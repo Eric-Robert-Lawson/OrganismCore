@@ -13,6 +13,7 @@ Access the OrganismCore code repository and updates:
 ### Discord
 Join the official OrganismCore Discord for discussions, questions, and collaboration:  
 [Discord Link](PLACEHOLDER)
+
 A community Discord for discussion and collaboration will be available soon. This link does not work yet and is a placeholder.
 
 ### LinkedIn
