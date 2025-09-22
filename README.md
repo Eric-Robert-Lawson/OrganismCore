@@ -81,6 +81,23 @@ f0(x)*Derivative(f1(x), x, x, x) + f1(x)*Derivative(f0(x), x, x, x) + 3*Derivati
 >>> k4[0]
 3.0*Derivative(f0(x), x)*Derivative(f0(x), x, x) + 3.0*Derivative(f0(x), x)*Derivative(f1(x), x, x) + 3.0*Derivative(f1(x), x)*Derivative(f0(x), x, x) + 3.0*Derivative(f1(x), x)*Derivative(f1(x), x, x)
 ```
+---
+
+## Community & Participation
+
+To engage with the OrganismCore community, follow updates, and collaborate, see [COMMUNITY.md](COMMUNITY.md).
+
+The community welcomes discussion, feedback, and collaboration.
+
+---
+
+## Support & Donations
+
+To support OrganismCore development or contribute to the personal fund for the author, see [DONATIONS.md](DONATIONS.md).
+
+- **Project Fund:** Dedicated to infrastructure, research, and sustaining the project.  
+- **Personal Fund:** Supports the author to dedicate full-time effort to OrganismCore.
+
 
 ---
 
