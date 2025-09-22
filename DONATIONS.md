@@ -13,9 +13,9 @@ There are two ways to contribute:
 
 | Cryptocurrency | Wallet Address |
 |----------------|----------------|
-| Bitcoin (BTC)  | `<PROJECT_BTC_ADDRESS>` |
-| Ethereum (ETH) | `<PROJECT_ETH_ADDRESS>` |
-| Solana (SOL)   | `<PROJECT_SOL_ADDRESS>` |
+| Bitcoin (BTC)  | `bc1qvytk9a20e7uztzg0leedq3kz0t0zteufmu7y4x` |
+| Ethereum (ETH) | `0xb72bDE53Bc6D4948FDf8D9178D42068E7d867976` |
+| Solana (SOL)   | `89V1PYoqmNzqd6hcEmLdQRwCQsqCxEsfNm9ou3oekUup` |
 
 *Use these wallets to support the project directly.*
 
@@ -25,9 +25,9 @@ There are two ways to contribute:
 
 | Cryptocurrency | Wallet Address |
 |----------------|----------------|
-| Bitcoin (BTC)  | `<PERSONAL_BTC_ADDRESS>` |
-| Ethereum (ETH) | `<PERSONAL_ETH_ADDRESS>` |
-| Solana (SOL)   | `<PERSONAL_SOL_ADDRESS>` |
+| Bitcoin (BTC)  | `bc1qj7djgywnavmf3y43hd9telx45f4utnpmphv79w` |
+| Ethereum (ETH) | `0x0F1d2E56CddA324564FCf95932Ef2aB0e2f58030` |
+| Solana (SOL)   | `HBP5Ui6uWiiN1QzhAW1rjUi2d12AocHN2XG3AN56rPhE` |
 
 *Use these wallets to support Eric Robert Lawson personally.*
 
