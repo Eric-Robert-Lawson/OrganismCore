@@ -7,9 +7,11 @@ import re
 # Eric Robert Lawson Copyright 2025
 
 """
-Getting Started:
+Getting Started
+===============
 
-1. Make sure this file is saved as DAG.py in your working directory.
+1. Make sure this file is saved as `DAG.py` in your working directory.
+
 2. Open Python in your command line or any Python shell:
 
     $ python
@@ -18,27 +20,51 @@ Getting Started:
 
     >>> import DAG
 
-4. Try the following trivial prototype examples:
+4. Try these simple prototype examples:
 
+# -------------------------------
 # Multinomial expansion example: (f_0(x) + f_1(x))^3
->>> k4 = DAG.multinomial_DAG(3, 2, 0, DAG.unordered_combinations)
->>> k4[0]
+# -------------------------------
+>>> result = DAG.multinomial_DAG(3, 2, 0, DAG.unordered_combinations)
+>>> result[0]
 3*f0(x)*f1(x)**2 + 3*f0(x)**2*f1(x) + f0(x)**3 + f1(x)**3
 
+# -------------------------------
 # n-th derivative example: 3rd derivative of (f_0(x)*f_1(x))
->>> k4 = DAG.multinomial_DAG(3, 2, 1, DAG.unordered_combinations)
->>> k4[0]
-f0(x)*Derivative(f1(x), x, x, x) + f1(x)*Derivative(f0(x), x, x, x) + 3*Derivative(f0(x), x)*Derivative(f1(x), x, x) + 3*Derivative(f1(x), x)*Derivative(f0(x), x, x)
+# -------------------------------
+>>> result = DAG.multinomial_DAG(3, 2, 1, DAG.unordered_combinations)
+>>> result[0]
+f0(x)*Derivative(f1(x), x, x, x) + f1(x)*Derivative(f0(x), x, x, x) + \
+3*Derivative(f0(x), x)*Derivative(f1(x), x, x) + 3*Derivative(f1(x), x)*Derivative(f0(x), x, x)
 
+# -------------------------------
 # Partial Bell polynomial example: B_{3,2}^f(x)
->>> k4 = DAG.predefined_bell_polynomial_DAG(0, 3, 2)
->>> k4[0]
+# -------------------------------
+>>> result = DAG.predefined_bell_polynomial_DAG(0, 3, 2)
+>>> result[0]
 3.0*Derivative(f0(x), x)*Derivative(f0(x), x, x)
 
+# -------------------------------
 # Convoluted partial Bell polynomial example: B_{3,2} over a=2 elements
->>> k4 = DAG.convoluted_partial_bell_polynomial(3, 2, 2)
->>> k4[0]
-3.0*Derivative(f0(x), x)*Derivative(f0(x), x, x) + 3.0*Derivative(f0(x), x)*Derivative(f1(x), x, x) + 3.0*Derivative(f1(x), x)*Derivative(f0(x), x, x) + 3.0*Derivative(f1(x), x)*Derivative(f1(x), x, x)
+# -------------------------------
+>>> result = DAG.convoluted_partial_bell_polynomial(3, 2, 2)
+>>> result[0]
+3.0*Derivative(f0(x), x)*Derivative(f0(x), x, x) + \
+3.0*Derivative(f0(x), x)*Derivative(f1(x), x, x) + \
+3.0*Derivative(f1(x), x)*Derivative(f0(x), x, x) + \
+3.0*Derivative(f1(x), x)*Derivative(f1(x), x, x)
+
+# -------------------------------
+# Further Resources
+# -------------------------------
+To understand more, see this rigorous mathematical paper:  
+https://doi.org/10.5281/zenodo.17290865
+
+I am also working on creating videos to provide additional guidance with these prototypes and next steps.
+
+Our main goal is to create a Domain-Specific Language (DSL) to fully unlock the potential of these RDUs.  
+Hopefully the requirements for this DSL are becoming clear — feel free to ask questions or contribute ideas!
+
 """
 
 def sub_dag_placement(n,q,DAG,layer,structural_ordering_and_pruning_fn):
@@ -586,3 +612,4 @@ def convoluted_partial_bell_polynomial(n,k,a):
     combinations_nk = sub_dag_placement(k,a,combinations_n,1,unordered_combinations_lesser_than) 
     k44=collect_from_layer(combinations_nk,1,subdag_prep_inv,compose_predefined_bell_polynomial_DAG,multiply_collect_nfactorial,add_transformation_fn,init_value=0)
     return k44
+
