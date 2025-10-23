@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use OrganismCore in your work, please cite it."
+title: "OrganismCore"
+version: "0.1.0"
+authors:
+  - family-names: "Lawson"
+    given-names: "Eric Robert"
+date-released: "2025-10-23"
+doi: "10.5281/zenodo.17429419"
+url: "https://github.com/Eric-Robert-Lawson/OrganismCore"
+keywords:
+  - "symbolic reasoning"
+  - "DAG"
+  - "Bell polynomials"
+  - "compositional reasoning"
+preferred-citation:
+  type: "software"
+  title: "OrganismCore"
+  authors:
+    - family-names: "Lawson"
+      given-names: "Eric Robert"
+  version: "0.1.0"
+  doi: "10.5281/zenodo.17429419"
+  url: "https://github.com/Eric-Robert-Lawson/OrganismCore"
