@@ -123,12 +123,23 @@ To support OrganismCore development or contribute to the personal fund for the a
 
 ---
 
-## License
+## License and project intent
 
-We use AGPLv3 to ensure improvements and hosted derivatives remain available to the community; OrganismCore aims to be a shared research substrate and we wish to avoid proprietary service forks.
+License: GNU Affero General Public License v3 (AGPLv3) — SPDX: AGPL-3.0-only. See [LICENSE](LICENSE) for the full text.
 
-See [LICENSE](LICENSE) for details. 
+We use AGPLv3 to ensure improvements and hosted derivatives remain available to the community. OrganismCore is intended to be a shared research substrate, and the AGPL helps prevent proprietary or centralized service forks that would hide improvements from the commons.
 
+Commercial licensing (optional)
+- AGPLv3 permits commercial use provided the license obligations are satisfied (including source disclosure for networked services).
+- If your organization cannot comply with AGPLv3 for operational or legal reasons (for example, closed SaaS, embedded proprietary products, or restrictive procurement rules), a negotiated commercial license is available. See [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) for the request process and typical timelines.
+
+Contributor / relicensing note
+- The public repository remains AGPLv3 for all users. If third‑party contributors have added code, relicensing those contributions may require their consent. To keep future governance and licensing options clear, please see [CONTRIBUTING.md](CONTRIBUTING.md) for contributor sign‑off guidance (DCO/CLA).
+
+Citation
+- If you use OrganismCore in research, please cite the repository or the project DOI/CITATION.cff (see [CITATION.cff](CITATION.cff) or the Zenodo badge in the repo).
+
+See [LICENSE](LICENSE) for details.
 ---
 
 ## Contribution
