@@ -1,0 +1,484 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{authblk}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\geometry{margin=1in}
+
+\title{Combinatorial Analysis on Bell Polynomials of a
+Product}
+
+\author{Eric Robert Lawson}
+\affil{Independent Researcher}
+
+\date{\today}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]   % or remove [section] if you don't want sectional numbering
+\newtheorem{lemma}[theorem]{Lemma}      % Lemma shares the theorem counter
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[theorem]  % resets definition number after each theorem
+\begin{document}
+
+\maketitle
+\begin{abstract}
+This paper presents a structural framework for understanding Bell Polynomials of the second kind through their decomposition over products of functions. Rather than treating the product as a single undifferentiated entity, we develop a method to express the complete and partial Bell Polynomials in terms of the individual functions composing the product. By introducing the generalized convoluted partial Bell Polynomial, the framework captures the combinatorial structure underlying the distribution of derivatives across product components. This approach reveals a convolution-type Faà di Bruno expansion that enables direct computation of higher-order derivatives of product and composite functions, offering both theoretical clarity and a foundation for computational implementation.
+\end{abstract}
+
+\section{Introduction}
+Bell Polynomials have many useful roles in mathematics, from uses including generating functions, defining many special functions and numbers, as well as having many other roles in different areas of mathematics. In this paper, we will be treating the complete Bell Polynomial as the nth derivative of an exponential function, or rather the coefficient of the Taylor series of $e^{G(x)}$, defined as
+\begin{equation*}
+    B_n^G(x) = e^{-G(x)} \frac{d^n}{dx^n} \left[e^{G(x)}\right]
+\end{equation*}
+The complete Bell Polynomial can also be defined in terms of partial Bell Polynomials
+\begin{equation*}
+    B_n^G(x) = \sum_{k=1}^n B_{n,k}^G(x)
+\end{equation*}
+The partial Bell Polynomial can also be explicitly defined:
+\begin{equation*}
+    B_{n,k}^G(x) = \sum_{Z} \frac{n!}{u_1! u_2! \cdots u_{n-k+1}!} \prod_{v=1}^{n-k+1} \left[\frac{G^{(v)}(x)}{v!}\right]^{u_v}
+\end{equation*}
+Where the sum \(Z\) runs through all possible combinations of non‑negative integers such that
+\[
+k = u_1 + u_2 + \cdots + u_{n-k+1}
+\quad\text{and}\quad
+n = u_1 + 2u_2 + \cdots + (n - k + 1)\,u_{n-k+1}.
+\]
+For more information on Bell polynomials, refer to [1].
+
+There are 2 important recurrence relations regarding the complete Bell Polynomial as well as the partial Bell Polynomial
+\begin{equation}
+    B_{n+1}^G(x) = G'(x)B_n^G(x) + \frac{d}{dx}\left[ B_n^G(x)\right]
+\end{equation}
+\begin{equation}
+    B_{n+1,k}^G(x) = G'(x)B_{n,k-1}^G(x) + \frac{d}{dx}\left[ B_{n,k}^G(x)\right]
+\end{equation}
+\begin{proof}
+    We begin by proving (1), which can be done by manipulating its definition
+\begin{align*}
+\frac{d^n}{dx^n} e^{f(x)} &= e^{f(x)} B^f_n(x) \\
+\frac{d^{n+1}}{dx^{n+1}} e^{f(x)} &= e^{f(x)} B^f_{n+1}(x) \\
+&= e^{f(x)}\bigl( f'(x) B^f_n(x) + \frac{d}{dx}[B^f_n(x)] \bigr) \therefore\\
+\quad B^f_{n+1}(x) &= f'(x) B^f_n(x) + \frac{d}{dx}[B^f_n(x)]
+\end{align*}
+In order to prove (2) we will be using Faà di Bruno’s formula using the same type of method used to prove (1)
+\begin{align*}
+\frac{d^n}{dx^n}\bigl[f(g(x))\bigr]
+&= \sum_{k=1}^{n} f^{(k)}\bigl(g(x)\bigr)\,B^{g}_{n,k}(x) \\[0.5em]
+\frac{d^{n+1}}{dx^{n+1}}\bigl[f(g(x))\bigr]
+&= \sum_{k=1}^{n+1} f^{(k)}\bigl(g(x)\bigr)\,B^{g}_{n+1,k}(x) \\[0.5em]
+&= \sum_{k=1}^{n} \Bigl(f^{(k+1)}\bigl(g(x)\bigr)\,g'(x)\,B^{g}_{n,k}(x)\Bigr)
+   + \sum_{k=1}^{n} f^{(k)}\bigl(g(x)\bigr)\,\frac{d}{dx}\!\bigl[B^{g}_{n,k}(x)\bigr] \\[0.5em]
+&= \sum_{k=2}^{n+1} f^{(k)}\bigl(g(x)\bigr)\,g'(x)\,B^{g}_{n,k-1}(x)
+   + \sum_{k=1}^{n} f^{(k)}\bigl(g(x)\bigr)\,\frac{d}{dx}\!\bigl[B^{g}_{n,k}(x)\bigr] \\[0.5em]
+&= \sum_{k=2}^{n} f^{(k)}\bigl(g(x)\bigr)\Bigl(g'(x)\,B^{g}_{n,k-1}(x)
+   + \tfrac{d}{dx}\!B^{g}_{n,k}(x)\Bigr)
+   + f^{(n+1)}\bigl(g(x)\bigr)\,g'(x)\,B^{g}_{n,n}(x) \\[0.5em]
+&\quad + f'(g(x))\,g^{(n+1)}(x)
+\end{align*}
+This expansion can then be used to prove (2)
+\begin{align*}
+\sum_{k=2}^{n} f^{(k)}\bigl(g(x)\bigr)\,B^{g}_{n+1,k}(x)
+&= \sum_{k=2}^{n} f^{(k)}\bigl(g(x)\bigr)\Bigl(g'(x)\,B^{g}_{n,k-1}(x)
+    + \frac{d}{dx}\!\bigl[B^{g}_{n,k}(x)\bigr]\Bigr) \\[0.5em]
+\therefore\quad B^{g}_{n+1,k}(x)
+&= g'(x)\,B^{g}_{n,k-1}(x) + \frac{d}{dx}\!\bigl[B^{g}_{n,k}(x)\bigr]
+\end{align*}
+For more information regarding Faà di Bruno’s formula, refer to [3].
+\end{proof}
+Let $\Lambda_a = \left(\lambda_1,\lambda_2,\ldots,\lambda_a\right)$ be a sequence of non-negative integers with $k$ parts. We denote the absolute value of the sequence $\Lambda_a$ to be defined as
+\begin{equation*}
+    |\Lambda_a| = \lambda_1+\lambda_2+\cdots+\lambda_a
+\end{equation*}
+We also denote the $\Lambda_a(m,-1)$ as $\Lambda_a(m,v) = (\lambda_1,\lambda_2,\ldots,\lambda_m+v,\ldots,\lambda_a)$ Where
+$v$ can be a negative or positive integer, thereby if $v$ is negative, this may allow terms in the sequence to be negative. We will denote the maximum of the sequence $\Lambda_a$ as $M(\Lambda_a)$.
+\bigskip
+\bigskip
+\section{The Complete Bell Polynomial}
+\begin{theorem}
+Let $G(x)$ be a product of real valued functions, denoted as $f_v(x)$, that are both continuous and differentiable, such that
+\begin{equation*}
+    G(x) = \prod_{v=1}^{a}f_v(x)
+\end{equation*}
+\begin{definition}
+Let $\Psi_a = (\psi_1,\psi_2,\ldots,\psi_a)$ and define the multinomial coefficient by 
+\[
+\binom{n}{\Psi_a} = \frac{n!}{\psi_1!\psi_2!\cdots \psi_a!}.
+\] 
+The generalized convoluted partial Bell Polynomial (GCPBP) is defined as
+\begin{equation*}
+    B_{n,k}^{\Lambda_a}(x) = \sum_{\substack{|\Psi_a|=n \\ \psi_v \ge 0}} \binom{n}{\Psi_a} \prod_{v=1}^a B_{\psi_v,\lambda_v}^{f_v}(x),
+\end{equation*}
+where the sum runs over all compositions $\Psi_a$ of $n$ into $a$ non-negative integers.
+\end{definition}
+
+\begin{definition}
+Let $\rho(k,\Lambda_a,j)$ be an integer defined by the following recurrence relation:
+\begin{align*}
+    \rho(k+1,\Lambda_a(m,1),j+1) &= (k-j-\lambda_m) \, \rho(k,\Lambda_a,j) + \rho(k,\Lambda_a,j+1).
+\end{align*}
+We can also define $\rho(k,\Lambda_a,j)$ at specific values of $j$, letting $q$ be a positive integer:
+\begin{align*}
+    \rho(k,\Lambda_a,0) &= 1, \\
+    \rho(k,\Lambda_a,k-M(\Lambda_a)+q) &= 0.
+\end{align*}
+\end{definition}
+With these definitions, we can now define the complete Bell Polynomial of a product
+\begin{equation*}
+    B_n^G(x) = \sum_{k=1}^n \sum_{|\Lambda_a|=k} \sum_{j=0}^{k-M(\Lambda_a)}\rho(k,\Lambda_a,j) B_{n,k}^{\Lambda_a}(x) \prod_{v=1}^a f_v^{k-j-\lambda_v} \tag{T2.1}
+\end{equation*}
+\end{theorem}
+\begin{lemma}
+Given a sequence $\Lambda_a$, the derivative of the GCPBP is
+\begin{equation*}
+    \frac{d}{dx}\left[B_{n,k}^{\Lambda_a}(x)\right] = B_{n+1,k}^{\Lambda_a}(x) - \sum_{m=1}^a f_m'(x) B_{n,k-1}^{\Lambda_a(m,-1)}(x).
+\end{equation*}
+\begin{proof}
+To prove Lemma 2.2, we differentiate Definition 2.1.1:
+\begin{align*}
+\frac{d}{dx}\left[B_{n,k}^{\Lambda_a}(x)\right] 
+&= \sum_{|\Psi_a|=n} \binom{n}{\Psi_a} \left(\prod_{v=1}^a B_{\psi_v,\lambda_v}^{f_v}(x)\right) \cdot 
+\left(\sum_{m=1}^a \frac{B_{\psi_m+1,\lambda_m}^{f_m}(x)}{B_{\psi_m,\lambda_m}^{f_m}(x)} - f_m'(x) \frac{B_{\psi_m,\lambda_m-1}^{f_m}(x)}{B_{\psi_m,\lambda_m}^{f_m}(x)} \right) \\
+&= \underbrace{\sum_{m=1}^a \sum_{|\Psi_a|=n} \binom{n}{\Psi_a} \frac{B_{\psi_m+1,\lambda_m}^{f_m}(x)}{B_{\psi_m,\lambda_m}^{f_m}(x)} \prod_{v=1}^{a}B_{\psi_v,\lambda_v}^{f_v}(x)}_{\text{(A)}} \\
+&\quad - \underbrace{\sum_{m=1}^a f_m'(x)\sum_{|\Psi_a|=n} \binom{n}{\Psi_a}\frac{B_{\psi_m,\lambda_m-1}^{f_m}(x)}{B_{\psi_m,\lambda_m}^{f_m}(x)} \prod_{v=1}^a B_{\psi_v,\lambda_v}^{f_v}(x)}_{\text{(B)}}.
+\end{align*}
+
+At this point, we evaluate what is taking place in terms of the sequences $\Psi_a$ for (A) and $\Lambda_a$ for (B), respectively.
+
+\textbf{(A) Increasing sequences:}  
+For any given sequence $\Psi_a$, we choose a term from the sequence and increase it by one, separately for each term. Doing this sums over every way to obtain $|\Psi_a| = n+1$, since each sequence incrementally accounts for all compositions of $n+1$ into $a$ non-negative integers.  
+
+Noting that for a sequence $\Psi_a'$ with $|\Psi_a'| = n+1$:
+\begin{equation*}
+    \binom{n+1}{\Psi_a'} = \sum_{m=1}^a \binom{n}{\Psi_a'(m,-1)},
+\end{equation*}
+we arrive at the combinatorial conclusion:
+\begin{equation*}
+    B_{n+1,k}^{\Lambda_a}(x) = \sum_{m=1}^a \sum_{|\Psi_a|=n}\binom{n}{\Psi_a} \frac{B_{\psi_m+1,\lambda_m}^{f_m}(x)}{B_{\psi_m,\lambda_m}^{f_m}(x)} \prod_{v=1}^a B_{\psi_v,\lambda_v}^{f_v}(x).
+\end{equation*}
+
+\textbf{(B) Decreasing sequences:}  
+For any given sequence $\Lambda_a$, we choose a term from the sequence and decrease it by 1, separately for each term. This effectively evaluates the GCPBP at $|\Lambda_a|-1 = k-1$ in terms of the sequence sum, while sequences that would produce negative indices default to zero.  
+
+It is important to note that we are not directly changing the sequence $\Lambda_a$ itself, but rather adjusting the way the GCPBP is evaluated for the given sequence. For a given $m$ and $\Lambda_a$, we evaluate the convoluted partial Bell polynomial with the sequence $\Lambda_a(m,-1)$, which allows subtraction from a positive integer within the sequence. This gives:
+\begin{equation*}
+\sum_{m=1}^a f_m'(x)B_{n,k-1}^{\Lambda_a(m,-1)}(x) = \sum_{m=1}^a f_m'(x) \sum_{|\Psi_a|=n} \binom{n}{\Psi_a} \frac{B_{\psi_m,\lambda_m-1}^{f_m}(x)}{B_{\psi_m,\lambda_m}^{f_m}(x)} \prod_{v=1}^a B_{\psi_v,\lambda_v}^{f_v}(x),
+\end{equation*}
+where any terms with negative indices in the Bell polynomials are understood to be zero by definition. This explains why the bounds in the second summation may appear mismatched.
+\end{proof}
+\end{lemma}
+
+\section{Proof of Theorem 2.1}
+To shorten notation, we will be using $f_v$ instead of $f_v(x)$, $G$ instead of $G(x)$, and we will be removing $(x)$ from partial and complete bell polynomials so some examples: $B_n^G$, $B_{n,k}^f$, and $B_{n,k}^{\Lambda_a}$ are used as short hand.
+
+By letting $G$ be a product of functions, we have the following property
+\begin{equation*}
+    G'=G\sum_{m=1}^a \frac{f_v'}{f_v}
+\end{equation*}
+By evaluating (1) in terms of the Theorem 2.1, a proof by induction can be obtained using (2) and Definition 2.1.2.
+\begin{proof}
+We begin the proof by evaluating each term in (1), considering the size of symbolic manipulations we will be doing here, I am going to strategically break down into smaller parts to then setup to fit into the proof to make it easy. 
+\begin{align*}
+G'B_n^G = \sum_{k=1}^n \sum_{|\Lambda_a|=k} \sum_{j=0}^{k-M(\Lambda_a)} \rho(k,\Lambda_a,j) B_{n,k}^{\Lambda_a} \left(\prod_{v=1}^af_v^{k-j-\lambda_v+1}\right) \sum_{m=1}^a \frac{f_m'}{f_m} \\
+= \sum_{k=1}^{n-1} \sum_{|\Lambda_a|=k} \sum_{j=0}^{k-M(\Lambda_a)-1} \rho(k,\Lambda_a,j+1) B_{n,k}^{\Lambda_a}\left(\prod_{v=1}^af_v^{k-j-\lambda_v}\right) \sum_{m=1}^a \frac{f_m'}{f_m}\\
++ G' \sum_{k=1}^n \sum_{|\Lambda_a|=k}B_{n,k}^{\Lambda_a} \left(\prod_{v=1}^af_v^{k-\lambda_v}\right)\\
++\sum_{|\Lambda_a|=n} \sum_{j=0}^{n-M(\Lambda_a)-1}\rho(n,\Lambda_a,j+1)B_{n,n}^{\Lambda_a} \left(\prod_{v=1}^af_v^{n-j-\lambda_v}\right)\sum_{m=1}^a \frac{f_m'}{f_m} \tag{P.1}
+\end{align*}
+We continue by differentiating Theorem 2.1, referring back to the proof of lemma 2.2, we denote $R(x)$ as the terms produced from differentiation part (B), leaving $R(x)$ to be evaluated later on, this will all make sense later.
+\begin{align*}
+\frac{d}{dx}\left[B_n^G\right] -R(x) = \sum_{k=1}^n \sum_{|\Lambda_a|=k} \sum_{j=0}^{k-M(\Lambda_a)}\rho(k,\Lambda_a,j)B_{n+1,k}^{\Lambda_a} \prod_{v=1}^a f_v^{k-j-\lambda_v} +\\
+\sum_{k=1}^n \sum_{|\Lambda_a|=k} \sum_{j=0}^{k-M(\Lambda_a)}\rho(k,\Lambda_a,j)B_{n,k}^{\Lambda_a}\left(\prod_{v=1}^a f_v^{k-j-\lambda_v}\right) \sum_{m=1}^a (k-j-\lambda_m)\frac{f_m'}{f_m} = \\
+\sum_{k=1}^n \sum_{|\Lambda_a|=k}\sum_{j=0}^{k-M(\Lambda_a)-1} \rho(k,\Lambda_a,j)B_{n,k}^{\Lambda_a}\left(\prod_{v=1}^a f_v^{k-j-\lambda_v}\right) \sum_{m=1}^a (k-j-\lambda_m)\frac{f_m'}{f_m}\\
++ \sum_{k=1}^n \sum_{|\Lambda_a|=k} \rho(k,\Lambda_a,k-M(\Lambda_a))B_{n,k}^{\Lambda_a}\left(\prod_{v=1}^a f_v^{M(\Lambda_a)-\lambda_v}\right) \sum_{m=1}^a (M(\Lambda_a)-\lambda_m)\frac{f_m'}{f_m}\\
++ \sum_{k=1}^n \sum_{|\Lambda_a|=k} \sum_{j=0}^{k-M(\Lambda_a)}\rho(k,\Lambda_a,j)B_{n+1,k}^{\Lambda_a} \prod_{v=1}^a f_v^{k-j-\lambda_v} \tag{P.2}
+\end{align*}
+We now take a look into the $R(x)$ term explicitly
+\begin{equation*}
+    R(x) = -\sum_{m=1}^af_m'\sum_{|\Lambda_a|=k} \sum_{j=0}^{k-M(\Lambda_a)}\rho(k,\Lambda_a,j)B_{n,k-1}^{\Lambda_a(m,-1)} \prod_{v=1}^a f_v^{k-j-\lambda_v}
+\end{equation*}
+We begin manipulating terms in $R(x)$, we will be shifting bounds on two summations, the $j$ and $k$ summation. Lets first start by shifting the $j$ summation. We will be going from $0 \le j \le k-M(\Lambda_a)$ to $-1 \le j-1 \le k-1-M(\Lambda_a)$. We will also remove the term $j=0$ from initial summation, so we are not considering $j=-1$
+
+\begin{align*}
+    -R(x) = \sum_{k=1}^n \sum_{|\Lambda_a|=k}\sum_{j=0}^{k-M(\Lambda_a)} \rho(k,\Lambda_a,j) \left(\sum_{m=1}^af_m'B_{n,k-1}^{\Lambda_a(m,-1)}\right)\prod_{v=1}^a f_v^{k-j-\lambda_v} \\
+    = \sum_{k=1}^n \sum_{|\Lambda_a|=k}\sum_{j=0}^{k-M(\Lambda_a)-1} \rho(k,\Lambda_a,j+1)\left(\sum_{m=1}^af_m'B_{n,k-1}^{\Lambda_a(m,-1)}\right) \prod_{v=1}^a f_v^{k-j-\lambda_v-1} \tag{A1}\\
+    +\sum_{k=1}^n \sum_{|\Lambda_a|=k}\left(\sum_{m=1}^af_m'B_{n,k-1}^{\Lambda_a(m,-1)}\right) \prod_{v=1}^a f_v^{k-\lambda_v}\tag{A2}
+\end{align*}
+Now that we have shifted $j$, we must now focus on fixing the $k$ parameter as well as shifting from $\Lambda_a(m,-1)$ to $\Lambda_a$. However this is not at all trivial and must be done with great care to ensure rigor. First lets start off simply and work our way up. Consider for both (A1) and (A2) at k=1 in summation, we will have $B_{n,0}$ which for $n>0$ is equal to $0$. Does this make sense? We refer back to Lemma 2.2, we see that if we let n=k=1, let $\Lambda_a$ be arbitrary we would have $|\Lambda_a|=1$ so therefore it would just be single derivative of whatever term is selected (denoted $m$). 
+\begin{equation*}
+\frac{d}{dx}\left[B_{1,1}^{\Lambda_a}\right] = \frac{d}{dx}\left[f_m'\right] = f_m'' = B_{2,1}^{\Lambda_a}-\sum_{m=1}^a f_m' B_{1,0}^{\Lambda_a(m,-1)} = f_m''-\sum_{m=1}^a f_m' B_{1,0}^{\Lambda_a(m,-1)}
+\end{equation*}
+Therefore $\sum_{m=1}^a f_m' B_{1,0}^{\Lambda_a(m,-1)}=0$, so we can just disregard the lower bound when shifting when $B_{n,0}$. However when we look further into shifting $k \xrightarrow{} k+1$ we notice there is the summation is now defined by $|\Lambda_a|=k+1$
+\begin{align*}
+    -R(x) = \sum_{k=1}^n \sum_{|\Lambda_a|=k}\sum_{j=0}^{k-M(\Lambda_a)-1} \rho(k,\Lambda_a,j+1)\left(\sum_{m=1}^af_m'B_{n,k-1}^{\Lambda_a(m,-1)}\right) \prod_{v=1}^a f_v^{k-j-\lambda_v-1} \tag{A1}\\
+    +\sum_{k=1}^n \sum_{|\Lambda_a|=k}\left(\sum_{m=1}^af_m'B_{n,k-1}^{\Lambda_a(m,-1)}\right) \prod_{v=1}^a f_v^{k-\lambda_v}\tag{A2} \\
+    = \sum_{k=1}^{n-1} \sum_{|\Lambda_a|=k+1}\sum_{j=0}^{k-M(\Lambda_a)} \rho(k+1,\Lambda_a,j+1)\left(\sum_{m=1}^af_m'B_{n,k}^{\Lambda_a(m,-1)}\right) \prod_{v=1}^a f_v^{k-j-\lambda_v} \\
+    +\sum_{k=1}^{n-1} \sum_{|\Lambda_a|=k+1}\left(\sum_{m=1}^af_m'B_{n,k}^{\Lambda_a(m,-1)}\right) \prod_{v=1}^a f_v^{k-\lambda_v+1}
+\end{align*}
+This is where things can get a bit more complicated. We have made the shift so that $|\Lambda_a|=k+1$, but I am dealing with GCPBP with the sequence $\Lambda_a(m,-1)$ and a coefficient with $\rho(k+1,\Lambda_a,j+1)$. What is preferred is if I can modify it so that we go to $|\Lambda_a|=k$ and we had $\rho(k+1,\Lambda_a(m,1),j+1)$ with the GCPBP being dependent on the sequence $\Lambda_a$. Consider the idea of changing perspectives, currently we have $|\Lambda_a| = k+1 = \sum_{q=1}^a\lambda_q$, therefore $k=-1+\sum_{q=1}^a \lambda_q$. Since for the summation $m$ we have already chosen $m$ to remove, is this not the same as choosing the $m$-th term in $\rho(k+1,\Lambda_a,j+1)$ and increasing it so that $\rho(k+1,\Lambda_a(m,1),j+1)$. In addition, since we are shifting also choosing $+1$ to chosen $m$ term in $\Lambda_a$, we also will have $f_m^{k-j-\lambda_m} \xrightarrow{} f_m^{k-j-\lambda_m-1} $ therefore it can be framed such that (allowing $\Lambda_a' = \Lambda_a(m,1)$)
+\begin{align*}
+\sum_{k=1}^{n-1} \sum_{|\Lambda_a|=k+1}\sum_{j=0}^{k-M(\Lambda_a)} \rho(k+1,\Lambda_a,j+1)\left(\sum_{m=1}^af_m'B_{n,k}^{\Lambda_a(m,-1)}\right) \prod_{v=1}^a f_v^{k-j-\lambda_v} \\
+    +\sum_{k=1}^{n-1} \sum_{|\Lambda_a|=k+1}\left(\sum_{m=1}^af_m'B_{n,k}^{\Lambda_a(m,-1)}\right) \prod_{v=1}^a f_v^{k-\lambda_v+1} = \\
+    \sum_{k=1}^{n-1} \sum_{|\Lambda_a|=k} B_{n,k}^{\Lambda_a}\left(\sum_{m=1}^a \sum_{j=0}^{k-M(\Lambda_a')}\frac{f_m'}{f_mG^j}\rho(k+1,\Lambda_a',j+1)\right) \prod_{v=1}^a f_v^{k-\lambda_v} \\
+    +G'\sum_{k=1}^{n-1} \sum_{|\Lambda_a|=k}\sum_{m=1}^a (1-\delta_{\lambda_m}^{M(\Lambda_a)})\rho(k+1,\Lambda_a',k-M(\Lambda_a')+1)B_{n,k}^{\Lambda_a}\frac{f_m'}{f_m}\prod_{v=1}^a f_v^{M(\Lambda_a')-\lambda_v}\\
+    +G\left(\sum_{m=1}^a\frac{f_m'}{f_m}\right)\sum_{k=1}^{n-1} \sum_{|\Lambda_a|=k}B_{n,k}^{\Lambda_a} \prod_{v=1}^a f_v^{k-\lambda_v} = -R(x) \tag{P.3}
+\end{align*}
+Using (P.1),(P.2), and (P.3); we are able to define $B_{n+1}^G$ using identity (1). We have from (P.1) we produce (C1), (C2), and (C3). From (P.2) we have (C4), (C5), and (C6). From (P.3) we have (C7)and (C8). For now we will leave the delta term out of this for now but we will bring back into it later! Please note this for later in proof.
+\begin{align*}
+B_{n+1}^G = \sum_{k=1}^{n-1} \sum_{|\Lambda_a|=k} \sum_{j=0}^{k-M(\Lambda_a)-1} \rho(k,\Lambda_a,j+1) B_{n,k}^{\Lambda_a}\left(\prod_{v=1}^af_v^{k-j-\lambda_v}\right) \sum_{m=1}^a \frac{f_m'}{f_m} \tag{C1}\\
++ G' \sum_{k=1}^n \sum_{|\Lambda_a|=k}B_{n,k}^{\Lambda_a} \left(\prod_{v=1}^af_v^{k-\lambda_v}\right)\tag{C2}\\
++\sum_{|\Lambda_a|=n} \sum_{j=0}^{n-M(\Lambda_a)-1}\rho(n,\Lambda_a,j+1)B_{n,n}^{\Lambda_a} \left(\prod_{v=1}^af_v^{n-j-\lambda_v}\right)\sum_{m=1}^a \frac{f_m'}{f_m} \tag{C3} \\
++\sum_{k=1}^n \sum_{|\Lambda_a|=k}\sum_{j=0}^{k-M(\Lambda_a)-1} \rho(k,\Lambda_a,j)B_{n,k}^{\Lambda_a}\left(\prod_{v=1}^a f_v^{k-j-\lambda_v}\right) \sum_{m=1}^a (k-j-\lambda_m)\frac{f_m'}{f_m}\tag{C4}\\
++ \sum_{k=1}^n \sum_{|\Lambda_a|=k} \rho(k,\Lambda_a,k-M(\Lambda_a))B_{n,k}^{\Lambda_a}\left(\prod_{v=1}^a f_v^{M(\Lambda_a)-\lambda_v}\right) \sum_{m=1}^a (M(\Lambda_a)-\lambda_m)\frac{f_m'}{f_m}\tag{C5}\\
++ \sum_{k=1}^n \sum_{|\Lambda_a|=k} \sum_{j=0}^{k-M(\Lambda_a)}\rho(k,\Lambda_a,j)B_{n+1,k}^{\Lambda_a} \prod_{v=1}^a f_v^{k-j-\lambda_v} \tag{C6} \\
+-\sum_{k=1}^{n-1} \sum_{|\Lambda_a|=k} B_{n,k}^{\Lambda_a}\left(\sum_{m=1}^a \sum_{j=0}^{k-M(\Lambda_a(m,1))}\frac{f_m'}{f_mG^j}\rho(k+1,\Lambda_a(m,1),j+1)\right) \prod_{v=1}^a f_v^{k-\lambda_v} \tag{C7}\\
+-G'\sum_{k=1}^{n-1} \sum_{|\Lambda_a|=k} B_{n,k}^{\Lambda_a}\prod_{v=1}^a f_v^{k-\lambda_v}\tag{C8}
+\end{align*}
+Lets begin by combining terms, you can see that (C1), (C4), and (C7) all share terms that can be combined. We must just consider the summation boundaries when combining!
+With (C1) we will keep these bounds where $1 \le k \le n-1$, $|\Lambda_a|=k$, and $0 \le j \le k-M(\Lambda_a)-1$. As for (C4) we will have to remove $k=n$ from outer summation to make $1 \le k \le n-1$ bounds. The term that gets created from this will be denoted (D1). For (C7) we will remove $j=k-M(\Lambda_a)$ from the inner $j$ summation so that $0\le j\le k-M(\Lambda_a)-1$. The extra term that is produced from this will be denoted (D2). We will combine the common terms from (C1),(C4), and (C7) together to create a function $\Theta(k,\Lambda_a,j,m)$ which includes the coefficient part of the terms to be evaluated later. 
+
+After doing this we have
+\begin{align*}
+    B_{n+1}^G = \sum_{k=1}^{n-1} \sum_{|\Lambda_a|=k} \sum_{j=0}^{k-M(\Lambda_a)-1}  B_{n,k}^{\Lambda_a}\left(\prod_{v=1}^af_v^{k-j-\lambda_v}\right) \sum_{m=1}^a \frac{f_m'}{f_m}\Theta(k,\Lambda_a,j,m) \tag{C1+C4-C7}\\
+    +G' \sum_{|\Lambda_a|=n}B_{n,n}^{\Lambda_a} \left(\prod_{v=1}^af_v^{n-\lambda_v}\right) \tag{C2-C8}\\
+    +\sum_{k=1}^n \sum_{|\Lambda_a|=k} \sum_{j=0}^{k-M(\Lambda_a)}\rho(k,\Lambda_a,j)B_{n+1,k}^{\Lambda_a} \prod_{v=1}^a f_v^{k-j-\lambda_v} \tag{C6}\\
+    +\sum_{|\Lambda_a|=n} \sum_{j=0}^{n-M(\Lambda_a)-1}\rho(n,\Lambda_a,j+1)B_{n,n}^{\Lambda_a} \left(\prod_{v=1}^af_v^{n-j-\lambda_v}\right)\sum_{m=1}^a \frac{f_m'}{f_m} \tag{C3}\\
+  + \sum_{k=1}^n \sum_{|\Lambda_a|=k} \rho(k,\Lambda_a,k-M(\Lambda_a))B_{n,k}^{\Lambda_a}\left(\prod_{v=1}^a f_v^{M(\Lambda_a)-\lambda_v}\right) \sum_{m=1}^a (M(\Lambda_a)-\lambda_m)\frac{f_m'}{f_m}\tag{C5}\\
+    - \sum_{k=1}^{n-1} \sum_{|\Lambda_a|=k} B_{n,k}^{\Lambda_a}\left(\sum_{m=1}^a\frac{f_m'}{f_m}\rho(k+1,\Lambda_a(m,1),k-M(\Lambda_a(m,1))+1)\right) \prod_{v=1}^a f_v^{M(\Lambda_a)-\lambda_v} \tag{D2}\\
+    +\sum_{|\Lambda_a|=n}\sum_{j=0}^{n-M(\Lambda_a)-1} \rho(n,\Lambda_a,j)B_{n,n}^{\Lambda_a}\left(\prod_{v=1}^a f_v^{n-j-\lambda_v}\right) \sum_{m=1}^a (n-j-\lambda_m)\frac{f_m'}{f_m} \tag{D1}
+\end{align*}
+We define $\Theta$ function in terms of $\rho$, which is equal to $0$ for $1\le k\le n-1$ and $0\le j\le k-M(\Lambda_a)-1$, we can apply definition 2.1.2 to know that theta is zero!
+\begin{align*}
+    \Theta(k,\Lambda_a,j,m) = \rho(k,\Lambda_a,j+1) + (k-j-\lambda_m)\rho(k,\Lambda_a,j) - \rho(k+1,\Lambda_a(m,1),j+1) = 0
+\end{align*}
+we also see that (C3) and (D1) can be combined using the same definition 2.1.2 and we get:
+\begin{align*}
+    \sum_{|\Lambda_a|=n} \sum_{j=0}^{n-M(\Lambda_a)-1} B_{n,n}^{\Lambda_a}\left(\prod_{v=1}^a f_v^{n-j-\lambda_v}\right) \sum_{m=1}^a \frac{f_m'}{f_m} \rho(n+1,\Lambda_a(m,1),j+1)
+\end{align*}
+and due to definition 2.1.2, we know that $(M(\Lambda_a)-\lambda_m)\rho(k,\Lambda_a,k-M(\Lambda_a))=\rho(k+1,\Lambda_a(m,1),k-M(\Lambda_a)+1)$ which leaves us with canceling (D2) and (C5) except for k=n in (C5). Note it is also important that we mention from (P.3) the extra term here cancels out at this part, which is a part of the combinatorial logic and only applies when we choose maximum value $m$.
+
+\begin{align*}
+    B_{n+1}^G = \sum_{|\Lambda_a|=n} \sum_{j=0}^{n-M(\Lambda_a)-1} B_{n,n}^{\Lambda_a}\left(\prod_{v=1}^a f_v^{n-j-\lambda_v}\right) \sum_{m=1}^a \frac{f_m'}{f_m} \rho(n+1,\Lambda_a(m,1),j+1)\\
+    +G' \sum_{|\Lambda_a|=n}B_{n,n}^{\Lambda_a} \left(\prod_{v=1}^af_v^{n-\lambda_v}\right)
+    +\sum_{k=1}^n \sum_{|\Lambda_a|=k} \sum_{j=0}^{k-M(\Lambda_a)}\rho(k,\Lambda_a,j)B_{n+1,k}^{\Lambda_a} \prod_{v=1}^a f_v^{k-j-\lambda_v}\\
+    + \sum_{|\Lambda_a|=n} \rho(n,\Lambda_a,n-M(\Lambda_a))B_{n,n}^{\Lambda_a}\left(\prod_{v=1}^a f_v^{M(\Lambda_a)-\lambda_v}\right) \sum_{m=1}^a (M(\Lambda_a)-\lambda_m)\frac{f_m'}{f_m}
+\end{align*}
+When we explicitly define $B_{n+1}^G$ and manipulate the expression, we obtain
+\begin{align*}
+\sum_{|\Lambda_a|=n+1}\sum_{j=0}^{n-M(\Lambda_a)+1}B_{n+1,n+1}^{\Lambda_a} \rho(n+1,\Lambda_a,j) \prod_{v=1}^a f_v^{n-j-\lambda_v+1} = \\
+\sum_{|\Lambda_a|=n} \sum_{j=0}^{n-M(\Lambda_a)}B_{n,n}^{\Lambda_a} \left(\prod_{v=1}^a f_v^{n-j-\lambda_v+1}\right) \sum_{m=1}^a \frac{f_m'}{f_m}\rho(n+1,\Lambda_a(m,1),j) \\
++\sum_{|\Lambda_a|=n} B_{n,n}^{\Lambda_a} \left(\prod_{v=1}^a f_v^{M(\Lambda_a)-\lambda_v}\right)\sum_{m=1}^a \frac{f_m'}{f_m} \rho(n,\Lambda_a,n-M(\Lambda_a))
+\end{align*}
+using definition 2.1.2 we obtain
+\begin{align*}
+    (M(\Lambda_a)-\lambda_m)\rho(n,\Lambda_a,n-M(\Lambda_a)) = \rho(n+1,\Lambda_a(m,1),n-M(\Lambda_a)+1) \therefore
+\end{align*}
+\begin{align*}
+\sum_{|\Lambda_a|=n+1}\sum_{j=0}^{n-M(\Lambda_a)+1}B_{n+1,n+1}^{\Lambda_a} \rho(n+1,\Lambda_a,j) \prod_{v=1}^a f_v^{n-j-\lambda_v+1} =\\
+\sum_{|\Lambda_a|=n}\sum_{j=0}^{n-M(\Lambda_a)+1} B_{n,n}^{\Lambda_a}\left(\prod_{v=1}^a f_v^{n-j-\lambda_v+1}\right)\sum_{m=1}^a \frac{f_m'}{f_m}\rho(n+1,\Lambda_a(m,1)
+\end{align*}
+this is shown in Lemma 2.2, letting $k=n+1$
+\end{proof}
+\section{Applications}
+T2.1 provides a way to evaluate the complete Bell Polynomial of a product
+in terms of its generating function, having an emphasis on discrete convolution
+aspects, providing a unique combinatorial perspective on Bell Polynomials. This
+allows us to evaluate the complete Bell Polynomial explicitly.
+\subsection{Evaluating for specific G(x)}
+Using T2.1, letting $a$ be a positive integer, the complete Bell Polynomial of $G(x)$ can be evaluated as
+\begin{align*}
+    B_n^G = \sum_{k=1}^n \sum_{|\Lambda_a|=k} \sum_{|\Psi_a|=n}\sum_{j=0}^{k-M(\Lambda_a)} \binom{n}{\Psi_a} \rho(k,\Lambda_a,j) G(x)^{k-j} \prod_{v=1}^{a} \frac{B_{\psi_v,\lambda_v}^{f_v}}{f_v^{\Lambda_v}}
+\end{align*}
+To express the partial Bell Polynomial of $f_v(x)$ explicitly, we can use the following methods developed by Kruchinin [3].
+\begin{align*}
+B_{n,k}^f(x) = \frac{n!}{k!}[z^n](f(x+z)-f(x))^k \tag{3}\\
+B_{n,k}^{f(g)}(x) = \sum_{j=k}^n B_{j,k}^f(x) B_{n,j}^g(x)\tag{4}
+\end{align*}
+These identities involve the "coefficient of" operator, denoted $[z^n]$, which represents
+\begin{align*}
+    [z^n]\sum_{k=1}^\infty a_k z^k = a_n
+\end{align*}
+additionally the following identity is valid
+\begin{align*}
+[z^n] \prod_{v=1}^a f_v(z) = \sum_{|\Psi_a|=n} \prod_{v=1}^a [z^{\psi_v}]f_v(z) \tag{5}
+\end{align*}
+
+\begin{proof}
+    Letting $G(x) = \prod_{v=1}^af_v(x)$ we define the following generating function
+    \begin{align*}
+        f_v(z) = \sum_{n=0}^\infty a_n^{(v)} z^n \\
+        G(z) = \sum_{n=0}^\infty A_n z^n
+    \end{align*}
+    We can multiply the generating functions and arrive at combinatorial sum
+    \begin{align*}
+        G(z) = \sum_{n=0}^\infty z^n \sum_{|\Psi_a|=n}\prod_{v=1}^a a_{\psi_v}^{(v)} = \sum_{n=0}^\infty A_n z^n
+    \end{align*}
+    Using the \textit{coefficient of} operator described in (5)
+    \begin{align*}
+        [z^n]G(z) = A_n = \sum_{|\Psi_a|=n}\prod_{v=1}^a a_{\psi_v}^{(v)}\\
+        =\sum_{|\Psi_a|=n} \prod_{v=1}^a [z^{\psi_v}] f_v(z)
+    \end{align*}
+\end{proof}
+It is interesting to consider when $a$ tends towards infinity, which implies an infinite product. This would allow for $G(x)$ to be any entire function that $n$-th order differentiation is possible. This may be evaluated further in a future paper.
+\section{Deriving identities regarding partial Bell Polynomials}
+It is possible to derive a formula for the partial Bell Polynomial as well using T2.1.
+\begin{theorem}
+    Letting $G(x)= \prod_{v=1}^a f_v(x)$ where $f_v(x)$ are real valued functions that are continuous and differentiable, we define the partial Bell Polynomial as
+    \begin{align*}
+        B_{n,k}^G(x) = \sum_{j=k}^n \sum_{|\Lambda_a|=j} \rho(j,\Lambda_a,j-k) B_{n,j}^{\Lambda_a}(x) \prod_{v=1}^a f_v(x)^{k-\lambda_v} \tag{T5.1}
+    \end{align*}
+\end{theorem}
+\begin{proof}
+    Using (3) and summing from $1 \le k' \le n$ we find
+    \begin{align*}
+        n![z^n] \sum_{k'=1}^n\frac{G(x)^{k'}}{(k')!}\left(\frac{G(x+z)}{G(x)}-1\right)^{k'} = 
+    \\
+    \sum_{k=1}^n \sum_{|\Lambda_a|=k}\sum_{j=0}^{k-M(\Lambda_a)}\rho(k,\Lambda_a,j) G(x)^{k-j}B_{n,k}^{\Lambda_a}(x) \prod_{v=1}^a f_v(x)^{-\lambda_v}
+    \end{align*}
+    By grouping the coefficients on the right hand side of the expression that are equal to a specific $k'$ value where we then obtain $B_{n,k'}^G(x)$. This is satisfied when we let $k'=k-j$, which results in
+    \begin{align*}
+        \frac{n!}{(k')!}[z^n]\left(\frac{G(x+z)}{G(x)}-1\right)^{k'} = \sum_{k=k'}^n \sum_{|\Lambda_a|=k} \rho(k,\Lambda_a,k-k')B_{n,k}^{\Lambda_a}(x) \prod_{v=1}^a f_v(x)^{\lambda_v} \tag{6}
+    \end{align*}
+    The left hand side of (6) can be simplified into $G(x)^{-k'}B_{n,k'}^G(x)$. By changing the summation index variable on the right hand side to $j$ rather than $k$, we obtain our desired result
+    \begin{align*}
+        B_{n,k}^G(x) = \sum_{j=k}^n \sum_{|\Lambda_a|=j} \rho(j,\Lambda_a,j-k) B_{n,j}^{\Lambda_a}(x) \prod_{v=1}^a f_v(x)^{k-\lambda_v}
+    \end{align*}
+\end{proof}
+When we apply this to Faà di Bruno’s formula we get a novel representations of the $n$-th order derivative of a composite function, which was proven in T5.1.
+\begin{theorem}
+ Let $G(x) = \prod_{v=1}^af_v(x)$ and $F(x)$ be differentiable and continuous, we find
+\begin{align*}
+\frac{d^n}{dx^n}[F(G(x))] = \sum_{k=1}^n F^{(k)}(G(x)) B_{n,k}^G(x) \\
+= \sum_{k=1}^n F^{(k)}(G(x)) \sum_{j=k}^n \sum_{|\Lambda_a|=j} \rho(j,\Lambda_a,j-k) B_{n,j}^{\Lambda_a}(x) \prod_{v=1}^a f_v(x)^{k-\lambda_v}
+\end{align*}
+\end{theorem}
+
+\subsection{Letting $G(x) = e^{ax}$}
+By letting $G(x) = e^{ax}$ and letting $f_v(x) = e^x$ we can apply Theorem 5.1.
+\begin{align*}
+    B_{n,k}^{e^{ax}}(x) = \sum_{j=k}^n \sum_{|\Lambda_a|=j} \rho(j,\Lambda_a,j-k) B_{n,j}^{\Lambda_a}(x) \prod_{v=1}^a e^{(k-\lambda_v)x}
+\end{align*}
+Since $f_v(x) = e^x$ for all $1\le v\le a$ using (3) and (5) to derive an identity.
+\begin{theorem}
+Letting $G(x) = f(x)^a$, where $f(x)$ is a real valued function that is continuous and differentiable, given a sequence $\Lambda_a$, we obtain
+
+\begin{align*}
+B_{n,j}^{\Lambda_a}(x) = \binom{j}{\Lambda_a}B_{n,j}^f(x)
+\end{align*}
+\begin{proof}
+Using Definition 2.1.1 and (3) we obtain
+\begin{align*}
+B_{n,j}^{\Lambda_a}(x) = \sum_{|\Psi_a|=n} \binom{n}{\Psi_a} \prod_{v=1}^a \frac{\psi_v!}{\lambda_v!}\big[z^{\psi_v}\big] (f(x+z)-f(x))^{\lambda_v} \\
+= \binom{n}{\Lambda_a} \sum_{|\Psi_a|=n} \prod_{v=1}^a \big[z^{\psi_v}\big](f(x+z)-f(x))^{\lambda_v}
+\end{align*}
+Due to (5), we can simplify the expression further since $\sum_{v=1}^a \lambda_v = j$
+\begin{align*}
+\sum_{|\Psi_a|=n}\prod_{v=1}^a \big[z^{\psi_v}\big](f(x+z)-f(x))^{\lambda_v} = \big[z^{n}\big](f(x+z)-f(x))^{j}
+\end{align*}
+Which brings us to our desired result
+\begin{align*}
+\binom{j}{\Lambda_a}\big[z^{n}\big](f(x+z)-f(x))^{j}=\binom{j}{\Lambda_a}B_{n,j}^f(x)
+\end{align*}
+\end{proof}
+When applying this to this example, we find
+\begin{align*}
+B_{n,k}^{e^{ax}}(x) = \sum_{j=k}^n \sum_{|\Lambda_a| = j} \binom{j}{\Lambda_a} \rho(j,\Lambda_a,j-k)B_{n,j}^{e^x}(x) e^{(ak-j)x}
+\end{align*}
+Using (3) we can define the partial Bell Polynomial explicitly
+\begin{align*}
+B_{n,k}^{e^{ax}}(x) = \frac{n!}{k!}e^{akx}\big[z^n\big](e^{az}-1)^k \\
+= \frac{n!}{k!}e^{akx}\sum_{v=0}^k \binom{k}{v} (-1)^{k-v}\big[z^n\big]e^{avz}\\
+\big[z^n\big]e^{avz} =  \sum_{m=0}^\infty \big[z^n\big] \frac{a^m v^m x^m}{m!} = \frac{a^n \cdot v^n}{n!} \therefore\\
+B_{n,k}^{e^{ax}}(x) = e^{akx} \frac{a^n}{k!} \sum_{v=0}^k \binom{k}{v} (-1)^{k-v}v^n = a^n e^{akx} \begin{Bmatrix} n \\ k \end{Bmatrix}
+\end{align*}
+Letting $x=0$, we are able to obtain both explicit expressions for the partial
+Bell Polynomials. When everything is simplified we are left with
+\begin{align*}
+B_{n,k}^{e^{ax}}(0) = a^n \begin{Bmatrix} n \\ k \end{Bmatrix} = \sum_{j=k}^n \begin{Bmatrix} n \\ j \end{Bmatrix} \sum_{|\Lambda_a|=j} \binom{j}{\Lambda_a} \rho(j,\Lambda_a,j-k)
+\end{align*}
+\end{theorem}
+\subsection{Letting $G(x) = f(x)^a$}
+By letting $G(x) = f(x)^a$, $f_v(x) = f(x)$ using Theorem 5.1 and 5.2, we obtain
+\begin{align*}
+B_{n,k}^{f(x)^a}(x) = \sum_{j=k}^{n} \sum_{|\Lambda_a|=j} \binom{j}{\Lambda_a} \rho(j,\Lambda_a,j-k) f(x)^{ak-j} B_{n,j}^f(x)
+\end{align*}
+By viewing $f(x)^a$ to be a composite function. We let $g(x) = x^a$ and $g(f(x)) = f(x)^a$. Using (4) we can derive 
+\begin{align*}
+ B_{n,k}^{f(x)^a}(x) = \sum_{j=k}^n B_{j,k}^{x^a}(f(x)) B_{n,j}^f(x)
+\end{align*}
+Using (3), we can explicitly define $B_{j,k}^{x^a}(x)$
+\begin{align*}
+B_{j,k}^{x^a}(x) = \frac{j!}{k!} \, f(x)^{a k} \, \big[ z^j \big] \, \Bigg( \Big( 1 + \frac{z}{f(x)} \Big)^a - 1 \Bigg)^k \\
+= \frac{j!}{k!} \, f(x)^{a k} \sum_{v=0}^k \binom{k}{v}(-1)^{k-v}  \, \big[ z^j \big] \, \Big( 1 + \frac{z}{f(x)} \Big)^{av} \\
+\big[ z^j \big] \, \Big( 1 + \frac{z}{f(x)} \Big)^{av} = \sum_{m=0}^{av} \binom{av}{m} \, \big[ z^j \big] \, \Big(\frac{z}{f(x)}\Big)^m = \binom{av}{j}f(x)^{-j} \therefore \\
+B_{j,k}^{x^a}(f(x)) = \frac{j!}{k!}f(x)^{ak-j}\sum_{v=0}^k \binom{k}{v} \binom{av}{j}(-1)^{k-v}
+\end{align*}
+We denote a new variable $\sigma(n,k,a)$, defined as
+\begin{align*}
+\sigma(n,k,a) = \sum_{v=0}^k \binom{k}{v} \binom{av}{j}(-1)^{k-v}
+\end{align*}
+By doing this we are left with the following expression
+\begin{align*}
+\sum_{j=k}^n f(x)^{ak-j}B_{n,j}^f(x) \frac{j!}{k!} \sigma(j,k,a) = \sum_{j=k}^n f(x)^{ak-j}B_{n,j}^f(x) \sum_{|\Lambda_a|=j} \binom{j}{\Lambda_a} \rho(j,\Lambda_a,j-k)
+\end{align*}
+Which leaves us with a unique representation for $\sigma(n,k,a)$
+\begin{align*}
+\frac{j!}{k!} \sigma(j,k,a)= \sum_{|\Lambda_a|=j} \binom{j}{\Lambda_a} \rho(j,\Lambda_a,j-k)
+\end{align*}
+
+\section{Software and Reproducibility}
+
+To facilitate reproducibility and enable further exploration of the combinatorial and symbolic reasoning framework presented in this work, we provide an open-source Python implementation of the Recursive DAG Unit (RDU) substrate. The software, \texttt{DAG.py}, encodes the combinatorial structures, multinomial expansions, $n$-th derivatives of product functions, and convoluted partial Bell polynomials discussed herein. Each node in the DAG represents a symbolic or structural unit of computation, and the layer-wise collection functions allow traceable aggregation of outputs across hierarchical reasoning layers.
+
+It is important to note that the DAG implementation provided is intended primarily as a demonstration of how convoluted partial Bell polynomials can be computed using the RDU substrate, and is not intended as a general symbolic computation library. Rather, this paper provides background and context for the concepts outlined in the open-source project, rather than serving as a direct interface for interacting with the results presented here.
+
+Key functionalities include:
+
+\begin{enumerate}
+    \item \textbf{Multinomial expansions and $n$-th derivatives}:
+    \begin{itemize}
+        \item Compute expansions of the form $(f_0(x) + f_1(x) + \dots + f_{k-1}(x))^n$.
+        \item Compute symbolic $n$-th derivatives of function products $f_0(x) \cdot f_1(x) \cdot \dots \cdot f_{k-1}(x)$.
+    \end{itemize}
+    
+    \item \textbf{Partial and convoluted Bell polynomials}:
+    \begin{itemize}
+        \item Generate $B_{n,k}^f(x)$ and their higher-dimensional convoluted forms.
+        \item Support experimentation with structural decompositions and domain-specific combinatorial ordering/pruning.
+    \end{itemize}
+    
+    \item \textbf{Layer-wise DAG collection}:
+    \begin{itemize}
+        \item Aggregate node-level computations using flexible \texttt{collect\_fn} and \texttt{transform\_func} functions.
+        \item Capture root-dependent and subdag-dependent symbolic reasoning in a modular framework.
+    \end{itemize}
+\end{enumerate}
+
+The code is structured to make the framework immediately usable for symbolic experimentation, while also serving as a concrete reference for the theoretical constructs introduced in this manuscript. The implementation is fully open-source, versioned, and citable:
+
+\begin{itemize}
+    \item \textbf{Zenodo DOI:} \href{https://doi.org/10.5281/zenodo.17180040}{10.5281/zenodo.17180040}
+    \item \textbf{GitHub repository:} \href{https://github.com/Eric-Robert-Lawson/OrganismCore/tree/main}{OrganismCore}
+\end{itemize}
+
+Readers are encouraged to explore and contribute to the associated open-source project. By importing DAG.py, users can reproduce the examples in this paper, extend computations to new symbolic constructs, or experiment with modifications to the RDU framework. Full documentation and example workflows are included within the code, providing a hands-on complement to the theoretical results presented here.
+
+
+\begin{thebibliography}{99}
+\bibitem{Comtet1974}
+Comtet, L. (1974).
+\newblock Bell Polynomials.
+\newblock In \textit{Advanced combinatorics: the art of finite and infinite expansions} (pp.\ 133--137).
+\newblock Dordrecht: D.\ Reidel Pub.
+
+\bibitem{Johnson2002}
+Johnson, W.P. (2002).
+\newblock The curious history of Faà di Bruno’s formula.
+\newblock \textit{The American Mathematical Monthly}, 109(3), 217-234.
+
+\bibitem{Kruchinin2011}
+Kruchinin, V. (2011).
+\newblock Derivation of Bell Polynomials of the Second Kind.
+\newblock \textit{arXiv preprint arXiv:1104.5065}
+\end{thebibliography}
+\end{document}
