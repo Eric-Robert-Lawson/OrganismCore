@@ -1,4 +1,3 @@
-```markdown
 # Commercial licensing — OrganismCore
 
 OrganismCore is published under the GNU Affero General Public License v3 (AGPLv3) to protect the public commons: changes and hosted derivatives that incorporate OrganismCore should remain available to the community. We recognize, however, that some organizations have operational, legal, or policy constraints that make AGPL obligations impractical for certain use cases (for example, closed SaaS offerings, embedded proprietary products, or restrictive procurement rules).
