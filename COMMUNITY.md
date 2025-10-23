@@ -28,8 +28,6 @@ Subscribe to updates, research notes, and writings on Substack:
 Read the full OrganismCore manifesto, outlining vision, principles, and research directions:  
 [Manifesto Link](https://doi.org/10.5281/zenodo.17180040)
 
-[Manifesto GitHub Link](The_Organism_Manifesto.pdf)
-
 ---
 
 ## Contribution & Participation
