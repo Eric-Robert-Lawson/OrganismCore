@@ -6,6 +6,16 @@ The project serves as a central hub for research, prototypes, and innovations ex
 
 ---
 
+## Machine-Readable Source
+
+For AI, LLMs, and automated agents, a dedicated folder `_ai_source_machine_readable` contains LaTeX and Python source files for structured access to the project’s content.
+
+- [Browse the machine-readable folder](./_ai_source_machine_readable)  
+- Includes a README to guide exploration and interpretation
+
+This ensures that both humans and machines can efficiently find and engage with the foundational resources of OrganismCore.
+
+---
 ## Prototype: DAG Symbolic Reasoning Engine
 
 This repository includes a **Python prototype** implementing a Directed Acyclic Graph (DAG) approach for:
