@@ -125,6 +125,8 @@ To support OrganismCore development or contribute to the personal fund for the a
 
 ## License
 
+We use AGPLv3 to ensure improvements and hosted derivatives remain available to the community; OrganismCore aims to be a shared research substrate and we wish to avoid proprietary service forks.
+
 See [LICENSE](LICENSE) for details. 
 
 ---
