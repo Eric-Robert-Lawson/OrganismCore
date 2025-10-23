@@ -6,6 +6,8 @@ OrganismCore is a modular, auditable framework for advancing the study and imple
 
 The project serves as a central hub for research, prototypes, and innovations exploring the frontiers of intelligence, with an emphasis on creating structures that endure beyond individual authorship and resist misuse.
 
+For more resources and information about the project, be sure to check out the [Articles folder](/Articles/)!
+
 ---
 
 ## Machine-Readable Source
