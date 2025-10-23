@@ -32,7 +32,7 @@ If your use case involves any of the above, a commercial license is likely the r
 To start the process please either:
 
 1. Open a new issue in this repository titled `Commercial licensing request`; or  
-2. Email: your-contact-email@example.com  (replace with your preferred contact address).
+2. Email: OrganismCore@proton.me
 
 When requesting a commercial license, please include the following information:
 - Organization name and primary point of contact (name & email)
@@ -83,7 +83,7 @@ This document is a project policy summary, not legal advice. For contract negoti
 ## Contact / next steps
 
 - Preferred public channel: open an issue titled `Commercial licensing request` in this repository so the request is tracked and acknowledged.  
-- Preferred private channel: OrganismCore@proton.me.
+- Preferred private channel: OrganismCore@proton.me
 
 We will respond promptly and outline next steps once we have basic details of the intended use.
 ```
