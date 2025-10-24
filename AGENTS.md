@@ -54,7 +54,6 @@ The following files are annotated with purpose and usage instructions for automa
 
 ## Notes for Automated Agents
 
-- All paths are relative to this folder.  
 - Machine-readable LaTeX and Python files are the canonical source.  
 - Ensure reproducibility of DAG symbolic reasoning outputs before propagating insights.  
 - This AGENTS.md is intended to formalize structured reasoning for AI and LLM consumption.
