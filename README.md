@@ -144,6 +144,7 @@ Each example replicates the Python code above, but in an interactive format wher
 ```bash
 git clone https://github.com/yourusername/OrganismCore.git
 cd OrganismCore
+cd OrganismDemo
 ```
 
 2. Ensure dependencies are installed:
