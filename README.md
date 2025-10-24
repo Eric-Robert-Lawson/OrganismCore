@@ -27,11 +27,12 @@ OrganismCore includes an **AGENTS.md** file located in the `_ai_source_machine_r
 ### How it works with GitHub Copilot
 
 1. **Open the repository** in an IDE or GitHub Codespace with Copilot enabled.  
-2. **Explore `_ai_source_machine_readable/AGENTS.md`** to understand the structured workflow for parsing LaTeX and Python source files.  
+2. **Explore `AGENTS.md`** to understand the structured workflow for parsing LaTeX and Python source files.  
 3. **Use Copilot Chat or inline suggestions** to query and analyze:  
    - Conceptual definitions (Reasoning DNA Units, combinatorial layering, POT generators, path traversal)  
    - Python prototypes (DAG symbolic reasoning engine, Bell polynomials, n-th derivatives)  
-   - Connections between manifesto principles, conceptual documents, and executable code  
+   - Connections between manifesto principles, conceptual documents, and executable code
+4. **Ensure you include references to the /Articles/_ai_source_machine_readable folder** to ensure context is understood with AGENTS.md
 
 ### Benefits
 
