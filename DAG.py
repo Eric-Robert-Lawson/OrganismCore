@@ -34,7 +34,7 @@ Getting Started
 # -------------------------------
 >>> result = DAG.multinomial_DAG(3, 2, 1, DAG.unordered_combinations)
 >>> result[0]
-f0(x)*Derivative(f1(x), x, x, x) + f1(x)*Derivative(f0(x), x, x, x) + \
+f0(x)*Derivative(f1(x), x, x, x) + f1(x)*Derivative(f0(x), x, x, x) + 
 3*Derivative(f0(x), x)*Derivative(f1(x), x, x) + 3*Derivative(f1(x), x)*Derivative(f0(x), x, x)
 
 # -------------------------------
@@ -612,4 +612,5 @@ def convoluted_partial_bell_polynomial(n,k,a):
     combinations_nk = sub_dag_placement(k,a,combinations_n,1,unordered_combinations_lesser_than) 
     k44=collect_from_layer(combinations_nk,1,subdag_prep_inv,compose_predefined_bell_polynomial_DAG,multiply_collect_nfactorial,add_transformation_fn,init_value=0)
     return k44
+
 
