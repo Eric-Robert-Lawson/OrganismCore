@@ -117,6 +117,48 @@ f0(x)*Derivative(f1(x), x, x, x) + f1(x)*Derivative(f0(x), x, x, x) + 3*Derivati
 >>> k4[0]
 3.0*Derivative(f0(x), x)*Derivative(f0(x), x, x) + 3.0*Derivative(f0(x), x)*Derivative(f1(x), x, x) + 3.0*Derivative(f1(x), x)*Derivative(f0(x), x, x) + 3.0*Derivative(f1(x), x)*Derivative(f1(x), x, x)
 ```
+
+---
+
+## Demo Walkthrough
+
+To make experimentation even easier, a fully runnable Jupyter Notebook `demo.ipynb` is included in this repository.
+
+### Contents of `demo.ipynb`:
+
+1. **Multinomial expansion**  
+2. **n-th derivative of function products**  
+3. **Partial Bell polynomial**  
+4. **Convoluted partial Bell polynomial**
+
+Each example replicates the Python code above, but in an interactive format where you can:
+
+- Modify function orders or numbers of functions.
+- Experiment with different DAG compositions.
+- Trace symbolic outputs and see how the combinatorial reasoning unfolds.
+
+### Running the Demo:
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/OrganismCore.git
+cd OrganismCore
+```
+
+2. Ensure dependencies are installed:
+
+```bash
+pip install -r requirements.txt
+```
+
+3. Launch the notebook:
+```bash
+jupyter notebook demo.ipynb
+
+```
+This interactive demo provides a guided experience of the DAG symbolic reasoning engine and demonstrates the key combinatorial and symbolic reasoning patterns in action.
+
 ---
 
 ## Community & Participation
