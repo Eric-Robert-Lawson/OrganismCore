@@ -22,7 +22,7 @@ This ensures that both humans and machines can efficiently find and engage with 
 ---
 ## Using AGENTS.md with GitHub Copilot
 
-OrganismCore includes an **AGENTS.md** file located in the `_ai_source_machine_readable` folder. This file is designed to **guide AI, LLMs, and automated agents** in interpreting the project’s conceptual and prototype content.
+OrganismCore includes an **AGENTS.md** file located in the top level of the project. This file is designed to **guide AI, LLMs, and automated agents** in interpreting the project’s conceptual and prototype content.
 
 ### How it works with GitHub Copilot
 
@@ -32,7 +32,7 @@ OrganismCore includes an **AGENTS.md** file located in the `_ai_source_machine_r
    - Conceptual definitions (Reasoning DNA Units, combinatorial layering, POT generators, path traversal)  
    - Python prototypes (DAG symbolic reasoning engine, Bell polynomials, n-th derivatives)  
    - Connections between manifesto principles, conceptual documents, and executable code
-4. **Ensure you include references to the /Articles/_ai_source_machine_readable folder** to ensure context is understood with AGENTS.md
+4. **Ensure you include references to the /Articles/_ai_source_machine_readable folder** to ensure the folder content's context is understood with AGENTS.md
 
 ### Benefits
 
