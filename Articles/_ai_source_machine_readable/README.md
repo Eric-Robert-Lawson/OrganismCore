@@ -22,6 +22,7 @@ To help machines navigate this folder, each file is annotated with its purpose a
 | File | Purpose / Context |
 |------|-----------------|
 | [`Practical_Intro_RDUs.tex`](/Articles/_ai_source_machine_readable/Practical_Intro_RDUs.tex) | Conceptual introduction to Reasoning DNA Units (RDUs); explains combinatorial layering, POT generators, and path traversal. |
+| [`multinomial_relation_document.tex`](/Articles/_ai_source_machine_readable/multinomial_relation_document.tex) | Detailed explanation of Python prototypes; links multinomial structures, higher-order derivatives, Bell polynomials, and RDUs; introduces the POT generator functions link with intended operations and emergent non-linear relations. |
 | [`Prototype_python_code.py`](/Articles/_ai_source_machine_readable/Prototype_python_code.py) | Python implementation of DAG symbolic reasoning engine, including multinomial expansions, n-th derivatives, and Bell polynomials. |
 | [`Prototype_mathematical_reference.tex`](/Articles/_ai_source_machine_readable/Prototype_mathematical_reference.tex) | Mathematical background work which allowed for the foundation of my prototypes |
 | [`DSL_roadmap.tex`](/Articles/_ai_source_machine_readable/DSL_roadmap.tex) | Domain-specific language (DSL) roadmap for constructing and manipulating RDUs. |
