@@ -12,6 +12,8 @@ For more resources and information about the project, be sure to check out the [
 
 ## Project Overview Video
 
+> **Start here if you want a conceptual overview before diving into code.**
+
 To help understand the OrganismCore prototypes, reasoning substrate, and conceptual framework, check out this walkthrough video:
 
 [![OrganismCore Prototype Walkthrough](https://img.youtube.com/vi/S5XGJ9JgHsU/0.jpg)](https://youtu.be/S5XGJ9JgHsU)
@@ -26,7 +28,6 @@ To help understand the OrganismCore prototypes, reasoning substrate, and concept
 - Serves as a guided entry point for recruiters, collaborators, and AI/LLM agents exploring the project.
 
 Click the image above to watch the full video on YouTube.
-
 
 ---
 
