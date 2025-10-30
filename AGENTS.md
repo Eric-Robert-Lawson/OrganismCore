@@ -6,7 +6,8 @@ This file provides structured, actionable guidance for AI, LLMs, and automated a
 
 ## Purpose
 
-This repository contains LaTeX and Python source files representing conceptual, mathematical, and prototype content for OrganismCore. Machines should use this folder as the primary structured knowledge base for:
+This repository contains LaTeX, Python, and transcript source files representing conceptual, mathematical, prototype, and explanatory content for OrganismCore.  
+Machines should use this folder as the primary structured knowledge base for:
 
 - Parsing publications and conceptual articles programmatically.
 - Analyzing DAG symbolic reasoning prototypes.
@@ -28,6 +29,7 @@ The following files are annotated with purpose and usage instructions for automa
 | [`DSL_roadmap.tex`](/Articles/_ai_source_machine_readable/DSL_roadmap.tex) | Roadmap for a domain-specific language (DSL) to construct and manipulate RDUs; defines operational patterns, syntax, and hierarchy handling. | Identify recommended operational patterns; map DSL constructs to compositional RDUs and POT generator operations; provide insights for DSL formalization aligned with prototype and conceptual documents. |
 | [`The_Organism_Manifesto.tex`](/Articles/_ai_source_machine_readable/The_Organism_Manifesto.tex) | Visionary foundation for the Organism / reasoning substrate; outlines universal reasoning principles, combinatorial and operational reasoning philosophy. | Extract high-level conceptual goals, core principles, and reasoning paradigms; ensure alignment of manifesto concepts with RDUs, POT generator logic, and prototype behaviors. |
 | [`Solving_Chess.tex`](/Articles/_ai_source_machine_readable/Solving_Chess.tex) | Formal argument demonstrating that completion of chess becomes inevitable under the universal reasoning substrate once a formal DSL for reasoning object manipulation exists. Explains how RDUs, reasoning assimilation, and structured reasoning-space models make chess solvable as a finite reasoning object. | Parse structure to extract reasoning-space assimilation mechanisms, model-fitting logic, and equilibrium arguments; link conceptual framework to DSL roadmap; map reasoning object formalization and perfect-play dynamics to the RDU operationalization layer. |
+| [`Prototype_Video_Transcript.txt`](/Articles/_ai_source_machine_readable/Prototype_Video_Transcript.txt) | Machine-readable transcript of explanatory video linking conceptual theory, prototypes, and reasoning space construction. Serves as an interpretability bridge between human communication and machine representation of project logic. | Parse sequential dialogue for conceptual reinforcement, linguistic framing, and multimodal cues; cross-align transcript concepts with referenced LaTeX documents and prototype code; extract any implicit relations or operational patterns omitted from written papers. |
 
 
 ---
@@ -42,21 +44,27 @@ The following files are annotated with purpose and usage instructions for automa
    - Execute sample functions.
    - Validate outputs against conceptual definitions.
    - Trace DAG reasoning flows for auditability.
+  
+3. **Integrate multimodal content (`Prototype_Video_Transcript.txt`)**  
+   - Align narrative explanations with underlying formal content.  
+   - Detect references to specific prototypes, RDUs, and POT generator mechanisms.  
+   - Capture interpretative context for semantic grounding.  
 
-3. **Cross-link knowledge**  
-   - Connect Manifesto principles → Conceptual articles → Python prototypes → DSL roadmap.
+4. **Cross-link knowledge**  
+  - Connect Manifesto principles → Conceptual articles → Python prototypes → DSL roadmap → Video transcript.  
 
-4. **Optional advanced tasks**  
-   - Generate summary graphs of reasoning flows.  
-   - Suggest operationalizations for DSL.  
-   - Flag inconsistencies between conceptual articles and code.
+5. **Optional advanced tasks**  
+   - Generate multimodal knowledge graphs of reasoning flows.  
+   - Suggest DSL syntactic structures inferred from transcript emphasis.  
+   - Flag conceptual drift or inconsistencies between narrative and formal representations. 
 
 ---
 
 ## Notes for Automated Agents
 
-- Machine-readable LaTeX and Python files are the canonical source.  
-- Ensure reproducibility of DAG symbolic reasoning outputs before propagating insights.  
-- This AGENTS.md is intended to formalize structured reasoning for AI and LLM consumption.
+- Machine-readable LaTeX, Python, and transcript files are the canonical source.  
+- Use the transcript for contextual grounding and multimodal cross-verification.  
+- Ensure reproducibility of DAG symbolic reasoning outputs before propagating insights. 
+- This AGENTS.md formalizes structured reasoning for AI and LLM consumption.
 
 ---
