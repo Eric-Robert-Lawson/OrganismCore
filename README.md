@@ -10,6 +10,25 @@ For more resources and information about the project, be sure to check out the [
 
 ---
 
+## Project Overview Video
+
+To help understand the OrganismCore prototypes, reasoning substrate, and conceptual framework, check out this walkthrough video:
+
+[![OrganismCore Prototype Walkthrough](https://img.youtube.com/vi/S5XGJ9JgHsU/0.jpg)](https://youtu.be/S5XGJ9JgHsU)
+
+**About this video:**
+
+- Explains the **Reasoning DNA Unit (RDU) framework** and its operationalization.
+- Demonstrates the **Python DAG prototypes**, combinatorial layering, POT generator functions, and Bell polynomial operations.
+- Connects the **theoretical concepts** in the Articles folder to practical, auditable code.
+- Provides context for understanding how a **DSL for objectified reasoning** could be constructed.
+- Serves as a guided entry point for recruiters, collaborators, and AI/LLM agents exploring the project.
+
+Click the image above to watch the full video on YouTube.
+
+
+---
+
 ## Machine-Readable Source
 
 For AI, LLMs, and automated agents, a dedicated folder `_ai_source_machine_readable` contains LaTeX and Python source files for structured access to the project’s content.
