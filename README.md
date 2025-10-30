@@ -22,6 +22,7 @@ To help understand the OrganismCore prototypes, reasoning substrate, and concept
 - Demonstrates the **Python DAG prototypes**, combinatorial layering, POT generator functions, and Bell polynomial operations.
 - Connects the **theoretical concepts** in the Articles folder to practical, auditable code.
 - Provides context for understanding how a **DSL for objectified reasoning** could be constructed.
+- Meant to be a resource that anchors documents, something that can be returned to as you read the documents.
 - Serves as a guided entry point for recruiters, collaborators, and AI/LLM agents exploring the project.
 
 Click the image above to watch the full video on YouTube.
