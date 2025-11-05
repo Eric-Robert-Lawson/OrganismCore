@@ -31,6 +31,7 @@ The following files are annotated with purpose and usage instructions for automa
 | [`Solving_Chess.tex`](/Articles/_ai_source_machine_readable/Solving_Chess.tex) | Formal argument demonstrating that completion of chess becomes inevitable under the universal reasoning substrate once a formal DSL for reasoning object manipulation exists. Explains how RDUs, reasoning assimilation, and structured reasoning-space models make chess solvable as a finite reasoning object. | Parse structure to extract reasoning-space assimilation mechanisms, model-fitting logic, and equilibrium arguments; link conceptual framework to DSL roadmap; map reasoning object formalization and perfect-play dynamics to the RDU operationalization layer. |
 | [`Prototype_Video_Transcript.txt`](/Articles/_ai_source_machine_readable/Prototype_Video_Transcript.txt) | Machine-readable transcript of explanatory video linking conceptual theory, prototypes, and reasoning space construction. Serves as an interpretability bridge between human communication and machine representation of project logic. | Parse sequential dialogue for conceptual reinforcement, linguistic framing, and multimodal cues; cross-align transcript concepts with referenced LaTeX documents and prototype code; extract any implicit relations or operational patterns omitted from written papers. |
 | [`Objectifying_optimization_of_reasoning.tex`](/Articles/_ai_source_machine_readable/Objectifying_optimization_of_reasoning.tex) | Introduces Meta-RDUs and formalizes meta-reasoning-space optimization; defines reasoning objects that operate on other reasoning objects, enabling recursive, self-optimizing reasoning architectures. Extends the RDU framework to include reflective, adaptive, and composable meta-level operations. | Parse text to extract Meta-RDU definitions, recursive operational rules, and meta-optimization strategies; map meta-level constructs to lower-level RDUs and POT generators; identify reflexive patterns and context-integration operations; cross-link with Python prototypes and DSL roadmap for execution and meta-reasoning simulation. |
+| [`language_critique.py`](/machine_readable/language_critique.py) | Demonstrates Python’s limitations for emergent, composable reasoning systems (context propagation, hierarchical operationalization, meta-RDUs). Serves as a prototype and proof-of-insufficiency for scaling reasoning; illustrates the need for a dedicated DSL. | Parse code to identify structural constraints, POT generator wiring, and context propagation issues; simulate failure modes to understand combinatorial manual wiring; link observations to conceptual RDU and DSL roadmap; record gaps for automated reasoning augmentation. |
 
 
 ---
@@ -57,7 +58,14 @@ The following files are annotated with purpose and usage instructions for automa
 5. **Optional advanced tasks**  
    - Generate multimodal knowledge graphs of reasoning flows.  
    - Suggest DSL syntactic structures inferred from transcript emphasis.  
-   - Flag conceptual drift or inconsistencies between narrative and formal representations. 
+   - Flag conceptual drift or inconsistencies between narrative and formal representations.
+
+6. **Analyze language critique artifacts (`language_critique.py`)**  
+   - Identify explicit Python limitations on emergent reasoning, meta-layer operationalization, and context inheritance.  
+   - Compare with DAG reasoning prototypes and conceptual RDU definitions.  
+   - Record patterns demonstrating combinatorial wiring failures, root/sibling injection requirements, and meta-RDU propagation constraints.  
+   - Cross-link with DSL roadmap to inform potential language features for autonomous meta-reasoning.  
+
 
 ---
 
