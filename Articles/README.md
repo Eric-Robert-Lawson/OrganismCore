@@ -46,4 +46,4 @@ They form a bridge between **thought, implementation, and interpretation** — e
 ---
 
 **Last updated:** October 2025  
-**Project:** [OrganismCore on GitHub](https://github.com/EricRLawson/OrganismCore)
+**Project:** [OrganismCore on GitHub](https://github.com/Eric-Robert-Lawson/OrganismCore)
