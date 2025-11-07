@@ -33,7 +33,7 @@ Click the image above to watch the full video on YouTube.
 
 ## Machine-Readable Source
 
-For AI, LLMs, and automated agents, a dedicated folder `_ai_source_machine_readable` contains LaTeX and Python source files for structured access to the project’s content.
+For AI, LLMs, and automated agents, a dedicated folder `_ai_source_machine_readable` contains source files for structured access to the project’s content.
 
 - [Browse the machine-readable folder](/Articles/_ai_source_machine_readable)  
 - Includes a README to guide exploration and interpretation
@@ -53,7 +53,7 @@ OrganismCore includes an **AGENTS.md** file located in the top level of the proj
    - Conceptual definitions (Reasoning DNA Units, combinatorial layering, POT generators, path traversal)  
    - Python prototypes (DAG symbolic reasoning engine, Bell polynomials, n-th derivatives)  
    - Connections between manifesto principles, conceptual documents, and executable code
-4. **Ensure you include references to the /Articles/_ai_source_machine_readable folder** to ensure the folder content's context is understood with AGENTS.md
+4. **Ensure you include references to the /Articles/_ai_source_machine_readable folder** to ensure the folder content's context is understood with AGENTS.md. It is also important to note that you should manually select the files, exclude the README.md within the directory! If this directory contains more than 20 references, then you must select the references that matter most for you to interpret or develop a strategy for including full project context using this method. (such as selective and narrower approach to selecting the references and understanding the project)
 
 ### Benefits
 
@@ -61,10 +61,10 @@ OrganismCore includes an **AGENTS.md** file located in the top level of the proj
 - AGENTS.md makes the **project machine-accessible**, improving discoverability, reproducibility, and structured comprehension.  
 - Copilot references files **directly in the repo**, providing a guided, context-aware experience of your symbolic reasoning framework.  
 
-> Note: This workflow currently works best with GitHub Copilot or Copilot Chat. Without Copilot, AGENTS.md serves as a structured human-readable guide.
+> Note: This workflow currently works best with GitHub Copilot or Copilot Chat. Methods such as ChatGPT with code access work as well, but the basis is that the agent has access to AGENTS.md and the source files for machine readability. This should NOT be replaced with actually parsing the repo yourself, it should be used as a tool to help make the project more accessible! Make it easier to determine whether the project is worth your time!
 
 ---
-## Prototype: DAG Symbolic Reasoning Engine
+## Prototype: DAG Reasoning DNA Unit proof of concept - Objectification and Operationalization
 
 This repository includes a **Python prototype** implementing a Directed Acyclic Graph (DAG) approach for:
 
@@ -72,7 +72,7 @@ This repository includes a **Python prototype** implementing a Directed Acyclic 
 - **n-th derivatives of function products**  
 - **Partial and convoluted Bell polynomials**  
 
-The DAG structure allows **auditable, composable reasoning**, where each node represents a combinatorial or symbolic computation step.
+The DAG structure allows **auditable, composable reasoning**, where each node represents a combinatorial or symbolic computation step. This is a proof of concept that reasoning can be objectified and operationalized, despite the lack of a domain specific language dedicated to doing so.
 
 ---
 
