@@ -55,6 +55,11 @@ OrganismCore includes an **AGENTS.md** file located in the top level of the proj
    - Connections between manifesto principles, conceptual documents, and executable code
 4. **Ensure you include references to the /Articles/_ai_source_machine_readable folder** to ensure the folder content's context is understood with AGENTS.md. It is also important to note that you should manually select the files, exclude the README.md within the directory! If this directory contains more than 20 references, then you must select the references that matter most for you to interpret or develop a strategy for including full project context using this method. (such as selective and narrower approach to selecting the references and understanding the project)
 
+### Video Tutorial
+[![Machine-Readable Repositories: How AI Can Instantly Understand Your Research Project](https://img.youtube.com/vi/c3MNIpZThhw/0.jpg)](https://youtu.be/c3MNIpZThhw)
+
+> [Click here to view the whole chat from the video, get the overview yourself or use copilot yourself! (This is dated from 11/07/2025)](https://github.com/copilot/share/084c5312-4804-88b7-8901-e00da016684b)
+
 ### Benefits
 
 - **Recruiters, collaborators, and reviewers** can interactively explore the repository with AI assistance.  
