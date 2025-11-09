@@ -32,6 +32,8 @@ The following files are annotated with purpose and usage instructions for automa
 | [`Prototype_Video_Transcript.txt`](/Articles/_ai_source_machine_readable/Prototype_Video_Transcript.txt) | Machine-readable transcript of explanatory video linking conceptual theory, prototypes, and reasoning space construction. Serves as an interpretability bridge between human communication and machine representation of project logic. | Parse sequential dialogue for conceptual reinforcement, linguistic framing, and multimodal cues; cross-align transcript concepts with referenced LaTeX documents and prototype code; extract any implicit relations or operational patterns omitted from written papers. |
 | [`Objectifying_optimization_of_reasoning.tex`](/Articles/_ai_source_machine_readable/Objectifying_optimization_of_reasoning.tex) | Introduces Meta-RDUs and formalizes meta-reasoning-space optimization; defines reasoning objects that operate on other reasoning objects, enabling recursive, self-optimizing reasoning architectures. Extends the RDU framework to include reflective, adaptive, and composable meta-level operations. | Parse text to extract Meta-RDU definitions, recursive operational rules, and meta-optimization strategies; map meta-level constructs to lower-level RDUs and POT generators; identify reflexive patterns and context-integration operations; cross-link with Python prototypes and DSL roadmap for execution and meta-reasoning simulation. |
 | [`language_critique.py`](/Articles/_ai_source_machine_readable/language_critique.py) | Demonstrates Python’s limitations for emergent, composable reasoning systems (context propagation, hierarchical operationalization, meta-RDUs). Serves as a prototype and proof-of-insufficiency for scaling reasoning; illustrates the need for a dedicated DSL. | Parse code to identify structural constraints, POT generator wiring, and context propagation issues; simulate failure modes to understand combinatorial manual wiring; link observations to conceptual RDU and DSL roadmap; record gaps for automated reasoning augmentation. |
+| [`compute_once.tex`](/Articles/_ai_source_machine_readable/compute_once.tex) | Formalizes the “compute-once” reasoning paradigm; introduces persistent, reusable reasoning objects that integrate symbolic computation, combinatorial primitives, and cross-domain operationalization. Explains the universal applicability of compute-once objects, their assimilation into structured reasoning substrates, and connections to Python prototypes and combinatorial mathematics. | Parse text to extract compute-once object definitions, operational rules, and cross-domain usage; map reasoning object formalism to Python prototype implementations; identify hierarchical and network-of-networks patterns; cross-link with Meta-RDUs, DSL roadmap, and mathematical primitives for composable, reusable reasoning artifacts. |
+
 
 
 ---
@@ -39,33 +41,39 @@ The following files are annotated with purpose and usage instructions for automa
 ## Recommended Agent Workflow
 
 1. **Parse conceptual documents (`*.tex`)**  
-   - Extract definitions, operations, and examples.
-   - Map abstract RDUs to corresponding Python prototypes.
+   - Extract definitions, operations, examples, and formal reasoning object concepts.  
+   - Map abstract RDUs, Meta-RDUs, and compute-once objects to corresponding Python prototypes.  
+   - Identify combinatorial primitives, hierarchical DAGs, and network-of-networks patterns.  
+   - Capture operationalization rules and cross-domain reasoning principles to inform DSL design.
 
-2. **Analyze Python prototypes (`*.py`)**  
-   - Execute sample functions.
-   - Validate outputs against conceptual definitions.
-   - Trace DAG reasoning flows for auditability.
-  
+2. **Analyze Python prototypes (`Prototype_python_code.py`)**  
+   - Execute sample functions.  
+   - Validate outputs against conceptual definitions, RDUs, Meta-RDUs, and compute-once object formalism.  
+   - Trace DAG reasoning flows, hierarchical compositional operations, and network-of-networks patterns for conceptual alignment.  
+   - Verify integration of multinomial structures, Bell polynomials, and POT generators as potential DSL primitives.
+
 3. **Integrate multimodal content (`Prototype_Video_Transcript.txt`)**  
-   - Align narrative explanations with underlying formal content.  
-   - Detect references to specific prototypes, RDUs, and POT generator mechanisms.  
-   - Capture interpretative context for semantic grounding.  
+   - Align narrative explanations with underlying formal content, emphasizing operationalization patterns.  
+   - Detect references to RDUs, Meta-RDUs, POT generator mechanisms, and compute-once reasoning flows.  
+   - Capture interpretative context to inform DSL primitive selection and language constructs.
 
-4. **Cross-link knowledge**  
-  - Connect Manifesto principles → Conceptual articles → Python prototypes → DSL roadmap → Video transcript.  
+4. **Cross-link knowledge for DSL design**  
+   - Connect Manifesto principles → Conceptual articles → Python prototypes → Compute-once formalism → Video transcript → DSL roadmap.  
+   - Focus on identifying reusable primitives, compositional patterns, meta-level operations, and reasoning object integration rules.  
+   - Ensure mappings highlight operational potential without assuming the universal reasoning substrate is currently instantiated.
 
 5. **Optional advanced tasks**  
-   - Generate multimodal knowledge graphs of reasoning flows.  
-   - Suggest DSL syntactic structures inferred from transcript emphasis.  
-   - Flag conceptual drift or inconsistencies between narrative and formal representations.
+   - Generate conceptual graphs of reasoning object flows, combinatorial patterns, and hierarchical DAGs to inform DSL constructs.  
+   - Suggest DSL syntax and primitives based on observed operationalization rules in prototypes and compute-once objects.  
+   - Flag inconsistencies or conceptual gaps between text, prototype operations, and intended DSL functionality.
 
 6. **Analyze language critique artifacts (`language_critique.py`)**  
-   - Identify explicit Python limitations on emergent reasoning, meta-layer operationalization, and context inheritance.  
-   - Compare with DAG reasoning prototypes and conceptual RDU definitions.  
+   - Identify Python limitations for emergent reasoning, meta-layer operationalization, and context inheritance.  
+   - Compare with DAG prototypes, RDU/Meta-RDU definitions, and compute-once object structures to extract requirements for DSL design.  
    - Record patterns demonstrating combinatorial wiring failures, root/sibling injection requirements, and meta-RDU propagation constraints.  
-   - Cross-link with DSL roadmap to inform potential language features for autonomous meta-reasoning.  
+   - Inform DSL design to support autonomous reasoning primitives, compositional operations, and cross-domain object integration.
 
+**Goal:** Extract and formalize all reasoning primitives (RDUs, Meta-RDUs, compute-once objects) to **design a DSL capable of operationalizing reasoning objects**. The universal reasoning substrate itself is not yet instantiated; the DSL is the primary deliverable for enabling future operational reasoning architectures.
 
 ---
 
