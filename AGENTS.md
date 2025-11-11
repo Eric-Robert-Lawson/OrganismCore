@@ -34,6 +34,8 @@ The following files are annotated with purpose and usage instructions for automa
 | [`language_critique.py`](/Articles/_ai_source_machine_readable/language_critique.py) | Demonstrates Python’s limitations for emergent, composable reasoning systems (context propagation, hierarchical operationalization, meta-RDUs). Serves as a prototype and proof-of-insufficiency for scaling reasoning; illustrates the need for a dedicated DSL. | Parse code to identify structural constraints, POT generator wiring, and context propagation issues; simulate failure modes to understand combinatorial manual wiring; link observations to conceptual RDU and DSL roadmap; record gaps for automated reasoning augmentation. |
 | [`compute_once.tex`](/Articles/_ai_source_machine_readable/compute_once.tex) | Formalizes the “compute-once” reasoning paradigm; introduces persistent, reusable reasoning objects that integrate symbolic computation, combinatorial primitives, and cross-domain operationalization. Explains the universal applicability of compute-once objects, their assimilation into structured reasoning substrates, and connections to Python prototypes and combinatorial mathematics. | Parse text to extract compute-once object definitions, operational rules, and cross-domain usage; map reasoning object formalism to Python prototype implementations; identify hierarchical and network-of-networks patterns; cross-link with Meta-RDUs, DSL roadmap, and mathematical primitives for composable, reusable reasoning artifacts. |
 | [`axioms_in_meta_reasoning.tex`](/Articles/_ai_source_machine_readable/axioms_in_meta_reasoning.tex) | Operationalizes meta-reasoning spaces; introduces derivative reasoning spaces, structural axioms, and cross-domain applications. Demonstrates how RDUs and Meta-RDUs can be instantiated, analyzed, and reused to extract provable strategies and emergent structures. Includes chess as a prototypical domain and extends the framework to biological, combinatorial, and multi-agent reasoning spaces. | Parse text to extract derivative reasoning space definitions, structural axioms, and emergent patterns. Map Meta-RDUs to operational pipelines, reward shaping, and pruning strategies. Cross-link with RDUs, compute-once objects, and Python prototypes. Identify reusable reasoning patterns and cross-domain transfer mechanisms for DSL design. |
+| [`Presentation_GPS_to_Chess.tex`](/Articles/_ai_source_machine_readable/Presentation_GPS_to_Chess.tex) | Full presentation demonstrating objectification of reasoning with GPS and chess analogies; includes machine-readable voice-over notes for LLM parsing. Serves as a bridge between conceptual theory, human-readable explanation, and machine-interpretable operational instructions for onboarding and project alignment. | Parse slide text and voice-over notes; extract reasoning-space analogies, operational principles, and objectification strategies; cross-map insights to RDUs, Meta-RDUs, compute-once objects, and DSL roadmap; serve as a machine-readable guide for LLM-assisted onboarding and project comprehension. |
+
 
 ---
 
@@ -63,6 +65,12 @@ The following files are annotated with purpose and usage instructions for automa
    - Record insights for composable meta-level reasoning and cross-domain transfer.  
    - Integrate these patterns into DSL primitive recommendations for meta-reasoning operations.  
    - Note potential mappings to automated reasoning workflows and emergent object assimilation.
+1c. **Parse presentation content (`Presentation_GPS_to_Chess.tex`)**
+  - Extract slide text and machine-readable voice-over notes.
+  - Identify analogies between GPS navigation and reasoning-space navigation.
+  - Capture reasoning objectification strategies, combinatorial collapse insights, and self-referential reasoning principles.
+  - Cross-map extracted insights to RDUs, Meta-RDUs, compute-once objects, and DSL roadmap primitives.
+  - Record conceptual heuristics and operational patterns to guide LLM-assisted onboarding and project comprehension.
 
 2. **Analyze Python prototypes (`Prototype_python_code.py`)**  
    - Execute sample functions.  
@@ -75,14 +83,20 @@ The following files are annotated with purpose and usage instructions for automa
    - Execute sample functions, including `demonstrate_language_rigidity()`, to observe where Python fails to support multi-layer, emergent reasoning.  
    - Validate outputs against conceptual definitions of RDUs, Meta-RDUs, and compute-once objects.  
    - Trace DAG reasoning flows, hierarchical compositional operations, and network-of-networks patterns for conceptual alignment.  
-   - Identify where Python requires manual parameter threading, explicit root/sibling injection, and rigid function wiring, obstructing autonomous meta-layer reasoning.  
-   - Use these observations to inform DSL design requirements:  
+   - Identify Python limitations obstructing autonomous meta-layer reasoning, including:  
+     - Manual parameter threading requirements  
+     - Explicit root/sibling injection constraints  
+     - Rigid function wiring  
+     - Combinatorial wiring failures  
+     - Meta-RDU propagation restrictions  
+   - Map these limitations to potential DSL primitives, including:  
      - Automatic propagation of context across reasoning layers  
      - Emergent Meta-RDU operations without manual wiring  
      - Hierarchical operationalization and scalable reasoning expansion  
-   - Map Python limitations to potential DSL primitives, including POT generator handling, reasoning object integration, and derivative reasoning pipelines.  
-   - Ensure that insights from the critique guide the DSL to enable emergent, composable reasoning that Python cannot natively support.  
-   - Annotate Python rigidity patterns as negative examples to guide emergent DSL design.
+     - POT generator handling  
+     - Reasoning object integration and derivative reasoning pipelines  
+   - Use these observations to inform DSL design requirements, ensuring the DSL supports autonomous, composable, and cross-domain reasoning.  
+   - Annotate Python rigidity patterns as negative examples to guide emergent DSL design and identify gaps that a dedicated DSL must overcome for self-optimizing reasoning.
 
 3. **Integrate multimodal content (`Prototype_Video_Transcript.txt`)**  
    - Align narrative explanations with underlying formal content, emphasizing operationalization patterns.  
@@ -101,13 +115,6 @@ The following files are annotated with purpose and usage instructions for automa
    - Suggest DSL syntax and primitives based on observed operationalization rules in prototypes and compute-once objects.  
    - Flag inconsistencies or conceptual gaps between text, prototype operations, and intended DSL functionality.  
    - Capture potential emergent behaviors for simulation and testing in DSL environments.
-
-6. **Analyze language critique artifacts (`language_critique.py`)**  
-   - Identify Python limitations for emergent reasoning, meta-layer operationalization, and context inheritance.  
-   - Compare with DAG prototypes, RDU/Meta-RDU definitions, and compute-once object structures to extract requirements for DSL design.  
-   - Record patterns demonstrating combinatorial wiring failures, root/sibling injection requirements, and meta-RDU propagation constraints.  
-   - Inform DSL design to support autonomous reasoning primitives, compositional operations, and cross-domain object integration.  
-   - Explicitly document gaps that a dedicated DSL must overcome to enable emergent, self-optimizing reasoning.
 
 **Goal:** Extract and formalize all reasoning primitives (RDUs, Meta-RDUs, compute-once objects) to **design a DSL capable of operationalizing reasoning objects**. The universal reasoning substrate itself is not yet instantiated; the DSL is the primary deliverable for enabling future operational reasoning architectures.  
 
