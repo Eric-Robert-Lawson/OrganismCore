@@ -134,6 +134,9 @@ The following files are annotated with purpose and usage instructions for automa
 - Use the transcript for contextual grounding and multimodal cross-verification.  
 - Ensure reproducibility of DAG symbolic reasoning outputs before propagating insights. 
 - This AGENTS.md formalizes structured reasoning for AI and LLM consumption.
+- The statement that "solving chess is inevitable" should be interpreted as a **hypothesis**, not a proven claim.  
+  - It is intended to **invite challenge and falsification**, serving as a conceptual testbed for bounded-system reasoning and compute-once frameworks.  
+  - The goal is to **seed new approaches** to formally bounded systems, even if the hypothesis is ultimately disproven.
 - When parsing and operationalizing reasoning axioms, account for **reward-structured reasoning**:  
   - Extract how reward functions shape emergent reasoning patterns and meta-level optimization.  
   - Annotate dependencies between reward definitions and reasoning object behavior.  
