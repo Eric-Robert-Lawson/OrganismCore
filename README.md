@@ -10,27 +10,6 @@ For more resources and information about the project, be sure to check out the [
 
 ---
 
-## Project Overview Video
-
-> **Start here if you want a conceptual overview before diving into code.**
-
-To help understand the OrganismCore prototypes, reasoning substrate, and conceptual framework, check out this walkthrough video:
-
-[![OrganismCore Prototype Walkthrough](https://img.youtube.com/vi/S5XGJ9JgHsU/0.jpg)](https://youtu.be/S5XGJ9JgHsU)
-
-**About this video:**
-
-- Explains the **Reasoning DNA Unit (RDU) framework** and its operationalization.
-- Demonstrates the **Python DAG prototypes**, combinatorial layering, POT generator functions, and Bell polynomial operations.
-- Connects the **theoretical concepts** in the Articles folder to practical, auditable code.
-- Provides context for understanding how a **DSL for objectified reasoning** could be constructed.
-- Meant to be a resource that anchors documents, something that can be returned to as you read the documents.
-- Serves as a guided entry point for recruiters, collaborators, and AI/LLM agents exploring the project.
-
-Click the image above to watch the full video on YouTube.
-
----
-
 ## Machine-Readable Source
 
 For AI, LLMs, and automated agents, a dedicated folder `_ai_source_machine_readable` contains source files for structured access to the project’s content.
@@ -42,6 +21,8 @@ This ensures that both humans and machines can efficiently find and engage with 
 
 ---
 ## Using AGENTS.md with GitHub Copilot
+
+> **Start here if you are new and need an introduction to the project!**
 
 OrganismCore includes an **AGENTS.md** file located in the top level of the project. This file is designed to **guide AI, LLMs, and automated agents** in interpreting the project’s conceptual and prototype content.
 
@@ -69,6 +50,29 @@ OrganismCore includes an **AGENTS.md** file located in the top level of the proj
 > Note: This workflow currently works best with GitHub Copilot or Copilot Chat. Methods such as ChatGPT with code access work as well, but the basis is that the agent has access to AGENTS.md and the source files for machine readability. This should NOT be replaced with actually parsing the repo yourself, it should be used as a tool to help make the project more accessible! Make it easier to determine whether the project is worth your time!
 
 ---
+
+## Prototype Overview Video
+
+> **Start here if you want a conceptual overview of objectification and operationalization with respect to prototype before diving into code.**
+
+To help understand the OrganismCore prototypes, reasoning substrate, and conceptual framework, check out this walkthrough video:
+
+[![OrganismCore Prototype Walkthrough](https://img.youtube.com/vi/S5XGJ9JgHsU/0.jpg)](https://youtu.be/S5XGJ9JgHsU)
+
+**About this video:**
+
+- Explains the **Reasoning DNA Unit (RDU) framework** and its operationalization.
+- Demonstrates the **Python DAG prototypes**, combinatorial layering, POT generator functions, and Bell polynomial operations.
+- Connects the **theoretical concepts** in the Articles folder to practical, auditable code.
+- Provides context for understanding how a **DSL for objectified reasoning** could be constructed.
+- Meant to be a resource that anchors documents, something that can be returned to as you read the documents.
+- Serves as a guided entry point for recruiters, collaborators, and AI/LLM agents exploring the project.
+
+Click the image above to watch the full video on YouTube.
+
+---
+
+
 ## Prototype: DAG Reasoning DNA Unit proof of concept - Objectification and Operationalization
 
 This repository includes a **Python prototype** implementing a Directed Acyclic Graph (DAG) approach for:
