@@ -41,6 +41,8 @@ OrganismCore includes an **AGENTS.md** file located in the top level of the proj
 
 > [Click here to view the whole chat from the video, get the overview yourself or use copilot yourself! (This is dated from 11/07/2025)](https://github.com/copilot/share/084c5312-4804-88b7-8901-e00da016684b)
 
+> But it is important to note that the project has changed dramatically since the 7th of november 2025. You should treat the above as an example of a snapshot of the project at that time. Go through and engage with the project in its current state with your own questions and engage how you like!
+
 ### Benefits
 
 - **Recruiters, collaborators, and reviewers** can interactively explore the repository with AI assistance.  
