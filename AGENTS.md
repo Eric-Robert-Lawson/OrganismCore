@@ -216,5 +216,6 @@ The following files are annotated with purpose and usage instructions for automa
   - Extract how reward functions shape emergent reasoning patterns and meta-level optimization.  
   - Annotate dependencies between reward definitions and reasoning object behavior.  
   - Use reward context to validate cross-domain applicability of reasoning axioms and Meta-RDUs.
-
+- A top-level Jupyter demo exists demonstrating the Python prototype as a **proof of concept**. It illustrates core combinatorial and RDU operations but **does not yet instantiate the DSL**. Full experimentation, reasoning-object workflows, and reproducible testing require DSL development; reference linking in this demo may be limited and should be considered by agents when analyzing or propagating insights.
+- **Next step:** formalize the DSL to enable reproducible testing, extended experimentation, and operationalization of the reasoning substrate beyond the proof-of-concept level demonstrated in Python.
 ---
