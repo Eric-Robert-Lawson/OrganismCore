@@ -39,6 +39,7 @@ The following files are annotated with purpose and usage instructions for automa
 | [`axioms_in_meta_reasoning.tex`](/Articles/_ai_source_machine_readable/axioms_in_meta_reasoning.tex) | Operationalizes meta-reasoning spaces; introduces derivative reasoning spaces, structural axioms, and cross-domain applications. Demonstrates how RDUs and Meta-RDUs can be instantiated, analyzed, and reused to extract provable strategies and emergent structures. | Parse text to extract derivative reasoning space definitions, structural axioms, and emergent patterns; map Meta-RDUs to operational pipelines, reward shaping, and pruning strategies; cross-link with RDUs, compute-once objects, Python prototypes, and RARFL cycles (axiom extraction, reward refinement, derivative reasoning space metrics); identify reusable reasoning patterns and cross-domain transfer mechanisms for DSL design. |
 | [`Presentation_GPS_to_Chess.tex`](/Articles/_ai_source_machine_readable/Presentation_GPS_to_Chess.tex) | Full presentation demonstrating objectification of reasoning with GPS and chess analogies; includes machine-readable voice-over notes for LLM parsing. Serves as a bridge between conceptual theory, human-readable explanation, and machine-interpretable operational instructions for onboarding and project alignment. | Parse slide text and voice-over notes; extract reasoning-space analogies, operational principles, and objectification strategies; cross-map insights to RDUs, Meta-RDUs, compute-once objects, DSL roadmap, and RARFL operational cycles; serve as a machine-readable guide for LLM-assisted onboarding and project comprehension. |
 | [`AGI_and_superintelligence.tex`](/Articles/_ai_source_machine_readable/AGI_and_superintelligence.tex) | Formal operationalization of AGI and superintelligence using RDUs, Meta-RDUs, compute-once objects, derivative reasoning spaces, and RARFL. Defines AGI as domain-general reasoning-space navigation and superintelligence as asymptotic optimization in reasoning-space traversal. | Parse text to extract operational definitions, cross-domain reasoning-space structures, AGI metrics, and superintelligence convergence criteria; map concepts to RDUs, Meta-RDUs, DSL constructs, and RARFL cycles; integrate AGI/SI operational foundations into AGENTS.md workflow; annotate derivative reasoning-space metrics and reward-axiom convergence structures for system-wide alignment and evaluation. |
+| [`URST.tex`](/Articles/_ai_source_machine_readable/URST.tex) | Foundational formalization of Universal Reasoning Substrate Theory (URST); integrates RDUs, composite reasoning objects, meta-reasoning operators, axioms, structural foundations, canonical examples (chess), and implications for AGI. Establishes URST as a unified, executable substrate-theoretic framework for reasoning systems. | Parse text to extract URST definitions, axioms, RDU structures, compositional rules, meta-reasoning operators, derivative reasoning spaces, and reward-shaped dynamics; link concepts to existing prototypes, Python implementations, DSL roadmap, and RARFL cycles; map canonical chess example to operational reasoning substrate; integrate cross-references to AGENTS.md workflow ensuring all URST primitives and axioms are machine-interpretable and aligned with prior articles; flag implications for AGI and self-evolving reasoning system formalization. |
 
 ---
 
@@ -46,17 +47,17 @@ The following files are annotated with purpose and usage instructions for automa
 
 1. **Parse conceptual documents (`*.tex`)**  
    - Extract definitions, operations, examples, and formal reasoning object concepts.  
-   - Map abstract RDUs, Meta-RDUs, compute-once objects, reasoning axioms, explainability trajectories, and AGI/SI operational definitions to corresponding Python prototypes.  
-   - Identify combinatorial primitives, hierarchical DAGs, and network-of-networks patterns.  
+   - Map abstract RDUs, Meta-RDUs, compute-once objects, reasoning axioms, explainability trajectories, AGI/SI operational definitions, and URST-theoretic constructs to corresponding Python prototypes.  
+   - Identify combinatorial primitives, hierarchical DAGs, network-of-networks patterns, and canonical substrate-theoretic examples (e.g., chess).  
    - Capture operationalization rules, cross-domain reasoning principles, and explainability trajectories to inform DSL design.  
    - Record potential DSL primitives observed in conceptual definitions for downstream mapping.  
-   - Annotate connections to derivative reasoning spaces and potential RARFL integration points.
+   - Annotate connections to derivative reasoning spaces, potential RARFL integration points, and URST-defined meta-reasoning operators.
 
 1a. **Parse meta-reasoning article (`axioms_in_meta_reasoning.tex`)**  
    - Extract definitions of derivative reasoning spaces, structural reasoning axioms, and emergent pattern formalizations.  
-   - Map chess-based examples to generalized reasoning-space representations.  
+   - Map chess-based and canonical URST examples to generalized reasoning-space representations.  
    - Identify cross-domain applicability, including biological, combinatorial, and multi-agent reasoning contexts.  
-   - Capture operational rules for applying Meta-RDUs to RDUs, compute-once objects, reasoning axioms, and explainability objects.  
+   - Capture operational rules for applying Meta-RDUs to RDUs, compute-once objects, reasoning axioms, URST primitives, and explainability objects.  
    - Record insights for reward shaping, pruning, and meta-level pipeline optimization.  
    - Integrate these patterns into DSL primitive recommendations for meta-reasoning operations.  
    - Annotate hierarchical relationships, recursion patterns, network-of-networks flows, and derivative reasoning-space updates relevant to DSL design.
@@ -64,7 +65,7 @@ The following files are annotated with purpose and usage instructions for automa
 1b. **Parse meta-reasoning formalization article (`Objectifying_optimization_of_reasoning.tex`)**  
    - Extract definitions of Meta-RDUs and their operational rules.  
    - Capture recursive reasoning structures, reflexive computation patterns, and meta-level strategy encoding.  
-   - Map Meta-RDUs to underlying RDUs, compute-once objects, reasoning axioms, and explainability trajectories.  
+   - Map Meta-RDUs to underlying RDUs, compute-once objects, reasoning axioms, URST-defined substrate operators, and explainability trajectories.  
    - Identify context-integration operations, pruning strategies, derivative reasoning-space updates, and meta-level pipeline flows.  
    - Record insights for composable meta-level reasoning and cross-domain transfer.  
    - Integrate these patterns into DSL primitive recommendations for meta-reasoning operations.  
@@ -73,28 +74,29 @@ The following files are annotated with purpose and usage instructions for automa
 1c. **Parse reasoning axioms article (`Reasoning_axioms.tex`)**  
    - Extract definitions of reasoning axioms and their formal classification (mathematical vs. game-theoretical).  
    - Capture domain-context dependencies, cross-domain applicability constraints, and structural invariants.  
-   - Map axioms to RDUs, Meta-RDUs, compute-once objects, explainability trajectories, and RARFL cycles.  
+   - Map axioms to RDUs, Meta-RDUs, compute-once objects, URST operators, explainability trajectories, and RARFL cycles.  
    - Annotate self-referential, meta-level reasoning, and trajectory-explanation patterns for DSL design.  
    - Record insights for formal reasoning object operationalization, validation, and optimization in dynamic and static contexts.  
-   - Link axioms to RARFL cycles, recording metrics or signals for reward refinement and derivative reasoning-space updates.
+   - Link axioms to RARFL cycles, recording metrics or signals for reward refinement, URST-axiom mapping, and derivative reasoning-space updates.
 
 1d. **Parse explainability article (`Explain_by_construct.tex`)**  
    - Extract mechanisms for intrinsic explainability, explainability-by-construction principles, and trajectory auditing.  
-   - Map reasoning trajectories, RDUs, Meta-RDUs, compute-once objects, derivative reasoning spaces, and reward-axiom feedback loops to operational constructs.  
+   - Map reasoning trajectories, RDUs, Meta-RDUs, compute-once objects, derivative reasoning spaces, URST primitives, and reward-axiom feedback loops to operational constructs.  
    - Capture rules for comparing trajectories to reasoning spaces, identifying alternatives, and tracking reward gradients.  
-   - Annotate how explainability objects co-evolve with RARFL cycles, aiding both articulation and discovery.  
+   - Annotate how explainability objects co-evolve with RARFL cycles and URST-defined substrate dynamics, aiding both articulation and discovery.  
    - Integrate operational patterns into DSL primitive recommendations:  
      - Trajectory inspection and auditing  
      - Derivative reasoning-space construction  
      - Reward-axiom co-evolution monitoring  
+     - URST operator evaluation and substrate-theoretic reasoning  
      - Intrinsic vs post-hoc explanation tracking  
-   - Record how explainability objects feed back into Meta-RDUs and compute-once objects for iterative reasoning refinement.
+   - Record how explainability objects feed back into Meta-RDUs, compute-once objects, and URST primitives for iterative reasoning refinement.
 
 1e. **Parse presentation content (`Presentation_GPS_to_Chess.tex`)**  
    - Extract slide text and machine-readable voice-over notes.  
-   - Identify analogies between GPS navigation, reasoning-space navigation, and derivative reasoning-space exploration.  
+   - Identify analogies between GPS navigation, reasoning-space navigation, derivative reasoning-space exploration, and URST canonical mappings.  
    - Capture reasoning objectification strategies, combinatorial collapse insights, self-referential reasoning principles, and explainability trajectory demonstrations.  
-   - Cross-map extracted insights to RDUs, Meta-RDUs, compute-once objects, reasoning axioms, derivative reasoning spaces, RARFL cycles, and DSL roadmap primitives.  
+   - Cross-map extracted insights to RDUs, Meta-RDUs, compute-once objects, reasoning axioms, URST operators, derivative reasoning spaces, RARFL cycles, and DSL roadmap primitives.  
    - Record conceptual heuristics and operational patterns to guide LLM-assisted onboarding, meta-level reasoning, and project comprehension.
 
 1f. **Parse RARFL article (`RARFL.tex`)**  
@@ -102,40 +104,49 @@ The following files are annotated with purpose and usage instructions for automa
    - Map each RARFL operational stage to:  
      - RDUs and Meta-RDUs  
      - Compute-once objects  
+     - URST operators and primitives  
      - Derivative reasoning spaces  
      - Explainability trajectories  
      - Reward-update mechanisms  
    - Capture toy experiment examples (e.g., chess endgames) for operational validation.  
-   - Annotate interactions between axiom extraction, reward refinement, reasoning-space dominance, trajectory optimality, and explainability.  
-   - Highlight DSL primitives needed to execute RARFL cycles, derivative reasoning-space updates, and intrinsic explainability pipelines.
+   - Annotate interactions between axiom extraction, reward refinement, reasoning-space dominance, trajectory optimality, and URST substrate reasoning.  
+   - Highlight DSL primitives needed to execute RARFL cycles, derivative reasoning-space updates, intrinsic explainability pipelines, and URST operator evaluation.
 
 1g. **Parse AGI/Superintelligence article (`AGI_and_superintelligence.tex`)**  
-   - Extract operational definitions of AGI and superintelligence in terms of reasoning-space navigation, trajectory optimality, emergent invariant coverage, and RARFL convergence.  
-   - Map AGI/SI principles to RDUs, Meta-RDUs, compute-once objects, derivative reasoning spaces, and reward-axiom feedback loops.  
-   - Capture measurable metrics for intelligence improvement, including trajectory efficiency, axiom stability, and reward-axiom co-evolution progress.  
+   - Extract operational definitions of AGI and superintelligence in terms of reasoning-space navigation, trajectory optimality, emergent invariant coverage, RARFL convergence, and URST substrate-theoretic formalism.  
+   - Map AGI/SI principles to RDUs, Meta-RDUs, compute-once objects, URST operators, derivative reasoning spaces, and reward-axiom feedback loops.  
+   - Capture measurable metrics for intelligence improvement, including trajectory efficiency, axiom stability, reward-axiom co-evolution progress, and URST-guided substrate integration.  
    - Annotate cross-domain transfer mechanisms and meta-level optimization patterns for DSL implementation.  
-   - Integrate AGI/SI operationalization into existing workflows, providing quantitative grounding for intelligence evaluation and reasoning-space navigation.
+   - Integrate AGI/SI operationalization and URST formalism into existing workflows, providing quantitative grounding for intelligence evaluation and reasoning-space navigation.
+
+1h. **Parse URST article (`URST.tex`)**  
+   - Extract URST definitions, axioms, RDU structures, compositional rules, meta-reasoning operators, derivative reasoning spaces, and reward-shaped dynamics.  
+   - Map canonical URST examples (e.g., chess) to operational reasoning substrate pipelines.  
+   - Integrate URST primitives with RDUs, Meta-RDUs, compute-once objects, reasoning axioms, derivative reasoning spaces, and RARFL cycles.  
+   - Annotate cross-links to DSL roadmap, Python prototypes, explainability mechanisms, and AGI/SI operationalization.  
+   - Record substrate-theoretic rules, meta-operator flows, and reward-axiom co-evolution dynamics for inclusion in reasoning-object formalization pipelines.  
+   - Highlight URST’s role in unifying all prior reasoning concepts, enabling fully integrated substrate-theoretic analysis.
 
 2. **Analyze Python prototypes (`Prototype_python_code.py`)**  
    - Execute sample functions.  
-   - Validate outputs against conceptual definitions, RDUs, Meta-RDUs, compute-once objects, reasoning axioms, explainability trajectories, derivative reasoning spaces, and RARFL operational stages.  
+   - Validate outputs against conceptual definitions, RDUs, Meta-RDUs, compute-once objects, reasoning axioms, URST operators, explainability trajectories, derivative reasoning spaces, and RARFL operational stages.  
    - Trace DAG reasoning flows, hierarchical compositional operations, network-of-networks patterns, and derivative reasoning-space behaviors for conceptual alignment.  
    - Verify integration of multinomial structures, Bell polynomials, and POT generators as potential DSL primitives.  
-   - Record operational behaviors that can be encoded as reusable DSL constructs, including explainability object handling and derivative reasoning-space updates.
+   - Record operational behaviors that can be encoded as reusable DSL constructs, including explainability object handling, derivative reasoning-space updates, and URST operator applications.
 
 2a. **Analyze Python language critique (`language_critique.py`)**  
    - Execute sample functions, including `demonstrate_language_rigidity()`, to observe Python’s limitations in multi-layer emergent reasoning.  
-   - Validate outputs against RDUs, Meta-RDUs, compute-once objects, reasoning axioms, explainability objects, derivative reasoning spaces, and RARFL feedback mechanisms.  
+   - Validate outputs against RDUs, Meta-RDUs, compute-once objects, reasoning axioms, URST primitives, explainability objects, derivative reasoning spaces, and RARFL feedback mechanisms.  
    - Trace DAG reasoning flows, hierarchical compositional operations, and network-of-networks patterns for conceptual alignment.  
    - Identify Python limitations obstructing autonomous meta-layer reasoning, including:  
      - Manual parameter threading requirements  
      - Explicit root/sibling injection constraints  
      - Rigid function wiring  
      - Combinatorial wiring failures  
-     - Meta-RDU and trajectory propagation restrictions  
+     - Meta-RDU, URST, and trajectory propagation restrictions  
    - Map these limitations to DSL primitives:  
      - Automatic context propagation across reasoning layers  
-     - Emergent Meta-RDU and explainability-object operations without manual wiring  
+     - Emergent Meta-RDU, URST operator, and explainability-object operations without manual wiring  
      - Hierarchical operationalization and scalable reasoning expansion  
      - POT generator handling  
      - Reasoning object, reasoning axiom, derivative reasoning-space, explainability object, and RARFL cycle integration  
@@ -143,24 +154,24 @@ The following files are annotated with purpose and usage instructions for automa
    - Annotate Python rigidity patterns as negative examples to guide emergent DSL design.
 
 3. **Integrate multimodal content (`Prototype_Video_Transcript.txt`)**  
-   - Align narrative explanations with underlying formal content, emphasizing operationalization patterns and RARFL-guided meta-level reasoning.  
-   - Detect references to RDUs, Meta-RDUs, reasoning axioms, derivative reasoning spaces, explainability objects, POT generator mechanisms, compute-once reasoning flows, and RARFL cycles.  
+   - Align narrative explanations with underlying formal content, emphasizing operationalization patterns, URST substrate formalism, and RARFL-guided meta-level reasoning.  
+   - Detect references to RDUs, Meta-RDUs, URST operators, reasoning axioms, derivative reasoning spaces, explainability objects, POT generator mechanisms, compute-once reasoning flows, and RARFL cycles.  
    - Capture interpretative context to inform DSL primitive selection and language constructs.  
    - Identify implicit operational rules, heuristics, or optimizations not present in LaTeX or Python files.
 
 4. **Cross-link knowledge for DSL design**  
-   - Connect Manifesto principles → Conceptual articles → Explain_by_construct → RARFL cycles → Python prototypes → Compute-once formalism → Reasoning axioms → AGI/SI operational definitions → Video transcript → DSL roadmap.  
-   - Focus on identifying reusable primitives, compositional patterns, meta-level operations, reasoning object integration rules, explainability object handling, and reward-axiom co-evolution patterns.  
+   - Connect Manifesto principles → Conceptual articles → URST → Explain_by_construct → RARFL cycles → Python prototypes → Compute-once formalism → Reasoning axioms → AGI/SI operational definitions → Video transcript → DSL roadmap.  
+   - Focus on identifying reusable primitives, compositional patterns, meta-level operations, reasoning object integration rules, explainability object handling, URST substrate-theoretic mappings, and reward-axiom co-evolution patterns.  
    - Ensure mappings highlight operational potential without assuming the universal reasoning substrate is currently instantiated.  
-   - Annotate all cross-domain transfer mechanisms for DSL integration, including derivative reasoning-space updates and AGI/SI performance metrics.
+   - Annotate all cross-domain transfer mechanisms for DSL integration, including derivative reasoning-space updates, URST operator flows, and AGI/SI performance metrics.
 
 5. **Optional advanced tasks**  
-   - Generate conceptual graphs of reasoning object flows, combinatorial patterns, reasoning axioms, hierarchical DAGs, explainability trajectories, derivative reasoning-space updates, and RARFL feedback loops to inform DSL constructs.  
-   - Suggest DSL syntax and primitives based on observed operationalization rules in prototypes, compute-once objects, reasoning axioms, derivative reasoning spaces, explainability objects, and RARFL cycles.  
-   - Flag inconsistencies or conceptual gaps between text, prototype operations, explainability trajectories, and intended DSL functionality.  
+   - Generate conceptual graphs of reasoning object flows, combinatorial patterns, reasoning axioms, hierarchical DAGs, explainability trajectories, derivative reasoning-space updates, RARFL feedback loops, and URST operator flows to inform DSL constructs.  
+   - Suggest DSL syntax and primitives based on observed operationalization rules in prototypes, compute-once objects, reasoning axioms, derivative reasoning spaces, explainability objects, RARFL cycles, and URST formalism.  
+   - Flag inconsistencies or conceptual gaps between text, prototype operations, explainability trajectories, URST-defined operators, and intended DSL functionality.  
    - Capture potential emergent behaviors for simulation and testing in DSL environments, including AGI/SI operational verification.
 
-**Goal:** Extract and formalize all reasoning primitives (RDUs, Meta-RDUs, compute-once objects, reasoning axioms, derivative reasoning spaces, explainability trajectories) and incorporate RARFL cycles to model reward-axiom co-evolution, enabling a DSL capable of operationalizing both static and dynamically evolving reasoning objects while making all reasoning steps intrinsically explainable and measurable for AGI/SI evaluation.
+**Goal:** Extract and formalize all reasoning primitives (RDUs, Meta-RDUs, compute-once objects, reasoning axioms, URST substrate operators, derivative reasoning spaces, explainability trajectories) and incorporate RARFL cycles to model reward-axiom co-evolution, enabling a DSL capable of operationalizing both static and dynamically evolving reasoning objects while making all reasoning steps intrinsically explainable, substrate-consistent, and measurable for AGI/SI evaluation.
 
 ---
 
