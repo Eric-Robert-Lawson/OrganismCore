@@ -173,6 +173,34 @@ The following files are annotated with purpose and usage instructions for automa
 
 **Goal:** Extract and formalize all reasoning primitives (RDUs, Meta-RDUs, compute-once objects, reasoning axioms, URST substrate operators, derivative reasoning spaces, explainability trajectories) and incorporate RARFL cycles to model reward-axiom co-evolution, enabling a DSL capable of operationalizing both static and dynamically evolving reasoning objects while making all reasoning steps intrinsically explainable, substrate-consistent, and measurable for AGI/SI evaluation.
 
+## Next Step: DSL Formalization
+
+- Define and formalize a domain-specific language (DSL) capable of instantiating, manipulating, and composing:
+  - RDUs and Meta-RDUs
+  - Compute-once reasoning objects
+  - URST operators and derivative reasoning spaces
+  - RARFL reward-axiom feedback loops
+  - Explainability objects and trajectories
+
+- Map existing prototypes, URST definitions, axioms, and combinatorial structures into DSL constructs.
+
+- Use the DSL to:
+  - Validate reasoning flows
+  - Perform toy RARFL experiments
+  - Operationalize substrate-theoretic hypotheses
+
+- Record canonical inputs/outputs and define reproducible patterns for verification, enabling agents to simulate and audit reasoning steps.
+
+- Output mappings from cross-linked knowledge and prototype analysis will serve as candidate DSL primitives, including:
+  - Meta-RDU recursion
+  - URST operator flows
+  - Reward-axiom update operations
+
+- Treat Python implementations, Bell/DAG experiments, and RARFL toy cycles as scaffolds illustrating operational principles, not as the final operational substrate. 
+  - These prototypes demonstrate that reasoning can be objectified, operationalized, and semantically grounded, even without a dedicated language. 
+  - The `language_critique.py` artifact highlights Python’s limitations in handling reasoning as a first-class object for a universal reasoning substrate. 
+  - Agents should treat the DSL formalization as iterative and evolving, incorporating insights from prototypes, RARFL cycles, and cross-linked conceptual artifacts.
+
 ---
 
 ## Notes for Automated Agents
