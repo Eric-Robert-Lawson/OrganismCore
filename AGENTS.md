@@ -112,6 +112,25 @@ The following files are annotated with purpose and usage instructions for automa
    - Annotate interactions between axiom extraction, reward refinement, reasoning-space dominance, trajectory optimality, and URST substrate reasoning.  
    - Highlight DSL primitives needed to execute RARFL cycles, derivative reasoning-space updates, intrinsic explainability pipelines, and URST operator evaluation.
 
+1f bis. **Parse the Tic-Tac-Toe Toy Universe (virtual substrate)**  
+   - Treat Tic-Tac-Toe as a fully solvable finite reasoning domain for debugging RDU, Meta-RDU, and URST operator behavior.  
+   - Extract complete reasoning-space representation:  
+     - 9! possible board arrangements  
+     - Symmetry reductions  
+     - Full game-tree enumeration  
+     - Terminal axioms (win/lose/draw)  
+   - Instantiate RDUs as move transitions and state-transform rules.  
+   - Construct derivative reasoning spaces by:  
+     - Eliminating dominated strategies  
+     - Collapsing symmetric positions  
+     - Encoding optimal-play equivalence classes  
+   - Use reward-axiom cycles (RARFL) to refine:  
+     - Optimal strategy identification  
+     - Move-value convergence  
+     - Axiom stability (e.g., “center > corner > edge” priority ordering)  
+   - Treat Tic-Tac-Toe as an experimental substrate for verifying combinatorial collapse, compute-once reasoning objects, and early-stage DSL operation before applying the framework to chess or general URST environments.
+
+
 1g. **Parse AGI/Superintelligence article (`AGI_and_superintelligence.tex`)**  
    - Extract operational definitions of AGI and superintelligence in terms of reasoning-space navigation, trajectory optimality, emergent invariant coverage, RARFL convergence, and URST substrate-theoretic formalism.  
    - Map AGI/SI principles to RDUs, Meta-RDUs, compute-once objects, URST operators, derivative reasoning spaces, and reward-axiom feedback loops.  
@@ -173,7 +192,21 @@ The following files are annotated with purpose and usage instructions for automa
 
 **Goal:** Extract and formalize all reasoning primitives (RDUs, Meta-RDUs, compute-once objects, reasoning axioms, URST substrate operators, derivative reasoning spaces, explainability trajectories) and incorporate RARFL cycles to model reward-axiom co-evolution, enabling a DSL capable of operationalizing both static and dynamically evolving reasoning objects while making all reasoning steps intrinsically explainable, substrate-consistent, and measurable for AGI/SI evaluation.
 
+- **Implement Tic-Tac-Toe as the first fully executable prototype of the OrganismCore reasoning substrate.**  
+  - Generate complete RDU graphs for all legal transitions.  
+  - Produce derivative reasoning spaces by pruning suboptimal branches.  
+  - Run full RARFL cycles to automatically rediscover optimal-play axioms.  
+  - Validate compute-once reasoning objects (e.g., solved-state equivalence classes).  
+  - Use results to refine DSL primitives for:  
+    - Move operators  
+    - State transformations  
+    - Reward-axiom updates  
+    - Meta-RDU reflection over solved-state classes.  
+
+
 ## Next Step: DSL Formalization
+
+Tic-Tac-Toe should serve as the first DSL testbed, providing a fully enumerable reasoning space for validating RDU composition, derivative reasoning-space operations, and reward–axiom updates.
 
 - Define and formalize a domain-specific language (DSL) capable of instantiating, manipulating, and composing:
   - RDUs and Meta-RDUs
