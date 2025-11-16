@@ -130,6 +130,17 @@ The following files are annotated with purpose and usage instructions for automa
      - Axiom stability (e.g., “center > corner > edge” priority ordering)  
    - Treat Tic-Tac-Toe as an experimental substrate for verifying combinatorial collapse, compute-once reasoning objects, and early-stage DSL operation before applying the framework to chess or general URST environments.
 
+### Semantic Grounding / Metadata Integration
+
+- Each RDU (move or state transition) carries metadata representing its derivative reasoning space.
+- Metadata includes outcome summaries (Win/Draw/Loss counts) computed from optimal pathing relative to the reward function.
+- During assimilation, agents can query this metadata to understand potential outcomes at any position without recomputing the full tree.
+- This semantic grounding allows:
+    - Reward function refinement in RARFL cycles.
+    - Trajectory evaluation and pruning.
+    - Context-aware decision-making for Meta-RDU operations.
+- Conceptually, this is analogous to GPS street names with attached distance/time: qualitative metadata informs optimal path selection at each combinatorial layer.
+
 
 1g. **Parse AGI/Superintelligence article (`AGI_and_superintelligence.tex`)**  
    - Extract operational definitions of AGI and superintelligence in terms of reasoning-space navigation, trajectory optimality, emergent invariant coverage, RARFL convergence, and URST substrate-theoretic formalism.  
