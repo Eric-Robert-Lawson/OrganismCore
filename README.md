@@ -1,89 +1,87 @@
 # OrganismCore
 
-This repository introduces a universal reasoning substrate — a symbolic and computational framework unifying mathematical composition and reasoning.
+A unified symbolic and computational framework for **objectified reasoning** — treating reasoning processes as composable, auditable, and operational structures. OrganismCore builds the foundations for a **universal reasoning substrate**, integrating symbolic computation, compositional logic, and recursive reasoning into a transparent, interpretable system.
 
-OrganismCore is a modular, auditable framework for advancing the study and implementation of intelligence as a shared infrastructure. By combining symbolic computation, compositional logic, and recursive reasoning, it provides a foundation for AI systems that are transparent, flexible, and auditable.
+This repository serves as the hub for research, prototypes, and documents advancing **Universal Reasoning Substrate Theory (URST)** — with the goal of making general reasoning and intelligence a shared public commons.
 
-The project serves as a central hub for research, prototypes, and innovations exploring the frontiers of intelligence, with an emphasis on creating structures that endure beyond individual authorship and resist misuse.
+See the [Articles folder](/Articles/) for the conceptual documents that anchor the project.
 
-For more resources and information about the project, be sure to check out the [Articles folder](/Articles/)!
 
 ---
 
 ## Machine-Readable Source
 
-For AI, LLMs, and automated agents, a dedicated folder `_ai_source_machine_readable` contains source files for structured access to the project’s content.
+The `_ai_source_machine_readable` folder contains structured, machine-readable versions of the core conceptual files. This enables LLMs and AI agents to navigate the research program with full context continuity.
 
-- [Browse the machine-readable folder](/Articles/_ai_source_machine_readable)  
-- Includes a README to guide exploration and interpretation
+- [Browse the machine-readable source](/Articles/_ai_source_machine_readable)  
+- Includes a README that explains how files relate and how agents should interpret them
 
-This ensures that both humans and machines can efficiently find and engage with the foundational resources of OrganismCore.
+This layer ensures both humans and machine collaborators can explore the OrganismCore substrate efficiently and consistently.
+
 
 ---
-## Using AGENTS.md with GitHub Copilot
 
-> **Start here if you are new and need an introduction to the project!**
+## Using AGENTS.md for Machine-Assisted Onboarding
 
-OrganismCore includes an **AGENTS.md** file located in the top level of the project. This file is designed to **guide AI, LLMs, and automated agents** in interpreting the project’s conceptual and prototype content.
+> **Recommended starting point for anyone new to OrganismCore.**
 
-### How it works with GitHub Copilot
+`AGENTS.md` defines the machine-readable onboarding procedure for LLMs, AI assistants, and automated agents. It describes how to interpret LaTeX documents, connect conceptual files, and maintain grounding across the entire research program.
 
-1. **Open the repository** in an IDE or GitHub Codespace with Copilot enabled.  
-2. **Explore `AGENTS.md`** to understand the structured workflow for parsing LaTeX and Python source files.  
-3. **Use Copilot Chat or inline suggestions** to query and analyze:  
-   - Conceptual definitions (Reasoning DNA Units, combinatorial layering, POT generators, path traversal)  
-   - Python prototypes (DAG symbolic reasoning engine, Bell polynomials, n-th derivatives)  
-   - Connections between manifesto principles, conceptual documents, and executable code
-4. **Ensure you include references to the /Articles/_ai_source_machine_readable folder** to ensure the folder content's context is understood with AGENTS.md. It is also important to note that you should manually select the files, exclude the README.md within the directory! If this directory contains more than 20 references, then you must select the references that matter most for you to interpret or develop a strategy for including full project context using this method. (such as selective and narrower approach to selecting the references and understanding the project)
+### Workflow with GitHub Copilot
 
-### Video Tutorial
-[![Machine-Readable Repositories: How AI Can Instantly Understand Your Research Project](https://img.youtube.com/vi/c3MNIpZThhw/0.jpg)](https://youtu.be/c3MNIpZThhw)
+1. Open the repository in an IDE or Codespace with Copilot enabled.  
+2. Read `AGENTS.md` to understand how agents should traverse LaTeX, Python prototypes, and conceptual documents.  
+3. Use Copilot Chat or inline suggestions to query:
+   - Reasoning DNA Units (RDUs)  
+   - Combinatorial layering  
+   - POT generators  
+   - Path traversal strategies  
+   - Python prototypes and their conceptual anchors  
+4. When referencing machine-readable files, use only the specific files listed in `AGENTS.md`. Do not include the README in that folder. The onboarding process depends on using the exact files that AGENTS.md specifies. Follow its instructions closely, and ensure that all queries you ask an AI agent explicitly draw from the context those files provide.
 
-> [Click here to view the whole chat from the video, get the overview yourself or use copilot yourself! (This is dated from 11/07/2025)](https://github.com/copilot/share/084c5312-4804-88b7-8901-e00da016684b)
 
-> But it is important to note that the project has changed dramatically since the 7th of november 2025. You should treat the above as an example of a snapshot of the project at that time. Go through and engage with the project in its current state with your own questions and engage how you like!
+### AGENTS.md Tutorial
+
+[▶ Machine-Readable Repositories: How AI Understands Your Research](https://youtu.be/c3MNIpZThhw)
+
+> The linked Copilot session (11/07/2025) shows an earlier snapshot of the project. Use it as a conceptual guide rather than a reflection of the current state.
 
 ### Benefits
 
-- **Recruiters, collaborators, and reviewers** can interactively explore the repository with AI assistance.  
-- AGENTS.md makes the **project machine-accessible**, improving discoverability, reproducibility, and structured comprehension.  
-- Copilot references files **directly in the repo**, providing a guided, context-aware experience of your symbolic reasoning framework.  
-
-> Note: This workflow currently works best with GitHub Copilot or Copilot Chat. Methods such as ChatGPT with code access work as well, but the basis is that the agent has access to AGENTS.md and the source files for machine readability. This should NOT be replaced with actually parsing the repo yourself, it should be used as a tool to help make the project more accessible! Make it easier to determine whether the project is worth your time!
-
+- **Collaborators and reviewers** can interrogate the repo interactively.  
+- Provides structured context to LLMs, improving reproducibility.  
+- Enables agents to reason across the full research program.
+  
 ---
 
 ## Prototype Overview Video
 
-> **Start here if you want a conceptual overview of objectification and operationalization with respect to prototype before diving into code.**
+> **Start here for a high-level conceptual grounding before diving into code.**
 
-To help understand the OrganismCore prototypes, reasoning substrate, and conceptual framework, check out this walkthrough video:
+[▶ OrganismCore Prototype Walkthrough](https://youtu.be/S5XGJ9JgHsU)
 
-[![OrganismCore Prototype Walkthrough](https://img.youtube.com/vi/S5XGJ9JgHsU/0.jpg)](https://youtu.be/S5XGJ9JgHsU)
+**This video covers:**
 
-**About this video:**
+- The **Reasoning DNA Unit (RDU)** framework  
+- Operationalization via Python DAG prototypes  
+- Combinatorial layering and POT generator functions  
+- Bell polynomial operations  
+- How these components support a future DSL for objectified reasoning  
 
-- Explains the **Reasoning DNA Unit (RDU) framework** and its operationalization.
-- Demonstrates the **Python DAG prototypes**, combinatorial layering, POT generator functions, and Bell polynomial operations.
-- Connects the **theoretical concepts** in the Articles folder to practical, auditable code.
-- Provides context for understanding how a **DSL for objectified reasoning** could be constructed.
-- Meant to be a resource that anchors documents, something that can be returned to as you read the documents.
-- Serves as a guided entry point for recruiters, collaborators, and AI/LLM agents exploring the project.
+This serves as a conceptual anchor for both the Articles folder and the code prototypes.
 
-Click the image above to watch the full video on YouTube.
 
 ---
 
+## Prototype: DAG-Based Reasoning DNA Unit
 
-## Prototype: DAG Reasoning DNA Unit proof of concept - Objectification and Operationalization
+The repository includes a Python prototype implementing a Directed Acyclic Graph (DAG) system for:
 
-This repository includes a **Python prototype** implementing a Directed Acyclic Graph (DAG) approach for:
+- Multinomial expansions  
+- n-th derivatives of function products  
+- Partial and convoluted Bell polynomials  
 
-- **Multinomial expansions**  
-- **n-th derivatives of function products**  
-- **Partial and convoluted Bell polynomials**  
-
-The DAG structure allows **auditable, composable reasoning**, where each node represents a combinatorial or symbolic computation step. This is a proof of concept that reasoning can be objectified and operationalized, despite the lack of a domain specific language dedicated to doing so.
+The DAG structure enables **auditable, composable symbolic reasoning**, demonstrating how reasoning operations can be objectified and operationalized even without a dedicated DSL.
 
 ---
 
