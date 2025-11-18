@@ -1,4 +1,7 @@
 # AGENTS.md — Machine Agent Instructions for OrganismCore
+This file is the centralized machine-onboarding protocol for the OrganismCore reasoning substrate.
+
+It defines document purpose, expected agent actions, cross-document mappings, and workflows for extraction, alignment, and DSL formalization.
 
 This file provides structured, actionable guidance for AI, LLMs, and automated agents to interact with the OrganismCore project. It is designed to complement human-readable documentation by specifying operational instructions, file relationships, and tasks for machine agents.
 
@@ -40,6 +43,7 @@ The following files are annotated with purpose and usage instructions for automa
 | [`Presentation_GPS_to_Chess.tex`](/Articles/_ai_source_machine_readable/Presentation_GPS_to_Chess.tex) | Full presentation demonstrating objectification of reasoning with GPS and chess analogies; includes machine-readable voice-over notes for LLM parsing. Serves as a bridge between conceptual theory, human-readable explanation, and machine-interpretable operational instructions for onboarding and project alignment. | Parse slide text and voice-over notes; extract reasoning-space analogies, operational principles, and objectification strategies; cross-map insights to RDUs, Meta-RDUs, compute-once objects, DSL roadmap, and RARFL operational cycles; serve as a machine-readable guide for LLM-assisted onboarding and project comprehension. |
 | [`AGI_and_superintelligence.tex`](/Articles/_ai_source_machine_readable/AGI_and_superintelligence.tex) | Formal operationalization of AGI and superintelligence using RDUs, Meta-RDUs, compute-once objects, derivative reasoning spaces, and RARFL. Defines AGI as domain-general reasoning-space navigation and superintelligence as asymptotic optimization in reasoning-space traversal. | Parse text to extract operational definitions, cross-domain reasoning-space structures, AGI metrics, and superintelligence convergence criteria; map concepts to RDUs, Meta-RDUs, DSL constructs, and RARFL cycles; integrate AGI/SI operational foundations into AGENTS.md workflow; annotate derivative reasoning-space metrics and reward-axiom convergence structures for system-wide alignment and evaluation. |
 | [`URST.tex`](/Articles/_ai_source_machine_readable/URST.tex) | Foundational formalization of Universal Reasoning Substrate Theory (URST); integrates RDUs, composite reasoning objects, meta-reasoning operators, axioms, structural foundations, canonical examples (chess), and implications for AGI. Establishes URST as a unified, executable substrate-theoretic framework for reasoning systems. | Parse text to extract URST definitions, axioms, RDU structures, compositional rules, meta-reasoning operators, derivative reasoning spaces, and reward-shaped dynamics; link concepts to existing prototypes, Python implementations, DSL roadmap, and RARFL cycles; map canonical chess example to operational reasoning substrate; integrate cross-references to AGENTS.md workflow ensuring all URST primitives and axioms are machine-interpretable and aligned with prior articles; flag implications for AGI and self-evolving reasoning system formalization. |
+| [`formalization_of_intuition.tex`](/Articles/_ai_source_machine_readable/formalization_of_intuition.tex) | Documents the origin story of the reasoning substrate: how objectifying reasoning transformed biological cognition into a systematic framework; explains the self-discovery sequence, the transition from informal biological reasoning to explicit substrate-level abstraction, and why the framework amplifies innovation even before DSL formalization. | Parse text to extract the meta-level origin story, the cognitive-to-operational transition, the emergence of collective reasoning, the distinction between intelligence vs. reasoning-space navigation, and the substrate-level implications for AGENTS.md; surface these insights as foundational context for all machine onboarding and reasoning-space alignment; link conceptual origin to ongoing RDU, Meta-RDU, compute-once, URST, and RARFL documents to ensure coherent system-wide initialization. |
 
 ---
 
@@ -156,6 +160,18 @@ The following files are annotated with purpose and usage instructions for automa
    - Annotate cross-links to DSL roadmap, Python prototypes, explainability mechanisms, and AGI/SI operationalization.  
    - Record substrate-theoretic rules, meta-operator flows, and reward-axiom co-evolution dynamics for inclusion in reasoning-object formalization pipelines.  
    - Highlight URST’s role in unifying all prior reasoning concepts, enabling fully integrated substrate-theoretic analysis.
+   - 
+1i. **Parse foundational context (`formalization_of_intuition.tex`)**  
+   - Extract the origin conditions and intuitive constraints that motivated the emergence of RDUs, Meta-RDUs, compute-once objects, and the eventual DSL formalization.  
+   - Capture implicit reasoning patterns, narrative priors, and cross-layer intuitions that shaped the operational substrate before it was mathematically encoded.  
+   - Map intuitive constructs to later formal definitions:  
+     - Early combinatorial intuitions → RDUs  
+     - Self-discovery dynamics → Meta-RDUs  
+     - Stable conceptual anchors → reasoning axioms  
+     - Intuitive substrate behavior → URST operators  
+   - Annotate how intuitive reasoning-space navigation informed the development of the POT generator, compositional DAG structures, and the concept of compute-once objects.  
+   - Integrate this foundational substrate into agent onboarding so the system understands *why* the reasoning ontology takes its current form, not only *how* it operates.  
+   - Record any pre-formal patterns that illuminate the project’s conceptual lineage, aiding future agents in contextual assimilation and ontology realignment.
 
 2. **Analyze Python prototypes (`Prototype_python_code.py`)**  
    - Execute sample functions.  
