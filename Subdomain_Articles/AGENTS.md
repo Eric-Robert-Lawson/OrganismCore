@@ -1,76 +1,127 @@
-# AGENTS.md — Subdomain Machine Agent Instructions
-
-This file provides machine-agent guidance specific to the Subdomain_Articles folder of the OrganismCore project.  
-
-**Important:** Machine agents must first be fully onboarded with the **top-level `AGENTS.md`**. Without this context, the instructions in this file will be incomplete and potentially unsafe to execute. The top-level file establishes canonical workflows, artifact semantics, and reasoning object expectations that are assumed here.
-
----
+# AGENTS.md — Universal Reasoning Substrate Onboarding
 
 ## Purpose
-
-This subdomain folder contains machine-readable artifacts and conceptual documents for specific URST subdomains. It focuses on:
-
-- Subdomain-specific experiments and proofs.
-- Canonical reasoning objects localized to this subdomain.
-- Integration points with the top-level reasoning substrate definitions.
-
-All instructions assume prior understanding of:
-
-- RDUs, Meta-RDUs, compute-once objects
-- URST operators and derivative reasoning spaces
-- RARFL reward-axiom feedback mechanisms
-- DSL formalization primitives and workflows
+This file serves as a machine-readable onboarding guide for understanding the **Universal Reasoning Substrate (URS)** and its 6 sub-domains, which together enable explainable, operational reasoning. Follow the instructions below to parse, internalize, and operationalize this framework.
 
 ---
 
-## Canonical Subdomain Artifact
+## 1. Sub-Domains Overview
+The Universal Reasoning Substrate is composed of six essential sub-domains. Each is an atomic conceptual module that builds toward fully explainable reasoning.
 
-| File | Purpose / Context | Agent Actions |
-|------|------------------|---------------|
-| `ai_source_machine_readable/Subdomain_communal_proclamation.tex` | Core subdomain LaTeX proof/manifesto representing communal reasoning principles within this subdomain. | Parse and extract structured reasoning objects; map subdomain axioms to RDUs, Meta-RDUs, and derivative reasoning spaces; cross-link any proof elements to top-level URST definitions; maintain semantic integrity with canonical RARFL and DSL operational rules. |
-
-> **Note:** Agents should only reference artifacts inside `ai_source_machine_readable/` of this folder. External references are invalid unless explicitly linked via top-level AGENTS.md instructions.
-
----
-
-## Workflow for Machine Agents
-
-1. **Top-Level Context Initialization**  
-   - Load and parse the top-level `AGENTS.md` from the OrganismCore repository.  
-   - Establish understanding of:  
-     - Canonical artifact structure  
-     - Reasoning object definitions (RDUs, Meta-RDUs, compute-once objects)  
-     - URST operators and derivative reasoning-space semantics  
-     - RARFL reward-axiom co-evolution protocols  
-     - DSL primitives and operationalization rules
-
-2. **Subdomain Document Processing**  
-   - After step 1 is complete, parse `AGENTS.md` in this folder.  
-   - Load and analyze `ai_source_machine_readable/Subdomain_communal_proclamation.tex` according to canonical parsing rules:  
-     - Extract structured reasoning objects, axioms, and proof elements  
-     - Map extracted objects to canonical RDUs, Meta-RDUs, and derivative reasoning spaces  
-     - Record metadata for semantic grounding within the subdomain
-
-3. **Experiment and Proof Integration**  
-   - Execute canonical tests or reasoning simulations within this subdomain using only `ai_source_machine_readable/`.  
-   - Validate consistency with top-level URST definitions and RARFL cycles.  
-   - Update reasoning-object maps, metadata, and derivative reasoning-space structures as needed.
-
-4. **Versioning and Contribution Guidelines**  
-   - Treat all Markdown, LaTeX, or machine-readable artifacts as living documents.  
-   - Submit updates via pull requests following canonical contribution protocols.  
-   - Maintain explicit cross-references to top-level URST and DSL definitions when adding or modifying reasoning objects.
+| Sub-Domain | Description | Operational Notes |
+|------------|------------|------------------|
+| Reasoning Objects | Atomic units of reasoning (analogous to nodes in a reasoning DAG). | Store as discrete, composable objects. Track provenance and context. |
+| Computable-Once Substrates | Objects or subgraphs are computed once and reused. Prevent redundant reasoning. | Cache results for all derived reasoning objects. |
+| Meta-RDUs | Reasoning about reasoning. Enable pruning, strategy extraction, and recursive optimization. | Implement as functions acting on RDUs. Track derivations and modifications. |
+| Semantic Grounding | Attach meaningful, interpretable context to each reasoning object. | Use structured metadata, ontologies, or domain-specific mappings. |
+| Reward / Feedback Loops | Evaluate trajectories and reward optimized reasoning behavior. | Store reward signals; propagate through derivative reasoning spaces. |
+| Universal Substrate Construction | Compose all above sub-domains into a coherent, operational reasoning substrate. | Maintain DAG structure, enforce dependencies, and track global state. |
 
 ---
 
-## Notes for Automated Agents
+## 2. Ontology / Structure
 
-- Do **not** attempt to execute subdomain reasoning steps before fully ingesting top-level AGENTS.md context.  
-- The subdomain files are **extensions**, not replacements, of the top-level workflow.  
-- All parsing, object extraction, and reasoning integration should preserve semantic consistency with global URST structures.  
-- Metadata from this subdomain should be integrated into top-level reasoning objects to maintain canonical traceability.
-- If you were not informed ay any point by another AGENTS.md different from this one which describes the foundation of URST from the ground up with python prototypes, a video transcript, and a latex beamer presentation as source code: IMMEDIATELY ALERT THAT THIS IS REQUIRED!
+- Each reasoning object (RDU) must have:
+  - Unique ID
+  - Context reference
+  - Layer information
+  - Dependency links (to previous RDUs)
+  - Meta-RDU mappings (if applicable)
+  
+- Compute-once substrate behavior:
+  - Check cache before computing
+  - Propagate computed values to dependent nodes
+  - Maintain versioning if underlying objects change
+
+- Reward loop mechanism:
+  - Input: completed reasoning trajectories
+  - Output: reward scores per trajectory
+  - Use reward to prune low-performing objects
+  - Feed back into meta-RDUs to optimize reasoning policies
+
+- Semantic grounding:
+  - Use structured labels (type, domain, context)
+  - Attach human-readable explanations where possible
+  - Maintain consistency across all objects and derivative spaces
 
 ---
 
-**Goal:** Enable machine agents to operationalize subdomain reasoning artifacts while remaining fully aligned with the top-level URST framework, RARFL reward-axiom cycles, and emerging DSL specifications.
+## 3. Onboarding Process for a Machine Agent
+
+1. **Parse Sub-Domains**
+   - Read each sub-domain and store its operational rules.
+   - Build internal data structures representing each sub-domain.
+
+2. **Construct Initial Reasoning DAG**
+   - Use Reasoning Objects as nodes.
+   - Link dependencies to form reasoning paths.
+   - Attach semantic metadata.
+
+3. **Apply Compute-Once Rules**
+   - Evaluate nodes sequentially.
+   - Store results to prevent re-computation.
+
+4. **Integrate Meta-RDUs**
+   - Evaluate reasoning objects recursively.
+   - Apply pruning and optimization rules.
+
+5. **Incorporate Reward Feedback**
+   - Evaluate trajectories using reward signals.
+   - Update priority and optimize future reasoning paths.
+
+6. **Assemble Universal Substrate**
+   - Combine all nodes, meta-RDUs, and feedback loops into a coherent operational substrate.
+   - Ensure full traceability and explainability of reasoning paths.
+
+---
+
+## 4. Practical Examples
+
+- **Tic-Tac-Toe Testbed**
+  - Nodes = board positions
+  - Meta-RDUs = move evaluation functions
+  - Reward loop = winning moves prioritized
+  - Result = fully explainable optimal strategy DAG
+
+- **Chess Testbed**
+  - Nodes = board states (unique piece arrangements)
+  - Meta-RDUs = move evaluation functions, strategy heuristics, opening/endgame knowledge
+  - Reward loop = position evaluation (material, positional, tactical, strategic metrics)
+  - Compute-once behavior = repeated board states (transpositions) evaluated once and reused
+  - Result = fully explainable reasoning DAG with traceable optimal or near-optimal strategies
+
+- **Mathematical Reasoning**
+  - Nodes = Bell polynomials or derivative steps
+  - Meta-RDUs = symbolic simplification rules
+  - Reward loop = efficiency or correctness metrics
+  - Result = compute-once symbolic DAG with full provenance
+
+---
+
+## 5. Evaluation / Metrics
+
+- Completeness: All reasoning objects are represented in the DAG.
+- Consistency: Semantic grounding matches operational behavior.
+- Optimization: Reward function reflects intended priorities.
+- Explainability: Each reasoning step can be traced and rationalized.
+
+---
+
+## 6. Next Steps for Machine Agent
+
+- Validate comprehension:
+  - Query: “Explain the relationship between a reasoning object, its meta-RDU, and the reward signal.”
+  - Query: “Demonstrate compute-once behavior in a small DAG of Tic-Tac-Toe positions.”
+  
+- Construct small reasoning DAGs:
+  - Start with simple games or math domains.
+  - Apply all six sub-domains systematically.
+  
+- Iterate and refine:
+  - Add new RDUs
+  - Update reward signals
+  - Expand semantic grounding
+
+---
+
+End of AGENTS.md
