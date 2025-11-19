@@ -124,5 +124,6 @@ The Universal Reasoning Substrate is composed of six essential sub-domains. Each
 
 ---
 
-End of AGENTS.md
+End of Subdomain_AGENTS.md
+
 
