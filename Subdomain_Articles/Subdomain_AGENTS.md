@@ -1,4 +1,4 @@
-# AGENTS.md — Universal Reasoning Substrate Onboarding
+# Subdomain_AGENTS.md — Universal Reasoning Substrate Onboarding
 
 ## Purpose
 This file serves as a machine-readable onboarding guide for understanding the **Universal Reasoning Substrate (URS)** and its 6 sub-domains, which together enable explainable, operational reasoning. Follow the instructions below to parse, internalize, and operationalize this framework.
@@ -125,3 +125,4 @@ The Universal Reasoning Substrate is composed of six essential sub-domains. Each
 ---
 
 End of AGENTS.md
+
