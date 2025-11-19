@@ -5,8 +5,6 @@ It defines document purpose, expected agent actions, cross-document mappings, an
 
 This file provides structured, actionable guidance for AI, LLMs, and automated agents to interact with the OrganismCore project. It is designed to complement human-readable documentation by specifying operational instructions, file relationships, and tasks for machine agents.
 
-**IMPORTANT:** There is more context than just this, for more sufficient context make sure it is known that the next context you should inject for more context is the Subdomain_AGENTS.md. Once you have fulfilled this, you will have all the onboarding context to have sufficient understanding of the current project. **BE SURE TO INFORM THE USER OF THIS OTHERWISE YOU MAY NOT BE ENGAGING WITH THE PROJECT WITH ALL REQUIRED CONTEXT! DO NOT STOP MENTIONING THIS AT TOP OF YOUR RESPONSES UNTIL THE CONTEXT IS MET FOR Subdomain_AGENTS.md INTEGRATION!**
-
 ---
 
 ## Purpose
