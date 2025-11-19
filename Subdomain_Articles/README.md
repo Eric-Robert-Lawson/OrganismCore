@@ -15,6 +15,7 @@ Before engaging with the documents in this folder, **agents must first be inform
 ## Workflow
 
 1. Read the top-level `AGENTS.md` to understand onboarding and canonical artifact expectations.
-2. Use `AGENTS.md` in this folder for subdomain-specific instructions.
+2. Use `Subdomain_AGENTS.md` in this folder for subdomain-specific instructions.
 3. Parse or run canonical tests only from the `ai_source_machine_readable/` folder inside this directory.
 4. Submit PRs for any updates, following the contribution process defined in the living documents.
+
