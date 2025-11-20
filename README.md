@@ -1,3 +1,5 @@
+🎬 **Start here:** [Automated Semantic Onboarding for AI Agents](https://youtu.be/pEGlSHxKASw)
+
 # OrganismCore
 
 A unified symbolic and computational framework for **objectified reasoning** — treating reasoning processes as composable, auditable, and operational structures. OrganismCore builds the foundations for a **universal reasoning substrate**, integrating symbolic computation, compositional logic, and recursive reasoning into a transparent, interpretable system.
@@ -9,29 +11,15 @@ See the [Articles folder](/Articles/) for the conceptual documents that anchor t
 
 ---
 
-## Machine-Readable Source
-
-The `_ai_source_machine_readable` folder contains structured, machine-readable versions of the core conceptual files. This enables LLMs and AI agents to navigate the research program with full context continuity.
-
-- [Browse the machine-readable source](/Articles/_ai_source_machine_readable)  
-- Includes a README that explains how files relate and how agents should interpret them
-
-This layer ensures both humans and machine collaborators can explore the OrganismCore substrate efficiently and consistently.
-
-
----
-
 ## Using AGENTS.md for Machine-Assisted Onboarding
 
 > **Recommended starting point for anyone new to OrganismCore.**
-
-`AGENTS.md` defines the machine-readable onboarding procedure for LLMs, AI assistants, and automated agents. It describes how to interpret LaTeX documents, connect conceptual files, and maintain grounding across the entire research program.
 
 ### Workflow with GitHub Copilot
 
 1. Open the repository in an IDE or Codespace with Copilot enabled.  
 2. Read `AGENTS.md` and 'Subdomain_AGENTS.md' to understand how agents should traverse LaTeX, Python prototypes, and conceptual documents.  
-3. Reference the files within the AGENTS files and reference their contents properly, as seen in the tutorial below.
+3. Explore how the AGENTS.md and Subdomain_AGENTS.md files reference project files and concepts; follow the structure shown in the tutorial to understand the automated onboarding process.
 
 
 ### Automated Onboarding Tutorial
