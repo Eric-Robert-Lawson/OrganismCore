@@ -1,6 +1,7 @@
+# OrganismCore
+
 🎬 **Start here:** [Automated Semantic Onboarding for AI Agents](https://youtu.be/pEGlSHxKASw)
 
-# OrganismCore
 
 A unified symbolic and computational framework for **objectified reasoning** — treating reasoning processes as composable, auditable, and operational structures. OrganismCore builds the foundations for a **universal reasoning substrate**, integrating symbolic computation, compositional logic, and recursive reasoning into a transparent, interpretable system.
 
