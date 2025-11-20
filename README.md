@@ -30,25 +30,19 @@ This layer ensures both humans and machine collaborators can explore the Organis
 ### Workflow with GitHub Copilot
 
 1. Open the repository in an IDE or Codespace with Copilot enabled.  
-2. Read `AGENTS.md` to understand how agents should traverse LaTeX, Python prototypes, and conceptual documents.  
-3. Use Copilot Chat or inline suggestions to query:
-   - Reasoning DNA Units (RDUs)  
-   - Combinatorial layering  
-   - POT generators  
-   - Path traversal strategies  
-   - Python prototypes and their conceptual anchors  
-4. When referencing machine-readable files, use only the specific files listed in `AGENTS.md`. Do not include the README in that folder. The onboarding process depends on using the exact files that AGENTS.md specifies. Follow its instructions closely, and ensure that all queries you ask an AI agent explicitly draw from the context those files provide.
+2. Read `AGENTS.md` and 'Subdomain_AGENTS.md' to understand how agents should traverse LaTeX, Python prototypes, and conceptual documents.  
+3. Reference the files within the AGENTS files and reference their contents properly, as seen in the tutorial below.
 
 
-### AGENTS.md Tutorial
+### Automated Onboarding Tutorial
 
-[▶ Machine-Readable Repositories: How AI Understands Your Research](https://youtu.be/c3MNIpZThhw)
+[▶ Automated Semantic Onboarding for AI Agents](https://youtu.be/pEGlSHxKASw)
 
-> The linked Copilot session (11/07/2025) shows an earlier snapshot of the project. Use it as a conceptual guide rather than a reflection of the current state.
+> For now we only have [AGENTS.md](AGENTS.md) in top layer and the [Subdomain_AGENTS.md](Subdomain_Articles/Subdomain_AGENTS.md) in the lower layer.
 
 ### Benefits
 
-- **Collaborators and reviewers** can interrogate the repo interactively.  
+- **Collaborators and reviewers** can interrogate and onboard to the repo interactively.  
 - Provides structured context to LLMs, improving reproducibility.  
 - Enables agents to reason across the full research program.
   
