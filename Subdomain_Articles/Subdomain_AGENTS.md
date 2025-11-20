@@ -1,7 +1,7 @@
 # Subdomain_AGENTS.md — Universal Reasoning Substrate Onboarding
 
 ## Purpose
-This file serves as a machine-readable onboarding guide for understanding the **Universal Reasoning Substrate (URS)**, its six sub-domains, and guidance for **communal DSL development**. The included documents (`Approaching_DSL_Using_URST.tex` and `Subdomain_communal_proclamation.tex`) provide core theoretical and operational context.  
+This file serves as a machine-readable onboarding guide for understanding the **Universal Reasoning Substrate (URS)**, its six sub-domains, and guidance for **communal DSL development**. 
 This file is designed for **machine agents**, requiring strict, stepwise parsing, cross-file linking, and dynamic context retrieval.
 
 ---
@@ -13,8 +13,8 @@ Machine agents must parse and integrate these documents before using the instruc
 
 | File | Purpose | Key Takeaways for Machine Agent |
 |------|---------|--------------------------------|
-| `Approaching_DSL_Using_URST.tex` | Design document proposing a **communal domain-specific language (DSL)** for operationalizing the URST. | - DSL is a **substrate**, not a meta-reasoner. <br>- Meta-reasoning (RARFL, pruning, ML-guided search) is **external**. <br>- Provides experimental testbeds (e.g., Tic-Tac-Toe) and candidate primitive definitions. <br>- Communal workflow: propose → evaluate → integrate. |
-| `Subdomain_communal_proclamation.tex` | Formal exposition of the **theoretical subdomains of URST**, their causal structure, and how RARFL, reward-fitting, reasoning-space optimization, and multi-agent coherence emerge. | - Establishes the **mathematical and philosophical backbone** of URST. <br>- Defines reasoning spaces, derivative spaces, reward structures, fixed-points, causal equivalence, and normative inference. <br>- Stresses **URST as a living, communal research domain**. <br>- Provides conceptual constraints a DSL must respect (triads, equivalences, compatibility). |
+| [`Approaching_DSL_Using_URST.tex`](ai_source_machine_readable/Approaching_DSL_Using_URST.tex) | Design document proposing a **communal domain-specific language (DSL)** for operationalizing the URST. | - DSL is a **substrate**, not a meta-reasoner. <br>- Meta-reasoning (RARFL, pruning, ML-guided search) is **external**. <br>- Provides experimental testbeds (e.g., Tic-Tac-Toe) and candidate primitive definitions. <br>- Communal workflow: propose → evaluate → integrate. |
+| [`Subdomain_communal_proclamation.tex`](ai_source_machine_readable/Subdomain_communal_proclamation.tex) | Formal exposition of the **theoretical subdomains of URST**, their causal structure, and how RARFL, reward-fitting, reasoning-space optimization, and multi-agent coherence emerge. | - Establishes the **mathematical and philosophical backbone** of URST. <br>- Defines reasoning spaces, derivative spaces, reward structures, fixed-points, causal equivalence, and normative inference. <br>- Stresses **URST as a living, communal research domain**. <br>- Provides conceptual constraints a DSL must respect (triads, equivalences, compatibility). |
 
 ---
 
@@ -234,3 +234,4 @@ store_tile_annotations(tile, pruned_tile.annotations)  # provenance + who/what p
 ---
 
 End of Subdomain_AGENTS.md
+
