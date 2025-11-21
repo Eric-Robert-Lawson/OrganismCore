@@ -15,7 +15,7 @@ Machine agents must parse and integrate these documents before using the instruc
 |------|---------|--------------------------------|
 | [`Approaching_DSL_Using_URST.tex`](ai_source_machine_readable/Approaching_DSL_Using_URST.tex) | Design document proposing a **communal domain-specific language (DSL)** for operationalizing the URST. | - DSL is a **substrate**, not a meta-reasoner. <br>- Meta-reasoning (RARFL, pruning, ML-guided search) is **external**. <br>- Provides experimental testbeds (e.g., Tic-Tac-Toe) and candidate primitive definitions. <br>- Communal workflow: propose → evaluate → integrate. |
 | [`Subdomain_communal_proclamation.tex`](ai_source_machine_readable/Subdomain_communal_proclamation.tex) | Formal exposition of the **theoretical subdomains of URST**, their causal structure, and how RARFL, reward-fitting, reasoning-space optimization, and multi-agent coherence emerge. | - Establishes the **mathematical and philosophical backbone** of URST. <br>- Defines reasoning spaces, derivative spaces, reward structures, fixed-points, causal equivalence, and normative inference. <br>- Stresses **URST as a living, communal research domain**. <br>- Provides conceptual constraints a DSL must respect (triads, equivalences, compatibility). |
-
+| [`Automated_Onboarding_relation_to_RARFL.tex`](ai_source_machine_readable/Automated_Onboarding_relation_to_RARFL.tex) | Explains how **Automated Onboarding** concretely relates to the **RARFL** process, formalizing feedback loops and emergent proto-DSL structures. | - Provides formal loop definitions and phases <br>- Illustrates self-optimization of semantic grounding <br>- Offers meta-level optimization insights for URST integration |
 ---
 
 ## 1. Sub-Domains Overview  
@@ -77,7 +77,10 @@ A valid DSL must **respect these constraints**.
 ## 3. Onboarding Process for a Machine Agent
 
 ### Step 1 — Parse Context Files  
-1. Read all `.tex` documents.  
+1. Read and parse context files in order:
+   - `Approaching_DSL_Using_URST.tex`
+   - `Subdomain_communal_proclamation.tex`
+   - `Automated_Onboarding_relation_to_RARFL.tex`
 2. Extract:
    - Triadic reasoning structure  
    - Definitions of reasoning spaces  
@@ -225,7 +228,9 @@ store_tile_annotations(tile, pruned_tile.annotations)  # provenance + who/what p
 
 ## 6. Next Steps for Machine Agent
 
-- Validate comprehension of URST triads (Objectification, operationalization, and context injection + Reasoning space, RARFL process, and derivative reasoning space are both triads which together form a hexad)
+- Validate comprehension of URST triads:
+    - Objectification, operationalization, and context injection  
+    - Reasoning space, RARFL process, and derivative reasoning space (together forming a hexad)
 - Build small reasoning DAGs using DSL primitives  
 - Apply external pruning / RL / meta-analysis  
 - Contribute new primitives back into substrate  
@@ -234,4 +239,5 @@ store_tile_annotations(tile, pruned_tile.annotations)  # provenance + who/what p
 ---
 
 End of Subdomain_AGENTS.md
+
 
