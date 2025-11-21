@@ -130,6 +130,38 @@ This dynamic grounding process allows the system to scale beyond fixed context l
 
 The result is a cognitively natural and computationally efficient mechanism for reasoning: the agent does not attempt to reason over the entire project at once but instead processes it in localized semantic frames that shift fluidly as attention demands. This mirrors human reasoning and reinforces the claim that the evolving documentation approaches a functional proto-DSL governing how and when semantic frames should be activated. 
 
+\section{Derivative Reasoning Space: Meta-Reasoning Integration}
+
+During the RARFL cycle, the agent maintains a \textbf{derivative reasoning space} $R'$ that captures the relationships, dependencies, and integration schema of all reasoning objects and semantic chunks. Formally, $R'$ is a meta-DAG mapping:
+
+\[
+R' = \{ \text{nodes: reasoning objects}, \ \text{edges: dependency/semantic relations}, \ \text{annotations: provenance/feedback} \}.
+\]
+
+The derivative reasoning space serves several functions:
+
+\begin{enumerate}
+    \item \textbf{Synthesis:} Combines localized reasoning DAGs and semantic chunks into a coherent global schema.  
+    \item \textbf{Validation:} Detects inconsistencies, redundancies, and violations of URST constraints.  
+    \item \textbf{Guidance:} Informs the agent which segments require refinement or further exploration.  
+    \item \textbf{Persistence:} Acts as a continuously referenced anchor object throughout onboarding and reasoning, ensuring that local operations remain aligned with the global structure.  
+\end{enumerate}
+
+This meta-reasoning layer effectively operationalizes \textit{self-referential mapping}, allowing the agent to reason about its own reasoning processes while maintaining a constantly evolving, auditable map of the semantic substrate. Integration with RARFL ensures that improvements in the semantic grounding propagate consistently across the derivative reasoning space, supporting scalable, modular, and explainable reasoning.
+
+\subsection{Integration with Chunked Semantic Grounding}
+
+The derivative reasoning space $R'$ complements \textit{chunked semantic grounding} by providing a global scaffold:
+
+\begin{itemize}
+    \item Each localized reasoning frame references $R'$ for context and alignment.
+    \item Updates to semantic chunks are propagated to $R'$, maintaining coherence across the project.
+    \item Metrics and provenance (cache hits, tile expansions, axioms stability) can be aggregated at the $R'$ level for analysis.
+    \item The agent can preemptively identify gaps in the grounding or reasoning coverage using $R'$ as a self-referential anchor.
+\end{itemize}
+
+The derivative reasoning space (also called the meta-reasoning space) is the optimal way to navigate the reasoning space of the files for the intended purpose of onboarding. This object can itself be iteratively improved by applying the RARFL process, reflecting on its own structure, and incorporating insights from reasoning outcomes. In this manner, both the segmented reasoning files and the global meta-reasoning space evolve together, enhancing overall semantic grounding, traceability, and the emergence of a proto-DSL.
+
 
 \section{Self-Referential Optimization of the Reasoning Substrate}
 
