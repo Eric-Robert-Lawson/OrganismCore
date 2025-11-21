@@ -113,6 +113,24 @@ This section formalizes a meta-reasoning structure in which semantic grounding i
 
 By closing the loop between agent reasoning and semantic grounding, this framework provides a scalable, auditable mechanism for operationalizing principles-first reasoning and lays the foundation for the development of a fully expressive DSL for universal reasoning.
 
+\section{Dynamic Semantic Grounding and Chunked Reasoning}
+
+A practical and theoretical observation emerging from the onboarding process is that neither humans nor AI systems require a globally active semantic context to perform coherent reasoning. Human cognition proceeds through \textit{dynamic activation of local reasoning frames}, in which only the concepts relevant to the current task are brought into working memory. Knowledge across disparate domains—such as physics, biology, programming, or abstract mathematics—remains latent until selectively activated.
+
+The structured onboarding material $D$ naturally supports this principle. Rather than requiring an agent to internalize the entire project substrate at once, the onboarding mechanism enables reasoning through \textbf{chunked semantic grounding}, wherein:
+
+\begin{itemize}
+    \item only the relevant subset of the grounding material is activated for a given task,
+    \item contextual frames can shift dynamically as reasoning transitions between subproblems,
+    \item global project structure is preserved as latent but accessible information, and
+    \item reasoning is constrained by local semantic affordances derived from the active documents.
+\end{itemize}
+
+This dynamic grounding process allows the system to scale beyond fixed context limits (e.g., file-access or token constraints) by sequentially activating semantically coherent chunks of $D$. The agent can operate on any subset $D_i \subset D$ while maintaining the ability to draw upon the global substrate when required. Over time, as the RARFL cycle refines $D$, these chunks become more standardized, structured, and internally consistent, further supporting efficient activation and transfer of context.
+
+The result is a cognitively natural and computationally efficient mechanism for reasoning: the agent does not attempt to reason over the entire project at once but instead processes it in localized semantic frames that shift fluidly as attention demands. This mirrors human reasoning and reinforces the claim that the evolving documentation approaches a functional proto-DSL governing how and when semantic frames should be activated. 
+
+
 \section{Self-Referential Optimization of the Reasoning Substrate}
 
 A key theoretical implication is that the system forms a meta-level loop in which the environment that shapes the agent's reasoning is itself shaped by the outcomes of the agent's reasoning. This self-referential structure parallels theoretical constructs such as Gödel Machines, AIXI-meta, and corrigible reward models, but is instantiated here in a practical and auditable workflow.
