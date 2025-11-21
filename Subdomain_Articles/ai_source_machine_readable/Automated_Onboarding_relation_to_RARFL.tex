@@ -41,7 +41,7 @@ An onboarding function $\mathcal{O}$ maps the document set $D$ to an internal st
 S_0 = \mathcal{O}(D).
 \]
 
-This state $S_0$ constrains and enables all subsequent reasoning performed by the agent.
+This state $S_0$ constrains and enables all subsequent reasoning performed by the agent. The agent can identify missing concepts, ambiguous definitions, or structural inconsistencies in $D$, and propose targeted refinements.
 
 \section{RARFL: The Reasoning Axiom–Reward Feedback Loop}
 
@@ -97,6 +97,8 @@ This self-referential cycle enables the semantic substrate to progressively refi
 \end{itemize}
 
 Over time, this feedback-driven refinement approximates the creation of a DSL that governs future reasoning, effectively bootstrapping the agent’s own environment. In this sense, the agent not only learns and reasons within the project, but also shapes the very substrate that constrains its reasoning, operationalizing meta-level optimization in a fully auditable workflow.
+
+\paragraph{Diagnostic Reasoning}The agent’s feedback loop also serves a diagnostic function: by analyzing faulty or suboptimal reasoning outputs, the agent can determine whether errors stem from incomplete or ambiguous semantic grounding, inadequacies in the documentation itself, or flaws inherent in the process being modeled. This enables targeted refinements, improving both the semantic substrate and the accuracy of downstream reasoning tasks. Such capability ensures that the system not only onboards agents efficiently but also continuously improves the quality and fidelity of the operational knowledge base.
 
 \paragraph{Practical Illustration.} For example, consider the Tic-Tac-Toe testbed: after onboarding, the agent can analyze the RDU DAG generated from game states, identify redundancies or ambiguities in the semantic grounding, and propose adjustments to improve future trajectory evaluations. These adjustments, once integrated, result in more efficient reasoning, higher axiom stability, and a tighter substrate that mirrors the intended theoretical properties of the universal reasoning framework.
 
