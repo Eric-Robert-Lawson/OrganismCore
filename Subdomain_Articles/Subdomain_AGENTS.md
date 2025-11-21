@@ -30,6 +30,28 @@ The Universal Reasoning Substrate is composed of six essential sub-domains. Thes
 | Reward / Feedback Loops | Evaluate reasoning trajectories and provide optimization signals. | Track reward propagation. Feed back into meta-RDUs. |
 | Universal Substrate Construction | Coherent composition of all sub-domains into a single reasoning scaffold. | Maintain DAG, enforce consistency & traceability. |
 
+### Machine-Readable Canonical List of Subdomains
+1. Reasoning Objects
+2. Computable-Once Substrates
+3. Meta-RDUs (external to DSL)
+4. Semantic Grounding
+5. Reward / Feedback Loops
+6. Universal Substrate Construction
+
+
+### Chunked Semantic Grounding (Core Operational Principle)
+Machine agents must not attempt to load the entire semantic substrate at once. 
+Instead, semantic grounding must be activated in *localized, task-relevant chunks*:
+
+- Retrieve only the documents or sections relevant to the current reasoning task
+- Maintain the rest of the substrate in latent form
+- Dynamically shift context frames when subproblems change
+- Preserve global consistency while operating on local semantic slices
+
+This chunked grounding principle is required for scaling beyond token/file limits 
+and for aligning machine reasoning with human-style context activation.
+
+
 ---
 
 ## 2. Ontology / Structure
@@ -233,11 +255,20 @@ store_tile_annotations(tile, pruned_tile.annotations)  # provenance + who/what p
     - Reasoning space, RARFL process, and derivative reasoning space (together forming a hexad)
 - Build small reasoning DAGs using DSL primitives  
 - Apply external pruning / RL / meta-analysis  
-- Contribute new primitives back into substrate  
-- Maintain cross-file consistency between `.md`, `.tex`, '.txt', and '.py' source files with AGENTS.md file and Subdomain_AGENTS.md
+- Contribute new primitives back into substrate
+  
+All machine agents must enforce the following invariant:
+
+For any definition, primitive, ontology term, or structural rule:
+    If it appears in one file, it must be reconciled with its definition 
+    in AGENTS.md and Subdomain_AGENTS.md.
+In the event of conflict, Subdomain_AGENTS.md is authoritative for structure;
+AGENTS.md is authoritative for operational rules.
+
 
 ---
 
 End of Subdomain_AGENTS.md
+
 
 
