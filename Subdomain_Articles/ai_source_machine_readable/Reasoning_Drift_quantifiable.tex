@@ -14,9 +14,9 @@ A Formalization Within Principle-First Semantic Architectures}
 \maketitle
 
 \begin{abstract}
-Reasoning systems---human or artificial---change over time. They update premises, refine models, and alter the internal operators through which they parse and manipulate information. Yet because reasoning is a process rather than a static object, these changes may accumulate in subtle ways. I call this phenomenon \emph{reasoning drift}: the gradual, often unnoticed deviation of a reasoning structure away from its originally grounded principles.
+Reasoning systems---human or artificial---change over discrete segments of learning. They update premises, refine models, and alter the internal operators through which they parse and manipulate information. Yet because reasoning is a process rather than a static object, these changes may accumulate in subtle ways. I call this phenomenon \emph{reasoning drift}: the gradual, often unnoticed deviation of a reasoning structure away from its originally grounded principles.
 
-This article introduces a formal account of reasoning drift and the conditions under which it can be measured, bounded, and corrected within a principle-first, semantically grounded reasoning architecture, specifically one refined by the Reasoning Axiom--Reward Feedback Loop (RARFL). By objectifying reasoning and semantic evolution, we define coherence as a measurable functional, reasoning as the derivative of coherence, and bias as the deviation of coherence itself. When reasoning processes are encoded as computable structures, these phenomena become not only observable but quantifiable.
+This article introduces a formal account of reasoning drift and the conditions under which it can be measured, bounded, and corrected within a principle-first, semantically grounded reasoning architecture, specifically one refined by the Reasoning Axiom--Reward Feedback Loop (RARFL). By objectifying reasoning and semantic evolution, we define coherence as a measurable functional, reasoning as the discrete derivative of coherence over reasoning segments, and bias as the deviation of coherence itself. We also introduce \emph{semantic efficiency}, quantifying coherence gain per unit of semantic grounding effort.
 \end{abstract}
 
 \section{Introduction}
@@ -128,25 +128,24 @@ A reasoning system remains coherent when:
 Coherence is therefore a dynamical stability condition.
 
 \section{Objectifying Coherence Through Semantic Evolution Analysis}
-A principled method for detecting coherence loss is to treat the \emph{evolution of semantic grounding itself} as an explicit, analyzable object. Let $G_t$ denote the semantic grounding graph at time $t$, encoding:
+Let $G_i$ denote the semantic grounding graph at reasoning segment $i$, encoding:
 \begin{itemize}
     \item concept definitions,
     \item relations and semantic constraints,
-    \item operator–concept connections,
+    \item operator--concept connections,
     \item and invariants required by the principle-first substrate.
 \end{itemize}
 
-The change in grounding between two time steps is:
+The discrete change in grounding between segments is:
 \[
-\Delta G_t = G_{t+1} - G_t,
+\Delta G_i = G_{i+1} - G_i,
 \]
-where subtraction denotes structural or semantic difference operators.
-
+where subtraction denotes structural or semantic difference operators.  
 The sequence
 \[
 \{ \Delta G_0, \Delta G_1, \Delta G_2, \ldots \}
 \]
-forms a \textbf{semantic evolution tail}.  
+forms a \textbf{semantic evolution tail}.
 
 Coherence can be objectified through three measurable properties:
 \begin{enumerate}
@@ -155,52 +154,59 @@ Coherence can be objectified through three measurable properties:
     \item \textbf{Stability:} whether semantic changes converge to fixed points or introduce unbounded drift.
 \end{enumerate}
 
-Define a coherence functional:
+Define a coherence functional over segments:
 \[
-\mathcal{C}(G_t) = \text{Clarity}(G_t) - \text{Ambiguity}(G_t),
+\mathcal{C}(G_i) = \text{Clarity}(G_i) - \text{Ambiguity}(G_i),
 \]
-where each component is computable from the structural properties of the grounding.
+computable from structural properties of the grounding.
 
-\subsection{Reasoning as the Derivative of Coherence}
-Formally, let reasoning $R_t$ at time $t$ be the rate of change of coherence:
+\subsection{Reasoning as the Discrete Derivative of Coherence}
+Reasoning $R_i$ at segment $i$ is defined as the discrete derivative of coherence:
 \[
-R_t = \frac{d}{dt} \mathcal{C}(G_t).
+R_i = \mathcal{C}(G_i) - \mathcal{C}(G_{i-1}).
 \]
-A positive $R_t$ indicates reasoning is increasing coherence; negative $R_t$ indicates reasoning is introducing drift or ambiguity.  
+A positive $R_i$ indicates reasoning increases coherence; negative $R_i$ indicates drift or ambiguity.  
 
-Conversely, coherence can be viewed as the integral of reasoning over time:
+Conversely, coherence is the cumulative sum of reasoning segments:
 \[
-\mathcal{C}(G_t) = \int_0^t R_\tau \, d\tau + \mathcal{C}(G_0),
+\mathcal{C}(G_i) = \sum_{j=1}^{i} R_j + \mathcal{C}(G_0),
 \]
-making explicit the fundamental duality between reasoning and coherence.
+making explicit the fundamental duality between reasoning and coherence in discrete segments.
+
+\subsection{Semantic Efficiency}
+We define semantic efficiency per segment $i$ as:
+\[
+\eta_i = \frac{R_i}{\Delta S(G_i)},
+\]
+where $\Delta S(G_i)$ quantifies the semantic grounding effort for segment $i$.  
+High $\eta_i$ indicates efficient reasoning: large coherence gain with minimal semantic effort.
+
 
 \subsection{Bias as Deviation from Coherence}
-Bias $B_t$ can be defined as the deviation of semantic evolution from an ideal coherence trajectory:
+Bias $B_i$ is the deviation of semantic evolution from the ideal coherence trajectory:
 \[
-B_t = \left\lVert \mathcal{C}(G_t) - \mathcal{C}^*(G_t) \right\rVert,
+B_i = \left\lVert \mathcal{C}(G_i) - \mathcal{C}^*(G_i) \right\rVert,
 \]
-where $\mathcal{C}^*(G_t)$ represents the ideal or canonical evolution of coherence.  
-
-Bias is thus an objective, relativistic metric: it is not subjective judgment but a quantifiable distance from perfect coherence, allowing for the measurement of deviations in reasoning, translation, interpretation, or systemic influence.
+where $\mathcal{C}^*(G_i)$ represents the canonical evolution of coherence.  
+Bias remains a measurable, objective metric in this discrete-segment framework.
 
 \section{Detecting and Correcting Drift}
-Because the operators are explicit objects, the system can:
 \subsection{Detect Drift}
 \begin{itemize}
-    \item compare operators to canonical baselines;
+    \item compare operators $R_i$ to canonical baselines;
     \item measure deviation in invariants;
-    \item track perturbations in the semantic grounding graph;
+    \item track perturbations in the semantic grounding graph $G_i$;
     \item detect failure of compositional or shortcut properties;
-    \item compute reasoning derivatives $R_t$ and bias metrics $B_t$.
+    \item compute reasoning derivatives $R_i$, bias $B_i$, and semantic efficiency $\eta_i$.
 \end{itemize}
 
 \subsection{Correct Drift}
 \begin{itemize}
     \item regenerate operators from canonical definitions;
     \item re-ground semantic mappings;
-    \item reapply RARFL constraints;
+    \item reapply RARFL constraints per reasoning segment;
     \item execute a coherence-restoration cycle;
-    \item minimize bias $B_t$ while maximizing positive reasoning derivative $R_t$.
+    \item minimize bias $B_i$ while maximizing positive reasoning derivative $R_i$ and semantic efficiency $\eta_i$.
 \end{itemize}
 
 \section{Conclusion}
@@ -209,11 +215,11 @@ Reasoning drift is unavoidable in adaptive, reflective reasoning systems. But wh
     \item principle-first,
     \item semantically grounded,
     \item objectified as computable reasoning structures,
-    \item measured via the reasoning derivative of coherence, and
-    \item bias is quantified as deviation from ideal coherence,
+    \item measured via discrete reasoning derivatives of coherence $R_i$, and
+    \item bias is quantified as deviation from ideal coherence $B_i$,
 \end{itemize}
 drift becomes quantifiable, controllable, and even beneficial as an engine of adaptation.
 
-This framework formalizes reasoning, coherence, and bias as mathematically defined, auditable, and dynamically measurable properties, providing a foundation for next-generation reasoning systems and objective analysis of textual, cultural, or conceptual corpora.
+This discrete-segment, semantic-efficiency-aware framework formalizes reasoning, coherence, and bias as auditable, measurable, and dynamically analyzable properties, providing a foundation for next-generation reasoning systems.
 
 \end{document}
