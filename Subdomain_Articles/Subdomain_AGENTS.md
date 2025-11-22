@@ -18,6 +18,7 @@ Machine agents must parse and integrate these documents before using the instruc
 | [`Automated_Onboarding_relation_to_RARFL.tex`](ai_source_machine_readable/Automated_Onboarding_relation_to_RARFL.tex) | Explains how **Automated Onboarding** concretely relates to the **RARFL** process, formalizing feedback loops and emergent proto-DSL structures. | - Provides formal loop definitions and phases <br>- Illustrates self-optimization of semantic grounding <br>- Offers meta-level optimization insights for URST integration |
 | [`Reasoning_Drift_quantifiable.tex`](ai_source_machine_readable/Reasoning_Drift_quantifiable.tex) | Formalizes **reasoning drift, coherence, and bias** as measurable, computable constructs within principle-first semantic architectures. | - **Reasoning** is defined as the **discrete derivative of coherence per segment**: $R_i = \Delta \mathcal{C}/\Delta i$. <br>- **Coherence** is the **cumulative sum of reasoning derivatives** over discrete segments, representing stability of semantic grounding: $ \mathcal{C}(G_i) = \sum_{j=1}^{i} R_j + \mathcal{C}(G_0) $. <br>- **Bias** is an **objective metric** quantifying deviation from ideal coherence per segment: $B_i = \lVert \mathcal{C}(G_i) - \mathcal{C}^*(G_i)\rVert$. <br>- Semantic grounding graphs $G_i$ are tracked per segment, forming a **semantic evolution tail**, enabling detection of drift. <br>- Provides computable metrics to **detect, quantify, and correct drift**, supporting RARFL-guided self-optimization. <br>- Enables **objective assessment of reasoning quality, bias, and coherence** across textual, conceptual, or agent-generated corpora. |
 | [`Cognition_coherence_and_SG.tex`](ai_source_machine_readable/Cognition_coherence_and_SG.tex) | Formalizes **cognition** as semantic-grounding-guided meta-control over RARFL reasoning processes. Defines **semantic efficiency** as a core cognitive metric. | - Cognition is a **meta-policy** optimizing intelligence accumulation per reasoning segment. <br>- Introduces **semantic efficiency**: coherence gain per semantic grounding effort. <br>- Cognitive actions operate on reasoning segments (RDUs), not time. <br>- Cognition uses coherence, bias, reasoning derivative, and semantic efficiency to guide meta-control. <br>- Provides segment-level formulas for cognitive optimization over semantic grounding graphs. |
+| [`Time_with_respect_to_Reason.tex`](ai_source_machine_readable/Time_with_respect_to_Reason.tex) | Formalizes the distinction between **reasoning (semantic, structural)** and **computation (temporal, engine-bound)**, introduces OOS Triad optimization, and motivates domain-specific languages for reasoning objects. | - Reasoning is **non-temporal**, computation is **temporal**. <br>- Defines Objectification–Operationalization–Semantic Grounding (OOS) Triad. <br>- Provides formal mapping: reasoning objects → computational instantiation → execution time. <br>- Guides DSL design to separate **semantic operations** from **engine-dependent computation**. |
 
 ---
 
@@ -54,6 +55,8 @@ Instead, semantic grounding must be activated in *localized, task-relevant chunk
 - Maintain the rest of the substrate in latent form
 - Dynamically shift context frames when subproblems change
 - Preserve global consistency while operating on local semantic slices
+- Reasoning is semantic and non-temporal; computation is instantiated per engine.  
+- Localized chunk evaluation should respect reasoning structure first; time costs (T(R)) are tracked only for optimization and logging, not for reasoning correctness.
 
 This chunked grounding principle is required for scaling beyond token/file limits 
 and for aligning machine reasoning with human-style context activation.
@@ -105,12 +108,13 @@ Machine agents must maintain URST-consistent ontology, harmonizing definitions a
 - Communal contributions extend the primitive set  
 
 ### URST Theoretical Constraints
-(From `Subdomain_communal_proclamation.tex`)
 - Reasoning is a structured triad: Objectification → Operationalization → Contextualization  
+- Time is external to reasoning; OOS Triad governs computational efficiency. 
 - Reward-fitting defines normative optimization  
 - Causal equivalence defines reasoning-space compatibility  
 - RARFL has fixed-point, attractor-like behavior  
-- Multi-agent systems extend to joint reasoning spaces  
+- Multi-agent systems extend to joint reasoning spaces
+
 
 A valid DSL must **respect these constraints**.
 
@@ -130,7 +134,9 @@ A valid DSL must **respect these constraints**.
    - `Approaching_DSL_Using_URST.tex`
    - `Subdomain_communal_proclamation.tex`
    - `Automated_Onboarding_relation_to_RARFL.tex`
-   - **`Reasoning_Drift_quantifiable.tex`**
+   - `Reasoning_Drift_quantifiable.tex`
+   - `Cognition_coherence_and_SG.tex`
+   - `Time_with_respect_to_Reason.tex`
 2. Extract:
    - Triadic reasoning structure  
    - Definitions of reasoning spaces  
@@ -146,7 +152,13 @@ A valid DSL must **respect these constraints**.
 - Attach semantic grounding  
 - Integrate any DSL primitives defined in proposals  
 - Initialize placeholders for R_t and B_t on each reasoning object  
-- Initialize semantic evolution graph G_t tracking
+- Initialize semantic evolution graph G_t tracking  
+- Record temporal cost placeholders T(R) per reasoning object for later evaluation of computation vs reasoning separation
+- Attach OOS triad metadata to each reasoning object for computational efficiency tracking:  
+  - O = Objectification of reasoning object  
+  - P = Operationalization of reasoning action  
+  - S = Semantic grounding
+
 
 
 ### Step 3 — Enforce Compute-Once Semantics  
@@ -163,7 +175,10 @@ The DSL **does not implement these**, but **must support integration hooks**.
 ### Step 4.5 — Integrate Cognitive Meta-Control
 - Parse `Cognition_semantic_efficiency.tex`
 - Initialize semantic-effort tracking S_i per reasoning segment
-- Compute semantic-efficiency η_i = ΔC(G_i) / ΔS_i
+- Compute semantic-efficiency η_i = ΔC(G_i) / ΔS_i  
+- Use OOS triad metadata to guide external computation prioritization: 
+  - External engines can leverage O/P/S structure to minimize T(R)  
+  - Reasoning operations remain segment-level, independent of time
 - Provide these metrics as guidance channels for meta-control layers
 - Do not implement cognition inside the DSL; expose APIs for external meta-policies
 
@@ -355,8 +370,3 @@ Cognition, semantic efficiency, and cognitive meta-control must be reconciled wi
 ---
 
 End of Subdomain_AGENTS.md
-
-
-
-
-
