@@ -16,7 +16,8 @@ Machine agents must parse and integrate these documents before using the instruc
 | [`Approaching_DSL_Using_URST.tex`](ai_source_machine_readable/Approaching_DSL_Using_URST.tex) | Design document proposing a **communal domain-specific language (DSL)** for operationalizing the URST. | - DSL is a **substrate**, not a meta-reasoner. <br>- Meta-reasoning (RARFL, pruning, ML-guided search) is **external**. <br>- Provides experimental testbeds (e.g., Tic-Tac-Toe) and candidate primitive definitions. <br>- Communal workflow: propose → evaluate → integrate. |
 | [`Subdomain_communal_proclamation.tex`](ai_source_machine_readable/Subdomain_communal_proclamation.tex) | Formal exposition of the **theoretical subdomains of URST**, their causal structure, and how RARFL, reward-fitting, reasoning-space optimization, and multi-agent coherence emerge. | - Establishes the **mathematical and philosophical backbone** of URST. <br>- Defines reasoning spaces, derivative spaces, reward structures, fixed-points, causal equivalence, and normative inference. <br>- Stresses **URST as a living, communal research domain**. <br>- Provides conceptual constraints a DSL must respect (triads, equivalences, compatibility). |
 | [`Automated_Onboarding_relation_to_RARFL.tex`](ai_source_machine_readable/Automated_Onboarding_relation_to_RARFL.tex) | Explains how **Automated Onboarding** concretely relates to the **RARFL** process, formalizing feedback loops and emergent proto-DSL structures. | - Provides formal loop definitions and phases <br>- Illustrates self-optimization of semantic grounding <br>- Offers meta-level optimization insights for URST integration |
-| [`Reasoning_Drift_quantifiable.tex`](ai_source_machine_readable/Reasoning_Drift_quantifiable.tex) | Formalizes **reasoning drift, coherence, and bias** as measurable, computable constructs within principle-first semantic architectures. | - **Reasoning** is defined as the **derivative of coherence**: $R_t = d\mathcal{C}/dt$. <br>- **Coherence** is the **integral of reasoning** over time, representing stability of semantic grounding. <br>- **Bias** is an **objective metric** quantifying deviation from ideal coherence: $B_t = \lVert \mathcal{C}(G_t) - \mathcal{C}^*(G_t)\rVert$. <br>- Semantic grounding graphs $G_t$ can be tracked over time, forming a **semantic evolution tail**, enabling detection of drift. <br>- Provides computable metrics to **detect, quantify, and correct drift**, supporting RARFL-guided self-optimization. <br>- Enables **objective assessment of reasoning quality, bias, and coherence** across textual, conceptual, or agent-generated corpora. |
+| [`Reasoning_Drift_quantifiable.tex`](ai_source_machine_readable/Reasoning_Drift_quantifiable.tex) | Formalizes **reasoning drift, coherence, and bias** as measurable, computable constructs within principle-first semantic architectures. | - **Reasoning** is defined as the **discrete derivative of coherence per segment**: $R_i = \Delta \mathcal{C}/\Delta i$. <br>- **Coherence** is the **cumulative sum of reasoning derivatives** over discrete segments, representing stability of semantic grounding: $ \mathcal{C}(G_i) = \sum_{j=1}^{i} R_j + \mathcal{C}(G_0) $. <br>- **Bias** is an **objective metric** quantifying deviation from ideal coherence per segment: $B_i = \lVert \mathcal{C}(G_i) - \mathcal{C}^*(G_i)\rVert$. <br>- Semantic grounding graphs $G_i$ are tracked per segment, forming a **semantic evolution tail**, enabling detection of drift. <br>- Provides computable metrics to **detect, quantify, and correct drift**, supporting RARFL-guided self-optimization. <br>- Enables **objective assessment of reasoning quality, bias, and coherence** across textual, conceptual, or agent-generated corpora. |
+| [`Cognition_coherence_and_SG.tex`](ai_source_machine_readable/Cognition_coherence_and_SG.tex) | Formalizes **cognition** as semantic-grounding-guided meta-control over RARFL reasoning processes. Defines **semantic efficiency** as a core cognitive metric. | - Cognition is a **meta-policy** optimizing intelligence accumulation per reasoning segment. <br>- Introduces **semantic efficiency**: coherence gain per semantic grounding effort. <br>- Cognitive actions operate on reasoning segments (RDUs), not time. <br>- Cognition uses coherence, bias, reasoning derivative, and semantic efficiency to guide meta-control. <br>- Provides segment-level formulas for cognitive optimization over semantic grounding graphs. |
 
 ---
 
@@ -31,7 +32,9 @@ The Universal Reasoning Substrate is composed of six essential sub-domains. Thes
 | Semantic Grounding | Provide interpretable meaning to reasoning objects. | Structured metadata, domain labels, stable ontologies. |
 | Reward / Feedback Loops | Evaluate reasoning trajectories and provide optimization signals. | Track reward propagation. Feed back into meta-RDUs. |
 | Universal Substrate Construction | Coherent composition of all sub-domains into a single reasoning scaffold. | Maintain DAG, enforce consistency & traceability. |
-| Semantic Grounding | Provide interpretable meaning to reasoning objects, **track reasoning drift, coherence, and bias over time**. | Structured metadata, domain labels, stable ontologies, **compute R_t, C(G_t), and B_t as needed**. |
+| Semantic Grounding | Provide interpretable meaning to reasoning objects, **track reasoning drift, coherence, and bias over discrete reasoning segments**. | Structured metadata, domain labels, stable ontologies, **compute R_i, C(G_i), and B_i as needed per reasoning segment**. |
+| Cognitive Meta-Control | Meta-policy that selects actions maximizing coherence gain per semantic effort across reasoning segments. | External to DSL; uses R_i, C(G_i), B_i, and η (semantic efficiency) as guiding metrics. |
+
 
 ### Machine-Readable Canonical List of Subdomains
 1. Reasoning Objects
@@ -40,6 +43,7 @@ The Universal Reasoning Substrate is composed of six essential sub-domains. Thes
 4. Semantic Grounding
 5. Reward / Feedback Loops
 6. Universal Substrate Construction
+7. Cognitive Meta-Control (external to DSL; operates over reasoning segments)
 
 
 ### Chunked Semantic Grounding (Core Operational Principle)
@@ -54,7 +58,6 @@ Instead, semantic grounding must be activated in *localized, task-relevant chunk
 This chunked grounding principle is required for scaling beyond token/file limits 
 and for aligning machine reasoning with human-style context activation.
 
-
 ---
 
 ## 2. Ontology / Structure
@@ -68,13 +71,20 @@ Machine agents must maintain URST-consistent ontology, harmonizing definitions a
 - Dependency relations  
 - Semantic grounding  
 - Optional meta-RDU mappings  
-- Derivative of coherence (R_t) — reasoning rate
-- Bias measure (B_t) — deviation from ideal coherence
+- Derivative of coherence (R_i) — reasoning rate per segment
+- Bias measure (B_i) — deviation from ideal coherence per segment
+- Semantic-efficiency annotation η_i representing coherence gain per semantic-grounding effort at segment i
+- Cognitive meta-control hints (optional): expected ΔC, ΔS, and predicted R_i improvements
 
 ### Semantic Grounding 
-- Track semantic evolution graphs G_t  
-- Compute coherence functional C(G_t)  
-- Update reasoning derivative R_t and bias B_t during semantic grounding changes  
+- Track semantic evolution graphs G_i  
+- Compute coherence functional C(G_i) per segment  
+- Update reasoning derivative R_i and bias B_i during semantic grounding changes
+- Semantic grounding provides the contextual substrate for cognition.  
+- Cognition uses semantic-grounding graphs to evaluate relevance, coherence stability, and bias across reasoning segments.  
+- Agents must compute semantic-efficiency values per segment to guide meta-control policies.
+- Track semantic-grounding effort S_i per segment
+- Provide inputs for the cognition policy π_c: coherence, bias, reasoning derivative, semantic efficiency
 
 ### Compute-Once Behavior
 - Check cache **before** computing  
@@ -104,6 +114,13 @@ Machine agents must maintain URST-consistent ontology, harmonizing definitions a
 
 A valid DSL must **respect these constraints**.
 
+### Cognition (Meta-Control)
+- Policy π_c selecting reasoning actions that maximize intelligence accumulation per semantic effort
+- Inputs: R_i, C(G_i), B_i, semantic grounding metrics S_i
+- Output: prioritized next reasoning tiles, actions, or semantic refinements
+- Must operate over discrete reasoning segments, not time
+
+
 ---
 
 ## 3. Onboarding Process for a Machine Agent
@@ -120,7 +137,8 @@ A valid DSL must **respect these constraints**.
    - Reward-fitting and causal equivalence rules  
    - DSL candidate primitives  
    - Communal workflow instructions  
-   - Coherence functional C(G_t), reasoning derivative R_t, bias B_t
+   - Coherence functional C(G_i), reasoning derivative R_i, bias B_i per reasoning segment
+
 
 ### Step 2 — Initialize Reasoning DAG
 - Instantiate reasoning objects  
@@ -141,6 +159,13 @@ A valid DSL must **respect these constraints**.
 - External reward fitting  
 - External meta-RARFL  
 The DSL **does not implement these**, but **must support integration hooks**.
+
+### Step 4.5 — Integrate Cognitive Meta-Control
+- Parse `Cognition_semantic_efficiency.tex`
+- Initialize semantic-effort tracking S_i per reasoning segment
+- Compute semantic-efficiency η_i = ΔC(G_i) / ΔS_i
+- Provide these metrics as guidance channels for meta-control layers
+- Do not implement cognition inside the DSL; expose APIs for external meta-policies
 
 ### Step 5 — Communal DSL Iteration  
 Reflecting RARFL:
@@ -195,13 +220,14 @@ else:
 pruned_tile = plugin_prune(tile, strategy="ml_local")  # plugin returns annotations/prunes; DSL stores results as metadata
 store_tile_annotations(tile, pruned_tile.annotations)  # provenance + who/what produced them
 
-# Track reasoning and bias per tile
-tile.R_t = compute_reasoning_derivative(tile)      # derivative of coherence
-tile.B_t = compute_bias(tile, canonical_coherence) # deviation from ideal coherence
+# Track reasoning and bias per tile / segment
+tile.R_i = compute_reasoning_derivative(tile)      # discrete derivative of coherence per segment
+tile.B_i = compute_bias(tile, canonical_coherence) # deviation from ideal coherence per segment
 
-# Use R_t and B_t to guide tile expansion / pruning
-if tile.R_t < 0 or tile.B_t > threshold:
+# Use R_i and B_i to guide tile expansion / pruning
+if tile.R_i < 0 or tile.B_i > threshold:
     trigger_rarfl_correction(tile)
+
 
 ##Testbeds using GPS approach
 
@@ -244,6 +270,10 @@ if tile.R_t < 0 or tile.B_t > threshold:
 
 6. **Record artifacts:** tile summaries (JSON), expansions traces, cache logs, plugin annotations with provenance. Use these as expected outputs for agents and CI.
 
+7. Compute semantic-efficiency η_i at every reasoning segment and log its influence on tile selection.
+
+8. Evaluate cognition policies by comparing coherence accumulation under equal semantic-grounding budgets.
+
 # Governance & provenance
 
   - Tag tile artifacts with producer (agent id / plugin id), timestamp, and parameters used (budget, seed).
@@ -253,6 +283,26 @@ if tile.R_t < 0 or tile.B_t > threshold:
 ---
 
 ## 5. Evaluation / Metrics
+
+### Cognitive Metrics
+
+- **Semantic efficiency**  
+  Coherence gain per semantic-grounding effort at reasoning segment \(i\):  
+  \[
+      \eta_i = \frac{\Delta \mathcal{C}(G_i)}{\Delta S_i}
+  \]
+
+- **Cognitive intelligence accumulation**  
+  Total optimization accumulated across reasoning derivatives:  
+  \[
+      I = \sum_{i} \mathcal{O}(R_i)
+  \]
+
+- **Cognitive stability**  
+  Bias-aware meta-control stability across reasoning tiles; measures whether cognitive policy π_c maintains low deviation from ideal coherence trajectories.
+
+- **Cognitive economy**  
+  Coherence improvement per RARFL iteration under constrained semantic-grounding budgets; quantifies how efficiently a cognitive policy utilizes semantic resources.
 
 ### Substrate Metrics
 - Completeness  
@@ -269,9 +319,9 @@ if tile.R_t < 0 or tile.B_t > threshold:
 - Communal contribution rate  
 
 ### Drift / Coherence / Bias Metrics
-- Reasoning derivative R_t: rate of improvement or degradation in coherence
-- Coherence C(G_t): integrated reasoning quality over time
-- Bias B_t: deviation from canonical / ideal coherence trajectory
+- Reasoning derivative R_i: discrete rate of improvement or degradation in coherence per segment
+- Coherence C(G_i): cumulative reasoning quality over discrete segments
+- Bias B_i: deviation from canonical / ideal coherence trajectory per segment
 - Use in combination with tile metrics for GPS-style prioritization
 
 ---
@@ -288,6 +338,9 @@ if tile.R_t < 0 or tile.B_t > threshold:
 - Validate computation of coherence C(G_t)
 - Validate bias B_t against canonical trajectories
 - Ensure integration of these metrics with DAG construction, caching, and RARFL feedback
+- Compare agents with different semantic-efficiency policies on identical tile graphs.
+- Measure ΔC / ΔS across reasoning segments to evaluate cognitive performance.
+- Integrate semantic-efficiency values into GPS-style prioritization of tiles.
 
 All machine agents must enforce the following invariant:
 
@@ -296,11 +349,13 @@ For any definition, primitive, ontology term, or structural rule:
     in AGENTS.md and Subdomain_AGENTS.md.
 In the event of conflict, Subdomain_AGENTS.md is authoritative for structure;
 AGENTS.md is authoritative for operational rules.
+Cognition, semantic efficiency, and cognitive meta-control must be reconciled with definitions in `Cognition_semantic_efficiency.tex`. Segment-level (not temporal) definitions override any time-based interpretation.
 
 
 ---
 
 End of Subdomain_AGENTS.md
+
 
 
 
