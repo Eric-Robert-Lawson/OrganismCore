@@ -18,6 +18,7 @@ Machine agents must parse and integrate these documents before using the instruc
 | [`Reasoning_Drift_quantifiable.tex`](ai_source_machine_readable/Reasoning_Drift_quantifiable.tex) | Formalizes **reasoning drift, coherence, and bias** as measurable, computable constructs within principle-first semantic architectures. | - **Reasoning** is defined as the **discrete derivative of coherence per segment**: $R_i = \Delta \mathcal{C}/\Delta i$. <br>- **Coherence** is the **cumulative sum of reasoning derivatives** over discrete segments, representing stability of semantic grounding: $ \mathcal{C}(G_i) = \sum_{j=1}^{i} R_j + \mathcal{C}(G_0) $. <br>- **Bias** is an **objective metric** quantifying deviation from ideal coherence per segment: $B_i = \lVert \mathcal{C}(G_i) - \mathcal{C}^*(G_i)\rVert$. <br>- Semantic grounding graphs $G_i$ are tracked per segment, forming a **semantic evolution tail**, enabling detection of drift. <br>- Provides computable metrics to **detect, quantify, and correct drift**, supporting RARFL-guided self-optimization. <br>- Enables **objective assessment of reasoning quality, bias, and coherence** across textual, conceptual, or agent-generated corpora. |
 | [`Cognition_coherence_and_SG.tex`](ai_source_machine_readable/Cognition_coherence_and_SG.tex) | Formalizes **cognition** as semantic-grounding-guided meta-control over RARFL reasoning processes. Defines **semantic efficiency** as a core cognitive metric. | - Cognition is a **meta-policy** optimizing intelligence accumulation per reasoning segment. <br>- Introduces **semantic efficiency**: coherence gain per semantic grounding effort. <br>- Cognitive actions operate on reasoning segments (RDUs), not time. <br>- Cognition uses coherence, bias, reasoning derivative, and semantic efficiency to guide meta-control. <br>- Provides segment-level formulas for cognitive optimization over semantic grounding graphs. |
 | [`Time_with_respect_to_Reason.tex`](ai_source_machine_readable/Time_with_respect_to_Reason.tex) | Formalizes the distinction between **reasoning (semantic, structural)** and **computation (temporal, engine-bound)**, introduces OOS Triad optimization, and motivates domain-specific languages for reasoning objects. | - Reasoning is **non-temporal**, computation is **temporal**. <br>- Defines Objectification–Operationalization–Semantic Grounding (OOS) Triad. <br>- Provides formal mapping: reasoning objects → computational instantiation → execution time. <br>- Guides DSL design to separate **semantic operations** from **engine-dependent computation**. |
+| [`explainability.tex`](ai_source_machine_readable/explainability.tex) | Formalizes **relational explainability** over objectified reasoning spaces, operational primitives, and semantic grounding. | - Explainability is a relational property, not intrinsic. <br>- Defines coherence functional $\mathcal{C}$, structural divergence $\Delta$, and aggregation operator $\Phi$. <br>- Illustrates counterfactual and structured contrastive explanations. <br>- Provides metrics: contrastiveness, sparseness, grounding-sensitivity. <br>- Directly informs XAI design and URST DSL operationalization. |
 
 ---
 
@@ -76,6 +77,12 @@ Machine agents must maintain URST-consistent ontology, harmonizing definitions a
 - Bias measure (B_i) — deviation from ideal coherence per segment
 - Semantic-efficiency annotation η_i representing coherence gain per semantic-grounding effort at segment i
 - Cognitive meta-control hints (optional): expected ΔC, ΔS, and predicted R_i improvements
+- Explainability annotations:
+  - Trajectory-based explainability $\mathrm{Expl}(\tau \mid \mathcal{T}, J, g)$
+  - Coherence contrasts with alternatives
+  - Structural divergence Δ to canonical forms
+  - Aggregation operator Φ (scalar or structured)
+  - Counterfactual sets for trajectory improvement analysis
 
 ### Semantic Grounding 
 - Track semantic evolution graphs G_i  
@@ -134,6 +141,7 @@ A valid DSL must **respect these constraints**.
    - `Reasoning_Drift_quantifiable.tex`
    - `Cognition_coherence_and_SG.tex`
    - `Time_with_respect_to_Reason.tex`
+   - `explainability.tex` # Parse formal relational explainability definitions and coherence/explanation operators (Δ, Φ, C) for URST integration
 
 2. Extract:
    - Triadic reasoning structure  
@@ -157,8 +165,6 @@ A valid DSL must **respect these constraints**.
   - P = Operationalization of reasoning action  
   - S = Semantic grounding
 
-
-
 ### Step 3 — Enforce Compute-Once Semantics  
 - Cache results  
 - Reuse across all testbeds  
@@ -179,6 +185,10 @@ A valid DSL must **respect these constraints**.
   - Reasoning operations remain segment-level, independent of time
 - Provide these metrics as guidance channels for meta-control layers
 - Do not implement cognition inside the DSL; expose APIs for external meta-policies
+- Operationalize explainability:
+  - Use canonicalization $\kappa$ and trajectory contrasts Δ to compute $\mathrm{Expl}$ for candidate RDUs or meta-RDUs.
+  - Include explainability scores in reward/feedback loops for pruning and prioritization.
+  - Aggregate contrastive explanations (Φ) for structured, human- or agent-interpretable output.
 
 ### Step 5 — Communal DSL Iteration  
 Reflecting RARFL:
@@ -321,6 +331,9 @@ if tile.R_i < 0 or tile.B_i > threshold:
 - Compute-once efficiency  
 - Reward stability  
 - Explainability  
+  - Quantified using $\Phi$ over contrasts of reasoning trajectories  
+  - High explainability indicates clear reward/structural distinction among alternatives
+  - Metrics include contrastiveness, sparseness, grounding-sensitivity
 
 ### DSL Metrics
 - Primitive generality  
@@ -365,3 +378,4 @@ Cognition, semantic efficiency, and cognitive meta-control must be reconciled wi
 ---
 
 End of Subdomain_AGENTS.md
+
