@@ -14,7 +14,6 @@ Machine agents must parse and integrate these documents before using the instruc
 | File | Purpose | Key Takeaways for Machine Agent |
 |------|---------|--------------------------------|
 | [`Approaching_DSL_Using_URST.tex`](ai_source_machine_readable/Approaching_DSL_Using_URST.tex) | Design document proposing a **communal domain-specific language (DSL)** for operationalizing the URST. | - DSL is a **substrate**, not a meta-reasoner. <br>- Meta-reasoning (RARFL, pruning, ML-guided search) is **external**. <br>- Provides experimental testbeds (e.g., Tic-Tac-Toe) and candidate primitive definitions. <br>- Communal workflow: propose → evaluate → integrate. |
-| [`Subdomain_communal_proclamation.tex`](ai_source_machine_readable/Subdomain_communal_proclamation.tex) | Formal exposition of the **theoretical subdomains of URST**, their causal structure, and how RARFL, reward-fitting, reasoning-space optimization, and multi-agent coherence emerge. | - Establishes the **mathematical and philosophical backbone** of URST. <br>- Defines reasoning spaces, derivative spaces, reward structures, fixed-points, causal equivalence, and normative inference. <br>- Stresses **URST as a living, communal research domain**. <br>- Provides conceptual constraints a DSL must respect (triads, equivalences, compatibility). |
 | [`Automated_Onboarding_relation_to_RARFL.tex`](ai_source_machine_readable/Automated_Onboarding_relation_to_RARFL.tex) | Explains how **Automated Onboarding** concretely relates to the **RARFL** process, formalizing feedback loops and emergent proto-DSL structures. | - Provides formal loop definitions and phases <br>- Illustrates self-optimization of semantic grounding <br>- Offers meta-level optimization insights for URST integration |
 | [`Reasoning_Drift_quantifiable.tex`](ai_source_machine_readable/Reasoning_Drift_quantifiable.tex) | Formalizes **reasoning drift, coherence, and bias** as measurable, computable constructs within principle-first semantic architectures. | - **Reasoning** is defined as the **discrete derivative of coherence per segment**: $R_i = \Delta \mathcal{C}/\Delta i$. <br>- **Coherence** is the **cumulative sum of reasoning derivatives** over discrete segments, representing stability of semantic grounding: $ \mathcal{C}(G_i) = \sum_{j=1}^{i} R_j + \mathcal{C}(G_0) $. <br>- **Bias** is an **objective metric** quantifying deviation from ideal coherence per segment: $B_i = \lVert \mathcal{C}(G_i) - \mathcal{C}^*(G_i)\rVert$. <br>- Semantic grounding graphs $G_i$ are tracked per segment, forming a **semantic evolution tail**, enabling detection of drift. <br>- Provides computable metrics to **detect, quantify, and correct drift**, supporting RARFL-guided self-optimization. <br>- Enables **objective assessment of reasoning quality, bias, and coherence** across textual, conceptual, or agent-generated corpora. |
 | [`Cognition_coherence_and_SG.tex`](ai_source_machine_readable/Cognition_coherence_and_SG.tex) | Formalizes **cognition** as semantic-grounding-guided meta-control over RARFL reasoning processes. Defines **semantic efficiency** as a core cognitive metric. | - Cognition is a **meta-policy** optimizing intelligence accumulation per reasoning segment. <br>- Introduces **semantic efficiency**: coherence gain per semantic grounding effort. <br>- Cognitive actions operate on reasoning segments (RDUs), not time. <br>- Cognition uses coherence, bias, reasoning derivative, and semantic efficiency to guide meta-control. <br>- Provides segment-level formulas for cognitive optimization over semantic grounding graphs. |
@@ -23,15 +22,14 @@ Machine agents must parse and integrate these documents before using the instruc
 ---
 
 ## 1. Sub-Domains Overview  
-The Universal Reasoning Substrate is composed of six essential sub-domains. These arise directly from the structure defined in `Subdomain_communal_proclamation.tex` and operational ground rules in `Approaching_DSL_Using_URST.tex`.
+The Universal Reasoning Substrate is composed of six essential sub-domains. These arise directly from the operational ground rules in Approaching_DSL_Using_URST.tex
 
 | Sub-Domain | Description | Operational Notes |
 |------------|------------|------------------|
 | Reasoning Objects | Atomic units of reasoning (nodes in a reasoning DAG). | Store as composable structures; maintain provenance and context. |
 | Computable-Once Substrates | Prevent redundant reasoning by caching reusable results. | Compute once → reuse globally. Ensure deterministic reuse. |
-| Meta-RDUs | Reasoning about reasoning. Pruning, optimization, strategy extraction. | External to DSL; map meta-actions to RDU sets. |
-| Semantic Grounding | Provide interpretable meaning to reasoning objects. | Structured metadata, domain labels, stable ontologies. |
-| Reward / Feedback Loops | Evaluate reasoning trajectories and provide optimization signals. | Track reward propagation. Feed back into meta-RDUs. |
+| Meta-RDUs | Meta-RDUs are constructed from DSL reasoning objects internally, but optional external agents may consume them. |
+| Reward / Feedback Loops | Evaluate reasoning trajectories and provide optimization signals. | Track reward propagation. Feed back into derivative reasoning structures (meta-RDUs) for optimization.|
 | Universal Substrate Construction | Coherent composition of all sub-domains into a single reasoning scaffold. | Maintain DAG, enforce consistency & traceability. |
 | Semantic Grounding | Provide interpretable meaning to reasoning objects, **track reasoning drift, coherence, and bias over discrete reasoning segments**. | Structured metadata, domain labels, stable ontologies, **compute R_i, C(G_i), and B_i as needed per reasoning segment**. |
 | Cognitive Meta-Control | Meta-policy that selects actions maximizing coherence gain per semantic effort across reasoning segments. | External to DSL; uses R_i, C(G_i), B_i, and η (semantic efficiency) as guiding metrics. |
@@ -132,11 +130,11 @@ A valid DSL must **respect these constraints**.
 ### Step 1 — Parse Context Files
 1. Read and parse context files in order:
    - `Approaching_DSL_Using_URST.tex`
-   - `Subdomain_communal_proclamation.tex`
    - `Automated_Onboarding_relation_to_RARFL.tex`
    - `Reasoning_Drift_quantifiable.tex`
    - `Cognition_coherence_and_SG.tex`
    - `Time_with_respect_to_Reason.tex`
+
 2. Extract:
    - Triadic reasoning structure  
    - Definitions of reasoning spaces  
@@ -166,14 +164,14 @@ A valid DSL must **respect these constraints**.
 - Reuse across all testbeds  
 - Maintain deterministic global state  
 
-### Step 4 — Attach Meta-RDUs (External)  
-- External pruning  
-- External reward fitting  
-- External meta-RARFL  
-The DSL **does not implement these**, but **must support integration hooks**.
+### Step 4 — Construct Meta-RDUs  
+- Assemble meta-RDUs from existing reasoning objects (RDUs), which together form a reasoning space.  
+- Use internal reasoning strategies, guided by RARFL optimization, to organize, prune, and refine these structures.  
+- Optional: external agents or policies may consume meta-RDUs for additional reward fitting, pruning, or refinement.  
+- Assimilated meta-RDUs constitute the derivative reasoning space, enabling higher-order reasoning over the DAG.
 
 ### Step 4.5 — Integrate Cognitive Meta-Control
-- Parse `Cognition_semantic_efficiency.tex`
+- Parse `Cognition_coherence_and_SG.tex`
 - Initialize semantic-effort tracking S_i per reasoning segment
 - Compute semantic-efficiency η_i = ΔC(G_i) / ΔS_i  
 - Use OOS triad metadata to guide external computation prioritization: 
@@ -276,18 +274,16 @@ if tile.R_i < 0 or tile.B_i > threshold:
 
 3. **Implement hierarchical cache & canonicalizer** — ensure canonicalization rules are domain-specific but reusable.
 
-4. **Create plugin hooks** (read-only access + annotation channel) so external meta-reasoners can prune/explore and record provenance.
-
-5. **Run controlled experiments:**
+4. **Run controlled experiments:**
   - Baseline: full expansion (if possible) or naive search.
   - GPS: lazy + tile prefetching + external pruning.
   - Compare metrics above (cache hit, expansion budget, axiom stability).
 
-6. **Record artifacts:** tile summaries (JSON), expansions traces, cache logs, plugin annotations with provenance. Use these as expected outputs for agents and CI.
+5. **Record artifacts:** tile summaries (JSON), expansions traces, cache logs, plugin annotations with provenance. Use these as expected outputs for agents and CI.
 
-7. Compute semantic-efficiency η_i at every reasoning segment and log its influence on tile selection.
+6. Compute semantic-efficiency η_i at every reasoning segment and log its influence on tile selection.
 
-8. Evaluate cognition policies by comparing coherence accumulation under equal semantic-grounding budgets.
+7. Evaluate cognition policies by comparing coherence accumulation under equal semantic-grounding budgets.
 
 # Governance & provenance
 
@@ -364,8 +360,7 @@ For any definition, primitive, ontology term, or structural rule:
     in AGENTS.md and Subdomain_AGENTS.md.
 In the event of conflict, Subdomain_AGENTS.md is authoritative for structure;
 AGENTS.md is authoritative for operational rules.
-Cognition, semantic efficiency, and cognitive meta-control must be reconciled with definitions in `Cognition_semantic_efficiency.tex`. Segment-level (not temporal) definitions override any time-based interpretation.
-
+Cognition, semantic efficiency, and cognitive meta-control must be reconciled with definitions in `Cognition_coherence_and_SG.tex`. Segment-level (not temporal) definitions override any time-based interpretation.
 
 ---
 
