@@ -1,0 +1,350 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\geometry{margin=1in}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue}
+
+\title{Explainability as a Relational Property\\
+of Objectified Reasoning Spaces}
+\author{Eric Robert Lawson}
+\date{\today}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposition}[section]
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We formalize a structural theory of explainability grounded in the
+\emph{Objectification--Operationalization--Semantic Grounding} triad used
+within the Universal Reasoning Substrate (URST). Explainability is defined
+not as an intrinsic attribute of a model, but as a \emph{relational}
+property that emerges when reasoning trajectories (objectified and operationalized)
+are compared relative to a reward/goal grounding. This note provides definitions,
+basic propositions, and illustrative examples showing how explainability
+follows from (1) explicit objectification of reasoning artifacts, (2)
+operational primitives that permit transformation and comparison of trajectories,
+and (3) semantic grounding that assigns external meaning and goal structure.
+Consequences for XAI, evaluation metrics, and system design are discussed.
+\end{abstract}
+
+\section{Introduction}
+
+Explainability is often treated as either an intrinsic property of a system
+(transparent $\Rightarrow$ explainable) or an external post-hoc process
+(interpretation after the fact). We propose a different viewpoint: \emph{explainability
+is a relational property} that only becomes defined within an \emph{objectified}
+reasoning space equipped with operational primitives and semantic grounding.
+Intuitively: an explanation exists only when one can \textbf{compare}
+a concrete reasoning trajectory against alternatives in a grounded, structured
+space and thereby account for why the chosen trajectory attains higher reward
+or relevance.
+
+This formulation is compact, mathematically tractable, and aligns with
+counterfactual and causal intuitions while directly linking to design
+practices (objectification, caching, provenance, RARFL).
+
+\section{Formal framework}
+
+We present minimal formal ingredients. This section intentionally focuses
+on definitions and simple propositions; later sections show examples and implications.
+
+\subsection{Core objects}
+
+\begin{itemize}
+  \item \textbf{Reasoning space.} Let $\mathcal{R}$ be the set of \emph{reasoning
+    trajectories} (also called trajectories or paths). A trajectory $\tau\in\mathcal{R}$
+    is a finite ordered sequence of reasoning objects (RDUs) or operations:
+    \[
+      \tau = (o_1, o_2, \dots, o_n), \qquad o_i\in\mathcal{O},
+    \]
+    where $\mathcal{O}$ is the set of objectified reasoning artifacts.
+  \item \textbf{Semantic grounding.} A grounding map $g:\mathcal{O}\to\mathcal{S}$
+    assigns semantic meaning from an external domain (facts, goals, ontology).
+    Grounding extends to trajectories via $g(\tau)=(g(o_1),\dots,g(o_n))$.
+  \item \textbf{Operationalization.} A set of primitives $\Pi$ and transformation
+    operators let us compute properties, compare canonical forms, and derive
+    equivalence classes. Operationalization includes canonicalization
+    $\kappa:\mathcal{O}\to\mathcal{C}$ and evaluation $EVAL:\mathcal{R}\to\mathbb{R}^k$.
+  \item \textbf{Reward / goal.} A reward functional $J:\mathcal{R}\times\mathcal{S}\to\mathbb{R}$
+    measures trajectory utility relative to grounding. Abbreviate $J(\tau)=J(\tau,g)$
+    when grounding is implicit.
+\end{itemize}
+
+\subsection{Coherence between reasoning trajectories}
+
+We introduce a minimal notion of \emph{coherence} that measures how
+structurally reasonable one trajectory is relative to another.
+
+\begin{definition}[Coherence functional]
+Let $\tau,\tau'\in\mathcal{R}$ be two trajectories.
+A \emph{coherence functional} is a map
+\[
+  \mathcal{C} : \mathcal{R}\times\mathcal{R}\to \mathbb{R}_{\ge 0}
+\]
+that aggregates both reward and structural contrasts. Formally, let
+$\Delta(\tau,\tau')$ measure structural divergence and
+$d_J = J(\tau)-J(\tau')$ measure reward difference. Then
+\[
+  \mathcal{C}(\tau,\tau') = f(d_J, \Delta(\tau,\tau')),
+\]
+where $f$ is a monotone function satisfying:
+\begin{enumerate}[label=(\roman*),itemsep=2pt,leftmargin=*]
+  \item $\mathcal{C}(\tau,\tau')$ decreases as $\Delta(\tau,\tau')$ increases;
+  \item $\mathcal{C}(\tau,\tau')$ increases as $d_J$ favors $\tau$ relative to $\tau'$;
+  \item $\mathcal{C}$ does not evaluate correctness, only the
+        \emph{reasonableness of the trajectory-to-trajectory relation}.
+\end{enumerate}
+\end{definition}
+
+Intuitively, coherence is the bridge between reasoning dynamics and
+explainability: a trajectory is more explainable when its contrastive
+relations to alternatives are structurally and reward-wise coherent.
+
+\subsection{Explainability as a relational functional}
+
+\begin{definition}[Explainability functional]
+Given a reasoning space $\mathcal{R}$, grounding $g$, reward $J$, and an
+operational comparator $\Delta:\mathcal{R}\times\mathcal{R}\to\mathbb{R}_{\ge 0}$
+(measuring structural difference), define the \emph{explainability} of a trajectory
+$\tau$ relative to a candidate set $\mathcal{T}\subseteq\mathcal{R}$ by
+\[
+  \mathrm{Expl}(\tau \mid \mathcal{T}, J, g) \;=\; \Phi\!\big(
+    \{\, (J(\tau)-J(\tau'),\,\Delta(\tau,\tau') \,):\, \tau'\in\mathcal{T}\setminus\{\tau\}\}\big),
+\]
+where $\Phi$ is an aggregation operator that maps comparative pairs to a scalar
+or structured explanation object (e.g., weighted contrast set, counterfactuals).
+\end{definition}
+
+\paragraph{Role of the aggregation operator $\Phi$.}
+The operator $\Phi$ aggregates contrast pairs
+$(J(\tau)-J(\tau'),\,\Delta(\tau,\tau'))$ into either a scalar or a structured
+explanation object. We require $\Phi$ to satisfy:
+
+\begin{enumerate}[label=(\alph*),itemsep=2pt,leftmargin=*]
+  \item \textbf{Coherence-monotonicity}: if all contrasts become more coherent
+        (larger reward advantage and smaller structural distance), then
+        $\Phi$ must not decrease;
+  \item \textbf{Contrast-sensitivity}: $\Phi$ must increase when new
+        counterfactuals with strong reward divergence are added;
+  \item \textbf{Structure-awareness}: $\Phi$ must decrease when $\Delta$
+        reveals incoherent or noisy structural divergence;
+  \item \textbf{Correctness-agnostic}: $\Phi$ evaluates explainability,
+        not external truth.
+\end{enumerate}
+
+A scalar instantiation is:
+\[
+  \Phi_{\mathrm{scalar}}(\mathcal{S})
+  \;=\;
+  \frac{1}{|\mathcal{S}|}\sum_{(d_J,d_\Delta)\in\mathcal{S}}
+  \mathcal{C}(d_J, d_\Delta),
+\]
+where $\mathcal{C}$ is the coherence functional applied to contrast pairs.
+
+\paragraph{Example: Structured explanation objects.}
+Beyond scalars, $\Phi$ can produce human-interpretable structures. For instance:
+
+\begin{itemize}
+  \item \textbf{Ranked contrastive explanation:} a list of alternative trajectories
+        sorted by reward difference and structural proximity.
+  \item \textbf{Minimal-edit counterfactual:} identify the smallest sequence of
+        object edits to reach an alternative trajectory with higher reward.
+  \item \textbf{Sparse contrast set:} select a subset of alternatives that
+        maximally differentiates $\tau$ from the rest, avoiding overwhelming detail.
+\end{itemize}
+These structured outputs make $\mathrm{Expl}$ directly actionable for design and XAI.
+
+
+\noindent Intuitively, $\mathrm{Expl}$ quantifies how well $\tau$ can be
+distinguished from alternatives with respect to both \emph{utility difference}
+and \emph{structural/computational difference}. High explainability requires
+(1) meaningful reward contrast and (2) accessible structural distinctions.
+
+\subsection{Minimal desiderata}
+
+A useful explainability definition should satisfy:
+
+\begin{enumerate}[label=\textbf{D\arabic*:},leftmargin=*,itemsep=3pt]
+  \item \textbf{Relationality}: $\mathrm{Expl}(\tau)$ depends on $\mathcal{T}$,
+    $J$, and $g$ (not solely on intrinsic $\tau$ features).
+  \item \textbf{Grounding-sensitivity}: changing semantic grounding $g$ can
+    change $\mathrm{Expl}$ even if $\tau$ unchanged.
+  \item \textbf{Operationalizability}: $\mathrm{Expl}$ must be computable via
+    the operational primitives $\Pi$ available in the DSL.
+  \item \textbf{Counterfactual content}: $\mathrm{Expl}$ should produce
+    counterfactual contrasts $\tau\mapsto\tau'$ that illuminate alternative
+    trajectories and why they were not chosen.
+\end{enumerate}
+
+\section{Simple propositions}
+
+\begin{proposition}[Explainability requires objectification]
+If reasoning artifacts are not objectified (no $\mathcal{O}$, no canonicalization),
+then for any comparator $\Delta$ the explainability functional is undefined or
+uninformative.
+\end{proposition}
+\begin{proof}[Sketch]
+Without discrete objects, trajectories cannot be meaningfully compared at the
+structural level; $\Delta(\tau,\tau')$ lacks well-defined components. Thus
+condition D3 fails and $\mathrm{Expl}$ collapses to a trivial or vacuous quantity.
+\end{proof}
+
+\subsubsection{Intuition for Structural Divergence $\Delta$}
+
+The operator $\Delta(\tau, \tau')$ measures structural divergence relative to convergence potential. 
+Two trajectories may differ in intermediate steps yet aim toward similar goals; $\Delta$ quantifies the 
+bounded structural differences that are relevant for explaining why one trajectory is favored over another. 
+For example, in route planning, two paths may differ in travel time, tolls, or turns — these differences 
+constitute $\Delta$, which then feeds into $\Phi$ to produce an explainability score or structured contrast.
+
+$\Delta$ contributes to the coherence functional $\mathcal{C}$ by quantifying structural divergence between trajectories relative to reward differences, forming the basis for relational explainability.
+
+Concretely, $\Delta$ can be instantiated as:
+\begin{itemize}
+  \item Canonical form comparison ($\kappa(\tau)$)
+  \item Minimal edit distance between trajectories
+  \item Graph or tree difference metrics
+  \item Symmetry collapse (identifying equivalent trajectories)
+\end{itemize}
+
+
+\begin{proposition}[Explainability is coherence-realized]
+Let $\mathrm{Expl}$ be the explainability functional and $\mathcal{C}$
+a coherence functional. If for all $\tau'\in\mathcal{T}$ the coherence
+$\mathcal{C}(\tau,\tau')$ is low, then for any aggregation operator $\Phi$
+satisfying coherence-monotonicity, $\mathrm{Expl}(\tau)$ is necessarily low.
+Conversely, high explainability requires the existence of a subset
+$\mathcal{T}'\subseteq\mathcal{T}$ with high coherence to $\tau$.
+\end{proposition}
+
+\begin{proof}[Sketch]
+If all contrast pairs exhibit low coherence, then every admissible
+aggregation operator $\Phi$ produces low output by monotonicity. If a
+subset of contrasts exhibits high coherence, aggregation yields a high
+explainability value. Thus explainability is realized through the
+coherence structure of trajectory contrasts.
+\end{proof}
+
+
+\begin{proposition}[Explainability is relative to grounding]
+Fix $\tau,\tau'$. There exist groundings $g_1\neq g_2$ such that
+$\operatorname{sign}(J_{g_1}(\tau)-J_{g_1}(\tau')) \neq
+\operatorname{sign}(J_{g_2}(\tau)-J_{g_2}(\tau'))$, hence $\mathrm{Expl}$ may
+change sign or magnitude when $g$ changes.
+\end{proposition}
+\begin{proof}
+Immediate: choose $g_1$ that assigns reward weight to features present in $\tau$
+and $g_2$ that assigns weight to features present in $\tau'$. Then the reward
+ordering flips.
+\end{proof}
+
+\begin{proposition}[Explainability invariant under operational equivalence]
+Let $\tau, \tau'\in\mathcal{R}$ be two trajectories. If they are operationally equivalent,
+i.e., have the same canonicalized forms $\kappa(\tau) = \kappa(\tau')$ and identical
+reward trajectories $J(\tau) = J(\tau')$, then their explainability is identical:
+\[
+  \mathrm{Expl}(\tau \mid \mathcal{T}, J, g) = \mathrm{Expl}(\tau' \mid \mathcal{T}, J, g).
+\]
+\end{proposition}
+\begin{proof}[Sketch]
+Operational equivalence ensures that every contrast pair $(J(\tau)-J(\tau''), \Delta(\tau,\tau''))$
+matches exactly with the corresponding pair for $\tau'$. Any aggregation operator $\Phi$
+thus produces the same output for both trajectories.
+\end{proof}
+
+
+\section{Illustrative examples}
+
+\subsection{Toy: Tic-Tac-Toe move explanation}
+Let $\mathcal{T}$ be the set of plausible moves (trajectories of depth 1).
+Grounding $g$ includes the objective ``win in 2''. Reward $J$ rates moves by
+expected win probability. $\Delta$ measures board-symmetry-canonical distance.
+Then $\mathrm{Expl}(move)$ yields a short list: moves that reduce opponent's
+win probability most while being structurally distinct (not symmetric collapses).
+This produces human-readable counterfactuals: ``Move A is chosen because
+it prevents line X (alternative B allows that line).''
+
+\subsection{Mathematical reasoning trajectories}
+Let $\tau$ be a proof sketch; alternatives $\tau'$ are different proof strategies.
+Grounding includes the theorem statement and proof schema; reward favors
+shortness and rigor. Explainability yields: which lemmas made the crucial step,
+which transformations were optional, and what counterfactual steps would lead
+to alternative lemma choices.
+
+\section{Operational implications for system design}
+
+\begin{itemize}
+  \item \textbf{Design the DSL to expose canonical forms:} canonicalization
+    $\kappa$ must be robust so $\Delta$ is meaningful.
+  \item \textbf{Provide mechanisms to enumerate plausible alternative trajectories}
+    (lazy expansion / tile APIs) so $\mathcal{T}$ is non-trivial.
+  \item \textbf{Make grounding explicit and versioned:} store $g$ with provenance;
+    changing grounding should be an auditable operation.
+  \item \textbf{Construct $\Phi$ to produce human-friendly contrasts:} use
+    sparse contrasts, counterfactual minimal edits, or ranked contrast sets.
+\end{itemize}
+
+\section{Relation to existing XAI notions}
+
+This framework subsumes many XAI ideas:
+\begin{itemize}
+  \item Counterfactual explanations appear as particular choices of $\mathcal{T}$
+    (single nearest alternative) and $\Phi$ (minimal $\Delta$ with reward flip).
+  \item Feature-attribution maps are local linearizations of $J$ but require
+    grounding and objectification to be meaningful beyond heuristic score.
+  \item Post-hoc interpretability is a brittle approximation of the true relational
+    $\mathrm{Expl}$ if objectification or grounding are missing.
+\end{itemize}
+
+\section{Evaluation metrics}
+
+From the formalism we can propose evaluation metrics for explainability:
+
+\begin{enumerate}[label=(\alph*)]
+  \item \textbf{Contrastiveness:} average $|J(\tau)-J(\tau')|$ weighted by
+    $\Delta(\tau,\tau')$ across selected alternatives.
+  \item \textbf{Sparseness:} minimal number of structural edits to transform
+    $\tau$ to a $\tau'$ with different reward ordering (measured via $\Delta$).
+  \item \textbf{Grounding-sensitivity:} sensitivity of explanations to small
+    controlled perturbations of $g$ (measures brittleness).
+\end{enumerate}
+
+\section{Discussion and consequences}
+
+\paragraph{Explainability $\neq$ correctness.}
+A trajectory may be highly explainable (large contrasts and sparse edits)
+but still incorrect relative to external truth; conversely, a correct
+trajectory with no accessible alternatives or opaque objectification is
+not explainable. This separation clarifies evaluation: explanations must be
+judged separately from truth.
+
+\paragraph{Design-first explainability.}
+Because explainability requires objectified artifacts and operational primitives,
+systems designed with these properties will be explainable by construction,
+not merely by post-hoc techniques.
+
+\paragraph{Governance and provenance.}
+Because grounding $g$ is central, policies about how $g$ is specified,
+versioned, and audited become part of explainability governance.
+
+\section{Conclusion}
+
+We proposed a concise formalization: explainability is a relational functional
+over objectified reasoning spaces, operational primitives, and semantic grounding.
+This viewpoint transforms explainability from a fuzzy post-hoc goal into a
+design objective that can be engineered, measured, and governed. The URST
+triad (Objectification--Operationalization--Semantic Grounding) is the minimal
+infrastructure required to make explainability precise and useful.
+
+Because explainability emerges from contrastive structural relations among trajectories, the Reasoning Axiom–Reward Feedback Loop (RARFL) ensures that reasoning trajectories naturally evolve toward higher-coherence forms, improving explainability by construction.
+
+\bigskip\noindent\textbf{Acknowledgments.} The ideas here grow from the OrganismCore
+and the automated onboarding process's programmatic thinking about reasoning objectification and RARFL.
+
+\end{document}
