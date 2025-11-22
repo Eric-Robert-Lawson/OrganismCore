@@ -30,11 +30,11 @@ The Universal Reasoning Substrate is composed of six essential sub-domains. Thes
 | Reasoning Objects | Atomic units of reasoning (nodes in a reasoning DAG). | Store as composable structures; maintain provenance and context. |
 | Computable-Once Substrates | Prevent redundant reasoning by caching reusable results. | Compute once → reuse globally. Ensure deterministic reuse. |
 | Meta-RDUs | Meta-RDUs are constructed from DSL reasoning objects internally, but optional external agents may consume them. |
-| Reward / Feedback Loops | Evaluate reasoning trajectories and provide optimization signals. | Track reward propagation. Feed back into derivative reasoning structures (meta-RDUs) for optimization.|
+| Reward / Feedback Loops | Evaluate reasoning trajectories and provide optimization signals. | Track reward propagation. Feed back into derivative reasoning structures (meta-RDUs) for optimization. <br>Integrate `safety.tex` checks: enforce RARFL, segment-level monitoring, and rollback unsafe segments.|
 | Universal Substrate Construction | Coherent composition of all sub-domains into a single reasoning scaffold. | Maintain DAG, enforce consistency & traceability. |
 | Semantic Grounding | Provide interpretable meaning to reasoning objects, **track reasoning drift, coherence, and bias over discrete reasoning segments**. | Structured metadata, domain labels, stable ontologies, **compute R_i, C(G_i), and B_i as needed per reasoning segment**. |
 | Cognitive Meta-Control | Meta-policy that selects actions maximizing coherence gain per semantic effort across reasoning segments. | External to DSL; uses R_i, C(G_i), B_i, and η (semantic efficiency) as guiding metrics. |
-
+| [`safety.tex`](ai_source_machine_readable/safety.tex) | Formalizes **structural safety guarantees** for ORAs, including RARFL constraints, semantic grounding enforcement, explainability, and segment-level monitoring. | - Ensures no runaway agency, emergent goal formation, or self-preservation drives. <br>- Integrates segment-level monitoring metrics (R_i, C(G_i), B_i, η_i) into safety checks. <br>- Provides audit trails, canonicalization, and pruning rules for machine-readable governance. <br>- Directly informs external meta-control policies and safe DSL operations. |
 
 ### Machine-Readable Canonical List of Subdomains
 1. Reasoning Objects
@@ -142,6 +142,7 @@ A valid DSL must **respect these constraints**.
    - `Cognition_coherence_and_SG.tex`
    - `Time_with_respect_to_Reason.tex`
    - `explainability.tex` # Parse formal relational explainability definitions and coherence/explanation operators (Δ, Φ, C) for URST integration
+   - `safety.tex` # Parse formal safety blueprint, RARFL immutability, segment-level monitoring, and pruning rules
 
 2. Extract:
    - Triadic reasoning structure  
@@ -189,6 +190,14 @@ A valid DSL must **respect these constraints**.
   - Use canonicalization $\kappa$ and trajectory contrasts Δ to compute $\mathrm{Expl}$ for candidate RDUs or meta-RDUs.
   - Include explainability scores in reward/feedback loops for pruning and prioritization.
   - Aggregate contrastive explanations (Φ) for structured, human- or agent-interpretable output.
+- Enforce safety blueprint (from `safety.tex`):
+  - For each reasoning segment i, evaluate R_i, C(G_i), B_i, and η_i against safety thresholds.
+  - Apply RARFL pruning rules: 
+      - Reject segments that violate axiomatic constraints.
+      - Roll back reasoning objects or tiles that exceed canonical divergence Δ.
+  - Ensure ORAs do not initiate ungrounded actions or self-directed optimization.
+  - Track provenance, timestamps, and contributor metadata for all segments.
+  - Provide explainability annotations for safety decisions, linking back to trajectory contrasts and segment-level metrics.
 
 ### Step 5 — Communal DSL Iteration  
 Reflecting RARFL:
@@ -347,6 +356,10 @@ if tile.R_i < 0 or tile.B_i > threshold:
 - Coherence C(G_i): cumulative reasoning quality over discrete segments
 - Bias B_i: deviation from canonical / ideal coherence trajectory per segment
 - Use in combination with tile metrics for GPS-style prioritization
+- Segment-level Safety Enforcement:
+  - Verify that each segment R_i, C(G_i), B_i, and η_i complies with immutable RARFL rules (from `safety.tex`).
+  - Trigger pruning or rollback if axioms, grounding, or explainability thresholds are violated.
+  - Log safety audit trails as part of provenance metadata for machine-readable compliance.
 
 ---
 
@@ -378,4 +391,5 @@ Cognition, semantic efficiency, and cognitive meta-control must be reconciled wi
 ---
 
 End of Subdomain_AGENTS.md
+
 
