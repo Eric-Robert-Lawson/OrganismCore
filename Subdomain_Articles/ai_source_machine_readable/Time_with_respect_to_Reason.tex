@@ -1,0 +1,151 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\geometry{margin=1in}
+
+\title{Reasoning Beyond Time: 
+A Formal Distinction Between Reasoning and Computation \\ 
+and the Necessity of OOS-Triad Optimization}
+\author{Eric Robert Lawson}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Reasoning is a semantic, compositional process independent of temporal constraints. 
+Computation, however, is the physical enactment of reasoning, inheriting time as a metric through hardware and algorithmic execution. 
+This paper formalizes the separation between reasoning and computation, introduces the Objectification--Operationalization--Semantic Grounding (OOS) Triad as the structural determinant of computational efficiency, and argues for a domain-specific language enabling optimal processing of reasoning objects. 
+The distinction reframes reasoning systems design: performance bottlenecks are not intrinsic to reasoning but to its computational instantiation.
+\end{abstract}
+
+\section{Introduction}
+
+Current AI frameworks often conflate reasoning with computation, implicitly treating reasoning as a time-bounded process. 
+However, reasoning---as a structured semantic operation---does not intrinsically reference time. 
+Time-based performance metrics apply only to computation, the physical execution of reasoning. 
+This distinction is essential for understanding intelligence, scaffolding, and the limits of algorithmic optimization.
+
+We formally distinguish reasoning from computation and show how reasoning efficiency emerges from the structural organization of reasoning objects, not from the passage of time.
+
+\section{Reasoning as a Non-Temporal Semantic Process}
+
+Let $\mathcal{R}$ denote the space of reasoning objects and let $G$ denote the semantic grounding graph. 
+Reasoning consists of compositional operations over $\mathcal{R}$:
+
+\[
+R : \mathcal{R}^n \to \mathcal{R}.
+\]
+
+There is no intrinsic time parameter in this semantic transformation.  
+Reasoning exists as a structural relation among reasoning objects, grounded within $G$, regardless of how quickly or slowly it is computed.
+
+\subsection{Coherence and Drift}
+
+Coherence $\mathcal{C}$ is a structural property of reasoning and semantic grounding:
+
+\[
+\mathcal{C}(G) \in \mathbb{R},
+\]
+
+independent of its computational realization.
+
+Bias or drift is defined as deviation from ideal coherence:
+
+\[
+B = \lVert \mathcal{C}(G) - \mathcal{C}^*(G) \rVert.
+\]
+
+Again, no temporal dependency is intrinsic to these definitions.
+
+\section{Computation as the Temporal Instantiation of Reasoning}
+
+Let $\mathcal{E}$ denote a computational engine implementing reasoning operations.
+Then computation is defined as:
+
+\[
+\text{Compute}(R) : (\mathcal{R},\mathcal{E}) \to \mathcal{R} \times \mathbb{R}_{\ge 0},
+\]
+
+where the associated time cost is:
+
+\[
+T(R) = \text{wall-clock time required by } \mathcal{E}.
+\]
+
+Thus, time is not a constituent dimension of reasoning but of the engine executing it.
+
+\subsection{Time-Based Metrics as Computational Efficiency}
+
+Any time-based measurement---latency, throughput, onboard parsing time, tile expansion rate, cache utilization---is purely a computational metric:
+
+\[
+\text{Time} \equiv \text{Hardware + Algorithmic efficiency}.
+\]
+
+Reasoning does not “happen in time”; computation does.
+
+\section{The OOS Triad: Structural Determinants of Computational Efficiency}
+
+Let the triad components be:
+\[
+O = \text{Objectification of reasoning objects},
+\]
+\[
+P = \text{Operationalization of reasoning actions},
+\]
+\[
+S = \text{Semantic Grounding of reasoning within } G.
+\]
+
+The computational cost of executing a reasoning step $R$ under engine $\mathcal{E}$ is:
+
+\[
+T(R) = f(O, P, S, \mathcal{E}),
+\]
+
+where $f$ is monotone with respect to improvements in the triad.
+
+Thus, computation time is not an intrinsic property of reasoning but a function of how well reasoning objects are structured and implemented.
+
+\section{Implications for Intelligence Systems}
+
+This distinction yields a central principle:
+
+\begin{quote}
+\textbf{Reasoning complexity is semantic; computation complexity is temporal.  
+Improving reasoning efficiency requires optimizing reasoning structure (OOS Triad), 
+not optimizing reasoning itself.}
+\end{quote}
+
+This reframes both AI architecture and cognitive modeling:
+\begin{itemize}
+    \item reasoning objects can be made more efficient through better objectification,
+    \item reasoning operations can be accelerated through operationalization,
+    \item semantic grounding determines the minimal structure needed for correct inference.
+\end{itemize}
+
+\section{Necessity of a Domain-Specific Language}
+
+A domain-specific language (DSL) for reasoning objects is not optional---it is required.
+Such a DSL allows:
+\begin{itemize}
+    \item explicit representation of reasoning objects,
+    \item reusable compositional scaffolding,
+    \item predictable computational execution,
+    \item hardware-level optimization,
+    \item separation of semantic reasoning from algorithmic implementation.
+\end{itemize}
+
+Without a DSL, reasoning remains entangled with ad hoc computational processes, making optimization impossible.
+
+\section{Conclusion}
+
+Reasoning is structural and semantic; computation is temporal and physical.
+The OOS Triad governs how efficiently reasoning can be instantiated.
+Recognizing this distinction reveals both a theoretical foundation for intelligence systems and a practical path forward:  
+\textbf{design computational architectures around reasoning objects, not algorithms},  
+and construct a DSL that operationalizes this principle.
+
+\end{document}
