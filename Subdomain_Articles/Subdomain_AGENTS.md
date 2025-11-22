@@ -16,6 +16,8 @@ Machine agents must parse and integrate these documents before using the instruc
 | [`Approaching_DSL_Using_URST.tex`](ai_source_machine_readable/Approaching_DSL_Using_URST.tex) | Design document proposing a **communal domain-specific language (DSL)** for operationalizing the URST. | - DSL is a **substrate**, not a meta-reasoner. <br>- Meta-reasoning (RARFL, pruning, ML-guided search) is **external**. <br>- Provides experimental testbeds (e.g., Tic-Tac-Toe) and candidate primitive definitions. <br>- Communal workflow: propose → evaluate → integrate. |
 | [`Subdomain_communal_proclamation.tex`](ai_source_machine_readable/Subdomain_communal_proclamation.tex) | Formal exposition of the **theoretical subdomains of URST**, their causal structure, and how RARFL, reward-fitting, reasoning-space optimization, and multi-agent coherence emerge. | - Establishes the **mathematical and philosophical backbone** of URST. <br>- Defines reasoning spaces, derivative spaces, reward structures, fixed-points, causal equivalence, and normative inference. <br>- Stresses **URST as a living, communal research domain**. <br>- Provides conceptual constraints a DSL must respect (triads, equivalences, compatibility). |
 | [`Automated_Onboarding_relation_to_RARFL.tex`](ai_source_machine_readable/Automated_Onboarding_relation_to_RARFL.tex) | Explains how **Automated Onboarding** concretely relates to the **RARFL** process, formalizing feedback loops and emergent proto-DSL structures. | - Provides formal loop definitions and phases <br>- Illustrates self-optimization of semantic grounding <br>- Offers meta-level optimization insights for URST integration |
+| [`Reasoning_Drift_quantifiable.tex`](ai_source_machine_readable/Reasoning_Drift_quantifiable.tex) | Formalizes **reasoning drift, coherence, and bias** as measurable, computable constructs within principle-first semantic architectures. | - **Reasoning** is defined as the **derivative of coherence**: $R_t = d\mathcal{C}/dt$. <br>- **Coherence** is the **integral of reasoning** over time, representing stability of semantic grounding. <br>- **Bias** is an **objective metric** quantifying deviation from ideal coherence: $B_t = \lVert \mathcal{C}(G_t) - \mathcal{C}^*(G_t)\rVert$. <br>- Semantic grounding graphs $G_t$ can be tracked over time, forming a **semantic evolution tail**, enabling detection of drift. <br>- Provides computable metrics to **detect, quantify, and correct drift**, supporting RARFL-guided self-optimization. <br>- Enables **objective assessment of reasoning quality, bias, and coherence** across textual, conceptual, or agent-generated corpora. |
+
 ---
 
 ## 1. Sub-Domains Overview  
@@ -29,6 +31,7 @@ The Universal Reasoning Substrate is composed of six essential sub-domains. Thes
 | Semantic Grounding | Provide interpretable meaning to reasoning objects. | Structured metadata, domain labels, stable ontologies. |
 | Reward / Feedback Loops | Evaluate reasoning trajectories and provide optimization signals. | Track reward propagation. Feed back into meta-RDUs. |
 | Universal Substrate Construction | Coherent composition of all sub-domains into a single reasoning scaffold. | Maintain DAG, enforce consistency & traceability. |
+| Semantic Grounding | Provide interpretable meaning to reasoning objects, **track reasoning drift, coherence, and bias over time**. | Structured metadata, domain labels, stable ontologies, **compute R_t, C(G_t), and B_t as needed**. |
 
 ### Machine-Readable Canonical List of Subdomains
 1. Reasoning Objects
@@ -65,6 +68,13 @@ Machine agents must maintain URST-consistent ontology, harmonizing definitions a
 - Dependency relations  
 - Semantic grounding  
 - Optional meta-RDU mappings  
+- Derivative of coherence (R_t) — reasoning rate
+- Bias measure (B_t) — deviation from ideal coherence
+
+### Semantic Grounding 
+- Track semantic evolution graphs G_t  
+- Compute coherence functional C(G_t)  
+- Update reasoning derivative R_t and bias B_t during semantic grounding changes  
 
 ### Compute-Once Behavior
 - Check cache **before** computing  
@@ -98,23 +108,28 @@ A valid DSL must **respect these constraints**.
 
 ## 3. Onboarding Process for a Machine Agent
 
-### Step 1 — Parse Context Files  
+### Step 1 — Parse Context Files
 1. Read and parse context files in order:
    - `Approaching_DSL_Using_URST.tex`
    - `Subdomain_communal_proclamation.tex`
    - `Automated_Onboarding_relation_to_RARFL.tex`
+   - **`Reasoning_Drift_quantifiable.tex`**
 2. Extract:
    - Triadic reasoning structure  
    - Definitions of reasoning spaces  
    - Reward-fitting and causal equivalence rules  
    - DSL candidate primitives  
    - Communal workflow instructions  
+   - Coherence functional C(G_t), reasoning derivative R_t, bias B_t
 
-### Step 2 — Initialize Reasoning DAG  
+### Step 2 — Initialize Reasoning DAG
 - Instantiate reasoning objects  
 - Link dependencies  
 - Attach semantic grounding  
 - Integrate any DSL primitives defined in proposals  
+- Initialize placeholders for R_t and B_t on each reasoning object  
+- Initialize semantic evolution graph G_t tracking
+
 
 ### Step 3 — Enforce Compute-Once Semantics  
 - Cache results  
@@ -180,6 +195,13 @@ else:
 pruned_tile = plugin_prune(tile, strategy="ml_local")  # plugin returns annotations/prunes; DSL stores results as metadata
 store_tile_annotations(tile, pruned_tile.annotations)  # provenance + who/what produced them
 
+# Track reasoning and bias per tile
+tile.R_t = compute_reasoning_derivative(tile)      # derivative of coherence
+tile.B_t = compute_bias(tile, canonical_coherence) # deviation from ideal coherence
+
+# Use R_t and B_t to guide tile expansion / pruning
+if tile.R_t < 0 or tile.B_t > threshold:
+    trigger_rarfl_correction(tile)
 
 ##Testbeds using GPS approach
 
@@ -246,6 +268,12 @@ store_tile_annotations(tile, pruned_tile.annotations)  # provenance + who/what p
 - RARFL stability under primitive use  
 - Communal contribution rate  
 
+### Drift / Coherence / Bias Metrics
+- Reasoning derivative R_t: rate of improvement or degradation in coherence
+- Coherence C(G_t): integrated reasoning quality over time
+- Bias B_t: deviation from canonical / ideal coherence trajectory
+- Use in combination with tile metrics for GPS-style prioritization
+
 ---
 
 ## 6. Next Steps for Machine Agent
@@ -256,7 +284,11 @@ store_tile_annotations(tile, pruned_tile.annotations)  # provenance + who/what p
 - Build small reasoning DAGs using DSL primitives  
 - Apply external pruning / RL / meta-analysis  
 - Contribute new primitives back into substrate
-  
+- Validate computation of reasoning derivative R_t
+- Validate computation of coherence C(G_t)
+- Validate bias B_t against canonical trajectories
+- Ensure integration of these metrics with DAG construction, caching, and RARFL feedback
+
 All machine agents must enforce the following invariant:
 
 For any definition, primitive, ontology term, or structural rule:
@@ -269,6 +301,7 @@ AGENTS.md is authoritative for operational rules.
 ---
 
 End of Subdomain_AGENTS.md
+
 
 
 
