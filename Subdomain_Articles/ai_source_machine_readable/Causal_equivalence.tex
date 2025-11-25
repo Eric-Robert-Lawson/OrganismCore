@@ -1,0 +1,73 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\geometry{margin=1in}
+
+\newtheorem{definition}{Definition}[section]
+\newtheorem{remark}{Remark}[section]
+
+\title{Causal Equivalence and Compatibility:\\
+A Subfield of the Universal Reasoning Substrate Theory (URST)}
+\author{Eric Robert Lawson}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document introduces \textbf{Causal Equivalence and Compatibility} as a new subfield emerging from the Universal Reasoning Substrate Theory (URST). By defining reasoning spaces, derivative reasoning spaces, and RARFL as foundational constructs, we formalize a framework to measure and analyze causal structure across domains. Causal equivalence provides a continuous, measurable, and explainable substrate, while causal compatibility defines the structural preconditions necessary for equivalence to exist. This subfield enables precise cross-domain reasoning transfer, emergent optimization, and explainable causal analysis.
+\end{abstract}
+
+\section{Introduction}
+The Universal Reasoning Substrate Theory (URST) provides a framework for modeling reasoning as a manipulable and objectifiable substrate. Within URST, reasoning spaces can be formalized, optimized, and transferred across domains via derivative reasoning spaces and the RARFL process.  
+
+A natural corollary of URST is the concept of \textbf{causal equivalence}, which measures the degree to which reasoning trajectories across distinct domains produce equivalent causal outcomes. Closely related is \textbf{causal compatibility}, which defines the structural preconditions for equivalence to exist.
+
+\section{Reasoning Spaces}
+\begin{definition}[Reasoning Space]
+A reasoning space $\mathcal{R}$ is a structured set of reasoning trajectories, where each trajectory represents a sequence of steps taken by an agent to achieve an objective under a specified reward function.
+\end{definition}
+
+\begin{definition}[Derivative Reasoning Space]
+Given a reasoning space $\mathcal{R}$, a derivative reasoning space $\mathcal{R}'$ is a transformed space that encodes optimized or partially solved trajectories of $\mathcal{R}$, typically via RARFL or other reasoning optimization methods.
+\end{definition}
+
+\section{Causal Equivalence}
+\begin{definition}[Causal Equivalence]
+Two reasoning spaces $\mathcal{R}_1$ and $\mathcal{R}_2$ are \textbf{causally equivalent} over a subset of trajectories $S \subseteq \mathcal{R}_1 \times \mathcal{R}_2$ if the outcomes under corresponding trajectories produce equivalent effects relative to their respective reward functions.  
+
+Formally, define a metric $\delta$ measuring divergence:
+\[
+\delta((\tau_1, \tau_2)) = \text{difference in causal effect of trajectories } \tau_1 \in \mathcal{R}_1, \tau_2 \in \mathcal{R}_2.
+\]
+
+Causal equivalence is satisfied when $\delta(\tau_1, \tau_2) \leq \epsilon$ for all $(\tau_1, \tau_2) \in S$, where $\epsilon$ is a threshold for acceptable divergence.
+\end{definition}
+
+\section{Causal Compatibility}
+\begin{definition}[Causal Compatibility]
+Two reasoning spaces $\mathcal{R}_1$ and $\mathcal{R}_2$ are \textbf{causally compatible} if there exists a non-empty subset of trajectories $S \subseteq \mathcal{R}_1 \times \mathcal{R}_2$ over which causal equivalence can be measured.  
+
+If the reasoning spaces are incompatible, no mapping exists and causal equivalence is undefined.
+\end{definition}
+
+\begin{remark}
+Causal compatibility defines the structural preconditions for equivalence. It distinguishes whether reasoning spaces are even comparable, while causal equivalence measures the degree of alignment where comparability exists.
+\end{remark}
+
+\section{Implications and Applications}
+\begin{itemize}
+    \item \textbf{Cross-domain transfer:} By quantifying equivalence and compatibility, reasoning optimized in one domain can be transferred to another with explicit measures of divergence.
+    \item \textbf{Explainable AI:} Divergence regions provide interpretable explanations for where and why causal reasoning fails to transfer.
+    \item \textbf{Emergent optimization:} RARFL and derivative reasoning spaces can leverage causal equivalence to guide optimization in partially observable or complex domains.
+    \item \textbf{Foundational theory:} Introduces a continuous, measurable, and structured framework for reasoning-space causality, redefining the traditional binary causal inference.
+\end{itemize}
+
+\section{Conclusion}
+Causal Equivalence and Compatibility, as a subfield of URST, provides a rigorous foundation for reasoning about causal relationships across domains. By shifting the perspective from binary inference to measurable equivalence, and introducing structural compatibility as a precondition, this subfield opens pathways for cross-domain reasoning transfer, emergent optimization, and explainable AI.  
+
+This framework represents a corollary epiphany from URST, extending the theoretical reach of reasoning-space analysis and establishing a new, operationally measurable field for causality.
+
+\end{document}
