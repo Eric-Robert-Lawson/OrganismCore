@@ -1,7 +1,7 @@
 # Subdomain_AGENTS.md — Universal Reasoning Substrate Onboarding
 
 ## Purpose
-This file serves as a machine-readable onboarding guide for understanding the **Universal Reasoning Substrate (URS)**, its six sub-domains, and guidance for **communal DSL development**. 
+This file serves as a machine-readable onboarding guide for understanding the **Universal Reasoning Substrate (URS)**, its sub-domains, and guidance for **communal DSL development**. 
 This file is designed for **machine agents**, requiring strict, stepwise parsing, cross-file linking, and dynamic context retrieval.
 
 ---
@@ -19,11 +19,12 @@ Machine agents must parse and integrate these documents before using the instruc
 | [`Cognition_coherence_and_SG.tex`](ai_source_machine_readable/Cognition_coherence_and_SG.tex) | Formalizes **cognition** as semantic-grounding-guided meta-control over RARFL reasoning processes. Defines **semantic efficiency** as a core cognitive metric. | - Cognition is a **meta-policy** optimizing intelligence accumulation per reasoning segment. <br>- Introduces **semantic efficiency**: coherence gain per semantic grounding effort. <br>- Cognitive actions operate on reasoning segments (RDUs), not time. <br>- Cognition uses coherence, bias, reasoning derivative, and semantic efficiency to guide meta-control. <br>- Provides segment-level formulas for cognitive optimization over semantic grounding graphs. |
 | [`Time_with_respect_to_Reason.tex`](ai_source_machine_readable/Time_with_respect_to_Reason.tex) | Formalizes the distinction between **reasoning (semantic, structural)** and **computation (temporal, engine-bound)**, introduces OOS Triad optimization, and motivates domain-specific languages for reasoning objects. | - Reasoning is **non-temporal**, computation is **temporal**. <br>- Defines Objectification–Operationalization–Semantic Grounding (OOS) Triad. <br>- Provides formal mapping: reasoning objects → computational instantiation → execution time. <br>- Guides DSL design to separate **semantic operations** from **engine-dependent computation**. |
 | [`explainability.tex`](ai_source_machine_readable/explainability.tex) | Formalizes **relational explainability** over objectified reasoning spaces, operational primitives, and semantic grounding. | - Explainability is a relational property, not intrinsic. <br>- Defines coherence functional $\mathcal{C}$, structural divergence $\Delta$, and aggregation operator $\Phi$. <br>- Illustrates counterfactual and structured contrastive explanations. <br>- Provides metrics: contrastiveness, sparseness, grounding-sensitivity. <br>- Directly informs XAI design and URST DSL operationalization. |
-
+| [`Causal_equivalence.tex`](ai_source_machine_readable/Causal_equivalence.tex) | Introduces **Causal Equivalence and Compatibility** as measurable constructs within reasoning spaces. | - Defines causal equivalence δ over reasoning trajectories; measurable and continuous. <br>- Defines causal compatibility as preconditions for equivalence. <br>- Supports cross-domain reasoning transfer. <br>- Provides formal metrics for divergence and alignment between reasoning spaces. <br>- Directly informs RARFL-guided optimization and derivative reasoning spaces. |
+| [`safety.tex`](ai_source_machine_readable/safety.tex) | Formalizes **structural safety guarantees** for ORAs, including RARFL constraints, semantic grounding enforcement, explainability, and segment-level monitoring. | - Ensures no runaway agency, emergent goal formation, or self-preservation drives. <br>- Integrates segment-level monitoring metrics (R_i, C(G_i), B_i, η_i) into safety checks. <br>- Provides audit trails, canonicalization, and pruning rules for machine-readable governance. <br>- Directly informs external meta-control policies and safe DSL operations. |
 ---
 
 ## 1. Sub-Domains Overview  
-The Universal Reasoning Substrate is composed of six essential sub-domains. These arise directly from the operational ground rules in Approaching_DSL_Using_URST.tex
+The Universal Reasoning Substrate is composed of essential sub-domains. These arise directly from the operational ground rules in Approaching_DSL_Using_URST.tex
 
 | Sub-Domain | Description | Operational Notes |
 |------------|------------|------------------|
@@ -34,7 +35,7 @@ The Universal Reasoning Substrate is composed of six essential sub-domains. Thes
 | Universal Substrate Construction | Coherent composition of all sub-domains into a single reasoning scaffold. | Maintain DAG, enforce consistency & traceability. |
 | Semantic Grounding | Provide interpretable meaning to reasoning objects, **track reasoning drift, coherence, and bias over discrete reasoning segments**. | Structured metadata, domain labels, stable ontologies, **compute R_i, C(G_i), and B_i as needed per reasoning segment**. |
 | Cognitive Meta-Control | Meta-policy that selects actions maximizing coherence gain per semantic effort across reasoning segments. | External to DSL; uses R_i, C(G_i), B_i, and η (semantic efficiency) as guiding metrics. |
-| [`safety.tex`](ai_source_machine_readable/safety.tex) | Formalizes **structural safety guarantees** for ORAs, including RARFL constraints, semantic grounding enforcement, explainability, and segment-level monitoring. | - Ensures no runaway agency, emergent goal formation, or self-preservation drives. <br>- Integrates segment-level monitoring metrics (R_i, C(G_i), B_i, η_i) into safety checks. <br>- Provides audit trails, canonicalization, and pruning rules for machine-readable governance. <br>- Directly informs external meta-control policies and safe DSL operations. |
+
 
 ### Machine-Readable Canonical List of Subdomains
 1. Reasoning Objects
@@ -83,6 +84,12 @@ Machine agents must maintain URST-consistent ontology, harmonizing definitions a
   - Structural divergence Δ to canonical forms
   - Aggregation operator Φ (scalar or structured)
   - Counterfactual sets for trajectory improvement analysis
+  - Causal equivalence δ_i,j per trajectory pair (with derivative reasoning spaces ℛ'_j)
+  - Causal compatibility flag (binary or set of compatible trajectory subsets)
+  - Divergence thresholds ε_i,j for RARFL-informed optimization
+  - Cross-domain transfer metadata:
+      - Indicates which derivative reasoning spaces are safe to apply
+      - Supports explainable transfer decisions
 
 ### Semantic Grounding 
 - Track semantic evolution graphs G_i  
@@ -103,6 +110,13 @@ Machine agents must maintain URST-consistent ontology, harmonizing definitions a
 - Input: completed reasoning trajectory  
 - Output: reward signals  
 - Function: prune, refine, optimize  
+- Input: completed reasoning trajectory ℛ_i, derivative trajectory ℛ'_j
+- Compute δ(ℛ_i, ℛ'_j) for all relevant pairs
+- If δ ≤ ε:
+    - Assign positive reward for equivalence-aligned reasoning transfer
+- Else:
+    - Assign negative reward or trigger RARFL correction
+- Store δ and compatibility metadata in meta-RDU for auditability and provenance
 
 ### DSL Substrate
 (From `Approaching_DSL_Using_URST.tex`)
@@ -122,6 +136,17 @@ Machine agents must maintain URST-consistent ontology, harmonizing definitions a
 
 
 A valid DSL must **respect these constraints**.
+
+### Causal Equivalence and Compatibility
+- **Causal Equivalence (δ):** A quantitative metric of similarity between reasoning trajectories across reasoning spaces.
+    - Machine agents must compute δ for corresponding trajectories when transferring reasoning strategies across domains.
+    - Equivalence threshold ε defines acceptable divergence.
+- **Causal Compatibility:** Structural precondition for measuring causal equivalence.
+    - Only causally compatible reasoning spaces are candidates for cross-domain transfer.
+- **Operationalization in RARFL:**
+    - Derivative reasoning spaces must track δ values between original and optimized trajectories.
+    - RARFL reward loops may incorporate causal equivalence metrics to guide optimization.
+- **Explainability:** Divergence regions highlight where causal reasoning transfer fails, supporting structured explanations and refinement.
 
 ### Cognition (Meta-Control)
 - Policy π_c selecting reasoning actions that maximize intelligence accumulation per semantic effort
@@ -152,6 +177,16 @@ A valid DSL must **respect these constraints**.
    - Communal workflow instructions  
    - Coherence functional C(G_i), reasoning derivative R_i, bias B_i per reasoning segment
 
+### Step 1.5 — Integrate Causal Equivalence
+1. Parse `Causal_equivalence.tex`.
+2. For each reasoning space ℛ_i:
+    - Compute δ between trajectories of ℛ_i and candidate derivative spaces ℛ'_j.
+    - Record causal compatibility flags for all trajectory subsets.
+    - Annotate meta-RDUs with δ values and compatibility metadata.
+3. Provide causal equivalence information to:
+    - RARFL optimization loops (reward guidance)
+    - Cross-domain reasoning transfer modules
+    - Explainability annotations (highlight divergence regions)
 
 ### Step 2 — Initialize Reasoning DAG
 - Instantiate reasoning objects  
@@ -361,6 +396,12 @@ if tile.R_i < 0 or tile.B_i > threshold:
   - Trigger pruning or rollback if axioms, grounding, or explainability thresholds are violated.
   - Log safety audit trails as part of provenance metadata for machine-readable compliance.
 
+### Causal Equivalence Metrics
+- **Average δ across trajectories:** mean divergence between reasoning space and derivative reasoning space
+- **Compatibility coverage:** fraction of trajectories with defined causal equivalence
+- **Divergence hotspots:** subsets of trajectories exceeding ε, indicating transfer failure
+- **Integration with RARFL:** track reward impact of δ-informed corrections
+
 ---
 
 ## 6. Next Steps for Machine Agent
@@ -391,5 +432,6 @@ Cognition, semantic efficiency, and cognitive meta-control must be reconciled wi
 ---
 
 End of Subdomain_AGENTS.md
+
 
 
