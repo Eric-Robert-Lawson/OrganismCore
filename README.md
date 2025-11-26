@@ -96,6 +96,23 @@ For hands-on experimentation and onboarding, follow these steps to engage with O
 
 ---
 
+## Academic Reference: Understanding Demo
+
+For a formal, citable presentation of the **Automated Semantic Onboarding** methodology and cross-model reasoning demonstration, see the **Understanding Demo** PDF:
+
+- [Understanding_demo.pdf](Understanding_demo.pdf)
+
+This document provides:
+
+- A reproducible, cross-model demonstration of reasoning objects
+- Detailed methods and results for Tic Tac Toe reasoning objects across Grok Code Fast 1, Chat GPT-5 mini, and Claude Sonnet 3.5
+- Insights on explainability, operationalization with a DSL, and cross-model reproducibility
+- Discussion of broader implications for universal reasoning substrates
+
+> **Note:** This PDF is intended as an academic contribution and formal reference. It is separate from the operational onboarding workflow in the repository. Researchers and contributors can reference it for background, methodology, and results while interacting with the practical onboarding materials (`AGENTS.md`, `Subdomain_AGENTS.md`) and reasoning objects in the repo.
+
+---
+
 ## Community & Participation
 
 To engage with the OrganismCore community, follow updates, and collaborate, see [COMMUNITY.md](COMMUNITY.md).
