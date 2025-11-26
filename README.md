@@ -2,43 +2,51 @@
 
 🎬 **Start here:** [Automated Semantic Onboarding for AI Agents](https://youtu.be/pEGlSHxKASw)
 
+A unified symbolic and computational framework for **objectified reasoning** that makes reasoning processes composable, auditable, reproducible, and directly executable.
 
-A unified symbolic and computational framework for **objectified reasoning** — treating reasoning processes as composable, auditable, and operational structures. OrganismCore builds the foundations for a **universal reasoning substrate**, integrating symbolic computation, compositional logic, and recursive reasoning into a transparent, interpretable system.
+OrganismCore introduces a **universal reasoning substrate** where models, agents, and humans can all interact with the same structured reasoning objects. These objects are produced through an *automated onboarding process* that works across different AI models, enabling:
 
-This repository serves as the hub for research, prototypes, and documents advancing **Universal Reasoning Substrate Theory (URST)** — with the goal of making general reasoning and intelligence a shared public commons.
+- Comparable reasoning behavior  
+- Fully traceable reasoning steps  
+- Cross-model reproducibility  
+- Interactive, agent-driven onboarding for researchers and developers  
 
-See the [Articles folder](/Articles/) for the conceptual documents that anchor the project.
+In addition, OrganismCore provides a foundation for a **domain-specific language (DSL)** designed to operationalize the universal reasoning substrate. This DSL enables reasoning workflows, reproducible experiments, and automated construction of reasoning objects to be formally specified and executed.
 
+This repository anchors the open research program advancing **Universal Reasoning Substrate Theory (URST)** and provides the infrastructure for reasoning-as-an-artifact.
+
+See the [Articles folder](/Articles/) for the conceptual and formal documents supporting the project.
 
 ---
 
-## Using AGENTS.md for Machine-Assisted Onboarding
+## Automated Onboarding (AGENTS.md)
 
-> **Recommended starting point for anyone new to OrganismCore.**
+> **This is the core demo of OrganismCore. Start here if you want to understand the new paradigm.**
 
-### Workflow with GitHub Copilot
+OrganismCore includes a reproducible **automated onboarding process** that lets any AI model (or human using an LLM) traverse and internalize the structure of the entire research program.  
+This process is defined in two files:
 
-1. Open the repository in an IDE or Codespace with Copilot enabled.  
-2. Read `AGENTS.md` and 'Subdomain_AGENTS.md' to understand how agents should traverse LaTeX, Python prototypes, and conceptual documents.  
-3. Explore how the AGENTS.md and Subdomain_AGENTS.md files reference project files and concepts; follow the structure shown in the tutorial to understand the automated onboarding process.
+- **AGENTS.md** — top-level semantic onboarding  
+- **Subdomain_AGENTS.md** — subdomain-level recursive onboarding  
 
+### Workflow (with GitHub Copilot or any LLM)
 
-### Automated Onboarding Tutorial
+1. Open the repo in an IDE or Codespace with an LLM assistant enabled.  
+2. Open `AGENTS.md` and follow the semantic instructions.  
+3. The assistant will recursively navigate LaTeX, Python prototypes, and conceptual documents.  
+4. The result is a **consistent reasoning object** produced directly from the onboarding pass.
 
-[▶ Automated Semantic Onboarding for AI Agents](https://youtu.be/pEGlSHxKASw)
+This provides a *structured and repeatable* way to onboard humans, AI models, and agents to the same reasoning substrate.  
 
-> For now we only have [AGENTS.md](AGENTS.md) in top layer and the [Subdomain_AGENTS.md](Subdomain_Articles/Subdomain_AGENTS.md) in the lower layer.
-
-### Benefits
-
-- **Collaborators and reviewers** can interrogate and onboard to the repo interactively.  
-- Provides structured context to LLMs, improving reproducibility.  
-- Enables agents to reason across the full research program.
+The onboarding process also acts as a **demonstration of how the proposed DSL can be used** to specify, execute, and compare reasoning objects across models, making it the living proof of the reasoning substrate in action.
   
 ---
 ## Reproducible Reasoning Objects
 
-OrganismCore enables creation of **fully auditable reasoning objects**. For example, tic-tac-toe reasoning objects have been automatically onboarded to multiple AI models:
+OrganismCore enables generation of **reproducible, transparent reasoning objects** through the automated onboarding procedure.  
+These reasoning objects are produced *consistently across multiple AI models* using the same AGENTS.md workflow. The process is designed to be compatible with the emerging **domain-specific language**, providing a medium to formalize and operationalize reasoning workflows.
+
+Below are three independently generated reasoning objects (tic-tac-toe domain) produced by three different models after running the same onboarding process. These objects serve as an example of **cross-model, DSL-compatible reasoning artifacts**.
 
 - 🔹 **Grok Code Fast 1 Model**: [View Reasoning Object](https://github.com/copilot/share/82541130-42a0-8cd0-b100-5e07e01360ae)
 - 🔹 **Chat GPT-5 mini**: [View Reasoning Object](https://github.com/copilot/share/8a3c51a0-43a4-8cd0-8102-dc0ec4d949bc)
@@ -48,11 +56,41 @@ These reasoning objects are **model-agnostic, fully reproducible, and auditable*
 
 ---
 
+## Why This Matters
+
+This is a working prototype of:
+
+- **Model-agnostic explainable reasoning**  
+- **Cross-model reproducibility of reasoning behavior**  
+- **Auditable chain-of-thought without leaking proprietary internals**  
+- **A standardized reasoning substrate for multi-agent systems**  
+- **A domain-specific language to formalize reasoning workflows**  
+
+The onboarding process *is itself* the demo — a self-referential proof that reasoning can be objectified, serialized, executed, and compared across architectures.
+
+---
+
+## What the Demo Actually Demonstrates
+
+The current demo is **not a prototype of the symbolic engine itself**.  
+It demonstrates:
+
+- The **automated onboarding process**
+- Generation of **consistent reasoning objects**
+- **Explainable AI behavior** across different models
+- **Operationalization potential for a DSL** formalizing reasoning workflows
+- A self-referential reasoning artifact that explains OrganismCore from inside the system
+
+The onboarding procedure is both a tool and a proof-of-concept for the entire paradigm and the universal reasoning substrate.
+
+---
+
 ## Explore OrganismCore
 
 For hands-on experimentation and onboarding, follow these steps to engage with OrganismCore.
 - Start with [AGENTS.md](AGENTS.md) and [Subdomain_AGENTS.md](Subdomain_Articles/Subdomain_AGENTS.md)  
 - Watch the [Automated Semantic Onboarding tutorial](https://youtu.be/pEGlSHxKASw)  
+- Interactively explore and experiment with **DSL-based reasoning workflows** via the automated onboarding process
 - Audit and interact with **existing reasoning objects** to understand model-agnostic reasoning workflows  
 - Join the [community](COMMUNITY.md) to collaborate on expanding reasoning spaces
 
