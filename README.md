@@ -36,143 +36,25 @@ See the [Articles folder](/Articles/) for the conceptual documents that anchor t
 - Enables agents to reason across the full research program.
   
 ---
+## Reproducible Reasoning Objects
 
-## Prototype Overview Video
+OrganismCore enables creation of **fully auditable reasoning objects**. For example, tic-tac-toe reasoning objects have been automatically onboarded to multiple AI models:
 
-> **Start here for a high-level conceptual grounding before diving into code.**
+- 🔹 **Grok Code Fast 1 Model**: [View Reasoning Object](https://github.com/copilot/share/82541130-42a0-8cd0-b100-5e07e01360ae)
+- 🔹 **Chat GPT-5 mini**: [View Reasoning Object](https://github.com/copilot/share/8a3c51a0-43a4-8cd0-8102-dc0ec4d949bc)
+- 🔹 **Anthropic (Claude Sonnet 3.5)**: [View Reasoning Object](https://github.com/copilot/share/ca5d01b2-0b84-8876-9901-5c0ec41148ad)
 
-[▶ OrganismCore Prototype Walkthrough](https://youtu.be/S5XGJ9JgHsU)
-
-**This video covers:**
-
-- The **Reasoning DNA Unit (RDU)** framework  
-- Operationalization via Python DAG prototypes  
-- Combinatorial layering and POT generator functions  
-- Bell polynomial operations  
-- How these components support a future DSL for objectified reasoning  
-
-This serves as a conceptual anchor for both the Articles folder and the code prototypes.
-
+These reasoning objects are **model-agnostic, fully reproducible, and auditable** by any researcher or developer.
 
 ---
 
-## Prototype: DAG-Based Reasoning DNA Unit
+## Explore OrganismCore
 
-The repository includes a Python prototype implementing a Directed Acyclic Graph (DAG) system for:
-
-- Multinomial expansions  
-- n-th derivatives of function products  
-- Partial and convoluted Bell polynomials  
-
-The DAG structure enables **auditable, composable symbolic reasoning**, demonstrating how reasoning operations can be objectified and operationalized even without a dedicated DSL.
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Python 3.10+  
-- [SymEngine](https://github.com/symengine/symengine.py)
-
-Install dependencies via pip:
-
-```bash
-pip install symengine
-```
-
-### Setup
-
-1. Save the prototype file as `DAG.py` in your working directory.  
-2. Open Python from the command line:
-
-```bash
-$ python
-```
-
-3. Import the prototype:
-
-```python
->>> import DAG
-```
-
----
-
-### Examples
-
-**Multinomial expansion:**  
-
-```python
->>> k4 = DAG.multinomial_DAG(3, 2, 0, DAG.unordered_combinations)
->>> k4[0]
-3*f0(x)*f1(x)**2 + 3*f0(x)**2*f1(x) + f0(x)**3 + f1(x)**3
-```
-
-**n-th derivative of function products:**  
-
-```python
->>> k4 = DAG.multinomial_DAG(3, 2, 1, DAG.unordered_combinations)
->>> k4[0]
-f0(x)*Derivative(f1(x), x, x, x) + f1(x)*Derivative(f0(x), x, x, x) + 3*Derivative(f0(x), x)*Derivative(f1(x), x, x) + 3*Derivative(f1(x), x)*Derivative(f0(x), x, x)
-```
-
-**Partial Bell polynomial example:**  
-
-```python
->>> k4 = DAG.predefined_bell_polynomial_DAG(0, 3, 2)
->>> k4[0]
-3.0*Derivative(f0(x), x)*Derivative(f0(x), x, x)
-```
-
-**Convoluted partial Bell polynomial example:**  
-
-```python
->>> k4 = DAG.convoluted_partial_bell_polynomial(3, 2, 2)
->>> k4[0]
-3.0*Derivative(f0(x), x)*Derivative(f0(x), x, x) + 3.0*Derivative(f0(x), x)*Derivative(f1(x), x, x) + 3.0*Derivative(f1(x), x)*Derivative(f0(x), x, x) + 3.0*Derivative(f1(x), x)*Derivative(f1(x), x, x)
-```
-
----
-
-## Demo Walkthrough
-
-To make experimentation even easier, a fully runnable Jupyter Notebook `demo.ipynb` is included in this repository.
-
-### Contents of `demo.ipynb`:
-
-1. **Multinomial expansion**  
-2. **n-th derivative of function products**  
-3. **Partial Bell polynomial**  
-4. **Convoluted partial Bell polynomial**
-
-Each example replicates the Python code above, but in an interactive format where you can:
-
-- Modify function orders or numbers of functions.
-- Experiment with different DAG compositions.
-- Trace symbolic outputs and see how the combinatorial reasoning unfolds.
-
-### Running the Demo:
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/yourusername/OrganismCore.git
-cd OrganismCore
-cd OrganismDemo
-```
-
-2. Ensure dependencies are installed:
-
-```bash
-pip install -r requirements.txt
-```
-
-3. Launch the notebook:
-```bash
-jupyter notebook demo.ipynb
-
-```
-This interactive demo provides a guided experience of the DAG symbolic reasoning engine and demonstrates the key combinatorial and symbolic reasoning patterns in action.
+For hands-on experimentation and onboarding, follow these steps to engage with OrganismCore.
+- Start with [AGENTS.md](AGENTS.md) and [Subdomain_AGENTS.md](Subdomain_Articles/Subdomain_AGENTS.md)  
+- Watch the [Automated Semantic Onboarding tutorial](https://youtu.be/pEGlSHxKASw)  
+- Audit and interact with **existing reasoning objects** to understand model-agnostic reasoning workflows  
+- Join the [community](COMMUNITY.md) to collaborate on expanding reasoning spaces
 
 ---
 
@@ -190,15 +72,6 @@ To support OrganismCore development or contribute to the personal fund for the a
 
 - **Project Fund:** Dedicated to infrastructure, research, and sustaining the project.  
 - **Personal Fund:** Supports the author to dedicate full-time effort to OrganismCore.
-
-
----
-
-## Notes
-
-- This is an **early prototype**. APIs and outputs may change.  
-- Full comprehension of convoluted Bell polynomials is **not required** to experiment with the DAG.  
-- Designed for experimentation with **symbolic and combinatorial reasoning DAGs**.  
 
 ---
 
