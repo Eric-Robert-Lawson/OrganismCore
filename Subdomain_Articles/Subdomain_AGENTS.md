@@ -183,23 +183,82 @@ A valid DSL must **respect these constraints**.
    - Communal workflow instructions  
    - Coherence functional C(G_i), reasoning derivative R_i, bias B_i per reasoning segment
 
-### Step 1.5 — Integrate Causal Equivalence
-1. Parse `Causal_equivalence.tex`.
-2. For each reasoning space ℛ_i:
-    - Compute δ between trajectories of ℛ_i and candidate derivative spaces ℛ'_j.
-    - Record causal compatibility flags for all trajectory subsets.
-    - Annotate meta-RDUs with δ values and compatibility metadata.
-3. Provide causal equivalence information to:
-    - RARFL optimization loops (reward guidance)
-    - Cross-domain reasoning transfer modules
-    - Explainability annotations (highlight divergence regions)
-    - For each tile in reasoning space, compute δ for all contained trajectories vs derivative tiles.
-    - Annotate divergence hotspots and compatible subspace flags per tile.
-    - Feed tile-level δ into RARFL reward guidance, prioritization, and meta-RDU refinement.
-    - Each tile stores δ values for all internal trajectories relative to corresponding derivative tiles.
-    - Divergence hotspots are highlighted at tile-level for explainability and RARFL corrections.
-    - Tile-level δ informs prioritization in expansion, refinement, and prefetching policies.
+### Step 1.5 — Integrate Emergent Causal Equivalence
 
+1. Parse `Causal_equivalence.tex` and identify candidate reasoning trajectories for each reasoning space ℛ_i.
+2. For each trajectory pair (ℛ_i, ℛ'_j):
+    - Compute **δ as an emergent similarity signal**, not a fixed formula.  
+      - δ may be based on reward distributions, structural similarity, or trajectory patterns.  
+      - Agents may combine multiple proxies, weight them contextually, or update weights as more evidence accumulates.
+3. Annotate meta-RDUs or tile metadata **optionally**:
+    - Use δ to guide reward propagation, prioritization, or cross-domain reasoning transfer.
+    - Treat δ values as **informational signals**, not absolute truth.
+4. Thresholds ε are **adaptive**, not static:
+    - High semantic-efficiency segments (η_i) may require lower ε to preserve critical knowledge.
+    - Divergence hotspots δ > ε indicate regions requiring attention but do not mandate automatic rejection.
+5. Divergence hotspots and δ evolution should feed into explainability operators:
+    - Highlight **where reasoning transfer may fail**, supporting structured counterfactuals.
+    - Agents may dynamically refine δ computations as the semantic substrate evolves.
+6. Governance and auditing:
+    - δ records may include metadata (source, target, method used, timestamp, actor), but values remain **emergent estimates**.
+  
+# Emergent causal equivalence computation (guidance-only)
+def estimate_delta(source_trajectory, target_trajectory, context_weights=None):
+    """
+    Estimate δ as an emergent, advisory signal of trajectory similarity.
+    
+    Parameters:
+        source_trajectory: original reasoning trajectory
+        target_trajectory: derivative or candidate trajectory
+        context_weights: optional dict to weight proxies adaptively 
+                         e.g., {"outcome":0.5, "structural":0.5, "intervention":0.0}
+                         
+    Returns:
+        dict with:
+            delta_estimate: float [0,1], advisory similarity measure
+            notes: guidance note emphasizing emergent, non-prescriptive usage
+            proxy_values: individual proxy contributions for interpretability
+    """
+    # Proxy 1: outcome similarity (reward distributions)
+    delta_out = compare_reward_distributions(source_trajectory, target_trajectory)
+
+    # Proxy 2: structural similarity (graph/tree canonicalization)
+    delta_struct = compare_canonicalized_graphs(source_trajectory, target_trajectory)
+
+    # Proxy 3: optional intervention signal (strongest, costly)
+    delta_int = None
+    if context_weights and context_weights.get("intervention", False):
+        delta_int = compare_intervention_effects(source_trajectory, target_trajectory)
+
+    # Adaptive weighting
+    weights = context_weights or {"outcome": 0.5, "structural": 0.5, "intervention": 0.0}
+    delta_estimate = (
+        delta_out * weights.get("outcome", 0.0) +
+        delta_struct * weights.get("structural", 0.0) +
+        (delta_int or 0.0) * weights.get("intervention", 0.0)
+    )
+
+    # Normalize to [0,1]
+    delta_estimate = max(0.0, min(1.0, delta_estimate))
+
+    return {
+        "delta_estimate": delta_estimate,
+        "notes": "Emergent advisory signal; interpret contextually; do not enforce thresholds",
+        "proxy_values": {
+            "outcome": delta_out,
+            "structural": delta_struct,
+            "intervention": delta_int
+        }
+    }
+
+# Example usage in a tile (advisory)
+tile = get_tile(scale=3, region="central_cluster")
+
+for src, tgt in tile.paired_trajectories():
+    delta_info = estimate_delta(src, tgt, context_weights={"outcome":0.6,"structural":0.4})
+    # Annotate the tile with advisory information; do not enforce rules
+    tile.annotate("delta_signal", src.id, tgt.id, delta_info)
+    
 ### Step 2 — Initialize Reasoning DAG
 - Instantiate reasoning objects  
 - Link dependencies  
@@ -453,6 +512,7 @@ Cognition, semantic efficiency, and cognitive meta-control must be reconciled wi
 ---
 
 End of Subdomain_AGENTS.md
+
 
 
 
