@@ -117,6 +117,9 @@ Machine agents must maintain URST-consistent ontology, harmonizing definitions a
 - Else:
     - Assign negative reward or trigger RARFL correction
 - Store δ and compatibility metadata in meta-RDU for auditability and provenance
+- δ_i,j should be tracked per reasoning segment (or tile), not just global trajectory.
+- ε thresholds can dynamically vary across segments based on semantic grounding η_i.
+- Record δ evolution over time as trajectories are refined (meta-RDUs, derivative reasoning spaces).
 
 ### DSL Substrate
 (From `Approaching_DSL_Using_URST.tex`)
@@ -153,6 +156,9 @@ A valid DSL must **respect these constraints**.
 - Inputs: R_i, C(G_i), B_i, semantic grounding metrics S_i
 - Output: prioritized next reasoning tiles, actions, or semantic refinements
 - Must operate over discrete reasoning segments, not time
+- When evaluating candidate meta-RDUs, compute δ relative to semantic efficiency η_i and local context semantics.
+- Ensure transfer decisions respect local semantic coherence; prevent global averaging from masking local divergence hotspots.
+- Adjust thresholds ε_i,j per segment using contextual relevance heuristics.
 
 
 ---
@@ -187,6 +193,12 @@ A valid DSL must **respect these constraints**.
     - RARFL optimization loops (reward guidance)
     - Cross-domain reasoning transfer modules
     - Explainability annotations (highlight divergence regions)
+    - For each tile in reasoning space, compute δ for all contained trajectories vs derivative tiles.
+    - Annotate divergence hotspots and compatible subspace flags per tile.
+    - Feed tile-level δ into RARFL reward guidance, prioritization, and meta-RDU refinement.
+    - Each tile stores δ values for all internal trajectories relative to corresponding derivative tiles.
+    - Divergence hotspots are highlighted at tile-level for explainability and RARFL corrections.
+    - Tile-level δ informs prioritization in expansion, refinement, and prefetching policies.
 
 ### Step 2 — Initialize Reasoning DAG
 - Instantiate reasoning objects  
@@ -401,6 +413,15 @@ if tile.R_i < 0 or tile.B_i > threshold:
 - **Compatibility coverage:** fraction of trajectories with defined causal equivalence
 - **Divergence hotspots:** subsets of trajectories exceeding ε, indicating transfer failure
 - **Integration with RARFL:** track reward impact of δ-informed corrections
+- Tile-level δ mean and max
+- Tile-level ε compliance rate
+- Divergence hotspot coverage (fraction of tiles exceeding ε)
+- Weighted δ aggregated by semantic efficiency η_i
+- ε_i,j may vary by segment importance, semantic efficiency η_i, or global cognitive priority.
+- High-η_i segments tolerate smaller δ to preserve critical knowledge fidelity.
+- Divergence regions δ > ε per segment/tile feed directly into explainability operator Φ.
+- Provide structured counterfactuals showing which reasoning objects or segments contributed most to divergence.
+- Annotate RARFL corrections or meta-RDU pruning with δ justification for auditability.
 
 ---
 
@@ -432,6 +453,7 @@ Cognition, semantic efficiency, and cognitive meta-control must be reconciled wi
 ---
 
 End of Subdomain_AGENTS.md
+
 
 
 
