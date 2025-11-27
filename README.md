@@ -32,15 +32,20 @@ This process is defined in two files:
 ### Workflow (with GitHub Copilot or any LLM)
 
 1. Open the repo in an IDE or Codespace with an LLM assistant enabled.  
-2. Open `AGENTS.md` and follow the semantic instructions.  
-3. The assistant will recursively navigate LaTeX, Python prototypes, and conceptual documents.  
-4. The result is a **consistent reasoning object** produced directly from the onboarding pass.
+2. Open `AGENTS.md` and follow the semantic instructions, referencing proper machine readable conceptual and code files.  
+3. Open `Subdomain_AGENTS.md` and follow the semantic instructions.  
+   - Reference proper machine readable domain files and policy definitions (e.g., `Policy.md`) to ensure reasoning objects align with semantic grounding and cross-model validation.  
+4. The assistant will recursively navigate LaTeX, Python prototypes, and conceptual documents.  
+5. The result is a **consistent reasoning object** produced directly from the onboarding pass.
+
+For clearer instructions, follow this video: [Automated Semantic Onboarding for AI Agents](https://youtu.be/pEGlSHxKASw)
 
 This provides a *structured and repeatable* way to onboard humans, AI models, and agents to the same reasoning substrate.  
 
 The onboarding process also acts as a **demonstration of how the proposed DSL can be used** to specify, execute, and compare reasoning objects across models, making it the living proof of the reasoning substrate in action.
-  
+
 ---
+
 ## Reproducible Reasoning Objects
 
 OrganismCore enables generation of **reproducible, transparent reasoning objects** through the automated onboarding procedure.  
@@ -48,8 +53,8 @@ These reasoning objects are produced *consistently across multiple AI models* us
 
 Below are three independently generated reasoning objects (tic-tac-toe domain) produced by three different models after running the same onboarding process. These objects serve as an example of **cross-model, DSL-compatible reasoning artifacts**.
 
-- 🔹 **Grok Code Fast 1 Model**: [View Reasoning Object](https://github.com/copilot/share/82541130-42a0-8cd0-b100-5e07e01360ae)
-- 🔹 **Chat GPT-5 mini**: [View Reasoning Object](https://github.com/copilot/share/8a3c51a0-43a4-8cd0-8102-dc0ec4d949bc)
+- 🔹 **Grok Code Fast 1 Model**: [View Reasoning Object](https://github.com/copilot/share/82541130-42a0-8cd0-b100-5e07e01360ae)  
+- 🔹 **Chat GPT-5 mini**: [View Reasoning Object](https://github.com/copilot/share/8a3c51a0-43a4-8cd0-8102-dc0ec4d949bc)  
 - 🔹 **Anthropic (Claude Sonnet 3.5)**: [View Reasoning Object](https://github.com/copilot/share/ca5d01b2-0b84-8876-9901-5c0ec41148ad)
 
 These reasoning objects are **model-agnostic, fully reproducible, and auditable** by any researcher or developer.
@@ -75,10 +80,10 @@ The onboarding process *is itself* the demo — a self-referential proof that re
 The current demo is **not a prototype of the symbolic engine itself**.  
 It demonstrates:
 
-- The **automated onboarding process**
-- Generation of **consistent reasoning objects**
-- **Explainable AI behavior** across different models
-- **Operationalization potential for a DSL** formalizing reasoning workflows
+- The **automated onboarding process**  
+- Generation of **consistent reasoning objects**  
+- **Explainable AI behavior** across different models  
+- **Operationalization potential for a DSL** formalizing reasoning workflows  
 - A self-referential reasoning artifact that explains OrganismCore from inside the system
 
 The onboarding procedure is both a tool and a proof-of-concept for the entire paradigm and the universal reasoning substrate.
@@ -87,10 +92,11 @@ The onboarding procedure is both a tool and a proof-of-concept for the entire pa
 
 ## Explore OrganismCore
 
-For hands-on experimentation and onboarding, follow these steps to engage with OrganismCore.
+For hands-on experimentation and onboarding, follow these steps to engage with OrganismCore:
+
 - Start with [AGENTS.md](AGENTS.md) and [Subdomain_AGENTS.md](Subdomain_Articles/Subdomain_AGENTS.md)  
 - Watch the [Automated Semantic Onboarding tutorial](https://youtu.be/pEGlSHxKASw)  
-- Interactively explore and experiment with **DSL-based reasoning workflows** via the automated onboarding process
+- Interactively explore and experiment with **DSL-based reasoning workflows** via the automated onboarding process  
 - Audit and interact with **existing reasoning objects** to understand model-agnostic reasoning workflows  
 - Join the [community](COMMUNITY.md) to collaborate on expanding reasoning spaces
 
@@ -98,24 +104,20 @@ For hands-on experimentation and onboarding, follow these steps to engage with O
 
 ## Academic Reference: Understanding Demo
 
-For a formal, citable presentation of the **Automated Semantic Onboarding** methodology and cross-model reasoning demonstration, see the **Understanding Demo** PDF:
+For a formal, citable presentation of **Automated Semantic Onboarding** methodology and cross-model reasoning demonstration, see the PDFs:
 
-- [Understanding_demo.pdf](Understanding_demo.pdf)
+- [Understanding_demo.pdf](Understanding_demo.pdf)  
+  Reproducible, cross-model demonstration of reasoning objects with detailed methods, results, and broader implications for universal reasoning substrates.
+- [Policy_and_semantic_grounding_cross_model_validation.pdf](Policy_and_semantic_grounding_cross_model_validation.pdf)  
+  Formal demonstration of **cross-model reasoning validation** with semantic grounding and policy alignment. Shows how reasoning objects from different AI models can be evaluated for **consistency, interpretability, and policy adherence**, enabling reproducible and auditable multi-model reasoning experiments.
 
-This document provides:
-
-- A reproducible, cross-model demonstration of reasoning objects
-- Detailed methods and results for Tic Tac Toe reasoning objects across Grok Code Fast 1, Chat GPT-5 mini, and Claude Sonnet 3.5
-- Insights on explainability, operationalization with a DSL, and cross-model reproducibility
-- Discussion of broader implications for universal reasoning substrates
-
-> **Note:** This PDF is intended as an academic contribution and formal reference. It is separate from the operational onboarding workflow in the repository. Researchers and contributors can reference it for background, methodology, and results while interacting with the practical onboarding materials (`AGENTS.md`, `Subdomain_AGENTS.md`) and reasoning objects in the repo.
+> **Note:** These PDFs are academic references. They complement the operational onboarding workflow (`AGENTS.md`, `Subdomain_AGENTS.md`) and reasoning objects in the repository.
 
 ---
 
 ## Community & Participation
 
-To engage with the OrganismCore community, follow updates, and collaborate, see [COMMUNITY.md](COMMUNITY.md).
+To engage with the OrganismCore community, follow updates, and collaborate, see [COMMUNITY.md](COMMUNITY.md).  
 
 The community welcomes discussion, feedback, and collaboration.
 
@@ -130,23 +132,25 @@ To support OrganismCore development or contribute to the personal fund for the a
 
 ---
 
-## License and project intent
+## License and Project Intent
 
 License: GNU Affero General Public License v3 (AGPLv3) — SPDX: AGPL-3.0-only. See [LICENSE](LICENSE) for the full text.
 
 We use AGPLv3 to ensure improvements and hosted derivatives remain available to the community. OrganismCore is intended to be a shared research substrate, and the AGPL helps prevent proprietary or centralized service forks that would hide improvements from the commons.
 
-Commercial licensing (optional)
-- AGPLv3 permits commercial use provided the license obligations are satisfied (including source disclosure for networked services).
-- If your organization cannot comply with AGPLv3 for operational or legal reasons (for example, closed SaaS, embedded proprietary products, or restrictive procurement rules), a negotiated commercial license is available. See [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) for the request process and typical timelines.
+**Commercial licensing (optional)**
 
-Contributor / relicensing note
-- The public repository remains AGPLv3 for all users. If third‑party contributors have added code, relicensing those contributions may require their consent. To keep future governance and licensing options clear, please see [CONTRIBUTING.md](CONTRIBUTING.md) for contributor sign‑off guidance (DCO/CLA).
+- AGPLv3 permits commercial use provided the license obligations are satisfied (including source disclosure for networked services).  
+- If your organization cannot comply with AGPLv3 for operational or legal reasons, a negotiated commercial license is available. See [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) for the request process and typical timelines.
 
-Citation
+**Contributor / relicensing note**
+
+- The public repository remains AGPLv3 for all users. If third‑party contributors have added code, relicensing those contributions may require their consent. See [CONTRIBUTING.md](CONTRIBUTING.md) for contributor sign‑off guidance (DCO/CLA).
+
+**Citation**
+
 - If you use OrganismCore in research, please cite the repository or the project DOI/CITATION.cff (see [CITATION.cff](CITATION.cff) or the Zenodo badge in the repo).
 
-See [LICENSE](LICENSE) for details.
 ---
 
 ## Contribution
