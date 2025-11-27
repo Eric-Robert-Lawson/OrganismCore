@@ -48,6 +48,9 @@ The onboarding process also acts as a **demonstration of how the proposed DSL ca
 
 ## Reproducible Reasoning Objects
 
+**[Understanding_demo.pdf](Understanding_demo.pdf)**
+  Reproducible, cross-model demonstration of reasoning objects with detailed methods, results, and broader implications for universal reasoning substrates.
+
 OrganismCore enables generation of **reproducible, transparent reasoning objects** through the automated onboarding procedure.  
 These reasoning objects are produced *consistently across multiple AI models* using the same AGENTS.md workflow. The process is designed to be compatible with the emerging **domain-specific language**, providing a medium to formalize and operationalize reasoning workflows.
 
@@ -59,6 +62,29 @@ Below are three independently generated reasoning objects (tic-tac-toe domain) p
 
 These reasoning objects are **model-agnostic, fully reproducible, and auditable** by any researcher or developer.
 
+---
+
+### Reproducible Policy Reasoning Objects (Cross-Model Validation)
+
+**[Policy_and_semantic_grounding_cross_model_validation.pdf](Policy_and_semantic_grounding_cross_model_validation.pdf)**
+Formal demonstration of **cross-model reasoning validation** with semantic grounding and policy alignment. Shows how reasoning objects from different AI models can be evaluated for **consistency, interpretability, and policy adherence**, enabling reproducible and auditable multi-model reasoning experiments.
+
+OrganismCore enables generation of **reproducible, transparent policy reasoning objects** through the automated onboarding procedure.  
+These objects demonstrate **policy alignment, semantic grounding, and cross-model validation** for reasoning workflows. They are produced consistently across multiple AI models using the same AGENTS.md workflow, enabling reproducible, auditable multi-model experiments.
+
+Below are independently generated policy reasoning objects from different models after running the same onboarding workflow. These serve as examples of **cross-model, policy-compliant reasoning artifacts**:
+
+- 🔹 **Claude Sonnet 4.5 – RARFL Iteration 1**: [View Policy Reasoning Object](https://github.com/copilot/share/083c1030-0b84-8450-b800-5e4fc45140be)  
+- 🔹 **Claude Sonnet 4.5 – RARFL Iteration 2**: [View Policy Reasoning Object](https://github.com/copilot/share/425c03a2-0280-80d0-8150-4c4ec4d109ec)  
+- 🔹 **GPT-5 mini – Cross-Model Applicability Check**: [View Policy Reasoning Object](https://github.com/copilot/share/c25d0020-0aa4-8c50-8901-dc0ec09309ad)  
+- 🔹 **Grok Code Fast 1 mini – Cross-Model Applicability Check**: [View Policy Reasoning Object](https://github.com/copilot/share/ca1d1232-4ba0-80f6-a011-5e06c0db21ae)  
+- 🔹 **Gemini 2.5 mini – Cross-Model Applicability Check**: [View Policy Reasoning Object](https://github.com/copilot/share/8a7c51b2-42a0-88f4-b951-ce4fe4db21ee)
+
+These objects are **model-agnostic, fully auditable, and reproducible**, providing:
+
+- Verification of **policy and semantic alignment** across reasoning objects  
+- A framework for **cross-model validation** of reasoning outputs  
+- Evidence for the **consistency and interpretability** of AI-generated policy reasoning artifacts
 ---
 
 ## Why This Matters
@@ -85,6 +111,7 @@ It demonstrates:
 - **Explainable AI behavior** across different models  
 - **Operationalization potential for a DSL** formalizing reasoning workflows  
 - A self-referential reasoning artifact that explains OrganismCore from inside the system
+- Usage of semantic grounding and optionally policy.md depending on use case
 
 The onboarding procedure is both a tool and a proof-of-concept for the entire paradigm and the universal reasoning substrate.
 
@@ -99,19 +126,6 @@ For hands-on experimentation and onboarding, follow these steps to engage with O
 - Interactively explore and experiment with **DSL-based reasoning workflows** via the automated onboarding process  
 - Audit and interact with **existing reasoning objects** to understand model-agnostic reasoning workflows  
 - Join the [community](COMMUNITY.md) to collaborate on expanding reasoning spaces
-
----
-
-## Academic Reference: Understanding Demo
-
-For a formal, citable presentation of **Automated Semantic Onboarding** methodology and cross-model reasoning demonstration, see the PDFs:
-
-- [Understanding_demo.pdf](Understanding_demo.pdf)  
-  Reproducible, cross-model demonstration of reasoning objects with detailed methods, results, and broader implications for universal reasoning substrates.
-- [Policy_and_semantic_grounding_cross_model_validation.pdf](Policy_and_semantic_grounding_cross_model_validation.pdf)  
-  Formal demonstration of **cross-model reasoning validation** with semantic grounding and policy alignment. Shows how reasoning objects from different AI models can be evaluated for **consistency, interpretability, and policy adherence**, enabling reproducible and auditable multi-model reasoning experiments.
-
-> **Note:** These PDFs are academic references. They complement the operational onboarding workflow (`AGENTS.md`, `Subdomain_AGENTS.md`) and reasoning objects in the repository.
 
 ---
 
