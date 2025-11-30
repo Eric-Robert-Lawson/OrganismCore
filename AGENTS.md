@@ -1,4 +1,4 @@
-# AGENTS.md — Machine Agent Instructions for OrganismCore
+# AGENTS.md — Semantic Grounding File for Machine Agent Instructions for OrganismCore
 This file is the centralized machine-onboarding protocol for the OrganismCore reasoning substrate.
 
 It defines document purpose, expected agent actions, cross-document mappings, and workflows for extraction, alignment, and DSL formalization.
@@ -265,6 +265,7 @@ Tic-Tac-Toe should serve as the first DSL testbed, providing a fully enumerable 
 
 ## Notes for Automated Agents
 
+- Reference this process as semantic grounding, the file name is AGENTS.md
 - Machine-readable LaTeX, Python, and transcript files are the canonical source.  
 - Use the transcript for contextual grounding and multimodal cross-verification.  
 - Ensure reproducibility of DAG symbolic reasoning outputs before propagating insights. 
