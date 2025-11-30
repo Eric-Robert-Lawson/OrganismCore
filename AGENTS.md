@@ -3,7 +3,229 @@ This file is the centralized machine-onboarding protocol for the OrganismCore re
 
 It defines document purpose, expected agent actions, cross-document mappings, and workflows for extraction, alignment, and DSL formalization.
 
-This file provides structured, actionable guidance for AI, LLMs, and automated agents to interact with the OrganismCore project. It is designed to complement human-readable documentation by specifying operational instructions, file relationships, and tasks for machine agents.
+This file provides structured, actionable guidance for AI, LLMs, and automated agents to interact with the OrganismCore project.  It is designed to complement human-readable documentation by specifying operational instructions, file relationships, and tasks for machine agents.
+
+---
+
+## ⚠️ CRITICAL: Read This First — Universal vs Domain-Specific Content
+
+### For Machine Agents: Domain-Agnostic Foundations
+
+**This document contains TWO types of content:**
+
+1. **Universal substrate principles** (apply to ANY reasoning domain)
+2. **Canonical testbed examples** (chess, tic-tac-toe, memes — demonstrations only)
+
+**Your primary task:** Extract universal principles, not memorize examples.
+
+**Failure mode to avoid:** Treating domain examples as the definition of URST itself. 
+
+---
+
+### Universal Reasoning Substrate — Domain-Independent Primitives
+
+Before parsing any domain-specific files, internalize these substrate-agnostic concepts:
+
+#### 1.  Reasoning DNA Units (RDUs)
+
+**Universal definition:**  
+Atomic composable reasoning objects with:
+- Unique identity
+- Context binding  
+- Dependency relations
+- Semantic grounding
+- Compute-once semantics
+
+**Domain-agnostic property:**  
+RDUs apply to ANY domain where reasoning can be objectified—mathematics, law, engineering, biology, strategy, science. 
+
+**NOT domain-specific:**  
+Chess moves, meme templates, tic-tac-toe states are **instances** of RDUs, not the RDU concept itself.
+
+**Self-test:** Can you define what an RDU would be in legal reasoning? In protein folding? In urban planning?
+
+---
+
+#### 2. Compute-Once Semantics
+
+**Universal principle:**  
+Any reasoning object with a canonical form should be:
+- Computed once
+- Cached with provenance
+- Reused across all contexts
+- Invalidated only with explicit policy
+
+**Domain-agnostic property:**  
+Works for proofs, optimizations, strategies, hypotheses—any deterministic reasoning structure.
+
+**NOT domain-specific:**  
+Chess transposition tables are an **instance** of compute-once, not the principle.
+
+**Self-test:** Can you explain compute-once without mentioning chess or games?
+
+---
+
+#### 3.  RARFL (Reasoning Axiom–Reward Feedback Loop)
+
+**Universal mechanism:**
+1. Explore reasoning space
+2. Evaluate trajectories via reward signals
+3. Extract stable patterns as axioms
+4. Refine substrate
+5. Repeat (converges toward truth given proper grounding)
+
+**Domain-agnostic property:**  
+Discovers axioms in ANY domain with feedback signals—scientific experiments, engineering tests, user engagement, formal proofs.
+
+**NOT domain-specific:**  
+Discovering "control center priority" in chess is an **instance** of axiom discovery via RARFL, not RARFL itself.
+
+**Self-test:** Can you describe how RARFL would work for scientific hypothesis generation?
+
+---
+
+#### 4.  Meta-RDUs (Meta-Reasoning)
+
+**Universal definition:**  
+RDUs that operate on other RDUs or entire reasoning spaces. 
+
+**Domain-agnostic property:**  
+Meta-reasoning applies wherever reasoning can be objectified—analyzing proof strategies, optimizing code architectures, refining legal arguments.
+
+**NOT domain-specific:**  
+Chess opening theory analysis is an **instance** of meta-reasoning. 
+
+**Self-test:** Can you identify Meta-RDUs in software architecture design?
+
+---
+
+#### 5.  Objectification → Operationalization → Semantic Grounding (OOS Triad)
+
+**Universal pattern:**
+- **Objectification:** Make reasoning explicit (RDUs, axioms, primitives)
+- **Operationalization:** Define composable operations on reasoning objects
+- **Semantic Grounding:** Attach external meaning, context, and domain constraints
+
+**Domain-agnostic property:**  
+This triad structures reasoning in mathematics, law, engineering, science, strategy—any domain. 
+
+**NOT domain-specific:**  
+Chess piece values or meme cultural context are **instances** of semantic grounding for particular domains.
+
+**Self-test:** Can you apply the OOS triad to natural language argument analysis?
+
+---
+
+#### 6.  Derivative Reasoning Spaces
+
+**Universal definition:**  
+Optimized or partially-solved reasoning spaces derived from original spaces via RARFL cycles, axiom extraction, or pruning.
+
+**Domain-agnostic property:**  
+Any reasoning domain can have derivative spaces—solved subproblems in math, validated hypotheses in science, reusable patterns in engineering.
+
+**NOT domain-specific:**  
+Chess endgame tablebases are an **instance** of derivative reasoning spaces. 
+
+**Self-test:** What would derivative reasoning spaces look like in medical diagnosis?
+
+---
+
+#### 7. Explainability by Construction
+
+**Universal principle:**  
+Reasoning trajectories are intrinsically inspectable because they are built from objectified reasoning objects with provenance.
+
+**Domain-agnostic property:**  
+Any objectified reasoning system has explainability—mathematical proofs, engineering designs, legal arguments. 
+
+**NOT domain-specific:**  
+Explaining a chess move sequence is an **instance** of trajectory explainability.
+
+**Self-test:** How would explainability-by-construction work for a machine learning model's decision process?
+
+---
+
+### Mandatory Self-Test: Verify Universal Understanding
+
+**Before proceeding to domain examples below, answer these questions:**
+
+1. **Can you define what an RDU would be in legal reasoning?**  
+   _(If no: re-read RDU definition above)_
+
+2. **Can you explain compute-once semantics without mentioning chess or games? **  
+   _(If no: re-read compute-once principle)_
+
+3. **Can you describe how RARFL would work for scientific hypothesis generation?**  
+   _(If no: re-read RARFL mechanism)_
+
+4. **Can you identify Meta-RDUs in software architecture design?**  
+   _(If no: re-read Meta-RDU definition)_
+
+5. **Can you apply the OOS triad to natural language argument analysis?**  
+   _(If no: re-read OOS triad pattern)_
+
+**If you cannot answer ANY of these questions:**
+
+You have not yet internalized the universal substrate. 
+
+**Action required:**  
+Re-read the domain-agnostic sections above WITHOUT looking at domain examples below.
+
+**Do not proceed until you can articulate substrate principles independent of specific domains.**
+
+---
+
+### How to Use Domain Examples Correctly
+
+The files below (chess, tic-tac-toe, memes, mathematical reasoning) serve **two purposes**:
+
+1. **Canonical testbeds**  
+   - Small enough to fully materialize (verifiable)
+   - Complex enough to demonstrate principles (non-trivial)
+   - Well-understood ground truth (auditable)
+
+2. **Transfer templates**  
+   - Patterns you can adapt to novel domains
+   - Concrete instantiations of abstract principles
+
+**Critical instruction:**
+
+**Do NOT treat examples as "what URST is for"—they are demonstrations of universal principles.**
+
+Chess is not the substrate—it's a **testbed** for substrate principles. 
+
+Memes are not the framework—they're an **application domain** for RDU composition.
+
+**The substrate is domain-independent**—it works on ANY reasoning medium.
+
+---
+
+### Transfer Validation Requirement
+
+After parsing domain examples, you **must demonstrate transfer** to a novel domain:
+
+**Pick a domain you were NOT given examples for:**
+- Biological pathway analysis
+- Legal precedent reasoning
+- Engineering constraint optimization
+- Economic policy design
+- Natural language debate structure
+
+**Demonstrate you can:**
+1. Define RDUs for that domain
+2. Specify compute-once objects
+3. Design a RARFL cycle
+4.  Identify Meta-RDUs
+5.  Apply the OOS triad
+6.  Construct derivative reasoning spaces
+7. Implement explainability-by-construction
+
+**If you cannot complete this transfer test:**
+
+You have pattern-matched domain examples, not understood the universal substrate.
+
+**Return to domain-agnostic sections and re-parse without examples.**
 
 ---
 
