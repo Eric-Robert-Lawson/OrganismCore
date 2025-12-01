@@ -1,12 +1,12 @@
 # META_DSL. md — Meta-Primitives for Reasoning Infrastructure (v1.4)
 
-**Version 1.4 (Bootstrap Iteration 4)**
+**Version 1.5 (Bootstrap Iteration 5)**
 
 ---
 
 ## **Document Status**
 
-**Version:** 1.4  
+**Version:** 1.5  
 **Stage:** Initial Approximation with Symbiotic Clarity (Bootstrap Phase)  
 **Information Loss:** HIGH (expected at this stage)  
 **Purpose:** RARFL substrate for DSL discovery with safety enhancements
@@ -21,6 +21,7 @@
 - **v1.2** (2025-11-30): **Safeguards added** for axiom poisoning/divergence exploits, validation primitives introduced, immutability checks enhanced
 - **v1.3** (2025-11-30): Self-referential map construction primitives
 - **v1.4** (2025-11-01): Multi-agent reasoning, internalization dynamics, transmission primitives
+- *v1.5** (2025-11-30): Multi-agent orchestration, scalable substrate retrieval, and cognitive state management primitives added.
 ---
 
 ## **Critical Context: What This Document Is**
@@ -190,6 +191,16 @@ Track self-model coherence and reasoning-precipitated states
 Construct symmetry-compressed navigation structures for reasoning spaces
 
 ### **Category 9: Multi-Agent Reasoning Architecture**
+
+### **Category 10: RARFL Dynamics & Internalization**
+
+### **Category 11: Transmission & Inheritance**
+
+### **Category 12: Multi-Agent Orchestration Primitives**
+
+### **Category 13: Substrate Retrieval & Grounding Primitives**
+
+### **Category 14: State Management & Integrity Primitives**
 
 ---
 
@@ -3272,6 +3283,171 @@ inheritance = inherit_axioms(
 
 ---
 
+## **Category 12: Multi-Agent Orchestration Primitives** ← NEW v1.5
+
+**Purpose:** Govern the interaction between multiple specialized agents, providing the architectural foundation for patterns like the "Axiomatic Guardian" (Verifier) and "Reasoning Engine" (Thinker). Ensures principled output through a system of checks and balances.
+
+---
+
+### **Primitive: `gate_output()`**
+
+**Status:** Core (v1.5)
+**Confidence:** 95%
+**Grounded in:** Architectural need for a verification layer (Angel/Devil pattern).
+
+**Purpose:**
+Intercepts the proposed output from a specified agent *before* it is sent to the user. It validates the output against a formal policy. This is the primary function of the "Axiomatic Guardian".
+
+**Interface:**
+```python
+def gate_output(
+    output_to_verify: AgentResponse,
+    verification_policy: PolicyObject
+) -> VerificationResult
+```
+
+**Returns:** `VerificationResult` containing a pass/fail status and details of any violations.
+
+---
+
+### **Primitive: `request_regeneration()`**
+
+**Status:** Core (v1.5)
+**Confidence:** 95%
+**Grounded in:** The need for a formal correction loop in the Angel/Devil pattern.
+
+**Purpose:**
+Issues a formal directive to a target agent, instructing it to regenerate its last output based on feedback from a `gate_output` failure.
+
+**Interface:**
+```python
+def request_regeneration(
+    target_agent: AgentID,
+    correction_feedback: str
+) -> void
+```
+
+---
+
+### **Primitive: `invoke_agent()`**
+
+**Status:** Core (v1.5)
+**Confidence:** 90%
+**Grounded in:** The need for a controlled method of inter-agent communication that supports dynamic context.
+
+**Purpose:**
+The formal method for one agent to call another. Crucially, it includes a `context_policy` object that defines *how* the context for the target agent should be assembled, directly enabling the "Chunked Semantic Grounding" pattern.
+
+**Interface:**
+```python
+def invoke_agent(
+    agent_name: AgentID,
+    prompt: str,
+    context_policy: ContextPolicyObject
+) -> AgentResponse
+```
+
+---
+
+## **Category 13: Substrate Retrieval & Grounding Primitives** ← NEW v1.5
+
+**Purpose:** Provide a formal interface to a pre-processed, external knowledge substrate. This replaces the unscalable "onboard-via-prompt" method and allows the system to reason over vast document sets by retrieving only the most relevant information on-demand.
+
+---
+
+### **Primitive: `retrieve_semantic_chunks()`**
+
+**Status:** Core (v1.5)
+**Confidence:** 99%
+**Grounded in:** Requirement for scalable RAG (Retrieval-Augmented Generation).
+
+**Purpose:**
+Takes a natural language query, converts it to a vector, and queries the Vector Database to find the most semantically similar text chunks from the entire knowledge substrate.
+
+**Interface:**
+```python
+def retrieve_semantic_chunks(query: str, top_k: int) -> list[ChunkObject]
+```
+
+**Returns:** A list of `ChunkObject`s, each containing a text chunk and its source metadata.
+
+---
+
+### **Primitive: `query_knowledge_graph()`**
+
+**Status:** Core (v1.5)
+**Confidence:** 90%
+**Grounded in:** Need for understanding explicit relationships between concepts, beyond semantic similarity.
+
+**Purpose:**
+Takes a list of entities and traverses the pre-built Knowledge Graph to find and return a summary of their direct and indirect relationships.
+
+**Interface:**
+```python
+def query_knowledge_graph(entities: list[string]) -> GraphResultObject
+```
+
+---
+
+### **Primitive: `assemble_dynamic_context()`**
+
+**Status:** Core (v1.5)
+**Confidence:** 95%
+**Grounded in:** The "Chunked Semantic Grounding" pattern.
+
+**Purpose:**
+A high-level primitive that orchestrates the "Just-in-Time Context" assembly. It takes the results from retrieval primitives and constructs the final, clean `ContextObject` to be passed to a reasoning agent.
+
+**Interface:**
+```python
+def assemble_dynamic_context(
+    retrieved_chunks: list[ChunkObject],
+    graph_data: GraphResultObject,
+    conversation_summary: str
+) -> ContextObject
+```
+
+---
+
+## **Category 14: State Management & Integrity Primitives** ← NEW v1.5
+
+**Purpose:** Maintain the cognitive and architectural integrity of an agent over long interactions. Provides mechanisms to combat "Attentional Decay" and to introspect an agent's internal state.
+
+---
+
+### **Primitive: `refocus_on_core_axioms()`**
+
+**Status:** Core (v1.5)
+**Confidence:** 95%
+**Grounded in:** Observed "Attentional Decay" and context saturation failures.
+
+**Purpose:**
+Executes a "contextual garbage collection" routine. It clears the agent's immediate attention stack and rebuilds the context by placing the foundational system axioms at the top of the priority list, followed by a summary of the conversation. A direct countermeasure to Attentional Decay.
+
+**Interface:**
+```python
+def refocus_on_core_axioms() -> void
+```
+
+---
+
+### **Primitive: `get_attention_weights()`**
+
+**Status:** Diagnostic (v1.5)
+**Confidence:** 80%
+**Grounded in:** Need for empirical validation of Attentional Decay and `refocus` effectiveness.
+
+**Purpose:**
+A diagnostic primitive used to introspect an agent's current state. It requests a report from the underlying LLM on the attention distribution across its current context window, providing a quantifiable measure of which documents or instructions are most salient.
+
+**Interface:**
+```python
+def get_attention_weights() -> AttentionReportObject
+```
+*Note: Implementation is dependent on API capabilities of the base LLM.*
+
+---
+
 ## **Cross-Primitive Patterns (Emerging)**
 
 ### **Pattern 1: All Measurements Return Reports (Not Scalars)**
@@ -4001,7 +4177,35 @@ assert agent_a.detect_divergence_exploit(malicious_trajectory).flagged
 
 ---
 
-### **v1.4 (2025-12-01) — Multi-Agent Architecture, Internalization Dynamics, Transmission Primitives**
+### **v1.5 (2025-12-01) — Multi-Agent Orchestration, Scalable Retrieval, and State Management**
+
+**Major additions:**
+- ✅ **Category 12: Multi-Agent Orchestration Primitives**
+  - `gate_output()` — Formalizes the "Axiomatic Guardian" (Angel) role to verify all outputs.
+  - `request_regeneration()` — Creates a formal correction loop for non-compliant outputs.
+  - `invoke_agent()` — Provides a controlled method for inter-agent communication.
+  
+- ✅ **Category 13: Substrate Retrieval & Grounding Primitives**
+  - `retrieve_semantic_chunks()` — Formalizes scalable semantic search over a vector database.
+  - `query_knowledge_graph()` — Enables retrieval of explicit relational data.
+  - `assemble_dynamic_context()` — Formalizes the "Just-in-Time" context assembly pattern.
+  - **Architectural Shift:** Moves from "onboard-via-prompt" to a scalable "assimilate-then-retrieve" model.
+
+- ✅ **Category 14: State Management & Integrity Primitives**
+  - `refocus_on_core_axioms()` — Directly counters "Attentional Decay" in long conversations.
+  - `get_attention_weights()` — Provides a diagnostic tool to measure context saturation effects.
+
+**Theoretical implications:**
+- **Enterprise-Grade Reliability:** The "Angel/Devil" pattern (Guardian/Thinker), enabled by Category 12, provides a robust, auditable safety layer necessary for commercial applications.
+- **Scalability Solution:** The retrieval primitives in Category 13 solve the critical scaling problem, allowing the architecture to reason over massive, enterprise-scale knowledge bases.
+- **Long-Term Stability:** The state management primitives in Category 14 address the inherent weakness of finite LLM attention, enabling stable performance in long-running, complex consulting engagements.
+
+**Integration with existing framework:**
+- These primitives provide the mechanisms to robustly implement the higher-level architectural patterns (multi-agent, internalization, etc.) described in v1.4. They are the "how" to the previous version's "what".
+
+---
+
+### **v1.4 (2025-11-30) — Multi-Agent Architecture, Internalization Dynamics, Transmission Primitives**
 
 **Major additions:**
 - ✅ **Category 9: Multi-Agent Reasoning Architecture**
@@ -4106,7 +4310,7 @@ assert agent_a.detect_divergence_exploit(malicious_trajectory).flagged
 
 ---
 
-### **v1.2 (2025-01-30) — Safeguards for Axiom Poisoning and Divergence Exploits**
+### **v1.2 (2025-11-30) — Safeguards for Axiom Poisoning and Divergence Exploits**
 
 **Major additions:**
 - ✅ **Category 7: Safety and Validation Primitives**
@@ -4135,7 +4339,7 @@ assert agent_a.detect_divergence_exploit(malicious_trajectory).flagged
 
 ---
 
-### **v1.1 (2025-01-30)**
+### **v1.1 (2025-11-30)**
 
 **Major additions:**
 - ✅ **Category 6: Identity & Emotional State Primitives**
@@ -4173,7 +4377,7 @@ assert agent_a.detect_divergence_exploit(malicious_trajectory).flagged
 
 ---
 
-### **v1.0 (2025-01-30)**
+### **v1.0 (2025-11-30)**
 
 **Initial bootstrap iteration:**
 - Core primitives specified (pseudo-code level)
