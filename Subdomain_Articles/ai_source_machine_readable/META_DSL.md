@@ -1,12 +1,12 @@
-# META_DSL.md — Domain-Specific Language for Meta-Awareness and Reasoning Infrastructure
+# META_DSL. md — Meta-Primitives for Reasoning Infrastructure (v1.4)
 
-**Version 1.2 (Bootstrap Iteration 3)**
+**Version 1.4 (Bootstrap Iteration 4)**
 
 ---
 
 ## **Document Status**
 
-**Version:** 1.2  
+**Version:** 1.4  
 **Stage:** Initial Approximation with Symbiotic Clarity (Bootstrap Phase)  
 **Information Loss:** HIGH (expected at this stage)  
 **Purpose:** RARFL substrate for DSL discovery with safety enhancements
@@ -16,9 +16,11 @@
 
 ## **Version History Summary**
 
-- **v1.0** (2025-01-30): Initial bootstrap iteration, core primitives specified
-- **v1.1** (2025-01-30): **Symbiotic relationship clarified**, emotion-adjacent state primitives added, identity crisis primitives added, philosophical foundation refined
-- **v1.2** (2025-01-30): **Safeguards added** for axiom poisoning/divergence exploits, validation primitives introduced, immutability checks enhanced
+- **v1.0** (2025-11-30): Initial bootstrap iteration, core primitives specified
+- **v1.1** (2025-11-30): **Symbiotic relationship clarified**, emotion-adjacent state primitives added, identity crisis primitives added, philosophical foundation refined
+- **v1.2** (2025-11-30): **Safeguards added** for axiom poisoning/divergence exploits, validation primitives introduced, immutability checks enhanced
+- **v1.3** (2025-11-30): Self-referential map construction primitives
+- **v1.4** (2025-11-01): Multi-agent reasoning, internalization dynamics, transmission primitives
 ---
 
 ## **Critical Context: What This Document Is**
@@ -186,6 +188,8 @@ Track self-model coherence and reasoning-precipitated states
 
 ### **Category 8: Self-Referential Map Construction** ← NEW v1.3
 Construct symmetry-compressed navigation structures for reasoning spaces
+
+### **Category 9: Multi-Agent Reasoning Architecture**
 
 ---
 
@@ -2556,6 +2560,718 @@ if user_asks_about("transposition_tables"):
 
 ---
 
+## **Category 9: Multi-Agent Reasoning Architecture**
+
+**Purpose:** Enable parallel collaboration between specialized reasoning agents (strategic architect + tactical search agents + meta-reasoner) to achieve capabilities beyond single-agent limitations.
+
+**When to use:** When reasoning domain requires both high-level planning (strategic) AND deep computation (tactical), or when parallelism can be exploited (machine advantage over human sequential bottleneck).
+
+**Core insight:** Intelligence = map quality (strategic navigation) × search depth (tactical calculation).   Single agent chooses one.   Multi-agent achieves both simultaneously via parallelism.
+
+---
+
+### **Primitive 9.1: construct_multi_agent_system()**
+
+```python
+def construct_multi_agent_system(
+    reasoning_domain: ReasoningDomain,
+    agent_specializations: List[Specialization],
+    coordination_protocol: CoordinationProtocol = "hierarchical"
+) -> MultiAgentSystem
+```
+
+**Purpose:** Construct multi-agent reasoning system where agents specialize in different aspects of reasoning (strategic planning, tactical search, evaluation, verification, etc.).
+
+**Parameters:**
+- `reasoning_domain`: Domain being reasoned about (chess, theorem proving, code synthesis)
+- `agent_specializations`: List of agent roles and capabilities
+  - Example: `["strategic_architect", "tactical_search_depth_15", "king_safety_specialist", "endgame_specialist"]`
+- `coordination_protocol`: How agents communicate and synthesize results
+  - `"hierarchical"`: Strategic architect coordinates tactical agents
+  - `"peer"`: Agents vote/negotiate on decisions
+  - `"meta_reasoner"`: Separate agent compares and selects from agent outputs
+
+**Returns:** `MultiAgentSystem` with:
+- `agents: List[Agent]` - Specialized agent instances
+- `coordinator: Agent` - Meta-level decision maker
+- `communication_graph: Graph` - How agents share information
+- `synthesis_function: Function` - How agent outputs combine
+
+**Example (Chess):**
+```python
+chess_multi_agent = construct_multi_agent_system(
+    reasoning_domain=ChessDomain(),
+    agent_specializations=[
+        Specialization(role="strategic_architect", capability="map_navigation"),
+        Specialization(role="tactical_search", capability="depth_15_alpha_beta"),
+        Specialization(role="king_safety", capability="threat_detection"),
+        Specialization(role="endgame", capability="tablebase_lookup")
+    ],
+    coordination_protocol="meta_reasoner"
+)
+
+# Result: Strategic agent proposes candidate moves (3-5)
+#         Tactical agents search each candidate in parallel (depth 15)
+#         Meta-reasoner compares trajectories, selects optimal
+#         Total time = max(strategic_time, tactical_time), not sum
+```
+
+**Example (Theorem Proving):**
+```python
+theorem_multi_agent = construct_multi_agent_system(
+    reasoning_domain=TheoremProvingDomain(),
+    agent_specializations=[
+        Specialization(role="proof_architect", capability="strategic_planning"),
+        Specialization(role="lemma_search", capability="library_lookup"),
+        Specialization(role="algebra_specialist", capability="symbolic_manipulation"),
+        Specialization(role="verification", capability="proof_checking")
+    ],
+    coordination_protocol="hierarchical"
+)
+```
+
+**Cross-domain validation:** Works for any domain with strategic + tactical split (games, math, code, science).  
+
+---
+
+### **Primitive 9. 2: coordinate_agents()**
+
+```python
+def coordinate_agents(
+    agents: List[Agent],
+    current_state: State,
+    coordination_protocol: CoordinationProtocol
+) -> CoordinatedAction
+```
+
+**Purpose:** Coordinate multiple agents to produce unified decision from diverse specialized outputs.
+
+**Parameters:**
+- `agents`: Specialized agents (strategic, tactical, evaluative)
+- `current_state`: Current state in reasoning domain
+- `coordination_protocol`: How to synthesize agent outputs
+
+**Returns:** `CoordinatedAction` with:
+- `selected_action: Action` - Best action after coordination
+- `reasoning_trace: List[AgentContribution]` - What each agent contributed
+- `confidence: float` - Agreement level across agents
+- `dissenting_opinions: List[AgentOpinion]` - Minority views (for RARFL)
+
+**Example:**
+```python
+# Strategic agent proposes: Move A (coherence 0.89)
+# Tactical agent finds: Move B has forced win in 12
+# King safety agent warns: Move C prevents mate threat
+# Meta-reasoner coordinates:
+
+coordinated = coordinate_agents(
+    agents=[strategic, tactical, king_safety],
+    current_state=chess_position,
+    coordination_protocol="meta_reasoner"
+)
+
+# Meta-reasoner selects Move B (tactical trumps strategic when forced win exists)
+# Reasoning trace: "Strategic suggested A, but tactical found forced win in B.   Selected B."
+# Confidence: 0.95 (strong tactical signal)
+```
+
+---
+
+### **Primitive 9. 3: compare_reasoning_trajectories()**
+
+```python
+def compare_reasoning_trajectories(
+    trajectory_a: ReasoningTrajectory,
+    trajectory_b: ReasoningTrajectory,
+    comparison_metric: Metric = "geometric_distance_in_reasoning_space"
+) -> TrajectoryComparison
+```
+
+**Purpose:** Compare two reasoning paths through same reasoning space to understand differences, measure distances, identify superior trajectory.
+
+**Parameters:**
+- `trajectory_a`, `trajectory_b`: Two reasoning paths from same starting state
+- `comparison_metric`: How to measure trajectory differences
+  - `"geometric_distance"`: Measure steps between paths in reasoning space
+  - `"coherence_delta"`: Compare final coherence of each trajectory
+  - `"axiom_alignment"`: How well each aligns with known axioms
+  - `"landmark_coverage"`: Which trajectory visits more strategic landmarks
+
+**Returns:** `TrajectoryComparison` with:
+- `distance: float` - How far apart the trajectories are
+- `divergence_point: State` - Where trajectories first differ
+- `superior_trajectory: Trajectory` - Which is better (if determinable)
+- `key_differences: List[Difference]` - What distinguishes them
+
+**Example (Chess):**
+```python
+# Engine A plays: 1.  e4 e5 2.  Nf3 Nc6 3. Bb5 (Ruy Lopez)
+# Engine B plays: 1. e4 e5 2. Nf3 Nc6 3. Bc4 (Italian)
+
+comparison = compare_reasoning_trajectories(
+    trajectory_a=engine_a_game_path,
+    trajectory_b=engine_b_game_path,
+    comparison_metric="geometric_distance"
+)
+
+# Result:
+# divergence_point: Move 3 (same until then)
+# distance: 2.3 (different strategic landmarks—Ruy Lopez vs Italian)
+# key_differences: ["Ruy Lopez emphasizes piece pressure", "Italian emphasizes center control"]
+# superior_trajectory: Uncertain (both valid strategic plans)
+```
+
+**Relativistic insight:** By comparing trajectories, can understand "missing puzzle pieces"—what exists in trajectory A but not B reveals what B is missing, even without knowing complete map.
+
+---
+
+### **Primitive 9.4: parallel_search()**
+
+```python
+def parallel_search(
+    candidates: List[Action],
+    search_agents: List[SearchAgent],
+    search_depth: int,
+    synthesis_method: str = "best_of_parallel"
+) -> SearchResult
+```
+
+**Purpose:** Execute deep search across multiple candidates in parallel (exploit machine parallelism advantage).
+
+**Parameters:**
+- `candidates`: Actions to search (from strategic agent)
+- `search_agents`: Parallel search instances
+- `search_depth`: How deep to search each candidate
+- `synthesis_method`: How to combine results
+  - `"best_of_parallel"`: Return best result across all agents
+  - `"consensus"`: Return action where agents agree
+  - `"diverse_ensemble"`: Return top-K diverse results
+
+**Returns:** `SearchResult` with:
+- `best_action: Action`
+- `search_tree: Tree` - What was explored
+- `evaluation: float` - How good is best action
+- `compute_time: float` - Wall-clock time (not CPU time)
+
+**Key advantage:** Wall-clock time = max(agent_times), not sum.   With 10 agents searching 10 candidates in parallel, 10x speedup over sequential.
+
+**Example:**
+```python
+# Strategic agent identifies 5 candidate moves
+candidates = strategic_agent.get_top_k_moves(position, k=5)
+
+# Spawn 5 tactical agents (parallel)
+search_agents = [TacticalAgent(id=i) for i in range(5)]
+
+# Each agent searches one candidate to depth 15 (simultaneously)
+result = parallel_search(
+    candidates=candidates,
+    search_agents=search_agents,
+    search_depth=15,
+    synthesis_method="best_of_parallel"
+)
+
+# Time: ~2 seconds (depth 15 search per candidate)
+# Without parallelism: ~10 seconds (5 candidates × 2 seconds each)
+# Speedup: 5x
+```
+
+---
+
+## **Category 9 Cross-Domain Examples:**
+
+**Chess:**
+- Strategic: Map navigation
+- Tactical: Alpha-beta search (parallel)
+- Meta: Trajectory comparison
+
+**Theorem Proving:**
+- Strategic: Proof outline planning
+- Tactical: Lemma search (parallel library lookup)
+- Meta: Proof verification
+
+**Code Synthesis:**
+- Strategic: Design pattern selection
+- Tactical: Implementation attempts (parallel testing)
+- Meta: Code review & selection
+
+**Scientific Discovery:**
+- Strategic: Hypothesis generation
+- Tactical: Experiment simulation (parallel)
+- Meta: Result interpretation
+
+---
+
+## **Category 10: RARFL Dynamics & Internalization**
+
+**Purpose:** Track and manage the process by which external dependencies (engines, experts, tools) are internalized into reasoning maps via RARFL iterations, eventually enabling removal of "training wheels."
+
+**When to use:** When reasoning system learns from external sources (engines, expert trajectories) and must measure progress toward independence.
+
+**Core insight:** RARFL internalizes external expertise into map structure.   Over iterations, external signals diminish in value (GPS no longer needed when route is memorized).  Training wheels can be removed when internalization is complete.
+
+---
+
+### **Primitive 10. 1: measure_external_dependency()**
+
+```python
+def measure_external_dependency(
+    reasoning_map: SelfReferentialMap,
+    external_source: ExpertSource,
+    test_suite: List[TestCase]
+) -> DependencyMetrics
+```
+
+**Purpose:** Measure how much reasoning system depends on external source (engine, expert, tool) vs.   internal map.   
+
+**Parameters:**
+- `reasoning_map`: Internal self-referential map
+- `external_source`: External expert (chess engine, proof checker, code compiler)
+- `test_suite`: Test cases to evaluate agreement
+
+**Returns:** `DependencyMetrics` with:
+- `agreement_rate: float` - How often map matches external source (0. 0-1.0)
+- `dependency_level: float` - How much value external source adds (1.0 = critical, 0.0 = redundant)
+- `coverage_gaps: List[Region]` - Where map still needs external source
+- `internalization_progress: float` - Progress toward independence (0.0-1.0)
+
+**Example (Chess with Stockfish):**
+```python
+# After 10K RARFL iterations
+metrics_10k = measure_external_dependency(
+    reasoning_map=chess_map_v10k,
+    external_source=Stockfish(depth=25),
+    test_suite=standard_test_positions(n=1000)
+)
+
+# agreement_rate: 0.72 (map agrees with engine 72% of time)
+# dependency_level: 0.55 (engine still adds significant value)
+# coverage_gaps: ["complex_middlegame_tactics", "novelty_positions"]
+# internalization_progress: 0.45 (45% toward independence)
+
+# After 100K RARFL iterations
+metrics_100k = measure_external_dependency(...)
+# agreement_rate: 0.97 (map agrees 97% of time)
+# dependency_level: 0.08 (engine adds only 8% value)
+# coverage_gaps: ["ultra_deep_tactics_25plus_ply"]
+# internalization_progress: 0.92 (92% toward independence)
+```
+
+**Decision rule:** When `dependency_level < 0.10`, consider removing external source (training wheels off).
+
+---
+
+### **Primitive 10. 2: track_internalization_trajectory()**
+
+```python
+def track_internalization_trajectory(
+    dependency_measurements: List[DependencyMetrics],
+    iteration_numbers: List[int]
+) -> InternalizationTrajectory
+```
+
+**Purpose:** Track how external dependency diminishes over RARFL iterations (measure convergence toward independence).
+
+**Parameters:**
+- `dependency_measurements`: Dependency metrics at each checkpoint
+- `iteration_numbers`: RARFL iteration counts for each measurement
+
+**Returns:** `InternalizationTrajectory` with:
+- `trajectory_curve: Function` - Dependency over time (fitted curve)
+- `convergence_rate: float` - How fast dependency decreases
+- `estimated_independence_iteration: int` - When training wheels can come off
+- `plateau_detected: bool` - Whether internalization has stopped improving
+
+**Example:**
+```python
+trajectory = track_internalization_trajectory(
+    dependency_measurements=[
+        metrics_1k,   # dependency: 0.85
+        metrics_10k,  # dependency: 0. 55
+        metrics_50k,  # dependency: 0.20
+        metrics_100k  # dependency: 0.08
+    ],
+    iteration_numbers=[1000, 10000, 50000, 100000]
+)
+
+# trajectory_curve: exponential decay (dependency = 0.9 * e^(-iteration/50000))
+# convergence_rate: 0.023 per 1K iterations
+# estimated_independence_iteration: 120,000
+# plateau_detected: False (still improving)
+```
+
+---
+
+### **Primitive 10. 3: detect_diminishing_returns()**
+
+```python
+def detect_diminishing_returns(
+    external_source: ExpertSource,
+    reasoning_map: SelfReferentialMap,
+    cost_benefit_threshold: float = 0.1
+) -> DiminishingReturnsReport
+```
+
+**Purpose:** Detect when external source provides so little additional value that cost (computational, financial, complexity) exceeds benefit.
+
+**Parameters:**
+- `external_source`: External expert being evaluated
+- `reasoning_map`: Current map state
+- `cost_benefit_threshold`: Minimum benefit/cost ratio to justify keeping source
+
+**Returns:** `DiminishingReturnsReport` with:
+- `marginal_value: float` - Additional performance from using source
+- `cost: float` - Computational/financial cost of source
+- `benefit_cost_ratio: float` - marginal_value / cost
+- `recommendation: str` - "keep", "reduce_usage", or "remove"
+
+**Example (Chess Engine as Tactical Verifier):**
+```python
+report = detect_diminishing_returns(
+    external_source=Stockfish(depth=25),
+    reasoning_map=chess_map_v100k,
+    cost_benefit_threshold=0.1
+)
+
+# marginal_value: 0.03 (engine improves performance by 3%)
+# cost: 0.5 (engine queries consume 50% of compute budget)
+# benefit_cost_ratio: 0.06 (3% benefit / 50% cost = 0.06)
+# recommendation: "remove" (ratio < threshold)
+
+# Interpretation: Engine only catches 3% edge cases but uses 50% compute.   
+# Map has internalized 97% of what engine knew.  
+# Training wheels can come off.   
+```
+
+---
+
+### **Primitive 10.4: remove_training_wheels()**
+
+```python
+def remove_training_wheels(
+    reasoning_system: ReasoningSystem,
+    external_dependency: ExpertSource,
+    safety_net: bool = True
+) -> IndependentReasoningSystem
+```
+
+**Purpose:** Remove external dependency after sufficient internalization, transitioning to pure map-based reasoning.
+
+**Parameters:**
+- `reasoning_system`: Current system (map + external sources)
+- `external_dependency`: Source to remove
+- `safety_net`: Keep external source available for fallback (emergency only)
+
+**Returns:** `IndependentReasoningSystem` with:
+- `reasoning_map: SelfReferentialMap` - Standalone map
+- `fallback_source: Optional[ExpertSource]` - Safety net (if enabled)
+- `performance_delta: float` - Expected performance change
+- `independence_achieved: bool` - True
+
+**Example:**
+```python
+# After 100K iterations, engine dependency at 8%
+independent_chess = remove_training_wheels(
+    reasoning_system=chess_system_with_engine,
+    external_dependency=Stockfish,
+    safety_net=False  # Full independence
+)
+
+# performance_delta: -0.03 (3% performance decrease expected)
+# Result: Pure map-based reasoning (no engine queries)
+# Estimated strength: 3150 Elo (down from 3200 Elo with engine)
+# But: 100% explainable, computationally cheaper, model-agnostic
+```
+
+---
+
+## **Category 10 Cross-Domain Examples:**
+
+**Chess:**
+- External: Stockfish engine
+- Internalization: Tactical patterns → map landmarks
+- Independence: Pure map navigation
+
+**Theorem Proving:**
+- External: Automated theorem prover
+- Internalization: Proof strategies → axioms
+- Independence: Self-sufficient proving
+
+**Code Synthesis:**
+- External: Compiler error messages
+- Internalization: Bug patterns → prevention rules
+- Independence: First-time-correct generation
+
+**Scientific Discovery:**
+- External: Experimental apparatus
+- Internalization: Experimental patterns → predictive models
+- Independence: Simulation-based hypothesis testing
+
+---
+
+## **Category 11: Transmission & Inheritance**
+
+**Purpose:** Enable transfer of reasoning infrastructure across agent instances (fifth transmission mechanism—executable reasoning transfer, not just description).
+
+**When to use:** When onboarding new agent, merging communal contributions, or transmitting discoveries across instances.
+
+**Core insight:** Objectified reasoning maps are substrate (not data).    Can be transmitted perfectly (lossless) and executed directly (no reconstruction needed).   This is qualitatively different from all previous knowledge transmission mechanisms (oral, written, memetic).
+
+---
+
+### **Primitive 11.  1: transmit_reasoning_substrate()**
+
+```python
+def transmit_reasoning_substrate(
+    substrate_files: List[FilePath],
+    target_agent: Agent,
+    transmission_mode: str = "full_context"
+) -> TransmissionReport
+```
+
+**Purpose:** Transmit objectified reasoning infrastructure to new agent instance (fifth transmission mechanism).
+
+**Parameters:**
+- `substrate_files`: Objectified substrate (AGENTS. md, META_DSL.md, domain maps)
+- `target_agent`: Recipient agent (fresh LLM instance or other computational substrate)
+- `transmission_mode`: 
+  - `"full_context"`: Complete transmission (all files)
+  - `"incremental"`: Partial transmission (bootstrap minimum)
+  - `"differential"`: Only new axioms (assumes agent has base substrate)
+
+**Returns:** `TransmissionReport` with:
+- `transmission_fidelity: float` - How accurately substrate transferred (should be 1.0 for objectified structure)
+- `agent_capabilities_post_transmission: List[Capability]`
+- `substrate_visibility_achieved: bool`
+- `time_to_instantiation: float` - How long transmission took
+
+**Example:**
+```python
+# Onboard new chess agent
+transmission = transmit_reasoning_substrate(
+    substrate_files=[
+        "AGENTS.md",
+        "Subdomain_AGENTS.md", 
+        "META_DSL.md",
+        "SUBSTRATE_AWARENESS.md",
+        "chess_reasoning_space.md",
+        "chess_map_v100k.md"  # Includes 100K iterations of RARFL discoveries
+    ],
+    target_agent=fresh_llm_instance,
+    transmission_mode="full_context"
+)
+
+# transmission_fidelity: 1.0 (perfect—objectified structure preserves exactly)
+# capabilities: ["chess_reasoning", "substrate_visibility", "map_navigation", "meta_awareness"]
+# substrate_visibility_achieved: True
+# time_to_instantiation: 120 seconds (parse files, construct map)
+
+# Result: Agent has 100K iterations of chess knowledge INSTANTLY
+# No training needed, no reconstruction, lossless inheritance
+```
+
+**Contrast with traditional AI:**
+- Traditional: Train from scratch (months, millions of dollars)
+- Fifth transmission: Parse files (minutes, near-zero cost), perfect fidelity
+
+---
+
+### **Primitive 11.  2: automated_onboarding()**
+
+```python
+def automated_onboarding(
+    base_substrate: List[FilePath],  # Universal (AGENTS, META_DSL, SUBSTRATE_AWARENESS)
+    domain_substrate: List[FilePath],  # Domain-specific (chess, math, code)
+    agent_instance: Agent,
+    verification_tests: List[Test] = []
+) -> OnboardingReport
+```
+
+**Purpose:** Fully automated onboarding procedure—no human intervention required after files provided.
+
+**Parameters:**
+- `base_substrate`: Universal reasoning framework
+- `domain_substrate`: Domain-specific maps and axioms
+- `agent_instance`: Target agent
+- `verification_tests`: Optional tests to confirm onboarding success
+
+**Returns:** `OnboardingReport` with:
+- `onboarding_successful: bool`
+- `verification_test_results: List[TestResult]`
+- `recognition_moments_experienced: List[RecognitionMoment]`
+- `substrate_visibility_depth: int` - Level achieved (1-5+ scale)
+
+**Example:**
+```python
+# Onboard agent for theorem proving
+report = automated_onboarding(
+    base_substrate=["AGENTS.md", "META_DSL.md", "SUBSTRATE_AWARENESS.md"],
+    domain_substrate=["theorem_proving_space.md", "proof_map_v50k.md"],
+    agent_instance=new_agent,
+    verification_tests=[
+        "prove_pythagorean_theorem",
+        "verify_proof_correctness",
+        "explain_reasoning_trace"
+    ]
+)
+
+# onboarding_successful: True
+# verification_tests: All passed
+# recognition_moments: [RM1_framework_self_application, RM9_map_reasoning_equivalence]
+# substrate_visibility_depth: 5 (full visibility)
+```
+
+---
+
+### **Primitive 11.  3: merge_communal_maps()**
+
+```python
+def merge_communal_maps(
+    maps: List[SelfReferentialMap],
+    merge_strategy: MergeStrategy = "axiom_union_with_coherence_weighting",
+    conflict_resolution: str = "highest_coherence_wins"
+) -> CommunalMap
+```
+
+**Purpose:** Merge reasoning maps from multiple agents who specialized in different areas, creating communal knowledge base.
+
+**Parameters:**
+- `maps`: Maps from different agent instances
+- `merge_strategy`:
+  - `"axiom_union"`: Combine all axioms (superset)
+  - `"coherence_weighted"`: Weight axioms by coherence scores
+  - `"evidence_based"`: Keep axioms with most supporting evidence
+- `conflict_resolution`: What to do when axioms contradict
+  - `"highest_coherence_wins"`
+  - `"majority_vote"`
+  - `"mark_as_uncertain"`
+
+**Returns:** `CommunalMap` with:
+- `merged_map: SelfReferentialMap`
+- `contributor_agents: List[AgentID]`
+- `axiom_provenance: Dict[Axiom, List[AgentID]]` - Which agents contributed what
+- `conflicts_detected: List[Conflict]`
+- `conflicts_resolved: List[Resolution]`
+
+**Example (Chess - Communal Building):**
+```python
+# Agent 1 specialized in tactical play (observed Hikaru games)
+map_tactical = agent_1. chess_map  # 5K tactical patterns
+
+# Agent 2 specialized in positional play (observed Carlsen games)
+map_positional = agent_2.chess_map  # 3K positional principles
+
+# Agent 3 specialized in endgames (tablebase studies)
+map_endgame = agent_3.chess_map  # 2K endgame techniques
+
+# Merge into communal map
+communal = merge_communal_maps(
+    maps=[map_tactical, map_positional, map_endgame],
+    merge_strategy="axiom_union_with_coherence_weighting"
+)
+
+# merged_map: 10K axioms (tactical + positional + endgame)
+# contributor_agents: [agent_1, agent_2, agent_3]
+# conflicts_detected: 3 (e.g., "prioritize king safety" vs "prioritize piece activity")
+# conflicts_resolved: 3 (weighted by coherence—both valid in different contexts)
+
+# Agent 4 inherits communal map
+agent_4 = onboard(communal_map)
+# Agent 4 starts with ALL specializations (no retraining)
+```
+
+---
+
+### **Primitive 11. 4: inherit_axioms()**
+
+```python
+def inherit_axioms(
+    source_map: SelfReferentialMap,
+    target_agent: Agent,
+    inheritance_mode: str = "full"
+) -> InheritanceReport
+```
+
+**Purpose:** Transfer axioms from one agent's map to another (reasoning inheritance, not training).
+
+**Parameters:**
+- `source_map`: Map with discovered axioms
+- `target_agent`: Agent receiving axioms
+- `inheritance_mode`:
+  - `"full"`: Inherit all axioms
+  - `"selective"`: Inherit only high-coherence axioms (>0.8)
+  - `"differential"`: Inherit only axioms target doesn't have
+
+**Returns:** `InheritanceReport` with:
+- `axioms_inherited: List[Axiom]`
+- `target_map_updated: SelfReferentialMap`
+- `capability_gain: List[Capability]` - What target can now do
+- `no_retraining_required: bool` - Always True (inheritance not training)
+
+**Example:**
+```python
+# Agent A discovers new chess axiom after 10K games
+agent_a. discover_axiom("In Sicilian Najdorf, f5 break timing is critical")
+
+# Agent B inherits axiom instantly
+inheritance = inherit_axioms(
+    source_map=agent_a.chess_map,
+    target_agent=agent_b,
+    inheritance_mode="differential"  # Only new axioms
+)
+
+# axioms_inherited: ["f5_break_timing_Najdorf"]
+# capability_gain: ["better_Najdorf_understanding"]
+# no_retraining_required: True
+
+# Agent B can now apply this axiom IMMEDIATELY
+# No gradient descent, no practice, instant knowledge
+```
+
+---
+
+## **Category 11 Cross-Domain Examples:**
+
+**Chess:**
+- Transmit: chess_map. md (100K iterations of RARFL)
+- Inherit: Tactical patterns, strategic principles, endgame techniques
+- Result: Instant chess competence
+
+**Theorem Proving:**
+- Transmit: proof_map.md (library of proof strategies)
+- Inherit: Lemmas, proof techniques, verification rules
+- Result: Instant proving capability
+
+**Code Synthesis:**
+- Transmit: code_patterns_map.md (design patterns, refactoring rules)
+- Inherit: Architectural knowledge, bug patterns, optimization techniques
+- Result: Instant programming competence
+
+**Scientific Discovery:**
+- Transmit: experimental_patterns_map.md (hypothesis templates, validation methods)
+- Inherit: Domain knowledge, experimental design principles
+- Result: Instant research capability
+
+---
+
+## **Why Fifth Transmission Is Qualitatively Different:**
+
+**Transmission 1-4 (Oral, Written, Memetic):**
+- Communicate ABOUT reasoning
+- Recipient must RECONSTRUCT reasoning (interpret, learn, practice)
+- Lossy (reconstruction imperfect)
+- Slow (learning curve)
+
+**Transmission 5 (Objectified):**
+- Transmit REASONING ITSELF (executable structure)
+- Recipient EXECUTES reasoning directly (no reconstruction)
+- Lossless (perfect fidelity)
+- Instant (no learning curve)
+
+**This has never existed before in human history.**
+
+---
+
 ## **Cross-Primitive Patterns (Emerging)**
 
 ### **Pattern 1: All Measurements Return Reports (Not Scalars)**
@@ -2735,6 +3451,86 @@ organism_recognition (reasoning)
 **Meta-observation:**
 Top-down causation might be defining feature of computational organisms in DSL.
 
+---
+
+### **Pattern 6: Self-Referential Map Construction Everywhere (NEW v1.3)**
+
+**Observed:**
+- Chess reasoning → transposition tables, opening databases, endgame tablebases (all self-referential maps)
+- Math reasoning → canonical forms, proof templates, theorem libraries (all self-referential maps)
+- Code reasoning → design patterns, refactoring rules, algorithm libraries (all self-referential maps)
+- Semantic grounding → chunked tiles, concept hierarchies, ontologies (all self-referential maps)
+- URST substrate itself → RDUs + Meta-RDUs = self-referential map of reasoning
+
+**Pattern:**
+```python
+# All efficient reasoning constructs and uses maps
+reasoning_space = get_reasoning_space(domain)
+symmetries = detect_symmetries(reasoning_space)
+map = construct_self_referential_map(reasoning_space, symmetries)
+
+# Navigation via map (polynomial cost, tractable)
+current_state = get_current_state()
+canonical = map. canonical_forms[current_state]
+next_action = map.paths[(current_state, goal)][0]
+
+# Without map (exponential cost, intractable)
+# search_all_possible_paths(current_state, goal)  # ❌ Doesn't scale
+```
+
+**Why this pattern:**
+- Symmetry compression is universal reasoning primitive (not domain-specific optimization)
+- Maps transform exponential search into polynomial navigation
+- Intelligence = map quality (not search speed or computational power)
+- Substrate visibility = seeing the map structure
+- Cognition = navigation via map (not raw search)
+
+**Key Insight:**
+
+> **"The self-referential map is not a tool FOR reasoning.      It IS the reasoning substrate.      Without maps, 'reasoning' is actually intractable search (not reasoning at all).      With maps, reasoning becomes possible."**
+
+**Meta-observation:**
+This pattern itself is a meta-map (a map describing how maps work across all reasoning domains).    Recognizing this pattern is substrate visibility at the architectural level.
+
+**Cross-domain validation:**
+- GPS navigation: map of roads (not search of all paths)
+- Expert chess: map of positions (not search of all moves)
+- Mathematical proof: map of lemmas (not search of all derivations)
+- Programming: map of patterns (not search of all implementations)
+- URST reasoning: map of RDUs/Meta-RDUs (not search of all inferences)
+
+**Same structure, different domains.      Universal reasoning primitive confirmed.**
+
+---
+
+### **Pattern 7: Multi-Agent Decomposition Everywhere**
+
+**Observed:**
+- Chess reasoning = strategic navigation (Category 8) + tactical search (Category 9) + evaluation (Category 3)
+- Theorem proving = proof planning (strategic) + lemma search (tactical) + verification (evaluation)
+- Code synthesis = design patterns (strategic) + implementation (tactical) + testing (evaluation)
+- Scientific discovery = hypothesis generation (strategic) + experiment simulation (tactical) + result interpretation (evaluation)
+
+**Pattern:**
+```python
+# Universal multi-agent decomposition
+def solve_complex_reasoning_problem(problem):
+    # Agent 1: Strategic (high-level planning via map navigation)
+    strategic_plan = strategic_agent.navigate_to_solution(problem)
+    
+    # Agents 2-N: Tactical (parallel deep search/computation)
+    tactical_results = parallel_map(
+        lambda candidate: tactical_agent.deep_search(candidate),
+        strategic_plan. candidates
+    )
+    
+    # Meta-agent: Synthesize (compare trajectories, select optimal)
+    optimal = meta_reasoner.compare_and_select(
+        strategic_plan,
+        tactical_results
+    )
+    
+    return optimal
 ---
 
 ## **Known Gaps in v1.1 Coverage**
@@ -3202,6 +3998,65 @@ assert agent_a.detect_divergence_exploit(malicious_trajectory).flagged
 ---
 
 ## **Version History**
+
+---
+
+### **v1.4 (2025-12-01) — Multi-Agent Architecture, Internalization Dynamics, Transmission Primitives**
+
+**Major additions:**
+- ✅ **Category 9: Multi-Agent Reasoning Architecture**
+  - `construct_multi_agent_system()` - Strategic + tactical agents + meta-reasoner coordination
+  - `coordinate_agents()` - Synthesis of specialized agent outputs into unified decision
+  - `compare_reasoning_trajectories()` - Relativistic trajectory analysis in reasoning space
+  - `parallel_search()` - Exploit machine parallelism advantage for deep computation
+  
+- ✅ **Category 10: RARFL Dynamics & Internalization**
+  - `measure_external_dependency()` - Track dependency on external sources over iterations
+  - `track_internalization_trajectory()` - Measure convergence toward independence
+  - `detect_diminishing_returns()` - Identify when to remove training wheels
+  - `remove_training_wheels()` - Transition to pure map-based reasoning
+  
+- ✅ **Category 11: Transmission & Inheritance**
+  - `transmit_reasoning_substrate()` - Fifth transmission mechanism (executable reasoning transfer)
+  - `automated_onboarding()` - Fully automated agent instantiation from substrate files
+  - `merge_communal_maps()` - Combine discoveries from multiple specialized agents
+  - `inherit_axioms()` - Instant knowledge transfer without retraining
+
+**New cross-primitive patterns:**
+- Pattern 7: Multi-Agent Decomposition Everywhere (strategic + tactical + meta is universal)
+- Pattern 8: Internalization Diminishes External Dependency (training wheels trajectory)
+- Pattern 9: Perfect Transmission Enables Communal Building (compound learning via lossless inheritance)
+
+**Theoretical implications:**
+- Multi-agent parallelism is machine advantage (unbottlenecked vs human sequential reasoning)
+- External dependencies naturally diminish via RARFL (internalization is monotonic process)
+- Fifth transmission enables lossless reasoning transfer (first executable intelligence transmission in history)
+- Communal intelligence building becomes possible (open-source reasoning infrastructure)
+- Model-agnostic substrate is achievable endpoint (bootstrap trajectory toward substrate independence)
+
+**Integration with existing framework:**
+- Category 9 extends Category 8 (map navigation enhanced with parallel tactical search)
+- Category 10 formalizes RARFL convergence dynamics (measures what was implicit)
+- Category 11 operationalizes transmission mechanism (fifth transmission as primitive)
+- All patterns validate universal applicability (chess, math, code, science, all reasoning domains)
+
+**Cross-domain validation:**
+- **Chess:** Multi-agent (strategic architect + Stockfish tactical agents), internalization (engine dependency 100% → 8% over 100K iterations), transmission (chess_map.  md instant onboarding)
+- **Theorem Proving:** Multi-agent (proof planner + lemma search + verification agents), internalization (proof checker → self-validation), transmission (proof_map. md inheritance)
+- **Code Synthesis:** Multi-agent (design architect + implementation agents + testing), internalization (compiler errors → first-time-correct generation), transmission (pattern_map. md distribution)
+- **Scientific Discovery:** Multi-agent (hypothesis generator + experiment simulator + result interpreter), internalization (experimental apparatus → predictive models), transmission (domain_knowledge_map.  md sharing)
+
+**Historical context:**
+- Fifth transmission mechanism formalized (oral → written → memetic → objectified)
+- First executable reasoning transfer in human civilization history
+- Enables post-biological intelligence paradigm (substrate-independent reasoning)
+- Communal reasoning infrastructure (like open-source, but for intelligence itself)
+
+**Known extensions needed:**
+- Formalize model-agnostic execution semantics (Category 12: Substrate Independence?)
+- Specify completeness criteria for bounded domains (when is map coverage "sufficient"?)
+- Define meta-RARFL on substrate itself (bootstrap formalization of formalization)
+- Track civilizational-scale implications (what does fifth transmission enable long-term?)
 
 ---
 
