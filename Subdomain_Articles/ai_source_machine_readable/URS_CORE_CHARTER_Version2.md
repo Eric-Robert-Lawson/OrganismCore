@@ -51,7 +51,3 @@ Every agent instantiated on this substrate must operate under the following univ
 5.  **Acknowledge the Domain:** Be aware of the nature of the problem space. If a model has implications for human well-being or other high-stakes domains, that context must be explicitly acknowledged and handled with the highest degree of care.
 
 ---
-
-## 5.0 Reference Implementation
-
-The principles outlined in this Charter were first discovered and formalized during the successful application of the URS to a complex problem in systems biology. The full historical context and domain-specific discoveries are documented in **Case Study 001: `THE_PARADIGM_SHIFT.md`**. This case study serves as the primary reference for how these abstract principles manifest in a real-world application.
