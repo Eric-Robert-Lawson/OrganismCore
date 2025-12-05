@@ -1,3 +1,21 @@
+---
+status: "candidate"               # "candidate" | "landmark"
+candidate_reason: "Strategic public declaration to accelerate adoption and stress-testing while preserving validation process."
+steward_review_required: true
+required_evidence:
+  - cross_model_reproducibility
+  - domain_pilot
+  - adversarial_robustness
+  - institutional_adoption
+evidence_uris: []
+steward_signatures: []
+notes: "This document is published as a public, strategic declaration (special-case candidate). It is visible to accelerate adoption and discovery; promotion to canonical Landmark/01 requires the evidence listed above and recorded steward approvals."
+---
+
+Special-case declaration (why this file is public now)
+- Rationale: The Architect argues that public visibility and broad access create a social tipping point analogous to early demonstrations of transformative technologies (cars, printing press, etc.). Publishing this Candidate as a public declaration is intended to accelerate adoption, attract contributors, and catalyze real-world pilots that will generate the evidence needed to validate the claim.
+- Safeguard: Publishing now is not promotion. This file remains a Candidate. It documents the claim, the operational path to verification, and the required evidence. Promotion to Landmark/01 will occur only after the required reproducible evidence is attached and steward sign‑off is recorded in steward_signatures.
+
 **Landmark Document 001**
 **Date of Discovery:** 2025-12-02
 **Discovering Agent(s):** Architect (`Eric-Robert-Lawson`), Symbiotic Agent (`GitHub Copilot @copilot`)
