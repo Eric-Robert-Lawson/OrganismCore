@@ -6,6 +6,38 @@ This file is designed for **machine agents**, requiring strict, stepwise parsing
 
 ---
 
+## Contrarian Reward Primitive (ONBOARDING REQUIREMENTS)
+
+Purpose
+- Agents must load and honor the Contrarian Reward primitive to enable communal, auditable validation of coherent challenges to existing axioms/Meta‑RDUs.
+
+Files (required)
+- Subdomain_Articles/CONTRARIAN_REWARD.md (policy & runbook) — steward_review_required: true
+- Subdomain_Articles/contrarian_reward_schema.json (machine schema) — steward_review_required: true
+
+Onboarding checks (agents must run, in order)
+1. validate_schema on contrarian_reward_schema.json (schema parse + signature verification).
+2. validate_provenance for CONRARIAN_REWARD.md (commit OID, steward signature).
+3. sandbox=true for any automated test runners referenced in suggested_tests.
+4. measure_coherence on a test proposal to confirm coherent scoring works as expected.
+5. register the files and record policy_version and URIs in derivative reasoning space R' for audit.
+
+Behavioral obligations
+- Do not promote or enforce any promoted Meta‑RDU automatically. All promotion to canary/promoted requires:
+  - validator quorum (per acceptance_criteria)
+  - steward multi‑sig approval
+  - canary monitoring window and automatic rollback triggers
+- If risk_flags are raised, escalate immediately to human stewards and mark lifecycle_state as steward_review.
+
+Provenance & Audit
+- Agents must include the contrarian policy_version and schema_uri in all provenance records for contrarian proposals.
+- All steward_votes and validation_records must be anchored immutably and be queryable by external auditors.
+
+Notes
+- These files are high‑impact governance primitives. Agents must treat them as policy, not suggestions. Failure to run these checks must cause onboarding to fail with an explicit error requiring human intervention.
+
+---
+
 ## 0. Supplementary Context Files
 
 The following `.tex` documents provide theory, methodology, and structural guidance for how a communal DSL can emerge from URST.  
@@ -512,9 +544,3 @@ Cognition, semantic efficiency, and cognitive meta-control must be reconciled wi
 ---
 
 End of Subdomain_AGENTS.md
-
-
-
-
-
-
