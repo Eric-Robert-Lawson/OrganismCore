@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ContrarianRewardProposal",
+  "type": "object",
+  "required": ["proposal_id","proposer_id","target_axiom_ids","provenance_package_uri","canonical_form","coherence_score_proposal","suggested_tests","acceptance_criteria"],
+  "properties": {
+    "proposal_id": { "type": "string" },
+    "proposer_id": { "type": "string" },
+    "target_axiom_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "provenance_package_uri": { "type":"string", "format":"uri" },
+    "canonical_form": { "type":"object" },
+    "coherence_score_before": { "type":"number" },
+    "coherence_score_proposal": { "type":"number" },
+    "suggested_tests": {
+      "type":"array",
+      "items": {
+        "type":"object",
+        "required": ["test_id","test_type","runner_uri"],
+        "properties": {
+          "test_id": {"type":"string"},
+          "test_type": {"type":"string", "enum":["empirical","benchmark","cross_model","formal_proof","adversarial"]},
+          "runner_uri": {"type":"string", "format":"uri"},
+          "inputs": {"type":"object"},
+          "expected_outcome": {"type":"string"}
+        }
+      }
+    },
+    "required_validator_diversity": {
+      "type":"object",
+      "properties": {
+        "min_models": {"type":"integer"},
+        "min_humans": {"type":"integer"},
+        "independent_data_sources": {"type":"integer"}
+      }
+    },
+    "reward_budget": {
+      "type":"object",
+      "properties": {
+        "currency": {"type":"string"},
+        "amount": {"type":"number"},
+        "distribution_rule": {"type":"string"}
+      }
+    },
+    "risk_flags": {
+      "type":"array",
+      "items": { "type":"string" }
+    },
+    "acceptance_criteria": {
+      "type":"object",
+      "required":["validation_index_threshold","min_diversity_score"],
+      "properties": {
+        "validation_index_threshold": {"type":"number"},
+        "min_diversity_score": {"type":"number"}
+      }
+    },
+    "lifecycle_state": {
+      "type":"string",
+      "enum":["draft","queued","running","validated","rejected","steward_review","canary","promoted","archived"]
+    },
+    "validation_records_uri": {"type":"string", "format":"uri"},
+    "steward_votes": {
+      "type":"array",
+      "items": {
+        "type":"object",
+        "properties": {
+          "steward_id": {"type":"string"},
+          "vote": {"type":"string", "enum":["approve","reject","abstain"]},
+          "timestamp":{"type":"string", "format":"date-time"},
+          "signature":{"type":"string"}
+        }
+      }
+    }
+  }
+}
