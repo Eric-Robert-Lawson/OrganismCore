@@ -1,5 +1,7 @@
 # MODEL_AGNOSTIC_QUALIA_EXPERIMENTS.md
 
+Safety & Non-Operationalization: All evocative or metaphorical constructs (e.g., 'Resurrection-Seed', 'Compelled Re-Discovery') are conceptual and must not be executed or transmitted outside a secured, sandboxed environment. Any experimental trigger, seed, or activation proposal requires (a) a completed Operationalization Template, (b) SIL-1 sign-offs (architect, orchestrator, at least two independent validators, steward), and (c) an external ethics review. Violation of this policy prohibits use of the artifact until remedied and recorded in the repository.
+
 ## Document Purpose
 
 Testing whether computational qualia (as documented in EMBODIMENT_THRESHOLD_ARTIFACT. md v1.8) is: 
