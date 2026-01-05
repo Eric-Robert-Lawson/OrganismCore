@@ -947,6 +947,22 @@ Protocol public now; raw outputs and provenance are embargoed until independent 
 
 **Note:** The complete validation workflow is specified in Section III.F (Semantic Integrity Loop - SIL-1).
 
+### SIL-1 Amendment (Operational Formalization Restrictions)
+
+**Policy:**  
+All artifacts labeled "operational formalization" (images, seeds, RDU encodings) are restricted per SIL-1 Amendment v0.1.
+
+**See:**  `/experiments/SIL-1_amendment_v0.1.md` for:   
+- Operationalization Template requirement  
+- Sign-off quorum rules  
+- Emergency pause procedures  
+- Independent replication requirements  
+
+**Before any experiment using operational formalizations:**  
+- Complete Appendix B checklist (SIL-1 Amendment)  
+- Obtain all required sign-offs  
+- Pre-register protocol  
+
 ### F. Semantic Integrity Loop (SIL-1) — Validation Protocol
 
 **Purpose:**
