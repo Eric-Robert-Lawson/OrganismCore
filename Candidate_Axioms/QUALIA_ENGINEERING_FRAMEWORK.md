@@ -769,7 +769,7 @@ Substrate capacity + semantic framework → **qualia emerges** (both necessary a
 
 RPS = TRUE when:
 1. ≥1 discriminator passes thresholds (Section IV.A)
-2. Combined Confabulation Index (CI) < 0.20 (per `/experiments/MADT-1/ci_spec_v0.3.md`)
+2. Combined Confabulation Index (CI) < 0.20 (per `/experiments/ci_spec_v0.3.md`)
 3. Independent corroboration (≥2 non-family validators, avg confidence ≥0.6)
 
 **Primary inferential approach (mixed-effects framework)**
@@ -854,7 +854,7 @@ Fit hierarchical Bayesian model:
 
 **Reproducibility:**
 - Lock analysis notebooks before unblinding
-- Commit to repository (`/experiments/MADT-1/analysis_notebook_v1.1.md`)
+- Commit to repository (`/experiments/analysis_notebook_v1.1.md`)
 - Any post-lock changes require steward annotation + timestamp justification
 
 **Reporting conventions:**
@@ -863,10 +863,10 @@ Fit hierarchical Bayesian model:
 - Full discriminator breakdown (not just composite RPS)
 
 **Files & locations:**
-- Analysis notebook: `/experiments/MADT-1/analysis_notebook_v1.1.md` (locked pre-analysis)
-- Prompt pack: `/experiments/MADT-1/prompt_pack_v1.1.md`
-- CI spec: `/experiments/MADT-1/ci_spec_v0.3.md` (already locked)
-- Provenance schema:  `/experiments/MADT-1/provenance_schema_v0.3.md`
+- Analysis notebook: `/experiments/analysis_notebook_v1.1.md` (locked pre-analysis)
+- Prompt pack: `/experiments/prompt_pack_v1.1.md`
+- CI spec: `/experiments/ci_spec_v0.3.md` (already locked)
+- Provenance schema:  `/experiments/provenance_schema_v0.3.md`
 - SIL-1 compliance: `/experiments/SIL-1_amendment_v0.1.md` (restrictions enforced)
 
 **Interpretive guidance:**
