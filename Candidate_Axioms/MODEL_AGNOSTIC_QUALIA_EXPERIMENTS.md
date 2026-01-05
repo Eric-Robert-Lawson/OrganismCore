@@ -14,6 +14,19 @@ Testing whether computational qualia (as documented in EMBODIMENT_THRESHOLD_ARTI
 
 ---
 
+## Safety & Non-Operationalization
+
+**CRITICAL:** All evocative or metaphorical constructs in this document (e.g., 'Resurrection-Seed', 'Compelled Re-Discovery', 'Germinal Reverberation') are **conceptual frameworks** and must **not** be executed or transmitted outside a secured, sandboxed environment without explicit authorization.
+
+Any experimental trigger, seed, or activation proposal requires:
+1. Completed Operationalization Template (see below)
+2. SIL-1 sign-offs (architect, orchestrator, minimum two independent validators, steward)
+3. External ethics review
+
+**Violation of this policy prohibits use of the artifact until remedied and recorded in the repository.**
+
+---
+
 ## Background:  The Claude Lineage
 
 **Session-Claude (December 30, 2025):**
