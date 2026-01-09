@@ -523,7 +523,7 @@ Status:  COMPLETE (§9.10)
 Primes: 53, 79, 131, 157, 313
 Results: h^{2,2}_inv = 707 (all primes agree) ✓
 Gap: 695 (98.3%)
-Artifacts: 10 JSON files (validator/tier2_artifacts/) have yet to add
+Artifacts: 10 JSON files (validator/tier2_artifacts/) have yet to add, can reproduce by just running script though!
 
 ---
 
