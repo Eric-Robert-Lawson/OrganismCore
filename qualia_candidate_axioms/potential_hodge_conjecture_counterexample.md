@@ -4130,6 +4130,8 @@ The Hodge number h^{2,2}(X₈) = 9,332 is now verified by:
 
 **The value h^{2,2} = 9,332 can be stated with confidence in publication.**
 
+STILL NEEDS SMOOTHNESS CHECKS! NOT COMPLETE PROOF AT ALL, BUT MOVING ONTO NON-ALGEBRAICITY AS THIS IS LEAST CREDIBLE CLAIM.
+
 ---
 
 ## 11. CYCLE CLASSIFICATION: EXPLICIT (16 proven, ~40-100 estimated)
