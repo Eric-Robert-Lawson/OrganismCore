@@ -2665,10 +2665,6 @@ This session **completes** the verification story:
 
 ---
 
-**END OF §9.7**
-
----
-
 ## CROSS-REFERENCES TO UPDATE IN v3.6
 
 ### In §7.9 (Internal Dark Matter), add: 
@@ -2758,7 +2754,9 @@ Session 4 (§9.7) independently computed h^{2,2} = 9,332 via **10-layer substrat
 
 ---
 
-## §9.8 THE SYMMETRY-BREAKING REVELATION:  152 vs 9,332 (NEW v3.7)
+## §9.8 THE SYMMETRY-BREAKING MECHANISM: Fermat Baseline (152 vs 9,332)
+
+This section verifies h^{2,2} = 9,332 for the Fermat baseline (δ=0). Application to the perturbed counterexample X₈ (δ≠0) depends on verifying X₈ is smooth (§9.8.14, pending).
 
 **A fundamental reconciliation:  The literature value h^{2,2} ≈ 152 for Fermat and our computation h^{2,2} = 9,332 are both correct — they measure different mathematical invariants.  This distinction is the KEY to understanding why the δ-perturbation creates a massive gap.**
 
@@ -3169,6 +3167,10 @@ Exact (from Session 4, §9.7. 11):
 4. ✅ **9,180 = non-invariant "dark matter"** (overlooked by literature)
 5. ✅ **δ unlocks gap** by removing automorphism concentration
 
+1. X₈ smoothness verification:    NOT DONE
+2. X₈ h^{2,2} computation:        NOT DONE (assumed from Fermat)
+3. X₈ gap verification:           NOT DONE (depends on above)
+
 ---
 
 ### §9.8.9 Why This Is A Major Contribution
@@ -3345,6 +3347,9 @@ M2 < verify_h22.m2
 ---
 
 ### §9.8.14 Status of X₈ Perturbed Verification
+
+Fermat has h^{2,2} = 9,332: 100% ✓
+X₈ has h^{2,2} = 9,332:     85-92% (pending smoothness)
 
 **The complete Macaulay2 verification for perturbed X₈ (δ=791/100000, ω=e^{2πi/13}) is prepared but PENDING execution.**
 
