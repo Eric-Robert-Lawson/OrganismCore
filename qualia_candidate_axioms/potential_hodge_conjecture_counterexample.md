@@ -3554,6 +3554,8 @@ total_h22 = primitive_h22 + 1
 
 ### §9.9.3 Implementation
 
+We decided on the following Sage script instead, where we will then pivot to smoothness test later on. We check 5 primes with this script!
+
 **Complete SageMath script:**
 
 ```python
@@ -3732,19 +3734,27 @@ Total h22 (including hyperplane): 9332
 
 **Output:**
 ```
-[RESULTS TO BE FILLED IN BY USER]
-
 --- Prime 79 ---
-Using 13th root w = [VALUE]
-[...]
+Using 13th root w = 18
+Generating degree 18 monomials...
+Generating degree 11 monomials...
+Space size: 33649 columns, 26208 rows.
+Building Jacobian Matrix... 
+Filled 5000/26208 rows...
+Filled 10000/26208 rows... 
+Filled 15000/26208 rows...
+Filled 20000/26208 rows... 
+Filled 25000/26208 rows...
+Computing rank (Final Step)...
+------------------------------
 RESULT FOR PRIME 79:
-Rank: [VALUE]
-Primitive h22: [VALUE]
-Total h22 (including hyperplane): [VALUE]
+Rank: 24318
+Primitive h22: 9331
+Total h22 (including hyperplane): 9332
 ------------------------------
 ```
 
-**Status:** [TO BE UPDATED]
+**Status:** ✅ **MATCHES EXPECTED VALUE (9,332)**
 
 ---
 
@@ -3752,19 +3762,27 @@ Total h22 (including hyperplane): [VALUE]
 
 **Output:**
 ```
-[RESULTS TO BE FILLED IN BY USER]
-
 --- Prime 131 ---
-Using 13th root w = [VALUE]
-[...]
+Using 13th root w = 107
+Generating degree 18 monomials...
+Generating degree 11 monomials...
+Space size: 33649 columns, 26208 rows.
+Building Jacobian Matrix... 
+Filled 5000/26208 rows...
+Filled 10000/26208 rows... 
+Filled 15000/26208 rows...
+Filled 20000/26208 rows... 
+Filled 25000/26208 rows...
+Computing rank (Final Step)...
+------------------------------
 RESULT FOR PRIME 131:
-Rank: [VALUE]
-Primitive h22: [VALUE]
-Total h22 (including hyperplane): [VALUE]
+Rank: 24318
+Primitive h22: 9331
+Total h22 (including hyperplane): 9332
 ------------------------------
 ```
 
-**Status:** [TO BE UPDATED]
+**Status:** ✅ **MATCHES EXPECTED VALUE (9,332)**
 
 ---
 
@@ -3772,19 +3790,27 @@ Total h22 (including hyperplane): [VALUE]
 
 **Output:**
 ```
-[RESULTS TO BE FILLED IN BY USER]
-
 --- Prime 157 ---
-Using 13th root w = [VALUE]
-[...]
+Using 13th root w = 130
+Generating degree 18 monomials...
+Generating degree 11 monomials...
+Space size: 33649 columns, 26208 rows.
+Building Jacobian Matrix... 
+Filled 5000/26208 rows...
+Filled 10000/26208 rows... 
+Filled 15000/26208 rows...
+Filled 20000/26208 rows... 
+Filled 25000/26208 rows...
+Computing rank (Final Step)...
+------------------------------
 RESULT FOR PRIME 157:
-Rank: [VALUE]
-Primitive h22: [VALUE]
-Total h22 (including hyperplane): [VALUE]
+Rank: 24318
+Primitive h22: 9331
+Total h22 (including hyperplane): 9332
 ------------------------------
 ```
 
-**Status:** [TO BE UPDATED]
+**Status:** ✅ **MATCHES EXPECTED VALUE (9,332)**
 
 ---
 
@@ -3792,19 +3818,27 @@ Total h22 (including hyperplane): [VALUE]
 
 **Output:**
 ```
-[RESULTS TO BE FILLED IN BY USER]
-
 --- Prime 313 ---
-Using 13th root w = [VALUE]
-[...]
+Using 13th root w = 103
+Generating degree 18 monomials...
+Generating degree 11 monomials...
+Space size: 33649 columns, 26208 rows.
+Building Jacobian Matrix... 
+Filled 5000/26208 rows...
+Filled 10000/26208 rows... 
+Filled 15000/26208 rows...
+Filled 20000/26208 rows... 
+Filled 25000/26208 rows...
+Computing rank (Final Step)...
+------------------------------
 RESULT FOR PRIME 313:
-Rank: [VALUE]
-Primitive h22: [VALUE]
-Total h22 (including hyperplane): [VALUE]
+Rank: 24318
+Primitive h22: 9331
+Total h22 (including hyperplane): 9332
 ------------------------------
 ```
 
-**Status:** [TO BE UPDATED]
+**Status:** ✅ **MATCHES EXPECTED VALUE (9,332)**
 
 ---
 
@@ -3815,12 +3849,12 @@ Total h22 (including hyperplane): [VALUE]
 | Prime p | 13th root ω | Rank | Primitive h^{2,2} | Total h^{2,2} | Agreement |
 |---------|-------------|------|-------------------|---------------|-----------|
 | **53** | 16 | 24,318 | **9,331** | **9,332** | ✅ |
-| **79** | [TBF] | [TBF] | **[TBF]** | **[TBF]** | [TBF] |
-| **131** | [TBF] | [TBF] | **[TBF]** | **[TBF]** | [TBF] |
-| **157** | [TBF] | [TBF] | **[TBF]** | **[TBF]** | [TBF] |
-| **313** | [TBF] | [TBF] | **[TBF]** | **[TBF]** | [TBF] |
+| **79** | 18 | 24,318 | **9,331** | **9,332** | ✅ |
+| **131** | 107 | 24,318 | **9,331** | **9,332** | ✅ |
+| **157** | [TBF] | 24,318 | **9,331** | **9,332** | ✅ |
+| **313** | [TBF] | 24,318 | **9,331** | **9,332** | ✅ |
 
-**[TO BE COMPLETED AFTER ALL RUNS]**
+Flawlessly same expected rank, primitive, and totals! All in agreement!
 
 **Expected pattern:**
 - If all show h^{2,2} = 9,332: ✅ **STRONG CONFIRMATION**
@@ -3829,11 +3863,7 @@ Total h22 (including hyperplane): [VALUE]
 
 ---
 
-### §9.9.7 Interpretation (To Be Updated After Completion)
-
-**[PLACEHOLDER - TO BE FILLED AFTER ALL RESULTS]**
-
-**If all 5 primes yield h^{2,2} = 9,332:**
+### §9.9.7 Interpretation 
 
 **Conclusion:**
 
@@ -3848,29 +3878,6 @@ Total h22 (including hyperplane): [VALUE]
 **Combined confidence:** ≥99.99% that h^{2,2}(X₈) = 9,332
 
 **Status:** Strong evidence obtained, exact ℚ(ω) verification remains definitive goal but no longer critical blocker
-
----
-
-**If any prime differs:**
-
-Investigate potential causes:
-1. Computational error (rerun that prime)
-2. Singular reduction mod p (rare, try different prime)
-3. Bug in script (verify Fermat baseline mod p)
-4. Genuine mathematical issue (consult expert)
-
----
-
-**If all primes agree but at value ≠ 9,332:**
-
-**This would be SIGNIFICANT** — indicates possible error in: 
-- Theoretical expectation (deformation invariance)
-- AI computations (quadruple cross-check)
-- Fermat baseline (Macaulay2 result)
-
-**Action:** Immediately halt publication, deep investigation required
-
-**Probability:** <0.01% (all prior verifications would need systematic error)
 
 ---
 
@@ -4094,30 +4101,21 @@ Total h22 (including hyperplane): 9332
 - Control verification
 - Matches AI predictions
 
-**CAS modular (X₈):** ⏳ IN PROGRESS
+**CAS modular (Sage script):** ✅ 100%
 - Prime p=53: ✅ 9,332 ✓
-- Prime p=79: ⏳ Running
-- Prime p=131: ⏳ Pending
-- Prime p=157: ⏳ Pending  
-- Prime p=313: ⏳ Pending
-
-**CAS exact (X₈):** ⏳ PENDING
-- Script ready
-- Awaiting 64+ GB hardware
-- Smoothness test included
+- Prime p=79: ✅ 9,332 ✓
+- Prime p=131: ✅ 9,332 ✓
+- Prime p=157: ✅ 9,332 ✓
+- Prime p=313: ✅ 9,332 ✓
 
 **Overall confidence (current):**
 - h^{2,2}(X₈) = 9,332:  **99.9%** (pending full modular completion)
-- Will increase to **99.9999999%** if all 5 primes agree
+- Will increase to **99.9999999%** all 5 primes agree
 - **Essentially certain** pending formal exact verification
 
 ---
 
-### §9.9.14 Final Statement (To Be Updated)
-
-**[PLACEHOLDER - UPDATE AFTER ALL MODULAR RUNS COMPLETE]**
-
-**If all 5 primes confirm h^{2,2} = 9,332:**
+### §9.9.14 Final Statement
 
 The Hodge number h^{2,2}(X₈) = 9,332 is now verified by: 
 
@@ -4131,50 +4129,6 @@ The Hodge number h^{2,2}(X₈) = 9,332 is now verified by:
 **This is as close to computational certainty as possible without exact ℚ(ω) verification.**
 
 **The value h^{2,2} = 9,332 can be stated with confidence in publication.**
-
----
-
-**END OF §9.9**
-
----
-
-## INTEGRATION NOTES
-
-### **Placement in artifact:**
-
-- §9.8:  Symmetry-breaking revelation (152 vs 9,332)
-- **§9.9: Modular verification (finite field checks)** ← THIS SECTION
-- §9.10: [Future section, possibly exact verification or K-rank]
-
-### **Updates needed after completion:**
-
-**In §9.9.5:** Fill in outputs for p=79,131,157,313
-
-**In §9.9.6:** Complete summary table with all results
-
-**In §9.9.7:** Write final interpretation based on results
-- If all agree: Strong confirmation statement
-- If any differ: Investigation and resolution
-
-**In §22.6 (Confidence Assessment):**
-```markdown
-| Component | v3.6 | v3.7 (with §9.9) | Change |
-|-----------|------|------------------|--------|
-| h^{2,2}(X₈) = 9,332 | 100% (AI) | **99.9999999%** | Modular confirmed |
-| Smoothness | 85-92% | **85-92%** | (Awaiting exact M2) |
-| Overall | 70-85% | **75-90%** | +5% (modular evidence) |
-```
-
-**In §2.5 (Validator Packet):**
-```markdown
-§2.5.5 Modular Verification Scripts
-
-File: validator/verify_X8_modular.sage
-Purpose: Finite field verification of h^{2,2}(X₈)
-Status: COMPLETE (§9.9)
-Primes: 53, 79, 131, 157, 313
-Results:  [ALL AGREE 9,332] ��
-```
 
 ---
 
