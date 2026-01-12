@@ -517,7 +517,7 @@ Purpose: Fermat h^{2,2} baseline (control verification)
 Status: COMPLETE (§9.8.1)
 Result: 9,332 ✓
 
-File: validator/macaulay2_smoothness_and_hodge.m2
+File: validator/tier5_smoothness_check.m2 (have not added, the script is in the artifact here!)
 Purpose: X₈ smoothness and h^{2,2} verification  
 Status: PENDING (script ready, awaiting execution)
 See: §9.8.14 (taking longer than expected, will return to this later!!!)
@@ -534,7 +534,7 @@ Artifacts: 10 JSON files (validator/tier2_artifacts/) have yet to add, can repro
 
 §2.5.8 Tier III:  Rational Reconstruction
 
-File: validator/finalize_h22_proof.py
+File: validator/finalize_h22_proof.py (have not added, the script is in the artifact here!)
 Purpose: Convert modular evidence to characteristic-0 proof
 Input: Tier II artifacts (5 JSON files)
 Output: Rank stability verification
@@ -5828,6 +5828,64 @@ Impact: 65-80% → 85-95% counterexample confidence
 #### **§9.12.2.1 Current Approach**
 
 **Script:**  `tier5_smoothness_check.m2` (running)
+
+**Content of script**
+```m2
+-- tier5_smoothness_check.m2
+-- TIER V: SMOOTHNESS CERTIFICATE
+-- Verifying the Jacobian Rank for X8 at delta = 791/100000
+
+p = 313; -- Using our established prime
+print "=== Starting Tier V: Smoothness Verification for X8 ===";
+
+Fp = ZZ/p;
+w = 0_Fp;
+for a from 2 to p-1 do (
+    cand = (a * 1_Fp)^((p-1)//13);
+    if (cand != 1_Fp) and (cand^13 == 1_Fp) then ( w = cand; break; );
+);
+
+R = Fp[z0, z1, z2, z3, z4, z5];
+coords = gens R;
+
+-- 1. DEFINE THE PERTURBED POLYNOMIAL X8
+-- Using delta = 791/100000 mod 313
+-- 100000 mod 313 = 143
+-- 1/143 mod 313 = 151
+-- delta = (791 * 151) mod 313 = (159 * 151) mod 313 = 209
+delta = 209_Fp;
+
+print "Assembling X8 Polynomial...";
+linearForms = for k from 0 to 12 list (
+    sum(for j from 0 to 5 list (sub(w^((k*j)%13), R)) * coords#j)
+);
+
+f_fermat = sum(for z in coords list z^8);
+f_invariant = 0_R;
+for l in linearForms do ( f_invariant = f_invariant + l^8; );
+
+f_X8 = f_fermat + (sub(delta, R)) * f_invariant;
+
+-- 2. JACOBIAN ANALYSIS
+print "Computing Singular Locus...";
+partials = for z in coords list diff(z, f_X8);
+J = ideal partials;
+S = J + ideal f_X8;
+
+-- In a smooth variety, the Singular Locus S must be the unit ideal (1)
+-- meaning there are no points where all partials and the poly vanish.
+isSmooth = isUnit S;
+
+print concatenate(40 : "-");
+if isSmooth then (
+    print "RESULT: X8 is verified SMOOTH over F_313.";
+    print "Deformation Invariance Bridge: VALIDATED.";
+) else (
+    print "RESULT: X8 is SINGULAR over F_313.";
+    print "Warning: Check delta value or variety construction.";
+);
+print concatenate(40 : "-");
+```
 
 **Method:**
 ```m2
