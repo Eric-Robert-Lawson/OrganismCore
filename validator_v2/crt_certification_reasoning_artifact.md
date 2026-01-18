@@ -228,7 +228,7 @@ def main():
     top_rows = top_k_indices_by_degree(row_deg, k)
     top_cols = top_k_indices_by_degree(col_deg, k)
     nnz, density = compute_minor_density(top_rows, top_cols, row_to_cols)
-    print(f"Initial selection: nnz={nnz}, density={density:. 5f}")
+    print(f"Initial selection: nnz={nnz}, density={density:.5f}")
     if density < args.density_target:
         print("Running greedy improvement...")
         new_rows, new_cols = greedy_improve(top_rows, top_cols, row_to_cols, col_to_rows, entries, iterations=args.iter)
@@ -584,7 +584,7 @@ if __name__ == "__main__":
 
 ```bash
 # Step 1: Generate minor indices
-python3 choose_dense_minor. py \
+python3 choose_dense_minor.py \
   --triplet validator/saved_inv_p313_triplets.json \
   --k 100 \
   --out_prefix minor_100
