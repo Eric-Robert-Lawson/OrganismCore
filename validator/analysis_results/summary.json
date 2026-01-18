@@ -1,0 +1,21 @@
+{
+  "num_isolated": 401,
+  "num_algebraic": 8,
+  "highly_significant_metrics": [
+    "entropy",
+    "kolmogorov",
+    "num_vars"
+  ],
+  "top_candidate": {
+    "monomial": [
+      9,
+      2,
+      2,
+      2,
+      1,
+      2
+    ],
+    "entropy": 2.1405180562767114,
+    "distance": 0.6839171495326692
+  }
+}

@@ -1,0 +1,1102 @@
+[
+  {
+    "monomial": [
+      9,
+      2,
+      2,
+      2,
+      1,
+      2
+    ],
+    "signature": {
+      "entropy": 2.1405180562767114,
+      "kolmogorov": 15,
+      "variance": 7.333333333333333,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6839171495326692
+  },
+  {
+    "monomial": [
+      2,
+      2,
+      9,
+      2,
+      2,
+      1
+    ],
+    "signature": {
+      "entropy": 2.1405180562767114,
+      "kolmogorov": 15,
+      "variance": 7.333333333333333,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6839171495326692
+  },
+  {
+    "monomial": [
+      1,
+      2,
+      2,
+      2,
+      2,
+      9
+    ],
+    "signature": {
+      "entropy": 2.1405180562767114,
+      "kolmogorov": 15,
+      "variance": 7.333333333333333,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6839171495326692
+  },
+  {
+    "monomial": [
+      8,
+      3,
+      2,
+      2,
+      2,
+      1
+    ],
+    "signature": {
+      "entropy": 2.239097917988786,
+      "kolmogorov": 15,
+      "variance": 5.333333333333333,
+      "range": 7,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 8,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6793700865256964
+  },
+  {
+    "monomial": [
+      3,
+      2,
+      8,
+      1,
+      2,
+      2
+    ],
+    "signature": {
+      "entropy": 2.239097917988786,
+      "kolmogorov": 15,
+      "variance": 5.333333333333333,
+      "range": 7,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 8,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6793700865256964
+  },
+  {
+    "monomial": [
+      3,
+      2,
+      1,
+      2,
+      8,
+      2
+    ],
+    "signature": {
+      "entropy": 2.2390979179887864,
+      "kolmogorov": 15,
+      "variance": 5.333333333333333,
+      "range": 7,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 8,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6793700865256964
+  },
+  {
+    "monomial": [
+      2,
+      8,
+      1,
+      2,
+      2,
+      3
+    ],
+    "signature": {
+      "entropy": 2.239097917988786,
+      "kolmogorov": 15,
+      "variance": 5.333333333333333,
+      "range": 7,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 8,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6793700865256964
+  },
+  {
+    "monomial": [
+      2,
+      3,
+      8,
+      2,
+      1,
+      2
+    ],
+    "signature": {
+      "entropy": 2.239097917988786,
+      "kolmogorov": 15,
+      "variance": 5.333333333333333,
+      "range": 7,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 8,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6793700865256964
+  },
+  {
+    "monomial": [
+      2,
+      3,
+      2,
+      1,
+      8,
+      2
+    ],
+    "signature": {
+      "entropy": 2.2390979179887864,
+      "kolmogorov": 15,
+      "variance": 5.333333333333333,
+      "range": 7,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 8,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6793700865256964
+  },
+  {
+    "monomial": [
+      2,
+      2,
+      2,
+      3,
+      8,
+      1
+    ],
+    "signature": {
+      "entropy": 2.2390979179887864,
+      "kolmogorov": 15,
+      "variance": 5.333333333333333,
+      "range": 7,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 8,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6793700865256964
+  },
+  {
+    "monomial": [
+      2,
+      1,
+      2,
+      8,
+      2,
+      3
+    ],
+    "signature": {
+      "entropy": 2.239097917988786,
+      "kolmogorov": 15,
+      "variance": 5.333333333333333,
+      "range": 7,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 8,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6793700865256964
+  },
+  {
+    "monomial": [
+      1,
+      8,
+      2,
+      3,
+      2,
+      2
+    ],
+    "signature": {
+      "entropy": 2.239097917988786,
+      "kolmogorov": 15,
+      "variance": 5.333333333333333,
+      "range": 7,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 8,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6793700865256964
+  },
+  {
+    "monomial": [
+      1,
+      2,
+      2,
+      8,
+      3,
+      2
+    ],
+    "signature": {
+      "entropy": 2.239097917988786,
+      "kolmogorov": 15,
+      "variance": 5.333333333333333,
+      "range": 7,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 8,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6793700865256964
+  },
+  {
+    "monomial": [
+      10,
+      1,
+      2,
+      1,
+      2,
+      2
+    ],
+    "signature": {
+      "entropy": 1.991076059838222,
+      "kolmogorov": 14,
+      "variance": 10.0,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6777144375464074
+  },
+  {
+    "monomial": [
+      2,
+      2,
+      10,
+      1,
+      1,
+      2
+    ],
+    "signature": {
+      "entropy": 1.991076059838222,
+      "kolmogorov": 14,
+      "variance": 10.0,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6777144375464074
+  },
+  {
+    "monomial": [
+      2,
+      2,
+      1,
+      1,
+      2,
+      10
+    ],
+    "signature": {
+      "entropy": 1.991076059838222,
+      "kolmogorov": 14,
+      "variance": 10.0,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6777144375464074
+  },
+  {
+    "monomial": [
+      2,
+      1,
+      2,
+      2,
+      1,
+      10
+    ],
+    "signature": {
+      "entropy": 1.991076059838222,
+      "kolmogorov": 14,
+      "variance": 10.0,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6777144375464074
+  },
+  {
+    "monomial": [
+      1,
+      2,
+      1,
+      10,
+      2,
+      2
+    ],
+    "signature": {
+      "entropy": 1.991076059838222,
+      "kolmogorov": 14,
+      "variance": 10.0,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6777144375464074
+  },
+  {
+    "monomial": [
+      2,
+      1,
+      11,
+      1,
+      2,
+      1
+    ],
+    "signature": {
+      "entropy": 1.8336056789417416,
+      "kolmogorov": 13,
+      "variance": 13.0,
+      "range": 10,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 11,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.677165423241649
+  },
+  {
+    "monomial": [
+      1,
+      2,
+      11,
+      2,
+      1,
+      1
+    ],
+    "signature": {
+      "entropy": 1.8336056789417416,
+      "kolmogorov": 13,
+      "variance": 13.0,
+      "range": 10,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 11,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.677165423241649
+  },
+  {
+    "monomial": [
+      1,
+      1,
+      2,
+      11,
+      1,
+      2
+    ],
+    "signature": {
+      "entropy": 1.8336056789417416,
+      "kolmogorov": 13,
+      "variance": 13.0,
+      "range": 10,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 11,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.677165423241649
+  },
+  {
+    "monomial": [
+      10,
+      2,
+      1,
+      1,
+      1,
+      3
+    ],
+    "signature": {
+      "entropy": 1.949137865273585,
+      "kolmogorov": 14,
+      "variance": 10.333333333333334,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6764359147333379
+  },
+  {
+    "monomial": [
+      10,
+      1,
+      1,
+      3,
+      1,
+      2
+    ],
+    "signature": {
+      "entropy": 1.949137865273585,
+      "kolmogorov": 14,
+      "variance": 10.333333333333334,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6764359147333379
+  },
+  {
+    "monomial": [
+      10,
+      1,
+      1,
+      2,
+      3,
+      1
+    ],
+    "signature": {
+      "entropy": 1.949137865273585,
+      "kolmogorov": 14,
+      "variance": 10.333333333333334,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6764359147333379
+  },
+  {
+    "monomial": [
+      3,
+      10,
+      2,
+      1,
+      1,
+      1
+    ],
+    "signature": {
+      "entropy": 1.949137865273585,
+      "kolmogorov": 14,
+      "variance": 10.333333333333334,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6764359147333379
+  },
+  {
+    "monomial": [
+      3,
+      2,
+      1,
+      1,
+      10,
+      1
+    ],
+    "signature": {
+      "entropy": 1.9491378652735851,
+      "kolmogorov": 14,
+      "variance": 10.333333333333334,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6764359147333379
+  },
+  {
+    "monomial": [
+      2,
+      1,
+      10,
+      3,
+      1,
+      1
+    ],
+    "signature": {
+      "entropy": 1.949137865273585,
+      "kolmogorov": 14,
+      "variance": 10.333333333333334,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6764359147333379
+  },
+  {
+    "monomial": [
+      2,
+      1,
+      1,
+      10,
+      1,
+      3
+    ],
+    "signature": {
+      "entropy": 1.949137865273585,
+      "kolmogorov": 14,
+      "variance": 10.333333333333334,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6764359147333379
+  },
+  {
+    "monomial": [
+      1,
+      3,
+      10,
+      1,
+      2,
+      1
+    ],
+    "signature": {
+      "entropy": 1.949137865273585,
+      "kolmogorov": 14,
+      "variance": 10.333333333333334,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6764359147333379
+  },
+  {
+    "monomial": [
+      1,
+      3,
+      1,
+      2,
+      1,
+      10
+    ],
+    "signature": {
+      "entropy": 1.949137865273585,
+      "kolmogorov": 14,
+      "variance": 10.333333333333334,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6764359147333379
+  },
+  {
+    "monomial": [
+      1,
+      2,
+      3,
+      1,
+      1,
+      10
+    ],
+    "signature": {
+      "entropy": 1.949137865273585,
+      "kolmogorov": 14,
+      "variance": 10.333333333333334,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6764359147333379
+  },
+  {
+    "monomial": [
+      1,
+      1,
+      2,
+      10,
+      3,
+      1
+    ],
+    "signature": {
+      "entropy": 1.949137865273585,
+      "kolmogorov": 14,
+      "variance": 10.333333333333334,
+      "range": 9,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 10,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6764359147333379
+  },
+  {
+    "monomial": [
+      9,
+      3,
+      1,
+      1,
+      2,
+      2
+    ],
+    "signature": {
+      "entropy": 2.0985798617120746,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      9,
+      2,
+      2,
+      1,
+      3,
+      1
+    ],
+    "signature": {
+      "entropy": 2.098579861712074,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      9,
+      2,
+      1,
+      3,
+      2,
+      1
+    ],
+    "signature": {
+      "entropy": 2.098579861712074,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      9,
+      1,
+      3,
+      2,
+      2,
+      1
+    ],
+    "signature": {
+      "entropy": 2.098579861712074,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      3,
+      1,
+      9,
+      2,
+      1,
+      2
+    ],
+    "signature": {
+      "entropy": 2.0985798617120746,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      3,
+      1,
+      2,
+      2,
+      9,
+      1
+    ],
+    "signature": {
+      "entropy": 2.098579861712074,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      2,
+      3,
+      1,
+      2,
+      9,
+      1
+    ],
+    "signature": {
+      "entropy": 2.0985798617120746,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      2,
+      2,
+      3,
+      1,
+      9,
+      1
+    ],
+    "signature": {
+      "entropy": 2.0985798617120746,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      2,
+      1,
+      2,
+      1,
+      3,
+      9
+    ],
+    "signature": {
+      "entropy": 2.098579861712074,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      2,
+      1,
+      1,
+      9,
+      3,
+      2
+    ],
+    "signature": {
+      "entropy": 2.0985798617120746,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      2,
+      1,
+      1,
+      3,
+      2,
+      9
+    ],
+    "signature": {
+      "entropy": 2.098579861712074,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      1,
+      9,
+      2,
+      1,
+      2,
+      3
+    ],
+    "signature": {
+      "entropy": 2.0985798617120746,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      1,
+      9,
+      1,
+      2,
+      3,
+      2
+    ],
+    "signature": {
+      "entropy": 2.0985798617120746,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      1,
+      2,
+      2,
+      9,
+      1,
+      3
+    ],
+    "signature": {
+      "entropy": 2.0985798617120746,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      1,
+      1,
+      3,
+      9,
+      2,
+      2
+    ],
+    "signature": {
+      "entropy": 2.0985798617120746,
+      "kolmogorov": 14,
+      "variance": 7.666666666666667,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6545223222618521
+  },
+  {
+    "monomial": [
+      2,
+      7,
+      2,
+      2,
+      3,
+      2
+    ],
+    "signature": {
+      "entropy": 2.3695710038552735,
+      "kolmogorov": 16,
+      "variance": 3.3333333333333335,
+      "range": 5,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 7,
+      "min_exp": 2,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6518841896960381
+  },
+  {
+    "monomial": [
+      2,
+      2,
+      3,
+      2,
+      7,
+      2
+    ],
+    "signature": {
+      "entropy": 2.3695710038552735,
+      "kolmogorov": 16,
+      "variance": 3.3333333333333335,
+      "range": 5,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 7,
+      "min_exp": 2,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6518841896960381
+  },
+  {
+    "monomial": [
+      9,
+      1,
+      4,
+      1,
+      1,
+      2
+    ],
+    "signature": {
+      "entropy": 2.0294069451656007,
+      "kolmogorov": 14,
+      "variance": 8.333333333333334,
+      "range": 8,
+      "gcd": 1,
+      "num_vars": 6,
+      "max_exp": 9,
+      "min_exp": 1,
+      "mean_exp": 3.0
+    },
+    "distance": 0.6496461077551559
+  }
+]
