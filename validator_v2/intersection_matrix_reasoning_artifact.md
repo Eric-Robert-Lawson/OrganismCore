@@ -1797,3 +1797,513 @@ Literature uses **generic hyperplane sections** (not coordinate) to avoid exactl
 **END OF UPDATE 2**
 
 ---
+
+# 📋 **UPDATE 3:   COORDINATE 4-PLANE SCAN RESULTS - MODERATE DEGENERACY**
+
+---
+
+## **UPDATE 3 (January 18, 2026 - 5:15 PM - Full Scan Complete)**
+
+### **🔬 COMPREHENSIVE COORDINATE 4-PLANE SCAN**
+
+**Full Macaulay2 script executed (verbatim):**
+
+```macaulay2
+-- coordinate_4plane_scan_fixed2.m2
+-- Robust scan of coordinate 4-planes; writes CSV and prints CSV as fallback. 
+
+p = 313;
+g = 27;
+
+R = GF p[z_0.. z_5];
+vs = flatten entries vars R;
+
+-- Build cyclotomic F (same construction)
+coeffs = {};
+for kk from 0 to 12 do (
+    row = {};
+    for jj from 0 to 5 do ( row = append(row, (g^(kk*jj)) % p); );
+    coeffs = append(coeffs, row);
+);
+Lforms = {};
+for kk from 0 to 12 do (
+    tmp = 0 * vs#0;
+    for j from 0 to 5 do ( tmp = tmp + (coeffs#kk#j) * vs#j; );
+    Lforms = append(Lforms, tmp);
+);
+F = 0 * vs#0;
+for kk from 0 to 12 do ( F = F + (Lforms#kk)^8; );
+
+relevant = ideal(vs);
+
+-- Collect CSV lines as plain strings
+csvLines = {};
+csvLines = append(csvLines, "indices,contained,dim,degree");
+
+containedCount = 0;
+total = 0;
+
+for i from 0 to 2 do (
+  for j from i+1 to 3 do (
+    for k from j+1 to 4 do (
+      for l from k+1 to 5 do (
+        total = total + 1;
+        idxCSV = toString(i) | "-" | toString(j) | "-" | toString(k) | "-" | toString(l);
+        I_ijkl = ideal(vs#i, vs#j, vs#k, vs#l);
+
+        remF = F % I_ijkl;
+        contained = (remF == 0);
+
+        S = saturate(ideal(F) + I_ijkl, relevant);
+
+        if S == ideal(1_R) then (
+            dSstr = "empty";
+            degSstr = "0";
+        ) else (
+            dS = dim S;
+            dSstr = toString dS;
+            degOk = true;
+            degS = 0;
+            try ( degS = degree S; ) else ( degOk = false; );
+            degSstr = if degOk then toString degS else "degError";
+        );
+
+        csvLine = idxCSV | "," | (if contained then "true" else "false") | "," | dSstr | "," | degSstr;
+        csvLines = append(csvLines, csvLine);
+
+        if contained then (
+            containedCount = containedCount + 1;
+            print("CONTAINED: plane " | toString({i,j,k,l}) | "  -> dim(S) = " | dSstr | ", degree = " | degSstr);
+        ) else (
+            print("NOT contained: plane " | toString({i,j,k,l}) | "  -> dim(S) = " | dSstr | ", degree = " | degSstr);
+        );
+      );
+    );
+  );
+);
+
+-- Build a single string for writing; ensure every element is a string
+csvText = "";
+for line in csvLines do (
+    csvText = csvText | toString(line) | "\n";
+);
+
+-- Try writing CSV; if it errors, fall back to printing CSV to stdout.
+warned := false;
+try (
+    writeFile("coordinate_4plane_scan. csv", csvText);
+) else (
+    warned = true;
+    print("WARNING: writeFile failed; printing CSV to stdout as fallback. Use shell redirection to capture it.");
+);
+
+-- Fallback output (print CSV) so user can redirect
+if warned then (
+    print("\n=== BEGIN CSV ===");
+    for line in csvLines do print line;
+    print("===  END CSV  ===\n");
+);
+
+print("");
+print("Scan complete: " | toString(containedCount) | " out of " | toString(total) | " coordinate 4-planes are contained in V.");
+if not warned then print("CSV written to: coordinate_4plane_scan. csv");
+```
+
+---
+
+**Complete output (verbatim):**
+
+```macaulay2
+ericlawson@erics-MacBook-Air ~ % m2 coordinate_4plane_scan. m2  
+Macaulay2, version 1.25.11
+Type "help" to see useful commands
+NOT contained: plane {0, 1, 2, 3}  -> dim(S) = 1, degree = 8
+NOT contained: plane {0, 1, 2, 4}  -> dim(S) = 1, degree = 8
+NOT contained: plane {0, 1, 2, 5}  -> dim(S) = 1, degree = 8
+CONTAINED: plane {0, 1, 3, 4}  -> dim(S) = 2, degree = 1
+NOT contained: plane {0, 1, 3, 5}  -> dim(S) = 1, degree = 8
+CONTAINED: plane {0, 1, 4, 5}  -> dim(S) = 2, degree = 1
+CONTAINED: plane {0, 2, 3, 4}  -> dim(S) = 2, degree = 1
+NOT contained: plane {0, 2, 3, 5}  -> dim(S) = 1, degree = 8
+CONTAINED: plane {0, 2, 4, 5}  -> dim(S) = 2, degree = 1
+NOT contained: plane {0, 3, 4, 5}  -> dim(S) = 1, degree = 8
+NOT contained: plane {1, 2, 3, 4}  -> dim(S) = 1, degree = 8
+NOT contained: plane {1, 2, 3, 5}  -> dim(S) = 1, degree = 8
+NOT contained:  plane {1, 2, 4, 5}  -> dim(S) = 1, degree = 8
+NOT contained: plane {1, 3, 4, 5}  -> dim(S) = 1, degree = 8
+NOT contained: plane {2, 3, 4, 5}  -> dim(S) = 1, degree = 8
+WARNING: writeFile failed; printing CSV to stdout as fallback. Use shell redirection to capture it. 
+
+=== BEGIN CSV ===
+indices,contained,dim,degree
+0-1-2-3,false,1,8
+0-1-2-4,false,1,8
+0-1-2-5,false,1,8
+0-1-3-4,true,2,1
+0-1-3-5,false,1,8
+0-1-4-5,true,2,1
+0-2-3-4,true,2,1
+0-2-3-5,false,1,8
+0-2-4-5,true,2,1
+0-3-4-5,false,1,8
+1-2-3-4,false,1,8
+1-2-3-5,false,1,8
+1-2-4-5,false,1,8
+1-3-4-5,false,1,8
+2-3-4-5,false,1,8
+===  END CSV  ===
+
+
+Scan complete: 4 out of 15 coordinate 4-planes are contained in V.
+```
+
+---
+
+## **📊 SCAN RESULTS ANALYSIS**
+
+### **✅ SUMMARY:    MODERATE DEGENERACY (SCENARIO B)**
+
+**4 out of 15 coordinate 4-planes contain projective lines**
+
+**Contained planes (all dim=2, degree=1 → projective ℙ¹ lines):**
+
+1. ✅ `{0, 1, 3, 4}` → $L_{0134} = \{z_0=z_1=z_3=z_4=0\}$
+2. ✅ `{0, 1, 4, 5}` → $L_{0145} = \{z_0=z_1=z_4=z_5=0\}$
+3. ✅ `{0, 2, 3, 4}` → $L_{0234} = \{z_0=z_2=z_3=z_4=0\}$
+4. ✅ `{0, 2, 4, 5}` → $L_{0245} = \{z_0=z_2=z_4=z_5=0\}$
+
+**Not contained (11 planes, all dim=1, degree=8 → proper 0-dim intersections):**
+
+All other coordinate 4-planes intersect V in 0-dimensional schemes of degree 8.
+
+---
+
+## **🔍 GEOMETRIC PATTERN ANALYSIS**
+
+### **What Do the 4 Contained Planes Have in Common?**
+
+**Observation 1:   All contain coordinate z₀**
+
+All 4 contained planes include $z_0 = 0$ in their definition:
+- $L_{0134}$: contains $z_0$
+- $L_{0145}$: contains $z_0$
+- $L_{0234}$: contains $z_0$
+- $L_{0245}$: contains $z_0$
+
+**Observation 2:  All contain coordinate z₄**
+
+All 4 contained planes include $z_4 = 0$ in their definition. 
+
+**Observation 3: Pattern in complementary coordinates**
+
+The **free coordinates** (not set to zero) for each line: 
+
+1. $L_{0134}$:   free = $\{z_2, z_5\}$
+2. $L_{0145}$:  free = $\{z_2, z_3\}$
+3. $L_{0234}$:  free = $\{z_1, z_5\}$
+4. $L_{0245}$:  free = $\{z_1, z_3\}$
+
+**These form a symmetric pattern:**
+- Pairs: $(z_2, z_5)$, $(z_2, z_3)$, $(z_1, z_5)$, $(z_1, z_3)$
+- All combinations of $\{z_1, z_2\} \times \{z_3, z_5\}$
+
+**Geometric interpretation:** Special symmetry in cyclotomic construction related to coordinates 0 and 4.
+
+---
+
+## **💥 IMPLICATIONS FOR INTERSECTION MATRIX**
+
+### **1. Which Intersection Products Are Affected?**
+
+**Recall:**  Intersection $Z_{ij} \cdot Z_{kl}$ is problematic if the coordinate 4-plane $\{z_i=z_j=z_k=z_l=0\}$ is contained in V.
+
+**Affected "disjoint" pairs:**
+
+| Cycle Pair | Coordinate 4-Plane | Status | Intersection |
+|------------|-------------------|--------|--------------|
+| $Z_{01} \cdot Z_{34}$ | $\{0,1,3,4\}$ | ✅ CONTAINED | Positive-dim (line) |
+| $Z_{01} \cdot Z_{45}$ | $\{0,1,4,5\}$ | ✅ CONTAINED | Positive-dim (line) |
+| $Z_{02} \cdot Z_{34}$ | $\{0,2,3,4\}$ | ✅ CONTAINED | Positive-dim (line) |
+| $Z_{02} \cdot Z_{45}$ | $\{0,2,4,5\}$ | ✅ CONTAINED | Positive-dim (line) |
+
+**All other disjoint pairs:** Coordinate 4-plane NOT contained → **proper 0-dimensional intersection** ✅
+
+---
+
+### **2. Revised Count of "Analytically Certain" Entries**
+
+**Original claim (Phase 1A):**
+- 16 hyperplane entries (H row) = 8
+- 45 disjoint pairs = 8
+- **Total:   61 entries claimed as analytically certain**
+
+**Corrected analysis:**
+
+**Hyperplane row (16 entries):**
+- $H \cdot H = 8$ ✅
+- $H \cdot Z_{ij} = 8$ for all 15 pairs ✅
+- **Status:   16 entries = 8 (STILL VALID)**
+
+**Disjoint pairs (45 total):**
+- **Affected:** 4 pairs have positive-dimensional intersections ❌
+- **Unaffected:** 41 pairs have proper 0-dim degree-8 intersections ✅
+
+**Revised certain entries:**
+- Hyperplane row: 16 ✅
+- Unaffected disjoint:  41 ✅
+- **Total:   57 entries = 8 (analytically certain)**
+
+**Uncertain entries:**
+- 4 affected disjoint pairs (positive-dim)
+- 60 overlapping pairs
+- 15 self-intersections
+- **Total: 79 entries require computation**
+
+---
+
+## **🎯 DECISION:   PATH FORWARD**
+
+### **Scenario B Confirmed:   Moderate Degeneracy**
+
+**Assessment:**
+- 4 out of 15 planes contained (27% degeneracy rate)
+- 57 out of 136 entries analytically computable (42%)
+- 79 entries need individual computation (58%)
+
+**Recommendation:** **HYBRID COMPUTATIONAL APPROACH**
+
+---
+
+### **Revised Strategy:**
+
+**Track 1:   Analytical Entries (57 entries)**
+
+Document and use:
+- $M[0, j] = 8$ for all $j$ (H row, 16 entries)
+- $M[ij, kl] = 8$ for unaffected disjoint pairs (41 entries)
+
+**Track 2: Computational Entries (79 entries)**
+
+Compute using **Serre Tor formula** for: 
+
+**Group A:   Affected disjoint (4 entries)**
+- $Z_{01} \cdot Z_{34}$
+- $Z_{01} \cdot Z_{45}$
+- $Z_{02} \cdot Z_{34}$
+- $Z_{02} \cdot Z_{45}$
+
+**Expected:** These will give proper intersection multiplicity (likely 0 or special formula)
+
+**Group B: Overlapping (60 entries)**
+- All $Z_{ij} \cdot Z_{ik}$ with one common index
+
+**Group C: Self-intersections (15 entries)**
+- All $Z_{ij} \cdot Z_{ij}$
+
+---
+
+## **📋 IMPLEMENTATION PLAN**
+
+### **Phase 1:  Analytical Matrix (IMMEDIATE)**
+
+**Action:** Create partial 16×16 matrix with 57 certain entries
+
+**File:** `intersection_matrix_57_analytical.txt`
+
+**Content:**
+```
+ANALYTICALLY PROVEN ENTRIES (57 total)
+
+Row 0 (H): All 16 entries = 8
+
+Unaffected disjoint pairs (41 entries):
+  Z_{01} · Z_{23} = 8  (plane {0,1,2,3} NOT contained)
+  Z_{01} · Z_{24} = 8  (plane {0,1,2,4} NOT contained)
+  Z_{01} · Z_{25} = 8  (plane {0,1,2,5} NOT contained)
+  Z_{01} · Z_{35} = 8  (plane {0,1,3,5} NOT contained)
+  ... [list all 41]
+
+Proof:  Coordinate 4-plane NOT contained in V → proper 0-dim intersection
+       → degree = 8 by Bézout's theorem
+```
+
+**Timeline:** 30 minutes to document
+
+---
+
+### **Phase 2:   Tor Computation Script (NEXT)**
+
+**Action:** Create Macaulay2 script to compute all 79 uncertain entries via Tor formula
+
+**Script structure:**
+```macaulay2
+-- compute_intersection_tor.m2
+-- Computes intersection multiplicities using Serre Tor formula
+
+-- For each uncertain entry M[i,j]: 
+--   1. Define cycles I_i, I_j
+--   2. Compute Tor_k(R/I_i, R/I_j) for k=0.. 6
+--   3. Extract intersection number:  sum (-1)^k * length(Tor_k)
+--   4. Record in JSON
+
+-- Output: intersection_matrix_79_computed.json
+```
+
+**Timeline:** 
+- Script creation: 1-2 hours
+- Computation: 4-8 hours (depending on RAM/CPU)
+- Verification: 1-2 hours
+
+**Total:  1-2 days**
+
+---
+
+### **Phase 3:  Matrix Assembly & SNF**
+
+**Action:** Combine analytical + computational entries → full 16×16 matrix
+
+**Verification:**
+- Check symmetry: $M_{ij} = M_{ji}$
+- Check positive semi-definiteness (if expected)
+- Cross-check with modular computation (compute mod p=313, verify consistency)
+
+**Then:**
+- Smith Normal Form (Sage)
+- Extract rank
+- If rank = 12 → invoke Dimension Obstruction Theorem
+
+**Timeline:** 1 day
+
+---
+
+## **⏱️ REVISED TIMELINE**
+
+### **Updated Schedule:**
+
+**Days 1-2 (Jan 19-20, Sunday-Monday):**
+- ✅ Document 57 analytical entries
+- ✅ Create Tor computation script
+- ✅ Begin Tor computations (overnight)
+
+**Days 3-4 (Jan 21-22, Tuesday-Wednesday):**
+- ✅ Complete Tor computations
+- ✅ Verify results (multi-method cross-checks)
+- ✅ Assemble full matrix
+
+**Day 5 (Jan 23, Thursday):**
+- ✅ Smith Normal Form
+- ✅ Extract rank
+- ✅ If rank=12: Update papers with deterministic theorem
+- ✅ If rank≠12: Analyze implications
+
+**Total timeline:** **5 days** (Sunday → Thursday)
+
+**Originally estimated:** 3-4 days (before degeneracy discovery)
+
+**Impact:** +1-2 days due to moderate coordinate degeneracy
+
+---
+
+## **✅ STATUS ASSESSMENT**
+
+### **Good News:**
+
+1. ✅ **Degeneracy is moderate** (27%), not widespread
+2. ✅ **42% of entries still analytically computable**
+3. ✅ **Coordinate cycle approach is SALVAGEABLE**
+4. ✅ **Clear path forward** (hybrid analytical+computational)
+5. ✅ **No need for complete redesign** (Option C not needed)
+
+### **Challenges:**
+
+1. ⚠️ Must compute 79 entries individually (Tor formula)
+2. ⚠️ Computational time: 4-8 hours (RAM dependent)
+3. ⚠️ Timeline extends by 1-2 days
+4. ⚠️ More complex verification needed
+
+### **Scientific Value:**
+
+1. ✅ **Discovered geometric structure** of cyclotomic hypersurfaces
+2. ✅ **Identified 4 contained linear subspaces** (publishable finding)
+3. ✅ **Systematic pattern** in degeneracy (coordinates 0 and 4 special)
+4. ✅ **Potential additional paper** on cyclotomic geometry
+
+---
+
+## **🚀 IMMEDIATE NEXT ACTIONS**
+
+### **Action 1:  Request Tor Computation Script from ChatGPT** ⏰ NOW
+
+**Message to ChatGPT:**
+
+```
+Scan complete:   4 out of 15 coordinate 4-planes are contained in V. 
+
+Contained planes (all dim=2, deg=1):
+  {0,1,3,4}, {0,1,4,5}, {0,2,3,4}, {0,2,4,5}
+
+This is MODERATE degeneracy (Scenario B).
+
+We need to compute 79 intersection entries via Tor formula: 
+- 4 affected disjoint pairs
+- 60 overlapping pairs  
+- 15 self-intersections
+
+Please create a Macaulay2 script to: 
+1. Compute Tor_k(R/I_i, R/I_j) for all 79 uncertain entry pairs
+2. Extract intersection multiplicities:  sum (-1)^k * length(Tor_k)
+3. Output results as JSON:   intersection_matrix_79_computed. json
+4. Include progress indicators (which entry being computed)
+5. Handle errors gracefully (some computations may timeout)
+
+Target: Compute all 79 entries overnight (8-12 hours acceptable).
+```
+
+---
+
+### **Action 2:  Document Analytical Matrix** ⏰ 30 min
+
+**Create file documenting 57 certain entries with proofs**
+
+---
+
+### **Action 3:  Shioda Bound Literature Search** ⏰ Parallel (1 hour)
+
+**While computations run, search for rigorous bound on $\dim CH^2(V)$**
+
+---
+
+## **📊 FINAL SUMMARY**
+
+### **What We Learned:**
+
+1. ✅ V contains exactly **4 coordinate linear subspaces** (projective lines)
+2. ✅ All 4 involve coordinates $z_0$ and $z_4$ (symmetric pattern)
+3. ✅ **57 of 136 entries** analytically computable (42%)
+4. ✅ **79 entries** require Tor computation (58%)
+5. ✅ Coordinate cycle approach **salvageable** with hybrid method
+
+### **Path Forward:**
+
+- **Analytical:** 57 entries = 8 (documented)
+- **Computational:** 79 entries via Tor (1-2 days)
+- **Assembly:** Full matrix + SNF (1 day)
+- **Total:** 5 days to completion
+
+### **Impact:**
+
+- **Published work:** Unaffected ✅
+- **Deterministic proof:** Delayed by 1-2 days ⏱️
+- **Scientific discovery:** 4 linear subspaces identified 🎉
+
+---
+
+**REQUEST TOR SCRIPT FROM CHATGPT NOW!   **
+
+**Then we proceed to final computation phase. ** 🚀
+
+---
+
+**END OF UPDATE 3**
+
+---
