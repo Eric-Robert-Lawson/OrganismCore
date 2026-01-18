@@ -246,52 +246,132 @@ $$Z_{01} \cdot Z_{01} = ? $$
 **Macaulay2 Test Script:**
 
 ```macaulay2
--- test_intersection_numbers. m2
--- Test three representative intersection cases
+-- test_intersection_numbers.m2
+-- Robust diagnostics using Lists (no HashTables), explicit printing.
+-- Builds cyclotomic F mod p, saturates intersections, and slices positive-dim components.
 
-needsPackage "Cyclotomic"
+p = 313;
+if (p % 13 != 1) then error "Prime p must be 1 mod 13";
 
--- Prime and setup
-p = 313
-Fp = ZZ/p
-w = primitiveRoot(13, Fp)
-R = Fp[z_0.. z_5]
+-- find integer representative g with g^13 ≡ 1 (mod p), g != 1
+g = 0;
+for a from 2 to (p-1) do (
+    if ((a^13 % p) == 1 and (a % p) != 1) then ( g = a; break; );
+);
+if g == 0 then error "No nontrivial 13th-root representative found; choose a different prime";
+
+print("prime p = " | toString p);
+print("g (integer rep) = " | toString g);
+
+-- Polynomial ring and vars
+R = GF p[z_0..z_5];
+vs = flatten entries vars R;
+
+-- Precompute coeffs
+coeffs = {};
+for kk from 0 to 12 do (
+    row = {};
+    for jj from 0 to 5 do ( row = append(row, (g^(kk*jj)) % p); );
+    coeffs = append(coeffs, row);
+);
+
+-- Build linear forms Lforms
+Lforms = {};
+for kk from 0 to 12 do (
+    tmp = 0 * vs#0;
+    for j from 0 to 5 do ( tmp = tmp + (coeffs#kk#j) * vs#j; );
+    Lforms = append(Lforms, tmp);
+);
 
 -- Cyclotomic polynomial F
-F = sum(0..12, k -> (sum(0.. 5, j -> w^(k*j)*z_j))^8)
+F = 0 * vs#0;
+for kk from 0 to 12 do ( F = F + (Lforms#kk)^8; );
 
--- Helper function:  compute intersection number via Tor
-intersectionTor = (I1, I2) -> (
-    T := for i from 0 to 6 list Tor_i(R/I1, R/I2);
-    sum(0..6, i -> (-1)^i * degree T_i)
-)
+-- helper: compute saturated intersection and diagnostics (return a List)
+relevant = ideal(vs);
+computeDiagList = I1 -> I2 -> (
+    S := saturate(I1 + I2, relevant);
+    d := dim S;
+    if d === (-infty) then (
+        return {"empty", d, 0, null, 0, null}; -- status, dim, degree, ideal, assocCount, assocPrimes
+    ) else if d === 0 then (
+        deg := degree S;
+        return {"zero-dim", d, deg, S, 0, null};
+    ) else (
+        ap := associatedPrimes S;
+        gensShort := gens S;
+        return {"positive-dim", d, null, S, #ap, ap};
+    )
+);
 
--- Test 1: Z_{01} · Z_{34} (disjoint, expect 8)
-print "Test 1: Z_{01} · Z_{34} (disjoint)"
-I_V = ideal(F)
-I_01 = ideal(F, z_0, z_1)
-I_34 = ideal(F, z_3, z_4)
-result1 = intersectionTor(I_01, I_34)
-print("  Result:  " | toString result1)
-print("  Expected: 8")
-print("  Match:  " | toString(result1 == 8))
+-- slicing helper: cut positive-dim component by 'cuts' random hyperplanes, trials times
+sliceAndDegree = (S, cuts, trials) -> (
+    results = {};
+    for t from 1 to trials do (
+        Ls = {};
+        for r from 1 to cuts do (
+            coeffsRnd = for i from 0 to 5 list (random(1..(p-1)));
+            lin = 0 * vs#0;
+            for i from 0 to 5 do lin = lin + (coeffsRnd#i) * vs#i;
+            Ls = append(Ls, lin);
+        );
+        Icut := S + ideal Ls;
+        Scut := saturate(Icut, relevant);
+        if dim Scut === 0 then deg := degree Scut else deg := "posDim=" | toString(dim Scut);
+        results = append(results, deg);
+    );
+    results
+);
 
--- Test 2: Z_{01} · Z_{02} (overlapping)
-print "\nTest 2: Z_{01} · Z_{02} (overlapping)"
-I_02 = ideal(F, z_0, z_2)
-result2 = intersectionTor(I_01, I_02)
-print("  Result: " | toString result2)
+-- Build cycle ideals (include F to ensure contained in V)
+I_V = ideal(F);
+I_01 = ideal(F, vs#0, vs#1);
+I_34 = ideal(F, vs#3, vs#4);
+I_02 = ideal(F, vs#0, vs#2);
 
--- Test 3: Z_{01} · Z_{01} (self-intersection)
-print "\nTest 3: Z_{01} · Z_{01} (self-intersection)"
-result3 = intersectionTor(I_01, I_01)
-print("  Result: " | toString result3)
+-- Compute diagnostics
+out1 = computeDiagList(I_01, I_34);
+out2 = computeDiagList(I_01, I_02);
+out3 = computeDiagList(I_01, I_01);
 
--- Summary
-print "\n=== SUMMARY ==="
-print("Disjoint: " | toString result1 | " (expect 8)")
-print("Overlapping: " | toString result2)
-print("Self:  " | toString result3)
+-- Print helper
+printListDiag = (label, L) -> (
+    print("\n== " | label | " ===============");
+    print("status: " | toString(L#0));
+    print("dim: " | toString(L#1));
+    print("degree (if zero-dim): " | toString(L#2));
+    print("associated primes count (if positive-dim): " | toString(L#4));
+    if L#4 > 0 then (
+        print("first up to 3 associated primes:");
+        for i from 0 to (min(2, L#4-1)) do print(L#5#i);
+    );
+    print("short gens of saturated ideal (if shown):");
+    if L#3 =!= null then print(gens L#3) else print "nil";
+);
+
+-- Print results
+printListDiag("Z_{01} · Z_{34} (disjoint)", out1);
+printListDiag("Z_{01} · Z_{02} (overlapping)", out2);
+printListDiag("Z_{01} · Z_{01} (self)", out3);
+
+-- If positive-dim, perform slicing tests
+if out2#0 === "positive-dim" then (
+    cuts = out2#1;
+    if cuts <= 0 then cuts = 1;
+    print("\nSlicing overlapping intersection by " | toString cuts | " random hyperplane(s), 5 trials:");
+    sres = sliceAndDegree(out2#3, cuts, 5);
+    print(sres);
+);
+
+if out3#0 === "positive-dim" then (
+    cuts = out3#1;
+    if cuts <= 0 then cuts = 1;
+    print("\nSlicing self-intersection by " | toString cuts | " random hyperplane(s), 5 trials:");
+    sres3 = sliceAndDegree(out3#3, cuts, 5);
+    print(sres3);
+);
+
+print "\n== End of diagnostics ==";
 ```
 
 **Expected runtime:** 5-30 minutes (depending on Macaulay2 performance)
@@ -300,6 +380,191 @@ print("Self:  " | toString result3)
 - 3 intersection numbers
 - Verification that method works
 - Data for MathOverflow post (if needed)
+
+**IMPORTANT:**
+After failure with concating we needed to do this into the macaulay2 REPL terminal to see results:
+
+```macaulay2
+-- Setup (copy-paste all at once)
+p = 313;
+g = 27;
+R = GF p[z_0..  z_5];
+vs = flatten entries vars R;
+
+-- Build coefficients
+coeffs = {};
+for kk from 0 to 12 do (
+    row = {};
+    for jj from 0 to 5 do ( row = append(row, (g^(kk*jj)) % p); );
+    coeffs = append(coeffs, row);
+);
+
+-- Build linear forms
+Lforms = {};
+for kk from 0 to 12 do (
+    tmp = 0 * vs#0;
+    for j from 0 to 5 do ( tmp = tmp + (coeffs#kk#j) * vs#j; );
+    Lforms = append(Lforms, tmp);
+);
+
+-- Cyclotomic polynomial F
+F = 0 * vs#0;
+for kk from 0 to 12 do ( F = F + (Lforms#kk)^8; );
+
+-- Define ideals
+I_V = ideal(F);
+I_01 = ideal(F, vs#0, vs#1);
+I_34 = ideal(F, vs#3, vs#4);
+I_02 = ideal(F, vs#0, vs#2);
+
+-- Helper
+relevant = ideal(vs);
+
+-- ==========================================
+-- TEST 1: Disjoint (EXPECT 8)
+-- ==========================================
+S1 = saturate(I_01 + I_34, relevant);
+print "=== TEST 1: Z_{01} · Z_{34} (disjoint) ==="
+print("dim S1 = " | toString(dim S1))
+print("degree S1 = " | toString(degree S1))
+
+-- ==========================================
+-- TEST 2: Overlapping (UNKNOWN)
+-- ==========================================
+S2 = saturate(I_01 + I_02, relevant);
+print ""
+print "=== TEST 2: Z_{01} · Z_{02} (overlapping) ==="
+print("dim S2 = " | toString(dim S2))
+if dim S2 == 0 then (
+    print("degree S2 = " | toString(degree S2))
+) else (
+    print("Status: positive-dimensional (need Tor or slicing)")
+)
+
+-- ==========================================
+-- TEST 3: Diagnostic only (NOT self-intersection)
+-- ==========================================
+S3 = I_01;  -- Just I_01 itself
+print ""
+print "=== TEST 3 (diagnostic): dim of I_01 ==="
+print("dim I_01 = " | toString(dim S3))
+print("(Self-intersection requires different method)")
+```
+
+we obtain:
+
+```macaulay2
+ericlawson@erics-MacBook-Air ~ % m2 test_intersection_numbers.m2  
+Macaulay2, version 1.25.11
+Type "help" to see useful commands
+prime p = 313
+g (integer rep) = 27
+test_intersection_numbers.m2:72:55:(3):[6]: warning: local declaration of deg shields variable with same name
+
+== Z_{01} · Z_{34} (disjoint) ===============
+test_intersection_numbers.m2:92:33:(3):[8]: error: expected a list, sequence, string, net, hash table, database, or dictionary
+test_intersection_numbers.m2:92:33:(3): entering debugger (enter 'help' to see commands)
+test_intersection_numbers.m2:92:32-92:35: --source code:
+    print("status: " | toString(L#0));
+
+i1 : 
+i1 : -- Setup (copy-paste all at once)
+p = 313;
+g = 27;
+R = GF p[z_0..  z_5];
+vs = flatten entries vars R;
+
+-- Build coefficients
+coeffs = {};
+for kk from 0 to 12 do (
+    row = {};
+    for jj from 0 to 5 do ( row = append(row, (g^(kk*jj)) % p); );
+    coeffs = append(coeffs, row);
+);
+
+-- Build linear forms
+Lforms = {};
+for kk from 0 to 12 do (
+    tmp = 0 * vs#0;
+    for j from 0 to 5 do ( tmp = tmp + (coeffs#kk#j) * vs#j; );
+    Lforms = append(Lforms, tmp);
+);
+
+-- Cyclotomic polynomial F
+F = 0 * vs#0;
+for kk from 0 to 12 do ( F = F + (Lforms#kk)^8; );
+
+-- Define ideals
+I_V = ideal(F);
+I_01 = ideal(F, vs#0, vs#1);
+I_34 = ideal(F, vs#3, vs#4);
+I_02 = ideal(F, vs#0, vs#2);
+
+-- Helper
+relevant = ideal(vs);
+
+-- ==========================================
+-- TEST 1: Disjoint (EXPECT 8)
+-- ==========================================
+S1 = saturate(I_01 + I_34, relevant);
+print "=== TEST 1: Z_{01} · Z_{34} (disjoint) ==="
+print("dim S1 = " | toString(dim S1))
+print("degree S1 = " | toString(degree S1))
+
+-- ==========================================
+-- TEST 2: Overlapping (UNKNOWN)
+-- ==========================================
+S2 = saturate(I_01 + I_02, relevant);
+print ""
+print "=== TEST 2: Z_{01} · Z_{02} (overlapping) ==="
+print("dim S2 = " | toString(dim S2))
+if dim S2 == 0 then (
+    print("degree S2 = " | toString(degree S2))
+) else (
+    print("Status: positive-dimensional (need Tor or slicing)")
+)
+
+-- ==========================================
+-- TEST 3: Diagnostic only (NOT self-intersection)
+-- ==========================================
+S3 = I_01;  -- Just I_01 itself
+print ""
+print "=== TEST 3 (diagnostic): dim of I_01 ==="
+print("dim I_01 = " | toString(dim S3))
+print("(Self-intersection requires different method)")
+
+o11 : Ideal of R
+
+o12 : Ideal of R
+
+o13 : Ideal of R
+
+o14 : Ideal of R
+
+o15 : Ideal of R
+
+o16 : Ideal of R
+=== TEST 1: Z_{01} · Z_{34} (disjoint) ===
+dim S1 = 2
+degree S1 = 1
+
+o20 : Ideal of R
+
+=== TEST 2: Z_{01} · Z_{02} (overlapping) ===
+dim S2 = 2
+Status: positive-dimensional (need Tor or slicing)
+
+o25 : Ideal of R
+
+=== TEST 3 (diagnostic): dim of I_01 ===
+dim I_01 = 3
+(Self-intersection requires different method)
+
+i30 : 
+```
+
+**IMPORTANT!!!**
+continue to update 2 to understand what this means!
 
 ---
 
