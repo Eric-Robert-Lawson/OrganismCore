@@ -1,6 +1,7 @@
 {
   "num_isolated": 401,
-  "num_algebraic": 8,
+  "num_algebraic": 24,
+  "algebraic_sample_size": 24,
   "highly_significant_metrics": [
     "entropy",
     "kolmogorov",
@@ -8,14 +9,15 @@
   ],
   "top_candidate": {
     "monomial": [
-      9,
       2,
-      2,
-      2,
+      12,
       1,
-      2
+      1,
+      1,
+      1
     ],
-    "entropy": 2.1405180562767114,
-    "distance": 0.6839171495326692
+    "entropy": 1.6688388898504305,
+    "kolmogorov": 12,
+    "distance": 0.4727157986722892
   }
 }
