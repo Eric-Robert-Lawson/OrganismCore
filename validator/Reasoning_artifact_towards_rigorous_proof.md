@@ -9,7 +9,7 @@
 **Zenodo DOI (Gap Theorem):** 10.5281/zenodo.14428474  
 
 **IMPORTANT:**
-Any files to run that are explicitly put in this file are only located in this reasoning artifact! This is to make things less complicated, and this needs to be remembered throughout this article.
+Any files to run that are explicitly put in this file are only located in this reasoning artifact! This is to make things less complicated, and this needs to be remembered throughout this article. Additionally scripts may contain errors such as having a space where it should not be, if that is case just make the fix and continue!
 
 ---
 
