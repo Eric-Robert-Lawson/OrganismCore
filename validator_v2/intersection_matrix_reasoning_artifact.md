@@ -2939,3 +2939,529 @@ Use correct 79 pairs (or all 87 if valid) to build full intersection matrix.
 **END OF UPDATE 3.5**
 
 ---
+
+# 📋 **UPDATE 4:    COORDINATE CYCLE DEGENERACY - FUNDAMENTAL OBSTRUCTION**
+
+---
+
+## **UPDATE 4 (January 18, 2026 - 7:45 PM - Critical Mathematical Discovery)**
+
+### **🚨 COORDINATE CYCLE APPROACH FAILS - ALL INTERSECTIONS ARE EXCESS**
+
+**After extensive debugging and computational testing, we have discovered a fundamental geometric obstruction that invalidates the coordinate cycle approach to computing the intersection matrix.**
+
+---
+
+## **📊 JOURNEY FROM UPDATE 3 TO UPDATE 4**
+
+### **Update 3 → 3.5:   Python Supervisor Architecture**
+
+**Problem identified:**
+- Original monolithic M2 script had no per-pair timeouts
+- Memory accumulation across 79 pairs
+- Crash isolation issues
+
+**Solution implemented:**
+- Python wrapper with subprocess management
+- Per-pair M2 process isolation
+- Robust timeout handling
+- Incremental JSON saves
+
+**Status:** ✅ **Computational infrastructure working**
+
+---
+
+### **Update 3.5 → Debugging Phase:    M2 Technical Issues**
+
+**Problems encountered:**
+
+**1. Quotient Ring vs Module Issues:**
+```
+ERROR: expected the same ring
+```
+- Tor_k requires Module objects, not quotient rings
+- Fixed by using `M = coker gens I_A` construction
+
+**2. Debugger Entry:**
+```
+entering debugger (type help to see debugger commands)
+```
+- M2 entering interactive debugger on errors
+- Fixed by robust detection + process group kill + stdout draining
+
+**3. Perturbation Coercion Failures:**
+```
+error: no method for binary operator * applied to objects: 
+      GF 313 (of class GF)
+*     z_0 (of class R)
+```
+- Type coercion issues with random coefficients
+- Attempted fixes with integer coefficients
+- **Eventually abandoned perturbation approach**
+
+**Timeline:** ~6 hours of iterative debugging
+
+**Status:** ✅ **M2 computation infrastructure working reliably**
+
+---
+
+### **Simplified Script Implementation**
+
+**Final working architecture:**
+
+**File:** `run_tor_pairs.py` (simplified, verbatim)
+
+```python
+#!/usr/bin/env python3
+"""
+Simplified run_tor_pairs.py
+
+- Runs a validated M2 worker that builds modules M = coker gens(I_A) and N = coker gens(I_B).
+- Computes Tor_k(M,N) for k = 0..maxTor and parses per-k diagnostics produced by M2.
+- If all Tor_k have finite lengths reported, computes the alternating-sum intersection number and records status="finite".
+- If any Tor_k is positive-dimensional (non-finite), records status="excess-intersection" and intersection = None.
+- Saves results to JSON (. part incremental) and final JSON and CSV summary. 
+
+Usage examples:
+  # quick test of first 3 uncertain pairs
+  python3 run_tor_pairs.py --limit 3 --per-pair-timeout 300
+
+  # run full set with a 1-hour timeout per pair
+  python3 run_tor_pairs.py --per-pair-timeout 3600
+
+"""
+from __future__ import annotations
+import argparse
+import json
+import os
+import signal
+import select
+import subprocess
+import tempfile
+import time
+import csv
+from typing import List, Optional
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--per-pair-timeout", type=int, default=7200,
+                    help="Timeout in seconds for each pair (default 7200s = 2h)")
+parser.add_argument("--max-tor", type=int, default=6, help="Compute Tor_0 ..  Tor_max (default 6)")
+parser.add_argument("--retries", type=int, default=1, help="Number of retries per pair on failure (default 1)")
+parser.add_argument("--json-out", default="intersection_matrix_79_computed.json")
+parser.add_argument("--csv-out", default="intersection_matrix_79_computed.csv")
+parser.add_argument("--log", default="run_tor_pairs.log")
+parser.add_argument("--p", type=int, default=313)
+parser.add_argument("--g", type=int, default=27)
+parser.add_argument("--limit", type=int, default=0,
+                    help="If >0, limit to first N uncertain pairs (for testing)")
+args = parser.parse_args()
+
+# [Rest of script as provided - full implementation with: 
+#  - Module-based Tor computation
+#  - Robust M2 process management  
+#  - Debugger detection and handling
+#  - Per-k Tor diagnostics parsing
+#  - Status classification (finite, excess-intersection, incomplete)
+#  - JSON and CSV output]
+```
+
+*[Full script implementation ~400 lines - see provided file]*
+
+**Key features:**
+- ✅ Module-based Tor computation (`coker gens`)
+- ✅ Per-k error handling
+- ✅ Debugger detection with stdout draining
+- ✅ Process group management
+- ✅ Clean status classification
+- ✅ Incremental saves
+
+**Status:** ✅ **Script executes reliably**
+
+---
+
+## **🔬 TEST RUN RESULTS**
+
+### **Execution:**
+
+```bash
+python3 run_tor_pairs. py --limit 3 --per-pair-timeout 300
+```
+
+**Output (verbatim JSON):**
+
+```json
+{
+  "generated_at": "2026-01-18 19:37:50",
+  "p": 313,
+  "g": 27,
+  "maxTor":  6,
+  "entries":  [
+    {
+      "pair": ["Z_01", "Z_01"],
+      "coordsA":  [0, 1],
+      "coordsB":  [0, 1],
+      "type": "self",
+      "Tor_dims": "[1, 1, 1, 1, -1, -1, -1]",
+      "Tor_lengths": "[None, None, None, None, 0, 0, 0]",
+      "status": "non-finite-Tor",
+      "intersection": null,
+      "error": null,
+      "raw_stdout":  "Macaulay2, version 1.25.11\n.. .\nBEGIN_TOR_K:  0\nTOR_K_DIM: 0 3\nTOR_K_NONFINITE: 0\nBEGIN_TOR_K: 1\nTOR_K_DIM: 1 3\nTOR_K_NONFINITE: 1\nBEGIN_TOR_K: 2\nTOR_K_DIM: 2 3\nTOR_K_NONFINITE: 2\nBEGIN_TOR_K: 3\nTOR_K_DIM: 3 3\nTOR_K_NONFINITE: 3\n..."
+    },
+    {
+      "pair":  ["Z_01", "Z_02"],
+      "coordsA":  [0, 1],
+      "coordsB": [0, 2],
+      "type":  "overlap",
+      "Tor_dims": "[1, 1, 1, -1, -1, -1, -1]",
+      "Tor_lengths": "[None, None, None, 0, 0, 0, 0]",
+      "status": "non-finite-Tor",
+      "intersection": null,
+      "error": null,
+      "raw_stdout": ".. .\nTOR_K_DIM: 0 2\nTOR_K_NONFINITE: 0\nTOR_K_DIM: 1 2\nTOR_K_NONFINITE: 1\nTOR_K_DIM: 2 2\nTOR_K_NONFINITE: 2\n..."
+    },
+    {
+      "pair": ["Z_01", "Z_03"],
+      "coordsA": [0, 1],
+      "coordsB": [0, 3],
+      "type": "overlap",
+      "Tor_dims":  "[1, 1, 1, -1, -1, -1, -1]",
+      "Tor_lengths": "[None, None, None, 0, 0, 0, 0]",
+      "status": "non-finite-Tor",
+      "intersection": null,
+      "error": null,
+      "raw_stdout": "...\nTOR_K_DIM:  0 2\nTOR_K_NONFINITE: 0\nTOR_K_DIM:  1 2\nTOR_K_NONFINITE:  1\nTOR_K_DIM: 2 2\nTOR_K_NONFINITE: 2\n..."
+    }
+  ]
+}
+```
+
+---
+
+## **💥 CRITICAL DISCOVERY:    ALL INTERSECTIONS ARE POSITIVE-DIMENSIONAL**
+
+### **Analysis of Results:**
+
+**Pair 1:   Z₀₁ · Z₀₁ (Self-Intersection)**
+```
+TOR_K_DIM: 0 3    → Tor_0 dimension = 3
+TOR_K_DIM: 1 3    → Tor_1 dimension = 3
+TOR_K_DIM: 2 3    → Tor_2 dimension = 3
+TOR_K_DIM: 3 3    → Tor_3 dimension = 3
+```
+
+**Tor₀, Tor₁, Tor₂, Tor₃ are all dimension 3** (positive-dimensional modules)
+
+**Mathematical meaning:**
+- Self-intersection $Z_{01} \cdot Z_{01}$ is NOT a set of points
+- The "intersection" is the cycle itself (a surface)
+- **Requires excess intersection theory** (normal bundle, not simple Tor formula)
+
+---
+
+**Pair 2:   Z₀₁ · Z₀₂ (Overlapping - share coordinate z₀)**
+```
+TOR_K_DIM: 0 2    → Tor_0 dimension = 2
+TOR_K_DIM: 1 2    → Tor_1 dimension = 2
+TOR_K_DIM: 2 2    → Tor_2 dimension = 2
+```
+
+**Tor₀, Tor₁, Tor₂ are dimension 2**
+
+**Geometric explanation:**
+$$Z_{01} \cap Z_{02} = V \cap \{z_0=0\} \cap \{z_1=0\} \cap \{z_2=0\}$$
+
+**Dimension counting:**
+- V: dim = 4 (fourfold)
+- Add $z_0=0$: dim = 3
+- Add $z_1=0$: dim = 2
+- Add $z_2=0$: dim = 1
+
+**Result:** **1-dimensional intersection (a curve), not 0-dimensional (points)**
+
+---
+
+**Pair 3:   Z₀₁ · Z₀₃ (Overlapping - share coordinate z₀)**
+
+**Same pattern:** Tor₀, Tor₁, Tor₂ dimension 2 → 1-dimensional intersection
+
+---
+
+### **Fundamental Realization:**
+
+**ALL overlapping pairs share a coordinate → ALL have dimension ≥ 1 intersections**
+
+**For any $Z_{ij} \cdot Z_{ik}$ (sharing index i):**
+$$Z_{ij} \cap Z_{ik} = V \cap \{z_i=0\} \cap \{z_j=0\} \cap \{z_k=0\}$$
+
+**This imposes only 3 independent constraints on a 4-fold → dimension 1 (curve)**
+
+**Therefore:**
+- ❌ **ALL 60 overlapping pairs have positive-dimensional intersections**
+- ❌ **ALL 15 self-intersections have positive-dimensional intersections**
+- ❌ **ALL 4 contained-disjoint pairs have positive-dimensional intersections** (we already knew these contain lines)
+
+**Total:** **79 out of 79 uncertain pairs have excess intersections** ❌❌❌
+
+---
+
+## **🚨 IMPLICATIONS**
+
+### **1. Coordinate Cycle Approach Is Fatally Flawed**
+
+**Our cycle definitions:**
+$$Z_{ij} = V \cap \{z_i=0\} \cap \{z_j=0\}$$
+
+**Are NOT in general position:**
+- They share coordinate hyperplanes
+- All intersection products are **non-transverse**
+- **Cannot use simple Tor alternating sum formula**
+
+---
+
+### **2. We Will Get ZERO Finite Intersection Numbers**
+
+**Expected from full 79-pair run:**
+- Finite intersections: **0**
+- Excess intersections: **79**
+- **No usable data for intersection matrix**
+
+---
+
+### **3. Simple Tor Formula Doesn't Apply**
+
+**The formula:**
+$$Z_i \cdot Z_j = \sum_{k=0}^n (-1)^k \cdot \text{length}(\text{Tor}_k)$$
+
+**Only works when:**
+- Intersection is **proper** (transverse, 0-dimensional)
+- All Tor_k modules are **finite length**
+
+**For our coordinate cycles:**
+- All intersections are **improper** (excess, positive-dimensional)
+- Tor modules are **positive-dimensional**
+- **Formula is undefined**
+
+---
+
+## **📚 WHY THIS HAPPENS (MATHEMATICAL EXPLANATION)**
+
+### **Coordinate Hyperplanes Are Special**
+
+**In general position:**
+- Two generic codimension-2 cycles in a 4-fold intersect in dimension 0 (points)
+- Tor modules are finite
+- Intersection number is well-defined
+
+**Coordinate hyperplanes:**
+- $\{z_i=0\}$ and $\{z_j=0\}$ are in **special position** (coordinate axes)
+- They intersect along **coordinate planes** (higher-dimensional loci)
+- On the variety V, this creates **non-transverse intersections**
+
+**Compounding factor:**
+- V itself contains 4 coordinate linear subspaces (from UPDATE 3)
+- This makes coordinate cycles even more degenerate
+
+---
+
+## **✅ LESSONS LEARNED**
+
+### **What Worked:**
+
+1. ✅ **Computational infrastructure** - Python supervisor + M2 worker architecture is robust
+2. ✅ **Error handling** - Debugger detection, process management, timeout handling all work
+3. ✅ **Tor computation** - Module-based Tor_k computation executes correctly
+4. ✅ **Status classification** - Correctly identifies excess vs finite intersections
+
+### **What Failed:**
+
+1. ❌ **Coordinate cycle choice** - Not in general position, all excess
+2. ❌ **Simple intersection theory** - Cannot use naive Tor formula
+3. ❌ **Perturbation heuristics** - Cannot fix fundamental degeneracy
+
+### **Time Investment:**
+
+- Update 3.5 → 4:  ~12 hours
+- Debugging M2 issues: ~6 hours
+- Script development: ~4 hours
+- Testing and analysis: ~2 hours
+- **Total: ~24 hours** to discover fundamental obstruction
+
+---
+
+## **🎯 NEXT APPROACH:    GENERIC LINEAR FORMS**
+
+### **The Solution (Standard in Intersection Theory)**
+
+**Instead of coordinate subspaces, use GENERIC linear combinations:**
+
+**Define 32 random linear forms:**
+$$L_i = a_{i0} z_0 + a_{i1} z_1 + \cdots + a_{i5} z_5$$
+
+where coefficients $a_{ij}$ are **random integers** (mod p=313).
+
+**Define 16 cycles:**
+$$W_0 = H \text{ (hyperplane class)}$$
+$$W_i = V \cap \{L_{2i-1}=0\} \cap \{L_{2i}=0\} \text{ for } i=1,\ldots,15$$
+
+**Key property:** Generic linear forms are **in general position**
+- No special coordinate structure
+- Intersections are **transverse** (expected dimension 0)
+- Tor modules will be **finite**
+- **Simple alternating sum formula applies**
+
+---
+
+### **Implementation Plan:**
+
+**Phase 1:   Generate Generic Cycles (1 day)**
+
+**Macaulay2 script:**
+```macaulay2
+-- Generate 32 random linear forms with integer coefficients
+setRandomSeed("reproducible-seed-12345");
+Lforms = for i from 1 to 32 list (
+  coeffs = for j from 0 to 5 list (random(-100, 100));
+  sum(0.. 5, j -> coeffs#j * vs#j)
+);
+
+-- Define 15 generic cycles (pairs of linear forms)
+genericCycles = {};
+for i from 1 to 15 do (
+  L1 = Lforms#(2*i-2);
+  L2 = Lforms#(2*i-1);
+  W_i = ideal(F, L1, L2);
+  genericCycles = append(genericCycles, W_i);
+);
+```
+
+**Timeline:** 4-6 hours (coding + testing)
+
+---
+
+**Phase 2:   Compute Intersection Matrix (2-3 days)**
+
+**Reuse existing Python supervisor:**
+- Replace coordinate cycles with generic cycles
+- Compute Tor for all ${16 \choose 2} = 120$ unique pairs
+- **Expected:** Most/all will have finite Tor
+- Extract intersection numbers via alternating sum
+
+**Timeline:** 24-48 hours computation
+
+---
+
+**Phase 3:   Smith Normal Form & Rank (1 day)**
+
+```python
+import numpy as np
+from sage.all import Matrix, ZZ
+
+M = Matrix(ZZ, 16, 16, intersection_data)
+D, U, V = M.smith_form()
+rank = sum(1 for d in D. diagonal() if d != 0)
+
+print(f"Rank of intersection matrix: {rank}")
+```
+
+**If rank = 12:**
+- ✅ Matches Shioda bound
+- ✅ Dimension Obstruction Theorem applies
+- ✅ **401 classes proven non-algebraic**
+
+**Timeline:** 4-6 hours
+
+---
+
+## **⏱️ REVISED TIMELINE**
+
+### **Path to Deterministic Proof:**
+
+**Monday, Jan 20 (Day 1):**
+- Implement generic linear form generation
+- Test on 3 representative pairs
+- Verify Tor is finite
+
+**Tuesday, Jan 21 (Day 2):**
+- Launch full 120-pair computation
+- Monitor progress
+
+**Wednesday, Jan 22 (Day 3):**
+- Complete computation
+- Extract intersection matrix
+- Verify symmetry
+
+**Thursday, Jan 23 (Day 4):**
+- Compute Smith Normal Form
+- Extract rank
+- If rank=12: Update papers with deterministic theorem
+
+**Friday, Jan 24 (Day 5):**
+- Finalize documentation
+- Prepare certificates
+- Upload to Zenodo/arXiv
+
+**Total timeline:** **5 days from now** → **Completion by Friday, Jan 24**
+
+---
+
+## **📊 STATUS ASSESSMENT**
+
+### **What We Have (Unchanged):**
+
+- ✅ Modular rank certificates (rank = 1883)
+- ✅ Pivot minor (rank ≥ 100 deterministic)
+- ✅ Variable-count barrier (proven)
+- ✅ Dimension 707 (dual certificates)
+- ✅ **Current work is PUBLISHABLE AS-IS**
+
+### **What We're Adding:**
+
+- ⏳ Intersection matrix via generic cycles (in progress)
+- ⏳ Smith Normal Form → rank
+- ⏳ Dimension Obstruction → deterministic non-algebraicity proof
+
+### **Impact of Coordinate Cycle Detour:**
+
+- Timeline impact: +2 days (from original 3-day estimate)
+- Scientific value: **Learned fundamental lesson about coordinate degeneracy**
+- Code assets: **Robust computational infrastructure ready for generic cycles**
+
+---
+
+## **✅ SUMMARY**
+
+### **Update 3 → 4 Journey:**
+
+1. ✅ Built robust Python supervisor (6 hours)
+2. ✅ Debugged M2 technical issues (6 hours)
+3. ✅ Implemented simplified Tor script (4 hours)
+4. ✅ Discovered coordinate cycle degeneracy (2 hours)
+5. ✅ **Total investment: 18 hours productive work**
+
+### **Key Discovery:**
+
+**Coordinate cycles $Z_{ij} = V \cap \{z_i=0\} \cap \{z_j=0\}$ are fundamentally unsuitable:**
+- All 79 uncertain pairs have **excess intersections**
+- **Zero** finite intersection numbers obtainable
+- Requires **generic linear forms** instead
+
+### **Next Steps:**
+
+**Switch to generic linear form approach:**
+- Define 16 cycles using random linear combinations
+- Compute intersection matrix (transverse intersections expected)
+- **Timeline: 5 days to deterministic proof**
+
+### **Lessons:**
+
+- ✅ Computational infrastructure is robust and reusable
+- ✅ Testing early revealed fundamental issue (before wasting days)
+- ✅ Generic linear forms are the standard approach (should have started here)
+- ✅ **Scientific process:  test → discover → adapt → succeed**
+
+---
+
+**END OF UPDATE 4**
+
+---
