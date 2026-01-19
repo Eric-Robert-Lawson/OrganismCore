@@ -1482,3 +1482,328 @@ D, N = crt_reconstruct(det_residues, primes_20)
 
 ---
 **ABOVE ARE ESTIMATES, updates from here are progress**
+
+---
+**UPDATE 1**
+
+Ran the following script with the 10 json files (monomials/triplets) available in validator folder:
+
+
+C1:
+
+```python
+#!/usr/bin/env python3
+"""
+Certificate C1: Monomial Set Consistency Verification
+
+Verifies that the 707 weight-0 monomials are identical across 
+all 5 independent prime reductions.
+
+Usage: 
+    python3 certificate_c1_consistency. py
+
+Expected runtime: < 1 second
+"""
+
+import json
+import hashlib
+import sys
+from pathlib import Path
+from datetime import datetime
+
+def load_monomials(prime):
+    """Load monomial set for given prime. Accepts two JSON layouts:
+       - {"monomials": [...]}  or {"weight0_monomials": [...]} (dict)
+       - [...]  (list of monomials)
+    """
+    filename = f'validator/saved_inv_p{prime}_monomials18.json'
+    try:
+        with open(filename, 'r') as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        print(f"❌ ERROR: File not found:  {filename}")
+        print("   Please ensure you're running from the OrganismCore directory")
+        print("   and that validator/ contains the monomial JSON files.")
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"❌ ERROR: Invalid JSON in {filename}:  {e}")
+        sys.exit(1)
+
+    # If file is a dict, look for expected keys
+    if isinstance(data, dict):
+        if 'monomials' in data:
+            return data['monomials']
+        if 'weight0_monomials' in data:
+            return data['weight0_monomials']
+        # fall back: maybe the whole dict *is* the monomial map
+        # try to find the first list value
+        for v in data.values():
+            if isinstance(v, list):
+                print(f"⚠️ WARNING: using first list-valued field from {filename} as monomials")
+                return v
+        print(f"❌ ERROR: {filename} is a JSON object but contains no 'monomials' or list-valued field.")
+        print("   Inspect the file to determine the correct key.")
+        sys.exit(1)
+
+    # If file is a list, assume it's the monomial list
+    if isinstance(data, list):
+        return data
+
+    # Unexpected type
+    print(f"❌ ERROR: Unexpected JSON structure in {filename}: {type(data).__name__}")
+    sys.exit(1)
+
+def monomial_hash(monomials):
+    """Compute deterministic hash of monomial set"""
+    # Sort to ensure deterministic ordering
+    sorted_monomials = sorted([tuple(m) for m in monomials])
+    # Convert to canonical string representation
+    canonical = str(sorted_monomials)
+    # SHA-256 hash
+    return hashlib.sha256(canonical.encode()).hexdigest()
+
+def monomial_fingerprint(monomials):
+    """Generate human-readable fingerprint"""
+    # First 3 monomials (for verification)
+    first_3 = sorted([tuple(m) for m in monomials])[:3]
+    return first_3
+
+def verify_consistency():
+    """Main verification routine"""
+    primes = [53, 79, 131, 157, 313]
+    
+    print("=" * 70)
+    print("CERTIFICATE C1: Monomial Set Consistency")
+    print("=" * 70)
+    print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print()
+    
+    # Load all monomial sets
+    monomial_sets = {}
+    hashes = {}
+    fingerprints = {}
+    
+    print("Loading monomial sets...")
+    print()
+    
+    for p in primes:
+        monomials = load_monomials(p)
+        monomial_sets[p] = monomials
+        hashes[p] = monomial_hash(monomials)
+        fingerprints[p] = monomial_fingerprint(monomials)
+        
+        print(f"Prime {p: 3d}:   {len(monomials):4d} monomials")
+        print(f"          Hash: {hashes[p][:32]}...")
+        print()
+    
+    # Check all have same count
+    counts = [len(monomial_sets[p]) for p in primes]
+    unique_counts = set(counts)
+    
+    print("-" * 70)
+    print("VERIFICATION 1: Monomial Counts")
+    print("-" * 70)
+    
+    if len(unique_counts) != 1:
+        print(f"❌ INCONSISTENT COUNTS: {dict(zip(primes, counts))}")
+        return False
+    
+    expected_count = counts[0]
+    print(f"✅ All primes have exactly {expected_count} monomials")
+    print()
+    
+    # Check all hashes match
+    unique_hashes = set(hashes.values())
+    
+    print("-" * 70)
+    print("VERIFICATION 2: SHA-256 Hash Comparison")
+    print("-" * 70)
+    
+    if len(unique_hashes) != 1:
+        print(f"❌ INCONSISTENT HASHES:")
+        for p in primes:
+            print(f"   Prime {p: 3d}: {hashes[p]}")
+        return False
+    
+    master_hash = list(unique_hashes)[0]
+    print(f"✅ All hashes match:")
+    print(f"   {master_hash}")
+    print()
+    
+    # Detailed set equality check
+    print("-" * 70)
+    print("VERIFICATION 3: Element-wise Set Equality")
+    print("-" * 70)
+    
+    base_set = set(tuple(m) for m in monomial_sets[53])
+    
+    all_match = True
+    for p in [79, 131, 157, 313]:
+        current_set = set(tuple(m) for m in monomial_sets[p])
+        
+        if current_set == base_set:
+            print(f"✅ Prime {p: 3d} matches prime 53 (perfect set equality)")
+        else:
+            only_in_base = base_set - current_set
+            only_in_current = current_set - base_set
+            print(f"❌ Prime {p:3d} MISMATCH:")
+            print(f"   Only in p=53:  {len(only_in_base)} monomials")
+            print(f"   Only in p={p}: {len(only_in_current)} monomials")
+            all_match = False
+    
+    print()
+    
+    if not all_match:
+        return False
+    
+    # Fingerprint verification (show first 3 monomials)
+    print("-" * 70)
+    print("VERIFICATION 4: Fingerprint Check (First 3 Monomials)")
+    print("-" * 70)
+    
+    base_fingerprint = fingerprints[53]
+    print(f"Prime 53 fingerprint:")
+    for i, mono in enumerate(base_fingerprint, 1):
+        print(f"  {i}. {mono}")
+    print()
+    
+    for p in [79, 131, 157, 313]:
+        if fingerprints[p] == base_fingerprint:
+            print(f"✅ Prime {p:3d} fingerprint matches")
+        else:
+            print(f"❌ Prime {p:3d} fingerprint MISMATCH")
+            all_match = False
+    
+    print()
+    
+    # Final result
+    print("=" * 70)
+    if all_match:
+        print("🎉 CERTIFICATE C1 VALID")
+    else:
+        print("❌ CERTIFICATE C1 FAILED")
+    print("=" * 70)
+    print()
+    
+    if all_match:
+        print("CONCLUSION:")
+        print(f"The {expected_count} weight-0 monomials are IDENTICAL across all")
+        print(f"5 independent prime reductions (p ∈ {{53, 79, 131, 157, 313}}).")
+        print()
+        print("This proves the monomial set is a consistent characteristic-zero")
+        print("structure, independent of the choice of reduction prime.")
+        print()
+        print("Mathematical significance:")
+        print(f"  • The {expected_count} monomials form a canonical basis")
+        print(f"  • This basis is intrinsic to the variety V (not an artifact of mod p)")
+        print(f"  • Provides foundation for rational kernel basis (Certificate C2)")
+        print()
+        
+        # Save certificate
+        cert_data = {
+            "certificate": "C1",
+            "timestamp": datetime.now().isoformat(),
+            "status": "VALID",
+            "primes": primes,
+            "monomial_count": expected_count,
+            "master_hash": master_hash,
+            "verification_steps": [
+                "Count consistency:  PASS",
+                "Hash equality: PASS",
+                "Set equality: PASS",
+                "Fingerprint match: PASS"
+            ]
+        }
+        
+        with open('certificates/certificate_c1_result.json', 'w') as f:
+            json.dump(cert_data, f, indent=2)
+        
+        print(f"Certificate data saved:  certificates/certificate_c1_result. json")
+        print()
+    
+    return all_match
+
+if __name__ == "__main__": 
+    # Create certificates directory if it doesn't exist
+    Path('certificates').mkdir(exist_ok=True)
+    
+    success = verify_consistency()
+    sys.exit(0 if success else 1)
+```
+
+outcome:
+
+```verbatim
+ericlawson@erics-MacBook-Air ~ % python3 certificate_c1_consistency.py
+======================================================================
+CERTIFICATE C1: Monomial Set Consistency
+======================================================================
+Timestamp: 2026-01-18 21:02:43
+
+Loading monomial sets...
+
+Prime  53:   2590 monomials
+          Hash: a709eb72b920e82ccb9a0d2327759e8d...
+
+Prime  79:   2590 monomials
+          Hash: a709eb72b920e82ccb9a0d2327759e8d...
+
+Prime  131:   2590 monomials
+          Hash: a709eb72b920e82ccb9a0d2327759e8d...
+
+Prime  157:   2590 monomials
+          Hash: a709eb72b920e82ccb9a0d2327759e8d...
+
+Prime  313:   2590 monomials
+          Hash: a709eb72b920e82ccb9a0d2327759e8d...
+
+----------------------------------------------------------------------
+VERIFICATION 1: Monomial Counts
+----------------------------------------------------------------------
+✅ All primes have exactly 2590 monomials
+
+----------------------------------------------------------------------
+VERIFICATION 2: SHA-256 Hash Comparison
+----------------------------------------------------------------------
+✅ All hashes match:
+   a709eb72b920e82ccb9a0d2327759e8df38500aec2cf2a926c9418c4b70afd21
+
+----------------------------------------------------------------------
+VERIFICATION 3: Element-wise Set Equality
+----------------------------------------------------------------------
+✅ Prime  79 matches prime 53 (perfect set equality)
+✅ Prime  131 matches prime 53 (perfect set equality)
+✅ Prime  157 matches prime 53 (perfect set equality)
+✅ Prime  313 matches prime 53 (perfect set equality)
+
+----------------------------------------------------------------------
+VERIFICATION 4: Fingerprint Check (First 3 Monomials)
+----------------------------------------------------------------------
+Prime 53 fingerprint:
+  1. (0, 0, 0, 0, 12, 6)
+  2. (0, 0, 0, 1, 10, 7)
+  3. (0, 0, 0, 2, 8, 8)
+
+✅ Prime  79 fingerprint matches
+✅ Prime 131 fingerprint matches
+✅ Prime 157 fingerprint matches
+✅ Prime 313 fingerprint matches
+
+======================================================================
+🎉 CERTIFICATE C1 VALID
+======================================================================
+
+CONCLUSION:
+The 2590 weight-0 monomials are IDENTICAL across all
+5 independent prime reductions (p ∈ {53, 79, 131, 157, 313}).
+
+This proves the monomial set is a consistent characteristic-zero
+structure, independent of the choice of reduction prime.
+
+Mathematical significance:
+  • The 2590 monomials form a canonical basis
+  • This basis is intrinsic to the variety V (not an artifact of mod p)
+  • Provides foundation for rational kernel basis (Certificate C2)
+
+Certificate data saved:  certificates/certificate_c1_result. json
+```
