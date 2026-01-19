@@ -514,21 +514,6 @@ establishes the rational kernel basis **deterministically**.
 
 ---
 
-## Formal Theorem
-
-**Theorem (Rational Kernel Basis):**
-
-The kernel of the multiplication matrix $M$ (defined over $\mathbb{Z}$) 
-has dimension 707 over $\mathbb{Q}$, with canonical monomial basis:
-
-$$\mathcal{B} = \{m_1, m_2, \ldots, m_{707}\}$$
-
-where each $m_i$ is a weight-0 degree-18 monomial with all six variables active.
-
-**Proof:** By Certificates C1 and C2 (computational verification). ∎
-
----
-
 ## Reproducibility
 
 **Scripts:**
@@ -2644,19 +2629,6 @@ def generate_certificate_markdown():
     doc.append("---")
     doc.append("")
 
-    # Formal theorem
-    doc.append("## Formal Theorem")
-    doc.append("")
-    doc.append("**Theorem (Rational Kernel Basis):**")
-    doc.append("")
-    doc.append("The cokernel of the multiplication matrix $M$ (defined over $\\mathbb{Z}$)")
-    doc.append(f"has dimension {cokernel_dim} over $\\mathbb{{Q}}$.")
-    doc.append("")
-    doc.append("**Proof (computational certificates):** By Certificates C1 and C2 (verified). ∎")
-    doc.append("")
-    doc.append("---")
-    doc.append("")
-
     # Reproducibility
     doc.append("## Reproducibility")
     doc.append("")
@@ -3131,17 +3103,6 @@ Prime  313: dimension = 707    ✅ PASS
 The verified cokernel dimension across independent primes provides
 strong deterministic modular evidence that the invariant H^{2,2}_prim
 space has dimension 707 over Q (see C2).
-
----
-
-## Formal Theorem
-
-**Theorem (Rational Kernel Basis):**
-
-The cokernel of the multiplication matrix $M$ (defined over $\mathbb{Z}$)
-has dimension 707 over $\mathbb{Q}$.
-
-**Proof (computational certificates):** By Certificates C1 and C2 (verified). ∎
 
 ---
 
