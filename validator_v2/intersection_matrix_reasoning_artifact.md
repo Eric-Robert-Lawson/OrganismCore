@@ -3609,6 +3609,411 @@ STATUS: done
 
 **Script:** `run_tor_pairs_generic_cycles.py`
 
+```python
+#!/usr/bin/env python3
+"""
+Fixed run_tor_pairs_generic_cycles.py using string.Template for M2 code insertion.
+
+This addresses the previous IndexError (caused by accidental '{}' placeholders
+in the M2 template when using str.format). The M2 template now uses $-style
+placeholders and Python's string.Template.safe_substitute to embed the
+coefficient rows and indices, avoiding the need to escape many braces.
+
+Usage example:
+  python3 run_tor_pairs_generic_cycles.py --num-forms 16 --seed 2026 --limit 3 --per-pair-timeout 300
+"""
+from __future__ import annotations
+import argparse
+import json
+import os
+import random
+import select
+import signal
+import string
+import subprocess
+import tempfile
+import time
+import csv
+from typing import List, Optional
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--num-forms", type=int, default=16,
+                    help="Number of random linear forms to generate (default 16)")
+parser.add_argument("--seed", type=int, default=2026, help="Random seed for reproducibility")
+parser.add_argument("--per-pair-timeout", type=int, default=7200,
+                    help="Timeout in seconds for each pair (default 7200s = 2h)")
+parser.add_argument("--max-tor", type=int, default=6, help="Compute Tor_0 .. Tor_max (default 6)")
+parser.add_argument("--retries", type=int, default=1, help="Number of retries per pair on failure (default 1)")
+parser.add_argument("--json-out", default="intersection_generic_cycles.json")
+parser.add_argument("--csv-out", default="intersection_generic_cycles.csv")
+parser.add_argument("--log", default="run_tor_pairs_generic.log")
+parser.add_argument("--p", type=int, default=313)
+parser.add_argument("--g", type=int, default=27)
+parser.add_argument("--limit", type=int, default=0,
+                    help="If >0, limit to first N uncertain pairs (for testing)")
+args = parser.parse_args()
+
+LOGFILE = args.log
+JSON_OUT = args.json_out
+CSV_OUT = args.csv_out
+PER_PAIR_TIMEOUT = args.per_pair_timeout
+MAX_TOR = args.max_tor
+RETRIES = args.retries
+p = args.p
+g = args.g
+LIMIT = args.limit
+NUM_FORMS = max(2, args.num_forms // 1)
+SEED = args.seed
+
+def log(s: str) -> None:
+    ts = time.strftime("%Y-%m-%d %H:%M:%S")
+    line = f"[{ts}] {s}"
+    print(line, flush=True)
+    with open(LOGFILE, "a") as f:
+        f.write(line + "\n")
+
+# Prepare random integer coefficients for linear forms
+random.seed(SEED)
+num_forms = NUM_FORMS
+if num_forms % 2 == 1:
+    log(f"num-forms {num_forms} is odd; incrementing to even")
+    num_forms += 1
+num_cycles = num_forms // 2
+
+coeffs = []
+for i in range(num_forms):
+    row = []
+    for j in range(6):
+        val = random.randint(1, p-1)
+        row.append(val)
+    coeffs.append(row)
+
+log(f"Generated {num_forms} linear forms -> {num_cycles} generic cycles (seed={SEED})")
+
+# Prepare cycle names and pair list
+pairNames = [f"Zg_{i+1:02d}" for i in range(num_cycles)]
+uncertainPairs = []
+for a in range(num_cycles):
+    for b in range(a, num_cycles):
+        uncertainPairs.append((a, b, "generic"))
+
+if LIMIT and LIMIT > 0:
+    uncertainPairs = uncertainPairs[:LIMIT]
+    log(f"LIMIT active: running first {len(uncertainPairs)} pairs")
+
+# Build coeffs rows block (M2 syntax uses { ... } for lists)
+coeffs_rows_lines = []
+for row in coeffs:
+    row_str = ", ".join(str(int(x % p)) for x in row)
+    coeffs_rows_lines.append(f"coeffs = append(coeffs, {{{row_str}}});")
+coeffs_rows_block = "\n".join(coeffs_rows_lines)
+
+# M2 template using $-placeholders (string.Template)
+M2_TEMPLATE = string.Template(r'''
+-- Generic-cycle per-pair worker
+p = $p;
+g = $g;
+maxTor = $maxTor;
+
+R = GF p[z_0..z_5];
+vs = flatten entries vars R;
+
+-- Build cyclotomic F
+coeffsCyclo = {};
+for kk from 0 to 12 do (
+  row = {};
+  for jj from 0 to 5 do row = append(row, (g^(kk*jj)) % p);
+  coeffsCyclo = append(coeffsCyclo, row);
+);
+LformsCyclo = {};
+for kk from 0 to 12 do (
+  tmpc = 0 * vs#0;
+  for j from 0 to 5 do tmpc = tmpc + (coeffsCyclo#kk#j) * vs#j;
+  LformsCyclo = append(LformsCyclo, tmpc);
+);
+F = 0 * vs#0;
+for kk from 0 to 12 do F = F + (LformsCyclo#kk)^8;
+
+-- Embedded integer coefficient matrix
+coeffs = {};
+$coeffs_rows
+
+-- Build linear forms L_i = sum coeffs#i#j * vs#j
+Lforms = {};
+for i from 0 to $num_forms_minus_one do (
+  tmp = 0 * vs#0;
+  for j from 0 to 5 do tmp = tmp + (coeffs#i#j) * vs#j;
+  Lforms = append(Lforms, tmp);
+);
+
+-- Build Zideals as Zg_i = ideal(F, L_{2i}, L_{2i+1})
+Zideals = {};
+pairNames = {};
+for i from 0 to $num_cycles_minus_one do (
+  idx1 = 2*i;
+  idx2 = 2*i + 1;
+  pairNames = append(pairNames, "Zg_" | toString(i+1));
+  Zideals = append(Zideals, ideal(F, Lforms#idx1, Lforms#idx2));
+);
+
+ia = $ia;
+ib = $ib;
+print("PAIR: " | pairNames#ia | " " | pairNames#ib);
+print("TYPE: generic-cycles");
+
+I_A = Zideals#ia;
+I_B = Zideals#ib;
+
+-- Modules via cokernel of gens
+M = try ( coker gens I_A ) else ( "__COKER_ERR__" );
+N = try ( coker gens I_B ) else ( "__COKER_ERR__" );
+
+print("CLASS_M: " | toString class M);
+print("CLASS_N: " | toString class N);
+
+if M === "__COKER_ERR__" or N === "__COKER_ERR__" then (
+  print("STATUS: cokergens-failed");
+  quit;
+);
+
+-- per-k Tor diagnostics (module-based)
+for k from 0 to maxTor do (
+  print("BEGIN_TOR_K: " | toString k);
+  t := try ( Tor_k(M, N) ) else ("__TOR_ERR__");
+  if t === "__TOR_ERR__" then (
+    print("TOR_K_ERROR: " | toString k);
+    dbg = "debugTrace-unavailable";
+    try ( dbg = toString( debugTrace() ) ) else ( dbg = "debugTrace-failed" );
+    print("TOR_K_DEBUGTRACE: " | dbg);
+  ) else if t === 0 then (
+    print("TOR_K_ZERO: " | toString k);
+  ) else (
+    d := dim t;
+    print("TOR_K_DIM: " | toString k | " " | toString d);
+    if d > 0 then (
+      print("TOR_K_NONFINITE: " | toString k);
+    ) else (
+      lk := try ( length t ) else ("__LENGTH_ERR__");
+      if lk === "__LENGTH_ERR__" then print("TOR_K_LENGTH_ERR: " | toString k) else print("TOR_K_LEN: " | toString k | " " | toString lk);
+    );
+  );
+);
+
+print("STATUS: done");
+quit;
+''')
+
+# Runner to execute M2 code (stream stdout, drain and kill on debugger detection)
+def run_m2_code(m2_code: str, timeout: int) -> str:
+    with tempfile.NamedTemporaryFile("w", suffix=".m2", delete=False) as tf:
+        tfname = tf.name
+        tf.write(m2_code)
+    dbg_signals = ["entering debugger", "expected pair to have a method", "adjacent objects", "entering the debugger", "debugger"]
+    try:
+        proc = subprocess.Popen(
+            ["m2", tfname],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            stdin=subprocess.DEVNULL,
+            preexec_fn=os.setsid,
+            text=True
+        )
+        log(f"Started M2 pid={proc.pid} for {os.path.basename(tfname)}")
+        start = time.time()
+        out_chunks = []
+        while True:
+            if proc.stdout:
+                rlist, _, _ = select.select([proc.stdout], [], [], 0.1)
+                if rlist:
+                    chunk = proc.stdout.read(4096)
+                    if chunk:
+                        out_chunks.append(chunk)
+                        lower = chunk.lower()
+                        for s in dbg_signals:
+                            if s.lower() in lower:
+                                log(f"Detected debugger token '{s}' in pid={proc.pid}; draining and killing")
+                                drain_start = time.time()
+                                last_read = time.time()
+                                while time.time() - drain_start < 1.0:
+                                    rr, _, _ = select.select([proc.stdout], [], [], 0.1)
+                                    if rr:
+                                        more = proc.stdout.read(4096)
+                                        if more:
+                                            out_chunks.append(more)
+                                            last_read = time.time()
+                                    else:
+                                        if time.time() - last_read > 0.2:
+                                            break
+                                try:
+                                    os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+                                except Exception as e:
+                                    log(f"Ignored kill error: {e}")
+                                try:
+                                    proc.wait(timeout=2)
+                                except Exception:
+                                    pass
+                                out_chunks.append("\nSTATUS: debugger-detected\n")
+                                break
+            if proc.poll() is not None:
+                break
+            if time.time() - start > timeout:
+                log(f"Timeout for M2 pid={proc.pid}; killing")
+                try:
+                    os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+                except Exception as e:
+                    log(f"Failed kill: {e}")
+                try:
+                    proc.wait(timeout=5)
+                except Exception:
+                    pass
+                out_chunks.append("\nSTATUS: timeout\n")
+                break
+        try:
+            if proc.stdout:
+                remaining = proc.stdout.read()
+                if remaining:
+                    out_chunks.append(remaining)
+        except Exception:
+            pass
+        out = "".join(out_chunks)
+    except Exception as e:
+        out = f"ERROR_RUN_M2: {e}\n"
+    finally:
+        try:
+            os.remove(tfname)
+        except Exception:
+            pass
+    return out
+
+def parse_m2_tor_output(out: str, max_tor: int):
+    tor_dims = [None] * (max_tor + 1)
+    tor_lens = [None] * (max_tor + 1)
+    nonfinite = [False] * (max_tor + 1)
+    errors = []
+    status = None
+    for line in out.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith("TOR_K_DIM:"):
+            parts = line.split()
+            try:
+                k = int(parts[1]); d = int(parts[2])
+                tor_dims[k] = d
+            except Exception:
+                errors.append(line)
+        elif line.startswith("TOR_K_NONFINITE:"):
+            try:
+                k = int(line.split()[1])
+                nonfinite[k] = True
+                tor_dims[k] = 1
+            except Exception:
+                errors.append(line)
+        elif line.startswith("TOR_K_LEN:"):
+            parts = line.split()
+            try:
+                k = int(parts[1]); val = int(parts[2])
+                tor_lens[k] = val
+            except Exception:
+                errors.append(line)
+        elif line.startswith("TOR_K_ZERO:"):
+            try:
+                k = int(line.split()[1])
+                tor_dims[k] = 0; tor_lens[k] = 0
+            except Exception:
+                errors.append(line)
+        elif line.startswith("TOR_K_ERROR:") or line.startswith("TOR_K_DEBUGTRACE:") or line.startswith("TOR_K_LENGTH_ERR:"):
+            errors.append(line)
+        elif line.startswith("STATUS:"):
+            status = line.split(":",1)[1].strip()
+    return tor_dims, tor_lens, nonfinite, status, errors
+
+def run_pair(ia: int, ib: int):
+    tpl_vars = {
+        "p": p,
+        "g": g,
+        "maxTor": MAX_TOR,
+        "coeffs_rows": coeffs_rows_block,
+        "num_forms_minus_one": num_forms - 1,
+        "num_cycles_minus_one": num_cycles - 1,
+        "num_forms": num_forms,
+        "num_cycles": num_cycles,
+        "ia": ia,
+        "ib": ib
+    }
+    m2_code = M2_TEMPLATE.safe_substitute(tpl_vars)
+    out = run_m2_code(m2_code, PER_PAIR_TIMEOUT)
+    tor_dims, tor_lens, nonfinite, status, errors = parse_m2_tor_output(out, MAX_TOR)
+    parsed = {
+        "pair": [pairNames[ia], pairNames[ib]],
+        "coordsA": None,
+        "coordsB": None,
+        "type": "generic",
+        "Tor_dims": tor_dims,
+        "Tor_lengths": tor_lens,
+        "Tor_nonfinite": nonfinite,
+        "status": None,
+        "intersection": None,
+        "error": None,
+        "raw_stdout": out
+    }
+    if errors:
+        parsed["error"] = "; ".join(errors)
+    if status:
+        parsed["status"] = status
+
+    if any(nonfinite) or any((d is not None and d > 0) for d in tor_dims):
+        parsed["status"] = "excess-intersection"
+        parsed["intersection"] = None
+        return parsed
+
+    all_lengths_present = all(tor_lens[k] is not None for k in range(0, MAX_TOR+1))
+    if all_lengths_present:
+        total_alt = sum(((-1)**k) * tor_lens[k] for k in range(0, MAX_TOR+1))
+        parsed["intersection"] = total_alt
+        parsed["status"] = "finite"
+        return parsed
+
+    parsed["status"] = "incomplete"
+    return parsed
+
+# Main loop
+results = []
+start_time = time.time()
+for idx, (ia, ib, ptype) in enumerate(uncertainPairs):
+    log(f"Processing pair {idx+1}/{len(uncertainPairs)}: {pairNames[ia]} vs {pairNames[ib]}")
+    parsed = run_pair(ia, ib)
+    results.append(parsed)
+    with open(JSON_OUT + ".part", "w") as f:
+        json.dump({
+            "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "p": p, "g": g, "num_forms": num_forms, "num_cycles": num_cycles,
+            "seed": SEED, "maxTor": MAX_TOR, "entries": results
+        }, f, indent=2)
+    log(f"Saved partial JSON with {len(results)} entries.")
+
+elapsed = time.time() - start_time
+log(f"Finished all pairs in {elapsed/60:.1f} minutes. Writing final JSON -> {JSON_OUT}")
+
+with open(JSON_OUT, "w") as f:
+    json.dump({
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "p": p, "g": g, "num_forms": num_forms, "num_cycles": num_cycles,
+        "seed": SEED, "maxTor": MAX_TOR, "entries": results
+    }, f, indent=2)
+
+# CSV summary
+with open(CSV_OUT, "w", newline="") as cf:
+    writer = csv.writer(cf)
+    writer.writerow(["pairA", "pairB", "type", "status", "intersection"])
+    for e in results:
+        writer.writerow([e["pair"][0], e["pair"][1], e["type"], e["status"], "" if e["intersection"] is None else str(e["intersection"])])
+
+log(f"Wrote JSON -> {JSON_OUT} and CSV -> {CSV_OUT}")
+log("Done.")
+
+```
+
 **Configuration:**
 - 16 random linear forms $L_i = \sum_{j=0}^5 a_{ij} z_j$ with integer coefficients $a_{ij} \in [1, 312]$
 - Seed: 2026 (reproducible)
