@@ -3812,3 +3812,111 @@ print("==========================================================");
 
 should observe same results across all 5 primes, same phenomenon observed!
 
+also here is C3, do across all 5 primes as well, will show zero across all 15!
+
+```m2
+-- validator_v2/cp3_single_prime_ready_fixed.m2
+-- CP3: Single-prime collapse test (clean, ready-to-run, fixed)
+-- Prints concise CSV lines:
+--   PRIME,CLASS,SUBSET_IDX,SUBSET_VARS,STATUS
+-- where STATUS is ZERO or NONZERO (no large remainders printed).
+--
+-- Instructions:
+-- 1) Quit and restart Macaulay2 to ensure a clean session.
+-- 2) Run:
+--      m2 validator_v2/cp3_single_prime_ready_fixed.m2 > cp3_single_prime_log.txt 2>&1
+-- 3) Inspect cp3_single_prime_log.txt (or paste here if you hit errors).
+
+-- --------------------
+-- Simple numeric k-combination helper (elements are integers)
+numericCombinations = (L, k) -> (
+    if k == 0 then {{}}
+    else if #L < k then {}
+    else (
+        first := L#0;
+        rest := drop(L,1);
+        (apply(numericCombinations(rest, k-1), s -> {first} | s)) | numericCombinations(rest, k)
+    )
+);
+
+-- --------------------
+-- Configuration (single prime)
+p = 53;                      -- change to other prime if desired
+numericIndices = {0,1,2,3,4,5};
+
+-- Candidate monomials (name, exponent vector)
+candidateList = {
+    {"target1", {9,2,2,2,1,2}}
+    -- add more entries as {"name",{e0,e1,e2,e3,e4,e5}}
+};
+
+-- safe manual subset-name builder (never concatenates lists)
+makeSubsetNameManual = idxList -> (
+    s := "(";
+    first := true;
+    for e in idxList list (
+        elemStr := if class e === ZZ then ("z_" | toString(e)) else toString(e);
+        if first then ( s = s | elemStr; first = false ) else ( s = s | "," | elemStr );
+    );
+    s = s | ")";
+    s
+);
+
+-- header
+print "Single-prime CP3 (ready, fixed)";
+print "Columns: PRIME,CLASS,SUBSET_IDX,SUBSET_VARS,STATUS";
+print "-----------------------------------------------";
+
+-- build field and ring (fresh names z0..z5 to avoid collisions)
+kk = ZZ/p;
+R = kk[z0, z1, z2, z3, z4, z5];
+
+-- find a nontrivial 13th-root element omega in kk (t^{(p-1)/13} with != 1)
+expPow = (p - 1) // 13;
+found = false;
+for t from 2 to p-1 do (
+    cand = (t_kk) ^ expPow;
+    if cand != 1_kk then ( omega = cand; found = true; break );
+);
+if not found then error("No primitive 13th root found for p=" | toString(p));
+
+-- quick diagnostic print to confirm omega type (optional)
+print("Using omega = " | toString(omega) | "  class=" | toString(class omega));
+
+-- build cyclotomic linear forms and Jacobian ideal J
+Llist = apply(13, k -> sum(6, j -> (omega^(k*j)) * R_j)); -- R_0..R_5 are z0..z5
+F = sum(Llist, Lk -> Lk^8);
+J = ideal jacobian F;
+
+-- compute the 4-subsets numerically
+fourSubsets = numericCombinations(numericIndices, 4);
+
+-- run tests and print concise CSV lines
+for pair in candidateList do (
+    cname = pair#0;
+    exps = pair#1;
+
+    -- build candidate monomial in this ring
+    mon = 1_R;
+    for i from 0 to 5 do mon = mon * (R_i ^ (exps#i));
+
+    idx = 0;
+    for idxList in fourSubsets do (
+        idx = idx + 1;
+        forbidden = flatten apply(numericIndices, x -> if member(x, idxList) then {} else {x});
+        Iforbid = ideal apply(forbidden, k -> R_k);
+        combined = J + Iforbid;
+
+        rem = mon % combined;
+
+        subsetName = makeSubsetNameManual(idxList);
+        st = if rem == 0 then "ZERO" else "NONZERO"; -- use 'st' not protected 'status'
+
+        print(toString(p) | "," | cname | "," | toString(idx) | "," | subsetName | "," | st);
+    );
+);
+
+print "";
+print("Single-prime run complete for p = " | toString(p));
+```
+
