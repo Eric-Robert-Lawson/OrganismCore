@@ -890,7 +890,6 @@ verification_logs/
 I was trying to arrive at building what I needed using this script, but lack the machine computational power to get it done in reasonable amount of time.
 
 ```m2
-ericlawson@erics-MacBook-Air ~ % cat solver_resumable.m2 
 -- solver_manualElim_fixed.m2
 -- Resumable manual Gaussian elimination runner (print-only checkpointing + automatic rebuild)
 -- Place next to solver_1_8.m2 and run in a fresh Macaulay2 session:
