@@ -25,9 +25,7 @@ We report a computational discovery (verified modulo $p=313$; multi‑prime chec
 \section*{Provenance \& Computational Scope}
 
 \begin{quote}
-All computations reported were performed \textbf{modulo $p = 313$} using Macaulay2 version 1.25.11 on macOS 12.6.   Scripts and raw outputs are archived at Zenodo DOI [INSERT‑DOI‑WHEN‑READY].  
-
-\textbf{Scripts:  }  \texttt{validator\_v2/c1. m2}, \texttt{validator\_v2/c2.m2}.  
+All computations reported were performed \textbf{modulo $p = 313$} using Macaulay2 version 1.25.11 on macOS 12.6.   Scripts and raw outputs are archived in the github repo (validator\_v2/novel\_sparsity\_path\_reasoning\_artifact.md line 3259).   
 
 \textbf{Inputs: } 2590‑dimensional invariant monomial basis (Certificate C2, mod 313), 707‑dimensional cokernel, multiplication matrix.  
 
@@ -187,25 +185,16 @@ Combining these will yield a rigorous, unconditional non‑algebraicity proof fo
 \section{Reproducibility}
 \label{sec: repro}
 
-All scripts and outputs are publicly archived at Zenodo [DOI to be inserted]. 
+All scripts and outputs are publicly archived in the github repo for OrganismCore. 
 
 \subsection{Running the Scripts}
 \textbf{Requirements:} Macaulay2 v1.25.11+, access to the saved Certificate C2 JSON outputs (2590‑dim monomial basis mod 313).
 
-\textbf{Commands:}
-\begin{verbatim}
-m2 validator_v2/c1.m2 > c1_output_p313.txt
-m2 validator_v2/c2.m2 > c2_output_p313.txt
-\end{verbatim}
-
 \textbf{Expected runtime:} CP1 $\sim$15 min, CP2 $\sim$45 min on modern laptop.
 
-\subsection{Artifact List}
-\begin{itemize}
-  \item \texttt{c1.m2}, \texttt{c2.m2} (Macaulay2 scripts)
-  \item \texttt{c1\_output\_p313.txt}, \texttt{c2\_output\_p313.txt} (full run logs)
-  \item \texttt{c1\_output\_p313.json}, \texttt{c2\_output\_p313.json} (parsed data)
-\end{itemize}
+\subsection{Artifact}
+
+The reasoning artifact that contains the CP1/CP2 is the Option C part 1 in validator\_v2/deterministic\_certificates\_reasoning\_artifact.md
 
 % ----------------------------------------------------------------------------
 \section{Conclusion}
