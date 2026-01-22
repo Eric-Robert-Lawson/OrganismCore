@@ -3815,108 +3815,2772 @@ should observe same results across all 5 primes, same phenomenon observed!
 also here is C3, do across all 5 primes as well, will show zero across all 15!
 
 ```m2
--- validator_v2/cp3_single_prime_ready_fixed.m2
--- CP3: Single-prime collapse test (clean, ready-to-run, fixed)
--- Prints concise CSV lines:
---   PRIME,CLASS,SUBSET_IDX,SUBSET_VARS,STATUS
--- where STATUS is ZERO or NONZERO (no large remainders printed).
+-- cp3_multi_prime_safe.m2
+-- Safe multi-prime check for 4-variable representability.
+-- Run in a fresh Macaulay2 session:
+--    m2 cp3_multi_prime_safe.m2
 --
--- Instructions:
--- 1) Quit and restart Macaulay2 to ensure a clean session.
--- 2) Run:
---      m2 validator_v2/cp3_single_prime_ready_fixed.m2 > cp3_single_prime_log.txt 2>&1
--- 3) Inspect cp3_single_prime_log.txt (or paste here if you hit errors).
+-- Output: lines of the form
+-- PRIME,CLASS,SUBSET_IDX,SUBSET_VARS,STATUS
+-- STATUS in {REPRESENTABLE, NOT_REPRESENTABLE, REMAINDER_ZERO}
 
--- --------------------
--- Simple numeric k-combination helper (elements are integers)
-numericCombinations = (L, k) -> (
-    if k == 0 then {{}}
-    else if #L < k then {}
-    else (
-        first := L#0;
-        rest := drop(L,1);
-        (apply(numericCombinations(rest, k-1), s -> {first} | s)) | numericCombinations(rest, k)
-    )
-);
+primesList := {53,79,131,157,313};
+candidateList := { {"target1", {9,2,2,2,1,2}} };
 
--- --------------------
--- Configuration (single prime)
-p = 53;                      -- change to other prime if desired
-numericIndices = {0,1,2,3,4,5};
-
--- Candidate monomials (name, exponent vector)
-candidateList = {
-    {"target1", {9,2,2,2,1,2}}
-    -- add more entries as {"name",{e0,e1,e2,e3,e4,e5}}
+fourSubsets := {
+ {0,1,2,3}, {0,1,2,4}, {0,1,2,5},
+ {0,1,3,4}, {0,1,3,5}, {0,1,4,5},
+ {0,2,3,4}, {0,2,3,5}, {0,2,4,5},
+ {0,3,4,5}, {1,2,3,4}, {1,2,3,5},
+ {1,2,4,5}, {1,3,4,5}, {2,3,4,5}
 };
 
--- safe manual subset-name builder (never concatenates lists)
-makeSubsetNameManual = idxList -> (
+makeSubsetName = L -> (
     s := "(";
-    first := true;
-    for e in idxList list (
-        elemStr := if class e === ZZ then ("z_" | toString(e)) else toString(e);
-        if first then ( s = s | elemStr; first = false ) else ( s = s | "," | elemStr );
+    for i from 0 to (#L - 1) do (
+        if i == 0 then s = s | ("z_" | toString(L#i)) else s = s | ("," | ("z_" | toString(L#i)))
     );
     s = s | ")";
     s
 );
 
--- header
-print "Single-prime CP3 (ready, fixed)";
-print "Columns: PRIME,CLASS,SUBSET_IDX,SUBSET_VARS,STATUS";
-print "-----------------------------------------------";
-
--- build field and ring (fresh names z0..z5 to avoid collisions)
-kk = ZZ/p;
-R = kk[z0, z1, z2, z3, z4, z5];
-
--- find a nontrivial 13th-root element omega in kk (t^{(p-1)/13} with != 1)
-expPow = (p - 1) // 13;
-found = false;
-for t from 2 to p-1 do (
-    cand = (t_kk) ^ expPow;
-    if cand != 1_kk then ( omega = cand; found = true; break );
+toMonomialList = obj -> (
+    if class obj === Matrix then flatten entries obj
+    else if class obj === List then obj
+    else {obj}
 );
-if not found then error("No primitive 13th root found for p=" | toString(p));
 
--- quick diagnostic print to confirm omega type (optional)
-print("Using omega = " | toString(omega) | "  class=" | toString(class omega));
+print("PRIME,CLASS,SUBSET_IDX,SUBSET_VARS,STATUS");
+print("-----------------------------------------");
 
--- build cyclotomic linear forms and Jacobian ideal J
-Llist = apply(13, k -> sum(6, j -> (omega^(k*j)) * R_j)); -- R_0..R_5 are z0..z5
-F = sum(Llist, Lk -> Lk^8);
-J = ideal jacobian F;
+for pIdx from 0 to (#primesList - 1) do (
+    p := primesList#pIdx;
+    kk := ZZ/p;
+    R := kk[z0,z1,z2,z3,z4,z5];
 
--- compute the 4-subsets numerically
-fourSubsets = numericCombinations(numericIndices, 4);
+    -- find a nontrivial element of order dividing 13
+    expPow := (p - 1) // 13;
+    omega := 0_kk;
+    for t from 2 to p-1 do (
+        elt := (t_kk) ^ expPow;
+        if elt != 1_kk then ( omega = elt; break );
+    );
+    if omega == 0_kk then error("no omega for p=" | toString(p));
 
--- run tests and print concise CSV lines
-for pair in candidateList do (
-    cname = pair#0;
-    exps = pair#1;
+    -- build Jacobian ideal J
+    Llist := apply(13, k -> sum(6, j -> (omega^(k*j)) * R_j));
+    F := sum(Llist, Lk -> Lk^8);
+    J := ideal jacobian F;
 
-    -- build candidate monomial in this ring
-    mon = 1_R;
-    for i from 0 to 5 do mon = mon * (R_i ^ (exps#i));
+    for cIdx from 0 to (#candidateList - 1) do (
+        cname := toString(candidateList#cIdx#0);
+        exps := candidateList#cIdx#1;
 
-    idx = 0;
-    for idxList in fourSubsets do (
-        idx = idx + 1;
-        forbidden = flatten apply(numericIndices, x -> if member(x, idxList) then {} else {x});
-        Iforbid = ideal apply(forbidden, k -> R_k);
-        combined = J + Iforbid;
+        -- build monomial
+        mon := 1_R;
+        for i from 0 to 5 do mon = mon * (R_i ^ (exps#i));
 
-        rem = mon % combined;
+        r := mon % J;
 
-        subsetName = makeSubsetNameManual(idxList);
-        st = if rem == 0 then "ZERO" else "NONZERO"; -- use 'st' not protected 'status'
+        if r == 0_R then (
+            for sIdx from 0 to (#fourSubsets - 1) do (
+                S := fourSubsets#sIdx;
+                subsetName := makeSubsetName(S);
+                print(toString(p) | "," | cname | "," | toString(sIdx+1) | "," | subsetName | ",REMAINDER_ZERO");
+            );
+            continue;
+        );
 
-        print(toString(p) | "," | cname | "," | toString(idx) | "," | subsetName | "," | st);
+        raw := try monomials r else null;
+        mons := if raw === null then {r} else toMonomialList(raw);
+
+        for sIdx from 0 to (#fourSubsets - 1) do (
+            S := fourSubsets#sIdx;
+
+            -- forbidden indices
+            forbidden := {};
+            for j from 0 to 5 do (
+                if not member(j, S) then forbidden = append(forbidden, j)
+            );
+
+            -- check whether any monomial uses any forbidden variable
+            usesForbidden := false;
+            for mIdx from 0 to (#mons - 1) do (
+                m := mons#mIdx;
+                for fIdx from 0 to (#forbidden - 1) do (
+                    j := forbidden#fIdx;
+                    ex := try degree(m, R_j) else null;
+                    if ex === null then (
+                        usesForbidden = true;
+                        break;
+                    ) else if ex > 0 then (
+                        usesForbidden = true;
+                        break;
+                    );
+                );
+                if usesForbidden then break;
+            );
+
+            subsetName := makeSubsetName(S);
+            status := if usesForbidden then "NOT_REPRESENTABLE" else "REPRESENTABLE";
+            print(toString(p) | "," | cname | "," | toString(sIdx+1) | "," | subsetName | "," | status);
+        );
     );
 );
 
-print "";
-print("Single-prime run complete for p = " | toString(p));
+print("Done.");
 ```
 
+
+result:
+
+```verbatim
+PRIME,CLASS,SUBSET_IDX,SUBSET_VARS,STATUS
+-----------------------------------------
+53,target1,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,target1,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,target1,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,target1,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,target1,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,target1,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,target1,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,target1,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,target1,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,target1,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,target1,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,target1,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,target1,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,target1,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,target1,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,target1,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,target1,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,target1,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,target1,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,target1,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,target1,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,target1,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,target1,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,target1,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,target1,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,target1,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,target1,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,target1,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,target1,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,target1,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,target1,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,target1,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,target1,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,target1,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,target1,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,target1,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,target1,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,target1,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,target1,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,target1,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,target1,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,target1,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,target1,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,target1,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,target1,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,target1,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,target1,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,target1,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,target1,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,target1,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,target1,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,target1,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,target1,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,target1,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,target1,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,target1,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,target1,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,target1,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,target1,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,target1,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,target1,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,target1,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,target1,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,target1,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,target1,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,target1,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,target1,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,target1,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,target1,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,target1,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,target1,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,target1,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,target1,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,target1,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,target1,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+Done.
+```
+
+
+
+
+additionally running the following:
+
+```python
+import json
+from pathlib import Path
+
+fn = Path("validator/saved_inv_p313_monomials18.json")
+if not fn.exists():
+    fn = Path("saved_inv_p313_monomials18.json")
+if not fn.exists():
+    raise SystemExit(f"Cannot find saved_inv_p313_monomials18.json in working dir or validator/")
+
+with open(fn) as f:
+    monomials = json.load(f)
+
+target = [9, 2, 2, 2, 1, 2]
+
+try:
+    idx = monomials.index(target)
+    print(f"✓ FOUND at index {idx} (out of {len(monomials)})")
+    if idx < 401:
+        print("✓ CONFIRMED: part of the 401 isolated classes (index < 401)")
+    else:
+        print("⚠ FOUND but NOT in indices 0..400 (so not in the usual isolated subset)")
+except ValueError:
+    print("✗ NOT FOUND in saved_inv_p313_monomials18.json")
+```
+
+yielded:
+
+```verbatim
+✓ FOUND at index 116 (out of 2590)
+✓ CONFIRMED: part of the 401 isolated classes (index < 401)
+```
+
+
+additionally found more candidate targets:
+
+```python
+import json
+import random
+
+with open('validator/saved_inv_p313_monomials18.json') as f:
+    monomials = json.load(f)
+
+# Sample 30 evenly-spaced classes from indices 0-400
+sample_indices = list(range(0, 401, 13))  # Every 13th class → 31 samples
+samples = [(i, monomials[i]) for i in sample_indices]
+
+# Format for M2
+print("candidateList := {")
+for i, exp_vec in samples:
+    exp_str = "{" + ",".join(map(str, exp_vec)) + "}"
+    print(f'  {{"class{i}", {exp_str}}},')
+print("};")
+```
+
+with the classes I found I created the new script:
+
+```m2
+-- cp3_test_sample_candidates.m2
+-- Run in a fresh Macaulay2 session:
+--    m2 cp3_test_sample_candidates.m2
+--
+-- Tests the supplied candidateList (31 sample isolated classes) across
+-- primes {53,79,131,157,313}. For each (prime, candidate, 4-subset)
+-- the script prints a CSV line:
+--   PRIME,CLASS,IDX,SUBSET,STATUS
+-- where STATUS is one of {REPRESENTABLE, NOT_REPRESENTABLE, REMAINDER_ZERO}.
+--
+-- This is a hardened version using only plain for-loops and defensive checks.
+
+primesList := {53,79,131,157,313};
+
+candidateList := {
+  {"class0", {18,0,0,0,0,0}},
+  {"class13", {13,2,0,1,2,0}},
+  {"class26", {12,2,2,1,1,0}},
+  {"class39", {11,4,1,1,1,0}},
+  {"class52", {11,0,2,1,1,3}},
+  {"class65", {10,4,3,1,0,0}},
+  {"class78", {10,1,2,1,2,2}},
+  {"class91", {10,0,2,4,0,2}},
+  {"class104", {9,4,1,0,0,4}},
+  {"class117", {9,2,2,1,3,1}},
+  {"class130", {9,1,2,4,1,1}},
+  {"class143", {9,0,3,5,0,1}},
+  {"class156", {8,7,3,0,0,0}},
+  {"class169", {8,4,0,2,4,0}},
+  {"class182", {8,2,4,1,2,1}},
+  {"class195", {8,1,5,2,1,1}},
+  {"class208", {8,1,0,0,7,2}},
+  {"class221", {8,0,1,4,0,5}},
+  {"class234", {7,6,1,1,0,3}},
+  {"class247", {7,4,4,0,1,2}},
+  {"class260", {7,3,4,1,3,0}},
+  {"class273", {7,2,5,2,2,0}},
+  {"class286", {7,1,8,0,1,1}},
+  {"class299", {7,1,1,3,3,3}},
+  {"class312", {7,0,5,0,1,5}},
+  {"class325", {7,0,1,6,1,3}},
+  {"class338", {6,8,0,0,2,2}},
+  {"class351", {6,6,0,5,0,1}},
+  {"class364", {6,4,5,0,3,0}},
+  {"class377", {6,3,5,3,1,0}},
+  {"class390", {6,3,0,0,9,0}}
+};
+
+-- explicit list of 15 four-subsets of indices 0..5
+fourSubsets := {
+ {0,1,2,3}, {0,1,2,4}, {0,1,2,5},
+ {0,1,3,4}, {0,1,3,5}, {0,1,4,5},
+ {0,2,3,4}, {0,2,3,5}, {0,2,4,5},
+ {0,3,4,5}, {1,2,3,4}, {1,2,3,5},
+ {1,2,4,5}, {1,3,4,5}, {2,3,4,5}
+};
+
+-- helper: build subset name string
+makeSubsetName = L -> (
+    s := "(";
+    for i from 0 to (#L - 1) do (
+        if i == 0 then s = s | ("z_" | toString(L#i)) else s = s | ("," | ("z_" | toString(L#i)))
+    );
+    s = s | ")";
+    s
+);
+
+-- helper: convert monomials(...) output to a list
+toMonomialList = obj -> (
+    if class obj === Matrix then flatten entries obj
+    else if class obj === List then obj
+    else {obj}
+);
+
+-- helper: test whether monomial/polynomial m uses generator R_j
+usesGenerator = (m, Rj) -> (
+    e := try degree(m, Rj) else null;
+    if e === null then (
+        sub := try monomials m else null;
+        if sub === null then true -- conservative
+        else (
+            if class sub === Matrix then any(apply(flatten entries sub, mm -> usesGenerator(mm, Rj)))
+            else any(apply(sub, mm -> usesGenerator(mm, Rj)))
+        )
+    ) else e > 0
+);
+
+-- header
+print("PRIME,CLASS,IDX,SUBSET,STATUS");
+print("-----------------------------------------");
+
+-- main multi-prime loop
+for pIdx from 0 to (#primesList - 1) do (
+    p := primesList#pIdx;
+    kk := ZZ/p;
+    R := kk[z0,z1,z2,z3,z4,z5];
+
+    -- find a nontrivial 13-th root element (omega)
+    expPow := (p - 1) // 13;
+    omega := 0_kk;
+    for t from 2 to p-1 do (
+        elt := (t_kk) ^ expPow;
+        if elt != 1_kk then ( omega = elt; break );
+    );
+    if omega == 0_kk then error("no omega found for p=" | toString(p));
+
+    -- build cyclotomic linear forms and Jacobian ideal J
+    Llist := apply(13, k -> sum(6, j -> (omega^(k*j)) * R_j));
+    F := sum(Llist, Lk -> Lk^8);
+    J := ideal jacobian F;
+
+    -- loop candidates
+    for cIdx from 0 to (#candidateList - 1) do (
+        cname := toString(candidateList#cIdx#0);
+        exps := candidateList#cIdx#1;
+
+        -- build candidate monomial in this ring
+        mon := 1_R;
+        for i from 0 to 5 do mon = mon * (R_i ^ (exps#i));
+
+        -- canonical remainder
+        r := mon % J;
+
+        -- if remainder is identically zero
+        if r == 0_R then (
+            for sIdx from 0 to (#fourSubsets - 1) do (
+                subsetName := makeSubsetName(fourSubsets#sIdx);
+                line := toString(p) | "," | cname | "," | toString(sIdx+1) | "," | subsetName | ",REMAINDER_ZERO";
+                print(line);
+            );
+            continue;
+        );
+
+        -- get monomials (defensive)
+        raw := try monomials r else null;
+        mons := if raw === null then {r} else toMonomialList(raw);
+
+        -- test each 4-subset
+        for sIdx from 0 to (#fourSubsets - 1) do (
+            S := fourSubsets#sIdx;
+            -- build forbidden indices
+            forbidden := {};
+            for j from 0 to 5 do (
+                if not member(j, S) then forbidden = append(forbidden, j)
+            );
+
+            usesForbidden := false;
+            for mIdx from 0 to (#mons - 1) do (
+                m := mons#mIdx;
+                for fIdx from 0 to (#forbidden - 1) do (
+                    j := forbidden#fIdx;
+                    ex := try degree(m, R_j) else null;
+                    if ex === null then (
+                        usesForbidden = true;
+                        break;
+                    ) else if ex > 0 then (
+                        usesForbidden = true;
+                        break;
+                    );
+                );
+                if usesForbidden then break;
+            );
+
+            subsetName := makeSubsetName(S);
+            status := if usesForbidden then "NOT_REPRESENTABLE" else "REPRESENTABLE";
+            line := toString(p) | "," | cname | "," | toString(sIdx+1) | "," | subsetName | "," | status;
+            print(line);
+        );
+    );
+);
+
+print("Done.");
+```
+
+which resulted in
+
+```verbatim
+PRIME,CLASS,IDX,SUBSET,STATUS
+-----------------------------------------
+53,class0,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class0,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class0,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class0,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class0,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class0,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class0,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class0,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class0,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class0,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class0,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class0,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class0,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class0,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class0,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class13,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class13,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class13,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class13,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class13,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class13,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class13,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class13,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class13,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class13,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class13,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class13,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class13,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class13,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class13,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class26,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class26,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class26,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class26,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class26,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class26,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class26,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class26,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class26,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class26,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class26,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class26,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class26,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class26,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class26,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class39,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class39,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class39,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class39,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class39,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class39,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class39,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class39,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class39,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class39,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class39,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class39,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class39,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class39,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class39,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class52,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class52,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class52,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class52,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class52,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class52,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class52,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class52,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class52,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class52,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class52,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class52,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class52,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class52,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class52,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class65,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class65,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class65,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class65,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class65,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class65,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class65,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class65,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class65,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class65,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class65,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class65,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class65,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class65,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class65,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class78,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class78,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class78,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class78,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class78,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class78,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class78,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class78,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class78,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class78,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class78,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class78,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class78,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class78,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class78,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class91,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class91,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class91,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class91,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class91,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class91,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class91,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class91,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class91,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class91,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class91,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class91,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class91,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class91,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class91,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class104,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class104,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class104,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class104,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class104,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class104,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class104,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class104,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class104,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class104,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class104,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class104,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class104,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class104,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class104,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class117,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class117,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class117,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class117,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class117,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class117,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class117,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class117,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class117,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class117,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class117,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class117,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class117,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class117,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class117,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class130,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class130,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class130,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class130,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class130,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class130,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class130,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class130,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class130,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class130,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class130,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class130,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class130,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class130,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class130,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class143,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class143,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class143,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class143,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class143,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class143,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class143,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class143,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class143,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class143,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class143,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class143,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class143,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class143,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class143,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class156,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class156,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class156,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class156,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class156,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class156,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class156,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class156,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class156,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class156,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class156,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class156,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class156,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class156,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class156,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class169,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class169,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class169,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class169,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class169,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class169,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class169,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class169,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class169,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class169,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class169,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class169,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class169,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class169,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class169,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class182,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class182,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class182,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class182,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class182,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class182,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class182,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class182,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class182,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class182,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class182,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class182,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class182,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class182,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class182,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class195,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class195,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class195,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class195,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class195,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class195,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class195,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class195,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class195,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class195,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class195,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class195,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class195,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class195,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class195,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class208,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class208,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class208,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class208,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class208,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class208,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class208,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class208,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class208,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class208,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class208,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class208,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class208,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class208,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class208,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class221,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class221,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class221,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class221,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class221,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class221,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class221,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class221,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class221,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class221,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class221,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class221,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class221,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class221,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class221,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class234,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class234,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class234,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class234,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class234,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class234,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class234,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class234,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class234,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class234,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class234,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class234,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class234,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class234,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class234,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class247,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class247,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class247,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class247,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class247,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class247,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class247,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class247,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class247,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class247,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class247,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class247,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class247,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class247,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class247,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class260,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class260,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class260,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class260,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class260,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class260,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class260,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class260,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class260,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class260,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class260,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class260,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class260,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class260,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class260,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class273,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class273,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class273,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class273,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class273,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class273,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class273,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class273,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class273,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class273,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class273,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class273,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class273,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class273,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class273,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class286,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class286,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class286,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class286,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class286,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class286,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class286,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class286,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class286,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class286,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class286,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class286,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class286,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class286,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class286,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class299,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class299,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class299,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class299,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class299,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class299,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class299,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class299,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class299,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class299,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class299,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class299,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class299,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class299,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class299,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class312,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class312,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class312,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class312,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class312,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class312,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class312,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class312,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class312,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class312,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class312,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class312,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class312,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class312,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class312,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class325,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class325,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class325,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class325,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class325,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class325,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class325,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class325,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class325,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class325,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class325,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class325,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class325,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class325,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class325,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class338,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class338,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class338,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class338,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class338,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class338,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class338,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class338,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class338,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class338,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class338,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class338,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class338,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class338,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class338,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class351,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class351,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class351,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class351,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class351,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class351,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class351,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class351,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class351,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class351,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class351,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class351,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class351,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class351,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class351,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class364,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class364,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class364,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class364,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class364,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class364,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class364,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class364,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class364,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class364,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class364,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class364,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class364,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class364,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class364,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class377,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class377,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class377,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class377,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class377,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class377,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class377,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class377,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class377,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class377,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class377,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class377,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class377,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class377,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class377,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class390,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+53,class390,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+53,class390,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+53,class390,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+53,class390,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+53,class390,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+53,class390,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class390,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class390,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class390,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class390,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+53,class390,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+53,class390,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+53,class390,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+53,class390,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class0,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class0,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class0,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class0,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class0,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class0,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class0,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class0,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class0,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class0,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class0,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class0,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class0,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class0,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class0,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class13,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class13,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class13,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class13,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class13,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class13,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class13,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class13,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class13,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class13,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class13,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class13,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class13,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class13,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class13,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class26,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class26,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class26,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class26,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class26,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class26,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class26,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class26,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class26,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class26,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class26,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class26,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class26,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class26,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class26,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class39,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class39,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class39,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class39,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class39,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class39,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class39,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class39,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class39,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class39,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class39,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class39,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class39,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class39,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class39,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class52,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class52,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class52,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class52,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class52,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class52,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class52,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class52,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class52,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class52,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class52,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class52,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class52,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class52,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class52,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class65,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class65,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class65,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class65,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class65,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class65,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class65,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class65,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class65,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class65,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class65,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class65,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class65,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class65,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class65,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class78,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class78,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class78,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class78,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class78,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class78,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class78,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class78,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class78,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class78,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class78,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class78,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class78,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class78,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class78,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class91,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class91,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class91,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class91,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class91,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class91,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class91,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class91,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class91,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class91,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class91,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class91,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class91,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class91,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class91,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class104,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class104,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class104,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class104,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class104,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class104,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class104,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class104,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class104,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class104,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class104,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class104,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class104,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class104,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class104,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class117,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class117,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class117,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class117,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class117,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class117,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class117,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class117,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class117,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class117,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class117,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class117,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class117,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class117,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class117,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class130,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class130,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class130,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class130,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class130,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class130,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class130,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class130,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class130,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class130,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class130,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class130,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class130,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class130,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class130,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class143,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class143,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class143,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class143,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class143,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class143,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class143,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class143,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class143,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class143,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class143,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class143,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class143,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class143,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class143,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class156,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class156,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class156,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class156,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class156,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class156,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class156,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class156,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class156,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class156,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class156,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class156,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class156,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class156,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class156,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class169,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class169,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class169,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class169,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class169,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class169,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class169,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class169,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class169,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class169,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class169,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class169,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class169,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class169,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class169,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class182,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class182,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class182,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class182,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class182,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class182,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class182,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class182,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class182,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class182,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class182,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class182,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class182,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class182,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class182,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class195,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class195,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class195,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class195,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class195,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class195,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class195,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class195,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class195,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class195,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class195,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class195,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class195,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class195,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class195,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class208,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class208,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class208,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class208,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class208,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class208,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class208,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class208,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class208,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class208,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class208,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class208,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class208,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class208,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class208,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class221,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class221,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class221,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class221,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class221,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class221,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class221,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class221,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class221,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class221,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class221,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class221,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class221,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class221,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class221,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class234,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class234,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class234,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class234,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class234,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class234,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class234,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class234,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class234,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class234,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class234,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class234,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class234,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class234,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class234,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class247,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class247,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class247,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class247,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class247,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class247,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class247,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class247,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class247,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class247,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class247,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class247,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class247,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class247,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class247,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class260,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class260,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class260,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class260,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class260,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class260,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class260,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class260,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class260,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class260,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class260,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class260,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class260,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class260,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class260,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class273,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class273,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class273,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class273,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class273,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class273,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class273,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class273,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class273,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class273,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class273,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class273,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class273,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class273,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class273,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class286,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class286,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class286,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class286,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class286,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class286,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class286,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class286,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class286,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class286,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class286,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class286,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class286,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class286,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class286,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class299,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class299,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class299,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class299,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class299,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class299,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class299,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class299,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class299,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class299,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class299,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class299,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class299,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class299,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class299,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class312,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class312,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class312,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class312,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class312,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class312,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class312,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class312,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class312,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class312,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class312,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class312,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class312,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class312,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class312,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class325,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class325,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class325,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class325,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class325,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class325,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class325,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class325,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class325,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class325,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class325,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class325,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class325,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class325,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class325,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class338,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class338,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class338,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class338,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class338,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class338,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class338,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class338,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class338,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class338,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class338,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class338,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class338,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class338,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class338,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class351,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class351,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class351,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class351,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class351,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class351,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class351,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class351,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class351,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class351,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class351,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class351,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class351,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class351,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class351,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class364,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class364,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class364,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class364,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class364,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class364,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class364,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class364,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class364,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class364,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class364,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class364,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class364,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class364,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class364,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class377,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class377,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class377,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class377,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class377,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class377,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class377,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class377,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class377,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class377,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class377,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class377,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class377,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class377,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class377,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class390,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+79,class390,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+79,class390,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+79,class390,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+79,class390,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+79,class390,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+79,class390,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class390,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class390,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class390,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class390,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+79,class390,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+79,class390,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+79,class390,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+79,class390,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class0,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class0,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class0,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class0,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class0,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class0,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class0,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class0,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class0,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class0,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class0,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class0,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class0,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class0,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class0,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class13,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class13,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class13,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class13,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class13,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class13,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class13,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class13,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class13,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class13,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class13,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class13,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class13,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class13,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class13,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class26,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class26,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class26,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class26,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class26,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class26,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class26,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class26,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class26,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class26,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class26,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class26,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class26,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class26,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class26,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class39,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class39,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class39,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class39,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class39,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class39,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class39,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class39,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class39,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class39,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class39,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class39,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class39,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class39,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class39,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class52,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class52,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class52,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class52,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class52,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class52,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class52,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class52,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class52,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class52,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class52,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class52,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class52,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class52,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class52,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class65,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class65,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class65,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class65,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class65,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class65,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class65,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class65,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class65,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class65,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class65,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class65,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class65,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class65,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class65,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class78,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class78,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class78,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class78,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class78,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class78,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class78,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class78,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class78,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class78,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class78,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class78,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class78,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class78,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class78,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class91,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class91,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class91,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class91,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class91,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class91,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class91,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class91,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class91,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class91,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class91,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class91,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class91,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class91,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class91,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class104,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class104,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class104,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class104,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class104,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class104,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class104,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class104,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class104,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class104,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class104,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class104,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class104,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class104,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class104,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class117,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class117,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class117,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class117,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class117,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class117,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class117,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class117,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class117,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class117,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class117,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class117,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class117,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class117,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class117,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class130,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class130,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class130,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class130,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class130,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class130,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class130,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class130,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class130,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class130,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class130,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class130,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class130,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class130,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class130,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class143,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class143,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class143,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class143,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class143,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class143,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class143,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class143,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class143,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class143,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class143,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class143,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class143,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class143,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class143,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class156,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class156,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class156,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class156,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class156,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class156,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class156,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class156,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class156,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class156,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class156,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class156,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class156,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class156,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class156,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class169,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class169,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class169,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class169,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class169,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class169,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class169,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class169,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class169,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class169,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class169,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class169,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class169,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class169,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class169,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class182,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class182,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class182,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class182,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class182,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class182,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class182,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class182,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class182,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class182,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class182,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class182,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class182,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class182,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class182,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class195,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class195,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class195,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class195,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class195,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class195,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class195,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class195,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class195,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class195,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class195,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class195,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class195,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class195,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class195,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class208,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class208,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class208,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class208,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class208,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class208,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class208,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class208,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class208,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class208,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class208,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class208,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class208,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class208,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class208,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class221,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class221,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class221,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class221,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class221,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class221,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class221,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class221,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class221,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class221,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class221,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class221,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class221,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class221,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class221,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class234,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class234,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class234,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class234,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class234,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class234,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class234,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class234,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class234,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class234,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class234,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class234,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class234,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class234,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class234,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class247,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class247,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class247,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class247,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class247,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class247,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class247,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class247,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class247,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class247,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class247,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class247,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class247,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class247,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class247,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class260,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class260,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class260,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class260,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class260,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class260,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class260,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class260,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class260,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class260,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class260,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class260,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class260,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class260,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class260,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class273,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class273,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class273,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class273,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class273,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class273,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class273,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class273,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class273,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class273,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class273,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class273,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class273,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class273,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class273,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class286,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class286,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class286,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class286,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class286,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class286,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class286,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class286,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class286,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class286,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class286,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class286,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class286,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class286,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class286,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class299,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class299,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class299,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class299,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class299,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class299,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class299,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class299,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class299,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class299,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class299,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class299,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class299,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class299,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class299,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class312,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class312,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class312,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class312,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class312,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class312,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class312,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class312,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class312,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class312,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class312,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class312,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class312,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class312,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class312,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class325,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class325,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class325,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class325,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class325,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class325,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class325,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class325,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class325,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class325,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class325,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class325,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class325,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class325,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class325,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class338,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class338,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class338,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class338,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class338,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class338,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class338,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class338,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class338,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class338,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class338,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class338,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class338,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class338,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class338,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class351,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class351,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class351,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class351,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class351,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class351,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class351,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class351,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class351,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class351,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class351,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class351,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class351,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class351,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class351,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class364,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class364,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class364,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class364,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class364,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class364,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class364,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class364,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class364,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class364,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class364,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class364,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class364,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class364,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class364,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class377,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class377,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class377,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class377,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class377,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class377,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class377,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class377,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class377,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class377,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class377,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class377,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class377,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class377,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class377,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class390,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+131,class390,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+131,class390,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+131,class390,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+131,class390,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+131,class390,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+131,class390,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class390,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class390,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class390,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class390,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+131,class390,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+131,class390,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+131,class390,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+131,class390,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class0,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class0,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class0,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class0,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class0,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class0,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class0,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class0,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class0,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class0,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class0,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class0,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class0,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class0,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class0,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class13,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class13,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class13,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class13,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class13,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class13,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class13,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class13,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class13,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class13,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class13,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class13,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class13,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class13,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class13,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class26,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class26,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class26,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class26,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class26,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class26,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class26,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class26,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class26,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class26,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class26,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class26,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class26,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class26,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class26,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class39,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class39,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class39,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class39,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class39,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class39,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class39,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class39,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class39,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class39,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class39,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class39,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class39,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class39,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class39,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class52,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class52,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class52,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class52,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class52,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class52,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class52,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class52,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class52,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class52,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class52,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class52,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class52,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class52,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class52,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class65,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class65,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class65,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class65,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class65,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class65,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class65,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class65,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class65,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class65,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class65,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class65,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class65,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class65,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class65,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class78,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class78,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class78,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class78,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class78,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class78,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class78,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class78,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class78,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class78,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class78,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class78,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class78,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class78,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class78,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class91,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class91,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class91,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class91,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class91,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class91,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class91,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class91,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class91,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class91,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class91,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class91,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class91,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class91,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class91,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class104,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class104,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class104,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class104,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class104,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class104,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class104,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class104,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class104,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class104,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class104,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class104,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class104,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class104,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class104,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class117,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class117,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class117,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class117,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class117,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class117,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class117,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class117,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class117,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class117,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class117,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class117,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class117,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class117,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class117,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class130,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class130,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class130,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class130,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class130,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class130,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class130,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class130,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class130,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class130,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class130,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class130,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class130,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class130,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class130,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class143,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class143,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class143,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class143,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class143,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class143,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class143,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class143,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class143,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class143,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class143,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class143,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class143,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class143,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class143,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class156,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class156,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class156,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class156,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class156,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class156,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class156,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class156,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class156,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class156,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class156,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class156,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class156,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class156,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class156,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class169,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class169,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class169,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class169,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class169,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class169,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class169,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class169,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class169,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class169,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class169,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class169,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class169,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class169,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class169,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class182,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class182,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class182,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class182,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class182,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class182,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class182,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class182,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class182,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class182,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class182,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class182,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class182,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class182,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class182,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class195,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class195,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class195,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class195,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class195,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class195,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class195,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class195,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class195,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class195,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class195,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class195,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class195,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class195,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class195,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class208,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class208,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class208,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class208,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class208,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class208,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class208,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class208,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class208,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class208,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class208,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class208,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class208,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class208,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class208,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class221,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class221,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class221,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class221,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class221,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class221,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class221,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class221,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class221,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class221,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class221,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class221,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class221,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class221,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class221,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class234,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class234,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class234,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class234,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class234,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class234,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class234,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class234,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class234,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class234,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class234,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class234,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class234,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class234,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class234,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class247,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class247,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class247,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class247,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class247,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class247,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class247,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class247,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class247,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class247,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class247,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class247,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class247,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class247,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class247,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class260,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class260,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class260,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class260,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class260,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class260,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class260,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class260,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class260,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class260,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class260,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class260,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class260,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class260,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class260,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class273,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class273,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class273,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class273,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class273,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class273,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class273,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class273,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class273,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class273,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class273,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class273,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class273,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class273,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class273,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class286,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class286,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class286,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class286,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class286,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class286,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class286,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class286,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class286,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class286,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class286,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class286,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class286,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class286,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class286,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class299,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class299,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class299,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class299,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class299,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class299,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class299,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class299,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class299,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class299,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class299,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class299,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class299,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class299,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class299,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class312,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class312,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class312,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class312,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class312,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class312,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class312,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class312,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class312,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class312,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class312,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class312,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class312,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class312,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class312,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class325,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class325,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class325,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class325,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class325,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class325,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class325,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class325,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class325,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class325,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class325,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class325,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class325,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class325,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class325,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class338,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class338,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class338,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class338,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class338,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class338,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class338,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class338,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class338,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class338,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class338,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class338,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class338,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class338,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class338,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class351,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class351,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class351,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class351,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class351,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class351,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class351,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class351,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class351,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class351,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class351,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class351,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class351,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class351,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class351,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class364,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class364,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class364,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class364,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class364,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class364,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class364,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class364,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class364,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class364,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class364,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class364,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class364,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class364,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class364,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class377,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class377,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class377,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class377,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class377,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class377,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class377,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class377,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class377,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class377,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class377,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class377,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class377,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class377,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class377,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class390,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+157,class390,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+157,class390,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+157,class390,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+157,class390,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+157,class390,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+157,class390,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class390,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class390,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class390,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class390,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+157,class390,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+157,class390,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+157,class390,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+157,class390,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class0,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class0,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class0,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class0,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class0,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class0,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class0,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class0,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class0,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class0,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class0,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class0,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class0,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class0,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class0,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class13,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class13,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class13,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class13,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class13,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class13,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class13,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class13,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class13,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class13,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class13,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class13,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class13,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class13,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class13,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class26,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class26,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class26,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class26,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class26,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class26,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class26,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class26,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class26,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class26,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class26,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class26,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class26,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class26,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class26,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class39,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class39,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class39,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class39,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class39,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class39,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class39,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class39,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class39,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class39,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class39,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class39,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class39,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class39,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class39,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class52,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class52,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class52,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class52,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class52,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class52,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class52,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class52,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class52,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class52,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class52,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class52,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class52,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class52,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class52,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class65,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class65,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class65,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class65,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class65,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class65,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class65,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class65,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class65,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class65,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class65,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class65,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class65,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class65,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class65,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class78,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class78,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class78,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class78,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class78,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class78,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class78,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class78,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class78,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class78,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class78,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class78,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class78,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class78,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class78,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class91,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class91,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class91,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class91,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class91,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class91,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class91,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class91,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class91,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class91,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class91,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class91,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class91,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class91,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class91,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class104,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class104,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class104,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class104,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class104,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class104,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class104,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class104,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class104,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class104,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class104,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class104,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class104,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class104,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class104,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class117,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class117,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class117,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class117,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class117,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class117,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class117,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class117,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class117,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class117,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class117,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class117,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class117,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class117,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class117,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class130,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class130,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class130,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class130,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class130,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class130,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class130,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class130,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class130,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class130,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class130,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class130,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class130,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class130,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class130,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class143,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class143,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class143,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class143,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class143,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class143,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class143,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class143,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class143,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class143,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class143,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class143,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class143,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class143,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class143,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class156,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class156,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class156,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class156,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class156,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class156,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class156,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class156,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class156,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class156,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class156,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class156,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class156,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class156,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class156,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class169,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class169,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class169,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class169,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class169,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class169,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class169,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class169,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class169,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class169,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class169,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class169,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class169,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class169,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class169,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class182,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class182,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class182,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class182,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class182,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class182,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class182,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class182,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class182,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class182,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class182,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class182,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class182,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class182,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class182,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class195,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class195,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class195,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class195,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class195,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class195,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class195,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class195,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class195,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class195,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class195,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class195,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class195,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class195,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class195,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class208,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class208,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class208,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class208,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class208,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class208,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class208,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class208,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class208,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class208,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class208,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class208,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class208,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class208,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class208,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class221,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class221,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class221,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class221,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class221,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class221,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class221,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class221,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class221,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class221,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class221,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class221,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class221,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class221,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class221,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class234,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class234,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class234,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class234,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class234,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class234,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class234,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class234,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class234,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class234,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class234,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class234,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class234,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class234,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class234,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class247,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class247,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class247,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class247,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class247,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class247,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class247,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class247,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class247,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class247,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class247,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class247,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class247,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class247,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class247,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class260,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class260,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class260,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class260,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class260,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class260,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class260,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class260,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class260,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class260,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class260,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class260,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class260,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class260,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class260,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class273,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class273,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class273,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class273,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class273,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class273,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class273,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class273,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class273,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class273,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class273,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class273,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class273,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class273,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class273,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class286,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class286,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class286,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class286,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class286,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class286,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class286,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class286,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class286,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class286,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class286,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class286,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class286,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class286,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class286,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class299,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class299,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class299,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class299,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class299,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class299,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class299,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class299,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class299,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class299,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class299,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class299,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class299,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class299,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class299,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class312,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class312,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class312,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class312,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class312,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class312,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class312,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class312,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class312,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class312,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class312,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class312,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class312,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class312,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class312,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class325,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class325,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class325,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class325,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class325,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class325,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class325,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class325,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class325,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class325,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class325,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class325,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class325,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class325,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class325,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class338,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class338,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class338,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class338,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class338,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class338,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class338,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class338,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class338,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class338,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class338,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class338,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class338,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class338,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class338,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class351,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class351,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class351,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class351,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class351,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class351,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class351,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class351,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class351,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class351,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class351,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class351,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class351,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class351,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class351,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class364,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class364,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class364,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class364,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class364,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class364,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class364,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class364,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class364,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class364,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class364,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class364,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class364,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class364,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class364,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class377,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class377,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class377,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class377,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class377,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class377,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class377,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class377,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class377,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class377,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class377,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class377,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class377,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class377,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class377,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class390,1,(z_0,z_1,z_2,z_3),NOT_REPRESENTABLE
+313,class390,2,(z_0,z_1,z_2,z_4),NOT_REPRESENTABLE
+313,class390,3,(z_0,z_1,z_2,z_5),NOT_REPRESENTABLE
+313,class390,4,(z_0,z_1,z_3,z_4),NOT_REPRESENTABLE
+313,class390,5,(z_0,z_1,z_3,z_5),NOT_REPRESENTABLE
+313,class390,6,(z_0,z_1,z_4,z_5),NOT_REPRESENTABLE
+313,class390,7,(z_0,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class390,8,(z_0,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class390,9,(z_0,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class390,10,(z_0,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class390,11,(z_1,z_2,z_3,z_4),NOT_REPRESENTABLE
+313,class390,12,(z_1,z_2,z_3,z_5),NOT_REPRESENTABLE
+313,class390,13,(z_1,z_2,z_4,z_5),NOT_REPRESENTABLE
+313,class390,14,(z_1,z_3,z_4,z_5),NOT_REPRESENTABLE
+313,class390,15,(z_2,z_3,z_4,z_5),NOT_REPRESENTABLE
+Done.
+```
