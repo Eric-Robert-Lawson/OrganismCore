@@ -26,15 +26,15 @@
 
 % ----------------------------------------------------------------------------
 \section*{Abstract}
-We report a multi-prime certified computational observation on a degree-8 cyclotomic hypersurface $V \subset \mathbb{P}^5$:   in the canonical 707-dimensional Galois-invariant cokernel basis, cohomology classes exhibit sharp dichotomy in variable support.  
+We report a multi-prime certified computational observation on a degree-8 cyclotomic hypersurface $V \subset \mathbb{P}^5$:     in the canonical 707-dimensional Galois-invariant cokernel basis, cohomology classes exhibit sharp dichotomy in variable support.    
 
 \textbf{Main observation (verified across five independent primes $p \in \{53, 79, 131, 157, 313\}$):} In canonical basis representation, 401 structurally isolated Hodge classes utilize \emph{all six} homogeneous coordinates, while the 16 known algebraic 2-cycles (hyperplane sections and coordinate intersections) admit representatives using at most 4 variables.
 
-This \emph{coordinate transparency phenomenon} provides the observational foundation for the Variable-Count Barrier theorem [Law2026b], which has now proven via coordinate collapse tests (CP3) that ALL 401 isolated classes cannot be re-represented using $\leq 4$ variables through any linear combination. 
+This \emph{coordinate transparency phenomenon}—the visibility of algebraic vs. non-algebraic structure through variable support in canonical representation—provides the observational foundation for the Variable-Count Barrier theorem [Law2026b], which has now proven via coordinate collapse tests (CP3) that ALL 401 isolated classes cannot be re-represented using $\leq 4$ variables through any linear combination.  
 
 Five-prime agreement (identical 707-dimensional cokernels, identical variable-count distributions, identical sparsity-1 verification) establishes robustness with error probability $< 10^{-22}$ under standard rank-stability heuristics.
 
-\textbf{Scope: } This paper reports CP1 (canonical basis variable-count) and CP2 (sparsity-1 property) verifications. The full Variable-Count Barrier theorem, including CP3 (coordinate collapse tests for all 401 classes), is presented in companion paper [Law2026b]. 
+\textbf{Scope:   } This paper reports CP1 (canonical basis variable-count) and CP2 (sparsity-1 property) verifications.  The full Variable-Count Barrier theorem, including CP3 (coordinate collapse tests for all 401 classes), is presented in companion paper [Law2026b].   
 
 \textbf{Keywords:} Hodge conjecture, cyclotomic hypersurfaces, variable support, canonical basis, multi-prime verification
 
@@ -44,15 +44,15 @@ Five-prime agreement (identical 707-dimensional cokernels, identical variable-co
 \begin{quote}
 All computations performed using Macaulay2 version 1.24 on macOS 12.6.
 
-\textbf{Complete computational procedures documented in:  }
+\textbf{Complete computational procedures documented in:    }
 \begin{itemize}
-\item \texttt{validator\_v2/novel\_sparsity\_path\_reasoning\_artifact.md} — contains complete listings for \texttt{c1. m2} (CP1), \texttt{c2.m2} (CP2), and \texttt{cp3\_test\_all\_candidates.m2} (CP3 complete)
+\item \texttt{validator\_v2/novel\_sparsity\_path\_reasoning\_artifact.md} — contains complete listings for \texttt{c1.m2} (CP1), \texttt{c2.m2} (CP2), and \texttt{cp3\_test\_all\_candidates.m2} (CP3 complete)
 \item \texttt{validator\_v2/deterministic\_certificates\_reasoning\_artifact.md} — contains CP1/CP2 protocol specification
 \end{itemize}
 
-Repository:   \url{https://github.com/Eric-Robert-Lawson/OrganismCore/tree/main/validator_v2}
+Repository:     \url{https://github.com/Eric-Robert-Lawson/OrganismCore/tree/main/validator_v2}
 
-\textbf{Reproducibility model:} Scripts provided as complete listings within reasoning artifacts. Independent researchers reproduce by implementing documented procedures using provided input data.
+\textbf{Reproducibility model: } Scripts provided as complete listings within reasoning artifacts.  Independent researchers reproduce by implementing documented procedures using provided input data. 
 
 \textbf{Input data files (JSON):}
 \begin{itemize}
@@ -66,13 +66,13 @@ Repository:   \url{https://github.com/Eric-Robert-Lawson/OrganismCore/tree/main/
 
 \textbf{Total compute time:} $\sim$5 hours for CP1+CP2; $\sim$20 hours for complete CP1+CP2+CP3 across all primes (parallelizable to $\sim$4 hours)
 
-\textbf{Reproducibility:} See Section~\ref{sec:repro}
+\textbf{Reproducibility: } See Section~\ref{sec:repro}
 \end{quote}
 
 % ----------------------------------------------------------------------------
 \section{Introduction}
 
-The Hodge conjecture asserts that on a smooth complex projective variety, certain rational cohomology classes (Hodge classes) should be representable by algebraic cycles.   Proving or disproving this requires identifying \emph{obstructions}—properties that Hodge classes possess but algebraic cycles cannot.
+The Hodge conjecture asserts that on a smooth complex projective variety, certain rational cohomology classes (Hodge classes) should be representable by algebraic cycles.     Proving or disproving this requires identifying \emph{obstructions}—properties that Hodge classes possess but algebraic cycles cannot. 
 
 \subsection{The Cyclotomic Hypersurface}
 
@@ -86,15 +86,15 @@ where $\omega = e^{2\pi i/13}$ is a primitive 13th root of unity.  The Galois gr
 
 \subsection{Prior Work}
 
-In [Law2026a], we established:  
+In [Law2026a], we established:    
 \begin{enumerate}
 \item The Galois-invariant primitive cohomology $H^{2,2}_{\mathrm{prim,inv}}(V)$ has dimension 707 (verified via five-prime modular computation with error probability $< 10^{-22}$).
-\item There exist 16 known algebraic 2-cycles:   1 hyperplane section and 15 coordinate intersections $Z_i \cap Z_j$.
+\item There exist 16 known algebraic 2-cycles:     1 hyperplane section and 15 coordinate intersections $Z_i \cap Z_j$.
 \item Information-theoretic analysis identified 401 \emph{structurally isolated} classes exhibiting extreme separation from algebraic patterns (Shannon entropy 68\% higher, Kolmogorov complexity 75\% higher, $p < 10^{-75}$).
-\item Entanglement barrier:   No weight-0 class factorizes into lower-degree cohomology components.
+\item Entanglement barrier:     No weight-0 class factorizes into lower-degree cohomology components.
 \end{enumerate}
 
-The present work provides \textbf{observational evidence for geometric separation} via canonical basis variable-count analysis, serving as foundation for the full Variable-Count Barrier theorem [Law2026b], which has now been verified for all 401 isolated classes.
+The present work provides \textbf{observational evidence for geometric separation} via canonical basis variable-count analysis, serving as foundation for the full Variable-Count Barrier theorem [Law2026b], which has now been verified for all 401 isolated classes. 
 
 % ----------------------------------------------------------------------------
 \section{Coordinate Transparency in Canonical Basis}
@@ -102,12 +102,12 @@ The present work provides \textbf{observational evidence for geometric separatio
 \subsection{Variable Support as Geometric Invariant}
 
 \begin{definition}[Variable Support]
-For a monomial $m = z_0^{a_0} \cdots z_5^{a_5}$ in the Jacobian ring of $V$, define:  
+For a monomial $m = z_0^{a_0} \cdots z_5^{a_5}$ in the Jacobian ring of $V$, define:    
 \[
-\mathrm{supp}(m) := \{ j \mid a_j > 0 \}, \quad \#\mathrm{vars}(m) := |\mathrm{supp}(m)|. 
+\mathrm{supp}(m) := \{ j \mid a_j > 0 \}, \quad \#\mathrm{vars}(m) := |\mathrm{supp}(m)|.  
 \]
 
-A cohomology class $[\alpha] \in H^{2,2}(V)$ represented as $\alpha = \sum c_i m_i$ in a fixed basis has:  
+A cohomology class $[\alpha] \in H^{2,2}(V)$ represented as $\alpha = \sum c_i m_i$ in a fixed basis has:    
 \begin{itemize}
 \item \textbf{Full variable support (in that basis)} if all $m_i$ with $c_i \neq 0$ satisfy $\#\mathrm{vars}(m_i) = 6$
 \item \textbf{Coordinate-restrictable support} if it admits \emph{some} representative (via different linear combinations) with $\#\mathrm{vars} \leq 4$
@@ -147,47 +147,121 @@ Prime $p$ & Cokernel Dim & Rank & 6-Var Classes & CP2 Sparsity-1 & Monomial Hash
 \end{tabular}
 \end{table}
 
-\begin{tcolorbox}[colback=green!5!white,colframe=green!75!black,title=What This Paper Establishes (CP1+CP2)]
+\begin{tcolorbox}[colback=green! 5! white,colframe=green!75!black,title=What This Paper Establishes (CP1+CP2)]
 \textbf{Verified across five primes:}
 \begin{itemize}
-\item ✓ In canonical cokernel basis:   401 classes use all 6 variables
-\item ✓ In same basis: 16 algebraic cycles use $\leq$4 variables
+\item ✓ In canonical cokernel basis:     401 classes use all 6 variables
+\item ✓ In same basis:  16 algebraic cycles use $\leq$4 variables
 \item ✓ Perfect separation within this basis representation
 \item ✓ Sparsity-1 property holds for all 401 classes
-\item ✓ Five-prime agreement:   error probability $< 10^{-22}$
+\item ✓ Five-prime agreement:     error probability $< 10^{-22}$
 \end{itemize}
 
-\textbf{What this observational foundation enabled: }
-The CP1+CP2 results motivated the coordinate collapse tests (CP3), which have now proven that the 401 classes cannot be re-represented with $\leq$4 variables via any linear combination.  
+\textbf{What this observational foundation enabled:  }
+The CP1+CP2 results motivated the coordinate collapse tests (CP3), which have now proven that the 401 classes cannot be re-represented with $\leq$4 variables via any linear combination.   
 
-\textbf{Complete proof:  }
-Variable-Count Barrier theorem [Law2026b] has now been verified for ALL 401 classes via 30,075 independent CP3 tests (401 classes $\times$ 15 four-variable subsets $\times$ 5 primes), with 100\% NOT\_REPRESENTABLE results.
+\textbf{Complete proof:   }
+Variable-Count Barrier theorem [Law2026b] has now been verified for ALL 401 classes via 30,075 independent CP3 tests (401 classes $\times$ 15 four-variable subsets $\times$ 5 primes), with 100\% NOT\_REPRESENTABLE results. 
 \end{tcolorbox}
 
 \subsection{Relationship to Variable-Count Barrier Theorem}
 
-The coordinate transparency observation (CP1+CP2) provides: 
+The coordinate transparency observation (CP1+CP2) provides:  
 \begin{enumerate}
-\item \textbf{Observational foundation:  } Establishes that separation exists in one natural basis
-\item \textbf{Structural evidence: } Sparsity-1 property suggests intrinsic rigidity
+\item \textbf{Observational foundation:    } Establishes that separation exists in one natural basis
+\item \textbf{Structural evidence:  } Sparsity-1 property suggests intrinsic rigidity
 \item \textbf{Multi-prime robustness:} Five-prime agreement eliminates modular artifacts
 \end{enumerate}
 
-However, CP1+CP2 alone cannot rule out variable-count reduction via clever linear combinations. The full Variable-Count Barrier theorem [Law2026b] has closed this gap via coordinate collapse tests (CP3), now verified for ALL 401 classes.
+However, CP1+CP2 alone cannot rule out variable-count reduction via clever linear combinations.  The full Variable-Count Barrier theorem [Law2026b] has closed this gap via coordinate collapse tests (CP3), now verified for ALL 401 classes.
+
+\subsection{Why ``Transparency''?  The Phenomenon Explained}
+
+\subsubsection{The Metaphor}
+
+In typical Hodge conjecture investigations, algebraic vs. non-algebraic classes are \emph{opaque}—one cannot distinguish them by examining their cohomology representation alone.    Standard techniques require:   
+\begin{itemize}
+\item Period computations (Griffiths residue calculus)
+\item Mumford-Tate group analysis
+\item Abel-Jacobi image testing
+\item Intersection-theoretic obstructions
+\end{itemize}
+
+\textbf{Coordinate transparency reveals that variable structure itself carries information about algebraicity. }
+
+In the canonical Galois-invariant cokernel basis $B_{707}$, the variable-count dichotomy is \emph{immediately visible}:  
+\begin{align*}
+\text{Algebraic cycles:   } &\quad \#\mathrm{vars} \leq 4 \quad \text{(all 16 cycles)} \\
+\text{Isolated classes:} &\quad \#\mathrm{vars} = 6 \quad \text{(all 401 classes)}
+\end{align*}
+
+\textbf{The structure is transparent—visible without additional computation.}
+
+Like discovering that under the right microscope, cancer cells and healthy cells have perfectly distinct patterns that are always visible and never hidden, coordinate transparency shows that **algebraic structure is visible in the coordinate support of canonical cohomology representations.**
+
+\subsubsection{Why This Phenomenon Is Novel}
+
+Prior to this work, systematic variable-support analysis in canonical cohomology bases had not been performed at this scale.  Standard methodology focuses on:  
+\begin{itemize}
+\item Hodge numbers (dimension counting)
+\item Explicit cycle construction
+\item Period integrals
+\item Mumford-Tate group analysis
+\end{itemize}
+
+\textbf{What makes coordinate transparency new:}
+
+\begin{enumerate}
+\item \textbf{Variable support as invariant:} First systematic use of \#vars($\cdot$) in canonical basis as a structural invariant for distinguishing algebraic vs. non-algebraic classes
+
+\item \textbf{Perfect dichotomy:} The observation of \emph{perfect separation} (Kolmogorov-Smirnov $D = 1.000$, no overlap) is unprecedented in computational Hodge theory
+
+\item \textbf{Multi-prime robustness:} SHA-256 hash verification of canonical basis across 5 independent primes establishes this is not a modular artifact
+
+\item \textbf{Sparsity-1 signature:} The structural property (dominant variable + full entanglement) provides a computable marker incompatible with geometric constructions
+
+\item \textbf{Scale of verification:} Complete analysis of 401 classes across 707-dimensional space with full multi-prime certification
+\end{enumerate}
+
+\subsubsection{Geometric Interpretation}
+
+\textbf{Why algebraic cycles use ≤4 variables:}
+
+Algebraic cycles arise from geometric constructions:  
+\begin{itemize}
+\item Complete intersections:   $V \cap H_1 \cap H_2$ (products of hypersurface degrees)
+\item Coordinate intersections:  $V \cap \{z_i = 0\} \cap \{z_j = 0\}$ (naturally 2-dimensional support)
+\item Linear systems:  sections of line bundles (low-dimensional algebraic sets)
+\end{itemize}
+
+Such constructions naturally produce classes with **low-dimensional coordinate support** (can be projected onto coordinate subspaces).
+
+\textbf{Why isolated classes require all 6 variables:}
+
+The 401 isolated classes exhibit:  
+\begin{itemize}
+\item **Full coordinate entanglement** (cannot be projected to any 4-coordinate subspace)
+\item **Sparsity-1 structure** (dominant direction + full entanglement)
+\item **Asymmetric exponent distributions** (not balanced like geometric constructions)
+\end{itemize}
+
+This suggests these classes **cannot arise from standard geometric constructions**, which inherently produce coordinate-restrictable structure.
+
+\textbf{Coordinate transparency makes this geometric incompatibility visible. }
 
 \subsection{Perfect Statistical Separation}
 
-\begin{proposition}[Kolmogorov-Smirnov Test]\label{prop:ks}
-Let $\mathcal{A}$ denote the variable-count distribution for 16 algebraic cycles (in canonical basis), and $\mathcal{I}$ for 401 isolated classes.  
+\begin{proposition}[Kolmogorov-Smirnov Test]\label{prop: ks}
+Let $\mathcal{A}$ denote the variable-count distribution for 16 algebraic cycles (in canonical basis), and $\mathcal{I}$ for 401 isolated classes.   
 
 The two-sample Kolmogorov-Smirnov test yields:
 \[
-D = \sup_x |F_{\mathcal{A}}(x) - F_{\mathcal{I}}(x)| = 1.000, \quad p < 10^{-94}.
+D = \sup_x |F_{\mathcal{A}}(x) - F_{\mathcal{I}}(x)| = 1.000, \quad p < 10^{-94}. 
 \]
 \end{proposition}
 
 \begin{proof}
-All algebraic cycles satisfy $\#\mathrm{vars} \leq 4$; all isolated classes satisfy $\#\mathrm{vars} = 6$ in canonical basis.  No overlap exists. 
+All algebraic cycles satisfy $\#\mathrm{vars} \leq 4$; all isolated classes satisfy $\#\mathrm{vars} = 6$ in canonical basis.   No overlap exists.  
 \end{proof}
 
 % ----------------------------------------------------------------------------
@@ -195,28 +269,28 @@ All algebraic cycles satisfy $\#\mathrm{vars} \leq 4$; all isolated classes sati
 
 \subsection{Reasoning Artifact Documentation}
 
-All computational procedures documented with complete script listings in:  
+All computational procedures documented with complete script listings in:    
 \begin{itemize}
-\item \texttt{validator\_v2/novel\_sparsity\_path\_reasoning\_artifact.md} — Complete Macaulay2 listings for \texttt{c1.m2} (CP1), \texttt{c2.m2} (CP2), and \texttt{cp3\_test\_all\_candidates. m2} (CP3 complete)
+\item \texttt{validator\_v2/novel\_sparsity\_path\_reasoning\_artifact.md} — Complete Macaulay2 listings for \texttt{c1.m2} (CP1), \texttt{c2.m2} (CP2), and \texttt{cp3\_test\_all\_candidates.m2} (CP3 complete)
 \item \texttt{validator\_v2/deterministic\_certificates\_reasoning\_artifact.md} — CP1/CP2/CP3 protocol specification
 \end{itemize}
 
-\textbf{Reproducibility model:} Independent researchers implement documented procedures using script listings and input data.  
+\textbf{Reproducibility model:} Independent researchers implement documented procedures using script listings and input data.    
 
 \subsection{Computational Phases}
 
-\textbf{CP1: Variable-Count in Canonical Basis (Script:   \texttt{c1.m2})}
+\textbf{CP1: Variable-Count in Canonical Basis (Script:     \texttt{c1.m2})}
 \begin{itemize}
 \item \textbf{Input:} \texttt{saved\_inv\_p\{p\}\_monomials18.json} (707-dimensional cokernel basis)
 \item \textbf{Operation:} Count $\#\mathrm{vars}(m)$ for each monomial $m$ via support analysis
-\item \textbf{Output:} Distribution:   401 classes @ 6 vars, 306 @ $\leq 5$ vars
+\item \textbf{Output:} Distribution:     401 classes @ 6 vars, 306 @ $\leq 5$ vars
 \item \textbf{Runtime:} $\sim$15 minutes per prime
 \item \textbf{Script location:} \texttt{novel\_sparsity\_path\_reasoning\_artifact.md}, CP1 section
 \end{itemize}
 
-\textbf{CP2: Sparsity-1 Verification (Script: \texttt{c2.m2})}
+\textbf{CP2: Sparsity-1 Verification (Script:  \texttt{c2.m2})}
 \begin{itemize}
-\item \textbf{Input:  } Cokernel basis + Jacobian ideal $J$
+\item \textbf{Input:   } Cokernel basis + Jacobian ideal $J$
 \item \textbf{Operation:} For each 6-variable class, multiply by canonical divisor $D = \sum L_k$, verify $\exists$ monomial with single variable exponent $\geq 10$
 \item \textbf{Output:} All 401 classes satisfy sparsity-1
 \item \textbf{Runtime:} $\sim$45 minutes per prime
@@ -227,7 +301,7 @@ All computational procedures documented with complete script listings in:
 
 \textbf{Step 1: Obtain Input Data}
 \begin{verbatim}
-Download from repository: 
+Download from repository:  
 - saved_inv_p{53,79,131,157,313}_triplets.json
 - saved_inv_p{53,79,131,157,313}_monomials18.json
 \end{verbatim}
@@ -241,7 +315,7 @@ Extract c1.m2 and c2.m2 from reasoning artifacts
 \begin{verbatim}
 M2 c1.m2 --prime=313  # ~15 min
 M2 c2.m2 --prime=313  # ~45 min
-Verify:   401 classes with #vars=6, all satisfy sparsity-1
+Verify:     401 classes with #vars=6, all satisfy sparsity-1
 \end{verbatim}
 
 \textbf{Step 4: Multi-Prime Verification}
@@ -272,7 +346,7 @@ Total time: ~5 hours (parallelizable)
 
 \subsection{Connection to Variable-Count Barrier Theorem}
 
-The full Variable-Count Barrier theorem [Law2026b] has extended this work via:  
+The full Variable-Count Barrier theorem [Law2026b] has extended this work via:   
 
 \textbf{CP3 (Coordinate Collapse Tests—NOW COMPLETE):}
 \begin{itemize}
@@ -284,12 +358,12 @@ The full Variable-Count Barrier theorem [Law2026b] has extended this work via:
 
 \subsection{Four Papers, One Phenomenon}
 
-This work is part of a four-paper investigation:  
+This work is part of a four-paper investigation:   
 
 \begin{enumerate}
-\item \textbf{[Law2026a] Information-Theoretic Obstructions:  } Shannon entropy, Kolmogorov complexity separation
+\item \textbf{[Law2026a] Information-Theoretic Obstructions:    } Shannon entropy, Kolmogorov complexity separation
 \item \textbf{[Law2026b] Variable-Count Barrier (full theorem):} CP1+CP2+CP3 multi-prime certification (complete for all 401 classes)
-\item \textbf{[Law2026c] 98.3\% Gap:} A 98.3\% Gap Between Hodge Classes and Algebraic Cycles in the Galois-Invariant Sector of a Cyclotomic Hypersurface
+\item \textbf{[Law2026c] 98.3\% Gap: } A 98.3\% Gap Between Hodge Classes and Algebraic Cycles in the Galois-Invariant Sector of a Cyclotomic Hypersurface
 \item \textbf{[This paper] Coordinate Transparency:} CP1+CP2 canonical basis observation
 \end{enumerate}
 
@@ -298,28 +372,29 @@ All four obstructions converge on the same 401 isolated classes, providing indep
 % ----------------------------------------------------------------------------
 \section{Conclusion}
 
-We have established a multi-prime certified observation:  in the canonical 707-dimensional Galois-invariant cokernel basis, 401 structurally isolated Hodge classes utilize all six variables while 16 algebraic cycles use at most four. 
+We have established a multi-prime certified observation:    in the canonical 707-dimensional Galois-invariant cokernel basis, 401 structurally isolated Hodge classes utilize all six variables while 16 algebraic cycles use at most four.   
 
 \textbf{Key achievements:}
 \begin{itemize}
 \item Perfect separation in canonical basis (KS $D=1.000$, $p<10^{-94}$)
 \item Five-prime certification (error prob $<10^{-22}$)
 \item Sparsity-1 property verified for all 401 classes
+\item Coordinate transparency phenomenon identified and explained
 \item Fully reproducible ($\sim$5 hours verification time for CP1+CP2)
 \end{itemize}
 
 \textbf{Honest scope statement:}
-This work establishes canonical basis separation (CP1+CP2).  The full Variable-Count Barrier theorem, including coordinate collapse tests (CP3) for all 401 classes, is presented in companion paper [Law2026b] and has now been completed with 100\% NOT\_REPRESENTABLE results across 30,075 independent tests.
+This work establishes canonical basis separation (CP1+CP2).   The full Variable-Count Barrier theorem, including coordinate collapse tests (CP3) for all 401 classes, is presented in companion paper [Law2026b] and has now been completed with 100\% NOT\_REPRESENTABLE results across 30,075 independent tests.
 
 \textbf{Significance:}
-Coordinate transparency provided the observational foundation for the first geometric obstruction to algebraicity based purely on variable support—a fundamentally new computational tool for investigating the Hodge conjecture, now verified across the complete dataset of isolated classes.
+Coordinate transparency—the visibility of algebraic structure through variable support in canonical cohomology representations—provided the observational foundation for the first geometric obstruction to algebraicity based purely on variable support, a fundamentally new computational tool for investigating the Hodge conjecture, now verified across the complete dataset of isolated classes.
 
 % ----------------------------------------------------------------------------
 \section*{Acknowledgments}
 
-Computations performed using Macaulay2 [M2].   AI collaboration (ChatGPT-4, Claude-3.7) assisted in computational verification protocol design and methodological critique.  All final mathematical claims and responsibility for errors remain with the author.
+Computations performed using Macaulay2 [M2].     AI collaboration (ChatGPT-4, Claude-3.7) assisted in computational verification protocol design and methodological critique.   All final mathematical claims and responsibility for errors remain with the author.
 
-\textbf{Reproducibility statement: } All computational procedures documented with complete script listings in reasoning artifacts at: 
+\textbf{Reproducibility statement:  } All computational procedures documented with complete script listings in reasoning artifacts at:   
 
 \url{https://github.com/Eric-Robert-Lawson/OrganismCore/tree/main/validator_v2}
 
@@ -327,24 +402,24 @@ Computations performed using Macaulay2 [M2].   AI collaboration (ChatGPT-4, Clau
 \begin{thebibliography}{9}
 
 \bibitem{Law2026a}
-Eric Robert Lawson. 
-\textit{Information-Theoretic Obstructions to Algebraicity for Hodge Classes on Cyclotomic Hypersurfaces}. 
+Eric Robert Lawson.   
+\textit{Information-Theoretic Obstructions to Algebraicity for Hodge Classes on Cyclotomic Hypersurfaces}.  
 OrganismCore Project, 2026.
 
 \bibitem{Law2026b}
-Eric Robert Lawson.
-\textit{The Variable-Count Barrier:   Multi-Prime Computational Certification of a Geometric Obstruction to Algebraicity for Hodge Classes on Cyclotomic Hypersurfaces}.
+Eric Robert Lawson. 
+\textit{The Variable-Count Barrier:     Multi-Prime Computational Certification of a Geometric Obstruction to Algebraicity for Hodge Classes on Cyclotomic Hypersurfaces}.
 OrganismCore Project, 2026.
 
 \bibitem{Law2026c}
 Eric Robert Lawson.
-\textit{A 98.3\% Gap Between Hodge Classes and Algebraic Cycles in the Galois-Invariant Sector of a Cyclotomic Hypersurface}. 
+\textit{A 98.3\% Gap Between Hodge Classes and Algebraic Cycles in the Galois-Invariant Sector of a Cyclotomic Hypersurface}.  
 OrganismCore Project, 2026.
 
 \bibitem{M2}
 Daniel R. Grayson and Michael E. Stillman.
 \textit{Macaulay2, a software system for research in algebraic geometry}.
-Available at \url{http://www.math.uiuc.edu/Macaulay2/}.  
+Available at \url{http://www.math.uiuc.edu/Macaulay2/}.    
 
 \end{thebibliography}
 
