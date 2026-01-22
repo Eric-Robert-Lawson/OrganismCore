@@ -881,3 +881,402 @@ verification_logs/
 ---
 
 **End of Roadmap**
+
+
+---
+
+**Where I last left off**
+
+I was trying to arrive at building what I needed using this script, but lack the machine computational power to get it done in reasonable amount of time.
+
+```m2
+ericlawson@erics-MacBook-Air ~ % cat solver_resumable.m2 
+-- solver_manualElim_fixed.m2
+-- Resumable manual Gaussian elimination runner (print-only checkpointing + automatic rebuild)
+-- Place next to solver_1_8.m2 and run in a fresh Macaulay2 session:
+--   m2 < solver_manualElim_fixed.m2 > manual_fixed_out.txt 2>&1
+-- or interactively:
+--   load "solver_manualElim_fixed.m2"
+------------------------------------------------------------
+
+-- Tunable parameters (use smaller chunkSize while testing)
+chunkSize = 3;
+testOnly  = false;
+NmultTest = 0;
+forceRebuild = true;
+
+print("Loading solver_1_8.m2 ...");
+load "solver_1_8.m2";
+
+print("Problem sizes: Nmons = " | toString(Nmons) | ", Nmult = " | toString(Nmult) | ", partials = " | toString(#partialsL));
+print("bMat dims = " | toString(numRows bMat) | " x " | toString(numColumns bMat));
+
+-- Build partialData
+partialData = {};
+for p from 0 to (#partialsL - 1) do (
+    P = partialsL#p;
+    Cp = coefficients P;
+    if class Cp === Sequence and (#Cp) > 1 and class (Cp#0) === Matrix and class (Cp#1) === Matrix then (
+        monList = flatten entries (Cp#0);
+        coeffList = flatten entries (Cp#1);
+    ) else (
+        monList = {}; coeffList = {};
+        for t in terms(P) do (
+            ok = false; c = 0_KF;
+            try ( c = coefficient(t); ok = true ) else ok = false;
+            if ok and c =!= 0_KF then ( monList = append(monList, t/c); coeffList = append(coeffList, c) )
+        );
+    );
+    monStrList = {};
+    for mm in monList do monStrList = append(monStrList, toString(mm));
+    partialData = append(partialData, {monList, monStrList, coeffList});
+);
+print("Built partialData; partial 0 monCount = " | toString(#(partialData#0#0)));
+
+-- Proven builder
+buildColumnStringKey2 = (a,b) -> (
+    data2 = partialData#a;
+    monListP = data2#0;
+    coeffListP = data2#2;
+    mm2 = monsM#b;
+    monMap2 = new MutableHashTable;
+    for i from 0 to (#monListP - 1) do (
+        ms = mm2 * (monListP#i);
+        monMap2#(toString ms) = coeffListP#i;
+    );
+    col2 = {};
+    for r from 0 to (Nmons - 1) do (
+        kr = toString(monsD#r);
+        col2 = append(col2, if monMap2#? kr then monMap2#kr else 0_KF)
+    );
+    col2
+);
+
+-- trim helper
+trimTrailingZeros = (M -> (
+    lastRow = -1;
+    for r from 0 to (numRows M - 1) do (
+        rowNonzero = false;
+        for c from 0 to (numColumns M - 1) do if M_(r,c) =!= 0_KF then ( rowNonzero = true; break );
+        if rowNonzero then lastRow = r;
+    );
+    if lastRow == -1 then matrix{{}} else M_(0..lastRow, 0..(numColumns M - 1))
+));
+
+-- Manual Gaussian elimination (parser-safe)
+manualReduce = (rowsList -> (
+    m = #rowsList;
+    if m == 0 then return matrix{{}};
+    n = #((rowsList#0));
+    rows = rowsList;
+
+    pivotRow = 0;
+    for col from 0 to (n - 1) do (
+        if pivotRow >= m then break;
+        p = -1;
+        for rr from pivotRow to (m - 1) do if rows#rr#col =!= 0_KF then ( p = rr; break );
+        if p == -1 then continue;
+
+        if p =!= pivotRow then (
+            rows = apply(toList(0..(m-1)), ii -> (
+                if ii == pivotRow then rows#p else if ii == p then rows#pivotRow else rows#ii
+            ));
+        );
+
+        pivotVal = rows#pivotRow#col;
+        inv = 1 / pivotVal;
+        newPivotRow = for j from 0 to (n - 1) list rows#pivotRow#j * inv;
+        rows = apply(toList(0..(m-1)), ii -> if ii == pivotRow then newPivotRow else rows#ii);
+
+        for rr from pivotRow + 1 to (m - 1) do (
+            fac = rows#rr#col;
+            if fac =!= 0_KF then (
+                newRow = for j from 0 to (n - 1) list rows#rr#j - fac * rows#pivotRow#j;
+                rows = apply(toList(0..(m-1)), ii -> if ii == rr then newRow else rows#ii)
+            )
+        );
+
+        pivotRow = pivotRow + 1;
+    );
+
+    pivotRows = {};
+    for rr from 0 to (m - 1) do (
+        pc = -1;
+        for cc from 0 to (n - 1) do if rows#rr#cc =!= 0_KF then ( pc = cc; break );
+        pivotRows = append(pivotRows, pc);
+    );
+
+    rr = m - 1;
+    while rr >= 0 do (
+        pc = pivotRows#rr;
+        if pc =!= -1 then (
+            r2 = 0;
+            while r2 <= rr - 1 do (
+                fac2 = rows#r2#pc;
+                if fac2 =!= 0_KF then (
+                    newRow = for j from 0 to (n - 1) list rows#r2#j - fac2 * rows#rr#j;
+                    rows = apply(toList(0..(m-1)), ii -> if ii == r2 then newRow else rows#ii)
+                );
+                r2 = r2 + 1;
+            );
+        );
+        rr = rr - 1;
+    );
+
+    matrix rows
+));
+
+-- === Checkpoint loader (no exists, use try/load) ===
+checkpointPointerFile = "checkpoint_latest.m2";
+
+-- resume markers that a checkpoint file should define (if present)
+resumeP = -1;
+resumeStart = -1;
+
+print("Attempting to load pointer file: " | checkpointPointerFile);
+try (
+    load checkpointPointerFile;
+    print("Pointer file loaded (if it existed).");
+) else (
+    print("Pointer not loaded (missing or invalid). Starting fresh unless pointer file created.");
+    resumeP = -1;
+    resumeStart = -1;
+);
+-- ===================================
+
+-- init state: preserve checkpoint-loaded state if present; only clear when starting fresh and forceRebuild requests it
+if resumeP == -1 then (
+    if forceRebuild then (
+        reducedMat = null;
+        genInfoList = {};
+        totalCols = 0;
+    ) else (
+        try ( reducedMat ) else reducedMat = null;
+        try ( genInfoList ) else genInfoList = {};
+        try ( totalCols ) else totalCols = 0;
+    );
+) else (
+    try ( genInfoList ) else genInfoList = {};
+    try ( totalCols ) else totalCols = 0;
+    try ( reducedMat ) else reducedMat = null;
+);
+-- ===================================
+
+-- === Automatic rebuild reducedMat from genInfoList if resuming and reducedMat is missing ===
+if (not (genInfoList === {})) and (reducedMat === null) then (
+    print("Rebuilding reducedMat from saved genInfoList (" | toString(#genInfoList) | " columns). This may take time...");
+    rebuildChunk = chunkSize; -- tune if desired
+    i = 0;
+    reducedMat = null;
+    while i < #genInfoList do (
+        j = min(i + rebuildChunk - 1, #genInfoList - 1);
+        colsRe = {};
+        for t from i to j do (
+            info = genInfoList#t;
+            colsRe = append(colsRe, buildColumnStringKey2(info#0, info#1));
+        );
+        rowsRe = {};
+        for r from 0 to (Nmons - 1) do (
+            rowVals = apply(colsRe, col -> col#r);
+            rhsVal = bMat_(r,0);
+            rowsRe = append(rowsRe, append(rowVals, rhsVal));
+        );
+        if reducedMat === null then (
+            Rr = manualReduce(rowsRe);
+            reducedMat = trimTrailingZeros Rr;
+        ) else (
+            mergedRows = {};
+            for rr from 0 to (Nmons - 1) do (
+                leftPart = if rr < numRows reducedMat then (for cc from 0 to (numColumns reducedMat - 1) list reducedMat_(rr,cc)) else (for cc from 0 to (numColumns reducedMat - 1) list 0_KF);
+                rightPart = apply(colsRe, col -> col#rr);
+                mergedRows = append(mergedRows, leftPart | rightPart)
+            );
+            Rm = manualReduce(mergedRows);
+            reducedMat = trimTrailingZeros Rm;
+        );
+        i = j + 1;
+        print("  rebuilt columns up to index " | toString(i) | " / " | toString(#genInfoList));
+    );
+    print("Rebuild finished; reducedMat dims = " | toString(numRows reducedMat) | " x " | toString(numColumns reducedMat));
+);
+-- ===================================
+
+maxMultIndex = if testOnly then min(Nmult-1, NmultTest-1) else (Nmult-1);
+numPartials = #partialsL;
+print("BEGIN incremental processing: partials = " | toString(numPartials) | ", multipliers 0.." | toString(maxMultIndex));
+
+-- micro-test (optional)
+print("Micro-test: testing builder on (0,0) ...");
+microCol = buildColumnStringKey2(0,0);
+print("Micro-test: class = " | toString(class microCol) | ", length = " | toString(#microCol));
+cnt = 0;
+for r from 0 to (min(200, Nmons-1)) do (
+    if microCol#r =!= 0_KF then (
+        print(" sample: r=" | toString(r) | " -> " | toString(microCol#r));
+        cnt = cnt + 1;
+        if cnt >= 6 then break;
+    )
+);
+
+-- MAIN loop (resumable)
+startPartialIdx = if (resumeP != -1) then resumeP else 0;
+for pIdx from startPartialIdx to (numPartials - 1) do (
+    print("Processing partial " | toString(pIdx) | " ...");
+    startM = 0;
+    if (resumeP == pIdx and resumeStart != -1) then (
+        startM = resumeStart;
+        print("Resuming inside partial " | toString(pIdx) | " at multiplier startM = " | toString(startM));
+        resumeStart = -1;
+    );
+    while startM <= maxMultIndex do (
+        endM = min(startM + chunkSize - 1, maxMultIndex);
+
+        -- build chunk columns
+        chunkCols = {};
+        chunkGen = {};
+        for mmIdx from startM to endM do (
+            ccol = buildColumnStringKey2(pIdx, mmIdx);
+            chunkCols = append(chunkCols, ccol);
+            chunkGen = append(chunkGen, {pIdx, mmIdx});
+        );
+        k = #chunkCols;
+        print("  Chunk multipliers " | toString(startM) | ".." | toString(endM) | " -> k=" | toString(k));
+
+        if k == 0 then (
+            print("  empty chunk; advancing");
+            startM = endM + 1;
+            continue;
+        );
+
+        for j from 0 to (k - 1) do if #chunkCols#j =!= Nmons then error("Column length mismatch");
+
+        -- build augmented rows
+        rowsAug = {};
+        for r from 0 to (Nmons - 1) do (
+            rowVals = apply(chunkCols, col -> col#r);
+            rhsVal = bMat_(r,0);
+            rowsAug = append(rowsAug, append(rowVals, rhsVal))
+        );
+        print("  Built rowsAug: count = " | toString(#rowsAug) | ", rowLen = " | toString(#(rowsAug#0)));
+
+        for gi in chunkGen do genInfoList = append(genInfoList, gi);
+        totalCols = totalCols + k;
+
+        if reducedMat === null then (
+            print("  manual reducing initial augmented chunk ...");
+            Rmat = manualReduce(rowsAug);
+            reducedMat = trimTrailingZeros Rmat;
+            print("  initial reduced dims = " | toString(numRows reducedMat) | " x " | toString(numColumns reducedMat));
+        ) else (
+            print("  merging chunk: building mergedRows ...");
+            mergedRows = {};
+            for rr from 0 to (Nmons - 1) do (
+                leftPart = if rr < numRows reducedMat then (for cc from 0 to (numColumns reducedMat - 1) list reducedMat_(rr,cc)) else (for cc from 0 to (numColumns reducedMat - 1) list 0_KF);
+                rightPart = apply(chunkCols, col -> col#rr);
+                mergedRows = append(mergedRows, leftPart | rightPart)
+            );
+            print("  manual reducing mergedRows ...");
+            Rmerged = manualReduce(mergedRows);
+            reducedMat = trimTrailingZeros Rmerged;
+            print("  merged reduced dims = " | toString(numRows reducedMat) | " x " | toString(numColumns reducedMat));
+        );
+
+        print("  chunk finished; totalColsProcessed = " | toString(totalCols));
+
+        -- === PRINT checkpoint payload (copy & paste to save) ===
+        nextStart = endM + 1; -- resume AFTER finished chunk
+        ckname = "checkpoints/ck_p" | toString(pIdx) | "_m" | toString(nextStart) | ".m2";
+        payload = "genInfoList = " | toString(genInfoList) | ";\n" |
+                  "totalCols = " | toString(totalCols) | ";\n" |
+                  "resumeP = " | toString(pIdx) | ";\n" |
+                  "resumeStart = " | toString(nextStart) | ";\n";
+        print("=== CK_SAVE_BEGIN " | ckname | " ===");
+        print(payload);
+        print("=== CK_SAVE_END " | ckname | " ===");
+        pointerLine = "load \"" | ckname | "\"";
+        print("=== CK_POINTER_LINE ===");
+        print(pointerLine);
+        print("=== CK_POINTER_LINE_END ===");
+        print("COPY payload (between CK_SAVE_BEGIN/END) into " | ckname);
+        print("COPY pointer line (between CK_POINTER_LINE/END) into checkpoint_latest.m2");
+        -- After printing, save payload into the printed ckname path and pointerLine into checkpoint_latest.m2
+        -- ===================================
+
+        startM = endM + 1;
+    );
+);
+
+print("Incremental elimination finished; totalColsProcessed = " | toString(totalCols));
+print("Final reducedMat dims = " | toString(numRows reducedMat) | " x " | toString(numColumns reducedMat));
+
+-- STEP11: back-substitution
+nVars = numColumns reducedMat - 1;
+print("STEP11: nVars = " | toString(nVars));
+xVec = for j from 0 to (nVars - 1) list 0_KF;
+for row from 0 to (numRows reducedMat - 1) do (
+    pivot = -1;
+    for colIdx from 0 to (nVars - 1) do if reducedMat_(row,colIdx) =!= 0_KF then ( pivot = colIdx; break );
+    if pivot == -1 then (
+        if reducedMat_(row, nVars) =!= 0_KF then error("Inconsistent system (no pivot but nonzero RHS)")
+    ) else (
+        rhs = reducedMat_(row, nVars);
+        for j from pivot+1 to (nVars - 1) do rhs = rhs - (reducedMat_(row,j) * (xVec#j));
+        xVec#pivot = rhs / reducedMat_(row,pivot);
+    )
+);
+print("STEP11 done; nonzero entries = " | toString(#select(xVec, v -> v =!= 0_KF)));
+
+-- STEP12 reconstruct multipliers
+numPartials = #partialsL;
+multList = for i from 0 to (numPartials - 1) list 0_R;
+limitVars = if (#genInfoList < nVars) then #genInfoList else nVars;
+for j from 0 to (limitVars - 1) do (
+    coeffJ = xVec#j;
+    if coeffJ =!= 0_KF then (
+        infoJ = genInfoList#j;
+        pI = infoJ#0; mmI = infoJ#1;
+        mmObj = monsM#mmI;
+        multList#pI = multList#pI + (coeffJ * mmObj);
+    )
+);
+print("STEP12 multipliers reconstructed");
+
+rem = POLY_TARGET;
+for i from 0 to (numPartials - 1) do rem = rem - (multList#i) * (partialsL#i);
+print("REMAINDER #terms = " | toString(#terms rem));
+
+print("=== CERTIFICATE START ===");
+print("CYCLE_NAME: " | TARGET_LABEL);
+print("PRIME: " | toString(PRIME_P));
+print("DEGREE: " | toString(degN));
+print("REMAINDER_TERMS_START");
+for tt in terms(rem) do (
+    ok = false; c = 0_KF;
+    try ( c = coefficient(tt); ok = true ) else ok = false;
+    if ok and c =!= 0_KF then (
+        monOnly = tt / c;
+        exps = exponents(monOnly);
+        if class exps === Matrix then em = flatten entries exps else em = exps;
+        print(toString(em) | " | " | toString(c));
+    )
+);
+print("REMAINDER_TERMS_END");
+for i from 0 to (numPartials - 1) do (
+    print("MULTIPLIER_" | toString(i) | "_START");
+    qi = multList#i;
+    for tt in terms(qi) do (
+        ok = false; c = 0_KF;
+        try ( c = coefficient(tt); ok = true ) else ok = false;
+        if ok and c =!= 0_KF then (
+            monOnly = tt / c;
+            exps = exponents(monOnly);
+            if class exps === Matrix then em = flatten entries exps else em = exps;
+            print(toString(em) | " | " | toString(c));
+        )
+    );
+    print("MULTIPLIER_" | toString(i) | "_END");
+);
+print("=== CERTIFICATE END ===");
+
+print("DONE manual elimination run (fixed2).");
+```
