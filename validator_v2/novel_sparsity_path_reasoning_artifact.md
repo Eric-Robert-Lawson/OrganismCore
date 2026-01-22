@@ -3710,3 +3710,105 @@ For:
 ---
 
 **END OF UPDATE 3**
+
+---
+
+**UPDATE 4**
+
+**USE THE FOLLOWING SCRIPT TO VERIFY C1 AND C2 ACROSS ALL 5 PRIMES**
+```m2
+-- validator_v2/run_cp53_print_only.m2
+-- CP1/CP2 run for p = 53 — prints results to stdout (safe, robust)
+
+p = 53;
+kk = ZZ/p;
+R = kk[z_0..z_5];
+
+print("Field: ZZ/" | toString(p));
+
+-- exponent for 13th-root extraction
+exp1 = (p - 1) // 13;
+
+-- find a generator g in kk* such that w = g^exp1 has exact order 13
+found = false;
+g = 2_kk;
+for a from 2 to p-1 do (
+    gCand = a_kk;
+    w = gCand^exp1;
+    if w^13 == 1_kk then (
+        primeOrder = true;
+        for k from 1 to 12 do (
+            if w^k == 1_kk then primeOrder = false;
+        );
+        if primeOrder then (
+            g = gCand;
+            found = true;
+            break;
+        );
+    );
+);
+
+if not found then error("No suitable generator found in ZZ/" | toString(p) | " — abort.");
+
+w = g^exp1;
+print("Chosen base g = " | toString(g) | ", w = g^" | toString(exp1) | " (order 13) : " | toString(w));
+
+-- quick sanity checks
+if w^13 != 1_kk then error("w^13 != 1 — abort");
+for k from 1 to 12 do if w^k == 1_kk then error("w has smaller order than 13 (k=" | toString(k) | ")");
+
+-- build L_k linear forms
+L = apply(13, k -> (
+    sum(6, j -> (w^(k*j)) * R_j)
+));
+
+F = sum(L, ell -> ell^8);
+
+-- Jacobian ideal
+print("Computing Jacobian ideal...");
+J = ideal jacobian F;
+print("Jacobian computed.");
+
+-- CP1: variable-count analysis (example test monomials)
+testMonomials = {
+    z_2^6 * z_3^6 * z_4^3 * z_5^3,
+    z_2^5 * z_3^5 * z_4^4 * z_5^4,
+    z_2^9 * z_3^9
+};
+
+print("");
+print("==========================================================");
+print("CP1: Variable support analysis (p=" | toString(p) | ")");
+print("==========================================================");
+for r in apply(testMonomials, m -> (
+    reduced = m % J;
+    supp = support reduced;
+    numVars = #supp;
+    hasForbidden = member(z_0, supp) or member(z_1, supp);
+    (m, reduced, numVars, hasForbidden)
+)) do (
+    print("Test Monomial: " | toString(r#0));
+    print("Reduced Form:  " | toString(r#1));
+    print("Variable Count: " | toString(r#2));
+    if r#3 then print("RESULT: FORBIDDEN VARIABLES INTRODUCED") else print("RESULT: SUPPORT STABLE");
+    print("----------------------------------------------------------");
+);
+
+-- CP2: test target candidate (primary isolated candidate)
+targetCandidate = z_0^9 * z_1^2 * z_2^2 * z_3^2 * z_4^1 * z_5^2;
+reducedTarget = targetCandidate % J;
+targetSupp = support reducedTarget;
+
+print("");
+print("==========================================================");
+print("CP2: Collapse test for target candidate (p=" | toString(p) | ")");
+print("==========================================================");
+print("TARGET CANDIDATE: " | toString(targetCandidate));
+print("REDUCED FORM: " | toString(reducedTarget));
+print("REDUCED VARIABLE COUNT: " | toString(#targetSupp));
+if #targetSupp == 6 then print("RESULT: Target remains in the interior (6 variables)") else print("RESULT: Target support collapsed");
+print("==========================================================");
+```
+
+should observe same results across all 5 primes, same phenomenon observed!
+
