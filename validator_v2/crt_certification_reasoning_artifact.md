@@ -8,7 +8,7 @@
 most recent updates at bottom, the file is chronological, be sure to keep in mind!
 
 **IMPORTANT:**
-Have not even tested scripts yet, will run and debug and fix if script doesn't work or there are problems.
+Update 4 has k=100 and k=150 ran. You can reproduce too!
 ---
 
 ## **🎯 OBJECTIVE**
