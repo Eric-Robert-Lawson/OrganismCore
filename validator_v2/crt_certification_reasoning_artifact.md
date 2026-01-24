@@ -1763,9 +1763,9 @@ python3 crt_minor_reconstruct.py \
 
 #### **Step 3: Rational Reconstruction (using script below)**
 ```bash
-python3 rational_from_crt_json.py crt_pivot_100.json
+python3 rational_from_crt_json.py crt_pivot_150.json
 ```
-**Output:** `crt_pivot_100_rational.json`
+**Output:** `crt_pivot_150_rational.json`
 
 #### **Automated Pipeline (k=150)**
 ```bash
