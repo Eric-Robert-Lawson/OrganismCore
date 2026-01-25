@@ -76,6 +76,31 @@ Understanding such gaps provides crucial data for:
 
 This paper establishes the first rigorously verified example of a greater than 98\% gap in a Galois-invariant sector---the symmetry-constrained subspace where algebraic cycles are \emph{most likely} to exist. 
 
+\begin{theorem}[Rank certificate over $\mathbb{Z}$]\label{thm:rank-cert-z}
+The Jacobian cokernel matrix corresponding to the Galois-invariant primitive cohomology
+$H^{2,2}_{\mathrm{prim,inv}}(V)=H^{2,2}_{\mathrm{prim,inv}}(V)$ has rank at least $1883$ over $\mathbb{Z}$.
+\end{theorem}
+
+\begin{proof}[Constructive proof]
+We exhibit an explicit $1883\times 1883$ minor whose exact integer determinant (a 4{,}364‑digit integer)
+was computed using the Bareiss fraction‑free algorithm. The computation required approximately
+$3.36$ hours on consumer hardware and produced a verified nonzero integer; therefore the claimed
+lower bound on the rank holds.
+
+The full certificate (pivot indices, CRT data, rational reconstruction output, and the exact determinant file)
+and the reproduction protocol are provided in the companion reasoning artifact (see \cite{Law2026gap}, Section~3).
+\end{proof}
+
+\begin{remark}
+This unconditional result removes reliance on rank‑stability heuristics for the lower bound on
+$H^{2,2}_{\mathrm{prim,inv}}(V)$. Combined with exact modular agreement (rank $=1883$) across the five primes
+$p\in\{53,79,131,157,313\}$ (product $M\approx 2.7\times 10^{10}$), we obtain strong evidence that
+\[
+\dim_{\mathbb{Q}} H^{2,2}_{\mathrm{prim,inv}}(V)=707,
+\]
+with a heuristic error probability on the order of $10^{-11}$ under the standard random‑prime model.
+\end{remark}
+
 \begin{theorem}[Main Theorem---Informal]\label{thm:main-informal}
 There exists an explicitly defined smooth hypersurface $V \subset \PP^5$ of degree 8, defined over the cyclotomic field $\QQ(\omega)$ with $\omega = e^{2\pi i/13}$, such that:
 \begin{enumerate}
@@ -1458,10 +1483,11 @@ for the $C_{13}$-invariant degree-8 cyclotomic hypersurface $V \subset \mathbb{P
 \subsection{Overview of Verification Method}
 
 Our approach employs deterministic multi-prime verification:   
-\begin{enumerate}[label=(\roman*)]
-\item \textbf{Certificate C1:} Monomial set consistency across 5 independent primes
-\item \textbf{Certificate C2:} Cokernel dimension verification via left-kernel computation
-\item \textbf{Good-prime justification:} Standard rank-stability argument
+\begin{enumerate}
+  \renewcommand\labelenumi{(\roman{enumi})}
+  \item \textbf{Certificate C1:} Monomial set consistency across 5 independent primes
+  \item \textbf{Certificate C2:} Cokernel dimension verification via left-kernel computation
+  \item \textbf{Good-prime justification:} Standard rank-stability argument
 \end{enumerate}
 
 \textbf{Status:  } Both certificates completed with runtime $< 20$ seconds total.
