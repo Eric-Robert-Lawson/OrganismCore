@@ -114,6 +114,27 @@ A cohomology class $[\alpha] \in H^{2,2}(V)$ represented as $\alpha = \sum c_i m
 \end{itemize}
 \end{definition}
 
+\begin{tcolorbox}[colback=green!5!white,colframe=green!75!black,
+  title={Foundation: Rank $\ge 1883$ over $\mathbb{Z}$ (unconditionally proven)}]
+The variable-count barrier computations are performed on a Hodge space for which we have an
+\emph{unconditional} lower bound
+\[
+\operatorname{rank}_{\mathbb{Z}}\ge 1883,
+\]
+witnessed by an explicit $1883\times 1883$ pivot minor whose exact integer determinant
+(4{,}364 digits) was computed using the Bareiss fraction-free algorithm. This integer
+determinant is nonzero, hence the rank lower bound does not rely on rank‑stability heuristics.
+
+Combined with exact modular agreement (rank $=1883$ modulo each prime
+$p\in\{53,79,131,157,313\}$), we obtain strong evidence that
+\[
+\dim_{\mathbb{Q}} H^{2,2}_{\mathrm{prim,inv}}(V)=707,
+\]
+with a heuristic failure probability on the order of $\displaystyle 3.7\times 10^{-11}$.
+
+For certificate data and reproduction instructions see the companion paper [5], Section~3.
+\end{tcolorbox}
+
 \subsection{Multi-Prime Computational Observation}
 
 \begin{observation}[Coordinate Transparency, Five-Prime Certified]\label{obs:coord-trans}
@@ -420,6 +441,11 @@ OrganismCore Project, 2026.
 Daniel R. Grayson and Michael E. Stillman.
 \textit{Macaulay2, a software system for research in algebraic geometry}.
 Available at \url{http://www.math.uiuc.edu/Macaulay2/}.    
+
+\bibitem{Law2026d}
+Eric Robert Lawson.
+\textit{Four Independent Obstructions Converge: Computational Evidence for Candidate Non-Algebraic Hodge Classes on a Cyclotomic Hypersurface}.  
+OrganismCore Project, 2026.
 
 \end{thebibliography}
 
