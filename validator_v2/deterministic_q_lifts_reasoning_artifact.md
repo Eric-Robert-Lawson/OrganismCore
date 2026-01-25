@@ -92,7 +92,7 @@ where $m_j$ are the 1883 weight-0 degree-18 monomials.
 
 #### **Algorithm**
 
-generate kernals from inv files, must do this for each prime!
+generate kernals from inv files, must do this for each prime! requires the monomial and triplet jsons for each prime! These files should be ~18mb each when created.
 
 ```python
 #!/usr/bin/env python3
