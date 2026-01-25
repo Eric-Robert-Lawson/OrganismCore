@@ -4406,9 +4406,10 @@ h22_inv := countInv - rank
 **Complete Macaulay2 script (tested and verified):**
 
 ```m2
--- verify_invariant_tier2.m2
+-- verify_invariant_tier2.m2  (fixed)
 -- TIER II: Symmetry Obstruction via C13-Invariant Sector
 -- Computes h^{2,2}_inv modulo p for p ≡ 1 (mod 13)
+-- Fixed: separator printing, JSON filename, index loops, and robust monomial-index keys
 
 needsPackage "JSON";
 
@@ -4461,11 +4462,11 @@ for p in primesToTest do (
     countInv := #invMon18;
     print("Invariant monomials (deg 18): " | toString countInv);
 
-    -- 6. Build index map (MutableHashTable for M2 1.25. 11)
+    -- 6. Build index map (use string keys to be robust)
     print "Building index map...";
     monToIndex := new MutableHashTable;
     for i from 0 to countInv - 1 do (
-        monToIndex#(invMon18#i) = i;
+        monToIndex#(toString(invMon18#i)) = i;
     );
 
     -- 7. Filter Jacobian generators (character matching)
@@ -4489,14 +4490,15 @@ for p in primesToTest do (
     print "Assembling matrix (MutableMatrix)...";
     M := mutableMatrix(Fp, countInv, #filteredGens);
 
-    for j from 0 to #filteredGens - 1 do (
+    for j from 0 to (#filteredGens - 1) do (
         (mons, coeffs) := coefficients filteredGens#j;
         mList := flatten entries mons;
         cList := flatten entries coeffs;
-        for k from 0 to #mList - 1 do (
+        for k from 0 to (#mList - 1) do (
             m := mList#k;
-            if monToIndex #?  m then (
-                M_(monToIndex#m, j) = sub(cList#k, Fp);
+            key := toString m;
+            if monToIndex #? key then (
+                M_(monToIndex#key, j) = sub(cList#k, Fp);
             );
         );
     );
@@ -4510,18 +4512,18 @@ for p in primesToTest do (
     h22inv := countInv - rk;
 
     -- 10. Results
-    print("-" * 40);
+    print "----------------------------------------"; -- literal separator
     print("RESULTS FOR PRIME " | toString p | ":");
     print("Invariant monomials: " | toString countInv);
     print("Rank:  " | toString rk);
     print("h^{2,2}_inv: " | toString h22inv);
     print("Gap (h22_inv - 12 algebraic): " | toString(h22inv - 12));
-    print("Gap percentage: " | toString(100. 0 * (h22inv - 12) / h22inv) | "%");
-    print("-" * 40);
+    print("Gap percentage: " | toString(100.0 * (h22inv - 12) / h22inv) | "%");
+    print "----------------------------------------";
 
     -- 11. Export artifacts (optional)
     monFile := "saved_inv_p" | toString p | "_monomials18.json";
-    triFile := "saved_inv_p" | toString p | "_triplets. json";
+    triFile := "saved_inv_p" | toString p | "_triplets.json";
     
     print("Exporting to " | monFile | " and " | triFile);
     
@@ -4532,8 +4534,8 @@ for p in primesToTest do (
     (openOut monFile) << toJSON monExps << close;
 
     triplets := {};
-    for c from 0 to (numgens source MatInv)-1 do (
-        for r from 0 to (numgens target MatInv)-1 do (
+    for c from 0 to (numColumns MatInv - 1) do (
+        for r from 0 to (numRows MatInv - 1) do (
             if MatInv_(r,c) != 0_Fp then (
                 triplets = append(triplets, {r, c, lift(MatInv_(r,c), ZZ)});
             );
