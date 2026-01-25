@@ -4406,76 +4406,74 @@ h22_inv := countInv - rank
 **Complete Macaulay2 script (tested and verified):**
 
 ```m2
--- verify_invariant_tier2.m2  (fixed)
+-- verify_invariant_tier2.m2 (streamed-triplet safe version)
 -- TIER II: Symmetry Obstruction via C13-Invariant Sector
--- Computes h^{2,2}_inv modulo p for p ≡ 1 (mod 13)
--- Fixed: separator printing, JSON filename, index loops, and robust monomial-index keys
-
+-- Writes monomials and triplets in streaming fashion to avoid large in-memory JSON
 needsPackage "JSON";
 
--- CONFIGURATION
+-- CONFIGURATION: edit this list to include additional primes (all p ≡ 1 mod 13)
 primesToTest = {53, 79, 131, 157, 313};
 
-print "=== TIER II: Symmetry Obstruction Verification ===";
+print("=== TIER II: Symmetry Obstruction Verification (safe IO) ===");
 
 for p in primesToTest do (
     if (p % 13) != 1 then continue;
-    
-    print("--- Prime:  " | toString p | " ---");
-    
+
+    print("--- Prime: " | toString p | " ---");
+
     -- 1. Setup finite field with 13th root
     Fp := ZZ/p;
     w := 0_Fp;
     for a from 2 to p-1 do (
         cand := (a * 1_Fp)^((p-1)//13);
-        if (cand != 1_Fp) and (cand^13 == 1_Fp) then ( 
-            w = cand; 
-            break; 
+        if (cand != 1_Fp) and (cand^13 == 1_Fp) then (
+            w = cand;
+            break;
         );
     );
     print("Using 13th root w = " | toString w);
 
     -- 2. Build polynomial ring
-    S := Fp[z_0.. z_5];
+    S := Fp[z_0..z_5];
     z := gens S;
 
     -- 3. Construct C13-invariant variety
-    print "Assembling C13-invariant variety... ";
+    print("Assembling C13-invariant variety...");
     linearForms := for k from 0 to 12 list (
-        sum(0.. 5, j -> (w^((k*j) % 13)) * z#j)
+        sum(0..5, j -> (w^((k*j) % 13)) * z#j)
     );
     fS := sum(linearForms, l -> l^8);
-    
+
     -- 4. Compute partial derivatives
     partials := for i from 0 to 5 list diff(z#i, fS);
 
     -- 5. Generate invariant monomial basis
-    print "Generating degree-18 invariant monomials...";
+    print("Generating degree-18 invariant monomials...");
     mon18List := flatten entries basis(18, S);
-    
+
     -- Filter to invariant:   Σ j·a_j ≡ 0 (mod 13)
     invMon18 := select(mon18List, m -> (
         ev := (exponents m)#0;
         (sum(for j from 0 to 5 list j * ev#j)) % 13 == 0
     ));
-    
+
     countInv := #invMon18;
     print("Invariant monomials (deg 18): " | toString countInv);
 
-    -- 6. Build index map (use string keys to be robust)
-    print "Building index map...";
+    -- 6. Build index map (use string keys)
+    print("Building index map...");
     monToIndex := new MutableHashTable;
     for i from 0 to countInv - 1 do (
         monToIndex#(toString(invMon18#i)) = i;
     );
 
     -- 7. Filter Jacobian generators (character matching)
-    print "Filtering Jacobian generators...";
+    print("Filtering Jacobian generators...");
     mon11List := flatten entries basis(11, S);
-    
+
     filteredGens := {};
     for i from 0 to 5 do (
-        targetWeight := i;  -- Character of ∂/∂z_i is -i
+        targetWeight := i;
         for m in mon11List do (
             mWeight := (sum(for j from 0 to 5 list j * (exponents m)#0#j)) % 13;
             if mWeight == targetWeight then (
@@ -4483,11 +4481,11 @@ for p in primesToTest do (
             );
         );
     );
-    
+
     print("Filtered generators: " | toString(#filteredGens));
 
-    -- 8. Assemble coefficient matrix
-    print "Assembling matrix (MutableMatrix)...";
+    -- 8. Assemble coefficient matrix (mutable)
+    print("Assembling matrix (MutableMatrix)...");
     M := mutableMatrix(Fp, countInv, #filteredGens);
 
     for j from 0 to (#filteredGens - 1) do (
@@ -4506,58 +4504,75 @@ for p in primesToTest do (
     MatInv := matrix M;
 
     -- 9. Compute rank
-    print "Computing rank (symmetry-locked)...";
+    print("Computing rank (symmetry-locked)...");
     time rk := rank MatInv;
-    
     h22inv := countInv - rk;
 
-    -- 10. Results
-    print "----------------------------------------"; -- literal separator
+    -- 10. Results summary
+    print("----------------------------------------");
     print("RESULTS FOR PRIME " | toString p | ":");
     print("Invariant monomials: " | toString countInv);
-    print("Rank:  " | toString rk);
+    print("Rank: " | toString rk);
     print("h^{2,2}_inv: " | toString h22inv);
     print("Gap (h22_inv - 12 algebraic): " | toString(h22inv - 12));
     print("Gap percentage: " | toString(100.0 * (h22inv - 12) / h22inv) | "%");
-    print "----------------------------------------";
+    print("----------------------------------------");
 
-    -- 11. Export artifacts (optional)
-    monFile := "saved_inv_p" | toString p | "_monomials18.json";
-    triFile := "saved_inv_p" | toString p | "_triplets.json";
-    
-    print("Exporting to " | monFile | " and " | triFile);
-    
+    -- 11. Export monomials (safe small JSON)
+    monFile := "validator_v2/saved_inv_p" | toString p | "_monomials18.json";
+    print("Writing monomials to " | monFile);
     monExps := for m in invMon18 list (
-        ev := (exponents m)#0; 
+        ev := (exponents m)#0;
         for j from 0 to 5 list ev#j
     );
-    (openOut monFile) << toJSON monExps << close;
+    (openOut monFile) << toJSON(monExps) << close;
 
-    triplets := {};
-    for c from 0 to (numColumns MatInv - 1) do (
-        for r from 0 to (numRows MatInv - 1) do (
-            if MatInv_(r,c) != 0_Fp then (
-                triplets = append(triplets, {r, c, lift(MatInv_(r,c), ZZ)});
+    -- 12. Export triplets in streaming fashion to avoid giant memory use
+    triFile := "validator_v2/saved_inv_p" | toString p | "_triplets.json";
+    print("Streaming triplets to " | triFile);
+    out = openOut triFile;
+
+    -- Start JSON object (write header)
+    out << "{\n";
+    out << "  \"prime\": " | toString p | ",\n";
+    out << "  \"h22_inv\": " | toString h22inv | ",\n";
+    out << "  \"rank\": " | toString rk | ",\n";
+    out << "  \"countInv\": " | toString countInv | ",\n";
+    out << "  \"triplets\": [\n";
+
+    firstEntry = true;
+    nC := numColumns MatInv;
+    nR := numRows MatInv;
+    -- iterate columns then rows to stream nonzeros
+    for c from 0 to (nC - 1) do (
+        for r from 0 to (nR - 1) do (
+            val := MatInv_(r,c);
+            if val != 0_Fp then (
+                if firstEntry then (
+                    firstEntry = false;
+                ) else (
+                    out << ",\n";
+                );
+                -- write JSON array [r, c, integer_value]
+                out << "    [" | toString r | ", " | toString c | ", " | toString lift(val, ZZ) | "]";
             );
         );
     );
 
-    triData := hashTable {
-        "prime" => p,
-        "h22_inv" => h22inv,
-        "rank" => rk,
-        "countInv" => countInv,
-        "triplets" => triplets
-    };
-    (openOut triFile) << toJSON triData << close;
+    -- Close JSON array and object
+    out << "\n  ]\n}\n";
+    close out;
 
-    -- Cleanup
-    MatInv = null;
-    M = null;
-    garbageCollect();
+    -- 13. Null references to help M2 free memory
+    MatInv = 0;
+    M = 0;
+    filteredGens = {};
+    mon18List = {};
+    invMon18 = {};
+    monToIndex = new MutableHashTable;
 );
 
-print "\n=== TIER II Verification Complete ===";
+print("=== TIER II Verification Complete ===");
 ```
 
 **Script location:** `validator/verify_invariant_tier2.m2`
