@@ -92,6 +92,257 @@ where $m_j$ are the 1883 weight-0 degree-18 monomials.
 
 #### **Algorithm**
 
+generate kernals from inv files
+
+```python
+#!/usr/bin/env python3
+"""
+extract_kernel_from_triplets.py
+
+Build a dense matrix from triplet JSON + monomials list and compute the kernel
+(nullspace) over a prime p. Writes kernel_p{p}.json with modular kernel basis.
+
+Usage (example):
+  python3 validator_v2/extract_kernel_from_triplets.py \
+    --triplet validator/saved_inv_p313_triplets.json \
+    --monomials validator/saved_inv_p313_monomials18.json \
+    --prime 313 \
+    --out validator_v2/kernel_p313.json
+
+Inputs:
+  --triplet : triplet JSON (supports {"triplets": [[r,c,v],...]} or plain list)
+  --monomials : monomials JSON (list of monomial strings) or a JSON with key "monomials"
+  --prime : prime modulus (int)
+  --out : output kernel JSON path (default kernel_p{p}.json)
+
+Output format (JSON):
+{
+  "kernel": [
+    [a_1, a_2, ..., a_n],   # vector 0 (coeffs mod p)
+    ...
+  ],
+  "metadata": {
+    "prime": p,
+    "n_vectors": k,
+    "n_coeffs": n,
+    "matrix_dims": [m, n],
+    "source_triplet": "...",
+    "source_monomials": "..."
+  }
+}
+
+Notes / assumptions:
+ - The triplet 'col' index is assumed to index the same monomial ordering as the monomials file.
+ - If triplet columns exceed number of monomials, columns are capped or a warning printed.
+ - The code constructs a dense m x n matrix (m rows, n columns). For your typical sizes
+   (e.g., m~2590, n~2016) this is feasible in memory (~40 MB for int64). If larger,
+   consider a sparse approach.
+ - Requires numpy installed.
+
+Author: Assistant (for OrganismCore)
+Date: 2026-01-25
+"""
+import argparse
+import json
+import math
+import sys
+from pathlib import Path
+
+try:
+    import numpy as np
+except Exception as e:
+    print("ERROR: numpy is required. Install with `pip install numpy`.", file=sys.stderr)
+    raise
+
+def load_triplets(path):
+    with open(path, 'r') as f:
+        data = json.load(f)
+    # try common shapes
+    if isinstance(data, dict):
+        if 'triplets' in data:
+            trip = data['triplets']
+        elif 'matrix' in data:
+            trip = data['matrix']
+        else:
+            # find first list-of-lists
+            trip = None
+            for v in data.values():
+                if isinstance(v, list) and v and isinstance(v[0], list):
+                    trip = v
+                    break
+            if trip is None:
+                raise ValueError(f"Unrecognized triplet JSON structure in {path}")
+    elif isinstance(data, list):
+        trip = data
+    else:
+        raise ValueError(f"Unrecognized triplet JSON in {path}")
+    normalized = []
+    for t in trip:
+        if isinstance(t, list) and len(t) >= 3:
+            r, c, v = int(t[0]), int(t[1]), int(t[2])
+            normalized.append((r, c, v))
+        elif isinstance(t, dict) and {'row','col','val'}.issubset(t.keys()):
+            normalized.append((int(t['row']), int(t['col']), int(t['val'])))
+        else:
+            raise ValueError("Triplet entry not understood: " + str(t))
+    return normalized
+
+def load_monomials(path):
+    with open(path, 'r') as f:
+        data = json.load(f)
+    if isinstance(data, dict) and 'monomials' in data:
+        mons = data['monomials']
+    elif isinstance(data, list):
+        mons = data
+    else:
+        raise ValueError(f"Unrecognized monomials file: {path}")
+    return mons
+
+def build_dense_matrix(triplets, ncols, dtype=np.int64):
+    # infer nrows
+    maxr = 0
+    for r,c,v in triplets:
+        if r > maxr:
+            maxr = r
+    nrows = maxr + 1
+    A = np.zeros((nrows, ncols), dtype=dtype)
+    for r,c,v in triplets:
+        if 0 <= c < ncols:
+            A[r, c] = (A[r, c] + int(v))
+        else:
+            # ignore out-of-range columns but warn once
+            pass
+    return A
+
+def mod_reduce(A, p):
+    A_mod = np.mod(A, p).astype(np.int64)
+    return A_mod
+
+def nullspace_modp(A_mod, p):
+    """
+    Compute nullspace of A over Z/pZ (A is m x n), return list of n-length vectors mod p.
+    Uses row-reduction to RREF and builds nullspace basis (free columns = parameters).
+    """
+    A = A_mod.copy()
+    m, n = A.shape
+    A = A % p
+    pivots = []
+    row = 0
+    # Convert to RREF
+    for col in range(n):
+        if row >= m:
+            break
+        # find pivot row
+        pivot = None
+        for r in range(row, m):
+            if A[r, col] % p != 0:
+                pivot = r
+                break
+        if pivot is None:
+            continue
+        # swap
+        if pivot != row:
+            A[[row, pivot], :] = A[[pivot, row], :]
+        inv = pow(int(A[row, col]), -1, p)
+        # normalize pivot row
+        A[row, :] = (A[row, :] * inv) % p
+        # eliminate other rows
+        for r in range(m):
+            if r == row:
+                continue
+            if A[r, col] != 0:
+                factor = int(A[r, col])
+                A[r, :] = (A[r, :] - factor * A[row, :]) % p
+        pivots.append(col)
+        row += 1
+    pivots_set = set(pivots)
+    free_cols = [c for c in range(n) if c not in pivots_set]
+    basis = []
+    # For each free variable, construct a nullspace vector
+    # Suppose variables x_free = 1, others 0, then solve pivot rows
+    # After RREF, pivot rows: x_pivot + sum_{free} A[row,free]*x_free = 0 => x_pivot = -A[row,free]
+    for free_col in free_cols:
+        vec = np.zeros(n, dtype=np.int64)
+        vec[free_col] = 1
+        # for each pivot row i, pivot_col = pivots[i], row i is the i-th pivot row
+        for i, pivot_col in enumerate(pivots):
+            # The row index in A for pivot i is i (since we built RREF with row increments)
+            # But pivot rows may be fewer than m; safe to check bounds
+            if i >= A.shape[0]:
+                continue
+            coeff = int(A[i, free_col]) % p
+            if coeff != 0:
+                vec[pivot_col] = (-coeff) % p
+        basis.append(vec.tolist())
+    return basis
+
+def write_kernel_json(outpath, basis, prime, n_coeffs, n_rows, n_cols, triplet_path, monomials_path):
+    out = {
+        "kernel": basis,
+        "metadata": {
+            "prime": int(prime),
+            "n_vectors": len(basis),
+            "n_coeffs": int(n_coeffs),
+            "matrix_dims": [int(n_rows), int(n_cols)],
+            "source_triplet": str(triplet_path),
+            "source_monomials": str(monomials_path)
+        }
+    }
+    with open(outpath, 'w') as f:
+        json.dump(out, f, indent=2)
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument('--triplet', required=True, help='Path to triplet JSON')
+    p.add_argument('--monomials', required=True, help='Path to monomials JSON (list)')
+    p.add_argument('--prime', required=True, type=int, help='Prime modulus to reduce to')
+    p.add_argument('--out', default=None, help='Output kernel JSON path (default: kernel_p{p}.json)')
+    args = p.parse_args()
+
+    triplet_path = Path(args.triplet)
+    monomials_path = Path(args.monomials)
+    prime = int(args.prime)
+    outpath = Path(args.out) if args.out else Path(f"validator_v2/kernel_p{prime}.json")
+
+    print(f"[+] Loading triplets from {triplet_path} ...")
+    triplets = load_triplets(str(triplet_path))
+    print(f"[+] {len(triplets)} triplets loaded")
+
+    print(f"[+] Loading monomials from {monomials_path} ...")
+    monomials = load_monomials(str(monomials_path))
+    ncols = len(monomials)
+    print(f"[+] {ncols} monomials")
+
+    # Build dense matrix (rows inferred from triplets)
+    print("[+] Building dense matrix (may use significant memory for large shapes)...")
+    A = build_dense_matrix(triplets, ncols, dtype=np.int64)
+    n_rows, n_cols = A.shape
+    print(f"[+] Matrix shape: {n_rows} x {n_cols}")
+
+    # Reduce mod p
+    print(f"[+] Reducing matrix entries modulo {prime} ...")
+    A_mod = mod_reduce(A, prime)
+
+    # Compute nullspace over F_p
+    print("[+] Computing nullspace over F_p (this may take some time)...")
+    basis = nullspace_modp(A_mod, prime)
+    k = len(basis)
+    print(f"[+] Nullspace size (mod {prime}) = {k} vectors")
+
+    # Write output
+    print(f"[+] Writing kernel JSON to {outpath} ...")
+    write_kernel_json(str(outpath), basis, prime, n_coeffs=n_cols, n_rows=n_rows, n_cols=n_cols,
+                      triplet_path=triplet_path, monomials_path=monomials_path)
+    print("[+] Done. Notes:")
+    print("    - Each kernel vector is given as a list of integers modulo p (0..p-1).")
+    print("    - If expected kernel dimension differs from produced, check monomial ordering and triplet column indices.")
+
+if __name__ == "__main__":
+    main()
+```
+
+then the rational_kernal_basis.py
+
 ```python
 #!/usr/bin/env python3
 """
