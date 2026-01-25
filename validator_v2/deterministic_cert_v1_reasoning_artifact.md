@@ -4,6 +4,8 @@
 **Date:** January 2026  
 **Author:** Eric Robert Lawson
 
+**STATUS: in archive/not actively pursuing**
+validator_v2/crt_certification_reasoning_artifact.md has provided the deterministic work that the artifact is trying to obtain, does it with less effort as well to my understanding
 ---
 
 ## Executive Summary
