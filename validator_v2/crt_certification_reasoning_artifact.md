@@ -2776,21 +2776,43 @@ Searching for up to k=1883 pivots (greedy elimination mod 313)...
 Pivot search complete: found 1883 pivots in 1315.66s
 Determinant of pivot minor modulo 313 = 128
 Wrote pivot_1883_rows.txt, pivot_1883_cols.txt, pivot_1883_report.json
+Pivot minor is nonzero modulo p (good). You can now run crt_minor_reconstruct.py across primes with these pivot rows/cols.
 Done.
 ```
 
 **CRT Reconstruction:**
 ```
-c:\math>python crt_minor_reconstruct.py --triplets saved_inv_p53_triplets.json ... --primes 53 79 131 157 313 --rows pivot_1883_rows.txt --cols pivot_1883_cols.txt --out crt_pivot_1883.json
+c:\math>python crt_minor_reconstruct.py --triplets saved_inv_p53_triplets.json saved_inv_p79_triplets.json saved_inv_p131_triplets.json saved_inv_p157_triplets.json saved_inv_p313_triplets.json --primes 53 79 131 157 313 --rows pivot_1883_rows.txt --cols pivot_1883_cols.txt --out crt_pivot_1883.json
 WARNING: minor size k=1883 exceeds recommended 1500. This may be slow or memory heavy.
 Computing determinant residues mod primes...
+  Loading triplets from saved_inv_p53_triplets.json ...
+  Building dense 1883x1883 minor modulo 53 ...
+  Computing det mod 53 ...  (this may take time)
     det ≡ 40 (mod 53)
+  Loading triplets from saved_inv_p79_triplets.json ...
+  Building dense 1883x1883 minor modulo 79 ...
+  Computing det mod 79 ...  (this may take time)
     det ≡ 3 (mod 79)
+  Loading triplets from saved_inv_p131_triplets.json ...
+  Building dense 1883x1883 minor modulo 131 ...
+  Computing det mod 131 ...  (this may take time)
     det ≡ 42 (mod 131)
+  Loading triplets from saved_inv_p157_triplets.json ...
+  Building dense 1883x1883 minor modulo 157 ...
+  Computing det mod 157 ...  (this may take time)
     det ≡ 84 (mod 157)
+  Loading triplets from saved_inv_p313_triplets.json ...
+  Building dense 1883x1883 minor modulo 313 ...
+  Computing det mod 313 ...  (this may take time)
     det ≡ 128 (mod 313)
+Estimating Hadamard bound using integer entries from first triplet file (approx)...
 Estimated log10(Hadamard bound) ≈ 17656.558
+Running iterative CRT...
 CRT reconstruction done.
+Certificate written to crt_pivot_1883.json
+Product of primes has log10 = 10.431; Hadamard log10 bound ≈ 17656.558
+WARNING: product(primes) <= ~2*HadamardBound.  Reconstructed integer may be ambiguous.  Consider adding more primes.
+Done.
 ```
 
 **Rational Reconstruction:**
@@ -2815,8 +2837,7 @@ c:\math>python compute_exact_det_bareiss.py --triplet saved_inv_p313_triplets.js
 [+] Starting Bareiss determinant computation (k=1883) ...
 [+] Wrote exact determinant result to det_pivot_1883_exact.json
     k = 1883
-    det = -34747023128560435630663918667761277011605788789750059629700897158732797775...
-          (continues for 4364 digits)
+    det = -34747023128560435630663918667761277011605788789750059629700897158732797775123160453495369642681419680176231439778973750861533694473832242261853324424795359674546582811557541049996349877466042329443612452698262873803234903290020102893370591882779809203162736348631073914807734146367800700911216079172088742064404067794688558957070026974719820335654842145123762530834858225182287785394517488346926112182542956398840979067708049825429728686577617040532733228918206433892461260065741655781778460477965020726489225587725777635086509301734554784542193149823372001256938968678723973067144252448185260002494787169726349675295698081849361454496813199634188951522084206119722996881879719431745181290534329885272234261917029879330960623391124657323524142629677246184905916802723368450553337651563440159968400969392813024887206728466727503981034840145551346013637828410642278981835782258123733664755176715258813789960879159901617853682879031707774058269671706340478806014397261519352494117727447784131502397754737746193591802427448556694657016211607861353096958830009552453889419002551196258863040393551405280156540114171806496020270330748772927456980259158732059397704417527381298838364921981177229726113841973245580538246931682643282371864087944438474883979257085594523106194177532005657181239479403031927476438231798206003112912810903982698356748439453647697029735037922136969942422913286382488110388403259729762088187258666055900710016895702299927695424469368678678313705074186101078825950892319932109234465098287795193256256569199964559740453167899201002308511022132762090286357863009662578614297145091267250030937912711970520639164006468361892546141763076874035527513887252582142469912545131892399096712573311400064164246959469273129833407571672578987325130124100184198588555589326387098750960897132065630275940242209003188248172637630360417410752508739071204588569405316544142588302684081956934437908404430745907187998203120129280389830191289848248991805488103409661209923101125408184384216729507536835094280808791137252678281037048132854705921027328555062364077280580332153511135823410930427661954699753983426441843101272882338797513784898693817826735504083205812287767958437554309333245785698186119745565311549158597498165828335065346970296736700528937027376628904456336955369811689555820108048961349480092600783017859843779365315868270681062493440387760044386496925962280128423238980817173641194618287355880770799151267065978241152331538109226696147592964592724498198640022728528718375827712270809845011469518237939301979568972820910619333268101724581024493763073681100458964745231658051068491917837595354036571536446611781630872732012570987265727954532399874497191843692420610210839252880802572208707556935752214628466630289892289258498541362625709637950050522350113129262195111546258446410218162047151356285127843300570504352111249498030238071526174164851848070614835225485515621029363744700929875124250234060353039183449073609902870809567796037222375213888051788779976259903031626158745427436965318224887903093655320918549424634130442463039340913184840211018096112234037928705989155020509410695373689568189786567197852056925281492093553936946796684000656329233638340124241567997389298786472161887629852176340246277092581953087784477690409735810452552033093645565359889212346718147161553029080424947325094866066690309922333366329786694766387462947844700057232540518724158070225781924564256414069496069120864247856526948123092743721631841507333519978103745894470647258446392979486923086760676297992416974415596781803194581354202500566071762389118516204824862644704877299463448623966220853542532306504569260493187739096333653018442094801087624390193859116721133098452022349727624150204577203019789728049621828317914988295841358305234401115493523111199797477830479958346675465684979232819214037384888279402522112145816101495084426000189500769167575633185817049449452823935964034111344507167763166931824952304577892912031525499676729546463576129563864912274440614745662346070585146646681741775630726927638572112387955401683728128987621815832280625541125977485800261283821071468719980146615774624729090225262119691784790815645622615719120333945725533937043142536324354015282428667674997849081225454203598897539036576470782127499840269980502365849231059117313942139970127166351802197567919057634639364603452480882841035481144833984891919692689990281931002327429283840000
     log10|det| = 4363.540917603337
     time (s) = 12110.41487789154
     matches_crt_signed = False
@@ -2919,6 +2940,433 @@ Bareiss algorithm gives:
 This eliminates ALL reliance on rank-stability heuristics for the rank claim.
 
 **The 1883×1883 minor certificate is publication-ready.**
+
+---
+**Full verbatim terminal with all commands**
+
+```verbatim
+c:\math>python pivot_finder_modp.py --triplet saved_inv_p313_triplets.json --prime 313 --k 100 --out_prefix pivot_100
+Loading triplets from saved_inv_p313_triplets.json ...
+Matrix dims inferred: nrows=2590, ncols=2016
+Searching for up to k=100 pivots (greedy elimination mod 313)...
+Pivot search complete: found 100 pivots in 1.39s
+Determinant of pivot minor modulo 313 = 136
+Wrote pivot_100_rows.txt, pivot_100_cols.txt, pivot_100_report.json
+Pivot minor is nonzero modulo p (good). You can now run crt_minor_reconstruct.py across primes with these pivot rows/cols.
+Done.
+
+c:\math>python pivot_finder_modp.py --triplet saved_inv_p313_triplets.json --prime 313 --k 150 --out_prefix pivot_150
+Loading triplets from saved_inv_p313_triplets.json ...
+Matrix dims inferred: nrows=2590, ncols=2016
+Searching for up to k=150 pivots (greedy elimination mod 313)...
+Pivot search complete: found 150 pivots in 7.08s
+Determinant of pivot minor modulo 313 = 144
+Wrote pivot_150_rows.txt, pivot_150_cols.txt, pivot_150_report.json
+Pivot minor is nonzero modulo p (good). You can now run crt_minor_reconstruct.py across primes with these pivot rows/cols.
+Done.
+
+c:\math>python pivot_finder_modp.py --triplet saved_inv_p313_triplets.json --prime 313 --k 200 --out_prefix pivot_200
+Loading triplets from saved_inv_p313_triplets.json ...
+Matrix dims inferred: nrows=2590, ncols=2016
+Searching for up to k=200 pivots (greedy elimination mod 313)...
+Pivot search complete: found 200 pivots in 14.48s
+Determinant of pivot minor modulo 313 = 208
+Wrote pivot_200_rows.txt, pivot_200_cols.txt, pivot_200_report.json
+Pivot minor is nonzero modulo p (good). You can now run crt_minor_reconstruct.py across primes with these pivot rows/cols.
+Done.
+
+c:\math>python pivot_finder_modp.py --triplet saved_inv_p313_triplets.json --prime 313 --k 500 --out_prefix pivot_500
+Loading triplets from saved_inv_p313_triplets.json ...
+Matrix dims inferred: nrows=2590, ncols=2016
+Searching for up to k=500 pivots (greedy elimination mod 313)...
+Pivot search complete: found 500 pivots in 291.18s
+Determinant of pivot minor modulo 313 = 194
+Wrote pivot_500_rows.txt, pivot_500_cols.txt, pivot_500_report.json
+Pivot minor is nonzero modulo p (good). You can now run crt_minor_reconstruct.py across primes with these pivot rows/cols.
+Done.
+
+c:\math>python crt_minor_reconstruct.py --triplets saved_inv_p53_triplets.json saved_inv_p79_triplets.json saved_inv_p131_triplets.json saved_inv_p157_triplets.json saved_inv_p313_triplets.json --primes 53 79 131 157 313 --rows pivot_100_rows.txt --cols pivot_100_cols.txt --out crt_pivot_100.json
+Computing determinant residues mod primes...
+  Loading triplets from saved_inv_p53_triplets.json ...
+  Building dense 100x100 minor modulo 53 ...
+  Computing det mod 53 ...  (this may take time)
+    det ≡ 10 (mod 53)
+  Loading triplets from saved_inv_p79_triplets.json ...
+  Building dense 100x100 minor modulo 79 ...
+  Computing det mod 79 ...  (this may take time)
+    det ≡ 75 (mod 79)
+  Loading triplets from saved_inv_p131_triplets.json ...
+  Building dense 100x100 minor modulo 131 ...
+  Computing det mod 131 ...  (this may take time)
+    det ≡ 127 (mod 131)
+  Loading triplets from saved_inv_p157_triplets.json ...
+  Building dense 100x100 minor modulo 157 ...
+  Computing det mod 157 ...  (this may take time)
+    det ≡ 151 (mod 157)
+  Loading triplets from saved_inv_p313_triplets.json ...
+  Building dense 100x100 minor modulo 313 ...
+  Computing det mod 313 ...  (this may take time)
+    det ≡ 136 (mod 313)
+Estimating Hadamard bound using integer entries from first triplet file (approx)...
+Estimated log10(Hadamard bound) ≈ 796.356
+Running iterative CRT...
+CRT reconstruction done.
+Certificate written to crt_pivot_100.json
+Product of primes has log10 = 10.431; Hadamard log10 bound ≈ 796.356
+WARNING: product(primes) <= ~2*HadamardBound.  Reconstructed integer may be ambiguous.  Consider adding more primes.
+Done.
+
+c:\math>python crt_minor_reconstruct.py --triplets saved_inv_p53_triplets.json saved_inv_p79_triplets.json saved_inv_p131_triplets.json saved_inv_p157_triplets.json saved_inv_p313_triplets.json --primes 53 79 131 157 313 --rows pivot_150_rows.txt --cols pivot_150_cols.txt --out crt_pivot_150.json
+Computing determinant residues mod primes...
+  Loading triplets from saved_inv_p53_triplets.json ...
+  Building dense 150x150 minor modulo 53 ...
+  Computing det mod 53 ...  (this may take time)
+    det ≡ 28 (mod 53)
+  Loading triplets from saved_inv_p79_triplets.json ...
+  Building dense 150x150 minor modulo 79 ...
+  Computing det mod 79 ...  (this may take time)
+    det ≡ 13 (mod 79)
+  Loading triplets from saved_inv_p131_triplets.json ...
+  Building dense 150x150 minor modulo 131 ...
+  Computing det mod 131 ...  (this may take time)
+    det ≡ 104 (mod 131)
+  Loading triplets from saved_inv_p157_triplets.json ...
+  Building dense 150x150 minor modulo 157 ...
+  Computing det mod 157 ...  (this may take time)
+    det ≡ 110 (mod 157)
+  Loading triplets from saved_inv_p313_triplets.json ...
+  Building dense 150x150 minor modulo 313 ...
+  Computing det mod 313 ...  (this may take time)
+    det ≡ 144 (mod 313)
+Estimating Hadamard bound using integer entries from first triplet file (approx)...
+Estimated log10(Hadamard bound) ≈ 1250.482
+Running iterative CRT...
+CRT reconstruction done.
+Certificate written to crt_pivot_150.json
+Product of primes has log10 = 10.431; Hadamard log10 bound ≈ 1250.482
+WARNING: product(primes) <= ~2*HadamardBound.  Reconstructed integer may be ambiguous.  Consider adding more primes.
+Done.
+
+c:\math>python crt_minor_reconstruct.py --triplets saved_inv_p53_triplets.json saved_inv_p79_triplets.json saved_inv_p131_triplets.json saved_inv_p157_triplets.json saved_inv_p313_triplets.json --primes 53 79 131 157 313 --rows pivot_200_rows.txt --cols pivot_200_cols.txt --out crt_pivot_200.json
+Computing determinant residues mod primes...
+  Loading triplets from saved_inv_p53_triplets.json ...
+  Building dense 200x200 minor modulo 53 ...
+  Computing det mod 53 ...  (this may take time)
+    det ≡ 28 (mod 53)
+  Loading triplets from saved_inv_p79_triplets.json ...
+  Building dense 200x200 minor modulo 79 ...
+  Computing det mod 79 ...  (this may take time)
+    det ≡ 65 (mod 79)
+  Loading triplets from saved_inv_p131_triplets.json ...
+  Building dense 200x200 minor modulo 131 ...
+  Computing det mod 131 ...  (this may take time)
+    det ≡ 84 (mod 131)
+  Loading triplets from saved_inv_p157_triplets.json ...
+  Building dense 200x200 minor modulo 157 ...
+  Computing det mod 157 ...  (this may take time)
+    det ≡ 129 (mod 157)
+  Loading triplets from saved_inv_p313_triplets.json ...
+  Building dense 200x200 minor modulo 313 ...
+  Computing det mod 313 ...  (this may take time)
+    det ≡ 208 (mod 313)
+Estimating Hadamard bound using integer entries from first triplet file (approx)...
+Estimated log10(Hadamard bound) ≈ 1689.649
+Running iterative CRT...
+CRT reconstruction done.
+Certificate written to crt_pivot_200.json
+Product of primes has log10 = 10.431; Hadamard log10 bound ≈ 1689.649
+WARNING: product(primes) <= ~2*HadamardBound.  Reconstructed integer may be ambiguous.  Consider adding more primes.
+Done.
+
+c:\math>python crt_minor_reconstruct.py --triplets saved_inv_p53_triplets.json saved_inv_p79_triplets.json saved_inv_p131_triplets.json saved_inv_p157_triplets.json saved_inv_p313_triplets.json --primes 53 79 131 157 313 --rows pivot_500_rows.txt --cols pivot_500_cols.txt --out crt_pivot_500.json
+Computing determinant residues mod primes...
+  Loading triplets from saved_inv_p53_triplets.json ...
+  Building dense 500x500 minor modulo 53 ...
+  Computing det mod 53 ...  (this may take time)
+    det ≡ 32 (mod 53)
+  Loading triplets from saved_inv_p79_triplets.json ...
+  Building dense 500x500 minor modulo 79 ...
+  Computing det mod 79 ...  (this may take time)
+    det ≡ 19 (mod 79)
+  Loading triplets from saved_inv_p131_triplets.json ...
+  Building dense 500x500 minor modulo 131 ...
+  Computing det mod 131 ...  (this may take time)
+    det ≡ 113 (mod 131)
+  Loading triplets from saved_inv_p157_triplets.json ...
+  Building dense 500x500 minor modulo 157 ...
+  Computing det mod 157 ...  (this may take time)
+    det ≡ 35 (mod 157)
+  Loading triplets from saved_inv_p313_triplets.json ...
+  Building dense 500x500 minor modulo 313 ...
+  Computing det mod 313 ...  (this may take time)
+    det ≡ 194 (mod 313)
+Estimating Hadamard bound using integer entries from first triplet file (approx)...
+Estimated log10(Hadamard bound) ≈ 4366.938
+Running iterative CRT...
+CRT reconstruction done.
+Certificate written to crt_pivot_500.json
+Product of primes has log10 = 10.431; Hadamard log10 bound ≈ 4366.938
+WARNING: product(primes) <= ~2*HadamardBound.  Reconstructed integer may be ambiguous.  Consider adding more primes.
+Done.
+
+c:\math>python rational_from_crt_json.py crt_pivot_100.json
+M = 26953691077
+cM (mod M) = 26545619654
+signed rep = -408071423
+heuristic bound (sqrt(M/2)) = 116089
+Reconstruction success: n/d = (-8117, 82234)
+Verify residues mod primes:
+  p = 53 residue_given = 10 computed = 10
+  p = 79 residue_given = 75 computed = 75
+  p = 131 residue_given = 127 computed = 127
+  p = 157 residue_given = 151 computed = 151
+  p = 313 residue_given = 136 computed = 136
+Residue check OK? True
+Wrote crt_pivot_100_rational.json
+
+c:\math>python rational_from_crt_json.py crt_pivot_150.json
+M = 26953691077
+cM (mod M) = 829019456
+signed rep = 829019456
+heuristic bound (sqrt(M/2)) = 116089
+No rational found within bound. You may need a larger modulus M (more primes) or a larger bound.
+Found reconstruction with bound * 2 : (-205701, 39568)
+Verify residues mod primes:
+  p = 53 residue_given = 28 computed = 28
+  p = 79 residue_given = 13 computed = 13
+  p = 131 residue_given = 104 computed = 104
+  p = 157 residue_given = 110 computed = 110
+  p = 313 residue_given = 144 computed = 144
+Residue check OK? True
+Wrote crt_pivot_150_rational.json
+
+c:\math>python rational_from_crt_json.py crt_pivot_200.json
+M = 26953691077
+cM (mod M) = 21064756854
+signed rep = -5888934223
+heuristic bound (sqrt(M/2)) = 116089
+Reconstruction success: n/d = (-12587, 71621)
+Verify residues mod primes:
+  p = 53 residue_given = 28 computed = 28
+  p = 79 residue_given = 65 computed = 65
+  p = 131 residue_given = 84 computed = 84
+  p = 157 residue_given = 129 computed = 129
+  p = 313 residue_given = 208 computed = 208
+Residue check OK? True
+Wrote crt_pivot_200_rational.json
+
+c:\math>python rational_from_crt_json.py crt_pivot_500.json
+M = 26953691077
+cM (mod M) = 19265582447
+signed rep = -7688108630
+heuristic bound (sqrt(M/2)) = 116089
+Reconstruction success: n/d = (-11828, 98747)
+Verify residues mod primes:
+  p = 53 residue_given = 32 computed = 32
+  p = 79 residue_given = 19 computed = 19
+  p = 131 residue_given = 113 computed = 113
+  p = 157 residue_given = 35 computed = 35
+  p = 313 residue_given = 194 computed = 194
+Residue check OK? True
+Wrote crt_pivot_500_rational.json
+
+c:\math>python compute_exact_det_bareiss.py --triplet saved_inv_p313_triplets.json --rows pivot_100_rows.txt --cols pivot_100_cols.txt --crt crt_pivot_100.json --out det_pivot_100_exact.json
+[+] Building integer 100x100 minor from saved_inv_p313_triplets.json ...
+[+] Starting Bareiss determinant computation (k=100) ...
+[+] Wrote exact determinant result to det_pivot_100_exact.json
+    k = 100
+    det = 7886466895716269941165065038940214958162029643084165574082764196878438606763292748725929289291261437186690608161965979857318080864899611536634057299866563466609295360000000000000000000000000000
+    log10|det| = 192.89688248466098
+    time (s) = 0.05611562728881836
+    matches_crt_signed = False
+    abs_det < M/2 = False
+[+] Done.
+
+c:\math>python compute_exact_det_bareiss.py --triplet saved_inv_p313_triplets.json --rows pivot_150_rows.txt --cols pivot_150_cols.txt --crt crt_pivot_150.json --out det_pivot_150_exact.json
+[+] Building integer 150x150 minor from saved_inv_p313_triplets.json ...
+[+] Starting Bareiss determinant computation (k=150) ...
+[+] Wrote exact determinant result to det_pivot_150_exact.json
+    k = 150
+    det = 61006906183613496770029951448885659656563777147411106656748950880800741087513647853303450966715665240190727731819624133038746001457562036838243091103997783919693070806264109381753095183606425660301911582207163927847977036004323633929057646816190791680000000000000000000000000000000000000
+    log10|det| = 286.78537900136587
+    time (s) = 0.1860196590423584
+    matches_crt_signed = False
+    abs_det < M/2 = False
+[+] Done.
+
+c:\math>python compute_exact_det_bareiss.py --triplet saved_inv_p313_triplets.json --rows pivot_200_rows.txt --cols pivot_200_cols.txt --crt crt_pivot_200.json --out det_pivot_200_exact.json
+[+] Building integer 200x200 minor from saved_inv_p313_triplets.json ...
+[+] Starting Bareiss determinant computation (k=200) ...
+[+] Wrote exact determinant result to det_pivot_200_exact.json
+    k = 200
+    det = -14829953499620206114496632729464915156319746269772792463746223006898523450790885933116892121137141027574214040489427379631344909549269536799516156348668118515605322449179900244314447716744555390543039203510317457961246014000126573263719103267561657151875360599106106650366883045953498875892686060341163793693638100634997327840168378368000000000000000000000000000000000000000000000000000
+    log10|det| = 385.17113978926915
+    time (s) = 0.4558298587799072
+    matches_crt_signed = False
+    abs_det < M/2 = False
+[+] Done.
+
+c:\math>python compute_exact_det_bareiss.py --triplet saved_inv_p313_triplets.json --rows pivot_500_rows.txt --cols pivot_500_cols.txt --crt crt_pivot_500.json --out det_pivot_500_exact.json
+[+] Building integer 500x500 minor from saved_inv_p313_triplets.json ...
+[+] Starting Bareiss determinant computation (k=500) ...
+[+] Wrote exact determinant result to det_pivot_500_exact.json
+    k = 500
+    det = 16077265330928243613087272918084852301756352520191576242593234968123121163309085569694887087793065610907512773367216361152911186356841149230532987027674329298624197237401332424655789939162553527283127403025297138616059914523607656149867117420140747675874588004364712045026772189152750491635775560584076386130662146320133572030080727764638758750289504925724620204606779540319402449158868107184209305334733933863410902629156564200375077917595846798326610267687887970776100963209892639411216428361554408780172229286502959043677151905809767672902935872105621608789379920055117829199109574872216975878751477000162571214573414011725080242127230353331178994913495919271457493307948716391966986766967497393621036840806857695008707600517579345544606399383644063457997556219209752832962620416286671696060537849429708889567821948596496199755017178943364080476971754769511244339379307318083999017791180146984577880701387182593302803677462706030173033977313202155796482790749493173523279442944568223334400000000000000000000000000000000
+    log10|det| = 1021.2062121791955
+    time (s) = 16.82701849937439
+    matches_crt_signed = False
+    abs_det < M/2 = False
+[+] Done.
+
+c:\math>python pivot_finder_modp.py --triplet saved_inv_p313_triplets.json --prime 313 --k 1000 --out_prefix pivot_1000
+Loading triplets from saved_inv_p313_triplets.json ...
+Matrix dims inferred: nrows=2590, ncols=2016
+Searching for up to k=1000 pivots (greedy elimination mod 313)...
+Pivot search complete: found 1000 pivots in 931.33s
+Determinant of pivot minor modulo 313 = 39
+Wrote pivot_1000_rows.txt, pivot_1000_cols.txt, pivot_1000_report.json
+Pivot minor is nonzero modulo p (good). You can now run crt_minor_reconstruct.py across primes with these pivot rows/cols.
+Done.
+
+c:\math>python crt_minor_reconstruct.py --triplets saved_inv_p53_triplets.json saved_inv_p79_triplets.json saved_inv_p131_triplets.json saved_inv_p157_triplets.json saved_inv_p313_triplets.json --primes 53 79 131 157 313 --rows pivot_1000_rows.txt --cols pivot_1000_cols.txt --out crt_pivot_1000.json
+Computing determinant residues mod primes...
+  Loading triplets from saved_inv_p53_triplets.json ...
+  Building dense 1000x1000 minor modulo 53 ...
+  Computing det mod 53 ...  (this may take time)
+    det ≡ 36 (mod 53)
+  Loading triplets from saved_inv_p79_triplets.json ...
+  Building dense 1000x1000 minor modulo 79 ...
+  Computing det mod 79 ...  (this may take time)
+    det ≡ 6 (mod 79)
+  Loading triplets from saved_inv_p131_triplets.json ...
+  Building dense 1000x1000 minor modulo 131 ...
+  Computing det mod 131 ...  (this may take time)
+    det ≡ 17 (mod 131)
+  Loading triplets from saved_inv_p157_triplets.json ...
+  Building dense 1000x1000 minor modulo 157 ...
+  Computing det mod 157 ...  (this may take time)
+    det ≡ 21 (mod 157)
+  Loading triplets from saved_inv_p313_triplets.json ...
+  Building dense 1000x1000 minor modulo 313 ...
+  Computing det mod 313 ...  (this may take time)
+    det ≡ 39 (mod 313)
+Estimating Hadamard bound using integer entries from first triplet file (approx)...
+Estimated log10(Hadamard bound) ≈ 9116.252
+Running iterative CRT...
+CRT reconstruction done.
+Certificate written to crt_pivot_1000.json
+Product of primes has log10 = 10.431; Hadamard log10 bound ≈ 9116.252
+WARNING: product(primes) <= ~2*HadamardBound.  Reconstructed integer may be ambiguous.  Consider adding more primes.
+Done.
+
+c:\math>python rational_from_crt_json.py crt_pivot_1000.json
+M = 26953691077
+cM (mod M) = 25870923956
+signed rep = -1082767121
+heuristic bound (sqrt(M/2)) = 116089
+Reconstruction success: n/d = (114013, 44111)
+Verify residues mod primes:
+  p = 53 residue_given = 36 computed = 36
+  p = 79 residue_given = 6 computed = 6
+  p = 131 residue_given = 17 computed = 17
+  p = 157 residue_given = 21 computed = 21
+  p = 313 residue_given = 39 computed = 39
+Residue check OK? True
+Wrote crt_pivot_1000_rational.json
+
+c:\math>python compute_exact_det_bareiss.py --triplet saved_inv_p313_triplets.json --rows pivot_1000_rows.txt --cols pivot_1000_cols.txt --crt crt_pivot_1000.json --out det_pivot_1000_exact.json
+[+] Building integer 1000x1000 minor from saved_inv_p313_triplets.json ...
+[+] Starting Bareiss determinant computation (k=1000) ...
+[+] Wrote exact determinant result to det_pivot_1000_exact.json
+    k = 1000
+    det = -4377155682962714127292709875362196085203636800522196865403028347706915441653927011493858526056851582713412819168317567671629854774312201699554307546273840551008620481239909487735544466513864878095814136822046505108704109190398432832951417691662734792246431282441431402997972342758422575339096962643041718868585567458956439743057612375567304255453853952186573404591142840528403896126919033024420942759015708297171230912006109282483119648412843945526749286933314234334938147756703841208827728138220503737227424892285896496523703258309006330846076080978527610195529513618144178981106362469291057785168700108923628957228226574551470169770611918558314777164392260725086263877140421142175456937026622274785311187835991332363298250005814730072324400174714872809018137479589998580406865694683950514240530103307799998230568048102923190927497380085206443591214983070803395940279453528709075748455787863295364908301845960677532647080105395644663147303420448778103834849544101490168229088303174417575213174451948162753083885435094737285479495269856587603853026637550959220679753892211366370150292240518832324354562978214204337385113382996702976229656244139535357836915048127641481083797332963215504760057092528351922797050232870259239429970377364465392750578872948338865728753361206786343101695051776310560404753391899729191577673433398802369287556696276273125027934954834951195554601123558863385899059757678026955919169425093350527309378606115607859806137658221208712675036952283521739661430958696510945082834561021756366336163548248380987676224252595911977110630551687451949753702678073077728064905491775091611626659454867097263689904611388620349894306845701753124356601819077647685991170740073973640169920170908080829349849669613251070492870704034312703043998223407428829193124388551356833306420246762481492575087524652475894273121402425452831811166168144865905034096410092313566476694730766580419093142568904480265417891570895695837328720941058867759402058289473698393416299076517360852586269640128715570122221124586248067111174016464501760333432570745526052360857035403394296811230552985751300347196158595476629006362606404111161517040113549312000
+    log10|det| = 2139.641191993506
+    time (s) = 539.6160011291504
+    matches_crt_signed = False
+    abs_det < M/2 = False
+[+] Done.
+
+c:\math>python pivot_finder_modp.py --triplet saved_inv_p313_triplets.json --prime 313 --k 1000 --out_prefix pivot_1883
+Loading triplets from saved_inv_p313_triplets.json ...
+Matrix dims inferred: nrows=2590, ncols=2016
+Searching for up to k=1000 pivots (greedy elimination mod 313)...
+Traceback (most recent call last):
+  File "c:\math\pivot_finder_modp.py", line 282, in <module>
+    main()
+  File "c:\math\pivot_finder_modp.py", line 226, in main
+    work_cols. setdefault(c2, set()).add(r2)
+                              ^^^^^
+KeyboardInterrupt
+^C
+c:\math>python pivot_finder_modp.py --triplet saved_inv_p313_triplets.json --prime 313 --k 1883 --out_prefix pivot_1883
+Loading triplets from saved_inv_p313_triplets.json ...
+Matrix dims inferred: nrows=2590, ncols=2016
+Searching for up to k=1883 pivots (greedy elimination mod 313)...
+Pivot search complete: found 1883 pivots in 1315.66s
+Determinant of pivot minor modulo 313 = 128
+Wrote pivot_1883_rows.txt, pivot_1883_cols.txt, pivot_1883_report.json
+Pivot minor is nonzero modulo p (good). You can now run crt_minor_reconstruct.py across primes with these pivot rows/cols.
+Done.
+
+c:\math>python crt_minor_reconstruct.py --triplets saved_inv_p53_triplets.json saved_inv_p79_triplets.json saved_inv_p131_triplets.json saved_inv_p157_triplets.json saved_inv_p313_triplets.json --primes 53 79 131 157 313 --rows pivot_1883_rows.txt --cols pivot_1883_cols.txt --out crt_pivot_1883.json
+WARNING: minor size k=1883 exceeds recommended 1500. This may be slow or memory heavy.
+Computing determinant residues mod primes...
+  Loading triplets from saved_inv_p53_triplets.json ...
+  Building dense 1883x1883 minor modulo 53 ...
+  Computing det mod 53 ...  (this may take time)
+    det ≡ 40 (mod 53)
+  Loading triplets from saved_inv_p79_triplets.json ...
+  Building dense 1883x1883 minor modulo 79 ...
+  Computing det mod 79 ...  (this may take time)
+    det ≡ 3 (mod 79)
+  Loading triplets from saved_inv_p131_triplets.json ...
+  Building dense 1883x1883 minor modulo 131 ...
+  Computing det mod 131 ...  (this may take time)
+    det ≡ 42 (mod 131)
+  Loading triplets from saved_inv_p157_triplets.json ...
+  Building dense 1883x1883 minor modulo 157 ...
+  Computing det mod 157 ...  (this may take time)
+    det ≡ 84 (mod 157)
+  Loading triplets from saved_inv_p313_triplets.json ...
+  Building dense 1883x1883 minor modulo 313 ...
+  Computing det mod 313 ...  (this may take time)
+    det ≡ 128 (mod 313)
+Estimating Hadamard bound using integer entries from first triplet file (approx)...
+Estimated log10(Hadamard bound) ≈ 17656.558
+Running iterative CRT...
+CRT reconstruction done.
+Certificate written to crt_pivot_1883.json
+Product of primes has log10 = 10.431; Hadamard log10 bound ≈ 17656.558
+WARNING: product(primes) <= ~2*HadamardBound.  Reconstructed integer may be ambiguous.  Consider adding more primes.
+Done.
+
+c:\math>python rational_from_crt_json.py crt_pivot_1883.json
+M = 26953691077
+cM (mod M) = 9339260950
+signed rep = 9339260950
+heuristic bound (sqrt(M/2)) = 116089
+Reconstruction success: n/d = (71401, 5446)
+Verify residues mod primes:
+  p = 53 residue_given = 40 computed = 40
+  p = 79 residue_given = 3 computed = 3
+  p = 131 residue_given = 42 computed = 42
+  p = 157 residue_given = 84 computed = 84
+  p = 313 residue_given = 128 computed = 128
+Residue check OK? True
+Wrote crt_pivot_1883_rational.json
+
+c:\math>python compute_exact_det_bareiss.py --triplet saved_inv_p313_triplets.json --rows pivot_1883_rows.txt --cols pivot_1883_cols.txt --crt crt_pivot_1883.json --out det_pivot_1883_exact.json
+[+] Building integer 1883x1883 minor from saved_inv_p313_triplets.json ...
+[+] Starting Bareiss determinant computation (k=1883) ...
+[+] Wrote exact determinant result to det_pivot_1883_exact.json
+    k = 1883
+    det = -34747023128560435630663918667761277011605788789750059629700897158732797775123160453495369642681419680176231439778973750861533694473832242261853324424795359674546582811557541049996349877466042329443612452698262873803234903290020102893370591882779809203162736348631073914807734146367800700911216079172088742064404067794688558957070026974719820335654842145123762530834858225182287785394517488346926112182542956398840979067708049825429728686577617040532733228918206433892461260065741655781778460477965020726489225587725777635086509301734554784542193149823372001256938968678723973067144252448185260002494787169726349675295698081849361454496813199634188951522084206119722996881879719431745181290534329885272234261917029879330960623391124657323524142629677246184905916802723368450553337651563440159968400969392813024887206728466727503981034840145551346013637828410642278981835782258123733664755176715258813789960879159901617853682879031707774058269671706340478806014397261519352494117727447784131502397754737746193591802427448556694657016211607861353096958830009552453889419002551196258863040393551405280156540114171806496020270330748772927456980259158732059397704417527381298838364921981177229726113841973245580538246931682643282371864087944438474883979257085594523106194177532005657181239479403031927476438231798206003112912810903982698356748439453647697029735037922136969942422913286382488110388403259729762088187258666055900710016895702299927695424469368678678313705074186101078825950892319932109234465098287795193256256569199964559740453167899201002308511022132762090286357863009662578614297145091267250030937912711970520639164006468361892546141763076874035527513887252582142469912545131892399096712573311400064164246959469273129833407571672578987325130124100184198588555589326387098750960897132065630275940242209003188248172637630360417410752508739071204588569405316544142588302684081956934437908404430745907187998203120129280389830191289848248991805488103409661209923101125408184384216729507536835094280808791137252678281037048132854705921027328555062364077280580332153511135823410930427661954699753983426441843101272882338797513784898693817826735504083205812287767958437554309333245785698186119745565311549158597498165828335065346970296736700528937027376628904456336955369811689555820108048961349480092600783017859843779365315868270681062493440387760044386496925962280128423238980817173641194618287355880770799151267065978241152331538109226696147592964592724498198640022728528718375827712270809845011469518237939301979568972820910619333268101724581024493763073681100458964745231658051068491917837595354036571536446611781630872732012570987265727954532399874497191843692420610210839252880802572208707556935752214628466630289892289258498541362625709637950050522350113129262195111546258446410218162047151356285127843300570504352111249498030238071526174164851848070614835225485515621029363744700929875124250234060353039183449073609902870809567796037222375213888051788779976259903031626158745427436965318224887903093655320918549424634130442463039340913184840211018096112234037928705989155020509410695373689568189786567197852056925281492093553936946796684000656329233638340124241567997389298786472161887629852176340246277092581953087784477690409735810452552033093645565359889212346718147161553029080424947325094866066690309922333366329786694766387462947844700057232540518724158070225781924564256414069496069120864247856526948123092743721631841507333519978103745894470647258446392979486923086760676297992416974415596781803194581354202500566071762389118516204824862644704877299463448623966220853542532306504569260493187739096333653018442094801087624390193859116721133098452022349727624150204577203019789728049621828317914988295841358305234401115493523111199797477830479958346675465684979232819214037384888279402522112145816101495084426000189500769167575633185817049449452823935964034111344507167763166931824952304577892912031525499676729546463576129563864912274440614745662346070585146646681741775630726927638572112387955401683728128987621815832280625541125977485800261283821071468719980146615774624729090225262119691784790815645622615719120333945725533937043142536324354015282428667674997849081225454203598897539036576470782127499840269980502365849231059117313942139970127166351802197567919057634639364603452480882841035481144833984891919692689990281931002327429283840000
+    log10|det| = 4363.540917603337
+    time (s) = 12110.41487789154
+    matches_crt_signed = False
+    abs_det < M/2 = False
+[+] Done.
+```
 
 ---
 
