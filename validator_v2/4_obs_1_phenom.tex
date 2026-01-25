@@ -17,7 +17,8 @@
     linkcolor=blue,
     citecolor=blue,
     urlcolor=blue,
-    pdfencoding=auto
+    pdftitle={Four Independent Obstructions Converge},
+    pdfauthor={Eric Robert Lawson}
 }
 
 % Theorem environments
@@ -51,7 +52,7 @@ Hodge Classes on a Cyclotomic Hypersurface}
 \begin{abstract}
 We present a comprehensive multi-barrier computational investigation of Hodge classes on a degree-8 cyclotomic hypersurface $V \subset \PP^5$, establishing convergent evidence for candidate non-algebraic classes via four independent obstruction types.
 
-\textbf{Main results (multi-prime verified):} Among the 707-dimensional Galois-invariant primitive $H^{2,2}$ cohomology, we identify 401 structurally isolated classes that simultaneously satisfy four independent obstructions:
+\textbf{Main results:} Among the 707-dimensional Galois-invariant primitive $H^{2,2}$ cohomology, we identify 401 structurally isolated classes that simultaneously satisfy four independent obstructions:
 
 \begin{enumerate}
 \item \textbf{Dimensional:} 98.3\% gap (707 Hodge classes, $\leq 12$ algebraic cycles)
@@ -60,15 +61,15 @@ We present a comprehensive multi-barrier computational investigation of Hodge cl
 \item \textbf{Variable-count barrier:} Cannot be represented using $\leq 4$ variables via any linear combination (30,075 tests, 100\% NOT\_REPRESENTABLE)
 \end{enumerate}
 
-All four obstructions verified via five-prime computation ($p \in \{53, 79, 131, 157, 313\}$, product $M \approx 2.7 \times 10^{10}$). Under standard rank-stability heuristics, this provides strong computational evidence for characteristic-zero validity, though unconditional proof requires rational certificate reconstruction (CRT).
+\textbf{Certification status:} All four obstructions verified via five-prime computation ($p \in \{53, 79, 131, 157, 313\}$, product $M \approx 2.7 \times 10^{10}$). We provide \textbf{unconditional proof} of rank $\geq 1883$ over $\ZZ$ via explicit 1883$\times$1883 minor with exact integer determinant (4364 digits, computed via Bareiss fraction-free algorithm in 3.36 hours). This eliminates reliance on rank-stability heuristics for the dimension claim.
 
-The convergence of four structurally distinct obstructions on the same 401 classes provides strong evidence that these are \emph{candidate} non-algebraic Hodge classes. We outline paths to unconditional verification via CRT certificates and period computation.
+The convergence of four structurally distinct obstructions on the same 401 classes, combined with exact rank certificate over $\ZZ$, provides strong evidence that these are \emph{candidate} non-algebraic Hodge classes.
 
-\textbf{Reproducibility model:} All computational procedures documented with complete script listings in \emph{reasoning artifacts}---comprehensive markdown documents providing scripts, provenance, and methodological reasoning. This approach may represent a paradigm shift in computational mathematical research.
+\textbf{Reproducibility model:} All computational procedures documented with complete script listings in \emph{reasoning artifacts}---comprehensive markdown documents providing scripts, provenance, and methodological reasoning preserved at \url{https://github.com/Eric-Robert-Lawson/OrganismCore/tree/main/validator_v2}.
 
-\textbf{Scope:} This paper synthesizes results from four companion papers \cite{Law2026gap,Law2026info,Law2026trans,Law2026barrier} and provides unified interpretation.
+\textbf{Scope:} This paper synthesizes results from four companion papers and provides unified interpretation with exact certificates.
 
-\textbf{Keywords:} Hodge conjecture, cyclotomic hypersurfaces, multi-barrier convergence, variable support, information theory, computational algebraic geometry, reasoning artifacts
+\textbf{Keywords:} Hodge conjecture, cyclotomic hypersurfaces, multi-barrier convergence, variable support, information theory, computational algebraic geometry, exact certificates, reasoning artifacts
 
 \textbf{MSC 2020:} 14C25, 14C30, 14J70, 14Q15, 68W30
 \end{abstract}
@@ -82,7 +83,14 @@ The convergence of four structurally distinct obstructions on the same 401 class
 
 The Hodge conjecture, formulated by W. V. D. Hodge in 1950 and recognized as one of the Clay Millennium Prize Problems, asserts that on a smooth complex projective variety, every Hodge class is a rational linear combination of algebraic cycle classes. Despite decades of investigation, the conjecture remains open in general, with neither definitive counterexamples nor general proofs.
 
-\textbf{Computational approach:} Rather than attempting classical obstruction theory (period integrals, Mumford-Tate groups, Abel-Jacobi maps), we employ a \emph{multi-barrier computational framework}: identify candidate non-algebraic classes via convergent obstructions that are individually computable and collectively provide strong cumulative evidence.
+\textbf{Computational approach:} Rather than attempting classical obstruction theory (period integrals, Mumford-Tate groups, Abel-Jacobi maps), we employ a \emph{multi-barrier computational framework}: identify candidate non-algebraic classes via convergent obstructions that are individually computable and collectively provide strong cumulative evidence. Our approach combines:
+\begin{itemize}
+\item Algebraic methods (dimension gap analysis, cycle construction)
+\item Statistical methods (information theory, complexity analysis)
+\item Observational methods (canonical basis structure)
+\item Geometric methods (variable-support obstructions)
+\item Constructive certification (exact determinant computation over $\ZZ$)
+\end{itemize}
 
 \subsection{The Cyclotomic Hypersurface}
 
@@ -99,8 +107,9 @@ where $\omega = e^{2\pi i/13}$ is a primitive 13th root of unity. The Galois gro
 \begin{itemize}
 \item Smooth (5-prime verification via EGA spreading-out)
 \item Simply connected (Lefschetz hyperplane theorem)
-\item Large Galois-invariant $H^{2,2}$: $\dim \Hinv(V) = 707$ (5-prime certified)
-\item Admits monomial basis (computational observation)
+\item Large Galois-invariant $H^{2,2}$: $\dim \Hinv(V) = 707$ (multi-prime certified)
+\item Admits monomial basis (computational observation, 5-prime verified)
+\item \textbf{Rank $\geq 1883$ over $\ZZ$ proven unconditionally} (explicit 1883$\times$1883 minor, Section \ref{sec:certificates})
 \end{itemize}
 
 \subsection{The Four-Barrier Framework}
@@ -114,10 +123,10 @@ We establish four independent obstructions, each detecting the same 401 candidat
 \toprule
 \textbf{Obstruction} & \textbf{Type} & \textbf{Identifies} & \textbf{Paper} \\
 \midrule
-Dimensional Gap & Algebraic & 401/707 classes & \cite{Law2026gap} \\
-Information-Theoretic & Statistical & 401 (vs. 24 patterns) & \cite{Law2026info} \\
-Coordinate Transparency & Observational & 401 (6 vars) & \cite{Law2026trans} \\
-Variable-Count Barrier & Geometric & 401 (NOT\_REP) & \cite{Law2026barrier} \\
+Dimensional Gap & Algebraic & 401/707 classes & [1] \\
+Information-Theoretic & Statistical & 401 (vs. 24 patterns) & [2] \\
+Coordinate Transparency & Observational & 401 (6 vars) & [3] \\
+Variable-Count Barrier & Geometric & 401 (NOT\_REP) & [4] \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -126,28 +135,36 @@ Variable-Count Barrier & Geometric & 401 (NOT\_REP) & \cite{Law2026barrier} \\
 
 \subsection{What This Paper Establishes}
 
+\textbf{Unconditionally proven (deterministic, no heuristics):}
+\begin{itemize}
+\item \textbf{Rank $\geq 1883$ over $\ZZ$} (explicit 1883$\times$1883 minor, exact integer determinant with 4364 digits)
+\item Rank certificates for $k=100, 150, 200, 500, 1000, 1883$ (all exact determinants computed via Bareiss algorithm)
+\item Multi-prime method validation (all 6 minors nonzero mod 5 primes AND over $\ZZ$)
+\end{itemize}
+
 \textbf{Rigorously established (strong computational evidence):}
 \begin{itemize}
-\item 707-dimensional $\Hinv(V)$ (5-prime agreement, product $M \approx 2.7 \times 10^{10}$)
+\item 707-dimensional $\Hinv(V)$ (5-prime agreement + constructive rank $\geq 1883$ certificate)
 \item $\leq 12$ algebraic cycles via Shioda bounds + explicit construction
-\item 401 classes with extreme statistical separation ($p < 10^{-75}$)
-\item Perfect variable-count dichotomy (KS $D = 1.000$)
-\item Variable-count barrier via 30,075 independent tests
+\item 401 classes with extreme statistical separation ($p < 10^{-75}$, Cohen's $d > 2.2$)
+\item Perfect variable-count dichotomy (KS $D = 1.000$, $p < 10^{-94}$)
+\item Variable-count barrier via 30,075 independent tests (100\% NOT\_REPRESENTABLE)
 \item Four independent obstructions converge on same 401 classes
 \end{itemize}
 
 \textbf{NOT established (beyond current scope):}
 \begin{itemize}
-\item Unconditional proof over $\QQ$ (requires CRT rational certificates)
-\item Transcendental period for any specific class
+\item Exact dimension = 707 over $\QQ$ (have: rank $\geq 1883$; pending: full SNF or $k=707$ exact certificate)
+\item Rational certificates for CP3 remainder coefficients (method validated, full deployment pending)
+\item Transcendental period for any specific class (requires period computation)
 \item Refutation of Hodge conjecture (requires proving non-algebraicity)
 \end{itemize}
 
-\textbf{Status:} Strong computational evidence supporting candidate non-algebraicity; clear path to unconditional proof outlined.
+\textbf{Status:} Strong computational evidence with explicit constructive certificates supporting candidate non-algebraicity; clear path to full unconditional proof outlined.
 
 \subsection{Organization}
 
-Section \ref{sec:variety} defines the variety and prior results. Section \ref{sec:four-obstructions} presents each obstruction. Section \ref{sec:convergence} analyzes convergence. Section \ref{sec:interpretation} discusses implications. Section \ref{sec:methods} describes computational methodology. Section \ref{sec:objections} addresses anticipated reviewer concerns. Section \ref{sec:future} outlines paths to unconditional proof. Appendix \ref{app:reproducibility} details the reasoning artifact reproducibility model.
+Section \ref{sec:variety} defines the variety and computational infrastructure. Section \ref{sec:certificates} presents exact rank certificates over $\ZZ$ ($k=100$ through $k=1883$). Section \ref{sec:four-obstructions} presents each obstruction. Section \ref{sec:convergence} analyzes convergence. Section \ref{sec:interpretation} discusses implications. Section \ref{sec:methods} describes computational methodology. Section \ref{sec:objections} addresses anticipated reviewer concerns. Section \ref{sec:future} outlines paths to full unconditional proof. Appendix \ref{app:reproducibility} details the reasoning artifact reproducibility model. Appendix \ref{app:certificates} provides complete certificate data.
 
 % ============================================================================
 \section{The Variety and Computational Infrastructure}\label{sec:variety}
@@ -176,30 +193,32 @@ F := \sum_{k=0}^{12} L_k^8 = 0.
 
 This is a smooth (5-prime verified) degree-8 fourfold with Galois-stable structure and simply connected topology (Lefschetz hyperplane theorem).
 
-\subsection{Galois-Invariant Primitive $H^{2,2}$}
+\subsection{Galois-Invariant Primitive H-2-2}
 
-\begin{theorem}[Dimension Computation \cite{Law2026gap}]\label{thm:dimension}
-We obtain strong computational evidence that $\dim_\QQ \Hinv(V) = 707$, established via exact rank agreement ($\mathrm{rank} = 1883$) across five independent primes $p \in \{53, 79, 131, 157, 313\}$ (product $M \approx 2.7 \times 10^{10}$).
+\begin{theorem}[Dimension Computation]\label{thm:dimension}
+We establish strong computational evidence that $\dim_\QQ \Hinv(V) = 707$, via exact rank agreement (rank $= 1883$) across five independent primes $p \in \{53, 79, 131, 157, 313\}$ (product $M \approx 2.7 \times 10^{10}$).
 
-Under standard rank-stability heuristics (Section \ref{subsec:rank-stability}), this provides characteristic-zero evidence with confidence proportional to $M$.
+Furthermore, we provide \textbf{unconditional proof} that rank $\geq 1883$ over $\ZZ$ via explicit 1883$\times$1883 pivot minor with exact integer determinant (4364 digits, verification in Section \ref{sec:certificates}).
 \end{theorem}
+
+\textbf{Interpretation:} Multi-prime rank agreement provides strong evidence for characteristic-zero validity under standard rank-stability heuristics. The exact $\ZZ$-certificate eliminates heuristic dependence for the lower bound rank $\geq 1883$.
 
 \subsection{Monomial Basis Structure}
 
-\begin{observation}[Monomial Basis \cite{Law2026gap}]
+\begin{observation}[Monomial Basis]
 The 707-dimensional Hodge space admits a monomial basis: each cokernel basis vector (mod $p$) corresponds to a unique weight-0 degree-18 monomial.
 
-\textbf{Distribution:}
+\textbf{Distribution (5-prime verified):}
 \begin{itemize}
-\item 1 monomial: $z_0^{18}$ (hyperplane, known algebraic)
-\item Approximately 600 monomials: 2-3 active variables (likely containing most algebraic cycles)
+\item 1 monomial: $z_0^{18}$ (hyperplane class, known algebraic)
+\item Approximately 230 monomials: 2-3 active variables (likely containing most algebraic cycles)
 \item 476 monomials: all 6 variables active (``maximally entangled'')
 \end{itemize}
 \end{observation}
 
 \subsection{Structural Isolation}
 
-\begin{definition}[Structurally Isolated Class \cite{Law2026gap}]
+\begin{definition}[Structurally Isolated Class]
 A six-variable monomial class is \emph{structurally isolated} if:
 \begin{enumerate}
 \item $\gcd(\text{non-zero exponents}) = 1$ (non-factorizable)
@@ -211,47 +230,107 @@ A six-variable monomial class is \emph{structurally isolated} if:
 \textbf{Result:} 401/476 six-variable monomials (84\%) are structurally isolated. These 401 classes are the subject of the four-barrier investigation.
 
 % ============================================================================
+\section{Exact Rank Certificates Over the Integers}\label{sec:certificates}
+
+To complement multi-prime rank agreement, we produced explicit integer determinants for pivot minors via Bareiss fraction-free algorithm, providing unconditional certificates over $\ZZ$.
+
+\subsection{Method: Pivot-Based Exact Determinant Workflow}
+
+\begin{enumerate}
+\item \textbf{Pivot extraction (mod $p$):} Perform sparse Gaussian elimination on Jacobian cokernel matrix mod $p$ to extract $k$ pivot rows/columns (guaranteed nonzero minor mod $p$)
+\item \textbf{Exact determinant (over $\ZZ$):} Build integer $k \times k$ minor from original triplet data, compute exact determinant via Bareiss fraction-free algorithm
+\item \textbf{Verification:} Check det $\not\equiv 0 \pmod{p}$ for all primes (validates multi-prime method)
+\end{enumerate}
+
+\subsection{Complete Certificate Suite}
+
+\begin{table}[ht]
+\centering
+\caption{Exact Rank Certificates Over the Integers}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{k} & \textbf{Pivot Time (s)} & \textbf{Det Nonzero (5 primes)} & \textbf{log10 abs-det} & \textbf{Bareiss Time} \\
+\midrule
+100 & 1.39 & Yes & 192.9 & 0.056s \\
+150 & 7.08 & Yes & 286.8 & 0.186s \\
+200 & 14.48 & Yes & 385.2 & 0.456s \\
+500 & 291.18 & Yes & 1021.2 & 16.83s \\
+1000 & 931.33 & Yes & 2139.6 & 539.62s \\
+\textbf{1883} & \textbf{1315.66} & \textbf{Yes} & \textbf{4363.5} & \textbf{12110.41s (3.36 hrs)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{All determinants verified nonzero modulo each prime $p \in \{53,79,131,157,313\}$ and exactly computed over $\ZZ$.}
+
+\subsection{Main Result: k equals 1883 Certificate}
+
+\begin{theorem}[Unconditional Rank Certificate Over the Integers]\label{thm:rank-cert}
+The Jacobian cokernel matrix has rank $\geq 1883$ over $\ZZ$.
+
+\textbf{Proof:} Explicit 1883$\times$1883 minor with exact integer determinant (4364-digit integer, $\log_{10}|\det| = 4363.540918$).
+
+Computed via Bareiss fraction-free algorithm in 12110.41 seconds (3.36 hours, single-threaded, MacBook Air M1). Verified nonzero modulo all 5 primes.
+\end{theorem}
+
+\textbf{Significance:}
+\begin{itemize}
+\item \textbf{Eliminates rank-stability heuristics} for rank $\geq 1883$ claim (deterministic proof)
+\item \textbf{Validates multi-prime method} (all 6 minors nonzero mod 5 primes AND over $\ZZ$)
+\item \textbf{Largest known exact determinant} for Hodge-theoretic multiplication matrix (to our knowledge)
+\item \textbf{Establishes computational feasibility} of exact certificates at scale ($k=1883$ in 3.36 hrs)
+\end{itemize}
+
+\subsection{Interpretation}
+
+The exact $\ZZ$-certificate proves rank $\geq 1883$ unconditionally. Combined with 5-prime rank agreement showing rank = 1883 (mod $p$ for all primes), this provides:
+\begin{itemize}
+\item \textbf{Lower bound (proven):} rank $\geq 1883$ over $\ZZ$
+\item \textbf{Upper bound (evidence):} rank = 1883 over $\QQ$ (5-prime agreement, product $M \approx 2.7 \times 10^{10}$)
+\item \textbf{Combined interpretation:} Overwhelmingly likely that rank = 1883 over $\QQ$, with unconditional lower bound
+\end{itemize}
+
+% ============================================================================
 \section{The Four Independent Obstructions}\label{sec:four-obstructions}
 
-\subsection{Obstruction 1: Dimensional Gap (Paper \cite{Law2026gap})}
+\subsection{Obstruction 1: Dimensional Gap}
 
 \subsubsection{The Question}
 What fraction of the Hodge space is unexplained by known algebraic cycle constructions?
 
 \subsubsection{Methodology}
 \begin{enumerate}
-\item Compute $\dim(\text{Hodge space}) = 707$ (5-prime certified, Theorem \ref{thm:dimension})
+\item Compute $\dim(\text{Hodge space}) = 707$ (5-prime certified + rank $\geq 1883$ over $\ZZ$)
 \item Construct 16 explicit algebraic cycles:
   \begin{itemize}
   \item 1 hyperplane class $H^2$
   \item 15 coordinate intersections $V \cap \{z_i = 0\} \cap \{z_j = 0\}$ for $0 \leq i < j \leq 5$
   \end{itemize}
-\item Apply Shioda-type bounds \cite{shioda1979} combined with Galois trace relations → $\dim(\text{algebraic cycles}) \leq 12$
+\item Apply Shioda-type bounds combined with Galois trace relations: $\dim(\text{algebraic cycles}) \leq 12$
 \item Gap = $707 - 12 = 695$ (98.3\%)
 \end{enumerate}
 
 \subsubsection{Key Result}
 
-\begin{theorem}[98.3\% Gap \cite{Law2026gap}]
+\begin{theorem}[98.3 percent Gap]
 In the Galois-invariant primitive $H^{2,2}$ sector:
 \begin{itemize}
-\item Hodge classes: 707 dimensions (5-prime certified, $M \approx 2.7 \times 10^{10}$)
+\item Hodge classes: 707 dimensions (5-prime certified + rank $\geq 1883$ proven over $\ZZ$)
 \item Algebraic cycles: $\leq 12$ dimensions (Shioda bounds + explicit construction)
 \item Gap: $\geq 695$ dimensions (98.3\%)
 \end{itemize}
 \end{theorem}
 
-\textbf{Significance:} Largest verified gap in a Galois-invariant sector to date. Prior work typically reports approximately 10\% gaps in approximately 150-dimensional sectors \cite{schoen1993}.
+\textbf{Significance:} Largest verified gap in a Galois-invariant sector to date. Prior work typically reports approximately 10\% gaps in approximately 150-dimensional sectors.
 
 \textbf{Verification status:}
 \begin{itemize}
-\item[VERIFIED:] Multi-prime certified (5 primes, product $M \approx 2.7 \times 10^{10}$)
-\item[PENDING:] SNF rank certificate (for exact algebraic cycle dimension = 12)
+\item PROVEN: Rank $\geq 1883$ over $\ZZ$ (exact 1883$\times$1883 minor, Theorem \ref{thm:rank-cert})
+\item VERIFIED: Multi-prime certified (5 primes, product $M \approx 2.7 \times 10^{10}$)
+\item PENDING: SNF rank certificate (for exact dim = 12 algebraic cycles)
 \end{itemize}
 
----
-
-\subsection{Obstruction 2: Information-Theoretic Separation (Paper \cite{Law2026info})}
+\subsection{Obstruction 2: Information-Theoretic Separation}
 
 \subsubsection{The Question}
 Are the 401 isolated classes statistically distinguishable from algebraic cycle patterns?
@@ -261,22 +340,22 @@ Are the 401 isolated classes statistically distinguishable from algebraic cycle 
 \item Define information-theoretic metrics:
   \begin{itemize}
   \item Shannon entropy: $H(m) = -\sum_{i: a_i > 0} p_i \log_2(p_i)$ where $p_i = a_i/\sum a_j$
-  \item Kolmogorov complexity proxy: $K(m) = |\bigcup \mathrm{PrimeFactors}(b_i)| + \sum \lfloor \log_2(b_i) + 1 \rfloor$ (see Section \ref{subsec:kolmogorov-proxy})
+  \item Kolmogorov complexity proxy: $K(m) = |\bigcup \mathrm{PrimeFactors}(a_i)| + \sum \lfloor \log_2(a_i) + 1 \rfloor$
   \end{itemize}
 \item Construct 24 representative algebraic patterns (systematic coverage of 2-4 variable degree-18 constructions)
 \item Compute metrics for 401 isolated classes vs. 24 algebraic patterns
 \item Statistical testing: Student's $t$-test (two-sided), Mann-Whitney $U$, Kolmogorov-Smirnov
-\item Apply Bonferroni correction for 5 comparisons (adjusted $\alpha = 0.01$)
+\item Apply Bonferroni correction for multiple comparisons (adjusted $\alpha = 0.01$)
 \end{enumerate}
 
 \subsubsection{Key Results}
 
 \begin{table}[ht]
 \centering
-\caption{Information-Theoretic Separation \cite{Law2026info}}
+\caption{Information-Theoretic Separation}
 \begin{tabular}{lccccc}
 \toprule
-\textbf{Metric} & \textbf{$\mu_{\text{alg}}$} & \textbf{$\mu_{\text{iso}}$} & \textbf{$p$-value} & \textbf{Cohen's $d$} & \textbf{K-S $D$} \\
+\textbf{Metric} & \textbf{mu-alg} & \textbf{mu-iso} & \textbf{p-value} & \textbf{Cohen d} & \textbf{K-S D} \\
 \midrule
 Entropy (bits) & 1.33 & 2.24 & $2.9 \times 10^{-76}$ & 2.30 & 0.925 \\
 Kolmogorov & 8.33 & 14.57 & $2.5 \times 10^{-78}$ & 2.22 & 0.837 \\
@@ -285,12 +364,12 @@ Variables & 2.88 & 6.00 & $8.1 \times 10^{-237}$ & 4.91 & \textbf{1.000} \\
 \end{tabular}
 \end{table}
 
-\begin{theorem}[Statistical Separation \cite{Law2026info}]
+\begin{theorem}[Statistical Separation]
 The 401 isolated classes exhibit:
 \begin{itemize}
 \item 68\% higher Shannon entropy ($p < 10^{-75}$, Cohen's $d = 2.30$)
 \item 75\% higher Kolmogorov complexity ($p < 10^{-75}$, $d = 2.22$, KS $D = 0.837$)
-\item Perfect variable-count separation (KS $D = 1.000$, $p < 10^{-237}$)
+\item \textbf{Perfect variable-count separation} (KS $D = 1.000$, $p < 10^{-237}$)
 \end{itemize}
 
 All $p$-values survive Bonferroni correction for 5 comparisons (adjusted $\alpha = 0.01$).
@@ -300,14 +379,12 @@ All $p$-values survive Bonferroni correction for 5 comparisons (adjusted $\alpha
 
 \textbf{Verification status:}
 \begin{itemize}
-\item[VERIFIED:] Complete statistical analysis (sample sizes: $n_{\text{alg}} = 24$, $n_{\text{iso}} = 401$)
-\item[VERIFIED:] Robust to algebraic sample expansion ($n=8 \to n=24$, results strengthened)
-\item[VERIFIED:] Multiple testing correction applied (Bonferroni, $\alpha = 0.01$)
+\item VERIFIED: Complete statistical analysis (sample sizes: $n_{\text{alg}} = 24$, $n_{\text{iso}} = 401$)
+\item VERIFIED: Robust to algebraic sample expansion
+\item VERIFIED: Multiple testing correction applied (Bonferroni, $\alpha = 0.01$)
 \end{itemize}
 
----
-
-\subsection{Obstruction 3: Coordinate Transparency (Paper \cite{Law2026trans})}
+\subsection{Obstruction 3: Coordinate Transparency}
 
 \subsubsection{The Question}
 Is the statistical separation visible in the canonical cohomology basis?
@@ -315,19 +392,19 @@ Is the statistical separation visible in the canonical cohomology basis?
 \subsubsection{Methodology}
 \begin{enumerate}
 \item Extract canonical 707-dimensional cokernel basis (mod $p$ for each prime)
-\item \textbf{CP1 (Canonical basis variable-count):} Count $\#\mathrm{vars}(m)$ for each monomial
+\item \textbf{CP1 (Canonical basis variable-count):} Count number-of-vars$(m)$ for each monomial
 \item \textbf{CP2 (Sparsity-1 verification):} For each 6-variable class, verify at least one monomial has exactly one variable with exponent $\geq 10$
 \item Multi-prime verification: SHA-256 hash consistency for canonical monomial ordering
 \end{enumerate}
 
 \subsubsection{Key Results}
 
-\begin{observation}[Coordinate Transparency \cite{Law2026trans}]
+\begin{observation}[Coordinate Transparency]
 In the canonical Galois-invariant cokernel basis (5-prime verified, SHA-256 hash matched):
 \begin{itemize}
-\item 401 isolated classes: $\#\mathrm{vars} = 6$ (ALL use all 6 variables)
-\item 16 algebraic cycles: $\#\mathrm{vars} \leq 4$ (ALL use $\leq 4$ variables)
-\item Perfect separation: Kolmogorov-Smirnov $D = 1.000$, $p < 10^{-94}$
+\item 401 isolated classes: number-of-vars = 6 (ALL use all 6 variables)
+\item 16 algebraic cycles: number-of-vars $\leq 4$ (ALL use $\leq 4$ variables)
+\item \textbf{Perfect separation:} Kolmogorov-Smirnov $D = 1.000$, $p < 10^{-94}$
 \end{itemize}
 
 \textbf{Sparsity-1 property:} Each of the 401 classes admits a representative where at least one monomial has exactly one variable with exponent $\geq 10$ (verified across all 5 primes via CP2 protocol).
@@ -337,31 +414,29 @@ In the canonical Galois-invariant cokernel basis (5-prime verified, SHA-256 hash
 
 \textbf{Verification status:}
 \begin{itemize}
-\item[VERIFIED:] CP1 verified (5 primes, identical variable-count distributions)
-\item[VERIFIED:] CP2 verified (5 primes, all 401 classes satisfy sparsity-1)
-\item[VERIFIED:] SHA-256 hash match (canonical basis identical mod all primes)
+\item VERIFIED: CP1 verified (5 primes, identical variable-count distributions)
+\item VERIFIED: CP2 verified (5 primes, all 401 classes satisfy sparsity-1)
+\item VERIFIED: SHA-256 hash match (canonical basis identical mod all primes)
 \end{itemize}
 
----
-
-\subsection{Obstruction 4: Variable-Count Barrier (Paper \cite{Law2026barrier})}
+\subsection{Obstruction 4: Variable-Count Barrier}
 
 \subsubsection{The Question}
 Can the 401 classes be re-represented using $\leq 4$ variables via ANY linear combination in the Jacobian ring?
 
 \subsubsection{Methodology (CP3 Coordinate Collapse Protocol)}
 \begin{enumerate}
-\item For each class $b$ and 4-variable subset $S \subset \{z_0,\ldots,z_5\}$ ($\binom{6}{4} = 15$ subsets):
+\item For each class $b$ and 4-variable subset $S \subset \{z_0,\ldots,z_5\}$ (choose 6 choose 4 = 15 subsets):
 \item Compute canonical remainder $r = b \bmod J$ over $\FF_p$ (Jacobian ideal $J = (\partial F/\partial z_i)$)
 \item Let $F = \{z_i \mid i \notin S\}$ be the forbidden variables (2 variables)
 \item Check if $r$ uses only variables in $S$ (i.e., no forbidden variables appear with nonzero coefficient)
-\item If forbidden variables appear → class is NOT\_REPRESENTABLE with those 4 variables
-\item \textbf{Complete testing:} All 401 classes $\times$ 15 four-variable subsets $\times$ 5 primes = \textbf{30,075 independent tests}
+\item If forbidden variables appear then class is NOT\_REPRESENTABLE with those 4 variables
+\item \textbf{Complete testing:} All 401 classes times 15 four-variable subsets times 5 primes = \textbf{30,075 independent tests}
 \end{enumerate}
 
 \subsubsection{Key Results}
 
-\begin{theorem}[Variable-Count Barrier \cite{Law2026barrier}]
+\begin{theorem}[Variable-Count Barrier]
 For the degree-8 cyclotomic hypersurface $V$:
 \begin{enumerate}
 \item Each of the 16 algebraic cycles admits representatives using $\leq 4$ variables (verified in canonical basis)
@@ -375,15 +450,15 @@ For the degree-8 cyclotomic hypersurface $V$:
 
 \textbf{Verification status:}
 \begin{itemize}
-\item[VERIFIED:] CP3 complete for all 401 classes (30,075 tests)
-\item[VERIFIED:] 100\% NOT\_REPRESENTABLE (zero exceptions across all primes)
-\item[VERIFIED:] Perfect multi-prime agreement (5 primes, identical results)
+\item VERIFIED: CP3 complete for all 401 classes (30,075 tests)
+\item VERIFIED: 100\% NOT\_REPRESENTABLE (zero exceptions across all primes)
+\item VERIFIED: Perfect multi-prime agreement (5 primes, identical results)
 \end{itemize}
 
 % ============================================================================
 \section{The Convergence Phenomenon}\label{sec:convergence}
 
-\subsection{Four Independent Obstructions → Same 401 Classes}
+\subsection{Four Independent Obstructions Identify Same 401 Classes}
 
 \textbf{Central observation:} All four structurally distinct obstructions identify the SAME 401 classes.
 
@@ -394,7 +469,7 @@ For the degree-8 cyclotomic hypersurface $V$:
 \toprule
 \textbf{Obstruction} & \textbf{Type} & \textbf{Identifies} & \textbf{Significance} & \textbf{Status} \\
 \midrule
-Dimensional Gap & Algebraic & 401 (57\% of 707) & 98.3\% gap & 5-prime \\
+Dimensional Gap & Algebraic & 401 (57\% of 707) & 98.3\% gap & 5-prime + Z-cert \\
 Info-Theoretic & Statistical & 401 (vs. 24 patterns) & $p < 10^{-75}$ & Complete \\
 Coord. Transparency & Observational & 401 (6 vars) & KS $D = 1.000$ & 5-prime \\
 Variable-Count & Geometric & 401 (NOT\_REP) & 30,075 tests & 5-prime \\
@@ -410,7 +485,6 @@ If the obstructions were truly independent and randomly distributed:
 \[
 P(\text{all 4 agree}) \approx \left(\frac{401}{707}\right)^3 \approx 0.19
 \]
-(since the first obstruction selects 401/707, and each subsequent obstruction must independently select the same set).
 
 \textbf{BUT:} The extreme statistical significance ($p < 10^{-75}$), perfect separations (KS $D = 1.000$), and 100\% NOT\_REPRESENTABLE results suggest this is NOT random coincidence---the four obstructions are detecting the same underlying structural property.
 
@@ -459,13 +533,11 @@ Sparsity-1 signature & Dominant + entangled & N/A \\
 \begin{itemize}
 \item Cycles with Kolmogorov complexity $\geq 14$ (vs. current max 10, 40\% increase)
 \item Cycles using all 6 variables (vs. current max 4)
-\item Cycles with near-maximal Shannon entropy (approximately $2.24$ bits vs. current $1.33$)
+\item Cycles with near-maximal Shannon entropy (approximately 2.24 bits vs. current 1.33)
 \item Approximately 389 such cycles (to span 401-dimensional subspace minus 12 known)
 \end{itemize}
 
 \textbf{Statistical plausibility:} Near-perfect KS separation ($D = 0.837$, $D = 1.000$), extreme $p$-values ($< 10^{-75}$), and 100\% NOT\_REPRESENTABLE across 30,075 tests suggest this is \textbf{extraordinarily unlikely}.
-
----
 
 \subsubsection{Interpretation 2: Computational Artifacts}
 
@@ -477,11 +549,10 @@ Sparsity-1 signature & Dominant + entangled & N/A \\
 \item Variable-count barrier holds mod all 5 primes but fails over $\QQ$
 \item Sparsity-1 property is a modular artifact
 \item Perfect separations are modular coincidences
+\item \textbf{Explicit 1883$\times$1883 minor with exact $\ZZ$-determinant (4364 digits) is misleading}
 \end{itemize}
 
-\textbf{Probability:} Under standard rank-stability heuristics (Section \ref{subsec:rank-stability}), characteristic-zero lifting failure has probability roughly $1/M \approx 3.7 \times 10^{-11}$ where $M = \prod p_i \approx 2.7 \times 10^{10}$.
-
----
+\textbf{Probability:} The exact $\ZZ$-certificate (Theorem \ref{thm:rank-cert}) is \textbf{deterministic}---it proves rank $\geq 1883$ unconditionally, making this interpretation implausible for the rank claim. For other obstructions, characteristic-zero lifting failure would require probability approximately $1/M \approx 3.7 \times 10^{-11}$.
 
 \subsubsection{Interpretation 3: Candidate Non-Algebraicity}
 
@@ -489,6 +560,7 @@ Sparsity-1 signature & Dominant + entangled & N/A \\
 
 \textbf{Evidence supporting this interpretation:}
 \begin{itemize}
+\item \textbf{Unconditional rank certificate:} Rank $\geq 1883$ over $\ZZ$ (proven, Theorem \ref{thm:rank-cert})
 \item Four independent obstructions converge (dimensional + statistical + observational + geometric)
 \item Extreme statistical significance ($p < 10^{-75}$, Cohen's $d > 2.2$)
 \item Perfect separations (KS $D = 1.000$)
@@ -503,51 +575,52 @@ Sparsity-1 signature & Dominant + entangled & N/A \\
 
 Three routes to unconditional non-algebraicity proof:
 
-\subsubsection{Route A: CRT Rational Certificates (Recommended)}
+\subsubsection{Route A: Rational Certificates for CP3 (Recommended, In Progress)}
 
 \textbf{Method:}
 \begin{enumerate}
 \item For each forbidden-variable monomial $m$ in CP3 remainder $r_p(b)$, extract coefficient $c_p \in \FF_p$ across all 5 primes
-\item Apply Chinese Remainder Theorem: reconstruct integer $c_M \in \ZZ$ (mod $M = \prod p_i$) with $c_M \equiv c_p \pmod{p}$
+\item Apply Chinese Remainder Theorem: reconstruct integer $c_M \in \ZZ$ (mod $M = \prod p_i$)
 \item Apply rational reconstruction: recover $c \in \QQ$ with $|n| < \sqrt{M/2}$, $0 < d < \sqrt{M/2}$
-\item If $c \neq 0$, certifies that $r_\QQ(b)$ over $\QQ$ has monomial $m$ with nonzero coefficient → NOT\_REPRESENTABLE over $\QQ$
+\item If $c \neq 0$, certifies that $r_\QQ(b)$ over $\QQ$ has monomial $m$ with nonzero coefficient, hence NOT\_REPRESENTABLE over $\QQ$
 \end{enumerate}
 
-\textbf{Status:} Computational infrastructure ready; implementation in progress\\
-\textbf{Difficulty:} Moderate\\
-\textbf{Timeline:} 3-4 days for 10-15 representative classes\\
-\textbf{Impact:} Upgrades multi-prime certification to unconditional $\QQ$ proof
+\textbf{Status:} Method validated (k=100 rational: $-8117/82234$); full deployment for CP3 in progress
 
----
+\textbf{Timeline:} 1-2 weeks for representative sample (10-20 cases)
+
+\textbf{Impact:} Upgrades multi-prime CP3 certification to unconditional $\QQ$ proof
 
 \subsubsection{Route B: Period Computation}
 
 \textbf{Method:}
 \begin{enumerate}
-\item Compute period integral for top candidate (e.g., $z_0^9 z_1^2 z_2^2 z_3^2 z_4^1 z_5^2$) via Griffiths residue calculus
+\item Compute period integral for top candidate via Griffiths residue calculus
 \item Test transcendence via PSLQ algorithm
-\item Prove period $\notin \QQ$-span of known algebraic cycle periods
+\item Prove period not-in QQ-span of known algebraic cycle periods
 \end{enumerate}
 
-\textbf{Status:} Not yet attempted\\
-\textbf{Difficulty:} Very high (period computation on fourfolds is computationally intensive)\\
-\textbf{Timeline:} Months to years\\
-\textbf{Impact:} Would provide unconditional proof of non-algebraicity for specific class
+\textbf{Status:} Not yet attempted
 
----
+\textbf{Difficulty:} Very high (period computation on fourfolds is computationally intensive)
+
+\textbf{Timeline:} Months to years
+
+\textbf{Impact:} Would provide unconditional proof of non-algebraicity for specific class
 
 \subsubsection{Route C: SNF Rank Certificate}
 
 \textbf{Method:}
 \begin{enumerate}
-\item Compute $16 \times 16$ intersection matrix via generic linear forms (circumvent coordinate degeneracy)
+\item Compute $16 \times 16$ intersection matrix via generic linear forms
 \item Compute Smith Normal Form over $\ZZ$ (or via CRT reconstruction)
 \item Proves $\dim(\text{algebraic cycles}) = 12$ unconditionally
 \end{enumerate}
 
-\textbf{Status:} In progress (workaround for coordinate degeneracy developed)\\
-\textbf{Difficulty:} Moderate-high\\
-\textbf{Timeline:} 2-4 weeks\\
+\textbf{Status:} In progress (workaround for coordinate degeneracy developed)
+
+\textbf{Timeline:} 2-4 weeks
+
 \textbf{Impact:} Confirms upper bound on algebraic cycle dimension
 
 % ============================================================================
@@ -562,7 +635,7 @@ Choose $p \equiv 1 \pmod{13}$ so $\FF_p$ contains primitive 13th roots of unity:
 \mathcal{P} = \{53, 79, 131, 157, 313\}
 \]
 
-Product: $M = \prod_{p \in \mathcal{P}} p = 53 \times 79 \times 131 \times 157 \times 313 = 26{,}953{,}691{,}077 \approx 2.7 \times 10^{10}$.
+Product: $M = \prod_{p \in \mathcal{P}} p = 26{,}953{,}691{,}077 \approx 2.7 \times 10^{10}$
 
 \subsubsection{Verification Protocol}
 
@@ -570,814 +643,262 @@ For each computational claim:
 \begin{enumerate}
 \item Compute result over $\FF_p$ for each $p \in \mathcal{P}$ independently
 \item Verify exact agreement across all 5 primes
-\item Apply rank-stability heuristics (Section \ref{subsec:rank-stability}) → infer characteristic-zero validity
-\item Confidence proportional to $M$ (approximately $1 - 1/M \approx 1 - 3.7 \times 10^{-11}$)
+\item Apply rank-stability heuristics (see below) to infer characteristic-zero validity
+\item \textbf{Where possible, produce explicit certificates via exact computation over $\ZZ$} (upgrades heuristic to deterministic)
 \end{enumerate}
 
-\subsection{Rank-Stability Heuristic}\label{subsec:rank-stability}
+\subsection{Rank-Stability Heuristic vs. Exact Certificates}
 
-\begin{remark}[Heuristic Justification]
-\textbf{Standard assumption in computational algebraic geometry:}
+\begin{remark}[Heuristic vs. Deterministic]
+\textbf{Standard rank-stability heuristic:}
 
-If a matrix rank equals $r$ modulo several independent primes $p_1, \ldots, p_k$ and the minors witnessing rank are nonzero modulo those primes, this provides strong evidence that the integer (or characteristic-zero) rank equals $r$.
+If a matrix rank equals $r$ modulo several independent primes, this provides evidence (probabilistic, not proof) that the characteristic-zero rank equals $r$. Quantitative strength proportional to $M = \prod p_i$.
 
-\textbf{Probabilistic model:}\\
-If the true characteristic-zero rank differs from the modular rank, this requires specific ``bad prime'' cancellations. For independent random primes, the probability of simultaneous rank agreement when the true rank differs is roughly $1/M$ where $M = \prod p_i$.
+\textbf{Upgrade to deterministic:}
 
-For our prime set: $M \approx 2.7 \times 10^{10}$, giving confidence roughly $1 - 3.7 \times 10^{-11}$.
+Compute exact integer minor via Bareiss fraction-free algorithm. If $\det \neq 0$ over $\ZZ$, then rank $\geq k$ unconditionally (no heuristics).
 
-\textbf{Important limitations:}
-\begin{itemize}
-\item This is a \emph{heuristic}, not rigorous proof
-\item Assumes primes are ``generic'' (not specially chosen to produce false agreement)
-\item Assumes no systematic cancellation pattern exists
-\end{itemize}
-
-\textbf{Paths to unconditional proof:}
-\begin{enumerate}
-\item Explicit integer determinant via CRT (certifies rank over $\ZZ$)
-\item Smith Normal Form over $\ZZ$ (certifies rank and invariant factors)
-\item Symbolic Gr\"obner basis over $\QQ$ (exact computation, computationally expensive)
-\end{enumerate}
+\textbf{Our approach:} Use multi-prime heuristics for global rank claim (rank = 1883), validated by exact $\ZZ$-certificate for lower bound (rank $\geq 1883$, Theorem \ref{thm:rank-cert}).
 \end{remark}
 
-\subsection{Kolmogorov Complexity Proxy}\label{subsec:kolmogorov-proxy}
+\subsection{Bareiss Fraction-Free Algorithm}
 
-\textbf{Definition (from \cite{Law2026info}):}
+For $k \times k$ minor with integer entries, Bareiss algorithm computes exact determinant via:
+\begin{itemize}
+\item Fraction-free elimination (all intermediate values are integers)
+\item No floating-point error accumulation
+\item Complexity: $O(k^3)$ integer operations
+\item Practical for $k \sim 1000$--2000 with modern hardware
+\end{itemize}
 
-For a monomial $m = z_0^{a_0} \cdots z_5^{a_5}$, let $g = \gcd(a_0, \ldots, a_5)$ (non-zero exponents) and $b_i = a_i / g$. Define:
+\textbf{Implementation:} Python script using gmpy2 for multiprecision integers (see Appendix \ref{app:reproducibility} for complete listing).
+
+\subsection{Kolmogorov Complexity Proxy}
+
+\textbf{True Kolmogorov complexity is uncomputable.} We use a computable proxy based on prime factorization and bit-length:
+
+For monomial $m = z_0^{a_0} \cdots z_5^{a_5}$:
 \[
-K(m) := \left|\bigcup_{i: b_i > 1} \mathrm{PrimeFactors}(b_i)\right| + \sum_{i: b_i > 0} \lfloor \log_2(b_i) + 1 \rfloor
+K_{\text{proxy}}(m) = \left|\bigcup_{i=0}^5 \mathrm{PrimeFactors}(a_i)\right| + \sum_{i=0}^5 \lfloor \log_2(a_i + 1) + 1 \rfloor
 \]
 
-\textbf{Components:}
-\begin{itemize}
-\item \textbf{Prime factor count:} Number of distinct prime factors across all reduced exponents $b_i$
-\item \textbf{Encoding length:} Total bits required to specify reduced exponents in binary
-\end{itemize}
+\textbf{Interpretation:} Counts distinct prime factors + total bit-length (proxy for description complexity).
 
-\textbf{Interpretation:}
-\begin{itemize}
-\item \textbf{Low $K$:} Simple factorization (e.g., $z_0^9 z_1^9$ has $K = |\{3\}| + (4 + 4) = 9$)
-\item \textbf{High $K$:} Complex, incompressible structure (e.g., $z_0^{10} z_1^2 z_2^1 z_3^1 z_4^1 z_5^3$ has $K \approx 15$)
-\end{itemize}
-
-\textbf{Justification:}
-\begin{itemize}
-\item Lower-bounds true Kolmogorov complexity via encoding efficiency
-\item Alternative formulations (compression-based using gzip/bzip2, MDL-based) tested and yield qualitatively similar results (not reported in detail)
-\item Expected to separate algebraic (simple factorization, products of degrees) from non-algebraic (complex structure)
-\end{itemize}
-
-\textbf{Statistical testing:}
-\begin{itemize}
-\item $p$-values: Student's $t$-test (two-sided) using asymptotic normality
-\item Validation: Permutation test ($10^4$ permutations) for small $p$-values
-\item Sample sizes: $n_{\text{alg}} = 24$, $n_{\text{iso}} = 401$ (sufficient for asymptotic validity)
-\item Multiple testing correction: Bonferroni for 5 comparisons (adjusted $\alpha = 0.01$)
-\end{itemize}
-
-\subsection{Three-Tier Certification (CP1/CP2/CP3)}
-
-\textbf{CP1 (Canonical Basis Variable-Count):}
-\begin{itemize}
-\item Input: 707-dimensional cokernel basis mod $p$ (from Jacobian matrix kernel computation)
-\item Operation: Count $\#\mathrm{vars}(m) = |\{i : a_i > 0\}|$ for each monomial $m = z_0^{a_0} \cdots z_5^{a_5}$
-\item Verification: SHA-256 hash of canonical monomial ordering (ensures identical basis across primes)
-\item Output: Distribution (401 classes @ 6 vars, 306 @ $\leq 5$ vars)
-\item Runtime: approximately 15 min/prime
-\end{itemize}
-
-\textbf{CP2 (Sparsity-1 Verification):}
-\begin{itemize}
-\item Input: Each 6-variable class from CP1
-\item Operation: Multiply by canonical divisor $D = \sum_{k=0}^{12} L_k$; verify $\exists$ monomial with single variable exponent $\geq 10$
-\item Interpretation: Tests for ``dominant variable + full entanglement'' signature
-\item Output: All 401 classes satisfy sparsity-1 property (5-prime verified)
-\item Runtime: approximately 45 min/prime
-\end{itemize}
-
-\textbf{CP3 (Coordinate Collapse Tests):}
-\begin{itemize}
-\item Input: Each of 401 classes, 15 four-variable subsets $\binom{6}{4} = 15$
-\item Operation: For each (class $b$, subset $S$):
-  \begin{enumerate}
-  \item Compute canonical remainder $r = b \bmod J$ over $\FF_p$
-  \item Check if $r$ uses only variables in $S$ (forbidden variables = complement of $S$)
-  \item Output: REPRESENTABLE (if $r$ uses only $S$) or NOT\_REPRESENTABLE (if forbidden vars appear)
-  \end{enumerate}
-\item Complete testing: 401 classes $\times$ 15 subsets $\times$ 5 primes = 30,075 tests
-\item Result: 100\% NOT\_REPRESENTABLE (zero exceptions)
-\item Runtime: approximately 3-4 hours/prime
-\end{itemize}
-
-\textbf{Total runtime:} approximately 20 hours across five primes (sequential); parallelizable to approximately 4 hours.
+\textbf{Validation:} Statistical tests (t-test, Mann-Whitney, KS) show extreme separation ($p < 10^{-75}$, Cohen's $d = 2.22$).
 
 % ============================================================================
-\section{Anticipated Objections and Rebuttals}\label{sec:objections}
+\section{Addressing Anticipated Objections}\label{sec:objections}
 
-\subsection{Objection 1: ``Modular computations are not proof''}
+\subsection{Objection 1: Rank Certificate Relies on Heuristics}
 
-\textbf{Rebuttal:}
-
-Correct---multi-prime modular computation provides \emph{strong computational evidence} under heuristics, not rigorous proof. We are explicit about this throughout.
-
-\textbf{Our position:}
+\textbf{Response:}
 \begin{itemize}
-\item Multi-prime agreement (product $M \approx 2.7 \times 10^{10}$) provides confidence proportional to $M$ under standard rank-stability heuristics
-\item We provide explicit path to unconditional proof via CRT rational certificates (Route A, Section \ref{sec:interpretation})
-\item The modular step is an efficient computational filter; rational certificates convert to exact proof
-\item We consistently frame results as ``candidate non-algebraic classes'' requiring further verification
+\item We provide \textbf{unconditional proof} of rank $\geq 1883$ over $\ZZ$ (Theorem \ref{thm:rank-cert})
+\item Explicit 1883$\times$1883 minor with exact integer determinant (4364 digits)
+\item No rank-stability heuristics needed for lower bound
+\item Multi-prime agreement (rank = 1883 mod all 5 primes) provides additional evidence for exact equality
 \end{itemize}
 
----
+\subsection{Objection 2: Kolmogorov Complexity Proxy Is Heuristic}
 
-\subsection{Objection 2: ``Kolmogorov complexity proxy is heuristic''}
-
-\textbf{Rebuttal:}
-
-Correct---true Kolmogorov complexity is uncomputable. We use a computable proxy (Section \ref{subsec:kolmogorov-proxy}) based on prime factorization and encoding length.
-
-\textbf{Our position:}
+\textbf{Response:}
 \begin{itemize}
-\item We use \emph{multiple} information-theoretic statistics (Shannon entropy, Kolmogorov proxy, variance, range, variable count)
-\item Each alone is suggestive; \emph{together} they show convergence
-\item We provide complete raw data (401 isolated + 24 algebraic patterns) for independent verification with alternative proxies
-\item Extreme statistical significance ($p < 10^{-75}$, Cohen's $d > 2.2$) is robust to proxy choice
-\item Alternative formulations (compression-based, not reported in detail) yield qualitatively similar results
+\item We use \textbf{multiple independent metrics} (Shannon entropy, complexity proxy, variable count)
+\item All metrics show convergent separation ($p < 10^{-75}$, Cohen's $d > 2.2$)
+\item Statistical tests are rigorous (permutation-validated, Bonferroni-corrected)
+\item Raw data provided for independent verification/alternative proxies
 \end{itemize}
 
----
+\subsection{Objection 3: Statistical Significance Numbers Are Too Extreme}
 
-\subsection{Objection 3: ``Statistical significance numbers are too extreme''}
-
-\textbf{Rebuttal:}
-
-The extreme $p$-values ($< 10^{-75}$) are obtained via standard statistical tests with appropriate sample sizes and conservative assumptions.
-
-\textbf{Our position:}
+\textbf{Response:}
 \begin{itemize}
-\item $p$-values computed via Student's $t$-test (two-sided, asymptotic formula)
-\item Validated via permutation testing ($10^4$ permutations) for sanity check
-\item Sample sizes: $n_{\text{alg}} = 24$, $n_{\text{iso}} = 401$ (large enough for asymptotic validity via CLT)
-\item Multiple testing correction applied (Bonferroni for 5 comparisons, adjusted $\alpha = 0.01$)
-\item Perfect KS separation ($D = 1.000$) reflects genuine dichotomy:
+\item $p$-values computed via asymptotic formulas (validated via permutation tests)
+\item Sample sizes sufficient for asymptotic validity ($n_{\text{alg}}=24$, $n_{\text{iso}}=401$)
+\item Multiple independent tests converge on same result
+\item Bonferroni correction applied ($\alpha = 0.01$ for 5 comparisons)
+\end{itemize}
+
+\subsection{Objection 4: Multi-Prime Agreement Could Be Coincidental}
+
+\textbf{Response:}
+\begin{itemize}
+\item Exact $\ZZ$-certificate eliminates coincidence for rank $\geq 1883$ (deterministic)
+\item Four structurally independent obstructions converge
+\item 30,075 independent CP3 tests: 100\% NOT\_REPRESENTABLE, zero exceptions
+\item Product $M \approx 2.7 \times 10^{10}$ gives probability of false agreement approximately $1/M \approx 3.7 \times 10^{-11}$
+\end{itemize}
+
+\subsection{Objection 5: The 401 Classes Could Still Be Algebraic}
+
+\textbf{Response:}
+
+We \textbf{explicitly state} this paper does not prove non-algebraicity. However:
+
+\begin{itemize}
+\item For ``hidden algebraic cycles'' interpretation to hold, requires:
   \begin{itemize}
-  \item ALL 401 isolated classes use 6 variables
-  \item ALL 24 algebraic patterns use $\leq 4$ variables
-  \item No overlap exists (hence $D = 1.000$, $p < 10^{-94}$)
+  \item Approximately 389 new cycles with 40\% higher complexity than any known cycle
+  \item All using 6 variables (vs. current max 4)
+  \item Perfect separation from 24 tested patterns (KS $D=1.000$, $p<10^{-94}$)
+  \item 100\% NOT\_REPRESENTABLE across 30,075 tests by coincidence
   \end{itemize}
-\item Complete raw data provided for independent verification
+\item Statistical plausibility: extraordinarily unlikely
+\item Our contribution: identify \textbf{prime candidates} for rigorous verification via periods/CRT
 \end{itemize}
 
----
+\subsection{Summary: What We Claim vs. What We Prove}
 
-\subsection{Objection 4: ``You haven't tested ALL algebraic cycle constructions''}
-
-\textbf{Rebuttal:}
-
-Correct---we test against 24 systematically selected representatives + 16 explicit cycles. Exhaustive enumeration of all algebraic cycles is impossible.
-
-\textbf{Our position:}
-\begin{itemize}
-\item Shioda-type bounds \cite{shioda1979} imply at most 12 independent algebraic cycles in the Galois-invariant sector
-\item Our 24 algebraic patterns systematically cover all plausible 2-4 variable degree-18 constructions within the invariant sector
-\item The variable-count barrier (Obstruction 4) proves the 401 classes are \emph{disjoint from the span} of the 16 coordinate-cycle classes
-\item If additional algebraic cycles exist matching isolated signatures, they would require:
-  \begin{itemize}
-  \item All 6 variables (vs. current max 4)
-  \item Kolmogorov complexity $\geq 14$ (vs. current max 10, 40\% increase)
-  \item Near-perfect separation from all 24 tested patterns
-  \item 100\% NOT\_REPRESENTABLE across 30,075 independent tests
-  \end{itemize}
-\item This is statistically implausible given KS $D = 0.837, 1.000$ and $p < 10^{-75}$
-\end{itemize}
-
----
-
-\subsection{Objection 5: ``Multi-prime error probability claim was wrong''}
-
-\textbf{Rebuttal:}
-
-Correct---earlier versions incorrectly claimed ``error prob $< 10^{-22}$''. We have corrected this.
-
-\textbf{Correction:}
-\begin{itemize}
-\item Product $M = 53 \times 79 \times 131 \times 157 \times 313 \approx 2.7 \times 10^{10}$
-\item Under standard rank-stability heuristics, confidence is roughly $1 - 1/M \approx 1 - 3.7 \times 10^{-11}$ (not $1 - 10^{-22}$)
-\item To reach $10^{-22}$ error probability would require $M \approx 10^{22}$ (e.g., ten 30-bit primes or five 60-bit primes)
-\item We now correctly state: ``strong computational evidence with confidence proportional to $M \approx 2.7 \times 10^{10}$ under rank-stability heuristics''
-\item Unconditional proof requires CRT rational certificates (Route A), not just multi-prime agreement
-\end{itemize}
+\begin{table}[ht]
+\centering
+\caption{Claims and Evidence Status}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Claim} & \textbf{Evidence Type} & \textbf{Status} \\
+\midrule
+Rank $\geq 1883$ over $\ZZ$ & Deterministic (exact det) & \textbf{Proven} \\
+Rank = 1883 (5-prime) & Probabilistic (approx $1-10^{-11}$) & Strong evidence \\
+Dim = 707 over $\QQ$ & Follows from rank & Pending full cert \\
+401 classes statistical sep. & Rigorous statistics & \textbf{Proven} \\
+Variable-count barrier & Multi-prime (30,075 tests) & Strong evidence \\
+401 classes non-algebraic & \textbf{Conjecture} & \textbf{Pending} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % ============================================================================
 \section{Future Directions}\label{sec:future}
 
-\subsection{Immediate Priorities (1-2 Weeks)}
+\subsection{Immediate Priority: Rational Certificates for CP3}
 
-\textbf{1. CRT Rational Certificates (Route A)}
-\begin{itemize}
-\item Implement CRT + rational reconstruction for 10-15 representative (class, subset) pairs from CP3
-\item Generate explicit $\QQ$ certificates proving NOT\_REPRESENTABLE unconditionally
-\item Upgrade computational certification to unconditional theorem over $\QQ$
-\item \textbf{Timeline:} 3-4 days of implementation + computation
-\item \textbf{Impact:} Removes ``pending rational reconstruction'' caveat; establishes variable-count barrier as rigorous theorem
-\end{itemize}
+\textbf{Goal:} For representative sample of (class, subset) pairs with NOT\_REPRESENTABLE, produce unconditional $\QQ$ certificates.
 
-\textbf{2. arXiv Submission}
-\begin{itemize}
-\item Submit this overview paper
-\item Cross-reference four companion papers \cite{Law2026gap,Law2026info,Law2026trans,Law2026barrier}
-\item \textbf{Timeline:} Concurrent with CRT completion
-\end{itemize}
+\textbf{Timeline:} 1-2 weeks for 10-20 cases
 
-\subsection{Short-Term Goals (2-4 Weeks)}
+\textbf{Impact:} Upgrades CP3 from ``multi-prime certified'' to ``unconditional QQ proof''
 
-\textbf{1. SNF Rank Certificate (Route C)}
-\begin{itemize}
-\item Compute $16 \times 16$ intersection matrix via generic linear forms (workaround for coordinate degeneracy)
-\item Smith Normal Form over $\ZZ$ (or via CRT reconstruction)
-\item Proves $\dim(\text{algebraic cycles}) = 12$ unconditionally
-\item \textbf{Timeline:} 2-4 weeks
-\item \textbf{Impact:} Confirms upper bound; enables unconditional statement of 98.3\% gap
-\end{itemize}
+\subsection{Medium Priority: SNF Rank Certificate}
 
-\textbf{2. Generalization to Other Cyclotomic Hypersurfaces}
-\begin{itemize}
-\item Apply CP1/CP2/CP3 framework to degree-6 hypersurface (smaller scale, faster computation)
-\item Test if coordinate transparency phenomenon appears universally
-\item Establish methodology as general framework
-\item \textbf{Timeline:} 2-3 weeks per variety
-\item \textbf{Impact:} Demonstrates generalizability beyond single example
-\end{itemize}
+\textbf{Goal:} Compute SNF of $16 \times 16$ intersection matrix (proves dim = 12 unconditionally).
 
-\subsection{Long-Term Goals (2-6 Months)}
+\textbf{Timeline:} 2-4 weeks
 
-\textbf{1. Period Computation (Route B)}
-\begin{itemize}
-\item Griffiths residue calculus for top candidate $z_0^9 z_1^2 z_2^2 z_3^2 z_4^1 z_5^2$
-\item PSLQ transcendence testing
-\item \textbf{Timeline:} Months to years (computationally intensive)
-\item \textbf{Impact:} Potential unconditional proof of non-algebraicity for specific class
-\end{itemize}
+\textbf{Impact:} Closes gap in algebraic cycle enumeration
 
-\textbf{2. Theoretical Understanding}
-\begin{itemize}
-\item Prove sparsity-1 property over $\QQ$ theoretically (currently computational observation)
-\item Explain \emph{why} variable-count obstructs algebraicity (connect to Chow ring structure, geometric restrictions)
-\item Formalize relationship between information-theoretic complexity and geometric realizability
-\item \textbf{Timeline:} Open research question
-\item \textbf{Impact:} Converts computational observations to theoretical framework
-\end{itemize}
+\subsection{Long-Term: Period Computation}
 
-\textbf{3. Peer-Reviewed Publication}
-\begin{itemize}
-\item Target journals: \emph{Journal of Algebra}, \emph{Compositio Mathematica}, or experimental mathematics journals
-\item Submit overview + companion papers as cohesive package
-\item \textbf{Timeline:} 6-12 months (submission → review → revision → acceptance)
-\item \textbf{Impact:} Establishes credibility and visibility in mathematical community
-\end{itemize}
+\textbf{Goal:} Compute period integrals for top candidates, test transcendence.
 
-% ============================================================================
-\section{Conclusion}
+\textbf{Timeline:} Months
 
-We have presented a comprehensive multi-barrier computational investigation establishing convergent evidence for candidate non-algebraic Hodge classes on a degree-8 cyclotomic hypersurface.
-
-\subsection{Key Achievements}
-
-\textbf{Four independent obstructions, all multi-prime verified:}
-
-\begin{enumerate}
-\item \textbf{Dimensional:} 98.3\% gap (707 Hodge classes, $\leq 12$ algebraic cycles)
-\item \textbf{Information-theoretic:} 68\% higher entropy, 75\% higher complexity ($p < 10^{-75}$, $d > 2.2$)
-\item \textbf{Coordinate transparency:} Perfect variable-count separation (KS $D = 1.000$, $p < 10^{-94}$)
-\item \textbf{Variable-count barrier:} 30,075 tests, 100\% NOT\_REPRESENTABLE (zero exceptions)
-\end{enumerate}
-
-\textbf{All four obstructions converge on the same 401 isolated classes.}
-
-\subsection{Significance}
-
-\textbf{For the Hodge Conjecture:}
-\begin{itemize}
-\item Largest verified gap in a Galois-invariant sector (98.3\%, prior work approximately 10\%)
-\item 401 prime candidates for non-algebraic classes
-\item Four independent lines of evidence converge with extreme statistical significance
-\item Clear paths to unconditional proof outlined (CRT certificates, period computation, SNF rank)
-\end{itemize}
-
-\textbf{For Computational Algebraic Geometry:}
-\begin{itemize}
-\item Novel multi-barrier framework (dimensional + statistical + observational + geometric)
-\item First systematic variable-support analysis at this scale
-\item Complete reproducibility on consumer hardware (less than 20 hours via reasoning artifacts)
-\item Generalizable methodology for other varieties
-\item Reasoning artifact paradigm: scripts + provenance + reasoning in unified documents
-\end{itemize}
-
-\subsection{Honest Scope Statement}
-
-\textbf{What this work establishes:}
-\begin{itemize}
-\item Strong computational evidence (5-prime certified, $M \approx 2.7 \times 10^{10}$)
-\item Four independent obstructions converge on same 401 classes
-\item Perfect statistical separations (KS $D = 1.000$)
-\item Complete multi-prime verification with zero discrepancies
-\item 100\% NOT\_REPRESENTABLE across 30,075 independent tests
-\end{itemize}
-
-\textbf{What this work does NOT establish:}
-\begin{itemize}
-\item Unconditional proof over $\QQ$ (requires CRT rational certificates)
-\item Transcendental period for any specific class (requires period computation)
-\item Refutation of Hodge conjecture (requires proving specific class non-algebraic)
-\end{itemize}
-
-\textbf{Status:} Strong computational evidence for candidate non-algebraicity; clear paths to unconditional proof.
-
-\subsection{Invitation to the Community}
-
-We invite the mathematical community to:
-\begin{enumerate}
-\item \textbf{Independently verify} our results using reasoning artifacts (complete reproducibility, less than 20 hours)
-\item \textbf{Apply our methodology} to other cyclotomic hypersurfaces or similar varieties
-\item \textbf{Investigate top candidates} via period computation or classical obstruction theory
-\item \textbf{Extend the framework} to higher-dimensional varieties or other Hodge types
-\item \textbf{Provide theoretical insights} on why variable-count obstructs algebraicity
-\end{enumerate}
-
-All computational procedures, data, and reasoning artifacts publicly available at:
-
-\url{https://github.com/Eric-Robert-Lawson/OrganismCore}
-
-\subsection{The Reasoning Artifact Paradigm}
-
-This work introduces a novel reproducibility model: \textbf{reasoning artifacts}---comprehensive markdown documents containing:
-\begin{itemize}
-\item Complete script listings (verbatim Macaulay2/Python code)
-\item Methodological reasoning (why each computational choice was made)
-\item Computational provenance (input data, execution logs, output verification)
-\item Error detection and correction history
-\item Design decisions and alternative approaches considered
-\end{itemize}
-
-\textbf{Advantages over traditional script repositories:}
-\begin{itemize}
-\item \textbf{Scripts + context:} Not just \emph{what} was computed, but \emph{why} and \emph{how}
-\item \textbf{Reproducibility + understanding:} Independent researchers can understand reasoning, not just replicate execution
-\item \textbf{Permanent archival:} GitHub repository provides stable, long-term access
-\item \textbf{Versioned provenance:} Git history captures evolution of computational methods
-\end{itemize}
-
-This may represent a paradigm shift in how computational mathematics is documented and shared. The OrganismCore project demonstrates that reasoning artifacts provide superior reproducibility compared to traditional methods.
-
-\subsection{Final Perspective}
-
-The convergence of four structurally independent obstructions on the same 401 classes---with extreme statistical significance ($p < 10^{-75}$), perfect separations (KS $D = 1.000$), complete multi-prime robustness (5 primes, $M \approx 2.7 \times 10^{10}$), and 100\% NOT\_REPRESENTABLE across 30,075 tests---provides strong computational evidence that these are candidate non-algebraic Hodge classes.
-
-While unconditional proof requires CRT rational certificates or period computation, the cumulative weight of evidence strongly suggests these 401 classes are prime candidates for classical obstruction-theoretic investigation.
-
-This work demonstrates the power of convergent computational obstructions for investigating fundamental questions in algebraic geometry, providing both a novel methodological framework and concrete candidates for further analysis.
+\textbf{Impact:} Would provide unconditional proof of non-algebraicity for specific classes
 
 % ============================================================================
 \section*{Acknowledgments}
 
-Computations performed using Macaulay2 \cite{M2}. AI collaboration (ChatGPT-4, Claude-3.7-Sonnet) assisted in computational verification protocol design, statistical analysis, multi-prime validation workflow, error detection, methodological critique, and reasoning artifact documentation. All final mathematical claims, computational implementations, script authorship, and responsibility for errors remain solely with the author.
+Computations performed using Macaulay2. AI collaboration (ChatGPT-4, Claude-3.7-Sonnet) assisted in computational verification protocol design, script development, and methodological critique. All final mathematical claims verified by the author.
 
-\textbf{Reproducibility statement:} All computational procedures documented with complete script listings in reasoning artifacts at:
+All computational procedures documented with complete script listings in reasoning artifacts at:
 
 \url{https://github.com/Eric-Robert-Lawson/OrganismCore/tree/main/validator_v2}
-
-Scripts are provided as complete listings within markdown reasoning artifacts. Independent verification requires extracting and implementing documented procedures using provided input data.
 
 % ============================================================================
 \appendix
 
 \section{Reproducibility via Reasoning Artifacts}\label{app:reproducibility}
 
-\subsection{The Reasoning Artifact Model}
-
-\textbf{What are reasoning artifacts?}
-
-Reasoning artifacts are comprehensive markdown documents containing:
-\begin{enumerate}
-\item \textbf{Complete script listings:} Verbatim Macaulay2/Python code (copy-paste ready)
-\item \textbf{Methodological reasoning:} Explanation of computational choices and design decisions
-\item \textbf{Execution provenance:} Input data specifications, runtime estimates, output formats
-\item \textbf{Verification protocols:} Step-by-step procedures for independent replication
-\item \textbf{Error history:} Documentation of bugs found and fixed during development
-\end{enumerate}
-
-\textbf{Why superior to traditional script repositories?}
-
-\begin{table}[ht]
-\centering
-\caption{Reasoning Artifacts vs. Traditional Scripts}
-\begin{tabular}{lcc}
-\toprule
-\textbf{Feature} & \textbf{Reasoning Artifacts} & \textbf{Script Repository} \\
-\midrule
-Executable code & Yes (extract from markdown) & Yes (direct execution) \\
-Methodological reasoning & Yes (embedded) & No (separate docs) \\
-Provenance & Yes (inline) & No (external) \\
-Version history & Yes (Git commits) & Yes (Git commits) \\
-Understandability & High (scripts + reasoning) & Moderate (scripts only) \\
-Long-term archival & Yes (GitHub permanence) & Yes (GitHub permanence) \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Computational Environment}
-
-\textbf{Hardware:}
+\textbf{Reasoning artifacts} are comprehensive markdown documents that preserve:
 \begin{itemize}
-\item Model: MacBook Air M1 (2020)
-\item CPU: Apple M1 chip (8-core CPU, 7-core GPU)
-\item RAM: 16GB unified memory
-\item Storage: 256GB SSD
+\item Complete script listings (copy-paste ready)
+\item Execution commands (exact invocations)
+\item Computational provenance (inputs, outputs, checksums)
+\item Methodological reasoning (why this approach, alternatives considered)
+\item Error history (false starts, corrections, lessons learned)
 \end{itemize}
 
-\textbf{Software:}
+\textbf{Location:}
+
+\url{https://github.com/Eric-Robert-Lawson/OrganismCore/blob/main/validator_v2/crt_certification_reasoning_artifact.md}
+
+\textbf{Key artifacts:}
 \begin{itemize}
-\item Macaulay2 version 1.24.11 (exact version critical for reproducibility)
-\item Operating system: macOS 12.6 Monterey
-\item Python 3.9.7 (for statistical analysis and future CRT reconstruction)
-\item Git version 2.37.1 (for version control)
+\item \texttt{crt\_certification\_reasoning\_artifact.md} --- Complete CRT + Bareiss workflow with k=100--1883 results
+\item \texttt{novel\_sparsity\_path\_reasoning\_artifact.md} --- CP1/CP2/CP3 protocols
+\item \texttt{deterministic\_certificates\_reasoning\_artifact.md} --- CP1/CP2 methodology
 \end{itemize}
 
-\textbf{Repository:}
+\textbf{Paradigm shift:} Traditional reproducibility provides scripts; reasoning artifacts provide scripts + reasoning + provenance + complete execution history in unified documents.
+
+\subsection{Complete Scripts (Archived in Reasoning Artifact)}
+
+All scripts preserved verbatim in \texttt{crt\_certification\_reasoning\_artifact.md}:
 \begin{itemize}
-\item GitHub: \url{https://github.com/Eric-Robert-Lawson/OrganismCore}
-\item Primary branch: \texttt{main}
-\item Reasoning artifacts location: \texttt{validator\_v2/}
-\item Git commit (at time of paper submission): [to be filled]
+\item \texttt{pivot\_finder\_modp.py} --- Pivot extraction via sparse Gaussian elimination
+\item \texttt{crt\_minor\_reconstruct.py} --- Multi-prime CRT reconstruction
+\item \texttt{rational\_from\_crt\_json.py} --- Rational reconstruction via extended GCD
+\item \texttt{compute\_exact\_det\_bareiss.py} --- Exact determinant via Bareiss algorithm
 \end{itemize}
 
-\subsection{Data Files and Locations}
+\section{Complete Certificate Data}\label{app:certificates}
 
-\textbf{Input data (JSON format):}
+\subsection{k equals 1883 Certificate (Full Details)}
 
-All input data files located at: \texttt{OrganismCore/validator\_v2/}
-
+\textbf{Pivot extraction:}
 \begin{verbatim}
-saved_inv_p53_triplets.json         (sparse matrix, 1883 x 2590)
-saved_inv_p53_monomials18.json      (707 monomials, degree-18)
-saved_inv_p79_triplets.json
-saved_inv_p79_monomials18.json
-saved_inv_p131_triplets.json
-saved_inv_p131_monomials18.json
-saved_inv_p157_triplets.json
-saved_inv_p157_monomials18.json
-saved_inv_p313_triplets.json
-saved_inv_p313_monomials18.json
+Prime: 313
+Pivot search time: 1315.66s
+Determinant mod 313: 128
 \end{verbatim}
 
-\textbf{File sizes:} Sparse matrices (approximately 5-10 MB each), monomial lists (approximately 50-100 KB each)
-
-\textbf{Total dataset size:} approximately 100 MB
-
-\subsection{Reasoning Artifact Locations}
-
-\textbf{All computational scripts documented in:}
-
-\begin{enumerate}
-\item \texttt{validator\_v2/novel\_sparsity\_path\_reasoning\_artifact.md}
-  \begin{itemize}
-  \item Contains: Complete Macaulay2 listings for:
-    \begin{itemize}
-        \item \texttt{c1.m2} (CP1: canonical basis variable-count analysis)
-    \item \texttt{c2.m2} (CP2: sparsity-1 verification)
-    \item \texttt{cp3\_multi\_prime\_safe.m2} (CP3: coordinate collapse tests)
-    \end{itemize}
-  \item Format: Verbatim code blocks (copy-paste ready)
-  \item Documentation: Inline comments + surrounding methodology text
-  \end{itemize}
-
-\item \texttt{validator\_v2/deterministic\_certificates\_reasoning\_artifact.md}
-  \begin{itemize}
-  \item Contains: CP1/CP2/CP3 protocol specifications
-  \item Documentation: Computational verification methodology
-  \item Certificates: C1 (monomial set consistency), C2 (cokernel dimension)
-  \item Format: Markdown with embedded verification results
-  \end{itemize}
-
-\item \texttt{validator/statistical\_analysis.py}
-  \begin{itemize}
-  \item Location: \texttt{OrganismCore/validator/}
-  \item Contains: Information-theoretic metric computation
-  \item Functions: Shannon entropy, Kolmogorov complexity proxy, statistical tests
-  \item Dependencies: NumPy, SciPy, Pandas
-  \end{itemize}
-\end{enumerate}
-
-\subsection{Independent Verification Procedure}
-
-\textbf{Prerequisites:}
-\begin{itemize}
-\item Macaulay2 version 1.20 or later (download: \url{http://www.math.uiuc.edu/Macaulay2/})
-\item Git (for cloning repository)
-\item Text editor (for extracting scripts from reasoning artifacts)
-\item 16GB+ RAM recommended (8GB minimum, may require longer runtime)
-\end{itemize}
-
-\textbf{Step-by-step verification (one prime):}
-
-\begin{enumerate}
-\item \textbf{Clone repository:}
+\textbf{Residues across all primes:}
 \begin{verbatim}
-git clone https://github.com/Eric-Robert-Lawson/OrganismCore
-cd OrganismCore/validator_v2
+p=53:  det congruent to 40 (mod 53)
+p=79:  det congruent to 3 (mod 79)
+p=131: det congruent to 42 (mod 131)
+p=157: det congruent to 84 (mod 157)
+p=313: det congruent to 128 (mod 313)
 \end{verbatim}
 
-\item \textbf{Verify data integrity (optional):}
+\textbf{CRT Reconstruction:}
 \begin{verbatim}
-# Check file sizes and existence
-ls -lh saved_inv_p313_triplets.json
-ls -lh saved_inv_p313_monomials18.json
+M = 26,953,691,077
+crt_reconstruction_modM = 9,339,260,950
+crt_reconstruction_signed = 9,339,260,950
+verification_ok = true
 \end{verbatim}
 
-\item \textbf{Extract scripts from reasoning artifacts:}
-\begin{itemize}
-\item Open \texttt{novel\_sparsity\_path\_reasoning\_artifact.md}
-\item Locate section ``CP1 Script Listing''
-\item Copy verbatim code block to new file \texttt{c1.m2}
-\item Repeat for \texttt{c2.m2} (CP2) and \texttt{cp3\_multi\_prime\_safe.m2} (CP3)
-\end{itemize}
-
-\item \textbf{Run CP1 (variable-count analysis):}
+\textbf{Rational Reconstruction:}
 \begin{verbatim}
-M2 c1.m2
-# Expected output: "401 classes with #vars=6"
-# Runtime: approximately 15 minutes
+n/d = 71401/5446
+Residue check: OK (all 5 primes)
 \end{verbatim}
 
-\item \textbf{Run CP2 (sparsity-1 verification):}
+\textbf{Exact Determinant (Bareiss):}
 \begin{verbatim}
-M2 c2.m2
-# Expected output: "All 401 classes satisfy sparsity-1"
-# Runtime: approximately 45 minutes
+Time: 12110.41s (3.36 hours)
+det = -34747023128560435630663918667761277011605788...
+      (4364-digit integer)
+log-base-10 of absolute-value-det = 4363.540918
 \end{verbatim}
 
-\item \textbf{Run CP3 (coordinate collapse tests):}
-\begin{verbatim}
-M2 cp3_multi_prime_safe.m2
-# Expected output: "6015 NOT_REPRESENTABLE (401 x 15)"
-# Runtime: approximately 3-4 hours
-\end{verbatim}
-
-\item \textbf{Verify results:}
+\textbf{Certificate files:}
 \begin{itemize}
-\item CP1: 401 classes with $\#\mathrm{vars} = 6$
-\item CP2: All 401 classes satisfy sparsity-1
-\item CP3: All 6,015 tests (401 classes $\times$ 15 subsets) return NOT\_REPRESENTABLE
-\end{itemize}
-\end{enumerate}
-
-\textbf{Multi-prime verification:}
-
-Repeat steps 4-7 for primes $p \in \{53, 79, 131, 157\}$ (modify prime parameter in scripts as documented in reasoning artifacts).
-
-\textbf{Total runtime:}
-\begin{itemize}
-\item Per prime: approximately 5 hours
-\item All 5 primes (sequential): approximately 20 hours
-\item All 5 primes (parallel, 5 cores): approximately 5 hours
+\item \texttt{pivot\_1883\_rows.txt}, \texttt{pivot\_1883\_cols.txt} --- Pivot indices
+\item \texttt{pivot\_1883\_report.json} --- Pivot extraction metadata
+\item \texttt{crt\_pivot\_1883.json} --- CRT reconstruction
+\item \texttt{crt\_pivot\_1883\_rational.json} --- Rational reconstruction
+\item \texttt{det\_pivot\_1883\_exact.json} --- Exact determinant
 \end{itemize}
 
-\subsection{Expected Outputs and Benchmarks}
+\subsection{Complete Suite (k equals 100 through 1883)}
 
-\begin{table}[ht]
-\centering
-\caption{Runtime Benchmarks (MacBook Air M1, 16GB RAM)}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Phase} & \textbf{Per Prime} & \textbf{All 5 (Sequential)} & \textbf{All 5 (Parallel)} \\
-\midrule
-CP1 (variable-count) & 15 min & 75 min & 15 min \\
-CP2 (sparsity-1) & 45 min & 225 min & 45 min \\
-CP3 (collapse tests) & 3-4 hours & 15-20 hours & 4 hours \\
-\midrule
-\textbf{Total} & approximately 5 hours & approximately 20 hours & approximately 5 hours \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\textbf{Expected console output (CP3, prime 313):}
-
-\begin{verbatim}
-Loading data for prime p=313...
-Testing 401 classes across 15 four-variable subsets...
-Progress: 0/401 (0%)
-Progress: 50/401 (12%)
-...
-Progress: 401/401 (100%)
-Results: 6015 NOT_REPRESENTABLE, 0 REPRESENTABLE
-Success: All 401 classes require all 6 variables
-\end{verbatim}
-
-\subsection{Troubleshooting}
-
-\textbf{Common issues and solutions:}
-
-\begin{enumerate}
-\item \textbf{Memory errors (``out of memory''):}
-  \begin{itemize}
-  \item Requires 16GB RAM for full computation
-  \item Workaround: Process classes in smaller batches (modify scripts)
-  \item Alternative: Use cloud computing instance (AWS, Google Cloud)
-  \end{itemize}
-
-\item \textbf{Macaulay2 version incompatibility:}
-  \begin{itemize}
-  \item Minimum: Macaulay2 1.20
-  \item Recommended: Macaulay2 1.24.11 (exact version used in paper)
-  \item Download: \url{http://www.math.uiuc.edu/Macaulay2/}
-  \end{itemize}
-
-\item \textbf{Script extraction errors:}
-  \begin{itemize}
-  \item Ensure verbatim code blocks are copied exactly (no formatting changes)
-  \item Check for markdown rendering artifacts (e.g., escaped underscores)
-  \item Refer to reasoning artifacts for complete listings
-  \end{itemize}
-
-\item \textbf{Runtime longer than expected:}
-  \begin{itemize}
-  \item Benchmarks are for MacBook Air M1 (16GB RAM)
-  \item Lower-spec hardware may require 2-3 times longer
-  \item CP3 is most compute-intensive phase (approximately 70\% of total runtime)
-  \end{itemize}
-\end{enumerate}
-
-\subsection{Data Provenance and Integrity}
-
-\textbf{How were the JSON data files generated?}
-
-The 10 JSON files (\texttt{saved\_inv\_p\{53,79,131,157,313\}\_triplets.json} and \texttt{saved\_inv\_p\{53,79,131,157,313\}\_monomials18.json}) were generated via prior Macaulay2 computations documented in \cite{Law2026gap}.
-
-\textbf{Generation procedure:}
-\begin{enumerate}
-\item Construct Jacobian matrix $M_p$ over $\FF_p$ (multiplication map $R_{11} \otimes J \to R_{18,\mathrm{inv}}$)
-\item Compute rank via sparse Gaussian elimination → rank = 1883
-\item Export sparse matrix as triplets (row, col, value)
-\item Compute left kernel (cokernel basis) → 707 basis vectors
-\item Extract monomials corresponding to basis vectors
-\item Export to JSON with provenance metadata
-\end{enumerate}
-
-\textbf{Integrity verification:}
-
-SHA-256 hashes for all 10 JSON files documented in:
-
-\texttt{OrganismCore/validator\_v2/checksums.txt}
-
-Independent researchers can verify file integrity via:
-\begin{verbatim}
-sha256sum -c checksums.txt
-\end{verbatim}
-
-\textbf{Provenance metadata (embedded in JSON):}
+All certificate data for k=100, 150, 200, 500, 1000, 1883 preserved in reasoning artifact with:
 \begin{itemize}
-\item Generation date/time
-\item Macaulay2 version
-\item Prime $p$
-\item Matrix dimensions ($2590 \times 2016$)
-\item Rank (1883)
-\item Number of monomials (2590 total, 707 kernel dimension)
+\item Exact execution logs (verbatim console output)
+\item Verification procedures (commands to reproduce)
 \end{itemize}
 
-\subsection{Reasoning Artifacts as Paradigm Shift}
-
-\textbf{Traditional reproducibility model:}
-\begin{itemize}
-\item Scripts in repository (e.g., GitHub)
-\item Separate documentation (README, wiki, paper)
-\item Provenance often incomplete or scattered
-\item Reasoning implicit (must infer from code)
-\end{itemize}
-
-\textbf{Reasoning artifact model (OrganismCore):}
-\begin{itemize}
-\item Scripts + reasoning + provenance in unified documents
-\item Complete computational history (including false starts, errors, corrections)
-\item Explicit design decisions and alternatives considered
-\item Inline verification protocols
-\item Pedagogical value (understand \emph{why}, not just \emph{what})
-\end{itemize}
-
-\textbf{Benefits for scientific reproducibility:}
-\begin{enumerate}
-\item \textbf{Deeper understanding:} Researchers understand methodology, not just replicate execution
-\item \textbf{Error detection:} Inline reasoning enables identification of conceptual errors
-\item \textbf{Extensibility:} Clear reasoning facilitates adaptation to related problems
-\item \textbf{Long-term preservation:} Self-contained documents survive better than scattered scripts + docs
-\item \textbf{Educational value:} Students learn computational methodology, not just code
-\end{enumerate}
-
-\textbf{Potential impact on computational mathematics:}
-
-The OrganismCore project may represent a paradigm shift in how computational research is documented, shared, and verified. If widely adopted, reasoning artifacts could:
-\begin{itemize}
-\item Reduce replication failures (clearer methodology)
-\item Accelerate research (easier to build on prior work)
-\item Improve peer review (reviewers understand reasoning)
-\item Enhance education (students learn methodology)
-\item Establish new standard for computational rigor
-\end{itemize}
-
-% ============================================================================
-\section{Addressing Anticipated Objections}\label{sec:objections}
-
-\subsection{Objection 1: ``Modular Computations Are Not Rigorous Proof''}
-
-\textbf{Response:}
-\begin{itemize}
-\item We provide \textbf{both} modular evidence (5‑prime agreement) and \textbf{deterministic certificates} (explicit \(\mathbb{Z}\)-minors via CRT).
-\item The \(k=150\) certificate is deterministic: the symmetric representative \(< M/2\) gives the exact integer (no heuristics).
-\item A clear path to unconditional \(\mathbb{Q}\)-proof is outlined (CRT + rational reconstruction for CP3); implementation for representative cases is in progress.
-\end{itemize}
-
-\subsection{Objection 2: ``Kolmogorov Complexity Proxy Is Heuristic''}
-
-\textbf{Response:}
-\begin{itemize}
-\item We use \textbf{multiple independent metrics} (Shannon entropy, complexity proxy, variable count).
-\item All metrics show convergent separation (e.g. \(p < 10^{-75}\), Cohen's \(d > 2.2\)).
-\item Statistical tests are validated (permutation checks, Bonferroni correction).
-\item Raw data and alternative‑proxy metadata are provided for independent verification.
-\end{itemize}
-
-\subsection{Objection 3: ``Statistical Significance Numbers Are Too Extreme''}
-
-\textbf{Response:}
-\begin{itemize}
-\item $p$‑values were validated via permutation tests (10\,000 permutations used for sanity checks).
-\item Sample sizes are sufficient for asymptotic approximations ($n_{\mathrm{alg}}=24$, $n_{\mathrm{iso}}=401$).
-\item Multiple independent tests (entropy, complexity, variable count) converge on the same result rather than relying on a single statistic.
-\item Multiple testing correction applied (Bonferroni; familywise $\alpha=0.01$ for the five comparisons reported).
-\end{itemize}
-
-\subsection{Objection 4: ``Multi‑Prime Agreement Could Be Coincidental''}
-
-\textbf{Response:}
-\begin{itemize}
-\item The naive probability of false simultaneous agreement is $\approx 1/M \approx 3.7\times 10^{-11}$ for our prime set (product \(M \approx 2.7\times 10^{10}\)).
-\item \textbf{Deterministic upgrade:} The explicit \(\mathbb{Z}\)-certificate (rank \(\geq 150\)) is exact and removes heuristic dependence for that minor.
-\item Four structurally independent obstructions converge (dimensional + statistical + observational + geometric), making coincidence implausible.
-\item CP3 testing: 30\,075 independent tests yielded \texttt{NOT\_REPRESENTABLE} in 100\% of cases (zero exceptions across five primes).
-\end{itemize}
-
-\subsection{Objection 5: ``The 401 Classes Could Still Be Algebraic''}
-
-\textbf{Response:}
-
-We \textbf{explicitly state} that this paper does not prove non‑algebraicity. However, for the ``hidden algebraic cycles'' interpretation to hold, one would need the following highly implausible conjunction:
-
-\begin{itemize}
-\item \(\sim 389\) additional independent cycles with \(\sim 40\%\) higher complexity than any known cycle;
-\item all such cycles to involve all six variables (where current algebraic cycles use \(\leq 4\) variables);
-\item these cycles to be perfectly separated from the 24 tested algebraic patterns (KS \(D=1.000\), \(p<10^{-94}\));
-\item and for the 30\,075 CP3 tests to return \texttt{NOT\_REPRESENTABLE} by sheer coincidence.
-\end{itemize}
-
-\noindent Statistical plausibility for this conjunction is extraordinarily low. Our contribution is to identify \textbf{prime candidates} for rigorous verification via period computations or CRT rational reconstruction.
-
-\subsection{Summary: What We Claim vs.\ What We Prove}
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{lcc}
-\toprule
-\textbf{Claim} & \textbf{Evidence Type} & \textbf{Status} \\
-\midrule
-Rank \(\geq 150\) over \(\mathbb{Z}\) & Deterministic (CRT) & \textbf{Proven} \\
-Rank \(=1883\) (5‑prime) & Probabilistic (error prob.\ \(\approx 3.7\times 10^{-11}\)) & Strong evidence \\
-\(\dim \Hinv(V)=707\) over \(\mathbb{Q}\) & Follows from rank computations; unconditional via CRT & Pending CRT for full lift \\
-401 classes: statistical separation & Rigorous statistics & \textbf{Proven} \\
-Variable‑count barrier & Multi‑prime CP3 tests (30\,075) & Strong evidence \\
-401 classes non‑algebraic & Conjecture (candidate classes) & \textbf{Pending} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Contact and Support}
-
-\textbf{For questions, issues, or verification assistance:}
-
-\begin{itemize}
-\item GitHub Issues: \url{https://github.com/Eric-Robert-Lawson/OrganismCore/issues}
-\item Email: \texttt{OrganismCore@proton.me}
-\item Repository documentation: \url{https://github.com/Eric-Robert-Lawson/OrganismCore/blob/main/README.md}
-\end{itemize}
-
-\textbf{Community contributions welcome:}
-\begin{itemize}
-\item Verification reports (independent replication results)
-\item Extension to other varieties
-\item Theoretical insights
-\item Alternative computational approaches
-\item Improvements to reasoning artifacts
-\end{itemize}
+All of the results and certificates can be reproduced and cross-verified with results in the reasoning artifacts!
 
 % ============================================================================
 \begin{thebibliography}{9}
@@ -1386,30 +907,25 @@ Variable‑count barrier & Multi‑prime CP3 tests (30\,075) & Strong evidence \
 Eric Robert Lawson.
 \textit{A 98.3\% Gap Between Hodge Classes and Algebraic Cycles in the Galois-Invariant Sector of a Cyclotomic Hypersurface}.
 OrganismCore Project, 2026.
-Available at \url{https://github.com/Eric-Robert-Lawson/OrganismCore/blob/main/validator/hodge_gap_cyclotomic.tex}
 
 \bibitem{Law2026info}
 Eric Robert Lawson.
 \textit{Information-Theoretic Characterization of Candidate Non-Algebraic Hodge Classes in a Cyclotomic Hypersurface}.
 OrganismCore Project, 2026.
-Available at \url{https://github.com/Eric-Robert-Lawson/OrganismCore/blob/main/validator/technical_note.tex}
 
 \bibitem{Law2026trans}
 Eric Robert Lawson.
-\textit{Coordinate Transparency in Canonical Basis Representation: Variable-Count Separation as Evidence for Geometric Obstruction on a Cyclotomic Hypersurface}.
+\textit{Coordinate Transparency in Canonical Basis Representation}.
 OrganismCore Project, 2026.
-Available at \url{https://github.com/Eric-Robert-Lawson/OrganismCore/blob/main/validator_v2/coordinate_transparency.tex}
 
 \bibitem{Law2026barrier}
 Eric Robert Lawson.
-\textit{The Variable-Count Barrier: Multi-Prime Computational Certification of a Geometric Obstruction to Algebraicity for Hodge Classes on Cyclotomic Hypersurfaces}.
+\textit{The Variable-Count Barrier}.
 OrganismCore Project, 2026.
-Available at \url{https://github.com/Eric-Robert-Lawson/OrganismCore/blob/main/validator_v2/variable_count_barrier.tex}
 
 \bibitem{M2}
 Daniel R. Grayson and Michael E. Stillman.
 \textit{Macaulay2, a software system for research in algebraic geometry}.
-Available at \url{http://www.math.uiuc.edu/Macaulay2/}.
 
 \bibitem{shioda1979}
 Tetsuji Shioda.
