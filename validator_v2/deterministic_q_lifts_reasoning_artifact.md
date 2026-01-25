@@ -346,57 +346,40 @@ then the rational_kernal_basis.py
 ```python
 #!/usr/bin/env python3
 """
-rational_kernel_basis.py
+rational_kernel_basis.py (fixed verification)
 
-Reconstruct rational kernel basis for H^{2,2}_{prim,inv}(V, Q) via CRT + rational reconstruction.
+Reconstruct rational kernel basis for H^{2,2}_{prim,inv}(V, Q) via CRT + rational
+reconstruction.
 
-Input:
-  - kernel_p53.json, kernel_p79.json, ..., kernel_p313.json
-    Each file: {"kernel": [[c_11, c_12, ..., c_{1,1883}], [c_21, ...], ...]}
-    (707 vectors × 1883 coefficients, all mod p)
+Fixes:
+ - Verifies reconstructed rational n/d against modular residues using the
+   congruence n ≡ r_p * d (mod p) rather than attempting to invert d mod p,
+   which can fail when gcd(d,p) != 1.
+ - Logs failed coefficient positions to a failures JSON file.
+ - Robust output handling when some coefficients failed reconstruction.
 
-Output:
-  - kernel_basis_Q.json
-    {"basis": [[n_11/d_11, n_12/d_12, ...], ...], "verification": {...}}
-
-Purpose:
-  Provides unconditional proof of dimension = 707 over Q for hodge_gap_cyclotomic.tex
-  Validates foundation for 4_obs_1_phenom.tex synthesis paper
-
-Algorithm:
-  For each coefficient position (i,j):
-    1. Extract residues: r_p = c_ij mod p for p in {53,79,131,157,313}
-    2. Apply CRT: reconstruct c_M (mod M = 53*79*131*157*313)
-    3. Apply rational reconstruction: find n/d with |n|,d < sqrt(M/2) and n/d ≡ c_M (mod M)
-    4. Verify: n/d mod p = r_p for all primes
-    5. Store as rational number (n, d)
-
-Notes:
-  - Total coefficients: 707 * 1883 = 1,331,281
-  - Expected sparsity: ~90% zero (based on monomial basis structure)
-  - Non-zero entries will reconstruct as rationals with small numerators/denominators
-  - Heuristic bound: sqrt(M/2) ≈ 116,089 (should suffice for cohomology coefficients)
+Usage:
+  python3 rational_kernel_basis.py \
+    --kernels validator_v2/kernel_p53.json validator_v2/kernel_p79.json ... \
+    --primes 53 79 131 157 313 \
+    --out validator_v2/kernel_basis_Q.json \
+    [--sample N] [--failures_out validator_v2/reconstruction_failures.json]
 
 Author: Assistant (for OrganismCore)
-Date: January 25, 2026
+Date: 2026-01-25 (fixed)
 """
-
 import json
 import math
 import sys
 from pathlib import Path
 
-# Increase string conversion limits for large rationals
+# Increase string conversion limits for large rationals (Python 3.11+)
 try:
     sys.set_int_max_str_digits(10_000_000)
 except AttributeError:
     pass
 
 def iterative_crt(residues):
-    """
-    residues: list of (modulus, residue) tuples
-    Returns: (x, M) where x is in [0, M) and M = product of moduli
-    """
     x, M = residues[0][1], residues[0][0]
     for (m, r) in residues[1:]:
         inv = pow(M % m, -1, m)
@@ -407,52 +390,36 @@ def iterative_crt(residues):
     return x, M
 
 def rational_reconstruction(a, m, bound=None):
-    """
-    Extended-GCD based rational reconstruction.
-    Find n/d with |n|, d <= bound such that n/d ≡ a (mod m).
-    Returns (n, d) or None if no reconstruction found.
-    """
     a = int(a) % int(m)
     m = int(m)
     if bound is None:
         bound = int(math.isqrt(m // 2))
-    
     r0, r1 = m, a
     s0, s1 = 1, 0
     t0, t1 = 0, 1
-    
     while r1 != 0 and abs(r1) > bound:
         q = r0 // r1
         r0, r1 = r1, r0 - q * r1
         s0, s1 = s1, s0 - q * s1
         t0, t1 = t1, t0 - q * t1
-    
     if r1 == 0:
         return None
-    
     num = r1
     den = t1
-    
     if den == 0:
         return None
     if den < 0:
         num, den = -num, -den
     if abs(num) > bound or den > bound:
         return None
-    
-    # Verify congruence
     if ((num - a * den) % m) != 0:
         return None
-    
-    # Reduce
     g = math.gcd(abs(num), den)
     num //= g
     den //= g
-    
     return (num, den)
 
 def load_kernel_modp(path):
-    """Load kernel basis mod p from JSON."""
     with open(path) as f:
         data = json.load(f)
     if 'kernel' in data:
@@ -466,55 +433,53 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--kernels', nargs='+', required=True,
-                        help='Paths to kernel_p*.json files (order: p=53,79,131,157,313)')
+                        help='Paths to kernel_p*.json files (order: primes)')
     parser.add_argument('--primes', nargs='+', type=int, required=True,
                         help='Primes in same order as kernel files')
     parser.add_argument('--out', default='kernel_basis_Q.json',
                         help='Output file for rational basis')
     parser.add_argument('--sample', type=int, default=None,
                         help='Reconstruct only first N basis vectors (for testing)')
+    parser.add_argument('--failures_out', default='validator_v2/reconstruction_failures.json',
+                        help='JSON file to record failed coefficient positions')
     args = parser.parse_args()
-    
+
     if len(args.kernels) != len(args.primes):
         print("ERROR: Number of kernel files must match number of primes")
         return
-    
-    # Load all kernel bases
+
     print(f"[+] Loading {len(args.kernels)} kernel bases...")
     kernels_modp = []
     for kpath in args.kernels:
         k = load_kernel_modp(kpath)
         kernels_modp.append(k)
         print(f"    {kpath}: {len(k)} vectors × {len(k[0])} coefficients")
-    
-    # Verify dimensions match
+
     n_vectors = len(kernels_modp[0])
     n_coeffs = len(kernels_modp[0][0])
     for i, k in enumerate(kernels_modp[1:], 1):
         if len(k) != n_vectors or len(k[0]) != n_coeffs:
             print(f"ERROR: Dimension mismatch in kernel file {i}")
             return
-    
+
     print(f"[+] Dimension verified: {n_vectors} vectors × {n_coeffs} coefficients")
-    
-    # Compute CRT product
+
     M = 1
     for p in args.primes:
         M *= p
     bound = int(math.isqrt(M // 2))
     print(f"[+] CRT product M = {M}")
     print(f"[+] Rational reconstruction bound = {bound}")
-    
-    # Determine how many vectors to process
+
     if args.sample:
         n_process = min(args.sample, n_vectors)
         print(f"[+] SAMPLE MODE: Processing first {n_process} vectors")
     else:
         n_process = n_vectors
         print(f"[+] Processing all {n_process} vectors")
-    
-    # Reconstruct rational basis
+
     rational_basis = []
+    failures = []  # list of {"vec": i, "coeff": j, "residues": [...], "note": "..."}
     stats = {
         'total_coeffs': 0,
         'zero_coeffs': 0,
@@ -523,88 +488,91 @@ def main():
         'verification_ok': 0,
         'verification_fail': 0
     }
-    
+
     import time
     t0 = time.time()
-    
+
     for vec_idx in range(n_process):
         if (vec_idx + 1) % 10 == 0:
             elapsed = time.time() - t0
             rate = vec_idx / elapsed if elapsed > 0 else 0
             eta = (n_process - vec_idx) / rate if rate > 0 else 0
             print(f"    [{vec_idx+1}/{n_process}] {rate:.1f} vec/sec, ETA: {eta/60:.1f} min")
-        
+
         rational_vector = []
-        
+
         for coeff_idx in range(n_coeffs):
             stats['total_coeffs'] += 1
-            
-            # Extract residues for this coefficient across all primes
-            residues_p = [kernels_modp[i][vec_idx][coeff_idx] for i in range(len(args.primes))]
-            
-            # Check if all zero (common case due to sparsity)
+
+            residues_p = [int(kernels_modp[i][vec_idx][coeff_idx]) for i in range(len(args.primes))]
+
             if all(r == 0 for r in residues_p):
-                rational_vector.append((0, 1))  # 0/1
+                rational_vector.append((0, 1))
                 stats['zero_coeffs'] += 1
                 continue
-            
-            # CRT reconstruction
+
             residues = [(args.primes[i], residues_p[i]) for i in range(len(args.primes))]
             c_M, _ = iterative_crt(residues)
-            
-            # Rational reconstruction
+
             result = rational_reconstruction(c_M, M, bound)
-            
             if result is None:
-                # Try larger bound (2x, 4x)
                 for mult in [2, 4]:
                     result = rational_reconstruction(c_M, M, bound * mult)
                     if result is not None:
                         break
-            
+
             if result is None:
-                print(f"WARNING: Failed to reconstruct coeff ({vec_idx}, {coeff_idx})")
+                # Reconstruction failed for this coefficient
+                failures.append({"vec": vec_idx, "coeff": coeff_idx, "residues": residues_p, "note": "reconstruction_failed"})
                 stats['failed'] += 1
-                rational_vector.append(None)  # Mark as failed
+                rational_vector.append(None)
                 continue
-            
+
             n, d = result
             stats['reconstructed'] += 1
-            
-            # Verify residues
+
+            # Verify residues via congruence n ≡ r_p * d (mod p)
             verify_ok = True
             for i, p in enumerate(args.primes):
                 expected = residues_p[i]
-                computed = (n * pow(d, -1, p)) % p
-                if computed != expected:
+                if ((n - (expected * d)) % p) != 0:
                     verify_ok = False
                     stats['verification_fail'] += 1
+                    failures.append({"vec": vec_idx, "coeff": coeff_idx, "residues": residues_p, "n": int(n), "d": int(d), "note": f"verification_failed_mod_{p}"})
                     break
-            
+
             if verify_ok:
                 stats['verification_ok'] += 1
-            
-            rational_vector.append((n, d))
-        
+
+            rational_vector.append((int(n), int(d)))
+
         rational_basis.append(rational_vector)
-    
+
     elapsed = time.time() - t0
     print(f"[+] Reconstruction complete in {elapsed:.1f}s")
-    print(f"[+] Statistics:")
+    print("[+] Statistics:")
     print(f"    Total coefficients: {stats['total_coeffs']}")
-    print(f"    Zero coefficients: {stats['zero_coeffs']} ({100*stats['zero_coeffs']/stats['total_coeffs']:.1f}%)")
+    if stats['total_coeffs'] > 0:
+        print(f"    Zero coefficients: {stats['zero_coeffs']} ({100*stats['zero_coeffs']/stats['total_coeffs']:.1f}%)")
     print(f"    Reconstructed: {stats['reconstructed']}")
     print(f"    Failed: {stats['failed']}")
     print(f"    Verification OK: {stats['verification_ok']}")
     print(f"    Verification FAIL: {stats['verification_fail']}")
-    
-    # Write output
+
+    # Prepare output; handle None entries robustly
+    basis_out = []
+    for vec in rational_basis:
+        row = []
+        for entry in vec:
+            if entry is None:
+                row.append(None)
+            else:
+                n, d = entry
+                row.append({"n": int(n), "d": int(d)})
+        basis_out.append(row)
+
     output = {
-        'basis': [
-            [{'n': int(n), 'd': int(d)} if (n, d) != (None, None) else None 
-             for (n, d) in vec]
-            for vec in rational_basis
-        ],
+        'basis': basis_out,
         'metadata': {
             'n_vectors': len(rational_basis),
             'n_coeffs': n_coeffs,
@@ -620,22 +588,27 @@ def main():
             'purpose': 'Unconditional proof of dimension = 707 over Q'
         }
     }
-    
-    with open(args.out, 'w') as f:
+
+    outpath = Path(args.out)
+    outpath.parent.mkdir(parents=True, exist_ok=True)
+    with open(outpath, 'w') as f:
         json.dump(output, f, indent=2)
-    
-    print(f"[+] Wrote rational basis to {args.out}")
-    print(f"[+] This certificate supports:")
-    print(f"    - hodge_gap_cyclotomic.tex (Theorem 1.1: dimension = 707)")
-    print(f"    - 4_obs_1_phenom.tex (Section 2: foundational dimension claim)")
-    
+
+    # Write failures file
+    failures_out = Path(args.failures_out)
+    failures_out.parent.mkdir(parents=True, exist_ok=True)
+    with open(failures_out, 'w') as ff:
+        json.dump({"failures": failures, "metadata": output['metadata']}, ff, indent=2)
+
+    print(f"[+] Wrote rational basis to {outpath}")
+    print(f"[+] Wrote failures to {failures_out}")
+
     if stats['failed'] > 0:
         print(f"WARNING: {stats['failed']} coefficients failed reconstruction")
-        print("         Consider adding more primes or investigating coefficient bounds")
-    
+        print(f"         See {failures_out} for details. Consider adding more primes for these positions.")
     if stats['verification_fail'] > 0:
         print(f"ERROR: {stats['verification_fail']} coefficients failed verification")
-        print("       DO NOT USE THIS BASIS - CRT reconstruction is incorrect")
+        print("       DO NOT USE THE BASIS until failures are resolved.")
     else:
         print("[+] All reconstructed coefficients verified successfully ✓")
 
@@ -2100,6 +2073,301 @@ This reasoning artifact provides **complete computational protocol** to eliminat
 
 **All scripts are production-ready and copy-paste executable.**
 
+---
+**UPDATE 1**
+
+# Update 1
+
+Required I create more prime kernals due to lack of kernals to support, had 665 validation errors:
+
+```verbatim
+c:\math>python rational_kernel_basis.py --kernels kernel_p53.json kernel_p79.json kernel_p131.json kernel_p157.json kernel_p313.json --primes 53 79 131 157 313 --out kernel_basis_Q.json
+[+] Loading 5 kernel bases...
+    kernel_p53.json: 707 vectors × 2590 coefficients
+    kernel_p79.json: 707 vectors × 2590 coefficients
+    kernel_p131.json: 707 vectors × 2590 coefficients
+    kernel_p157.json: 707 vectors × 2590 coefficients
+    kernel_p313.json: 707 vectors × 2590 coefficients
+[+] Dimension verified: 707 vectors × 2590 coefficients
+[+] CRT product M = 26953691077
+[+] Rational reconstruction bound = 116089
+[+] Processing all 707 vectors
+    [10/707] 251.5 vec/sec, ETA: 0.0 min
+    [20/707] 238.6 vec/sec, ETA: 0.0 min
+    [30/707] 228.0 vec/sec, ETA: 0.0 min
+    [40/707] 245.3 vec/sec, ETA: 0.0 min
+    [50/707] 220.9 vec/sec, ETA: 0.0 min
+    [60/707] 232.6 vec/sec, ETA: 0.0 min
+    [70/707] 229.0 vec/sec, ETA: 0.0 min
+    [80/707] 222.7 vec/sec, ETA: 0.0 min
+    [90/707] 215.6 vec/sec, ETA: 0.0 min
+    [100/707] 222.5 vec/sec, ETA: 0.0 min
+    [110/707] 214.5 vec/sec, ETA: 0.0 min
+    [120/707] 208.2 vec/sec, ETA: 0.0 min
+    [130/707] 203.2 vec/sec, ETA: 0.0 min
+    [140/707] 194.7 vec/sec, ETA: 0.0 min
+    [150/707] 199.9 vec/sec, ETA: 0.0 min
+    [160/707] 208.8 vec/sec, ETA: 0.0 min
+    [170/707] 213.0 vec/sec, ETA: 0.0 min
+    [180/707] 221.2 vec/sec, ETA: 0.0 min
+    [190/707] 224.8 vec/sec, ETA: 0.0 min
+    [200/707] 232.3 vec/sec, ETA: 0.0 min
+    [210/707] 235.3 vec/sec, ETA: 0.0 min
+    [220/707] 241.2 vec/sec, ETA: 0.0 min
+    [230/707] 243.5 vec/sec, ETA: 0.0 min
+    [240/707] 251.1 vec/sec, ETA: 0.0 min
+    [250/707] 253.1 vec/sec, ETA: 0.0 min
+    [260/707] 259.1 vec/sec, ETA: 0.0 min
+    [270/707] 260.7 vec/sec, ETA: 0.0 min
+    [280/707] 266.3 vec/sec, ETA: 0.0 min
+    [290/707] 267.7 vec/sec, ETA: 0.0 min
+    [300/707] 272.9 vec/sec, ETA: 0.0 min
+    [310/707] 274.0 vec/sec, ETA: 0.0 min
+    [320/707] 278.9 vec/sec, ETA: 0.0 min
+    [330/707] 281.4 vec/sec, ETA: 0.0 min
+    [340/707] 283.3 vec/sec, ETA: 0.0 min
+    [350/707] 289.1 vec/sec, ETA: 0.0 min
+    [360/707] 288.4 vec/sec, ETA: 0.0 min
+    [370/707] 294.0 vec/sec, ETA: 0.0 min
+    [380/707] 292.8 vec/sec, ETA: 0.0 min
+    [390/707] 293.4 vec/sec, ETA: 0.0 min
+    [400/707] 298.6 vec/sec, ETA: 0.0 min
+    [410/707] 299.3 vec/sec, ETA: 0.0 min
+    [420/707] 301.8 vec/sec, ETA: 0.0 min
+    [430/707] 303.4 vec/sec, ETA: 0.0 min
+    [440/707] 307.0 vec/sec, ETA: 0.0 min
+    [450/707] 307.1 vec/sec, ETA: 0.0 min
+    [460/707] 310.5 vec/sec, ETA: 0.0 min
+    [470/707] 310.2 vec/sec, ETA: 0.0 min
+    [480/707] 314.0 vec/sec, ETA: 0.0 min
+    [490/707] 314.2 vec/sec, ETA: 0.0 min
+    [500/707] 315.1 vec/sec, ETA: 0.0 min
+    [510/707] 317.4 vec/sec, ETA: 0.0 min
+    [520/707] 320.4 vec/sec, ETA: 0.0 min
+    [530/707] 320.3 vec/sec, ETA: 0.0 min
+    [540/707] 323.2 vec/sec, ETA: 0.0 min
+    [550/707] 323.0 vec/sec, ETA: 0.0 min
+    [560/707] 324.3 vec/sec, ETA: 0.0 min
+    [570/707] 325.7 vec/sec, ETA: 0.0 min
+    [580/707] 328.4 vec/sec, ETA: 0.0 min
+    [590/707] 331.2 vec/sec, ETA: 0.0 min
+    [600/707] 330.9 vec/sec, ETA: 0.0 min
+    [610/707] 330.5 vec/sec, ETA: 0.0 min
+    [620/707] 333.1 vec/sec, ETA: 0.0 min
+    [630/707] 335.6 vec/sec, ETA: 0.0 min
+    [640/707] 335.3 vec/sec, ETA: 0.0 min
+    [650/707] 337.7 vec/sec, ETA: 0.0 min
+    [660/707] 337.4 vec/sec, ETA: 0.0 min
+    [670/707] 339.8 vec/sec, ETA: 0.0 min
+    [680/707] 339.4 vec/sec, ETA: 0.0 min
+    [690/707] 341.7 vec/sec, ETA: 0.0 min
+    [700/707] 341.3 vec/sec, ETA: 0.0 min
+[+] Reconstruction complete in 2.1s
+[+] Statistics:
+    Total coefficients: 1831130
+    Zero coefficients: 1751993 (95.7%)
+    Reconstructed: 79137
+    Failed: 0
+    Verification OK: 78472
+    Verification FAIL: 665
+[+] Wrote rational basis to kernel_basis_Q.json
+[+] Wrote failures to validator_v2\reconstruction_failures.json
+ERROR: 665 coefficients failed verification
+       DO NOT USE THE BASIS until failures are resolved.
+
+c:\math>python reconstruct_failures.py
+Total failures: 665
+{'vec': 20, 'coeff': 52, 'residues': [52, 78, 130, 124, 23], 'n': -1, 'd': 1, 'note': 'verification_failed_mod_157'}
+{'vec': 20, 'coeff': 173, 'residues': [27, 61, 45, 57, 158], 'n': 1359, 'd': 280, 'note': 'verification_failed_mod_131'}
+{'vec': 20, 'coeff': 216, 'residues': [13, 64, 128, 40, 176], 'n': -256, 'd': 653, 'note': 'verification_failed_mod_79'}
+{'vec': 20, 'coeff': 413, 'residues': [8, 63, 32, 96, 34], 'n': 301, 'd': 865, 'note': 'verification_failed_mod_53'}
+{'vec': 20, 'coeff': 422, 'residues': [2, 55, 69, 57, 210], 'n': 364, 'd': 235, 'note': 'verification_failed_mod_313'}
+{'vec': 20, 'coeff': 441, 'residues': [24, 67, 102, 58, 294], 'n': -779, 'd': 980, 'note': 'verification_failed_mod_53'}
+{'vec': 20, 'coeff': 443, 'residues': [13, 70, 66, 26, 215], 'n': 893, 'd': 1393, 'note': 'verification_failed_mod_53'}
+{'vec': 20, 'coeff': 462, 'residues': [5, 78, 54, 62, 306], 'n': -1226, 'd': 41, 'note': 'verification_failed_mod_131'}
+{'vec': 20, 'coeff': 577, 'residues': [11, 37, 59, 42, 219], 'n': 1764, 'd': 827, 'note': 'verification_failed_mod_53'}
+{'vec': 20, 'coeff': 583, 'residues': [1, 1, 1, 85, 199], 'n': 1, 'd': 1, 'note': 'verification_failed_mod_157'}
+{'vec': 20, 'coeff': 594, 'residues': [11, 16, 25, 48, 119], 'n': -2861, 'd': 310, 'note': 'verification_failed_mod_53'}
+{'vec': 20, 'coeff': 640, 'residues': [16, 26, 116, 89, 288], 'n': -33, 'd': 1679, 'note': 'verification_failed_mod_53'}
+{'vec': 20, 'coeff': 725, 'residues': [41, 64, 103, 90, 251], 'n': 271, 'd': 556, 'note': 'verification_failed_mod_131'}
+{'vec': 20, 'coeff': 919, 'residues': [43, 8, 80, 57, 273], 'n': 1211, 'd': 181, 'note': 'verification_failed_mod_131'}
+{'vec': 21, 'coeff': 193, 'residues': [5, 34, 103, 14, 118], 'n': 1662, 'd': 343, 'note': 'verification_failed_mod_79'}
+{'vec': 21, 'coeff': 299, 'residues': [23, 33, 98, 72, 35], 'n': 1990, 'd': 817, 'note': 'verification_failed_mod_79'}
+{'vec': 21, 'coeff': 583, 'residues': [12, 77, 28, 113, 279], 'n': 843, 'd': 905, 'note': 'verification_failed_mod_79'}
+{'vec': 21, 'coeff': 635, 'residues': [35, 31, 108, 74, 145], 'n': 1299, 'd': 758, 'note': 'verification_failed_mod_53'}
+{'vec': 22, 'coeff': 162, 'residues': [40, 67, 83, 97, 260], 'n': -356, 'd': 1241, 'note': 'verification_failed_mod_53'}
+{'vec': 22, 'coeff': 556, 'residues': [13, 19, 41, 30, 192], 'n': -492, 'd': 643, 'note': 'verification_failed_mod_79'}
+
+c:\math>python debug_reconstruct.py
+vec,coeff: 20 52
+residues: [(53, 52), (79, 78), (131, 130), (157, 124), (313, 23)]
+CRT cM: 24743248166 M: 26953691077
+mult 1 bound 116089 -> (-1, 1)
+  congruence ok? False
+mult 2 bound 232178 -> (-1, 1)
+  congruence ok? False
+mult 4 bound 464356 -> (-1, 1)
+  congruence ok? False
+mult 8 bound 928712 -> (-550070, 1573)
+  congruence ok? True
+```
+
+Therefore I needed to create more json invariant files for monomial and triplets, so I needed to use this m2 script from qualia_candidate_axioms/potential_hodge_conjecture_counterexample.md and change the primes to 443, 521, 547, 599, 677, and 911:
+
+```m2
+-- verify_invariant_tier2.m2
+-- TIER II: Symmetry Obstruction via C13-Invariant Sector
+-- Computes h^{2,2}_inv modulo p for p ≡ 1 (mod 13)
+
+needsPackage "JSON";
+
+-- CONFIGURATION
+primesToTest = {443,521,547,599,677,911};
+
+print "=== TIER II: Symmetry Obstruction Verification ===";
+
+for p in primesToTest do (
+    if (p % 13) != 1 then continue;
+    
+    print("--- Prime:  " | toString p | " ---");
+    
+    -- 1. Setup finite field with 13th root
+    Fp := ZZ/p;
+    w := 0_Fp;
+    for a from 2 to p-1 do (
+        cand := (a * 1_Fp)^((p-1)//13);
+        if (cand != 1_Fp) and (cand^13 == 1_Fp) then ( 
+            w = cand; 
+            break; 
+        );
+    );
+    print("Using 13th root w = " | toString w);
+
+    -- 2. Build polynomial ring
+    S := Fp[z_0.. z_5];
+    z := gens S;
+
+    -- 3. Construct C13-invariant variety
+    print "Assembling C13-invariant variety... ";
+    linearForms := for k from 0 to 12 list (
+        sum(0.. 5, j -> (w^((k*j) % 13)) * z#j)
+    );
+    fS := sum(linearForms, l -> l^8);
+    
+    -- 4. Compute partial derivatives
+    partials := for i from 0 to 5 list diff(z#i, fS);
+
+    -- 5. Generate invariant monomial basis
+    print "Generating degree-18 invariant monomials...";
+    mon18List := flatten entries basis(18, S);
+    
+    -- Filter to invariant:   Σ j·a_j ≡ 0 (mod 13)
+    invMon18 := select(mon18List, m -> (
+        ev := (exponents m)#0;
+        (sum(for j from 0 to 5 list j * ev#j)) % 13 == 0
+    ));
+    
+    countInv := #invMon18;
+    print("Invariant monomials (deg 18): " | toString countInv);
+
+    -- 6. Build index map (MutableHashTable for M2 1.25. 11)
+    print "Building index map...";
+    monToIndex := new MutableHashTable;
+    for i from 0 to countInv - 1 do (
+        monToIndex#(invMon18#i) = i;
+    );
+
+    -- 7. Filter Jacobian generators (character matching)
+    print "Filtering Jacobian generators...";
+    mon11List := flatten entries basis(11, S);
+    
+    filteredGens := {};
+    for i from 0 to 5 do (
+        targetWeight := i;  -- Character of ∂/∂z_i is -i
+        for m in mon11List do (
+            mWeight := (sum(for j from 0 to 5 list j * (exponents m)#0#j)) % 13;
+            if mWeight == targetWeight then (
+                filteredGens = append(filteredGens, m * partials#i);
+            );
+        );
+    );
+    
+    print("Filtered generators: " | toString(#filteredGens));
+
+    -- 8. Assemble coefficient matrix
+    print "Assembling matrix (MutableMatrix)...";
+    M := mutableMatrix(Fp, countInv, #filteredGens);
+
+    for j from 0 to #filteredGens - 1 do (
+        (mons, coeffs) := coefficients filteredGens#j;
+        mList := flatten entries mons;
+        cList := flatten entries coeffs;
+        for k from 0 to #mList - 1 do (
+            m := mList#k;
+            if monToIndex #?  m then (
+                M_(monToIndex#m, j) = sub(cList#k, Fp);
+            );
+        );
+    );
+
+    MatInv := matrix M;
+
+    -- 9. Compute rank
+    print "Computing rank (symmetry-locked)...";
+    time rk := rank MatInv;
+    
+    h22inv := countInv - rk;
+
+    -- 10. Results
+    print("-" * 40);
+    print("RESULTS FOR PRIME " | toString p | ":");
+    print("Invariant monomials: " | toString countInv);
+    print("Rank:  " | toString rk);
+    print("h^{2,2}_inv: " | toString h22inv);
+    print("Gap (h22_inv - 12 algebraic): " | toString(h22inv - 12));
+    print("Gap percentage: " | toString(100. 0 * (h22inv - 12) / h22inv) | "%");
+    print("-" * 40);
+
+    -- 11. Export artifacts (optional)
+    monFile := "saved_inv_p" | toString p | "_monomials18.json";
+    triFile := "saved_inv_p" | toString p | "_triplets. json";
+    
+    print("Exporting to " | monFile | " and " | triFile);
+    
+    monExps := for m in invMon18 list (
+        ev := (exponents m)#0; 
+        for j from 0 to 5 list ev#j
+    );
+    (openOut monFile) << toJSON monExps << close;
+
+    triplets := {};
+    for c from 0 to (numgens source MatInv)-1 do (
+        for r from 0 to (numgens target MatInv)-1 do (
+            if MatInv_(r,c) != 0_Fp then (
+                triplets = append(triplets, {r, c, lift(MatInv_(r,c), ZZ)});
+            );
+        );
+    );
+
+    triData := hashTable {
+        "prime" => p,
+        "h22_inv" => h22inv,
+        "rank" => rk,
+        "countInv" => countInv,
+        "triplets" => triplets
+    };
+    (openOut triFile) << toJSON triData << close;
+
+    -- Cleanup
+    MatInv = null;
+    M = null;
+    garbageCollect();
+);
+
+print "\n=== TIER II Verification Complete ===";
+```
+
+then convert those jsons into the proper kernel files!
 ---
 
 **END OF ARTIFACT**
