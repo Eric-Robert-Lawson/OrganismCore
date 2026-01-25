@@ -5,6 +5,10 @@
 **Author:** Eric Robert Lawson  
 **Status:** ✅ **THEOREM PROVEN - PUBLICATION READY**
 
+**IMPORTANT**
+
+**YOU SHOULD GO TO qualia_candidate_axioms/potential_hodge_conjecture_counterexample.md in order to understand origin of the counterexample, also the origin of the inv files!**
+
 **Repository:** https://github.com/Eric-Robert-Lawson/OrganismCore  
 **Zenodo DOI (Gap Theorem):** 10.5281/zenodo.14428474  
 
