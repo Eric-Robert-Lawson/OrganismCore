@@ -1,5 +1,7 @@
 # 📋 **SNF VIA MULTI-PRIME CRT REASONING ARTIFACT**
 
+**PUTTING OFF FOR LATER, PRIORITIZING PERIOD COMPUTATIONS INSTEAD!**
+
 ## **🎯 OBJECTIVE**
 
 **Goal:** Compute the Smith Normal Form (SNF) of the 16×16 intersection matrix for algebraic cycles over ℤ, yielding the **exact rank** of the algebraic cycle group (currently upper-bounded at ≤12).
