@@ -2784,5 +2784,704 @@ This is where we will begin with update 3 to start verification of the kernel_ba
 
 ---
 
+**UPDATE 3**
+
+We continue with the following, ensuring it is in same directory as triplet jsons:
+
+```python
+#!/usr/bin/env python3
+"""
+reconstruct_integer_triplets_via_crt.py
+
+Reconstruct an integer coefficient triplet file (matrix over Z) by CRT from
+per-prime triplet JSON files saved_inv_p{p}_triplets.json.
+
+Usage (triplet files must be in the current working directory):
+  python3 validator_v2/reconstruct_integer_triplets_via_crt.py \
+    --primes 53 79 131 157 313 443 521 547 599 677 911 \
+    --out validator_v2/saved_inv_triplets_integer.json \
+    [--verify]
+
+Notes:
+ - Expects per-prime files named saved_inv_p{p}_triplets.json in the current directory
+   (the script will look for them in `.`).
+ - Each per-prime file should contain a JSON object with key "triplets" that is
+   a list of [row, col, value] (value should be the lifted integer representative).
+ - Missing (row,col) entries in a per-prime file are treated as residue 0 (i.e., zero entry).
+ - The script writes a JSON with key "triplets": [[r,c,val], ...] where val are
+   signed integers chosen in (-M/2, M/2], with M = product(primes).
+ - If --verify is passed, the script checks that val % p == residue_p for each prime p;
+   any conflicts are reported and cause a nonzero exit code.
+
+Caveats:
+ - This is deterministic only if the true integer coefficients are smaller (in absolute
+   value) than M/2. Choose enough primes so that M/2 exceeds the expected coefficient sizes.
+ - The union of (r,c) entries across primes is used; absent entries are treated as 0.
+"""
+from pathlib import Path
+import argparse
+import json
+import math
+import sys
+
+def iterative_crt(residues):
+    # residues: list of (p, r) with p prime, 0 <= r < p
+    x, M = residues[0][1], residues[0][0]
+    for (m, r) in residues[1:]:
+        inv = pow(M % m, -1, m)
+        t = ((r - x) * inv) % m
+        x = x + t * M
+        M = M * m
+        x %= M
+    return x, M
+
+def load_triplets_file(path):
+    d = json.load(open(path))
+    # accept either {"triplets": [...]} or a bare list
+    if isinstance(d, dict) and 'triplets' in d:
+        trip = d['triplets']
+    elif isinstance(d, list):
+        trip = d
+    else:
+        # try to find any list value
+        trip = None
+        for v in d.values():
+            if isinstance(v, list):
+                trip = v
+                break
+        if trip is None:
+            raise SystemExit(f"Cannot find triplets list in {path}")
+    # Normalize to list of (r,c,v)
+    norm = []
+    for t in trip:
+        if isinstance(t, list) and len(t) >= 3:
+            r,c,v = int(t[0]), int(t[1]), int(t[2])
+            norm.append((r,c,v))
+        elif isinstance(t, dict):
+            # try common dict keys
+            if {'row','col','val'}.issubset(t.keys()):
+                norm.append((int(t['row']), int(t['col']), int(t['val'])))
+            elif {'r','c','v'}.issubset(t.keys()):
+                norm.append((int(t['r']), int(t['c']), int(t['v'])))
+            else:
+                raise SystemExit(f"Unrecognized triplet dict format in {path}: {t}")
+        else:
+            raise SystemExit(f"Unrecognized triplet entry in {path}: {t}")
+    return norm
+
+def main():
+    ap = argparse.ArgumentParser(description="Reconstruct integer triplets via CRT (triplet files must be in current directory)")
+    ap.add_argument('--primes', nargs='+', type=int, required=True, help='Primes in the same order used for kernels')
+    ap.add_argument('--out', required=True, help='Output integer triplets JSON path')
+    ap.add_argument('--verify', action='store_true', help='Verify reconstructed integers reduce to original residues')
+    ap.add_argument('--min-n-primes', type=int, default=1, help='Minimum number of primes that must have a nonzero residue to consider entry (default 1)')
+    args = ap.parse_args()
+
+    primes = [int(p) for p in args.primes]
+    out_path = Path(args.out)
+    triplet_dir = Path('.')  # triplet files must be in current working directory
+
+    # Load per-prime triplet maps: (r,c) -> residue
+    per_prime_maps = []
+    union_keys = set()
+    print("[+] Loading per-prime triplets from current directory...")
+    for p in primes:
+        path = triplet_dir / f"saved_inv_p{p}_triplets.json"
+        if not path.exists():
+            raise SystemExit(f"Triplet file not found in current directory: {path}")
+        trip = load_triplets_file(path)
+        mp = {}
+        for (r,c,v) in trip:
+            # normalize residue to 0..p-1
+            rv = int(v) % p
+            mp[(r,c)] = rv
+            union_keys.add((r,c))
+        per_prime_maps.append(mp)
+        print(f"    loaded p={p}: {len(trip)} nonzero entries")
+
+    M_total = 1
+    for p in primes:
+        M_total *= p
+    print(f"[+] Product of primes M = {M_total} (bits: {M_total.bit_length()})")
+    print(f"[+] Union of positions to process: {len(union_keys)} entries")
+
+    reconstructed = []
+    conflicts = []
+    idx = 0
+    # iterate through union and CRT each
+    for (r,c) in sorted(union_keys):
+        idx += 1
+        if idx % 10000 == 0:
+            print(f"  processed {idx}/{len(union_keys)}")
+        residues = []
+        nonzero_count = 0
+        for i,p in enumerate(primes):
+            res = per_prime_maps[i].get((r,c), 0) % p
+            residues.append((p, int(res)))
+            if res != 0:
+                nonzero_count += 1
+        if nonzero_count < args.min_n_primes and nonzero_count == 0:
+            # skip entries that are zero everywhere
+            continue
+        # do CRT
+        try:
+            xmod, M = iterative_crt(residues)
+        except Exception as exc:
+            conflicts.append({"r": r, "c": c, "note": f"crt_failed: {exc}"})
+            continue
+        # map to signed representative in (-M/2, M/2]
+        if xmod > M // 2:
+            x_signed = xmod - M
+        else:
+            x_signed = xmod
+        # if zero after sign mapping, skip
+        if x_signed == 0:
+            continue
+        reconstructed.append([int(r), int(c), int(x_signed)])
+        # optional immediate verify per-prime
+        if args.verify:
+            for (p,res) in residues:
+                if (x_signed % p) != res:
+                    conflicts.append({"r": r, "c": c, "p": p, "res_expected": res, "res_from_int": int(x_signed % p)})
+                    break
+
+    print(f"[+] Reconstructed integer triplets: {len(reconstructed)} nonzero entries")
+    if args.verify:
+        if conflicts:
+            print(f"[!] Verification conflicts found: {len(conflicts)}")
+            # write conflicts file for inspection
+            (out_path.parent / (out_path.stem + "_conflicts.json")).write_text(json.dumps(conflicts, indent=2))
+            print(f"[!] Wrote conflicts to {out_path.parent / (out_path.stem + '_conflicts.json')}")
+        else:
+            print("[+] All reconstructed integers reduce correctly to per-prime residues")
+
+    # Write output JSON
+    out_data = {
+        "primes_used": primes,
+        "crt_product": str(M_total),
+        "triplets": reconstructed
+    }
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, 'w') as f:
+        json.dump(out_data, f, indent=2)
+
+    print(f"[+] Wrote integer triplets JSON to {out_path}")
+    if conflicts:
+        print("[!] NOTE: conflicts present; inspect the conflicts JSON before using the triplets")
+        sys.exit(2)
+    else:
+        sys.exit(0)
+
+if __name__ == '__main__':
+    main()
+```
+
+output:
+
+```verbatim
+c:\math>python reconstruct_integer_triplets_via_crt.py --primes 53 79 131 157 313 443 521 547 599 677 911 --out validator_v2/saved_inv_triplets_integer.json --verify
+[+] Loading per-prime triplets from current directory...
+    loaded p=53: 122640 nonzero entries
+    loaded p=79: 122640 nonzero entries
+    loaded p=131: 122640 nonzero entries
+    loaded p=157: 122640 nonzero entries
+    loaded p=313: 122640 nonzero entries
+    loaded p=443: 122640 nonzero entries
+    loaded p=521: 122640 nonzero entries
+    loaded p=547: 122640 nonzero entries
+    loaded p=599: 122640 nonzero entries
+    loaded p=677: 122640 nonzero entries
+    loaded p=911: 122640 nonzero entries
+[+] Product of primes M = 1257132026085202124689385321 (bits: 91)
+[+] Union of positions to process: 122640 entries
+  processed 10000/122640
+  processed 20000/122640
+  processed 30000/122640
+  processed 40000/122640
+  processed 50000/122640
+  processed 60000/122640
+  processed 70000/122640
+  processed 80000/122640
+  processed 90000/122640
+  processed 100000/122640
+  processed 110000/122640
+  processed 120000/122640
+[+] Reconstructed integer triplets: 122640 nonzero entries
+[+] All reconstructed integers reduce correctly to per-prime residues
+[+] Wrote integer triplets JSON to validator_v2\saved_inv_triplets_integer.json
+```
+
+We then validated with the following file:
+
+```python
+#!/usr/bin/env python3
+"""
+clear_denominators_and_verify.py
+
+Reads a rational basis JSON produced by rational_kernel_basis.py,
+clears denominators to produce integer kernel vectors, saves them,
+and verifies M * w == 0 exactly using an integer triplet file.
+
+Usage:
+  python3 clear_denominators_and_verify.py \
+    --rational-basis kernel_basis_Q_v2_fixed.json \
+    --triplets validator_v2/saved_inv_triplets_integer.json \
+    --out-prefix kernel_basis_integer
+
+Outputs:
+  <out-prefix>_vectors.json
+  <out-prefix>_matrix.npy
+  <out-prefix>_verification.json
+"""
+import argparse
+import json
+import math
+from pathlib import Path
+
+def lcm(a, b):
+    return abs(a // math.gcd(a, b) * b) if a and b else abs(a or b)
+
+def parse_triplets(trip_path):
+    d = json.load(open(trip_path))
+    if isinstance(d, dict) and 'triplets' in d:
+        trip = d['triplets']
+    elif isinstance(d, list):
+        trip = d
+    else:
+        # try to find a list value
+        trip = None
+        for v in d.values():
+            if isinstance(v, list):
+                trip = v
+                break
+        if trip is None:
+            raise ValueError("Cannot find triplets in file")
+    normalized = []
+    for t in trip:
+        if isinstance(t, list) and len(t) >= 3:
+            r,c,v = int(t[0]), int(t[1]), int(t[2])
+            normalized.append((r,c,v))
+        elif isinstance(t, dict) and {'row','col','val'}.issubset(t.keys()):
+            normalized.append((int(t['row']), int(t['col']), int(t['val'])))
+        else:
+            raise ValueError("Unrecognized triplet format: " + str(t))
+    return normalized
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--rational-basis', required=True, help='Rational basis JSON (from rational_kernel_basis.py)')
+    ap.add_argument('--triplets', required=True, help='Integer triplets JSON (e.g., saved_inv_triplets_integer.json)')
+    ap.add_argument('--out-prefix', default='kernel_basis_integer', help='Output prefix for files')
+    args = ap.parse_args()
+
+    rb_path = Path(args.rational_basis)
+    trip_path = Path(args.triplets)
+    out_prefix = Path(args.out_prefix)
+
+    data = json.load(open(rb_path))
+    basis = data.get('basis')
+    if basis is None:
+        raise SystemExit("No 'basis' key in rational basis JSON")
+
+    n_vectors = len(basis)
+    n_coeffs = len(basis[0]) if n_vectors > 0 else 0
+    print(f"[+] Loading rational basis: {n_vectors} vectors x {n_coeffs} coeffs")
+
+    # Compute LCM denominators and integer vectors
+    integer_vectors = []
+    lcms = []
+    for i, vec in enumerate(basis):
+        l = 1
+        for j, entry in enumerate(vec):
+            if entry is None:
+                continue
+            d = int(entry['d'])
+            l = lcm(l, d)
+        lcms.append(l)
+        w = []
+        for j, entry in enumerate(vec):
+            if entry is None:
+                w.append(0)
+            else:
+                n = int(entry['n'])
+                d = int(entry['d'])
+                wj = (n * (l // d))
+                w.append(wj)
+        integer_vectors.append(w)
+
+    # Build output paths robustly using Path
+    vec_json_path = out_prefix.with_name(out_prefix.name + "_vectors.json")
+    npy_path = out_prefix.with_name(out_prefix.name + "_matrix.npy")
+    ver_path = out_prefix.with_name(out_prefix.name + "_verification.json")
+
+    out_data = {
+        "n_vectors": n_vectors,
+        "n_coeffs": n_coeffs,
+        "lcms": [str(x) for x in lcms],
+        "vectors": [ [str(v) for v in row] for row in integer_vectors ]
+    }
+    vec_json_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(vec_json_path, 'w') as f:
+        json.dump(out_data, f, indent=2)
+    print(f"[+] Wrote integer vectors JSON to {vec_json_path}")
+
+    # Save NPY (object dtype) with numpy
+    try:
+        import numpy as np
+        arr = np.empty((n_vectors, n_coeffs), dtype=object)
+        for i in range(n_vectors):
+            for j in range(n_coeffs):
+                arr[i,j] = integer_vectors[i][j]
+        # npy_path is a Path; convert to str
+        np.save(str(npy_path), arr, allow_pickle=True)
+        print(f"[+] Saved integer matrix (numpy .npy) to {npy_path}")
+    except Exception as e:
+        print("[!] numpy save failed:", e)
+        npy_path = None
+
+    # Verification: compute Mat * w == 0 using triplets
+    print("[+] Loading triplets for exact verification...")
+    triplets = parse_triplets(trip_path)
+    # infer nrows
+    maxr = 0
+    for (r,c,v) in triplets:
+        if r > maxr:
+            maxr = r
+    n_rows = maxr + 1
+    print(f"[+] Triplets loaded: {len(triplets)} entries; inferred n_rows = {n_rows}")
+
+    # For each vector compute residuals per row
+    nonzero_rows = 0
+    worst_abs = 0
+    bad_rows = {}
+    for vi, w in enumerate(integer_vectors):
+        # accumulate row sums as python ints
+        row_sums = [0] * n_rows
+        for (r,c,v) in triplets:
+            # skip out-of-range columns
+            if c < 0 or c >= n_coeffs:
+                continue
+            row_sums[r] += v * w[c]
+        # check any non-zero
+        for r, s in enumerate(row_sums):
+            if s != 0:
+                nonzero_rows += 1
+                worst_abs = max(worst_abs, abs(s))
+                bad_rows.setdefault(vi, []).append({"row": r, "residual": str(s)})
+        # optionally free row_sums
+    verification = {
+        "n_vectors": n_vectors,
+        "n_coeffs": n_coeffs,
+        "triplet_count": len(triplets),
+        "nonzero_residual_rows": nonzero_rows,
+        "max_abs_residual": str(worst_abs),
+        "bad_rows_sample": {str(k): v for k,v in list(bad_rows.items())[:20]}
+    }
+    with open(ver_path, 'w') as f:
+        json.dump(verification, f, indent=2)
+    print(f"[+] Wrote verification summary to {ver_path}")
+
+    if nonzero_rows == 0:
+        print("[+] Verification OK: all M*w == 0")
+    else:
+        print(f"[!] Verification FAILED: {nonzero_rows} nonzero residual rows (see {ver_path})")
+
+if __name__ == "__main__":
+    main()
+```
+
+I got:
+
+```verbatim
+c:\math>python clear_denominators_and_verify.py --rational-basis kernel_basis_Q_v2_fixed.json --triplets validator_v2/saved_inv_triplets_integer.json --out-prefix kernel_basis_integer
+[+] Loading rational basis: 707 vectors x 2590 coeffs
+[+] Wrote integer vectors JSON to kernel_basis_integer_vectors.json
+[+] Saved integer matrix (numpy .npy) to kernel_basis_integer_matrix.npy
+[+] Loading triplets for exact verification...
+[+] Triplets loaded: 122640 entries; inferred n_rows = 2590
+[+] Wrote verification summary to kernel_basis_integer_verification.json
+[!] Verification FAILED: 583 nonzero residual rows (see kernel_basis_integer_verification.json)
+```
+
+I created the following script:
+
+```
+#!/usr/bin/env python3
+"""
+find_bad_vectors.py
+
+Find all kernel vectors that produced nonzero residuals in exact integer verification.
+
+Usage:
+  python find_bad_vectors.py \
+    --vectors kernel_basis_integer_vectors.json \
+    --triplets validator_v2/saved_inv_triplets_integer.json \
+    --out bad_vectors_report.json
+
+Outputs:
+ - Prints a short summary to stdout
+ - Writes a JSON report with per-vector counts and sample residuals.
+"""
+import argparse, json
+from pathlib import Path
+
+def load_integer_vectors(path):
+    d = json.load(open(path, 'r'))
+    vecs = [[int(x) for x in row] for row in d['vectors']]
+    return vecs
+
+def load_triplets(path):
+    d = json.load(open(path, 'r'))
+    trip = d.get('triplets') if isinstance(d, dict) else d
+    if trip is None:
+        for v in d.values():
+            if isinstance(v, list):
+                trip = v
+                break
+    if trip is None:
+        raise SystemExit("Cannot find triplets list in " + str(path))
+    norm = []
+    for t in trip:
+        if isinstance(t, list) and len(t) >= 3:
+            norm.append((int(t[0]), int(t[1]), int(t[2])))
+        elif isinstance(t, dict) and {'row','col','val'}.issubset(t.keys()):
+            norm.append((int(t['row']), int(t['col']), int(t['val'])))
+        else:
+            raise SystemExit("Unrecognized triplet entry: " + str(t))
+    return norm
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--vectors', required=True, help='kernel_basis_integer_vectors.json')
+    ap.add_argument('--triplets', required=True, help='integer triplets JSON (reconstructed via CRT)')
+    ap.add_argument('--out', default='bad_vectors_report.json', help='output report (JSON)')
+    args = ap.parse_args()
+
+    vecs = load_integer_vectors(args.vectors)
+    triplets = load_triplets(args.triplets)
+    n_rows = max(r for r,_,_ in triplets) + 1
+    n_coeffs = len(vecs[0]) if vecs else 0
+    print(f"Loaded {len(vecs)} vectors (n_coeffs={n_coeffs}), triplets: {len(triplets)} entries, inferred n_rows={n_rows}")
+
+    bad_report = {}
+    total_bad_rows = 0
+    max_per_vector = 0
+    # Pre-group triplets by row for faster accumulation
+    trip_by_row = {}
+    for r,c,v in triplets:
+        trip_by_row.setdefault(r, []).append((c,v))
+
+    for vi, w in enumerate(vecs):
+        # compute row sums
+        nonzero_rows = []
+        max_abs = 0
+        for r in sorted(trip_by_row.keys()):
+            s = 0
+            for (c,v) in trip_by_row[r]:
+                if 0 <= c < len(w):
+                    s += v * w[c]
+            if s != 0:
+                nonzero_rows.append({"row": r, "residual": str(s)})
+                max_abs = max(max_abs, abs(s))
+        if nonzero_rows:
+            bad_report[str(vi)] = {
+                "n_bad_rows": len(nonzero_rows),
+                "max_abs_residual": str(max_abs),
+                "sample_bad_rows": nonzero_rows[:10]  # sample up to 10
+            }
+            total_bad_rows += len(nonzero_rows)
+            if len(nonzero_rows) > max_per_vector:
+                max_per_vector = len(nonzero_rows)
+
+    out = {
+        "n_vectors": len(vecs),
+        "n_coeffs": n_coeffs,
+        "triplet_count": len(triplets),
+        "total_bad_vectors": len(bad_report),
+        "total_bad_rows": total_bad_rows,
+        "max_bad_rows_for_vector": max_per_vector,
+        "bad_vectors": bad_report
+    }
+    with open(args.out, 'w') as f:
+        json.dump(out, f, indent=2)
+    print(f"Wrote report to {args.out}")
+    print(f"total bad vectors: {len(bad_report)}, total bad rows: {total_bad_rows}")
+    if bad_report:
+        # Print a short table of first few bad vectors
+        print("First few bad vectors (index, n_bad_rows, max_abs_residual):")
+        cnt = 0
+        for vi, info in sorted(bad_report.items(), key=lambda kv: int(kv[0])):
+            print(vi, info["n_bad_rows"], info["max_abs_residual"])
+            cnt += 1
+            if cnt >= 10:
+                break
+
+if __name__ == '__main__':
+    main()
+```
+
+result:
+
+```verbatim
+c:\math>python find_bad_vectors.py --vectors kernel_basis_integer_vectors.json --triplets validator_v2/saved_inv_triplets_integer.json --out bad_vectors_report.json
+Loaded 707 vectors (n_coeffs=2590), triplets: 122640 entries, inferred n_rows=2590
+Wrote report to bad_vectors_report.json
+total bad vectors: 1, total bad rows: 583
+First few bad vectors (index, n_bad_rows, max_abs_residual):
+132 583 3205506998046217445889396569715021243029387863270118193724675225097613085988070708804711366170819342238244845474580795994510474694861678852301670892757227832048418165262586934012068209140742967377467619367133211658641967755853516398051689464948497284821836796767345502555857321747397574334405770358792897051301560899834594604702677683537099184300663297933110270533650710846559416823896599049780698551277119193531629757127890460307425281860190638053861552242000
+```
+
+as a result the only bad index is 132, therefore I run the following script:
+
+```python
+#!/usr/bin/env python3
+import argparse, json
+from pathlib import Path
+
+def load_integer_vectors(path):
+    d = json.load(open(path))
+    return [[int(x) for x in row] for row in d['vectors']]
+
+def load_triplets(path):
+    d = json.load(open(path))
+    trip = d.get('triplets') if isinstance(d, dict) else d
+    if trip is None:
+        for v in d.values():
+            if isinstance(v, list):
+                trip = v; break
+    return [(int(t[0]), int(t[1]), int(t[2])) for t in trip]
+
+def load_perprime_triplets(primes):
+    per = {}
+    for p in primes:
+        fname = Path(f"saved_inv_p{p}_triplets.json")
+        if not fname.exists():
+            raise SystemExit(f"missing {fname}")
+        per[p] = load_triplets(str(fname))
+    return per
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--vec-json', default='kernel_basis_integer_vectors.json')
+    ap.add_argument('--triplets', default='validator_v2/saved_inv_triplets_integer.json')
+    ap.add_argument('--primes', nargs='*', type=int, default=[53,79,131,157,313,443,521,547,599,677,911])
+    ap.add_argument('--vec', type=int, required=True, help='vector index to debug')
+    args = ap.parse_args()
+
+    vecs = load_integer_vectors(args.vec_json)
+    if args.vec < 0 or args.vec >= len(vecs):
+        raise SystemExit(f"vec index {args.vec} out of range (0..{len(vecs)-1})")
+    W = vecs[args.vec]
+    print(f"Loaded vector {args.vec}: length {len(W)}; nonzeros {sum(1 for x in W if x!=0)}")
+
+    trip = load_triplets(args.triplets)
+    n_rows = max(r for r,_,_ in trip)+1
+    print("Integer triplet entries:", len(trip), "inferred rows:", n_rows)
+
+    # compute integer residuals
+    row_sums = [0]*n_rows
+    for (r,c,v) in trip:
+        if 0 <= c < len(W):
+            row_sums[r] += v * W[c]
+    nz = [(r,s) for r,s in enumerate(row_sums) if s!=0]
+    print("Nonzero integer residuals count:", len(nz))
+    for (r,s) in nz[:20]:
+        print(" row", r, "residual", s)
+
+    # CRT modulus
+    M = 1
+    for p in args.primes: M *= p
+    print("CRT product M =", M)
+
+    # show sample residuals modulo M and quotient
+    print("\nSample residuals modulo M (first 10):")
+    for (r,s) in nz[:10]:
+        print(r, "res mod M =", s % M, "quotient =", s // M)
+
+    # compute per-prime modular residuals using per-prime triplets
+    per = load_perprime_triplets(args.primes)
+    for p in args.primes:
+        trip_p = per[p]
+        nrows_p = max(r for r,_,_ in trip_p)+1
+        row_sums_p = [0]*nrows_p
+        for (r,c,v) in trip_p:
+            if 0 <= c < len(W):
+                row_sums_p[r] = (row_sums_p[r] + (v % p) * (W[c] % p)) % p
+        nzp = [(r,s) for r,s in enumerate(row_sums_p) if s!=0]
+        print(f"\nprime {p}: nonzero rows mod {p} = {len(nzp)}; sample (first 10):", nzp[:10])
+
+if __name__ == '__main__':
+    main()
+```
+
+result:
+
+```verbatim
+c:\math>python debug_vector_residuals.py --vec 132
+Loaded vector 132: length 2590; nonzeros 1786
+Integer triplet entries: 122640 inferred rows: 2590
+Nonzero integer residuals count: 583
+ row 36 residual 232415141044151760863678216802561455057349991491119101311754933754451512724977190205891128228291861342054445280750093609895902789714901753813296139039650624668912347489774173743255104226564412053916353371442622028469392563768299302804860540442596293112768961834528594703512353428964369502864473414438666668016550725591458554431666690414019009580237014016540371712580686867140178801288557048392612656617503129173929744170205578674468805212647353087098704000
+ row 44 residual -16092408518944013816518667302757700099918281946615991079814487418140900848206579513987534498468324039807950816433554476975219822005793163738161792273674932892657921427156071806869258045434885201905072478798779859150295247631298918006953740678929932830932186934678528840720916061344355301809657030669326497322829142790154318529466187856824385971273963826812346569160961929477885462512274039409039568154115681214610002119142775994558232425857074173736927600000
+ row 46 residual -15790608557651828512736825199454013692394106079103518880871297526544625911467575632153090328837094170943397502810672800758280594213307245668962669417503890550238561613621765090722079177838982906509605572011920380480103499226587996636778805851294876856717289953398590298640922976454961453327043072308379583768461227894015847981653589950115595310750318995777513213374542569365759035860407661836239816245479751374812200833662247743711904888726356185335587580000
+ row 47 residual -32184817037888027633037334605515400199836563893231982159628974836281801696413159027975068996936648079615901632867108953950439644011586327476323584547349865785315842854312143613738516090869770403810144957597559718300590495262597836013907481357859865661864373869357057681441832122688710603619314061338652994645658285580308637058932375713648771942547927653624693138321923858955770925024548078818079136308231362429220004238285551989116464851714148347473855200000
+ row 48 residual -16092408518944013816518667302757700099918281946615991079814487418140900848206579513987534498468324039807950816433554476975219822005793163738161792273674932892657921427156071806869258045434885201905072478798779859150295247631298918006953740678929932830932186934678528840720916061344355301809657030669326497322829142790154318529466187856824385971273963826812346569160961929477885462512274039409039568154115681214610002119142775994558232425857074173736927600000
+ row 49 residual -16092408518944013816518667302757700099918281946615991079814487418140900848206579513987534498468324039807950816433554476975219822005793163738161792273674932892657921427156071806869258045434885201905072478798779859150295247631298918006953740678929932830932186934678528840720916061344355301809657030669326497322829142790154318529466187856824385971273963826812346569160961929477885462512274039409039568154115681214610002119142775994558232425857074173736927600000
+ row 52 residual -31106243739283653900766244456897914557429961263355322680852195627544502372829955049965018550753111161193689572090878579209249637944781522967647484524433468761880418934944259616521173604434523497932651109804603931034739244691415753769031989118046657456889512588603636154834074799948593953169169506962973866554707434781263095157035005741451300924822130636411580271168746304155134582281373335848896952998508975110313392662633587856561231670614650505091692420000
+ row 54 residual -15749710768835893927023924001762057285851732651538480095069031309959067802614121654145742109244204925235379875878596628479125187743149584439228301687406608266606621241095365786119825135919440783672399038137282207933797626970461806940649704584109850291594121437482280724317449249489594981949202454072339237814203975518050755642488983086326352586302136953492049121860252428916382113307375129077214568872799646090813757846806898384705078369808736523022192020000
+ row 55 residual -14871812688760927911001135368316354560871826236509924399812164519106612180128496833247685482248299241044170294735762991129239712166050346596658440417053244856634583895201924086066361159838207456931500910908256878276038055880613291409883339756509633064394911855494891129603923597802301730269316395500709657277898895670075707942061547319450483649932722815657270671426972385151272467081542462474970863486020250940188570557737669529454694481884367446651996780000
+ row 68 residual -64369634075776055266074669211030800399673127786463964319257949672563603392826318055950137993873296159231803265734217907900879288023172654952647169094699731570631685708624287227477032181739540807620289915195119436601180990525195672027814962715719731323728747738714115362883664245377421207238628122677305989291316571160617274117864751427297543885095855307249386276643847717911541850049096157636158272616462724858440008476571103978232929703428296694947710400000
+ row 70 residual -193007305799126190551905283807853568762743383294435062658435649194379934932922777942316823637023950889658701962872291293956933508871397634033569201190798447137582977175130209667495228008845448152970973544920963795361106776263280200230758557692979863812363961049853141497002744696907801182190775699499780363461693287763968767011203116669170055411292107658426331977029182961123109611307830462094631064082331023333085484756583211899331542405617027708109540120000
+ row 71 residual -64369634075776055266074669211030800399673127786463964319257949672563603392826318055950137993873296159231803265734217907900879288023172654952647169094699731570631685708624287227477032181739540807620289915195119436601180990525195672027814962715719731323728747738714115362883664245377421207238628122677305989291316571160617274117864751427297543885095855307249386276643847717911541850049096157636158272616462724858440008476571103978232929703428296694947710400000
+ row 73 residual -64369634075776055266074669211030800399673127786463964319257949672563603392826318055950137993873296159231803265734217907900879288023172654952647169094699731570631685708624287227477032181739540807620289915195119436601180990525195672027814962715719731323728747738714115362883664245377421207238628122677305989291316571160617274117864751427297543885095855307249386276643847717911541850049096157636158272616462724858440008476571103978232929703428296694947710400000
+ row 76 residual -21621253878215145886477562919629563922026499168965863085688603807423815544461749803324099419910171684472274048727494252308279371898380861458244707086823550107562681113504770140177684800165202390494734161092582937394295329213363632355929606810246832450416176380278296410932601711623861224562056270398556007379459332696093355077090157973123671660842024335297269412863051494296407487932327389780174932982226218607570818786749669101849389057810240441781248520000
+ row 77 residual -129319116319675243170111303345766520088224371853996799441562700487338822205272972185059836773491580327584199595858302517890779916698639093849404499794867503362960435576563126018561492002293395120641817848972046212744434415143917803416610004198226816214227833947860165310921612060177145702101354652985186812100466396448154024105200571014030216116677978479066906591180984274250697365909815926654335677059102665052466245574045813999476423282176449460371458400000
+ row 78 residual -129029192235613676851130320883914060443785313713462364040039299916233014495462804148480056380619086323023903063663369166846269246372492201877349418992133483252111903496905850236757778182886238367941198839681142542973398198097154573736119964814833139430842664712644198018344470275465994058289305449169899395341549769384694286170465036934312651943434844546782839572234339855036890533004004120963326111146014057384673131263594010977971141344516521425133439600000
+ row 80 residual -86116102851762973340413874743226860177336561855819721160534000134523945566911925444513297718036888883536034219840557228245683054357043765242251306262333662205024113024489658751773090061726544496194338896217729585239277537747024125717576656337686651881690166220168121109755360778547713253463553367385028735814005388610949436758555202649447622686704274341949915387805108043095862632971273349205887262735038907479046458945879941659149188208897656961834966000000
+ row 86 residual -21553186053279207195018550557627753348037395308999466573593783414556470367545495364176639462248596721264033265976383752981796652783106515641567416632477917227160072596093854336426915333715565853440302974828674368790739069190652967236101667366371136035704638991310027551820268676696190950350225775497531135350077732741359004017533428502338369352779663079844484431863497379041782894318302654442389279509850444175411040929007635666579403880362741576728576400000
+ row 88 residual -64107995053078161772719862760371735852011619013841053256800074991763581415635080844831022325436250483720417054022279443858970219253592944628188374645001278451962804150258149337097970524130635416093795630996560354874489742456153844646094102723529454643196154457960330329408605815973375461966210911085466868385502138593094156444094507263840725952832801758266728330019047774679047789605186854857118362174995525235189490599730541504911135033239956669029835360000
+ row 91 residual -21372435101335511028075538834727799199221687098563072625042117332337658239623469772182487493162291423362451016734220674683767015631462547028663919970808480923355597058438404281178168646447453378674923567918724048516843490337659217306066197957405696858893966811282125814855615746109516286767491693179060888266334574366359068927139352604114360406433792036342792184595048976580580210748392544288729387117263642917066055967398171572680164799305273568307988920000
+CRT product M = 1257132026085202124689385321
+
+Sample residuals modulo M (first 10):
+36 res mod M = 0 quotient = 184877273207261227135135915861401306307873606620353923785318907060289789279244958375326591133338768601706321079793813347206431844693645300550293163568960310720898124135102157469610628420976901327064182520819377119606083409176629690286925674965409600852058476452154629268594091436429626190005858098246994338123807096794845544525017903411966887727440115577874199066175133077051475646908760963664179943449431571975510439448931024000
+44 res mod M = 0 quotient = -12800889791231323549457562258619181639736564495281550828048360800857003089573096928053857596128824584979364975603871849028743505864597642906400458431662810926458958968524708660650163803259961534434420963270979961102157076197392193128590308299563722207763805362355300094289042636119031405324308008385259199982879175490458504868215032339398102575643136021320595028117490533674204796786839658033148755999970458605389384386679535600000
+46 res mod M = 0 quotient = -12560819571851095294087350405396256210567724831036465265820039644396737023401606173546536768930517916437568514400944495082198461839526900005391893803332624108535909115939209365856796443644744680546411413639360998904865290837238712951743003504702611541067346478657926009148007876964940022003823456907972692363838151795510644855660415953963471920977606571832918736333573749537104178805613585244001722650478739995074719125232813980000
+47 res mod M = 0 quotient = -25601779582462647098915124517238363279473128990563101656096721601714006179146193856107715192257649169958729951207743698057487011729195285812800916863325621852917917937049417321300327606519923068868841926541959922204314152394784386257180616599127444415527610724710600188578085272238062810648616016770518399965758350980917009736430064678796205151286272042641190056234981067348409593573679316066297511999940917210778768773359071200000
+48 res mod M = 0 quotient = -12800889791231323549457562258619181639736564495281550828048360800857003089573096928053857596128824584979364975603871849028743505864597642906400458431662810926458958968524708660650163803259961534434420963270979961102157076197392193128590308299563722207763805362355300094289042636119031405324308008385259199982879175490458504868215032339398102575643136021320595028117490533674204796786839658033148755999970458605389384386679535600000
+49 res mod M = 0 quotient = -12800889791231323549457562258619181639736564495281550828048360800857003089573096928053857596128824584979364975603871849028743505864597642906400458431662810926458958968524708660650163803259961534434420963270979961102157076197392193128590308299563722207763805362355300094289042636119031405324308008385259199982879175490458504868215032339398102575643136021320595028117490533674204796786839658033148755999970458605389384386679535600000
+52 res mod M = 0 quotient = -24743816157600162984961746717333902946262951367745946212191403863586808258729578862865661229444893897889667178439949302783468759154276882034465683453964201594750999118776556728635241408749072486845993501411594520166715477354249441090767274303592459139294592044284922349138777970018475283230177264755600318817125001135342458574319510334966075822856024765314342178501960344826823283959470417974368496797210173483592162236896866020000
+54 res mod M = 0 quotient = -12528286959549988633693392008776999681777445363367229108979162683024779443575107561831652806675422221367567964520851974778644337068134248020654356302554441324020312696234338296239606286771505984638704568845150476809276801471938652052801860184992591633294051784050851338354173163762083596713891865146904357560233903082090437866328055275154821595930307042793743284393837877494631278075275547860214485457139742862006694756203733620000
+55 res mod M = 0 quotient = -11829952924732020777297864474933973676689348065203971471785143451005951130630615482605619491713526371581541856804319587050200024374041774026007292163283715333894259629510572555165570925431587492287366736209946501731944232816693567899802366676698778794831851818556220834061005508396330091698908975129614292895582300156199997913296938195528661976287456068801046023613919800221369227938331476826540082419754886580561904023424759180000
+68 res mod M = 0 quotient = -51203559164925294197830249034476726558946257981126203312193443203428012358292387712215430384515298339917459902415487396114974023458390571625601833726651243705835835874098834642600655213039846137737683853083919844408628304789568772514361233198254888831055221449421200377156170544476125621297232033541036799931516701961834019472860129357592410302572544085282380112469962134696819187147358632132595023999881834421557537546718142400000
+
+prime 53: nonzero rows mod 53 = 0; sample (first 10): []
+
+prime 79: nonzero rows mod 79 = 0; sample (first 10): []
+
+prime 131: nonzero rows mod 131 = 0; sample (first 10): []
+
+prime 157: nonzero rows mod 157 = 0; sample (first 10): []
+
+prime 313: nonzero rows mod 313 = 0; sample (first 10): []
+
+prime 443: nonzero rows mod 443 = 0; sample (first 10): []
+
+prime 521: nonzero rows mod 521 = 0; sample (first 10): []
+
+prime 547: nonzero rows mod 547 = 0; sample (first 10): []
+
+prime 599: nonzero rows mod 599 = 0; sample (first 10): []
+
+prime 677: nonzero rows mod 677 = 0; sample (first 10): []
+
+prime 911: nonzero rows mod 911 = 0; sample (first 10): []
+```
+
+Plan now is to compute more prime invariants and kernels to see if this mitigates the problem. I will then add the needed files to the invariant folder in validator_v2 folder so that kernel reconstruction can take place on users end with all proper primes. So far planning to recompute the following additional primes that are mod 13: [937, 1093, 1171, 1223, 1249, 1301, 1327, 1483]
+
+After which I will recompute the kernels and do same process as update 2 but with all additional primes [53, 79, 131, 157, 313, 443, 521, 547, 599, 677, 911, 937, 1093, 1171, 1223, 1249, 1301, 1327, 1483] in update 4!
+
+---
 
 **END OF ARTIFACT**
