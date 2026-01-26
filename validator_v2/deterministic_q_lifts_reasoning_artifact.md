@@ -21,8 +21,6 @@ Eliminate **all** reliance on rank-stability heuristics by producing determinist
 4. **Data Integrity Checksums** (SHA-256 verification)
 5. **Complete Reproducibility Instructions** (end-to-end protocol)
 
-**Current Status**: We have **rank ≥ 1883 over ℤ** (unconditional). This artifact provides the path to **complete ℚ-certification**.
-
 ---
 
 ## **📊 STATUS SUMMARY (updated)**
