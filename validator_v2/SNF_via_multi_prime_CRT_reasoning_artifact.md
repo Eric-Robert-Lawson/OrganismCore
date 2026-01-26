@@ -2,6 +2,8 @@
 
 **PUTTING OFF FOR LATER, PRIORITIZING PERIOD COMPUTATIONS INSTEAD!**
 
+**NOT CRITICAL AND REQUIRED FOR COUNTEREXAMPLE PROOF**
+
 ## **🎯 OBJECTIVE**
 
 **Goal:** Compute the Smith Normal Form (SNF) of the 16×16 intersection matrix for algebraic cycles over ℤ, yielding the **exact rank** of the algebraic cycle group (currently upper-bounded at ≤12).
