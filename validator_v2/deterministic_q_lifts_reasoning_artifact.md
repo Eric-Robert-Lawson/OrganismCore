@@ -11,6 +11,8 @@
 
 **Update 4: big jump, status significantly changed and we proven deterministic ℚ-lift and CP3 Barrier over ℚ**
 
+**Update 5 SNF PATH BLOCKED DUE TO ALREADY KNOWN BLOCKER validator_v2/intersection_matrix_reasoning_artifact.md **
+
 ## **🎯 OBJECTIVE**
 
 Eliminate **all** reliance on rank-stability heuristics by producing deterministic certificates over ℚ for:
@@ -3668,6 +3670,17 @@ c:\math>python clear_denominators_and_verify.py --rational-basis kernel_basis_Q_
 | **Data Checksums** | ⚠️ Partial — triplets & bases produced but checksums not yet recorded | ✅ Add SHA256 manifest for all key artifacts | **Low** | 1 day (recommended now) |
 | **Reproducibility** | ✅ End‑to‑end protocol + artifacts saved (M2 outputs, kernel_p*.json, kernel_basis_Q_v3.json, CRT triplets, integer verification) | ✅ Full reproducibility achievable with manifest | **Low** | 1 day (finalize manifest) |
 
+---
+
+**UPDATE 5**
+
+SNF PATH BLOCKED DUE TO ALREADY KNOWN BLOCKER validator_v2/intersection_matrix_reasoning_artifact.md 
 
 ---
 **END OF ARTIFACT**
+
+
+
+
+
+
