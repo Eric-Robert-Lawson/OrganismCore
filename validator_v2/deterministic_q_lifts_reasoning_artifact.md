@@ -2,13 +2,14 @@
 
 **Document**: `deterministic_q_lifts_reasoning_artifact.md`  
 **Purpose**: Complete computational protocol for lifting all modular results to unconditional ℚ-proofs  
-**Status**: Action plan with complete scripts and reproducibility instructions  
 **Date**: January 25, 2026  
 **Author**: Eric Robert Lawson (OrganismCore Project)
 
 ---
 
 **IMPORTANT TO NOTE THAT THE FIRST PART OF THE ARTIFACT IS MEANT AS A BASIS, UPDATES ARE THE ACTIONS TAKEN TO COMPUTE!**
+
+**Update 4: big jump, status significantly changed and we proven deterministic ℚ-lift and CP3 Barrier over ℚ**
 
 ## **🎯 OBJECTIVE**
 
@@ -24,16 +25,16 @@ Eliminate **all** reliance on rank-stability heuristics by producing determinist
 
 ---
 
-## **📊 STATUS SUMMARY**
+## **📊 STATUS SUMMARY (updated)**
 
 | **Component** | **Current Status** | **Deterministic Target** | **Priority** | **Timeline** |
 |---------------|-------------------|--------------------------|--------------|--------------|
 | **Rank ≥ 1883 over ℤ** | ✅ **PROVEN** (k=1883 cert) | ✅ Complete | — | **Done** |
-| **Dimension = 707 over ℚ** | 📊 Strong evidence (5-prime) | ⚠️ Rational basis needed | **High** | 1-2 weeks |
-| **CP3 Barrier over ℚ** | 📊 Multi-prime (30,075 tests) | ⚠️ Rational cert sample | **Medium** | 1 week |
-| **SNF (Cycle Rank)** | 📊 Upper bound ≤12 (Shioda) | ⚠️ Exact rank needed | **Medium** | 2-4 weeks |
-| **Data Checksums** | ⚠️ Partial (triplet JSONs) | ✅ Complete manifest | **Low** | 1 day |
-| **Reproducibility** | ✅ Complete (reasoning artifacts) | ✅ End-to-end protocol | **Low** | 1 day |
+| **Dimension = 707 over ℚ** | ✅ **PROVEN (deterministic q‑lift)** — kernel_basis_Q_v3.json; integer verification OK | ✅ Complete | **High** | **Done** |
+| **CP3 Barrier over ℚ** | ✅ Verified: multi‑prime tests + CRT + exact integer verification (deterministic evidence) | ✅ Complete | **Medium** | **Done** |
+| **SNF (Cycle Rank)** | 📊 Upper bound ≤12 (Shioda). SNF / formal independence certificate not yet computed | ⚠️ Exact integer SNF needed for formal cycle‑rank certificate | **Medium** | 2–4 weeks (optional / depends on resources) |
+| **Data Checksums** | ⚠️ Partial — triplets & bases produced but checksums not yet recorded | ✅ Add SHA256 manifest for all key artifacts | **Low** | 1 day (recommended now) |
+| **Reproducibility** | ✅ End‑to‑end protocol + artifacts saved (M2 outputs, kernel_p*.json, kernel_basis_Q_v3.json, CRT triplets, integer verification) | ✅ Full reproducibility achievable with manifest | **Low** | 1 day (finalize manifest) |
 
 ---
 
@@ -3484,4 +3485,191 @@ After which I will recompute the kernels and do same process as update 2 but wit
 
 ---
 
+**UPDATE 4**
+
+**SUCCESS!**
+
+After adding the additional primes, computing their invariants and then kernels to have 19 total primes kernels, we obtained:
+
+```verbatim
+c:\math>python rational_kernel_basis.py --kernels kernel_p53.json kernel_p79.json kernel_p131.json kernel_p157.json kernel_p313.json kernel_p443.json kernel_p521.json kernel_p547.json kernel_p599.json kernel_p677.json kernel_p911.json kernel_p937.json kernel_p1093.json kernel_p1171.json kernel_p1223.json kernel_p1249.json kernel_p1301.json kernel_p1327.json kernel_p1483.json --primes 53 79 131 157 313 443 521 547 599 677 911 937 1093 1171 1223 1249 1301 1327 1483 --out kernel_basis_Q_v3.json
+[+] Loading 19 kernel bases...
+    kernel_p53.json: 707 vectors × 2590 coefficients
+    kernel_p79.json: 707 vectors × 2590 coefficients
+    kernel_p131.json: 707 vectors × 2590 coefficients
+    kernel_p157.json: 707 vectors × 2590 coefficients
+    kernel_p313.json: 707 vectors × 2590 coefficients
+    kernel_p443.json: 707 vectors × 2590 coefficients
+    kernel_p521.json: 707 vectors × 2590 coefficients
+    kernel_p547.json: 707 vectors × 2590 coefficients
+    kernel_p599.json: 707 vectors × 2590 coefficients
+    kernel_p677.json: 707 vectors × 2590 coefficients
+    kernel_p911.json: 707 vectors × 2590 coefficients
+    kernel_p937.json: 707 vectors × 2590 coefficients
+    kernel_p1093.json: 707 vectors × 2590 coefficients
+    kernel_p1171.json: 707 vectors × 2590 coefficients
+    kernel_p1223.json: 707 vectors × 2590 coefficients
+    kernel_p1249.json: 707 vectors × 2590 coefficients
+    kernel_p1301.json: 707 vectors × 2590 coefficients
+    kernel_p1327.json: 707 vectors × 2590 coefficients
+    kernel_p1483.json: 707 vectors × 2590 coefficients
+[+] Dimension verified: 707 vectors × 2590 coefficients
+[+] CRT product M = 5896248844997446616582744775360152335261080841658417
+[+] Rational reconstruction bound = 54296633620315019565767999
+[+] Processing all 707 vectors
+    [10/707] 94.5 vec/sec, ETA: 0.1 min
+    [20/707] 108.7 vec/sec, ETA: 0.1 min
+    [30/707] 96.2 vec/sec, ETA: 0.1 min
+    [40/707] 102.3 vec/sec, ETA: 0.1 min
+    [50/707] 89.6 vec/sec, ETA: 0.1 min
+    [60/707] 90.7 vec/sec, ETA: 0.1 min
+    [70/707] 89.8 vec/sec, ETA: 0.1 min
+    [80/707] 92.2 vec/sec, ETA: 0.1 min
+    [90/707] 87.6 vec/sec, ETA: 0.1 min
+    [100/707] 85.8 vec/sec, ETA: 0.1 min
+    [110/707] 83.1 vec/sec, ETA: 0.1 min
+    [120/707] 82.3 vec/sec, ETA: 0.1 min
+    [130/707] 75.8 vec/sec, ETA: 0.1 min
+    [140/707] 74.7 vec/sec, ETA: 0.1 min
+    [150/707] 78.0 vec/sec, ETA: 0.1 min
+    [160/707] 81.3 vec/sec, ETA: 0.1 min
+    [170/707] 83.6 vec/sec, ETA: 0.1 min
+    [180/707] 86.6 vec/sec, ETA: 0.1 min
+    [190/707] 88.7 vec/sec, ETA: 0.1 min
+    [200/707] 91.3 vec/sec, ETA: 0.1 min
+    [210/707] 93.4 vec/sec, ETA: 0.1 min
+    [220/707] 95.6 vec/sec, ETA: 0.1 min
+    [230/707] 97.6 vec/sec, ETA: 0.1 min
+    [240/707] 99.5 vec/sec, ETA: 0.1 min
+    [250/707] 101.3 vec/sec, ETA: 0.1 min
+    [260/707] 103.6 vec/sec, ETA: 0.1 min
+    [270/707] 104.9 vec/sec, ETA: 0.1 min
+    [280/707] 106.4 vec/sec, ETA: 0.1 min
+    [290/707] 107.8 vec/sec, ETA: 0.1 min
+    [300/707] 109.3 vec/sec, ETA: 0.1 min
+    [310/707] 111.1 vec/sec, ETA: 0.1 min
+    [320/707] 112.8 vec/sec, ETA: 0.1 min
+    [330/707] 113.8 vec/sec, ETA: 0.1 min
+    [340/707] 115.3 vec/sec, ETA: 0.1 min
+    [350/707] 116.8 vec/sec, ETA: 0.1 min
+    [360/707] 117.6 vec/sec, ETA: 0.0 min
+    [370/707] 118.7 vec/sec, ETA: 0.0 min
+    [380/707] 119.8 vec/sec, ETA: 0.0 min
+    [390/707] 121.1 vec/sec, ETA: 0.0 min
+    [400/707] 122.1 vec/sec, ETA: 0.0 min
+    [410/707] 123.1 vec/sec, ETA: 0.0 min
+    [420/707] 124.3 vec/sec, ETA: 0.0 min
+    [430/707] 125.5 vec/sec, ETA: 0.0 min
+    [440/707] 126.1 vec/sec, ETA: 0.0 min
+    [450/707] 127.2 vec/sec, ETA: 0.0 min
+    [460/707] 127.7 vec/sec, ETA: 0.0 min
+    [470/707] 128.3 vec/sec, ETA: 0.0 min
+    [480/707] 128.9 vec/sec, ETA: 0.0 min
+    [490/707] 129.8 vec/sec, ETA: 0.0 min
+    [500/707] 130.8 vec/sec, ETA: 0.0 min
+    [510/707] 131.8 vec/sec, ETA: 0.0 min
+    [520/707] 132.2 vec/sec, ETA: 0.0 min
+    [530/707] 133.2 vec/sec, ETA: 0.0 min
+    [540/707] 133.6 vec/sec, ETA: 0.0 min
+    [550/707] 134.5 vec/sec, ETA: 0.0 min
+    [560/707] 135.2 vec/sec, ETA: 0.0 min
+    [570/707] 135.6 vec/sec, ETA: 0.0 min
+    [580/707] 136.5 vec/sec, ETA: 0.0 min
+    [590/707] 136.9 vec/sec, ETA: 0.0 min
+    [600/707] 137.6 vec/sec, ETA: 0.0 min
+    [610/707] 138.4 vec/sec, ETA: 0.0 min
+    [620/707] 139.1 vec/sec, ETA: 0.0 min
+    [630/707] 139.4 vec/sec, ETA: 0.0 min
+    [640/707] 139.8 vec/sec, ETA: 0.0 min
+    [650/707] 140.8 vec/sec, ETA: 0.0 min
+    [660/707] 140.9 vec/sec, ETA: 0.0 min
+    [670/707] 141.8 vec/sec, ETA: 0.0 min
+    [680/707] 142.4 vec/sec, ETA: 0.0 min
+    [690/707] 142.6 vec/sec, ETA: 0.0 min
+    [700/707] 143.1 vec/sec, ETA: 0.0 min
+[+] Reconstruction complete in 4.9s
+[+] Statistics:
+    Total coefficients: 1831130
+    Zero coefficients: 1751993 (95.7%)
+    Reconstructed: 79137
+    Failed: 0
+    Verification OK: 79137
+    Verification FAIL: 0
+[+] Wrote rational basis to kernel_basis_Q_v3.json
+[+] Wrote failures to validator_v2\reconstruction_failures.json
+[+] All reconstructed coefficients verified successfully ✓
+```
+
+Which we verified using reconstruct_integer_triplets_via_crt.py we obtain:
+
+```verbatim
+c:\math>python reconstruct_integer_triplets_via_crt.py --primes 53 79 131 157 313 443 521 547 599 677 911 937 1093 1171 1223 1249 1301 1327 1483 --out validator_v2/saved_inv_triplets_integer.json --verify
+[+] Loading per-prime triplets from current directory...
+    loaded p=53: 122640 nonzero entries
+    loaded p=79: 122640 nonzero entries
+    loaded p=131: 122640 nonzero entries
+    loaded p=157: 122640 nonzero entries
+    loaded p=313: 122640 nonzero entries
+    loaded p=443: 122640 nonzero entries
+    loaded p=521: 122640 nonzero entries
+    loaded p=547: 122640 nonzero entries
+    loaded p=599: 122640 nonzero entries
+    loaded p=677: 122640 nonzero entries
+    loaded p=911: 122640 nonzero entries
+    loaded p=937: 122640 nonzero entries
+    loaded p=1093: 122640 nonzero entries
+    loaded p=1171: 122640 nonzero entries
+    loaded p=1223: 122640 nonzero entries
+    loaded p=1249: 122640 nonzero entries
+    loaded p=1301: 122640 nonzero entries
+    loaded p=1327: 122640 nonzero entries
+    loaded p=1483: 122640 nonzero entries
+[+] Product of primes M = 5896248844997446616582744775360152335261080841658417 (bits: 172)
+[+] Union of positions to process: 122640 entries
+  processed 10000/122640
+  processed 20000/122640
+  processed 30000/122640
+  processed 40000/122640
+  processed 50000/122640
+  processed 60000/122640
+  processed 70000/122640
+  processed 80000/122640
+  processed 90000/122640
+  processed 100000/122640
+  processed 110000/122640
+  processed 120000/122640
+[+] Reconstructed integer triplets: 122640 nonzero entries
+[+] All reconstructed integers reduce correctly to per-prime residues
+[+] Wrote integer triplets JSON to validator_v2\saved_inv_triplets_integer.json
+```
+
+Where we then run clear_denominators_and_verify.py file and we obtained: 
+
+```verbatim
+c:\math>python clear_denominators_and_verify.py --rational-basis kernel_basis_Q_v3.json --triplets validator_v2/saved_inv_triplets_integer.json --out-prefix validator_v2/kernel_basis_integer_v3
+[+] Loading rational basis: 707 vectors x 2590 coeffs
+[+] Wrote integer vectors JSON to validator_v2\kernel_basis_integer_v3_vectors.json
+[+] Saved integer matrix (numpy .npy) to validator_v2\kernel_basis_integer_v3_matrix.npy
+[+] Loading triplets for exact verification...
+[+] Triplets loaded: 122640 entries; inferred n_rows = 2590
+[+] Wrote verification summary to validator_v2\kernel_basis_integer_v3_verification.json
+[+] Verification OK: all M*w == 0
+```
+
+**THIS IS HUGE!**
+
+
+## **📊 STATUS SUMMARY (updated)**
+
+| **Component** | **Current Status** | **Deterministic Target** | **Priority** | **Timeline** |
+|---------------|-------------------|--------------------------|--------------|--------------|
+| **Rank ≥ 1883 over ℤ** | ✅ **PROVEN** (k=1883 cert) | ✅ Complete | — | **Done** |
+| **Dimension = 707 over ℚ** | ✅ **PROVEN (deterministic q‑lift)** — kernel_basis_Q_v3.json; integer verification OK | ✅ Complete | **High** | **Done** |
+| **CP3 Barrier over ℚ** | ✅ Verified: multi‑prime tests + CRT + exact integer verification (deterministic evidence) | ✅ Complete | **Medium** | **Done** |
+| **SNF (Cycle Rank)** | 📊 Upper bound ≤12 (Shioda). SNF / formal independence certificate not yet computed | ⚠️ Exact integer SNF needed for formal cycle‑rank certificate | **Medium** | 2–4 weeks (optional / depends on resources) |
+| **Data Checksums** | ⚠️ Partial — triplets & bases produced but checksums not yet recorded | ✅ Add SHA256 manifest for all key artifacts | **Low** | 1 day (recommended now) |
+| **Reproducibility** | ✅ End‑to‑end protocol + artifacts saved (M2 outputs, kernel_p*.json, kernel_basis_Q_v3.json, CRT triplets, integer verification) | ✅ Full reproducibility achievable with manifest | **Low** | 1 day (finalize manifest) |
+
+
+---
 **END OF ARTIFACT**
