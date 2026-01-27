@@ -2523,4 +2523,20 @@ TOP 50 CALABI-YAU 4-FOLDS by h^{2,2} (CORRECTED)
 
 **This is huge and I will investigate this.**
 
+- Significance: A sweep of the Hirst & Schettini weight‑system database produced extraordinary candidate Calabi–Yau fourfolds with record‑scale middle cohomology (claimed maximum h^{2,2} = 1,213,644). If verified, these examples extend the empirical landscape by orders of magnitude and provide high‑leverage data for questions about algebraic vs. transcendental middle classes and for phenomenology that depends on middle‑cohomology counts.
+
+- What we found so far: Agent 5 identified 12 weight systems that share the reported maximum h^{2,2}; the top candidate (weights [1,1,84,516,1204,1806]) shows extreme asymmetry (h^{1,1}=252, h^{1,3}=303,148), producing a >99.97% “aperiodic” gap (h^{2,2} minus small divisor counts). These numbers are consistent with the LG‑model outputs in the repository but are extraordinary enough to demand independent exact verification.
+
+- Why caution is required: reported Hodge numbers can be corrupted by (i) float/rounding errors in combinatorial LG code, (ii) CRT/reconstruction mistakes, or (iii) ambient/orbifold singularities and unresolved contributions (primitive vs. orbifold Hodge counts). Claims about the proportion of algebraic (rational) classes crucially depend on the Picard number ρ; small ρ strengthens the claim that most H^4 is non‑divisor.
+
+- Verification approach (planned, minimal sufficient pipeline):
+  1. Obtain provenance: request the exact defining polynomial(s) and the authors’ modular prime lists / kernel files.
+  2. Cheap sanity checks: intradivisibility(ws), EulerNumber(ws), and Poincare_approx_clean(ws) to confirm gross consistency.
+  3. Exact LG verification: re‑run the LG computation in exact arithmetic (or modular arithmetic + CRT) to reproduce the reported Poincaré polynomial and Hodge numbers.
+  4. Geometric checks: run Jacobian / singular‑locus tests (Macaulay2) and compute classGroup/Picard proxy to bound ρ.
+  5. Variable‑count sampling: test a statistically meaningful sample of reconstructed H^{2,2} vectors (or the full h^{1,1} divisor basis) for low‑variable support to estimate the rational % without enumerating 1.2M classes.
+  6. Produce a provenance bundle (raw inputs, prime lists, exact logs, checksums) and publish a verification report or erratum if discrepancies appear.
+
+- Outcome scope: If all checks pass, this is a major validated database discovery (extreme h^{2,2} families). If errors or singularities are found, we will document the divergence, correct the record, and extract robust lessons (code hardening, modular pipelines) for future MARS searches.
+
 ---
