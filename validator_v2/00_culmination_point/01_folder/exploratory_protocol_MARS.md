@@ -1715,3 +1715,13 @@ Create: `verified_candidates.json`
 **Ready to deploy agents!** 🚀
 
 Copy Agent 1-5 prompts (Section 6) to separate LLM sessions and begin search.
+
+---
+
+**UPDATE 1**
+
+found: https://github.com/Tancredi-Schettini-Gherardini/P5CY4ML
+
+This is huge dataset for hodge numbers of 4-fold, but no picard numbers.
+
+The file is 22.6mb in size, but type is strange. When put into text file it is 75mb+ so I cannot upload to AI agent. Can only upload to github in compressed form. Exploring parsing with scripts. But this is huge discovery for database of hodge numbers!
