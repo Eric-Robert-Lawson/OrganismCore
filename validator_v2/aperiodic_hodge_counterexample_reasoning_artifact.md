@@ -5190,6 +5190,4 @@ print "======================================================================";
 
 and results:
 
-```verbatim
-pending
-```
+abandoned, computationally intractable! Will continue exploring. but this concludes the file for now.
