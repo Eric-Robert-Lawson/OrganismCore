@@ -1720,8 +1720,491 @@ Copy Agent 1-5 prompts (Section 6) to separate LLM sessions and begin search.
 
 **UPDATE 1**
 
-found: https://github.com/Tancredi-Schettini-Gherardini/P5CY4ML
+found: https://github.com/Tancredi-Schettini-Gherardini/P5CY4ML (THANK YOU!)
 
 This is huge dataset for hodge numbers of 4-fold, but no picard numbers.
 
 The file is 22.6mb in size, but type is strange. When put into text file it is 75mb+ so I cannot upload to AI agent. Can only upload to github in compressed form. Exploring parsing with scripts. But this is huge discovery for database of hodge numbers!
+
+downloaded the file and utilized the following script:
+
+```python
+#!/usr/bin/env python3
+"""
+Parse Calabi-Yau 4-fold dataset from 5dTransWH.all.gz
+Extract weight systems and Hodge numbers
+Filter and sort by h^{2,2}
+"""
+
+import gzip
+import re
+import csv
+from collections import defaultdict
+
+def parse_line(line):
+    """
+    Parse one line of 5dTransWH.all.gz
+    
+    Example input:
+    1 1 1 1 1 1 6=d M:462 6 N:7 6 V:1,0,426 [2610]
+    
+    Returns dict with:
+    - weights: [w0, w1, w2, w3, w4, w5]
+    - degree: sum of weights
+    - h11, h12, h22: Hodge numbers
+    - chi: Euler characteristic
+    """
+    parts = line.strip().split()
+    
+    if len(parts) < 10:
+        return None
+    
+    try:
+        # Weight system (first 6 integers)
+        weights = [int(parts[i]) for i in range(6)]
+        
+        # Degree (format: "6=d" or "6d")
+        degree_str = parts[6]
+        if '=' in degree_str:
+            degree = int(degree_str.split('=')[0])
+        else:
+            degree = int(degree_str.replace('d', ''))
+        
+        # Hodge numbers V:h11,h12,h22
+        v_match = re.search(r'V:([\d,]+)', line)
+        if not v_match:
+            return None
+        
+        hodge_parts = v_match.group(1).split(',')
+        h11 = int(hodge_parts[0])
+        h12 = int(hodge_parts[1])
+        h22 = int(hodge_parts[2])
+        
+        # Euler characteristic [chi]
+        chi_match = re.search(r'\[(-?\d+)\]', line)
+        chi = int(chi_match.group(1)) if chi_match else None
+        
+        return {
+            'weights': weights,
+            'degree': degree,
+            'h11': h11,
+            'h12': h12,
+            'h22': h22,
+            'chi': chi,
+            'raw_line': line.strip()
+        }
+        
+    except (ValueError, IndexError) as e:
+        print(f"Error parsing line: {line.strip()}")
+        print(f"Error: {e}")
+        return None
+
+
+def main():
+    """Main parsing function"""
+    
+    print("=" * 60)
+    print("CALABI-YAU 4-FOLD PARSER")
+    print("=" * 60)
+    print()
+    
+    # Configuration
+    input_file = '5dTransWH.all.gz'
+    output_csv = 'cy4_dataset.csv'
+    min_h22 = 500  # Minimum h^{2,2} to include
+    
+    print(f"Reading from: {input_file}")
+    print(f"Filtering: h^{{2,2}} >= {min_h22}")
+    print(f"Output to: {output_csv}")
+    print()
+    
+    # Parse file
+    all_data = []
+    filtered_data = []
+    line_count = 0
+    error_count = 0
+    
+    print("Parsing file...")
+    
+    with gzip.open(input_file, 'rt') as f:
+        for line in f:
+            line_count += 1
+            
+            # Progress indicator
+            if line_count % 100000 == 0:
+                print(f"  Processed {line_count:,} lines... "
+                      f"(Found {len(filtered_data):,} with h22 >= {min_h22})")
+            
+            # Parse line
+            entry = parse_line(line)
+            
+            if entry is None:
+                error_count += 1
+                continue
+            
+            all_data.append(entry)
+            
+            # Filter by h22
+            if entry['h22'] >= min_h22:
+                filtered_data.append(entry)
+    
+    print()
+    print("=" * 60)
+    print("PARSING COMPLETE")
+    print("=" * 60)
+    print(f"Total lines: {line_count:,}")
+    print(f"Successfully parsed: {len(all_data):,}")
+    print(f"Parsing errors: {error_count:,}")
+    print(f"Entries with h^{{2,2}} >= {min_h22}: {len(filtered_data):,}")
+    print()
+    
+    # Statistics
+    if all_data:
+        h22_values = [d['h22'] for d in all_data]
+        print("STATISTICS (all entries):")
+        print(f"  h^{{2,2}} min:    {min(h22_values):,}")
+        print(f"  h^{{2,2}} max:    {max(h22_values):,}")
+        print(f"  h^{{2,2}} mean:   {sum(h22_values) / len(h22_values):,.1f}")
+        print(f"  h^{{2,2}} median: {sorted(h22_values)[len(h22_values)//2]:,}")
+        print()
+    
+    # Sort filtered data by h22 (descending)
+    filtered_data.sort(key=lambda x: x['h22'], reverse=True)
+    
+    # Show top 10
+    print("TOP 10 by h^{2,2}:")
+    print("-" * 60)
+    for i, entry in enumerate(filtered_data[:10], 1):
+        weights_str = ','.join(map(str, entry['weights']))
+        print(f"{i:2d}. [{weights_str}]  h^{{2,2}} = {entry['h22']:,}  "
+              f"h^{{1,1}} = {entry['h11']}  χ = {entry['chi']:,}")
+    print()
+    
+    # Save to CSV
+    if filtered_data:
+        print(f"Saving filtered data to {output_csv}...")
+        
+        with open(output_csv, 'w', newline='') as csvfile:
+            fieldnames = ['rank', 'w0', 'w1', 'w2', 'w3', 'w4', 'w5', 
+                         'degree', 'h11', 'h12', 'h22', 'chi']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            
+            writer.writeheader()
+            
+            for rank, entry in enumerate(filtered_data, 1):
+                writer.writerow({
+                    'rank': rank,
+                    'w0': entry['weights'][0],
+                    'w1': entry['weights'][1],
+                    'w2': entry['weights'][2],
+                    'w3': entry['weights'][3],
+                    'w4': entry['weights'][4],
+                    'w5': entry['weights'][5],
+                    'degree': entry['degree'],
+                    'h11': entry['h11'],
+                    'h12': entry['h12'],
+                    'h22': entry['h22'],
+                    'chi': entry['chi']
+                })
+        
+        print(f"✓ Saved {len(filtered_data):,} entries to {output_csv}")
+    
+    print()
+    print("DONE!")
+    print("=" * 60)
+
+
+if __name__ == '__main__':
+    main()
+```
+
+result:
+
+```verbatim
+============================================================
+CALABI-YAU 4-FOLD PARSER
+============================================================
+
+Reading from: 5dTransWH.all.gz
+Filtering: h^{2,2} >= 500
+Output to: cy4_dataset.csv
+
+Parsing file...
+  Processed 100,000 lines... (Found 40,540 with h22 >= 500)
+  Processed 200,000 lines... (Found 82,600 with h22 >= 500)
+  Processed 300,000 lines... (Found 126,673 with h22 >= 500)
+  Processed 400,000 lines... (Found 172,607 with h22 >= 500)
+  Processed 500,000 lines... (Found 219,943 with h22 >= 500)
+  Processed 600,000 lines... (Found 268,042 with h22 >= 500)
+  Processed 700,000 lines... (Found 316,080 with h22 >= 500)
+  Processed 800,000 lines... (Found 365,021 with h22 >= 500)
+  Processed 900,000 lines... (Found 416,278 with h22 >= 500)
+  Processed 1,000,000 lines... (Found 471,210 with h22 >= 500)
+  Processed 1,100,000 lines... (Found 534,477 with h22 >= 500)
+
+============================================================
+PARSING COMPLETE
+============================================================
+Total lines: 1,100,055
+Successfully parsed: 1,100,055
+Parsing errors: 0
+Entries with h^{2,2} >= 500: 534,477
+
+STATISTICS (all entries):
+  h^{2,2} min:    1
+  h^{2,2} max:    303,148
+  h^{2,2} mean:   2,300.3
+  h^{2,2} median: 468
+
+TOP 10 by h^{2,2}:
+------------------------------------------------------------
+ 1. [1,1,84,516,1204,1806]  h^{2,2} = 303,148  h^{1,1} = 252  χ = 1,820,448
+ 2. [1,1,83,510,1190,1785]  h^{2,2} = 299,707  h^{1,1} = 253  χ = 1,799,808
+ 3. [1,1,78,479,1118,1677]  h^{2,2} = 281,581  h^{1,1} = 259  χ = 1,691,088
+ 4. [1,1,77,473,1104,1656]  h^{2,2} = 278,140  h^{1,1} = 260  χ = 1,670,448
+ 5. [1,1,72,444,1036,1554]  h^{2,2} = 261,857  h^{1,1} = 223  χ = 1,572,528
+ 6. [1,1,70,430,1003,1505]  h^{2,2} = 252,721  h^{1,1} = 279  χ = 1,518,048
+ 7. [1,1,69,424,989,1484]  h^{2,2} = 249,280  h^{1,1} = 280  χ = 1,497,408
+ 8. [1,1,67,413,964,1446]  h^{2,2} = 243,731  h^{1,1} = 229  χ = 1,463,808
+ 9. [1,1,64,393,917,1376]  h^{2,2} = 231,154  h^{1,1} = 286  χ = 1,388,688
+10. [1,1,84,432,1036,1554]  h^{2,2} = 230,787  h^{1,1} = 253  χ = 1,386,288
+
+Saving filtered data to cy4_dataset.csv...
+✓ Saved 534,477 entries to cy4_dataset.csv
+
+DONE!
+============================================================
+```
+
+
+also did another script for quick top 50:
+
+```python
+#!/usr/bin/env python3
+"""Quick extraction of top 50 CY4 by h^{2,2}"""
+
+import gzip
+import re
+
+def parse_line(line):
+    """Parse one line - simplified"""
+    parts = line.strip().split()
+    
+    try:
+        weights = [int(parts[i]) for i in range(6)]
+        
+        v_match = re.search(r'V:([\d,]+)', line)
+        if not v_match:
+            return None
+        
+        h11, h12, h22 = map(int, v_match.group(1).split(','))
+        
+        chi_match = re.search(r'\[(-?\d+)\]', line)
+        chi = int(chi_match.group(1)) if chi_match else None
+        
+        return {'weights': weights, 'h11': h11, 'h12': h12, 'h22': h22, 'chi': chi}
+    except:
+        return None
+
+# Parse file
+print("Loading data...")
+data = []
+
+with gzip.open('5dTransWH.all.gz', 'rt') as f:
+    for i, line in enumerate(f):
+        if i % 100000 == 0:
+            print(f"  {i:,} lines...")
+        
+        entry = parse_line(line)
+        if entry:
+            data.append(entry)
+
+print(f"\nTotal entries: {len(data):,}")
+
+# Sort by h22
+data.sort(key=lambda x: x['h22'], reverse=True)
+
+# Print top 50
+print("\n" + "="*70)
+print("TOP 50 CALABI-YAU 4-FOLDS by h^{2,2}")
+print("="*70)
+
+for i, entry in enumerate(data[:50], 1):
+    w = entry['weights']
+    print(f"{i:2d}. [{w[0]},{w[1]},{w[2]},{w[3]},{w[4]},{w[5]}]  "
+          f"h^{{1,1}}={entry['h11']:<3}  h^{{2,2}}={entry['h22']:>8,}  "
+          f"χ={entry['chi']:>9,}")
+
+print("="*70)
+```
+
+result:
+
+```verbatim
+Loading data...
+  0 lines...
+  100,000 lines...
+  200,000 lines...
+  300,000 lines...
+  400,000 lines...
+  500,000 lines...
+  600,000 lines...
+  700,000 lines...
+  800,000 lines...
+  900,000 lines...
+  1,000,000 lines...
+  1,100,000 lines...
+
+Total entries: 1,100,055
+
+======================================================================
+TOP 50 CALABI-YAU 4-FOLDS by h^{2,2}
+======================================================================
+ 1. [1,1,84,516,1204,1806]  h^{1,1}=252  h^{2,2}= 303,148  χ=1,820,448
+ 2. [1,1,83,510,1190,1785]  h^{1,1}=253  h^{2,2}= 299,707  χ=1,799,808
+ 3. [1,1,78,479,1118,1677]  h^{1,1}=259  h^{2,2}= 281,581  χ=1,691,088
+ 4. [1,1,77,473,1104,1656]  h^{1,1}=260  h^{2,2}= 278,140  χ=1,670,448
+ 5. [1,1,72,444,1036,1554]  h^{1,1}=223  h^{2,2}= 261,857  χ=1,572,528
+ 6. [1,1,70,430,1003,1505]  h^{1,1}=279  h^{2,2}= 252,721  χ=1,518,048
+ 7. [1,1,69,424,989,1484]  h^{1,1}=280  h^{2,2}= 249,280  χ=1,497,408
+ 8. [1,1,67,413,964,1446]  h^{1,1}=229  h^{2,2}= 243,731  χ=1,463,808
+ 9. [1,1,64,393,917,1376]  h^{1,1}=286  h^{2,2}= 231,154  χ=1,388,688
+10. [1,1,84,432,1036,1554]  h^{1,1}=253  h^{2,2}= 230,787  χ=1,386,288
+11. [1,1,83,427,1024,1536]  h^{1,1}=254  h^{2,2}= 228,186  χ=1,370,688
+12. [1,1,63,387,903,1354]  h^{1,1}=314  h^{2,2}= 227,486  χ=1,366,848
+13. [1,2,126,774,1806,2709]  h^{1,1}=314  h^{2,2}= 227,486  χ=1,366,848
+14. [1,2,125,768,1792,2688]  h^{1,1}=316  h^{2,2}= 225,644  χ=1,355,808
+15. [1,1,62,381,889,1333]  h^{1,1}=315  h^{2,2}= 224,045  χ=1,346,208
+16. [1,2,124,762,1778,2667]  h^{1,1}=315  h^{2,2}= 224,045  χ=1,346,208
+17. [1,1,60,370,863,1295]  h^{1,1}=247  h^{2,2}= 218,312  χ=1,311,402
+18. [1,2,120,737,1720,2580]  h^{1,1}=340  h^{2,2}= 216,596  χ=1,301,664
+19. [1,2,118,725,1692,2538]  h^{1,1}=341  h^{2,2}= 213,155  χ=1,281,024
+20. [1,1,56,348,812,1218]  h^{1,1}=177  h^{2,2}= 206,823  χ=1,242,048
+21. [1,1,57,350,817,1225]  h^{1,1}=321  h^{2,2}= 205,919  χ=1,237,488
+22. [1,2,114,700,1634,2451]  h^{1,1}=321  h^{2,2}= 205,919  χ=1,237,488
+23. [1,2,113,694,1620,2430]  h^{1,1}=323  h^{2,2}= 204,077  χ=1,226,448
+24. [1,2,112,688,1605,2408]  h^{1,1}=392  h^{2,2}= 202,208  χ=1,215,648
+25. [1,3,168,1032,2408,3612]  h^{1,1}=392  h^{2,2}= 202,208  χ=1,215,648
+26. [1,3,167,1026,2394,3591]  h^{1,1}=395  h^{2,2}= 200,957  χ=1,208,160
+27. [1,1,55,339,791,1187]  h^{1,1}=253  h^{2,2}= 200,186  χ=1,202,682
+28. [1,1,72,372,892,1338]  h^{1,1}=224  h^{2,2}= 199,576  χ=1,198,848
+29. [1,2,110,676,1577,2366]  h^{1,1}=393  h^{2,2}= 198,767  χ=1,195,008
+30. [1,3,165,1014,2366,3549]  h^{1,1}=393  h^{2,2}= 198,767  χ=1,195,008
+31. [1,1,54,333,777,1165]  h^{1,1}=278  h^{2,2}= 196,518  χ=1,180,824
+32. [1,2,108,666,1554,2331]  h^{1,1}=278  h^{2,2}= 196,518  χ=1,180,824
+33. [1,3,162,995,2322,3483]  h^{1,1}=433  h^{2,2}= 194,943  χ=1,172,304
+34. [1,1,70,360,863,1295]  h^{1,1}=280  h^{2,2}= 192,409  χ=1,156,182
+35. [1,1,52,323,754,1131]  h^{1,1}=182  h^{2,2}= 192,137  χ=1,153,962
+36. [1,3,159,977,2280,3420]  h^{1,1}=434  h^{2,2}= 191,502  χ=1,151,664
+37. [1,1,69,355,851,1277]  h^{1,1}=281  h^{2,2}= 189,808  χ=1,140,582
+38. [1,2,105,645,1505,2257]  h^{1,1}=470  h^{2,2}= 189,530  χ=1,140,048
+39. [1,4,210,1290,3010,4515]  h^{1,1}=470  h^{2,2}= 189,530  χ=1,140,048
+40. [1,4,209,1284,2996,4494]  h^{1,1}=478  h^{2,2}= 188,608  χ=1,134,528
+41. [1,2,103,635,1482,2223]  h^{1,1}=298  h^{2,2}= 187,330  χ=1,125,816
+42. [1,2,103,633,1477,2215]  h^{1,1}=471  h^{2,2}= 186,089  χ=1,119,408
+43. [1,4,206,1266,2954,4431]  h^{1,1}=471  h^{2,2}= 186,089  χ=1,119,408
+44. [1,3,154,946,2207,3311]  h^{1,1}=511  h^{2,2}= 185,289  χ=1,114,848
+45. [1,4,204,1253,2924,4386]  h^{1,1}=530  h^{2,2}= 184,080  χ=1,107,456
+46. [1,5,252,1548,3612,5418]  h^{1,1}=552  h^{2,2}= 181,888  χ=1,094,688
+47. [1,3,151,928,2165,3248]  h^{1,1}=512  h^{2,2}= 181,848  χ=1,094,208
+48. [1,2,100,614,1433,2150]  h^{1,1}=399  h^{2,2}= 180,641  χ=1,086,288
+49. [1,3,150,921,2150,3225]  h^{1,1}=399  h^{2,2}= 180,641  χ=1,086,288
+50. [1,4,200,1229,2868,4302]  h^{1,1}=531  h^{2,2}= 180,639  χ=1,086,816
+======================================================================
+```
+
+and then ran stats:
+
+```python
+#!/usr/bin/env python3
+"""Generate statistics from CY4 dataset"""
+
+import gzip
+import re
+from collections import Counter
+
+def parse_line(line):
+    parts = line.strip().split()
+    try:
+        weights = [int(parts[i]) for i in range(6)]
+        v_match = re.search(r'V:([\d,]+)', line)
+        if not v_match:
+            return None
+        h11, h12, h22 = map(int, v_match.group(1).split(','))
+        return {'weights': weights, 'h11': h11, 'h12': h12, 'h22': h22}
+    except:
+        return None
+
+print("Analyzing dataset...")
+data = []
+
+with gzip.open('5dTransWH.all.gz', 'rt') as f:
+    for line in f:
+        entry = parse_line(line)
+        if entry:
+            data.append(entry)
+
+print(f"\nTotal entries: {len(data):,}\n")
+
+# h^{2,2} distribution
+h22_values = [d['h22'] for d in data]
+h22_sorted = sorted(h22_values)
+
+print("h^{2,2} DISTRIBUTION:")
+print(f"  Minimum:    {min(h22_values):,}")
+print(f"  Maximum:    {max(h22_values):,}")
+print(f"  Mean:       {sum(h22_values)/len(h22_values):,.1f}")
+print(f"  Median:     {h22_sorted[len(h22_sorted)//2]:,}")
+print(f"  90th %ile:  {h22_sorted[int(0.9*len(h22_sorted))]:,}")
+print(f"  95th %ile:  {h22_sorted[int(0.95*len(h22_sorted))]:,}")
+print(f"  99th %ile:  {h22_sorted[int(0.99*len(h22_sorted))]:,}")
+print()
+
+# Count by threshold
+thresholds = [100, 500, 1000, 5000, 10000, 50000, 100000]
+print("COUNTS BY THRESHOLD:")
+for t in thresholds:
+    count = sum(1 for h in h22_values if h >= t)
+    pct = 100 * count / len(h22_values)
+    print(f"  h^{{2,2}} >= {t:>6,}:  {count:>8,}  ({pct:5.2f}%)")
+print()
+
+# h^{1,1} distribution
+h11_values = [d['h11'] for d in data]
+h11_counter = Counter(h11_values)
+print("h^{1,1} DISTRIBUTION:")
+for h11 in sorted(h11_counter.keys()):
+    count = h11_counter[h11]
+    pct = 100 * count / len(data)
+    print(f"  h^{{1,1}} = {h11}:  {count:>8,}  ({pct:5.2f}%)")
+```
+
+result:
+
+```verbatim
+Analyzing dataset...
+
+Total entries: 1,100,055
+
+h^{2,2} DISTRIBUTION:
+  Minimum:    1
+  Maximum:    303,148
+  Mean:       2,300.3
+  Median:     468
+  90th %ile:  4,908
+  95th %ile:  9,541
+  99th %ile:  30,969
+
+COUNTS BY THRESHOLD:
+  h^{2,2} >=    100:   896,733  (81.52%)
+  h^{2,2} >=    500:   534,477  (48.59%)
+  h^{2,2} >=  1,000:   372,395  (33.85%)
+  h^{2,2} >=  5,000:   108,018  ( 9.82%)
+  h^{2,2} >= 10,000:    52,194  ( 4.74%)
+  h^{2,2} >= 50,000:     5,082  ( 0.46%)
+  h^{2,2} >= 100,000:     1,275  ( 0.12%)
+
+
+(The rest is way too long, looks over h^{1,1} so compute yourself if you're curious)
+```
+AMAZING RESULTS FROM MARS PROTOCOL SO FAR! JUST ON THIS 1 FIND!
