@@ -748,7 +748,7 @@ end
 m2 scripts/verify_smoothness_c7.m2 > logs/smoothness.log 2>&1
 ```
 
-**Expected output:** (pending)
+**Expected output:** (FAILED for C7! Showed dim=0 for primes 29 and 43! Pending for C11!)
 ```
 ========================================
 SMOOTHNESS CHECK MOD p = 29
