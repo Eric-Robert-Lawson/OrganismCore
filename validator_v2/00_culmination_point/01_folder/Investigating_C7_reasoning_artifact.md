@@ -540,17 +540,41 @@ Time_C₇ ≈ 3.36 × (4000/1883)³ ≈ 3.36 × 9.6 ≈ 32 hours
 **Script:** `test_environment.m2`
 
 ```m2
--- Test Macaulay2 setup
-stdio << "Macaulay2 version: " << version#"VERSION" << endl;
-stdio << "Testing cyclotomic field construction..." << endl;
+-- ============================================================================
+-- TEST ENVIRONMENT: C₇ Computation Setup
+-- ============================================================================
 
--- Test basic cyclotomic field
-QQ[x];
+stdio << "Macaulay2 version: " << version#"VERSION" << endl;
+stdio << "Testing cyclotomic field construction..." << endl << endl;
+
+-- Test basic cyclotomic field construction
+-- Φ₇(x) = x⁶ + x⁵ + x⁴ + x³ + x² + x + 1
+
+R = QQ[x];
 phi7 = x^6 + x^5 + x^4 + x^3 + x^2 + x + 1;
-K = QQ[x] / ideal(phi7);
+
+stdio << "Cyclotomic polynomial Φ₇(x) = " << phi7 << endl;
+
+-- Create quotient ring K = QQ[x]/(Φ₇(x))
+K = R / ideal(phi7);
 
 stdio << "Cyclotomic field ℚ(ω₇) constructed successfully" << endl;
-stdio << "✓ Environment ready" << endl;
+stdio << "Ring: " << describe K << endl << endl;
+
+-- Test that x^7 - 1 is divisible by Φ₇(x)
+stdio << "Testing ω^7 - 1 modulo Φ₇(ω)..." << endl;
+
+-- Compute x^7 - 1 mod (x^6 + ... + 1)
+rem = (x^7 - 1) % phi7;
+stdio << "x^7 - 1 mod Φ₇(x) = " << rem << endl;
+
+if rem == 0 then (
+    stdio << "✓ Verification passed: ω^7 ≡ 1 (as expected)" << endl;
+) else (
+    stdio << "✗ Verification failed!" << endl;
+);
+
+stdio << endl << "✓ Environment ready for C₇ computation" << endl;
 
 end
 ```
@@ -560,17 +584,28 @@ end
 m2 test_environment.m2
 ```
 
-**Expected output:**
+**Expected output:** (verified by actually computing on macbook)
 ```
-Macaulay2 version: 1.25.x
 Testing cyclotomic field construction...
+
+                               6    5    4    3    2
+Cyclotomic polynomial Φ₇(x) = x  + x  + x  + x  + x  + x + 1
 Cyclotomic field ℚ(ω₇) constructed successfully
-✓ Environment ready
+                     R
+Ring: ------------------------------
+       6    5    4    3    2
+      x  + x  + x  + x  + x  + x + 1
+
+Testing ω^7 - 1 modulo Φ₇(ω)...
+x^7 - 1 mod Φ₇(x) = 0
+✓ Verification passed: ω^7 ≡ 1 (as expected)
+
+✓ Environment ready for C₇ computation
 ```
 
 ---
 
-### **Task 0.2: Create Working Directory Structure**
+### **Task 0.2: Create Working Directory Structure** (optional)
 
 ```bash
 mkdir -p c7_computation
@@ -595,7 +630,7 @@ mkdir -p {scripts,data,logs,certificates,analysis}
 
 **Goal:** Confirm V₇ is smooth (no singularities)
 
-**Method:** Singular locus test mod p for p ∈ {53, 79, 131}
+**Method:** Singular locus test mod p for p ∈ {29, 43, 71}
 
 **Script:** `verify_smoothness_c7.m2`
 
@@ -607,7 +642,7 @@ mkdir -p {scripts,data,logs,certificates,analysis}
 -- Runtime: ~30 minutes per prime
 -- ============================================================================
 
-primes = {53, 79, 131};
+primes = {29, 43, 71};
 
 verifySmoothnessModP = method();
 verifySmoothnessModP (ZZ) := p -> (
@@ -713,7 +748,7 @@ end
 m2 scripts/verify_smoothness_c7.m2 > logs/smoothness.log 2>&1
 ```
 
-**Expected output:**
+**Expected output:** (pending)
 ```
 ========================================
 SMOOTHNESS CHECK MOD p = 53
