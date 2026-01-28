@@ -630,118 +630,156 @@ mkdir -p {scripts,data,logs,certificates,analysis}
 
 **Goal:** Confirm V₇ is smooth (no singularities)
 
-**Method:** Singular locus test mod p for p ∈ {29, 43, 71}
+**Method:** Singular locus test mod p for p ∈ {29, 43, 71} (different primes depending on variation)
 
 **Script:** `verify_smoothness_c7.m2`
 
 ```m2
 -- ============================================================================
--- SMOOTHNESS VERIFICATION: C₇-Invariant Variety
+-- CORRECTED SMOOTHNESS VERIFICATION (WITH SATURATION)
 -- ============================================================================
--- Check singular locus is empty (EGA spreading-out principle)
--- Runtime: ~30 minutes per prime
+-- Computes PROJECTIVE singular locus (not affine cone)
 -- ============================================================================
 
-primes = {29, 43, 71};
+-- CONFIGURATION
+primesToTest = {53, 79, 131};
+cyclotomicOrder = 7;  -- Change to 13 for C13, 11 for C11, etc.
+
+-- ============================================================================
 
 verifySmoothnessModP = method();
-verifySmoothnessModP (ZZ) := p -> (
+verifySmoothnessModP (ZZ, ZZ) := (p, n) -> (
     stdio << "========================================" << endl;
-    stdio << "SMOOTHNESS CHECK MOD p = " << p << endl;
+    stdio << "SMOOTHNESS CHECK: C" << n << " mod p = " << p << endl;
     stdio << "========================================" << endl;
     
-    -- Define ring over F_p
-    R = ZZ/p[z_0..z_5];
-    
-    -- Primitive 7th root of unity mod p
-    -- Need p ≡ 1 (mod 7) for F_p to contain primitive 7th root
-    if (p % 7) != 1 then (
-        stdio << "WARNING: p ≢ 1 (mod 7), no primitive 7th root" << endl;
-        stdio << "Skipping this prime" << endl;
+    -- Check p ≡ 1 (mod n)
+    if (p % n) != 1 then (
+        stdio << "WARNING: p ≢ 1 (mod " << n << "), skipping" << endl;
         return null;
     );
     
-    -- Find primitive 7th root
+    -- Define ring
+    R = ZZ/p[z_0..z_5];
+    
+    -- Find primitive nth root of unity
     omega = null;
     for g from 2 to p-1 do (
-        if (g^7 % p) == 1 and (g^1 % p) != 1 then (
+        if (g^n % p) == 1 and (g^1 % p) != 1 then (
             omega = sub(g, R);
             break;
         );
     );
     
     if omega === null then (
-        stdio << "ERROR: Could not find primitive 7th root mod " << p << endl;
+        stdio << "ERROR: No primitive " << n << "th root found" << endl;
         return null;
     );
     
-    stdio << "Primitive 7th root: ω = " << omega << endl;
-    stdio << "Verification: ω^7 = " << omega^7 << endl;
+    stdio << "Primitive " << n << "th root: ω = " << omega << endl;
     
-    -- Define cyclotomic linear forms
-    L = new MutableList from apply(7, k -> (
-        sum apply(6, j -> omega^(k*j) * R_(j))
-    ));
+    -- Cyclotomic linear forms
+    L = apply(n, k -> sum apply(6, j -> omega^(k*j) * R_(j)));
     
-    stdio << "Cyclotomic linear forms defined" << endl;
-    
-    -- Define hypersurface F
-    F = sum apply(7, k -> L#k^8);
+    -- Hypersurface F
+    F = sum apply(n, k -> L#k^8);
     
     stdio << "Hypersurface F constructed" << endl;
     
-    -- Jacobian ideal (partial derivatives)
-    J = ideal(diff(z_0, F), diff(z_1, F), diff(z_2, F),
-              diff(z_3, F), diff(z_4, F), diff(z_5, F));
+    -- Jacobian ideal
+    J = ideal apply(6, i -> diff(R_i, F));
     
     stdio << "Jacobian ideal computed" << endl;
     
-    -- Add F to get singular locus
-    singLocus = J + ideal(F);
+    -- AFFINE singular locus (WRONG - includes cone point)
+    singAffine = J + ideal(F);
+    dimAffine = dim singAffine;
     
-    stdio << "Computing dimension of singular locus..." << endl;
+    stdio << "dim(affine singular locus) = " << dimAffine << endl;
     
-    dimSing = dim singLocus;
+    -- PROJECTIVE singular locus (CORRECT - saturate away irrelevant ideal)
+    I = ideal(z_0, z_1, z_2, z_3, z_4, z_5);
     
-    stdio << "========================================" << endl;
-    stdio << "RESULT FOR p = " << p << endl;
-    if dimSing == -1 then (
-        stdio << "✓ Singular locus is EMPTY (variety is smooth)" << endl;
+    stdio << "Saturating by irrelevant ideal..." << endl;
+    
+    singProj = saturate(singAffine, I);
+    dimProj = dim singProj;
+    
+    stdio << "dim(projective singular locus) = " << dimProj << endl;
+    
+    -- Check if saturation changed the ideal
+    if singProj == singAffine then (
+        stdio << "Note: Saturation did not change ideal" << endl;
     ) else (
-        stdio << "✗ Singular locus has dimension " << dimSing << endl;
-        stdio << "WARNING: Variety may be singular!" << endl;
+        stdio << "Note: Saturation removed affine cone components" << endl;
     );
+    
+    stdio << endl;
+    stdio << "========================================" << endl;
+    stdio << "RESULT FOR C" << n << " mod p = " << p << endl;
+    
+    if dimProj == -1 then (
+        stdio << "✓ PROJECTIVE singular locus is EMPTY" << endl;
+        stdio << "  → Variety is SMOOTH" << endl;
+    ) else (
+        stdio << "✗ PROJECTIVE singular locus has dimension " << dimProj << endl;
+        stdio << "  → Variety may be SINGULAR" << endl;
+    );
+    
     stdio << "========================================" << endl << endl;
     
-    return (dimSing == -1);
+    return (dimProj == -1);
 );
 
--- Main execution
+-- ============================================================================
+-- MAIN EXECUTION
+-- ============================================================================
+
+stdio << "Testing C" << cyclotomicOrder << " smoothness" << endl;
+stdio << "Primes: " << primesToTest << endl << endl;
+
 results = new MutableHashTable;
 
-for p in primes do (
-    results#p = verifySmoothnessModP(p);
+for p in primesToTest do (
+    results#p = verifySmoothnessModP(p, cyclotomicOrder);
 );
 
 -- Summary
-stdio << endl << "============================================" << endl;
+stdio << endl;
+stdio << "============================================" << endl;
 stdio << "SMOOTHNESS VERIFICATION SUMMARY" << endl;
 stdio << "============================================" << endl;
+stdio << "Variety: C" << cyclotomicOrder << "-invariant" << endl;
+stdio << "Primes tested: " << primesToTest << endl << endl;
 
-allSmooth = all(primes, p -> results#p === true);
+for p in primesToTest do (
+    stdio << "p = " << p << ": ";
+    if results#p === true then (
+        stdio << "✓ SMOOTH" << endl;
+    ) else if results#p === false then (
+        stdio << "✗ SINGULAR" << endl;
+    ) else (
+        stdio << "⚠ SKIPPED" << endl;
+    );
+);
+
+stdio << endl;
+
+allSmooth = all(primesToTest, p -> results#p === true);
 
 if allSmooth then (
-    stdio << "✓ SMOOTH ACROSS ALL PRIMES" << endl;
-    stdio << "  Variety V₇ is smooth (EGA spreading-out)" << endl;
+    stdio << "✓✓✓ VARIETY IS SMOOTH (all primes agree) ✓✓✓" << endl;
+    stdio << "  EGA spreading-out principle applies" << endl;
+    stdio << "  Safe to proceed with Hodge theory" << endl;
 ) else (
-    stdio << "✗ SMOOTHNESS FAILED" << endl;
+    stdio << "✗✗✗ VARIETY MAY BE SINGULAR ✗✗✗" << endl;
     stdio << "  Check individual prime results above" << endl;
+    stdio << "  Consider perturbation or different construction" << endl;
 );
 
 stdio << "============================================" << endl;
 
 end
-```
 
 **Execution:**
 ```bash
@@ -768,13 +806,11 @@ SMOOTHNESS VERIFICATION SUMMARY
 ============================================
 ```
 
-**IMPORTANT**
+## **RESULTS**
 
-for C7 smoothness across 5 primes (mod 7 = 1) is dim=0 not dim=-1. performing pertubation test (pending)
+**PENDING COMPUTATION**
 
-for C11 smoothness across 5 prime (mod 11 = 1) is dim=1 not dim=-1. performing pertubation test (pending)
-
-for C17 smoothness across 1 prime was dim=2 so failed! doing pertubation test (pending)
+---
 
 **DECISION GATE 1:**
 - ✅ **If smooth:** Proceed to Phase 2
