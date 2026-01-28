@@ -768,6 +768,14 @@ SMOOTHNESS VERIFICATION SUMMARY
 ============================================
 ```
 
+**IMPORTANT**
+
+for C7 smoothness across all 3 primes is dim=0 not dim=-1
+
+for C11 smoothness across 1 prime is dim=1 not dim=-1
+
+for C17 smoothness pending
+
 **DECISION GATE 1:**
 - ✅ **If smooth:** Proceed to Phase 2
 - ❌ **If singular:** ABORT (variety invalid, cannot use Hodge theory)
