@@ -584,7 +584,7 @@ end
 m2 test_environment.m2
 ```
 
-**Expected output:** (verified by actually computing on macbook)
+**Expected output:** (verified by actually computing on macbook for C7 and C11 just in case)
 ```
 Testing cyclotomic field construction...
 
