@@ -1,4 +1,4 @@
-# 📋 **C₇-INVARIANT CYCLOTOMIC VARIETY — COMPLETE REASONING ARTIFACT v1.0**
+# 📋 **C₇ and more-INVARIANT CYCLOTOMIC VARIETY — COMPLETE REASONING ARTIFACT v1.0**
 
 **Computational Investigation of a Second Cyclotomic Calabi-Yau Fourfold for Hodge Conjecture Analysis**
 
@@ -584,7 +584,7 @@ end
 m2 test_environment.m2
 ```
 
-**Expected output:** (verified by actually computing on macbook for C7 and C11 just in case)
+**Expected output:** (verified by actually computing on macbook for C7, C11, and C17)
 ```
 Testing cyclotomic field construction...
 
@@ -748,7 +748,7 @@ end
 m2 scripts/verify_smoothness_c7.m2 > logs/smoothness.log 2>&1
 ```
 
-**Expected output:** (FAILED for C7! Showed dim=0 for primes 29 and 43! Pending for C11!)
+**Expected output:** (FAILED for C7! Showed dim=0 for primes 29 and 43! Pending for C11 and C17!)
 ```
 ========================================
 SMOOTHNESS CHECK MOD p = 29
