@@ -770,9 +770,9 @@ SMOOTHNESS VERIFICATION SUMMARY
 
 **IMPORTANT**
 
-for C7 smoothness across all 3 primes is dim=0 not dim=-1
+for C7 smoothness across 5 primes (mod 7 = 1) is dim=0 not dim=-1. performing pertubation test (pending)
 
-for C11 smoothness across all 3 prime is dim=1 not dim=-1
+for C11 smoothness across 5 prime (mod 11 = 1) is dim=1 not dim=-1. performing pertubation test (pending)
 
 for C17 smoothness across 1 prime was dim=2 so failed! doing pertubation test (pending)
 
