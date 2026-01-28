@@ -748,7 +748,7 @@ end
 m2 scripts/verify_smoothness_c7.m2 > logs/smoothness.log 2>&1
 ```
 
-**Expected output:** (FAILED for C7! Showed dim=0 for primes 29 and 43! Pending for C11 and C17!)
+**Expected output:** (FAILED for C7 and C17! Showed dim=0 for primes 29 and 43! Pending for C11)
 ```
 ========================================
 SMOOTHNESS CHECK MOD p = 29
@@ -774,7 +774,7 @@ for C7 smoothness across all 3 primes is dim=0 not dim=-1
 
 for C11 smoothness across 2 prime is dim=1 not dim=-1
 
-for C17 smoothness pending
+for C17 smoothness across 1 prime was dim=2 so failed! doing pertubation test (pending)
 
 **DECISION GATE 1:**
 - ✅ **If smooth:** Proceed to Phase 2
