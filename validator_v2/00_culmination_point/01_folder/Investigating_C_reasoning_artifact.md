@@ -772,7 +772,7 @@ SMOOTHNESS VERIFICATION SUMMARY
 
 for C7 smoothness across all 3 primes is dim=0 not dim=-1
 
-for C11 smoothness across 1 prime is dim=1 not dim=-1
+for C11 smoothness across 2 prime is dim=1 not dim=-1
 
 for C17 smoothness pending
 
