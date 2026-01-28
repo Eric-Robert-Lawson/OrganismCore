@@ -751,7 +751,7 @@ m2 scripts/verify_smoothness_c7.m2 > logs/smoothness.log 2>&1
 **Expected output:** (pending)
 ```
 ========================================
-SMOOTHNESS CHECK MOD p = 53
+SMOOTHNESS CHECK MOD p = 29
 ========================================
 Primitive 7th root: ω = ...
 ...
@@ -792,7 +792,7 @@ SMOOTHNESS VERIFICATION SUMMARY
 
 **Goal:** Build Jacobian cokernel matrix for 5 primes
 
-**Primes:** p ∈ {53, 79, 131, 157, 313} (all ≡ 1 mod 7)
+**Primes:** p ∈ {29, 43, 71, 113, 127} (all ≡ 1 mod 7)
 
 **Script:** `rank_stability_c7.m2`
 
@@ -804,7 +804,7 @@ SMOOTHNESS VERIFICATION SUMMARY
 -- Expected runtime: 2-4 hours per prime
 -- ============================================================================
 
-primes = {53, 79, 131, 157, 313};
+primes = {29, 43, 71, 113, 127};
 
 computeRankModP = method();
 computeRankModP (ZZ) := p -> (
@@ -915,7 +915,7 @@ uniqueRanks = unique rankList;
 if #uniqueRanks == 1 then (
     stdio << "✓ RANK STABILITY CONFIRMED" << endl;
     stdio << "  Characteristic zero rank = " << first uniqueRanks << endl;
-    stdio << "  Dimension H^{2,2}_prim,inv = " << (#(flatten entries basis(18, ZZ/53[z_0..z_5])) - first uniqueRanks) << endl;
+    stdio << "  Dimension H^{2,2}_prim,inv = " << (#(flatten entries basis(18, ZZ/29[z_0..z_5])) - first uniqueRanks) << endl;
     stdio << "  Error probability < 10^(-22)" << endl;
 ) else (
     stdio << "✗ RANK DISAGREEMENT DETECTED" << endl;
@@ -945,7 +945,7 @@ end
 m2 scripts/rank_stability_c7.m2 > logs/rank_stability.log 2>&1
 
 # Option B: Parallel (faster, requires 5 cores)
-for p in 53 79 131 157 313; do
+for p in 29 43 71 113 127; do
     echo "Starting rank computation mod $p"
     m2 scripts/rank_single_prime_c7.m2 --prime $p > logs/rank_p${p}.log 2>&1 &
 done
@@ -958,11 +958,11 @@ echo "All rank computations complete"
 ============================================
 RANK STABILITY SUMMARY
 ============================================
-p = 53:  rank = 2847
-p = 79:  rank = 2847
-p = 131:  rank = 2847
-p = 157:  rank = 2847
-p = 313:  rank = 2847
+p = 29:  rank = 2847
+p = 43:  rank = 2847
+p = 71:  rank = 2847
+p = 113:  rank = 2847
+p = 127:  rank = 2847
 
 ✓ RANK STABILITY CONFIRMED
   Characteristic zero rank = 2847
@@ -1000,7 +1000,7 @@ Compute dimension from rank stability results
 
 import json
 
-primes = [53, 79, 131, 157, 313]
+primes = [29, 43, 71, 113, 127]
 
 print("Loading rank results...")
 ranks = {}
@@ -1021,7 +1021,7 @@ else:
     print("✗ Ranks disagree:", rank_values)
     exit(1)
 
-num_monomials = ranks[53]['num_monomials']
+num_monomials = ranks[29]['num_monomials']
 
 dimension = num_monomials - rank
 
@@ -1335,9 +1335,9 @@ CONCLUSION:
 
 ## **Checkpoint 1: Smoothness (Day 2)**
 
-- [ ] Smoothness verified mod p = 53
-- [ ] Smoothness verified mod p = 79
-- [ ] Smoothness verified mod p = 131
+- [ ] Smoothness verified mod p = 29
+- [ ] Smoothness verified mod p = 43
+- [ ] Smoothness verified mod p = 71
 - [ ] All singular loci empty (dim = -1)
 - [ ] EGA spreading-out principle applies
 
@@ -1347,11 +1347,11 @@ CONCLUSION:
 
 ## **Checkpoint 2: Rank Stability (Week 1-2)**
 
-- [ ] Rank computed mod p = 53
-- [ ] Rank computed mod p = 79
-- [ ] Rank computed mod p = 131
-- [ ] Rank computed mod p = 157
-- [ ] Rank computed mod p = 313
+- [ ] Rank computed mod p = 29
+- [ ] Rank computed mod p = 43
+- [ ] Rank computed mod p = 71
+- [ ] Rank computed mod p = 113
+- [ ] Rank computed mod p = 127
 - [ ] All 5 ranks agree (stability confirmed)
 - [ ] Error probability < 10^-22
 
