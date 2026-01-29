@@ -437,3 +437,165 @@ result:
 ```verbatim
 pending
 ```
+
+---
+
+# **STEP 3: Canonical monomial calculations**
+
+```m2
+restart;
+p = 53;
+n = 13;
+R = ZZ/p[z_0..z_5];
+
+stdio << "Generating canonical C₁₃-invariant monomial list at p=53..." << endl;
+
+-- Enumerate all degree-18 monomials (no exponent bound)
+allMons = flatten entries basis(18, R);
+
+stdio << "Total degree-18 monomials: " << #allMons << endl;
+
+-- Filter to C₁₃-invariant
+invMons = select(allMons, m -> (
+    exps = flatten exponents m;
+    wt = (exps#1) + 2*(exps#2) + 3*(exps#3) + 4*(exps#4) + 5*(exps#5);
+    (wt % n) == 0
+));
+
+stdio << "C₁₃-invariant monomials: " << #invMons << endl;
+
+-- Sort lexicographically
+invMonsSorted = sort invMons;
+
+-- Export to JSON
+stdio << "Exporting to canonical_monomials_p53.json..." << endl;
+
+file = openOut "canonical_monomials_p53.json";
+file << "{" << endl;
+file << "  \"prime\": " << p << "," << endl;
+file << "  \"count\": " << #invMonsSorted << "," << endl;
+file << "  \"monomials\": [" << endl;
+
+for i from 0 to #invMonsSorted-1 do (
+    m = invMonsSorted#i;
+    exps = flatten exponents m;
+    
+    file << "    {";
+    file << "\"index\": " << i << ", ";
+    file << "\"monomial\": \"" << toString m << "\", ";
+    file << "\"exponents\": [";
+    file << concatenate between(", ", apply(exps, e -> toString e));
+    file << "]";
+    file << "}";
+    
+    if i < #invMonsSorted-1 then file << "," << endl;
+);
+
+file << endl << "  ]" << endl;
+file << "}" << endl;
+
+close file;
+
+stdio << "✓ Canonical list saved to canonical_monomials_p53.json" << endl;
+stdio << "✓ Compute SHA256 via: shasum -a 256 canonical_monomials_p53.json" << endl;
+
+end
+```
+
+The result syntax:
+
+```verbatim
+Generating canonical C₁₃-invariant monomial list at p=53...
+Total degree-18 monomials: 33649
+C₁₃-invariant monomials: 2590
+Exporting to canonical_monomials_p53.json...
+✓ Canonical list saved to canonical_monomials_p53.json
+✓ Compute SHA256 via: shasum -a 256 canonical_monomials_p53.json
+```
+SHA: a3ee52aefac0247b737df1fb1cd460a270bdf7dbad5e360728062b07475cc29c  canonical_monomials_p53.json
+
+Then I also performed this to ensure prime results are same:
+
+```m2
+-- ============================================================================
+-- VERIFY: Canonical monomial list is universal (prime-independent)
+-- ============================================================================
+
+restart;
+
+-- Generate at two primes
+primes = {53, 313};
+monLists = new MutableHashTable;
+
+for p in primes do (
+    stdio << "Generating at p = " << p << "..." << endl;
+    
+    n = 13;
+    R := ZZ/p[z_0..z_5];
+    
+    allMons := flatten entries basis(18, R);
+    
+    invMons := select(allMons, m -> (
+        exps := flatten exponents m;
+        wt := (exps#1) + 2*(exps#2) + 3*(exps#3) + 4*(exps#4) + 5*(exps#5);
+        (wt % n) == 0
+    ));
+    
+    -- Sort and extract EXPONENT SEQUENCES (prime-independent)
+    invMonsSorted := sort invMons;
+    expSeqs := apply(invMonsSorted, m -> flatten exponents m);
+    
+    monLists#p = expSeqs;
+    
+    stdio << "  p=" << p << ": " << #expSeqs << " monomials" << endl;
+);
+
+-- Compare exponent sequences
+stdio << endl << "Comparing exponent sequences..." << endl;
+
+exps53 = monLists#53;
+exps313 = monLists#313;
+
+if #exps53 != #exps313 then (
+    stdio << "✗ COUNTS DIFFER: " << #exps53 << " vs " << #exps313 << endl;
+    error "Enumeration is PRIME-DEPENDENT (BUG)";
+);
+
+-- Check each monomial
+mismatchCount = 0;
+for i from 0 to #exps53-1 do (
+    if exps53#i != exps313#i then (
+        stdio << "✗ MISMATCH at index " << i << endl;
+        stdio << "  p=53:  " << exps53#i << endl;
+        stdio << "  p=313: " << exps313#i << endl;
+        mismatchCount = mismatchCount + 1;
+    );
+);
+
+if mismatchCount == 0 then (
+    stdio << "✓✓✓ PERFECT MATCH: All 2590 monomials identical" << endl;
+    stdio << "✓ Canonical list is UNIVERSAL (prime-independent)" << endl;
+) else (
+    stdio << "✗ " << mismatchCount << " mismatches found" << endl;
+    error "Enumeration is NOT universal";
+);
+
+end
+```
+
+result:
+
+```verbatim
+Generating at p = 53...
+  p=53: 2590 monomials
+Generating at p = 313...
+  p=313: 2590 monomials
+
+Comparing exponent sequences...
+✓✓✓ PERFECT MATCH: All 2590 monomials identical
+✓ Canonical list is UNIVERSAL (prime-independent)
+```
+
+---
+
+# **STEP 4: Multi-prime dimension/rank computation using p=53 canonical ordering**
