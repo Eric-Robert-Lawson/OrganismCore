@@ -992,7 +992,6 @@ Extract 707-dimensional kernel basis at p=53
 import json
 import numpy as np
 from scipy.sparse import csr_matrix
-from scipy.linalg import null_space
 import hashlib
 
 # ============================================================================
@@ -1028,42 +1027,44 @@ print(f"Matrix shape: {M.shape}")
 print()
 
 # ============================================================================
-# STEP 2: COMPUTE KERNEL VIA ROW REDUCTION
+# STEP 2: COMPUTE KERNEL VIA TRANSPOSE
 # ============================================================================
 
-print("Computing kernel via Gaussian elimination mod 53...")
-print("(This may take 5-10 minutes)")
+print("Computing left kernel (cokernel basis)...")
+print("Method: Right kernel of transpose")
+print()
+
+# For cokernel, we want vectors v such that v^T @ M = 0
+# This is equivalent to M^T @ v = 0 (right kernel of transpose)
+
+M_T = M_dense.T  # Shape: (2016, 2590)
+
+print(f"Transpose shape: {M_T.shape}")
 print()
 
 def kernel_mod_p(matrix, p):
     """
-    Compute kernel basis of matrix over F_p
+    Compute right kernel of matrix over F_p via row reduction
     Returns kernel as columns of a matrix
     """
     M = matrix.copy().astype(np.int64)
     nrows, ncols = M.shape
     
-    # Augment with identity to track column operations
-    # We want to find vectors v such that M @ v = 0
-    # Work with transpose: find nullspace of M^T
+    print(f"  Row reducing {nrows} × {ncols} matrix...")
     
-    MT = M.T  # ncols × nrows
-    
-    # Row reduce MT to find pivot columns
+    # Track which columns are pivot columns
     pivot_cols = []
     pivot_row = 0
     
-    working = MT.copy()
-    
-    for col in range(nrows):
-        if pivot_row >= ncols:
+    for col in range(ncols):
+        if pivot_row >= nrows:
             break
         
         # Find pivot
         pivot_found = False
-        for row in range(pivot_row, ncols):
-            if working[row, col] % p != 0:
-                working[[pivot_row, row]] = working[[row, pivot_row]]
+        for row in range(pivot_row, nrows):
+            if M[row, col] % p != 0:
+                M[[pivot_row, row]] = M[[row, pivot_row]]
                 pivot_found = True
                 break
         
@@ -1072,54 +1073,46 @@ def kernel_mod_p(matrix, p):
         
         pivot_cols.append(col)
         
-        # Normalize and eliminate
-        pivot_inv = pow(int(working[pivot_row, col]), -1, p)
-        working[pivot_row] = (working[pivot_row] * pivot_inv) % p
+        # Normalize pivot row
+        pivot_inv = pow(int(M[pivot_row, col]), -1, p)
+        M[pivot_row] = (M[pivot_row] * pivot_inv) % p
         
-        for row in range(ncols):
-            if row != pivot_row and working[row, col] % p != 0:
-                factor = working[row, col]
-                working[row] = (working[row] - factor * working[pivot_row]) % p
+        # Eliminate column
+        for row in range(nrows):
+            if row != pivot_row and M[row, col] % p != 0:
+                factor = M[row, col]
+                M[row] = (M[row] - factor * M[pivot_row]) % p
         
         pivot_row += 1
         
         if pivot_row % 100 == 0:
-            print(f"  Processed {pivot_row} columns")
+            print(f"    Processed {pivot_row} rows...")
     
-    print(f"  Pivot columns found: {len(pivot_cols)}")
-    print(f"  Expected rank: {nrows - saved_dim} = {nrows - saved_dim}")
-    print()
+    print(f"  Pivot columns: {len(pivot_cols)}")
     
     # Free columns give kernel basis
-    free_cols = [i for i in range(nrows) if i not in pivot_cols]
+    free_cols = [i for i in range(ncols) if i not in pivot_cols]
     kernel_dim = len(free_cols)
     
     print(f"  Free columns (kernel dimension): {kernel_dim}")
-    print(f"  Expected: {saved_dim}")
     print()
     
-    if kernel_dim != saved_dim:
-        print(f"  ⚠ WARNING: Kernel dimension mismatch!")
-    
     # Build kernel basis vectors
-    # For each free column, set it to 1 and solve for pivot columns
     kernel_basis = []
     
     for idx, free_col in enumerate(free_cols):
         if idx % 50 == 0:
             print(f"  Building kernel vector {idx}/{kernel_dim}...")
         
-        # Kernel vector (in original column space)
-        v = np.zeros(nrows, dtype=np.int64)
+        # Kernel vector
+        v = np.zeros(ncols, dtype=np.int64)
         v[free_col] = 1
         
-        # Back-substitute to find values at pivot positions
+        # Back-substitute for pivot positions
         for piv_idx in reversed(range(len(pivot_cols))):
             piv_col = pivot_cols[piv_idx]
-            # Row piv_idx of reduced form has pivot at piv_col
-            # working[piv_idx, piv_col] = 1
-            # working[piv_idx, :] @ v should = 0
-            val = sum(working[piv_idx, j] * v[j] for j in range(nrows)) % p
+            # M[piv_idx, :] @ v should equal 0
+            val = sum(M[piv_idx, j] * v[j] for j in range(ncols)) % p
             v[piv_col] = (-val) % p
         
         kernel_basis.append(v)
@@ -1127,56 +1120,33 @@ def kernel_mod_p(matrix, p):
     print()
     return np.array(kernel_basis).T  # Return as columns
 
-# Alternative: Use numpy's null_space over floats, then lift mod p
-print("Method 1: Computing kernel via custom row reduction...")
+print("Computing kernel of M^T (this gives left kernel of M)...")
+kernel = kernel_mod_p(M_T, prime)
 
-try:
-    kernel_custom = kernel_mod_p(M_dense, prime)
-    print(f"Kernel dimension (custom): {kernel_custom.shape[1]}")
-except Exception as e:
-    print(f"Custom method failed: {e}")
-    kernel_custom = None
-
+print(f"Kernel dimension: {kernel.shape[1]}")
+print(f"Expected: {saved_dim}")
 print()
-print("Method 2: Using scipy nullspace (over floats, then lift mod p)...")
-
-# Convert to float, compute nullspace, then round and reduce mod p
-M_float = M_dense.astype(float) % prime
-kernel_float = null_space(M_float)
-kernel_lifted = np.round(kernel_float).astype(np.int64) % prime
-
-print(f"Kernel dimension (scipy): {kernel_lifted.shape[1]}")
-print()
-
-# Use whichever worked
-if kernel_custom is not None and kernel_custom.shape[1] == saved_dim:
-    kernel = kernel_custom
-    method = "custom"
-elif kernel_lifted.shape[1] >= saved_dim - 10:  # Allow some tolerance
-    kernel = kernel_lifted
-    method = "scipy"
-else:
-    print("⚠ Both methods failed to find expected kernel dimension")
-    kernel = kernel_lifted  # Use best available
-    method = "scipy (partial)"
 
 # ============================================================================
 # STEP 3: VERIFY KERNEL
 # ============================================================================
 
-print(f"Using {method} kernel basis")
-print(f"Verifying M @ kernel = 0 (mod {prime})...")
+print("Verifying kernel (v^T @ M = 0)...")
 print()
 
-product = (M_dense @ kernel) % prime
-max_entry = np.max(np.abs(product))
+# kernel has shape (2590, k) where k should be 707
+# We want to check M^T @ kernel = 0 (equivalent to kernel^T @ M = 0)
 
-print(f"  Max entry in M @ kernel: {max_entry}")
+verification_matrix = (M_T @ kernel) % prime  # Shape: (2016, k)
+max_entry = np.max(np.abs(verification_matrix))
+
+print(f"  Verification matrix shape: {verification_matrix.shape}")
+print(f"  Max entry in M^T @ kernel: {max_entry}")
 
 if max_entry == 0:
     print("  ✓ Kernel verification PASSED")
 else:
-    print(f"  ⚠ Kernel verification failed (max entry = {max_entry})")
+    print(f"  ⚠ Kernel verification FAILED (max entry = {max_entry})")
 
 print()
 
@@ -1190,11 +1160,11 @@ print("Saving kernel basis...")
 kernel_list = kernel.tolist()
 
 kernel_data = {
-    "prime": prime,
+    "prime": int(prime),
     "kernel_dimension": int(kernel.shape[1]),
     "vector_dimension": int(kernel.shape[0]),
-    "expected_dimension": saved_dim,
-    "method": method,
+    "expected_dimension": int(saved_dim),
+    "method": "right_kernel_of_transpose",
     "verification_max_error": int(max_entry),
     "kernel_basis": kernel_list
 }
@@ -1214,12 +1184,12 @@ print()
 
 # Save summary
 summary = {
-    "prime": prime,
+    "prime": int(prime),
     "kernel_dimension": int(kernel.shape[1]),
-    "expected_dimension": saved_dim,
-    "match": (kernel.shape[1] == saved_dim),
-    "verification_passed": (max_entry == 0),
-    "method": method,
+    "expected_dimension": int(saved_dim),
+    "match": bool(int(kernel.shape[1]) == int(saved_dim)),
+    "verification_passed": bool(int(max_entry) == 0),
+    "method": "right_kernel_of_transpose",
     "sha256": sha256
 }
 
@@ -1249,5 +1219,87 @@ print()
 result:
 
 ```verbatim
-pending
+============================================================
+KERNEL EXTRACTION AT p=53
+============================================================
+
+Prime: 53
+Expected kernel dimension: 707
+Loading 122640 triplets...
+
+Matrix shape: (2590, 2016)
+
+Computing left kernel (cokernel basis)...
+Method: Right kernel of transpose
+
+Transpose shape: (2016, 2590)
+
+Computing kernel of M^T (this gives left kernel of M)...
+  Row reducing 2016 × 2590 matrix...
+    Processed 100 rows...
+    Processed 200 rows...
+    Processed 300 rows...
+    Processed 400 rows...
+    Processed 500 rows...
+    Processed 600 rows...
+    Processed 700 rows...
+    Processed 800 rows...
+    Processed 900 rows...
+    Processed 1000 rows...
+    Processed 1100 rows...
+    Processed 1200 rows...
+    Processed 1300 rows...
+    Processed 1400 rows...
+    Processed 1500 rows...
+    Processed 1600 rows...
+    Processed 1700 rows...
+    Processed 1800 rows...
+  Pivot columns: 1883
+  Free columns (kernel dimension): 707
+
+  Building kernel vector 0/707...
+  Building kernel vector 50/707...
+  Building kernel vector 100/707...
+  Building kernel vector 150/707...
+  Building kernel vector 200/707...
+  Building kernel vector 250/707...
+  Building kernel vector 300/707...
+  Building kernel vector 350/707...
+  Building kernel vector 400/707...
+  Building kernel vector 450/707...
+  Building kernel vector 500/707...
+  Building kernel vector 550/707...
+  Building kernel vector 600/707...
+  Building kernel vector 650/707...
+  Building kernel vector 700/707...
+
+Kernel dimension: 707
+Expected: 707
+
+Verifying kernel (v^T @ M = 0)...
+
+  Verification matrix shape: (2016, 707)
+  Max entry in M^T @ kernel: 0
+  ✓ Kernel verification PASSED
+
+Saving kernel basis...
+  Kernel basis saved to kernel_basis_p53.json
+  File size: 6.3 MB
+  SHA256: aa9e5f636584c111ae06d31d8997f0e83a2a61ff622af03a8060d3e473012657
+
+============================================================
+KERNEL EXTRACTION COMPLETE
+============================================================
+Kernel dimension: 707
+Expected: 707
+Match: ✓
+Verification: ✓ PASSED
+============================================================
+
+✓✓✓ KERNEL EXTRACTION SUCCESSFUL ✓✓✓
+
+Next step: Variable-count tests (CP1/CP2/CP3)
 ```
+
+---
+
