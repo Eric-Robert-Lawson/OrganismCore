@@ -1301,5 +1301,38 @@ Verification: ✓ PASSED
 Next step: Variable-count tests (CP1/CP2/CP3)
 ```
 
----
+## Step 5: Kernel Basis Extraction (Cohomology Class Generators) - COMPLETE
 
+**Purpose**: Extract explicit 707-dimensional kernel basis of the Jacobian cokernel matrix at p=53, representing generators of the C₁₃-invariant primitive cohomology space H²'²_prim,inv(X₈).
+
+**Mathematical Framework**: The kernel of the 2590×2016 Jacobian matrix represents degree-18 monomials annihilated by the Jacobian ideal, forming a basis for the quotient space R₁₈,inv / Image(J). Each of the 707 kernel vectors corresponds to a primitive Hodge class.
+
+**Computational Method**:
+1. Load verified matrix from Step 4 (2590×2016, rank=1883)
+2. Compute transpose M^T (2016×2590)
+3. Perform Gaussian elimination over 𝔽₅₃ to identify 1883 pivot columns and 707 free columns
+4. For each free column, construct kernel vector by setting it to 1 and back-substituting for pivot column values
+5. Verify kernel: compute M^T @ kernel_basis mod 53, confirm result is zero matrix
+6. Save 707 basis vectors (each a length-2590 vector of coefficients in monomial basis)
+
+**Results**:
+- Kernel dimension: **707** (matches expected)
+- Pivot columns: **1883** (confirms rank)
+- Free columns: **707** (dimension of H²'²_prim,inv)
+- Verification: **PASSED** (max error = 0, all 2016×707 entries zero)
+- File: `kernel_basis_p53.json` (6.3 MB, 707 vectors × 2590 components)
+- SHA256: `aa9e5f636584c111ae06d31d8997f0e83a2a61ff622af03a8060d3e473012657`
+
+**Validation**: Mathematical verification confirms M^T @ v ≡ 0 (mod 53) for all 707 basis vectors. Zero maximum error establishes correctness.
+
+**Significance**: Explicit basis enables downstream analysis:
+- Variable-count tests (CP1/CP2/CP3)
+- Coordinate transparency verification
+- Information-theoretic analysis
+- Period integral computation (future work)
+
+**Next Step**: CP1 (canonical basis variable-count analysis) to identify which classes use all 6 variables.
+
+**Status**: ✅ COMPLETE (runtime: ~10 minutes, verification: 100%)
+
+---
