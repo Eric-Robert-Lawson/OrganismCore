@@ -924,71 +924,224 @@ All divisions are EXACT (no remainders) by mathematical theorem.
 **Python Script:** `compute_exact_det_bareiss.py`
 
 ```python
-import json
-from fractions import Fraction
+#!/usr/bin/env python3
+"""
+compute_exact_det_bareiss.py
 
-def bareiss_determinant(matrix):
-    """
-    Compute exact integer determinant via Bareiss algorithm.
-    
-    Args:
-        matrix: List of lists (n×n integer matrix)
-    
-    Returns:
-        int: Exact determinant
-    """
-    n = len(matrix)
-    M = [row[:] for row in matrix]  # Deep copy
-    
-    sign = 1
-    prev_pivot = 1
-    
-    for k in range(n - 1):
-        # Find pivot (largest absolute value for stability)
-        pivot_row = k
-        pivot_val = abs(M[k][k])
-        for i in range(k + 1, n):
-            if abs(M[i][k]) > pivot_val:
-                pivot_val = abs(M[i][k])
-                pivot_row = i
-        
-        # Swap rows if needed
-        if pivot_row != k:
-            M[k], M[pivot_row] = M[pivot_row], M[k]
-            sign *= -1
-        
-        # Current pivot
-        pivot = M[k][k]
-        
-        if pivot == 0:
-            return 0  # Singular matrix
-        
-        # Update submatrix (Bareiss step)
+Build integer k x k minor from a triplet JSON (integer entries) and pivot rows/cols,
+then compute the exact determinant using the Bareiss fraction-free algorithm.
+
+Usage (example):
+  python3 compute_exact_det_bareiss.py \
+    --triplet saved_inv_p313_triplets.json \
+    --rows pivot_rows.txt \
+    --cols pivot_cols.txt \
+    --crt crt_pivot_200.json \
+    --out det_pivot_200_exact.json
+
+Arguments:
+  --triplet : path to triplet JSON containing integer entries (not reduced mod p)
+  --rows    : pivot_rows.txt (one index per line; assumed 0-based)
+  --cols    : pivot_cols.txt (one index per line; assumed 0-based)
+  --crt     : optional CRT JSON file previously produced (to compare signed rep and M)
+  --out     : output JSON file (default: det_exact.json)
+
+Notes:
+ - Requires gmpy2 for speed & low memory if available; otherwise uses Python ints.
+ - Bareiss is fraction-free and returns exact integer determinant.
+ - For k ~ 200 this may still be heavy but often feasible if entries are modest.
+
+Outputs:
+ - JSON with fields: k, det (string), abs_det_log10, time_seconds, matches_crt (if CRT file provided)
+
+Author: Assistant (adapted for OrganismCore)
+"""
+import argparse
+import json
+import time
+import math
+from pathlib import Path
+import sys
+# allow conversion of very large integers to decimal strings for the certificate files
+try:
+    # increase limits (set to a large value suitable for your determinants)
+    sys.set_int_max_str_digits(10_000_000)
+    # optional: also increase chars limit if available
+    try:
+        sys.set_int_max_str_chars(10_000_000)
+    except AttributeError:
+        pass
+except AttributeError:
+    # running on a Python version that doesn't have this API (<=3.10) — nothing to do
+    pass
+
+try:
+    import gmpy2
+    from gmpy2 import mpz
+    GMPY2 = True
+except Exception:
+    GMPY2 = False
+
+
+def parse_args():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--triplet", required=True, help="Triplet JSON with integer entries")
+    ap.add_argument("--rows", required=True, help="Pivot rows file (one index per line, 0-based)")
+    ap.add_argument("--cols", required=True, help="Pivot cols file (one index per line, 0-based)")
+    ap.add_argument("--crt", required=False, help="Optional crt JSON to compare with")
+    ap.add_argument("--out", default="det_exact.json", help="Output JSON file")
+    return ap.parse_args()
+
+
+def load_triplets(path):
+    import json
+    with open(path) as f:
+        data = json.load(f)
+    # find triplets list (common keys)
+    if isinstance(data, dict):
+        if 'triplets' in data:
+            trip = data['triplets']
+        elif 'matrix' in data:
+            trip = data['matrix']
+        else:
+            # search for first list-of-lists
+            trip = None
+            for v in data.values():
+                if isinstance(v, list) and v and isinstance(v[0], list):
+                    trip = v
+                    break
+            if trip is None:
+                raise RuntimeError("Couldn't find triplets list in JSON")
+    elif isinstance(data, list):
+        trip = data
+    else:
+        raise RuntimeError("Unrecognized triplet JSON")
+    normalized = []
+    for t in trip:
+        if isinstance(t, list) and len(t) >= 3:
+            r, c, v = int(t[0]), int(t[1]), int(t[2])
+        elif isinstance(t, dict) and {'row', 'col', 'val'}.issubset(t.keys()):
+            r, c, v = int(t['row']), int(t['col']), int(t['val'])
+        else:
+            raise RuntimeError("Unrecognized triplet entry: " + str(t))
+        normalized.append((r, c, v))
+    return normalized
+
+
+def build_integer_minor(triplets, rows, cols):
+    # Build map r -> dict(c -> integer value)
+    orig = {}
+    for r, c, v in triplets:
+        if r not in orig:
+            orig[r] = {}
+        orig[r][c] = orig[r].get(c, 0) + int(v)
+    k = len(rows)
+    M = [[0] * k for _ in range(k)]
+    for i, r in enumerate(rows):
+        rowmap = orig.get(r, {})
+        for j, c in enumerate(cols):
+            M[i][j] = int(rowmap.get(c, 0))
+    return M
+
+
+def bareiss_det_int(A):
+    # Fraction-free Bareiss algorithm using Python ints (or gmpy2 mpz)
+    n = len(A)
+    if n == 0:
+        return 1
+    if n == 1:
+        return A[0][0]
+    # convert to mpz if available
+    if GMPY2:
+        A = [[mpz(v) for v in row] for row in A]
+        one = mpz(1)
+    else:
+        A = [[int(v) for v in row] for row in A]
+        one = 1
+    D_prev = one
+    for k in range(0, n - 1):
+        Akk = A[k][k]
+        # if Akk == 0, swap with a lower row that has nonzero in column k (keep track of sign)
+        if Akk == 0:
+            swap = None
+            for r in range(k + 1, n):
+                if A[r][k] != 0:
+                    swap = r
+                    break
+            if swap is None:
+                return 0
+            # swap rows and corresponding columns for determinant sign
+            A[k], A[swap] = A[swap], A[k]
+            for row in A:
+                row[k], row[swap] = row[swap], row[k]
+            Akk = A[k][k]
+            # multiply result by -1 accounted by later
         for i in range(k + 1, n):
             for j in range(k + 1, n):
-                # M[i][j] = (pivot * M[i][j] - M[i][k] * M[k][j]) // prev_pivot
-                numerator = pivot * M[i][j] - M[i][k] * M[k][j]
-                M[i][j] = numerator // prev_pivot
-        
-        prev_pivot = pivot
-    
-    return sign * M[n-1][n-1]
+                # A[i][j] = (A[i][j]*A[k][k] - A[i][k]*A[k][j]) // D_prev
+                num = A[i][j] * Akk - A[i][k] * A[k][j]
+                # exact division should hold
+                A[i][j] = num // D_prev
+            # optional: free memory on A[i][k]
+            A[i][k] = 0
+        D_prev = Akk
+    return int(A[n - 1][n - 1])
 
-# Usage
-with open('minor_k1883_p313.json', 'r') as f:
-    data = json.load(f)
 
-matrix = data['matrix']  # Sparse triplet format → dense conversion needed
+def main():
+    args = parse_args()
+    triplets = load_triplets(args.triplet)
+    rows = [int(x.strip()) for x in open(args.rows) if x.strip()]
+    cols = [int(x.strip()) for x in open(args.cols) if x.strip()]
+    if len(rows) != len(cols):
+        raise RuntimeError("rows and cols length mismatch")
+    k = len(rows)
+    print(f"[+] Building integer {k}x{k} minor from {args.triplet} ...")
+    M = build_integer_minor(triplets, rows, cols)
+    print(f"[+] Starting Bareiss determinant computation (k={k}) ...")
+    t0 = time.time()
+    det = bareiss_det_int(M)
+    t1 = time.time()
+    abs_det = abs(det)
+    out = {
+        "triplet_file": args.triplet,
+        "rows_file": args.rows,
+        "cols_file": args.cols,
+        "k": k,
+        "det": str(det),
+        "abs_det_log10": math.log10(abs_det) if abs_det > 0 else None,
+        "time_seconds": t1 - t0
+    }
+    # if CRT provided, compare
+    if args.crt:
+        try:
+            with open(args.crt) as f:
+                crt = json.load(f)
+            s_signed = int(crt.get("crt_reconstruction_signed") or crt.get("crt_reconstruction_modM"))
+            M_crt = int(crt.get("crt_product"))
+            out["crt_signed"] = str(s_signed)
+            out["crt_product"] = str(M_crt)
+            out["matches_crt_signed"] = (int(det) == int(s_signed))
+            out["abs_det_less_half_M"] = (abs_det < (M_crt // 2))
+        except Exception as e:
+            out["crt_compare_error"] = str(e)
+    # write out
+    with open(args.out, "w") as g:
+        json.dump(out, g, indent=2)
+    print("[+] Wrote exact determinant result to", args.out)
+    print("    k =", k)
+    print("    det =", out["det"])
+    if out.get("abs_det_log10") is not None:
+        print("    log10|det| =", out["abs_det_log10"])
+    print("    time (s) =", out["time_seconds"])
+    if "matches_crt_signed" in out:
+        print("    matches_crt_signed =", out["matches_crt_signed"])
+        print("    abs_det < M/2 =", out["abs_det_less_half_M"])
+    print("[+] Done.")
 
-# Convert sparse to dense
-n = data['size']
-dense = [[0]*n for _ in range(n)]
-for (i, j, val) in data['triplets']:
-    dense[i][j] = val
 
-det = bareiss_determinant(dense)
-print(f"Determinant: {det}")
-print(f"Digits: {len(str(abs(det)))}")
+if __name__ == "__main__":
+    main()
 ```
 
 **Optimization Notes:**
