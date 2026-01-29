@@ -151,7 +151,7 @@ for p in primeList do (
 );
 
 if smoothCount == 19 then (
-    stdio << "✓✓✓ X₈ IS SMOOTH (all 5 primes agree) ✓✓✓" << endl;
+    stdio << "✓✓✓ X₈ IS SMOOTH (all 19 primes agree) ✓✓✓" << endl;
     stdio << "EGA spreading-out principle applies" << endl;
     stdio << "Variety is smooth over ℚ" << endl;
 ) else if smoothCount >= 10 then (
