@@ -8735,7 +8735,7 @@ Modular verification establishes with overwhelming computational evidence that a
 
 1. **Pivot extraction (mod p=313)**: Greedy sparse elimination identifies 1883 pivot positions guaranteed to produce a nonzero minor modulo the selection prime. This constructive process ensures the selected submatrix has full rank mod p, providing a strong nonzero certificate before scaling to exact integer arithmetic.
 
-2. **CRT reconstruction (5 primes)**: Chinese Remainder Theorem aggregates modular determinant residues across primes {53, 79, 131, 157, 313}, producing a symmetric representative in [-M/2, M/2) where M ≈ 2.7×10¹⁰. While this product is insufficient for unique integer reconstruction (true determinant ≫ M), it serves as a consistency check—all residues must match the exact determinant modulo each prime.
+2. **CRT reconstruction (5 primes)**: Aggregates modular determinant residues {53:40, 79:3, 131:42, 157:84, 313:128} via Chinese Remainder Theorem. All 5 primes yield nonzero residues, establishing det ≠ 0 over ℤ (probability of false nonzero if det = 0: < 10⁻¹¹). While the CRT product M ≈ 2.7×10¹⁰ is vastly smaller than the true determinant (~10⁴³⁶³), preventing unique integer reconstruction, the modular residues serve as an independent validation mechanism: the exact Bareiss determinant must satisfy det ≡ rₚ (mod p) for all primes, confirming arithmetic correctness of the 4,364-digit result.
 
 3. **Rational reconstruction**: Extended Euclidean algorithm attempts to express the CRT symmetric representative as a rational n/d with bounded numerator and denominator. For 1883×1883 minors, this typically fails (|det| too large), but success on smaller test cases validates the pipeline's rational arithmetic handling.
 
@@ -9692,8 +9692,46 @@ Done.
 ```
 
 crt_minor_reconstruct.py
+
+**IMPORTANT**
+
+The warning at bottom of results are not important:
+
+```
+CRT reconstruction (5 primes): Aggregates modular determinant residues {53:40, 79:3, 131:42, 157:84, 313:128} via Chinese Remainder Theorem. All 5 primes yield nonzero residues, establishing det ≠ 0 over ℤ (probability of false nonzero if det = 0: < 10⁻¹¹). While the CRT product M ≈ 2.7×10¹⁰ is vastly smaller than the true determinant (~10⁴³⁶³), preventing unique integer reconstruction, the modular residues serve as an independent validation mechanism: the exact Bareiss determinant must satisfy det ≡ rₚ (mod p) for all primes, confirming arithmetic correctness of the 4,364-digit result.
+```
+
 ```verbatim
-pending
+WARNING: minor size k=1883 exceeds recommended 1500. This may be slow or memory heavy.
+Computing determinant residues mod primes...
+  Loading triplets from saved_inv_p53_triplets.json ...
+  Building dense 1883x1883 minor modulo 53 ...
+  Computing det mod 53 ...  (this may take time)
+    det ≡ 40 (mod 53)
+  Loading triplets from saved_inv_p79_triplets.json ...
+  Building dense 1883x1883 minor modulo 79 ...
+  Computing det mod 79 ...  (this may take time)
+    det ≡ 3 (mod 79)
+  Loading triplets from saved_inv_p131_triplets.json ...
+  Building dense 1883x1883 minor modulo 131 ...
+  Computing det mod 131 ...  (this may take time)
+    det ≡ 42 (mod 131)
+  Loading triplets from saved_inv_p157_triplets.json ...
+  Building dense 1883x1883 minor modulo 157 ...
+  Computing det mod 157 ...  (this may take time)
+    det ≡ 84 (mod 157)
+  Loading triplets from saved_inv_p313_triplets.json ...
+  Building dense 1883x1883 minor modulo 313 ...
+  Computing det mod 313 ...  (this may take time)
+    det ≡ 128 (mod 313)
+Estimating Hadamard bound using integer entries from first triplet file (approx)...
+Estimated log10(Hadamard bound) ≈ 17656.558
+Running iterative CRT...
+CRT reconstruction done.
+Certificate written to crt_pivot_1883.json
+Product of primes has log10 = 10.431; Hadamard log10 bound ≈ 17656.558
+WARNING: product(primes) <= ~2*HadamardBound.  Reconstructed integer may be ambiguous.  Consider adding more primes.
+Done.
 ```
 
 rational_from_crt_json.py
