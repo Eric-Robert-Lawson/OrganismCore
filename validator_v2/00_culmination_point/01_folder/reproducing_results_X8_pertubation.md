@@ -7142,20 +7142,22 @@ You've now successfully reproduced:
 Save as `cp3_test_all_candidates.m2`:
 
 ```m2
--- cp3_test_all_candidates_v2.m2
--- CP3 coordinate collapse tests using ideal-based method (cleaner)
+-- cp3_test_all_candidates.m2
+-- Complete CP3 coordinate collapse tests
+-- Tests all 401 isolated classes across 19 primes
 -- 
--- Usage:
+-- Usage with Python wrapper:
 --   python3 run_cp3_tests.py --parallel 4
 --
--- Method: For each 4-var subset S and forbidden set F = {vars not in S},
---   compute remainder r = monomial mod (J + ideal(F))
---   If r == 0: class can be represented using only S variables (REPRESENTABLE)
---   If r != 0: class cannot be represented (NOT_REPRESENTABLE)
+-- Usage single prime (manual):
+--   m2 -e 'primesList = {313}; load "cp3_test_all_candidates_corrected.m2"' > cp3_results_p313.csv
+--
+-- Method: Compute remainder r = monomial mod J, then check if r uses forbidden variables
+-- Runtime: ~3-4 hours per prime
 
 primesList := {53,79,131,157,313,443,521,547,599,677,911,937,1093,1171,1223,1249,1301,1327,1483};
 
--- Full 401-class candidate list
+-- Complete 401-class candidate list
 candidateList := {
   {"class0", {5,3,2,2,4,2}},
   {"class1", {5,2,4,2,2,3}},
@@ -7569,6 +7571,7 @@ fourSubsets := {
  {1,2,4,5}, {1,3,4,5}, {2,3,4,5}
 };
 
+-- Helper: format subset name
 makeSubsetName = idxList -> (
     s := "(";
     first := true;
@@ -7580,15 +7583,34 @@ makeSubsetName = idxList -> (
     s | ")"
 );
 
-print("PRIME,CLASS,SUBSET_IDX,SUBSET,STATUS");
+-- Helper: check if polynomial uses a variable
+usesVariable = (poly, var) -> (
+    if poly == 0 then return false;
+    mons := if class poly === RingElement then (
+        try (
+            flatten entries monomials poly
+        ) else {poly}
+    ) else {poly};
+    for m in mons do (
+        deg := try degree(m, var) else null;
+        if deg === null then return true;
+        if deg > 0 then return true;
+    );
+    false
+);
+
+-- CSV header
+print("PRIME,CLASS,SUBSET_IDX,SUBSET,RESULT");
 print("-----------------------------------------");
 
+-- Main loop over primes
 for pIdx from 0 to (#primesList - 1) do (
     p := primesList#pIdx;
     kk := ZZ/p;
     R := kk[z0,z1,z2,z3,z4,z5];
+    zVars := {z0,z1,z2,z3,z4,z5};
 
-    -- Find omega
+    -- Find omega (primitive 13th root)
     expPow := (p - 1) // 13;
     omega := 0_kk;
     for t from 2 to p-1 do (
@@ -7597,40 +7619,51 @@ for pIdx from 0 to (#primesList - 1) do (
     );
     if omega == 0_kk then error("No omega for p=" | toString(p));
 
-    -- Build F and J
-    Llist := apply(13, k -> sum(6, j -> (omega^(k*j)) * R_j));
+    -- Build cyclotomic polynomial and Jacobian
+    Llist := apply(13, k -> sum(6, j -> (omega^(k*j)) * zVars#j));
     F := sum(Llist, Lk -> Lk^8);
     J := ideal jacobian F;
 
-    -- Test all candidates
+    -- Test all 401 candidates
     for cand in candidateList do (
         cname := cand#0;
         exps := cand#1;
 
+        -- Build monomial
         mon := 1_R;
-        for i from 0 to 5 do mon = mon * (R_i ^ (exps#i));
+        for i from 0 to 5 do mon = mon * (zVars#i ^ (exps#i));
 
+        -- Compute canonical remainder mod J ONCE
+        rem := mon % J;
+
+        -- Test each 4-variable subset
         sidx := 0;
         for S in fourSubsets do (
             sidx = sidx + 1;
             
-            -- Build forbidden ideal
+            -- Identify forbidden variables (not in S)
             forbidden := flatten apply({0,1,2,3,4,5}, x -> 
                 if member(x, S) then {} else {x});
-            Iforbid := ideal apply(forbidden, k -> R_k);
-            combined := J + Iforbid;
 
-            -- Test
-            rem := mon % combined;
-            status := if rem == 0 then "REPRESENTABLE" else "NOT_REPRESENTABLE";
+            -- Check if remainder uses ANY forbidden variable
+            usesForbidden := false;
+            for forbidIdx in forbidden do (
+                if usesVariable(rem, zVars#forbidIdx) then (
+                    usesForbidden = true;
+                    break;
+                );
+            );
+
+            result := if usesForbidden then "NOT_REPRESENTABLE" else "REPRESENTABLE";
 
             subsetName := makeSubsetName(S);
             print(toString(p) | "," | cname | "," | toString(sidx) | "," 
-                  | subsetName | "," | status);
+                  | subsetName | "," | result);
         );
     );
 );
 
+print("");
 print("Done.");
 ```
 
