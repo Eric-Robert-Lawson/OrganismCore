@@ -9682,6 +9682,6 @@ python3 compute_exact_det_bareiss.py \
 
 results:
 
-'''verbatim
+```verbatim
 pending
-'''
+```
