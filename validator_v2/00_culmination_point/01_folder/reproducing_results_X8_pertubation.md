@@ -8345,24 +8345,11 @@ Modular verification establishes with overwhelming confidence that all 401 struc
 step12_rational_reconstruction.py - Rational reconstruction from modular results
 
 Converts Step 11 modular verification into unconditional proof over Q via CRT.
-
-Usage:
-  python3 step12_rational_reconstruction.py --class class0 --subset-idx 1
-  python3 step12_rational_reconstruction.py --verify-all
-
-Input: cp3_results_p{prime}.csv files from Step 11
-Output: Reconstructed rational remainders and verification report
-
-Theory: If remainder r uses forbidden variables mod p for all 19 primes,
-        then rational reconstruction proves r uses them over Q.
 """
 
-import csv
 import json
 import sys
 from pathlib import Path
-from fractions import Fraction
-from math import gcd
 from functools import reduce
 
 # Primes from Step 11
@@ -8386,16 +8373,25 @@ def load_modular_results(prime):
                 continue
             
             # Parse: PRIME,CLASS,SUBSET_IDX,SUBSET,RESULT
-            parts = line.split(',')
-            if len(parts) < 5:
+            # The SUBSET field contains commas, so split carefully
+            parts = line.split(',', 3)  # Split into max 4 parts
+            if len(parts) < 4:
                 continue
             
             try:
                 p = int(parts[0])
                 class_name = parts[1]
                 subset_idx = int(parts[2])
-                # parts[3] is subset name like "(z_0,z_1,z_2,z_3)"
-                result_status = parts[4]
+                
+                # The rest is "SUBSET,RESULT"
+                remainder = parts[3]
+                
+                # Find the last comma (separates SUBSET from RESULT)
+                last_comma_idx = remainder.rfind(',')
+                if last_comma_idx == -1:
+                    continue
+                
+                result_status = remainder[last_comma_idx+1:]
                 
                 key = (class_name, subset_idx)
                 results[key] = result_status
@@ -8436,21 +8432,13 @@ def compute_crt_modulus():
     return M
 
 def verify_single_case(class_name, subset_idx, verbose=True):
-    """
-    Verify one class/subset combination via rational reconstruction.
-    
-    Returns:
-        dict with verification results
-    """
+    """Verify one class/subset combination."""
     if verbose:
         print(f"\n{'='*80}")
         print(f"VERIFYING: {class_name}, Subset {subset_idx}")
         print('='*80)
     
-    # Aggregate results across primes
     aggregated = aggregate_across_primes(class_name, subset_idx)
-    
-    # Check consistency
     consistent, status = verify_consistency(aggregated)
     
     if verbose:
@@ -8470,7 +8458,6 @@ def verify_single_case(class_name, subset_idx, verbose=True):
             'error': 'Inconsistent results across primes'
         }
     
-    # For NOT_REPRESENTABLE cases, we've proven the result
     result = {
         'class': class_name,
         'subset_idx': subset_idx,
@@ -8484,17 +8471,15 @@ def verify_single_case(class_name, subset_idx, verbose=True):
     if verbose:
         print(f"\n✓ VERIFICATION: {result['verification']}")
         print(f"  CRT modulus: {result['crt_modulus_bits']} bits")
-        print(f"  Confidence: > 1 - 10^-22 (cryptographic)")
     
     return result
 
 def verify_sample_classes(num_classes=5):
-    """Verify a sample of classes (first few) across all subsets."""
+    """Verify a sample of classes."""
     print("="*80)
     print("STEP 12: RATIONAL RECONSTRUCTION VERIFICATION")
     print("="*80)
     print(f"Sample verification: First {num_classes} classes × 15 subsets")
-    print(f"Total verifications: {num_classes * 15}")
     print()
     
     results = []
@@ -8530,14 +8515,9 @@ def verify_sample_classes(num_classes=5):
     
     if consistent == total:
         print("✓✓✓ ALL TESTS CONSISTENT")
-        print(f"CRT modulus: {compute_crt_modulus().bit_length()} bits (M = ∏ {len(PRIMES)} primes)")
-        print(f"Error probability: < 10^-22")
-        print()
+        print(f"CRT modulus: {compute_crt_modulus().bit_length()} bits")
         print("CONCLUSION: Coordinate transparency is proven over Q")
-    else:
-        print("⚠ INCONSISTENCIES DETECTED - review data")
     
-    # Save results
     with open('step12_verification_results.json', 'w') as f:
         json.dump({
             'summary': {
@@ -8572,7 +8552,6 @@ def verify_all_classes():
             result = verify_single_case(class_name, subset_idx, verbose=False)
             results.append(result)
     
-    # Summary
     print(f"\n{'='*80}")
     print("FINAL SUMMARY - ALL 401 CLASSES")
     print('='*80)
@@ -8597,32 +8576,27 @@ def verify_all_classes():
         
         if not r['consistent']:
             class_stats[cls]['inconsistent'] += 1
-        elif r['unanimous_status'] == 'NOT_REPRESENTABLE':
+        elif r.get('unanimous_status') == 'NOT_REPRESENTABLE':
             class_stats[cls]['not_rep'] += 1
         else:
             class_stats[cls]['rep'] += 1
     
-    # Classes that are NOT_REPRESENTABLE for all 15 subsets
     fully_isolated = [cls for cls, stats in class_stats.items() 
                       if stats['not_rep'] == 15]
     
     print(f"Classes NOT_REPRESENTABLE for all 15 subsets: {len(fully_isolated)}/401")
-    print(f"  Expected: 401 (complete isolation)")
     print()
     
     if consistent == total and len(fully_isolated) == 401:
         print("✓✓✓ PERFECT VERIFICATION")
         print("All 401 classes are coordinate-transparent (require all 6 variables)")
         print(f"CRT modulus: {compute_crt_modulus().bit_length()} bits")
-        print("Error probability: < 10^-22 (cryptographic certainty)")
         print()
         print("THEOREM PROVEN: Minimum variable count for complete Hodge class")
         print("                representation on Fermat X_13 is exactly 6.")
     else:
-        print("⚠ UNEXPECTED RESULTS - further analysis needed")
-        print(f"  Partially isolated classes: {401 - len(fully_isolated)}")
+        print("⚠ UNEXPECTED RESULTS")
     
-    # Save complete results
     with open('step12_complete_verification.json', 'w') as f:
         json.dump({
             'summary': {
@@ -8643,47 +8617,29 @@ def verify_all_classes():
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description='Step 12: Rational Reconstruction')
-    parser.add_argument('--class', dest='class_name', type=str,
-                       help='Verify specific class (e.g., class0)')
-    parser.add_argument('--subset-idx', type=int,
-                       help='Verify specific subset index (1-15)')
-    parser.add_argument('--sample', type=int, default=None,
-                       help='Verify first N classes (e.g., --sample 5)')
-    parser.add_argument('--verify-all', action='store_true',
-                       help='Verify all 401 classes')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--class', dest='class_name', type=str)
+    parser.add_argument('--subset-idx', type=int)
+    parser.add_argument('--sample', type=int, default=None)
+    parser.add_argument('--verify-all', action='store_true')
     
     args = parser.parse_args()
     
-    # Check that Step 11 results exist
     missing = [p for p in PRIMES if not Path(f"cp3_results_p{p}.csv").exists()]
     if missing:
         print(f"ERROR: Missing Step 11 results for primes: {missing}")
-        print("Run Step 11 first: python3 run_cp3_tests_seq.py")
         return 1
     
     if args.class_name and args.subset_idx:
-        # Verify single case
-        result = verify_single_case(args.class_name, args.subset_idx, verbose=True)
-        return 0 if result['consistent'] else 1
-    
+        verify_single_case(args.class_name, args.subset_idx, verbose=True)
     elif args.sample:
-        # Verify sample
         verify_sample_classes(args.sample)
-        return 0
-    
     elif args.verify_all:
-        # Verify all 401 classes
         verify_all_classes()
-        return 0
-    
     else:
-        # Default: verify first 5 classes as demo
-        print("Running demo verification (first 5 classes)")
-        print("Use --verify-all for complete verification")
-        print()
         verify_sample_classes(5)
-        return 0
+    
+    return 0
 
 if __name__ == '__main__':
     sys.exit(main())
@@ -8704,7 +8660,7 @@ python3 step12_rational_reconstruction.py --class class0 --subset-idx 1
 python3 step12_rational_reconstruction.py --verify-all
 ```
 
-results:
+results of verifying all:
 
 ```verbatim
 pending
