@@ -9682,6 +9682,22 @@ python3 compute_exact_det_bareiss.py \
 
 results:
 
+pivot_finder_modp.py
+```verbatim
+pending
+```
+
+crt_minor_reconstruct.py
+```verbatim
+pending
+```
+
+rational_from_crt_json.py
+```verbatim
+pending
+```
+
+compute_exact_det_bareiss.py
 ```verbatim
 pending
 ```
