@@ -9684,7 +9684,14 @@ results:
 
 pivot_finder_modp.py
 ```verbatim
-pending
+Loading triplets from saved_inv_p313_triplets.json ...
+Matrix dims inferred: nrows=2590, ncols=2016
+Searching for up to k=1883 pivots (greedy elimination mod 313)...
+Pivot search complete: found 1883 pivots in 872.98s
+Determinant of pivot minor modulo 313 = 128
+Wrote pivot_1883_rows.txt, pivot_1883_cols.txt, pivot_1883_report.json
+Pivot minor is nonzero modulo p (good). You can now run crt_minor_reconstruct.py across primes with these pivot rows/cols.
+Done.
 ```
 
 crt_minor_reconstruct.py
