@@ -8725,6 +8725,8 @@ Modular verification establishes with overwhelming computational evidence that a
 
 ---
 
+**IMPORTANT: HAVE GMPY2 PYTHON IMPORT!**
+
 ## **Description**
 
 **Objective**: Convert modular rank evidence (5-prime agreement, rank = 1883) into an **unconditional deterministic proof** over ℤ by computing the exact integer determinant of a full-rank 1883×1883 pivot minor via the Bareiss fraction-free algorithm.
