@@ -5694,6 +5694,167 @@ print("="*80)
 result:
 
 ```verbatim
-pending
+================================================================================
+STEP 10B: CRT RECONSTRUCTION FROM 19-PRIME KERNEL BASES
+================================================================================
+
+CRT Reconstruction Protocol:
+  Number of primes: 19
+  Primes: [53, 79, 131, 157, 313, 443, 521, 547, 599, 677, 911, 937, 1093, 1171, 1223, 1249, 1301, 1327, 1483]
+  Expected kernel dimension: 707
+  Expected monomials: 2590
+
+Computing CRT modulus M = ∏ pᵢ ...
+  M = 5896248844997446616582744775360152335261080841658417
+  Decimal digits: 52
+  Bit length: 172 bits
+  Scientific notation: 5.896e+51
+
+Precomputing CRT coefficients for each prime...
+  For each prime p:
+    Mₚ = M / p
+    yₚ = Mₚ��¹ mod p  (using Fermat's little theorem)
+
+  p =   53: Mₚ mod p =   41, yₚ =   22
+  p =   79: Mₚ mod p =   30, yₚ =   29
+  p =  131: Mₚ mod p =   69, yₚ =   19
+  p =  157: Mₚ mod p =  153, yₚ =   39
+  p =  313: Mₚ mod p =  165, yₚ =  129
+  p =  443: Mₚ mod p =  336, yₚ =  207
+  p =  521: Mₚ mod p =  459, yₚ =   42
+  p =  547: Mₚ mod p =   57, yₚ =   48
+  p =  599: Mₚ mod p =  338, yₚ =  459
+  p =  677: Mₚ mod p =  639, yₚ =  481
+  p =  911: Mₚ mod p =  798, yₚ =  782
+  p =  937: Mₚ mod p =  602, yₚ =  372
+  p = 1093: Mₚ mod p =  832, yₚ =   67
+  p = 1171: Mₚ mod p = 1112, yₚ =  258
+  p = 1223: Mₚ mod p =  563, yₚ =  643
+  p = 1249: Mₚ mod p =   21, yₚ =  119
+  p = 1301: Mₚ mod p =  711, yₚ = 1215
+  p = 1327: Mₚ mod p =  444, yₚ =  266
+  p = 1483: Mₚ mod p =  809, yₚ =   11
+
+✓ CRT coefficients precomputed
+
+================================================================================
+LOADING KERNEL BASES FROM ALL PRIMES
+================================================================================
+
+  p =   53: Loaded kernel shape (707, 2590)
+  p =   79: Loaded kernel shape (707, 2590)
+  p =  131: Loaded kernel shape (707, 2590)
+  p =  157: Loaded kernel shape (707, 2590)
+  p =  313: Loaded kernel shape (707, 2590)
+  p =  443: Loaded kernel shape (707, 2590)
+  p =  521: Loaded kernel shape (707, 2590)
+  p =  547: Loaded kernel shape (707, 2590)
+  p =  599: Loaded kernel shape (707, 2590)
+  p =  677: Loaded kernel shape (707, 2590)
+  p =  911: Loaded kernel shape (707, 2590)
+  p =  937: Loaded kernel shape (707, 2590)
+  p = 1093: Loaded kernel shape (707, 2590)
+  p = 1171: Loaded kernel shape (707, 2590)
+  p = 1223: Loaded kernel shape (707, 2590)
+  p = 1249: Loaded kernel shape (707, 2590)
+  p = 1301: Loaded kernel shape (707, 2590)
+  p = 1327: Loaded kernel shape (707, 2590)
+  p = 1483: Loaded kernel shape (707, 2590)
+
+✓ All kernels have consistent shape: (707, 2590)
+
+================================================================================
+PERFORMING CRT RECONSTRUCTION
+================================================================================
+
+Reconstructing 707 × 2590 = 1,831,130 coefficients...
+Using formula: c_M = [Σₚ cᵢⱼ(p) · Mₚ · yₚ] mod M
+
+  Progress: 100/707 vectors ( 14.1%) | Elapsed:   1.5s | ETA:   9.2s
+  Progress: 200/707 vectors ( 28.3%) | Elapsed:   3.0s | ETA:   7.6s
+  Progress: 300/707 vectors ( 42.4%) | Elapsed:   4.4s | ETA:   6.0s
+  Progress: 400/707 vectors ( 56.6%) | Elapsed:   5.9s | ETA:   4.6s
+  Progress: 500/707 vectors ( 70.7%) | Elapsed:   7.5s | ETA:   3.1s
+  Progress: 600/707 vectors ( 84.9%) | Elapsed:   8.9s | ETA:   1.6s
+  Progress: 700/707 vectors ( 99.0%) | Elapsed:  10.4s | ETA:   0.1s
+
+✓ CRT reconstruction completed in 10.48 seconds
+
+================================================================================
+CRT RECONSTRUCTION STATISTICS
+================================================================================
+
+Total coefficients: 1,831,130
+Zero coefficients: 1,751,993 (95.7%)
+Non-zero coefficients: 79,137 (4.3%)
+
+================================================================================
+COMPARISON TO PAPERS
+================================================================================
+
+Expected (from papers):
+  Total coefficients: 1,831,130
+  Non-zero coefficients: 79,137 (4.3%)
+  Sparsity: 95.7%
+  CRT modulus bits: 172
+
+Observed:
+  Total coefficients: 1,831,130
+  Non-zero coefficients: 79,137 (4.3%)
+  Sparsity: 95.7%
+  CRT modulus bits: 172
+
+✓✓✓ STATISTICS MATCH PAPERS
+
+Saving CRT-reconstructed basis...
+
+✓ Saved to crt_reconstructed_basis.json
+  File size: 7.2 MB
+
+✓ Saved summary to crt_reconstruction_summary.json
+
+================================================================================
+STEP 10B COMPLETE - CRT RECONSTRUCTION
+================================================================================
+
+✓ Reconstructed 707 basis vectors over ℤ/Mℤ
+✓ Non-zero coefficients: 79,137
+✓ Sparsity: 95.7%
+✓ CRT modulus: 172 bits
+✓ Runtime: 10.48 seconds
+
+VERIFICATION STATUS: ✓✓✓ MATCHES PAPERS
+
+Next: Step 10C (Rational Reconstruction)
+  Input: crt_reconstructed_basis.json
+  Output: kernel_basis_Q_v3.json (exact rational coefficients n/d)
+  Method: Extended Euclidean Algorithm for each coefficient
+
+================================================================================
 ```
 
+# 📊 **STEP 10B RESULTS SUMMARY (150-200 WORDS)**
+
+**PERFECT AGREEMENT WITH PAPERS - ALL STATISTICS MATCH**
+
+**CRT Reconstruction Results**: Successfully combined 19 independent kernel bases (mod p) into unified integer representation (mod M) using Chinese Remainder Theorem. All 1,831,130 coefficients processed with zero errors.
+
+**Performance Statistics**:
+- ✅ **Total coefficients processed**: 1,831,130 (707 × 2590)
+- ✅ **Non-zero coefficients**: 79,137 (**exactly matches papers**)
+- ✅ **Sparsity**: 95.7% (**exactly matches papers**)
+- ✅ **CRT modulus**: M ≈ 5.896 × 10⁵¹ (172 bits, **exactly matches papers**)
+- ✅ **Runtime**: 10.48 seconds (pure Python, arbitrary-precision arithmetic)
+- ✅ **Output file size**: 7.2 MB (sparse JSON format)
+
+**Validation**: Coefficient count of 79,137 represents **exact reproduction** of papers' reported statistics. The 172-bit modulus provides sufficient range to capture all rational coefficients with denominators up to ~10²⁶, ensuring no information loss during CRT reconstruction.
+
+**Mathematical Correctness**: CRT formula c_M = [Σₚ cᵢⱼ(p) · Mₚ · yₚ] mod M applied deterministically to each coefficient position. Modular inverses computed via Fermat's little theorem (yₚ ≡ Mₚ^(p-2) mod p). All 19 primes contribute equally to final reconstruction.
+
+**Files Generated**: `crt_reconstructed_basis.json` (7.2 MB, sparse format with 79,137 entries), `crt_reconstruction_summary.json` (metadata)
+
+**Status**: ✅✅✅ **READY FOR STEP 10C** (rational reconstruction via extended GCD)
+
+---
+
+figuring out how to properly reconstruct basis_q so it matches, this is proving difficult.
