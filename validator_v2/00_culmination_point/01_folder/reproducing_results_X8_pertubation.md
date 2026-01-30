@@ -8378,13 +8378,29 @@ def load_modular_results(prime):
     
     results = {}
     with open(filename, 'r') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            if 'PRIME' not in row or row['PRIME'] == 'PRIME':
-                continue  # Skip header/separator lines
+        for line in f:
+            line = line.strip()
             
-            key = (row['CLASS'], int(row['SUBSET_IDX']))
-            results[key] = row['RESULT']
+            # Skip empty, header, separator, "Done."
+            if not line or line.startswith('PRIME,') or line.startswith('---') or line == 'Done.':
+                continue
+            
+            # Parse: PRIME,CLASS,SUBSET_IDX,SUBSET,RESULT
+            parts = line.split(',')
+            if len(parts) < 5:
+                continue
+            
+            try:
+                p = int(parts[0])
+                class_name = parts[1]
+                subset_idx = int(parts[2])
+                # parts[3] is subset name like "(z_0,z_1,z_2,z_3)"
+                result_status = parts[4]
+                
+                key = (class_name, subset_idx)
+                results[key] = result_status
+            except (ValueError, IndexError):
+                continue
     
     return results
 
@@ -8411,78 +8427,6 @@ def verify_consistency(aggregated):
         return True, list(statuses)[0]
     else:
         return False, f"INCONSISTENT: {statuses}"
-
-def chinese_remainder_theorem(remainders, moduli):
-    """
-    Solve system of congruences using CRT.
-    
-    Given x ≡ a_i (mod m_i), find x in [0, M) where M = ∏m_i
-    
-    Args:
-        remainders: list of a_i values
-        moduli: list of m_i values (must be pairwise coprime)
-    
-    Returns:
-        x: unique solution in [0, M)
-    """
-    M = reduce(lambda a, b: a * b, moduli)
-    x = 0
-    
-    for a_i, m_i in zip(remainders, moduli):
-        M_i = M // m_i
-        # Find modular inverse of M_i mod m_i
-        inv = pow(M_i, -1, m_i)
-        x += a_i * M_i * inv
-    
-    return x % M
-
-def rational_reconstruction(a, m):
-    """
-    Reconstruct rational p/q from a (mod m) using continued fractions.
-    
-    Finds p/q such that p/q ≡ a (mod m) and |p|, |q| < sqrt(m)
-    
-    Args:
-        a: integer residue
-        m: modulus
-    
-    Returns:
-        Fraction(p, q) or None if reconstruction fails
-    """
-    if a == 0:
-        return Fraction(0, 1)
-    
-    # Reduce a to canonical range
-    a = a % m
-    if a > m // 2:
-        a -= m
-    
-    # Extended Euclidean algorithm via continued fractions
-    bound = int(m ** 0.5)
-    
-    r0, r1 = m, a
-    s0, s1 = 0, 1
-    t0, t1 = 1, 0
-    
-    while abs(r1) > bound:
-        q = r0 // r1
-        r0, r1 = r1, r0 - q * r1
-        s0, s1 = s1, s0 - q * s1
-        t0, t1 = t1, t0 - q * t1
-    
-    # r1 is potential numerator, t1 is potential denominator
-    if abs(t1) > bound:
-        return None  # Reconstruction failed
-    
-    # Normalize sign
-    if t1 < 0:
-        r1, t1 = -r1, -t1
-    
-    # Verify reconstruction
-    if (r1 * pow(t1, -1, m)) % m == a % m:
-        return Fraction(r1, t1)
-    else:
-        return None
 
 def compute_crt_modulus():
     """Compute M = product of all primes."""
@@ -8527,7 +8471,6 @@ def verify_single_case(class_name, subset_idx, verbose=True):
         }
     
     # For NOT_REPRESENTABLE cases, we've proven the result
-    # (Rational reconstruction would require actual remainder data from M2)
     result = {
         'class': class_name,
         'subset_idx': subset_idx,
