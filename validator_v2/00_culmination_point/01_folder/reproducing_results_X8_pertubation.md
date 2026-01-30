@@ -7142,23 +7142,20 @@ You've now successfully reproduced:
 Save as `cp3_test_all_candidates.m2`:
 
 ```m2
--- cp3_test_all_candidates.m2
--- Complete CP3 coordinate collapse tests for 401 isolated classes across 19 primes
+-- cp3_test_all_candidates_v2.m2
+-- CP3 coordinate collapse tests using ideal-based method (cleaner)
 -- 
--- Usage (all primes via Python wrapper):
---   python3 run_cp3_tests.py --parallel 19
+-- Usage:
+--   python3 run_cp3_tests.py --parallel 4
 --
--- Usage (single prime, manual):
---   m2 -e 'primesList = {313}; load "cp3_test_all_candidates.m2"' > cp3_results_p313.csv
---
--- Output: CSV format with columns PRIME,CLASS,SUBSET_IDX,SUBSET,STATUS
--- Runtime: ~3-4 hours per prime (parallelizable across 19 cores)
+-- Method: For each 4-var subset S and forbidden set F = {vars not in S},
+--   compute remainder r = monomial mod (J + ideal(F))
+--   If r == 0: class can be represented using only S variables (REPRESENTABLE)
+--   If r != 0: class cannot be represented (NOT_REPRESENTABLE)
 
--- Prime list (all primes p ≡ 1 mod 13, ensuring primitive 13th roots exist)
 primesList := {53,79,131,157,313,443,521,547,599,677,911,937,1093,1171,1223,1249,1301,1327,1483};
 
--- Complete candidate list (401 structurally isolated classes)
--- Each entry: {className, exponentVector}
+-- Full 401-class candidate list
 candidateList := {
   {"class0", {5,3,2,2,4,2}},
   {"class1", {5,2,4,2,2,3}},
@@ -7563,7 +7560,7 @@ candidateList := {
   {"class400", {1,4,7,4,1,1}}
 };
 
--- All 15 four-variable subsets of {0,1,2,3,4,5}
+-- 15 four-variable subsets
 fourSubsets := {
  {0,1,2,3}, {0,1,2,4}, {0,1,2,5},
  {0,1,3,4}, {0,1,3,5}, {0,1,4,5},
@@ -7572,106 +7569,64 @@ fourSubsets := {
  {1,2,4,5}, {1,3,4,5}, {2,3,4,5}
 };
 
--- Helper: format subset name
-makeSubsetName = L -> (
+makeSubsetName = idxList -> (
     s := "(";
-    for i from 0 to (#L - 1) do (
-        if i == 0 then s = s | ("z_" | toString(L#i)) 
-        else s = s | ("," | ("z_" | toString(L#i)))
+    first := true;
+    for idx in idxList do (
+        elemStr := "z_" | toString(idx);
+        if first then ( s = s | elemStr; first = false ) 
+        else ( s = s | "," | elemStr );
     );
-    s = s | ")";
-    s
+    s | ")"
 );
 
--- Helper: convert monomials to list
-toMonomialList = obj -> (
-    if class obj === Matrix then flatten entries obj
-    else if class obj === List then obj
-    else {obj}
-);
-
--- CSV header
 print("PRIME,CLASS,SUBSET_IDX,SUBSET,STATUS");
 print("-----------------------------------------");
 
--- Main loop over primes
 for pIdx from 0 to (#primesList - 1) do (
     p := primesList#pIdx;
     kk := ZZ/p;
-    R := kk[z0,z1,z2,z3,z4,z5, MonomialOrder => GRevLex];
-    zVars := {z0,z1,z2,z3,z4,z5};
+    R := kk[z0,z1,z2,z3,z4,z5];
 
-    -- Find primitive 13th root of unity
+    -- Find omega
     expPow := (p - 1) // 13;
     omega := 0_kk;
     for t from 2 to p-1 do (
         elt := (t_kk) ^ expPow;
         if elt != 1_kk then ( omega = elt; break );
     );
-    if omega == 0_kk then error("no omega found for p=" | toString(p));
+    if omega == 0_kk then error("No omega for p=" | toString(p));
 
-    -- Build cyclotomic forms and polynomial
-    Llist := apply(13, k -> (
-        s := 0_R;
-        for j from 0 to 5 do s = s + (omega^(k*j)) * (zVars#j);
-        s
-    ));
+    -- Build F and J
+    Llist := apply(13, k -> sum(6, j -> (omega^(k*j)) * R_j));
     F := sum(Llist, Lk -> Lk^8);
     J := ideal jacobian F;
 
-    -- Test all 401 candidates
-    for cIdx from 0 to (#candidateList - 1) do (
-        cname := toString(candidateList#cIdx#0);
-        exps := candidateList#cIdx#1;
+    -- Test all candidates
+    for cand in candidateList do (
+        cname := cand#0;
+        exps := cand#1;
 
-        -- Build monomial
         mon := 1_R;
-        for i from 0 to 5 do mon = mon * (zVars#i ^ (exps#i));
+        for i from 0 to 5 do mon = mon * (R_i ^ (exps#i));
 
-        -- Canonical remainder
-        r := mon % J;
+        sidx := 0;
+        for S in fourSubsets do (
+            sidx = sidx + 1;
+            
+            -- Build forbidden ideal
+            forbidden := flatten apply({0,1,2,3,4,5}, x -> 
+                if member(x, S) then {} else {x});
+            Iforbid := ideal apply(forbidden, k -> R_k);
+            combined := J + Iforbid;
 
-        if r == 0_R then (
-            for sIdx from 0 to (#fourSubsets - 1) do (
-                subsetName := makeSubsetName(fourSubsets#sIdx);
-                line := toString(p) | "," | cname | "," | toString(sIdx+1) 
-                        | "," | subsetName | ",REMAINDER_ZERO";
-                print(line);
-            );
-            continue;
-        );
-
-        raw := try monomials r else null;
-        mons := if raw === null then {r} else toMonomialList(raw);
-
-        -- Test each subset
-        for sIdx from 0 to (#fourSubsets - 1) do (
-            S := fourSubsets#sIdx;
-            forbidden := {};
-            for j from 0 to 5 do (
-                if not member(j, S) then forbidden = append(forbidden, j)
-            );
-
-            usesForbidden := false;
-            for mIdx from 0 to (#mons - 1) do (
-                m := mons#mIdx;
-                for fIdx from 0 to (#forbidden - 1) do (
-                    j := forbidden#fIdx;
-                    ex := try degree(m, zVars#j) else null;
-                    if ex === null then (
-                        usesForbidden = true; break;
-                    ) else if ex > 0 then (
-                        usesForbidden = true; break;
-                    );
-                );
-                if usesForbidden then break;
-            );
+            -- Test
+            rem := mon % combined;
+            status := if rem == 0 then "REPRESENTABLE" else "NOT_REPRESENTABLE";
 
             subsetName := makeSubsetName(S);
-            status := if usesForbidden then "NOT_REPRESENTABLE" else "REPRESENTABLE";
-            line := toString(p) | "," | cname | "," | toString(sIdx+1) 
-                    | "," | subsetName | "," | status;
-            print(line);
+            print(toString(p) | "," | cname | "," | toString(sidx) | "," 
+                  | subsetName | "," | status);
         );
     );
 );
