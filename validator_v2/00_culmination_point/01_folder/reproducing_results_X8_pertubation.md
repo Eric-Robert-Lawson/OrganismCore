@@ -9736,7 +9736,19 @@ Done.
 
 rational_from_crt_json.py
 ```verbatim
-pending
+M = 26953691077
+cM (mod M) = 9339260950
+signed rep = 9339260950
+heuristic bound (sqrt(M/2)) = 116089
+Reconstruction success: n/d = (71401, 5446)
+Verify residues mod primes:
+  p = 53 residue_given = 40 computed = 40
+  p = 79 residue_given = 3 computed = 3
+  p = 131 residue_given = 42 computed = 42
+  p = 157 residue_given = 84 computed = 84
+  p = 313 residue_given = 128 computed = 128
+Residue check OK? True
+Wrote crt_pivot_1883_rational.json
 ```
 
 compute_exact_det_bareiss.py
