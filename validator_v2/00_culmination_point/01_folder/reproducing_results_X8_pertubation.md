@@ -7669,15 +7669,27 @@ print("Done.");
 
 ---
 
-## **Script 2: Python Wrapper for Parallel Execution**
+## **Script 2: Python Wrapper**
 
 Save as `run_cp3_tests.py`:
 
 ```python
 #!/usr/bin/env python3
 """
-run_cp3_tests.py - CORRECTED VERSION
-Continues running even if results are mixed REPRESENTABLE/NOT_REPRESENTABLE
+run_cp3_sequential.py - Run CP3 tests one prime at a time (sequential)
+
+Usage:
+  python3 run_cp3_sequential.py                    # Run all 19 primes
+  python3 run_cp3_sequential.py --start-from 313   # Resume from prime 313
+  python3 run_cp3_sequential.py --primes 53 79 131 # Run specific primes only
+
+Advantages of sequential:
+  - Easy to monitor progress
+  - Can stop and resume
+  - Clean output per prime
+  - No parallel race conditions
+
+Estimated time: 60-76 hours for all 19 primes
 """
 
 import subprocess
@@ -7685,7 +7697,6 @@ import sys
 import time
 import json
 from pathlib import Path
-from multiprocessing import Pool, cpu_count
 from datetime import datetime
 
 PRIMES = [53, 79, 131, 157, 313, 443, 521, 547, 599, 677, 911, 937, 
@@ -7695,7 +7706,10 @@ def run_single_prime(prime):
     """Run CP3 test for a single prime."""
     output_file = f"cp3_results_p{prime}.csv"
     
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] Starting prime {prime}...")
+    print(f"\n{'='*80}")
+    print(f"PRIME {prime} - Started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print('='*80)
+    
     start_time = time.time()
     
     try:
@@ -7705,175 +7719,194 @@ def run_single_prime(prime):
             f"primesList = {{{prime}}}; load \"cp3_test_all_candidates.m2\""
         ]
         
+        print(f"Running: {' '.join(cmd)}")
+        print(f"Output: {output_file}")
+        print()
+        
         with open(output_file, 'w') as f:
             result = subprocess.run(
                 cmd, 
                 stdout=f, 
                 stderr=subprocess.PIPE, 
-                text=True, 
-                timeout=15000  # 4 hour timeout
+                text=True
             )
         
         elapsed = time.time() - start_time
         
         if result.returncode != 0:
-            error = result.stderr[:500]
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] ✗ Prime {prime} FAILED: {error}")
-            return (prime, False, output_file, elapsed, error)
+            print(f"✗ FAILED (exit code {result.returncode})")
+            print(f"Error output:")
+            print(result.stderr[:1000])
+            return {
+                'prime': prime,
+                'success': False,
+                'runtime_hours': elapsed / 3600,
+                'error': result.stderr[:500]
+            }
         
+        # Analyze results
         if not Path(output_file).exists():
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] ✗ Prime {prime} FAILED: No output")
-            return (prime, False, output_file, elapsed, "No output file")
+            print(f"✗ FAILED: Output file not created")
+            return {
+                'prime': prime,
+                'success': False,
+                'runtime_hours': elapsed / 3600,
+                'error': 'No output file'
+            }
         
         with open(output_file, 'r') as f:
-            lines = sum(1 for _ in f)
+            lines = f.readlines()
         
-        expected_lines = 6017  # 1 header + 1 separator + 6015 data rows
+        # Count results
+        not_rep = sum(1 for l in lines if 'NOT_REPRESENTABLE' in l)
+        rep = sum(1 for l in lines 
+                 if l.strip().endswith('REPRESENTABLE') 
+                 and 'NOT_REPRESENTABLE' not in l)
+        total = not_rep + rep
         
-        if lines < 100:  # Definitely too few
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] ⚠ Prime {prime} has only {lines} lines (expected ~{expected_lines})")
-            return (prime, True, output_file, elapsed, f"Low line count: {lines}")
+        pct_not_rep = (not_rep / total * 100) if total > 0 else 0
         
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] ✓ Prime {prime} completed "
-              f"in {elapsed/3600:.2f}h ({lines} lines)")
-        return (prime, True, output_file, elapsed, None)
+        print(f"✓ COMPLETED in {elapsed/3600:.2f} hours")
+        print(f"  Total lines: {len(lines)}")
+        print(f"  Total tests: {total}")
+        print(f"  NOT_REPRESENTABLE: {not_rep} ({pct_not_rep:.1f}%)")
+        print(f"  REPRESENTABLE: {rep}")
         
-    except subprocess.TimeoutExpired:
-        elapsed = time.time() - start_time
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] ✗ Prime {prime} TIMEOUT")
-        return (prime, False, output_file, elapsed, "Timeout")
+        return {
+            'prime': prime,
+            'success': True,
+            'runtime_hours': elapsed / 3600,
+            'total_lines': len(lines),
+            'total_tests': total,
+            'not_representable': not_rep,
+            'representable': rep,
+            'pct_not_representable': pct_not_rep
+        }
+        
     except Exception as e:
         elapsed = time.time() - start_time
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] ✗ Prime {prime} ERROR: {e}")
-        return (prime, False, output_file, elapsed, str(e))
-
-def validate_results(results):
-    """Validate and summarize results - DOES NOT REQUIRE 100% NOT_REPRESENTABLE."""
-    stats = {
-        'total_primes': len(PRIMES),
-        'successful_primes': 0,
-        'failed_primes': [],
-        'total_runtime_hours': 0,
-        'per_prime_stats': {}
-    }
-    
-    for prime, success, output_file, runtime, error in results:
-        stats['total_runtime_hours'] += runtime / 3600
-        
-        if success:
-            stats['successful_primes'] += 1
-            try:
-                with open(output_file, 'r') as f:
-                    lines = f.readlines()
-                
-                not_rep = sum(1 for l in lines if 'NOT_REPRESENTABLE' in l)
-                rep = sum(1 for l in lines 
-                         if l.strip().endswith('REPRESENTABLE') 
-                         and 'NOT_REPRESENTABLE' not in l)
-                
-                total = not_rep + rep
-                pct_not_rep = (not_rep / total * 100) if total > 0 else 0
-                
-                stats['per_prime_stats'][prime] = {
-                    'total_lines': len(lines),
-                    'not_representable': not_rep,
-                    'representable': rep,
-                    'pct_not_representable': pct_not_rep,
-                    'runtime_hours': runtime / 3600
-                }
-                
-            except Exception as e:
-                stats['per_prime_stats'][prime] = {'error': str(e)}
-        else:
-            stats['failed_primes'].append({'prime': prime, 'error': error})
-    
-    # SUCCESS = all primes completed (regardless of REPRESENTABLE/NOT_REPRESENTABLE mix)
-    return stats['successful_primes'] == len(PRIMES), stats
+        print(f"✗ EXCEPTION: {e}")
+        return {
+            'prime': prime,
+            'success': False,
+            'runtime_hours': elapsed / 3600,
+            'error': str(e)
+        }
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--parallel', type=int, default=None)
-    parser.add_argument('--sequential', action='store_true')
-    parser.add_argument('--primes', nargs='+', type=int, default=None)
+    parser = argparse.ArgumentParser(description='Run CP3 tests sequentially')
+    parser.add_argument('--start-from', type=int, default=None,
+                       help='Resume from this prime (e.g., 313)')
+    parser.add_argument('--primes', nargs='+', type=int, default=None,
+                       help='Specific primes to test')
     args = parser.parse_args()
     
-    # Check Macaulay2 available
+    # Check Macaulay2
     try:
         subprocess.run(['m2', '--version'], capture_output=True, check=True)
     except:
-        print("ERROR: Macaulay2 not found")
+        print("ERROR: Macaulay2 not found in PATH")
         sys.exit(1)
     
+    # Check M2 file
     if not Path('cp3_test_all_candidates.m2').exists():
         print("ERROR: cp3_test_all_candidates.m2 not found")
         sys.exit(1)
     
-    primes_to_test = args.primes if args.primes else PRIMES
-    
-    print("="*80)
-    print("CP3 COORDINATE COLLAPSE TESTS - MODULAR VERIFICATION (CORRECTED)")
-    print("="*80)
-    print(f"Primes: {len(primes_to_test)}")
-    
-    if args.sequential:
-        print("Mode: Sequential (~60-76 hours)")
-        num_workers = 1
+    # Determine which primes to test
+    if args.primes:
+        primes_to_test = args.primes
+    elif args.start_from:
+        primes_to_test = [p for p in PRIMES if p >= args.start_from]
     else:
-        num_workers = args.parallel if args.parallel else min(cpu_count(), len(primes_to_test))
-        print(f"Mode: Parallel ({num_workers} workers)")
+        primes_to_test = PRIMES
     
+    print("="*80)
+    print("CP3 COORDINATE COLLAPSE TESTS - SEQUENTIAL MODE")
+    print("="*80)
+    print(f"Primes to test: {len(primes_to_test)}")
+    print(f"Primes: {primes_to_test}")
+    print(f"Estimated time: ~{len(primes_to_test) * 4} hours")
+    print(f"Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print()
-    start_time = time.time()
     
-    if num_workers == 1:
-        results = [run_single_prime(p) for p in primes_to_test]
-    else:
-        with Pool(num_workers) as pool:
-            results = pool.map(run_single_prime, primes_to_test)
+    overall_start = time.time()
+    results = []
     
-    total_elapsed = time.time() - start_time
+    for i, prime in enumerate(primes_to_test, 1):
+        print(f"\n[{i}/{len(primes_to_test)}] Processing prime {prime}...")
+        
+        result = run_single_prime(prime)
+        results.append(result)
+        
+        # Save progress after each prime
+        summary = {
+            'timestamp': datetime.now().isoformat(),
+            'primes_completed': i,
+            'primes_total': len(primes_to_test),
+            'results': results
+        }
+        
+        with open('cp3_progress.json', 'w') as f:
+            json.dump(summary, f, indent=2)
+        
+        print(f"\nProgress: {i}/{len(primes_to_test)} primes completed")
+        print(f"Cumulative runtime: {(time.time() - overall_start)/3600:.2f} hours")
     
+    total_elapsed = time.time() - overall_start
+    
+    # Final summary
     print()
     print("="*80)
-    print("VALIDATION")
+    print("FINAL SUMMARY")
     print("="*80)
     
-    is_valid, stats = validate_results(results)
+    successful = [r for r in results if r['success']]
+    failed = [r for r in results if not r['success']]
     
-    print(f"Successful: {stats['successful_primes']}/{stats['total_primes']}")
-    print(f"Runtime: {total_elapsed/3600:.2f}h")
+    print(f"Total primes: {len(results)}")
+    print(f"Successful: {len(successful)}")
+    print(f"Failed: {len(failed)}")
+    print(f"Total runtime: {total_elapsed/3600:.2f} hours")
     print()
     
-    if stats['failed_primes']:
+    if failed:
         print("FAILED PRIMES:")
-        for fail in stats['failed_primes']:
-            print(f"  Prime {fail['prime']}: {fail['error']}")
+        for r in failed:
+            print(f"  Prime {r['prime']}: {r.get('error', 'Unknown error')}")
         print()
     
-    if stats['per_prime_stats']:
+    if successful:
         print("PER-PRIME STATISTICS:")
-        for p in primes_to_test:
-            if p in stats['per_prime_stats'] and 'error' not in stats['per_prime_stats'][p]:
-                s = stats['per_prime_stats'][p]
-                print(f"  p={p:4d}: {s['not_representable']:5d} NOT_REP ({s['pct_not_representable']:5.1f}%), "
-                      f"{s['representable']:5d} REP, {s['runtime_hours']:.2f}h")
+        for r in successful:
+            print(f"  p={r['prime']:4d}: {r['not_representable']:5d} NOT_REP "
+                  f"({r['pct_not_representable']:5.1f}%), "
+                  f"{r['representable']:5d} REP, {r['runtime_hours']:.2f}h")
     
-    with open('cp3_summary.json', 'w') as f:
-        json.dump({
-            'timestamp': datetime.now().isoformat(), 
-            'statistics': stats
-        }, f, indent=2)
+    # Save final summary
+    final_summary = {
+        'timestamp': datetime.now().isoformat(),
+        'total_primes': len(results),
+        'successful_primes': len(successful),
+        'failed_primes': len(failed),
+        'total_runtime_hours': total_elapsed / 3600,
+        'results': results
+    }
     
-    print(f"\nSummary: cp3_summary.json")
+    with open('cp3_summary_sequential.json', 'w') as f:
+        json.dump(final_summary, f, indent=2)
     
-    if is_valid:
-        print("\n✓✓✓ ALL PRIMES COMPLETED")
-        print(f"Output files: cp3_results_p*.csv ({stats['successful_primes']} files)")
-        print("\nNext: Analyze results to verify NOT_REPRESENTABLE percentages")
+    print()
+    print(f"Summary saved to: cp3_summary_sequential.json")
+    print(f"Progress saved to: cp3_progress.json")
+    print()
+    
+    if len(successful) == len(results):
+        print("✓✓✓ ALL PRIMES COMPLETED SUCCESSFULLY")
         return 0
     else:
-        print("\n✗ SOME PRIMES FAILED")
+        print(f"⚠ {len(failed)} PRIMES FAILED")
         return 1
 
 if __name__ == '__main__':
