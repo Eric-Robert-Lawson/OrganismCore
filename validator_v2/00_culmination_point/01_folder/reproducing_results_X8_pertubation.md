@@ -8770,24 +8770,24 @@ Algorithm (greedy sparse modular elimination):
 
 Usage:
   python3 pivot_finder_modp.py \
-    --triplet saved_inv_p313_triplets.json \
+    --triplet validator/saved_inv_p313_triplets.json \
     --prime 313 \
-    --k 1883 \
-    --out_prefix pivot_1883
+    --k 100 \
+    --out_prefix pivot_100
 
-Output: 
-  pivot_1883_rows.txt
-  pivot_1883_cols.txt
-  pivot_1883_report.json
+Output:
+  pivot_100_rows.txt
+  pivot_100_cols.txt
+  pivot_100_report.json
 
 Notes:
  - This script performs exact modular arithmetic (Python ints).
- - For k=1883 expect ~20-25 minutes runtime on MacBook Air M1.
+ - For k ~ 100 this should run quickly on a MacBook Air M1; larger k will take longer.
  - The pivot minor is guaranteed nonzero mod the chosen prime (if k pivots found).
- - You may then run crt_minor_reconstruct.py with the pivot rows/cols across other primes. 
+ - You may then run crt_minor_reconstruct.py with the pivot rows/cols across other primes.
 
 Author: ChatGPT assistant (adapted for OrganismCore)
-Date: 2026-01-30
+Date: 2026-01-18
 """
 
 import argparse
@@ -8811,9 +8811,9 @@ def parse_args():
 def load_triplets_json(path: str):
     with open(path) as f:
         data = json.load(f)
-    # Accept either {"triplets": [[r,c,v], ...], ... } or plain list
+    # Accept either {"triplets": [[r,c,v], ...], ...} or plain list
     if isinstance(data, dict):
-        if 'triplets' in data: 
+        if 'triplets' in data:
             triplets = data['triplets']
         elif 'matrix' in data:
             triplets = data['matrix']
@@ -8870,13 +8870,13 @@ def modular_det_gauss_dense(mat: List[List[int]], p: int) -> int:
         inv = pow(aii, -1, p)
         # normalize i-th row
         for j in range(i+1, n):
-            if A[i][j]: 
+            if A[i][j]:
                 A[i][j] = (A[i][j] * inv) % p
         # eliminate below
         for r in range(i+1, n):
             if A[r][i]:
                 factor = A[r][i] % p
-                if factor: 
+                if factor:
                     for c in range(i+1, n):
                         if A[i][c]:
                             A[r][c] = (A[r][c] - factor * A[i][c]) % p
@@ -8906,7 +8906,7 @@ def main():
             # skip explicit zeros
             continue
         rowdict = row_to_cols.get(r)
-        if rowdict is None: 
+        if rowdict is None:
             rowdict = {}
             row_to_cols[r] = rowdict
         rowdict[c] = (rowdict.get(c, 0) + val) % p
@@ -9030,7 +9030,7 @@ def main():
         print("Pivot minor is nonzero modulo p (good). You can now run crt_minor_reconstruct.py across primes with these pivot rows/cols.")
     print("Done.")
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
     main()
 ```
 
@@ -9045,20 +9045,18 @@ CRT minor reconstruction for modular determinants.
 
 Usage:
   python3 crt_minor_reconstruct.py \
-    --triplets saved_inv_p53_triplets.json saved_inv_p79_triplets.json \
-               saved_inv_p131_triplets.json saved_inv_p157_triplets.json \
-               saved_inv_p313_triplets.json \
+    --triplets validator/saved_inv_p53_triplets.json validator/saved_inv_p79_triplets.json ...  \
     --primes 53 79 131 157 313 \
-    --rows pivot_1883_rows.txt --cols pivot_1883_cols.txt \
-    --out crt_pivot_1883.json
+    --rows minor_rows.txt --cols minor_cols.txt \
+    --out crt_certificate. json
 
-- pivot_1883_rows.txt and pivot_1883_cols.txt: one global index (0-based) per line
+- minor_rows.txt and minor_cols.txt: one global index (0-based) per line
 - The triplet JSONs should correspond (in order) to the primes listed. 
 - The script will compute the determinant of the specified minor modulo each prime,
   then reconstruct the integer determinant via CRT and output a certificate JSON.
 
-Warning: Determinant computation is done by modular Gaussian elimination on the
-dense k x k minor. For k=1883, expect several minutes per prime.
+Warning:  Determinant computation is done by modular Gaussian elimination on the
+dense k x k minor.  For k ~ 1000+, this may be slow and memory heavy.
 """
 
 import argparse
@@ -9089,9 +9087,9 @@ def load_indices(path: str) -> List[int]:
 
 def load_triplets_json(path: str):
     with open(path) as f:
-        data = json.load(f)
+        data = json. load(f)
     # Accept a few formats:
-    # 1) {"triplets": [[r,c,v], ...], "nrows": ..., "ncols": ...}
+    # 1) {"triplets": [[r,c,v], ...], "nrows": .. ., "ncols": ...}
     # 2) [[r,c,v], ...]
     if isinstance(data, dict):
         if 'triplets' in data:
@@ -9123,7 +9121,7 @@ def load_triplets_json(path: str):
             raise ValueError("Triplet entry not understood: " + str(t))
     return normalized
 
-def build_dense_minor(triplets: List[Tuple[int,int,int]], rows: List[int], cols: List[int], p: int):
+def build_dense_minor(triplets: List[Tuple[int,int,int]], rows:  List[int], cols: List[int], p: int):
     """
     Build dense k x k minor modulo p.
     rows, cols are lists of global indices. 
@@ -9182,7 +9180,7 @@ def modular_det_gauss(mat: List[List[int]], p: int) -> int:
 
 def hadamard_bound_from_dense(mat: List[List[int]]):
     """
-    Compute Hadamard bound estimate: |det| <= product ||row||_2
+    Compute Hadamard bound estimate:  |det| <= product ||row||_2
     We'll compute log10(bound) to avoid overflow and return bound as float if reasonable.
     """
     import math
@@ -9206,7 +9204,7 @@ def iterative_crt(residues: List[Tuple[int,int]]):
     """
     x, M = residues[0][1], residues[0][0]
     for (m, r) in residues[1:]:
-        # solve x + t*M ≡ r (mod m) => t ≡ (r - x) * inv(M mod m) mod m
+        # solve x + t*M ≡ r (mod m)  => t ≡ (r - x) * inv(M mod m) mod m
         inv = pow(M % m, -1, m)
         t = ((r - x) * inv) % m
         x = x + t * M
@@ -9244,7 +9242,7 @@ def main():
         triplets = load_triplets_json(path)
         print(f"  Building dense {k}x{k} minor modulo {p} ...")
         minor = build_dense_minor(triplets, rows, cols, p)
-        print(f"  Computing det mod {p} ... (this may take time)")
+        print(f"  Computing det mod {p} ...  (this may take time)")
         detmod = modular_det_gauss(minor, p)
         print(f"    det ≡ {detmod} (mod {p})")
         residues.append((p, detmod))
@@ -9289,14 +9287,14 @@ def main():
         json.dump(cert, f, indent=2)
     print(f"Certificate written to {outpath}")
     if not verify_ok:
-        print("WARNING: CRT verification failed for at least one modulus. Do not trust reconstruction.")
+        print("WARNING: CRT verification failed for at least one modulus.  Do not trust reconstruction.")
     # Advice on strength
     if log10_bound and M: 
         # check magnitude
         log10_M = math.log10(M)
         print(f"Product of primes has log10 = {log10_M:.3f}; Hadamard log10 bound ≈ {log10_bound:.3f}")
         if log10_M <= log10_bound + 0.30103:  # M <= 2*bound ~ log10(M) <= log10(bound)+log10(2)
-            print("WARNING: product(primes) <= ~2*HadamardBound. Reconstructed integer may be ambiguous. Consider adding more primes.", file=sys.stderr)
+            print("WARNING: product(primes) <= ~2*HadamardBound.  Reconstructed integer may be ambiguous.  Consider adding more primes.", file=sys.stderr)
     print("Done.")
 
 if __name__ == "__main__":
@@ -9321,7 +9319,7 @@ Attempt rational reconstruction of cM modulo M:
   where B = floor(sqrt(M/2)) by default (heuristic).
 
 Usage:
-  python3 rational_from_crt_json.py crt_pivot_1883.json
+  python3 rational_from_crt_json.py my_crt_file.json
 """
 import sys, json, math
 
@@ -9425,13 +9423,13 @@ compute_exact_det_bareiss.py
 Build integer k x k minor from a triplet JSON (integer entries) and pivot rows/cols,
 then compute the exact determinant using the Bareiss fraction-free algorithm.
 
-Usage:
+Usage (example):
   python3 compute_exact_det_bareiss.py \
     --triplet saved_inv_p313_triplets.json \
-    --rows pivot_1883_rows.txt \
-    --cols pivot_1883_cols.txt \
-    --crt crt_pivot_1883.json \
-    --out det_pivot_1883_exact.json
+    --rows pivot_rows.txt \
+    --cols pivot_cols.txt \
+    --crt crt_pivot_200.json \
+    --out det_pivot_200_exact.json
 
 Arguments:
   --triplet : path to triplet JSON containing integer entries (not reduced mod p)
@@ -9443,13 +9441,12 @@ Arguments:
 Notes:
  - Requires gmpy2 for speed & low memory if available; otherwise uses Python ints.
  - Bareiss is fraction-free and returns exact integer determinant.
- - For k=1883 expect ~3-4 hours runtime on MacBook Air M1.
+ - For k ~ 200 this may still be heavy but often feasible if entries are modest.
 
 Outputs:
  - JSON with fields: k, det (string), abs_det_log10, time_seconds, matches_crt (if CRT file provided)
 
 Author: Assistant (adapted for OrganismCore)
-Date: 2026-01-30
 """
 import argparse
 import json
@@ -9625,7 +9622,7 @@ def main():
         json.dump(out, g, indent=2)
     print("[+] Wrote exact determinant result to", args.out)
     print("    k =", k)
-    print("    det =", out["det"][:100] + "..." if len(out["det"]) > 100 else out["det"])
+    print("    det =", out["det"])
     if out.get("abs_det_log10") is not None:
         print("    log10|det| =", out["abs_det_log10"])
     print("    time (s) =", out["time_seconds"])
