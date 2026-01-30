@@ -7714,7 +7714,8 @@ def run_single_prime(prime):
     
     try:
         cmd = [
-            "m2", 
+            "m2",
+            "--stop", 
             "-e", 
             f"primesList = {{{prime}}}; load \"cp3_test_all_candidates.m2\""
         ]
