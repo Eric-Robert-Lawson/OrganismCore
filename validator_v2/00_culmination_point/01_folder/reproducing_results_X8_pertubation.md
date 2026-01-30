@@ -3,6 +3,9 @@
 Perhaps this reasoning artifact can preserve the full logic more clean. I will be manually logging and preserving the calculations.
 
 WE WILL BE RECOMPUTING EVERYTHING FROM SCRATCH, IT IS SUSPECTED THAT ORIGINAL REASONING ARTIFACTS AND SOME RESULTS ARE PREDICATED OFF OF FAULTY RECOLLECTIONS OF DATA. SO FULL REPRODUCIBILITY IS VALUED ABOVE ALL ELSE. THIS REASONING ARTIFACT WILL REPRODUCE FROM SCRATCH WITH SCRIPTS THAT WILL GO THROUGH THE PROCESS FROM STEP 1 TO END.
+
+Will require the files in validator_v2/invariant_jsons to reproduce from scratch. This is important!
+
 ---
 
 # **The claim**
