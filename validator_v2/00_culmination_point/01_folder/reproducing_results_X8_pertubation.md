@@ -7139,23 +7139,25 @@ You've now successfully reproduced:
 
 ## **Script 1: Macaulay2 Test Implementation**
 
-Save as `cp3_test_all_candidates.m2`:
+Save as `cp3_coordinate_tests.m2`:
 
 ```m2
--- cp3_test_all_candidates.m2
--- Complete CP3 coordinate collapse tests
+-- cp3_coordinate_tests.m2
+-- Complete CP3 coordinate collapse tests (CORRECTED)
 -- Tests all 401 isolated classes across 19 primes
 -- 
 -- Usage with Python wrapper:
---   python3 run_cp3_tests.py --parallel 4
+--   python3 run_cp3_tests_seq.py --primes 53 79 131
 --
 -- Usage single prime (manual):
---   m2 -e 'primesList = {313}; load "cp3_test_all_candidates_corrected.m2"' > cp3_results_p313.csv
+--   m2 --stop -e 'primesList = {313}; load "cp3_coordinate_tests.m"'
 --
 -- Method: Compute remainder r = monomial mod J, then check if r uses forbidden variables
 -- Runtime: ~3-4 hours per prime
 
-primesList := {53,79,131,157,313,443,521,547,599,677,911,937,1093,1171,1223,1249,1301,1327,1483};
+-- primesList is set by calling Python script via -e flag
+-- DO NOT hardcode it here - this line is COMMENTED OUT
+-- primesList := {53,79,131,157,313,443,521,547,599,677,911,937,1093,1171,1223,1249,1301,1327,1483};
 
 -- Complete 401-class candidate list
 candidateList := {
@@ -7665,6 +7667,7 @@ for pIdx from 0 to (#primesList - 1) do (
 
 print("");
 print("Done.");
+exit 0
 ```
 
 ---
@@ -7676,12 +7679,12 @@ Save as `run_cp3_tests.py`:
 ```python
 #!/usr/bin/env python3
 """
-run_cp3_sequential.py - Run CP3 tests one prime at a time (sequential)
+run_cp3_tests.py - Run CP3 tests one prime at a time (sequential)
 
 Usage:
-  python3 run_cp3_sequential.py                    # Run all 19 primes
-  python3 run_cp3_sequential.py --start-from 313   # Resume from prime 313
-  python3 run_cp3_sequential.py --primes 53 79 131 # Run specific primes only
+  python3 run_cp3_tests.py                    # Run all 19 primes
+  python3 run_cp3_tests.py --start-from 313   # Resume from prime 313
+  python3 run_cp3_tests.py --primes 53 79 131 # Run specific primes only
 
 Advantages of sequential:
   - Easy to monitor progress
@@ -7717,7 +7720,7 @@ def run_single_prime(prime):
             "m2",
             "--stop", 
             "-e", 
-            f"primesList = {{{prime}}}; load \"cp3_test_all_candidates.m2\""
+            f"primesList = {{{prime}}}; load \"cp3_coordinate_tests.m2\""
         ]
         
         print(f"Running: {' '.join(cmd)}")
@@ -7811,8 +7814,8 @@ def main():
         sys.exit(1)
     
     # Check M2 file
-    if not Path('cp3_test_all_candidates.m2').exists():
-        print("ERROR: cp3_test_all_candidates.m2 not found")
+    if not Path('cp3_coordinate_tests.m2').exists():
+        print("ERROR: cp3_coordinate_tests.m2 not found")
         sys.exit(1)
     
     # Determine which primes to test
