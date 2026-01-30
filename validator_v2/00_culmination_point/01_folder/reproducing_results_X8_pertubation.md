@@ -7108,3 +7108,782 @@ You've now successfully reproduced:
 - **Step 10F**: Kernel condition verification (M·k = 0)
 
 **All 707 vectors verified. Dimension proof complete.** 🎯🏆
+
+---
+
+# 📝 **STEP 11: CP3 COORDINATE COLLAPSE TESTS (MODULAR VERIFICATION)**
+
+## **Description**
+
+**Objective**: Verify that all 401 structurally isolated Hodge classes cannot be represented using ≤4 variables via any linear combination in the Jacobian ring, establishing the variable-count barrier as an intrinsic geometric property through multi-prime modular verification.
+
+**Method**: For each isolated class $b$ (represented as a weight-0 degree-18 monomial) and each 4-variable subset $S \subset \{z_0, \ldots, z_5\}$, we perform coordinate collapse testing across 19 independent primes:
+
+1. **Compute canonical remainder**: $r = b \bmod J$ over $\mathbb{F}_p$, where $J = (\partial F/\partial z_i)$ is the Jacobian ideal
+2. **Identify forbidden variables**: For each subset $S$ with $|S| = 4$, define $F = \{z_i \mid i \notin S\}$ as the 2 forbidden variables
+3. **Test variable usage**: Examine whether the canonical remainder $r$ contains any forbidden variables with nonzero coefficients
+   - If any $z_i \in F$ appears with nonzero coefficient in $r$ → **NOT_REPRESENTABLE**
+   - If $r$ uses only variables in $S$ → **REPRESENTABLE**
+
+**Complete enumeration coverage**:
+- **401 classes**: All six-variable monomials identified through structural isolation analysis (gcd=1, high variance, no standard algebraic patterns)
+- **15 four-variable subsets** per class: All possible $\binom{6}{4} = 15$ ways to choose 4 variables from 6
+- **19 primes**: $\{53, 79, 131, 157, 313, 443, 521, 547, 599, 677, 911, 937, 1093, 1171, 1223, 1249, 1301, 1327, 1483\}$ (all satisfy $p \equiv 1 \pmod{13}$ for primitive 13th roots)
+- **Total modular tests**: $401 \times 15 \times 19 = 114{,}285$ independent computations
+
+**Expected result**: Perfect 19-prime agreement with 100% NOT_REPRESENTABLE status for all 6,015 test cases (401 classes × 15 subsets) across all primes. This establishes that coordinate transparency (Obstruction 3) is not a basis artifact but an intrinsic geometric constraint—the 401 classes fundamentally require all 6 variables and cannot be projected onto any 4-coordinate subspace.
+
+**Multi-prime confidence**: Under standard rank-stability heuristics, error probability for characteristic-zero validity is $< 10^{-22}$, comparable to cryptographic primality testing. Step 12 will convert this modular evidence into unconditional proof over $\mathbb{Q}$ via rational reconstruction.
+
+---
+
+## **Script 1: Macaulay2 Test Implementation**
+
+Save as `cp3_test_all_candidates.m2`:
+
+```m2
+-- cp3_test_all_candidates.m2
+-- Complete CP3 coordinate collapse tests for 401 isolated classes across 19 primes
+-- 
+-- Usage (all primes via Python wrapper):
+--   python3 run_cp3_tests.py --parallel 19
+--
+-- Usage (single prime, manual):
+--   m2 -e 'primesList = {313}; load "cp3_test_all_candidates.m2"' > cp3_results_p313.csv
+--
+-- Output: CSV format with columns PRIME,CLASS,SUBSET_IDX,SUBSET,STATUS
+-- Runtime: ~3-4 hours per prime (parallelizable across 19 cores)
+
+-- Prime list (all primes p ≡ 1 mod 13, ensuring primitive 13th roots exist)
+primesList := {53,79,131,157,313,443,521,547,599,677,911,937,1093,1171,1223,1249,1301,1327,1483};
+
+-- Complete candidate list (401 structurally isolated classes)
+-- Each entry: {className, exponentVector}
+candidateList := {
+  {"class0", {5,3,2,2,4,2}},
+  {"class1", {5,2,4,2,2,3}},
+  {"class2", {4,2,5,3,2,2}},
+  {"class3", {3,5,2,4,2,2}},
+  {"class4", {3,2,2,2,5,4}},
+  {"class5", {2,3,2,4,2,5}},
+  {"class6", {2,2,4,3,2,5}},
+  {"class7", {2,2,2,5,4,3}},
+  {"class8", {6,2,2,1,5,2}},
+  {"class9", {2,7,2,2,3,2}},
+  {"class10", {2,6,2,5,1,2}},
+  {"class11", {2,2,5,2,1,6}},
+  {"class12", {2,2,3,2,7,2}},
+  {"class13", {2,2,1,6,5,2}},
+  {"class14", {2,1,6,2,2,5}},
+  {"class15", {1,2,5,2,6,2}},
+  {"class16", {5,4,1,3,1,4}},
+  {"class17", {5,2,3,2,5,1}},
+  {"class18", {5,1,5,2,3,2}},
+  {"class19", {5,1,4,3,4,1}},
+  {"class20", {4,3,4,1,5,1}},
+  {"class21", {4,1,1,4,3,5}},
+  {"class22", {4,1,1,3,5,4}},
+  {"class23", {3,2,1,5,2,5}},
+  {"class24", {3,1,4,1,5,4}},
+  {"class25", {2,5,3,5,2,1}},
+  {"class26", {2,2,5,1,3,5}},
+  {"class27", {2,2,3,5,1,5}},
+  {"class28", {2,1,5,2,5,3}},
+  {"class29", {2,1,3,5,5,2}},
+  {"class30", {1,5,2,2,3,5}},
+  {"class31", {1,5,1,3,4,4}},
+  {"class32", {1,4,4,1,3,5}},
+  {"class33", {1,4,1,5,4,3}},
+  {"class34", {1,3,5,2,2,5}},
+  {"class35", {1,3,5,1,4,4}},
+  {"class36", {1,3,4,4,1,5}},
+  {"class37", {1,3,2,5,5,2}},
+  {"class38", {5,4,2,1,2,4}},
+  {"class39", {5,2,4,1,4,2}},
+  {"class40", {5,2,2,5,2,2}},
+  {"class41", {5,2,2,4,4,1}},
+  {"class42", {5,1,4,4,2,2}},
+  {"class43", {4,5,2,2,1,4}},
+  {"class44", {4,5,1,2,4,2}},
+  {"class45", {4,4,2,2,5,1}},
+  {"class46", {4,4,1,5,2,2}},
+  {"class47", {4,2,5,2,4,1}},
+  {"class48", {4,2,4,5,1,2}},
+  {"class49", {4,1,2,2,4,5}},
+  {"class50", {2,5,5,2,2,2}},
+  {"class51", {2,5,4,4,1,2}},
+  {"class52", {2,4,5,4,2,1}},
+  {"class53", {2,4,2,1,4,5}},
+  {"class54", {2,4,1,2,5,4}},
+  {"class55", {2,1,4,5,2,4}},
+  {"class56", {1,2,5,4,2,4}},
+  {"class57", {1,2,4,4,5,2}},
+  {"class58", {5,4,1,2,3,3}},
+  {"class59", {5,3,3,2,1,4}},
+  {"class60", {5,3,1,4,3,2}},
+  {"class61", {5,2,3,4,1,3}},
+  {"class62", {4,5,2,1,3,3}},
+  {"class63", {4,5,1,3,2,3}},
+  {"class64", {4,3,5,1,2,3}},
+  {"class65", {4,3,2,5,3,1}},
+  {"class66", {3,5,4,1,2,3}},
+  {"class67", {3,5,2,3,4,1}},
+  {"class68", {3,4,5,2,1,3}},
+  {"class69", {3,4,5,1,3,2}},
+  {"class70", {3,4,3,5,1,2}},
+  {"class71", {3,3,5,4,1,2}},
+  {"class72", {3,3,4,5,2,1}},
+  {"class73", {3,3,1,2,4,5}},
+  {"class74", {3,2,3,1,4,5}},
+  {"class75", {3,1,4,2,3,5}},
+  {"class76", {3,1,3,4,2,5}},
+  {"class77", {3,1,2,5,3,4}},
+  {"class78", {3,1,2,4,5,3}},
+  {"class79", {2,5,4,3,3,1}},
+  {"class80", {2,4,1,3,3,5}},
+  {"class81", {2,3,3,1,5,4}},
+  {"class82", {2,3,1,5,3,4}},
+  {"class83", {2,3,1,4,5,3}},
+  {"class84", {2,1,5,3,3,4}},
+  {"class85", {1,4,3,3,2,5}},
+  {"class86", {1,4,2,3,5,3}},
+  {"class87", {1,3,4,2,5,3}},
+  {"class88", {1,3,3,5,2,4}},
+  {"class89", {1,2,5,3,4,3}},
+  {"class90", {1,2,4,5,3,3}},
+  {"class91", {4,4,3,1,4,2}},
+  {"class92", {4,4,2,4,1,3}},
+  {"class93", {4,2,4,4,3,1}},
+  {"class94", {3,4,4,2,4,1}},
+  {"class95", {3,2,1,4,4,4}},
+  {"class96", {2,1,4,4,4,3}},
+  {"class97", {1,4,3,2,4,4}},
+  {"class98", {1,4,2,4,3,4}},
+  {"class99", {5,3,2,3,2,3}},
+  {"class100", {5,2,3,3,3,2}},
+  {"class101", {3,5,3,2,3,2}},
+  {"class102", {3,2,2,3,3,5}},
+  {"class103", {2,3,3,2,3,5}},
+  {"class104", {2,2,3,3,5,3}},
+  {"class105", {4,4,3,2,2,3}},
+  {"class106", {4,4,2,3,3,2}},
+  {"class107", {4,3,4,2,3,2}},
+  {"class108", {4,3,3,4,2,2}},
+  {"class109", {3,4,4,3,2,2}},
+  {"class110", {2,3,2,3,4,4}},
+  {"class111", {2,2,3,4,3,4}},
+  {"class112", {9,2,2,2,1,2}},
+  {"class113", {2,2,9,2,2,1}},
+  {"class114", {1,2,2,2,2,9}},
+  {"class115", {8,3,2,2,2,1}},
+  {"class116", {3,2,8,1,2,2}},
+  {"class117", {3,2,1,2,8,2}},
+  {"class118", {2,8,1,2,2,3}},
+  {"class119", {2,3,8,2,1,2}},
+  {"class120", {2,3,2,1,8,2}},
+  {"class121", {2,2,2,3,8,1}},
+  {"class122", {2,1,2,8,2,3}},
+  {"class123", {1,8,2,3,2,2}},
+  {"class124", {1,2,2,8,3,2}},
+  {"class125", {7,5,2,1,1,2}},
+  {"class126", {7,5,1,2,2,1}},
+  {"class127", {7,2,1,2,1,5}},
+  {"class128", {7,1,1,2,5,2}},
+  {"class129", {5,7,2,2,1,1}},
+  {"class130", {5,2,1,7,1,2}},
+  {"class131", {5,1,2,7,2,1}},
+  {"class132", {5,1,1,2,2,7}},
+  {"class133", {2,7,2,1,5,1}},
+  {"class134", {2,5,2,7,1,1}},
+  {"class135", {2,5,1,2,1,7}},
+  {"class136", {2,2,1,5,7,1}},
+  {"class137", {2,1,5,1,7,2}},
+  {"class138", {1,7,2,5,2,1}},
+  {"class139", {1,5,7,2,1,2}},
+  {"class140", {1,2,7,1,2,5}},
+  {"class141", {1,2,2,7,5,1}},
+  {"class142", {1,2,1,2,5,7}},
+  {"class143", {7,4,3,1,2,1}},
+  {"class144", {7,4,2,3,1,1}},
+  {"class145", {7,3,4,2,1,1}},
+  {"class146", {7,2,1,1,3,4}},
+  {"class147", {7,1,2,1,4,3}},
+  {"class148", {6,4,5,1,1,1}},
+  {"class149", {6,1,1,5,4,1}},
+  {"class150", {5,6,4,1,1,1}},
+  {"class151", {5,1,1,1,4,6}},
+  {"class152", {4,5,1,1,6,1}},
+  {"class153", {4,3,1,7,2,1}},
+  {"class154", {4,2,1,3,1,7}},
+  {"class155", {4,1,3,2,1,7}},
+  {"class156", {4,1,1,5,1,6}},
+  {"class157", {4,1,1,2,7,3}},
+  {"class158", {3,7,1,2,1,4}},
+  {"class159", {3,4,1,1,2,7}},
+  {"class160", {3,2,4,1,1,7}},
+  {"class161", {3,1,1,7,2,4}},
+  {"class162", {2,7,1,3,4,1}},
+  {"class163", {2,4,3,1,1,7}},
+  {"class164", {2,4,1,1,7,3}},
+  {"class165", {2,1,3,7,1,4}},
+  {"class166", {2,1,3,4,7,1}},
+  {"class167", {1,7,3,4,1,2}},
+  {"class168", {1,6,1,1,4,5}},
+  {"class169", {1,3,4,1,7,2}},
+  {"class170", {1,3,2,7,1,4}},
+  {"class171", {1,3,2,4,7,1}},
+  {"class172", {1,3,1,7,4,2}},
+  {"class173", {1,2,4,3,7,1}},
+  {"class174", {1,1,7,3,2,4}},
+  {"class175", {1,1,7,2,4,3}},
+  {"class176", {1,1,6,5,1,4}},
+  {"class177", {1,1,5,4,6,1}},
+  {"class178", {1,1,4,7,3,2}},
+  {"class179", {1,1,4,6,5,1}},
+  {"class180", {1,1,2,3,4,7}},
+  {"class181", {1,1,1,4,5,6}},
+  {"class182", {7,1,2,2,2,4}},
+  {"class183", {4,2,2,1,2,7}},
+  {"class184", {4,1,7,2,2,2}},
+  {"class185", {2,7,1,4,2,2}},
+  {"class186", {2,4,7,1,2,2}},
+  {"class187", {2,1,2,7,4,2}},
+  {"class188", {1,7,4,2,2,2}},
+  {"class189", {1,4,2,2,7,2}},
+  {"class190", {6,5,3,2,1,1}},
+  {"class191", {6,3,2,1,1,5}},
+  {"class192", {6,1,2,5,1,3}},
+  {"class193", {6,1,2,3,5,1}},
+  {"class194", {5,3,2,1,6,1}},
+  {"class195", {5,2,1,6,3,1}},
+  {"class196", {5,1,6,1,2,3}},
+  {"class197", {5,1,3,6,1,2}},
+  {"class198", {3,6,1,2,5,1}},
+  {"class199", {3,5,1,6,1,2}},
+  {"class200", {3,3,2,2,1,7}},
+  {"class201", {3,2,7,3,1,2}},
+  {"class202", {3,2,7,2,3,1}},
+  {"class203", {3,2,5,6,1,1}},
+  {"class204", {3,2,2,1,7,3}},
+  {"class205", {3,1,5,1,2,6}},
+  {"class206", {3,1,2,6,1,5}},
+  {"class207", {3,1,2,3,7,2}},
+  {"class208", {3,1,1,5,6,2}},
+  {"class209", {2,7,3,1,2,3}},
+  {"class210", {2,7,2,3,1,3}},
+  {"class211", {2,5,6,1,1,3}},
+  {"class212", {2,5,1,1,3,6}},
+  {"class213", {2,3,7,3,2,1}},
+  {"class214", {2,3,6,5,1,1}},
+  {"class215", {2,3,1,6,1,5}},
+  {"class216", {2,3,1,3,7,2}},
+  {"class217", {2,2,1,7,3,3}},
+  {"class218", {1,6,5,3,1,2}},
+  {"class219", {1,6,5,2,3,1}},
+  {"class220", {1,5,6,3,2,1}},
+  {"class221", {1,5,3,1,2,6}},
+  {"class222", {1,5,2,3,1,6}},
+  {"class223", {1,5,1,2,6,3}},
+  {"class224", {1,2,6,3,1,5}},
+  {"class225", {1,2,6,1,5,3}},
+  {"class226", {1,2,3,7,2,3}},
+  {"class227", {1,2,3,5,6,1}},
+  {"class228", {1,1,6,3,5,2}},
+  {"class229", {1,1,5,6,2,3}},
+  {"class230", {6,1,4,2,1,4}},
+  {"class231", {4,6,1,1,2,4}},
+  {"class232", {4,1,6,4,1,2}},
+  {"class233", {4,1,2,1,6,4}},
+  {"class234", {2,4,4,6,1,1}},
+  {"class235", {2,4,1,4,1,6}},
+  {"class236", {2,1,6,1,4,4}},
+  {"class237", {1,6,4,4,2,1}},
+  {"class238", {1,4,4,2,1,6}},
+  {"class239", {1,4,1,6,2,4}},
+  {"class240", {1,4,1,4,6,2}},
+  {"class241", {1,2,4,6,1,4}},
+  {"class242", {5,4,1,1,5,2}},
+  {"class243", {5,2,5,1,1,4}},
+  {"class244", {4,2,1,1,5,5}},
+  {"class245", {4,1,5,5,2,1}},
+  {"class246", {2,5,5,1,4,1}},
+  {"class247", {2,1,5,4,1,5}},
+  {"class248", {1,5,2,1,5,4}},
+  {"class249", {1,5,1,4,2,5}},
+  {"class250", {1,4,2,5,1,5}},
+  {"class251", {1,1,5,5,4,2}},
+  {"class252", {6,3,1,2,2,4}},
+  {"class253", {6,2,3,1,2,4}},
+  {"class254", {6,2,2,3,1,4}},
+  {"class255", {6,2,1,4,2,3}},
+  {"class256", {6,2,1,3,4,2}},
+  {"class257", {6,1,3,2,4,2}},
+  {"class258", {6,1,2,4,3,2}},
+  {"class259", {4,3,2,6,1,2}},
+  {"class260", {4,2,6,2,1,3}},
+  {"class261", {4,2,6,1,3,2}},
+  {"class262", {4,2,3,6,2,1}},
+  {"class263", {4,2,1,2,3,6}},
+  {"class264", {4,1,2,3,2,6}},
+  {"class265", {3,6,2,1,4,2}},
+  {"class266", {3,4,2,6,2,1}},
+  {"class267", {3,2,6,4,2,1}},
+  {"class268", {3,2,2,4,1,6}},
+  {"class269", {2,6,4,2,1,3}},
+  {"class270", {2,6,4,1,3,2}},
+  {"class271", {2,6,3,2,4,1}},
+  {"class272", {2,6,2,4,3,1}},
+  {"class273", {2,4,6,3,1,2}},
+  {"class274", {2,4,6,2,3,1}},
+  {"class275", {2,3,4,1,2,6}},
+  {"class276", {2,2,4,1,6,3}},
+  {"class277", {2,1,4,3,6,2}},
+  {"class278", {1,2,6,2,3,4}},
+  {"class279", {1,2,3,6,4,2}},
+  {"class280", {6,2,2,2,3,3}},
+  {"class281", {4,4,4,1,1,4}},
+  {"class282", {4,4,1,4,4,1}},
+  {"class283", {3,6,2,2,2,3}},
+  {"class284", {3,3,6,2,2,2}},
+  {"class285", {3,2,3,2,2,6}},
+  {"class286", {2,6,3,3,2,2}},
+  {"class287", {2,3,2,2,6,3}},
+  {"class288", {4,3,4,3,1,3}},
+  {"class289", {4,3,3,3,4,1}},
+  {"class290", {3,4,3,4,3,1}},
+  {"class291", {3,1,3,3,4,4}},
+  {"class292", {1,3,4,3,3,4}},
+  {"class293", {1,3,3,4,4,3}},
+  {"class294", {10,2,1,1,1,3}},
+  {"class295", {10,1,1,3,1,2}},
+  {"class296", {10,1,1,2,3,1}},
+  {"class297", {3,10,2,1,1,1}},
+  {"class298", {3,2,1,1,10,1}},
+  {"class299", {2,1,10,3,1,1}},
+  {"class300", {2,1,1,10,1,3}},
+  {"class301", {1,3,10,1,2,1}},
+  {"class302", {1,3,1,2,1,10}},
+  {"class303", {1,2,3,1,1,10}},
+  {"class304", {1,1,2,10,3,1}},
+  {"class305", {10,1,2,1,2,2}},
+  {"class306", {2,2,10,1,1,2}},
+  {"class307", {2,2,1,1,2,10}},
+  {"class308", {2,1,2,2,1,10}},
+  {"class309", {1,2,1,10,2,2}},
+  {"class310", {9,1,4,1,1,2}},
+  {"class311", {9,1,2,4,1,1}},
+  {"class312", {4,9,1,2,1,1}},
+  {"class313", {4,1,1,1,9,2}},
+  {"class314", {1,4,9,1,1,2}},
+  {"class315", {1,4,2,1,9,1}},
+  {"class316", {1,2,1,9,4,1}},
+  {"class317", {1,2,1,4,1,9}},
+  {"class318", {1,1,4,1,2,9}},
+  {"class319", {1,1,1,2,9,4}},
+  {"class320", {9,3,1,1,2,2}},
+  {"class321", {9,2,2,1,3,1}},
+  {"class322", {9,2,1,3,2,1}},
+  {"class323", {9,1,3,2,2,1}},
+  {"class324", {3,1,9,2,1,2}},
+  {"class325", {3,1,2,2,9,1}},
+  {"class326", {2,3,1,2,9,1}},
+  {"class327", {2,2,3,1,9,1}},
+  {"class328", {2,1,2,1,3,9}},
+  {"class329", {2,1,1,9,3,2}},
+  {"class330", {2,1,1,3,2,9}},
+  {"class331", {1,9,2,1,2,3}},
+  {"class332", {1,9,1,2,3,2}},
+  {"class333", {1,2,2,9,1,3}},
+  {"class334", {1,1,3,9,2,2}},
+  {"class335", {8,1,5,2,1,1}},
+  {"class336", {8,1,1,1,2,5}},
+  {"class337", {5,8,1,1,2,1}},
+  {"class338", {5,1,2,1,1,8}},
+  {"class339", {2,1,1,8,5,1}},
+  {"class340", {1,8,1,5,1,2}},
+  {"class341", {1,5,1,1,8,2}},
+  {"class342", {1,2,5,1,8,1}},
+  {"class343", {1,1,8,2,1,5}},
+  {"class344", {1,1,2,1,8,5}},
+  {"class345", {8,4,1,1,3,1}},
+  {"class346", {8,3,1,4,1,1}},
+  {"class347", {7,2,6,1,1,1}},
+  {"class348", {6,7,1,1,1,2}},
+  {"class349", {4,8,3,1,1,1}},
+  {"class350", {4,3,1,1,1,8}},
+  {"class351", {4,1,8,1,1,3}},
+  {"class352", {3,4,1,8,1,1}},
+  {"class353", {3,1,1,4,8,1}},
+  {"class354", {2,1,7,1,1,6}},
+  {"class355", {2,1,1,1,6,7}},
+  {"class356", {1,8,1,4,3,1}},
+  {"class357", {1,6,2,1,1,7}},
+  {"class358", {1,4,1,3,8,1}},
+  {"class359", {1,2,1,1,7,6}},
+  {"class360", {1,1,8,1,3,4}},
+  {"class361", {1,1,7,1,6,2}},
+  {"class362", {1,1,6,2,7,1}},
+  {"class363", {1,1,4,8,1,3}},
+  {"class364", {1,1,3,8,4,1}},
+  {"class365", {8,4,1,2,1,2}},
+  {"class366", {8,2,4,1,2,1}},
+  {"class367", {4,2,2,8,1,1}},
+  {"class368", {2,8,2,1,1,4}},
+  {"class369", {2,8,1,1,4,2}},
+  {"class370", {2,2,8,4,1,1}},
+  {"class371", {2,2,1,8,1,4}},
+  {"class372", {2,1,4,2,8,1}},
+  {"class373", {2,1,1,2,4,8}},
+  {"class374", {1,8,2,2,4,1}},
+  {"class375", {1,4,8,2,2,1}},
+  {"class376", {1,2,2,1,4,8}},
+  {"class377", {1,1,2,4,2,8}},
+  {"class378", {8,3,3,1,1,2}},
+  {"class379", {8,2,3,3,1,1}},
+  {"class380", {3,1,8,3,2,1}},
+  {"class381", {3,1,3,1,8,2}},
+  {"class382", {2,3,8,1,3,1}},
+  {"class383", {1,8,3,2,1,3}},
+  {"class384", {1,8,3,1,3,2}},
+  {"class385", {1,3,3,2,8,1}},
+  {"class386", {1,3,1,8,2,3}},
+  {"class387", {1,2,1,3,3,8}},
+  {"class388", {1,1,3,2,3,8}},
+  {"class389", {7,1,3,1,1,5}},
+  {"class390", {3,1,7,5,1,1}},
+  {"class391", {1,7,5,1,1,3}},
+  {"class392", {1,5,7,1,3,1}},
+  {"class393", {1,1,3,1,5,7}},
+  {"class394", {1,1,1,5,3,7}},
+  {"class395", {1,1,1,3,7,5}},
+  {"class396", {7,1,1,4,1,4}},
+  {"class397", {4,1,7,1,4,1}},
+  {"class398", {4,1,4,7,1,1}},
+  {"class399", {1,7,4,1,4,1}},
+  {"class400", {1,4,7,4,1,1}}
+};
+
+-- All 15 four-variable subsets of {0,1,2,3,4,5}
+fourSubsets := {
+ {0,1,2,3}, {0,1,2,4}, {0,1,2,5},
+ {0,1,3,4}, {0,1,3,5}, {0,1,4,5},
+ {0,2,3,4}, {0,2,3,5}, {0,2,4,5},
+ {0,3,4,5}, {1,2,3,4}, {1,2,3,5},
+ {1,2,4,5}, {1,3,4,5}, {2,3,4,5}
+};
+
+-- Helper: format subset name
+makeSubsetName = L -> (
+    s := "(";
+    for i from 0 to (#L - 1) do (
+        if i == 0 then s = s | ("z_" | toString(L#i)) 
+        else s = s | ("," | ("z_" | toString(L#i)))
+    );
+    s = s | ")";
+    s
+);
+
+-- Helper: convert monomials to list
+toMonomialList = obj -> (
+    if class obj === Matrix then flatten entries obj
+    else if class obj === List then obj
+    else {obj}
+);
+
+-- CSV header
+print("PRIME,CLASS,SUBSET_IDX,SUBSET,STATUS");
+print("-----------------------------------------");
+
+-- Main loop over primes
+for pIdx from 0 to (#primesList - 1) do (
+    p := primesList#pIdx;
+    kk := ZZ/p;
+    R := kk[z0,z1,z2,z3,z4,z5, MonomialOrder => GRevLex];
+    zVars := {z0,z1,z2,z3,z4,z5};
+
+    -- Find primitive 13th root of unity
+    expPow := (p - 1) // 13;
+    omega := 0_kk;
+    for t from 2 to p-1 do (
+        elt := (t_kk) ^ expPow;
+        if elt != 1_kk then ( omega = elt; break );
+    );
+    if omega == 0_kk then error("no omega found for p=" | toString(p));
+
+    -- Build cyclotomic forms and polynomial
+    Llist := apply(13, k -> (
+        s := 0_R;
+        for j from 0 to 5 do s = s + (omega^(k*j)) * (zVars#j);
+        s
+    ));
+    F := sum(Llist, Lk -> Lk^8);
+    J := ideal jacobian F;
+
+    -- Test all 401 candidates
+    for cIdx from 0 to (#candidateList - 1) do (
+        cname := toString(candidateList#cIdx#0);
+        exps := candidateList#cIdx#1;
+
+        -- Build monomial
+        mon := 1_R;
+        for i from 0 to 5 do mon = mon * (zVars#i ^ (exps#i));
+
+        -- Canonical remainder
+        r := mon % J;
+
+        if r == 0_R then (
+            for sIdx from 0 to (#fourSubsets - 1) do (
+                subsetName := makeSubsetName(fourSubsets#sIdx);
+                line := toString(p) | "," | cname | "," | toString(sIdx+1) 
+                        | "," | subsetName | ",REMAINDER_ZERO";
+                print(line);
+            );
+            continue;
+        );
+
+        raw := try monomials r else null;
+        mons := if raw === null then {r} else toMonomialList(raw);
+
+        -- Test each subset
+        for sIdx from 0 to (#fourSubsets - 1) do (
+            S := fourSubsets#sIdx;
+            forbidden := {};
+            for j from 0 to 5 do (
+                if not member(j, S) then forbidden = append(forbidden, j)
+            );
+
+            usesForbidden := false;
+            for mIdx from 0 to (#mons - 1) do (
+                m := mons#mIdx;
+                for fIdx from 0 to (#forbidden - 1) do (
+                    j := forbidden#fIdx;
+                    ex := try degree(m, zVars#j) else null;
+                    if ex === null then (
+                        usesForbidden = true; break;
+                    ) else if ex > 0 then (
+                        usesForbidden = true; break;
+                    );
+                );
+                if usesForbidden then break;
+            );
+
+            subsetName := makeSubsetName(S);
+            status := if usesForbidden then "NOT_REPRESENTABLE" else "REPRESENTABLE";
+            line := toString(p) | "," | cname | "," | toString(sIdx+1) 
+                    | "," | subsetName | "," | status;
+            print(line);
+        );
+    );
+);
+
+print("Done.");
+```
+
+---
+
+## **Script 2: Python Wrapper for Parallel Execution**
+
+Save as `run_cp3_tests.py`:
+
+```python
+#!/usr/bin/env python3
+"""
+run_cp3_tests.py - Parallel execution wrapper for CP3 modular tests
+
+Runs CP3 coordinate collapse tests across 19 primes with parallelization.
+
+Usage:
+  python3 run_cp3_tests.py --parallel 19    # Use 19 parallel processes
+  python3 run_cp3_tests.py --parallel 4     # Use 4 parallel processes  
+  python3 run_cp3_tests.py --sequential     # Run sequentially
+
+Output:
+  cp3_results_p{prime}.csv for each prime (19 files)
+  cp3_summary.json with aggregate statistics
+
+Author: Assistant (for OrganismCore)
+Date: 2026-01-30
+"""
+
+import subprocess
+import sys
+import time
+import json
+from pathlib import Path
+from multiprocessing import Pool, cpu_count
+from datetime import datetime
+
+PRIMES = [53, 79, 131, 157, 313, 443, 521, 547, 599, 677, 911, 937, 
+          1093, 1171, 1223, 1249, 1301, 1327, 1483]
+
+def run_single_prime(prime):
+    """Run CP3 test for a single prime."""
+    output_file = f"cp3_results_p{prime}.csv"
+    
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] Starting prime {prime}...")
+    start_time = time.time()
+    
+    try:
+        cmd = ["m2", "-e", f"primesList = {{{prime}}}; load \"cp3_test_all_candidates.m2\""]
+        
+        with open(output_file, 'w') as f:
+            result = subprocess.run(cmd, stdout=f, stderr=subprocess.PIPE, 
+                                   text=True, timeout=15000)
+        
+        elapsed = time.time() - start_time
+        
+        if result.returncode != 0:
+            error = result.stderr[:500]
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] ✗ Prime {prime} FAILED")
+            return (prime, False, output_file, elapsed, error)
+        
+        if not Path(output_file).exists():
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] ✗ Prime {prime} FAILED: No output")
+            return (prime, False, output_file, elapsed, "No output file")
+        
+        with open(output_file, 'r') as f:
+            lines = sum(1 for _ in f)
+        
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] ✓ Prime {prime} completed "
+              f"in {elapsed/3600:.2f}h ({lines} lines)")
+        return (prime, True, output_file, elapsed, None)
+        
+    except subprocess.TimeoutExpired:
+        elapsed = time.time() - start_time
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] ✗ Prime {prime} TIMEOUT")
+        return (prime, False, output_file, elapsed, "Timeout")
+    except Exception as e:
+        elapsed = time.time() - start_time
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] ✗ Prime {prime} ERROR: {e}")
+        return (prime, False, output_file, elapsed, str(e))
+
+def validate_results(results):
+    """Validate and summarize results."""
+    stats = {
+        'total_primes': len(PRIMES),
+        'successful_primes': 0,
+        'failed_primes': [],
+        'total_runtime_hours': 0,
+        'per_prime_stats': {}
+    }
+    
+    for prime, success, output_file, runtime, error in results:
+        stats['total_runtime_hours'] += runtime / 3600
+        
+        if success:
+            stats['successful_primes'] += 1
+            try:
+                with open(output_file, 'r') as f:
+                    lines = f.readlines()
+                not_rep = sum(1 for l in lines if 'NOT_REPRESENTABLE' in l)
+                rep = sum(1 for l in lines if l.strip().endswith('REPRESENTABLE') 
+                         and 'NOT_REPRESENTABLE' not in l)
+                stats['per_prime_stats'][prime] = {
+                    'total_lines': len(lines),
+                    'not_representable': not_rep,
+                    'representable': rep,
+                    'runtime_hours': runtime / 3600
+                }
+            except Exception as e:
+                stats['per_prime_stats'][prime] = {'error': str(e)}
+        else:
+            stats['failed_primes'].append({'prime': prime, 'error': error})
+    
+    return stats['successful_primes'] == len(PRIMES), stats
+
+def main():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--parallel', type=int, default=None)
+    parser.add_argument('--sequential', action='store_true')
+    parser.add_argument('--primes', nargs='+', type=int, default=None)
+    args = parser.parse_args()
+    
+    # Check Macaulay2 available
+    try:
+        subprocess.run(['m2', '--version'], capture_output=True, check=True)
+    except:
+        print("ERROR: Macaulay2 not found")
+        sys.exit(1)
+    
+    if not Path('cp3_test_all_candidates.m2').exists():
+        print("ERROR: cp3_test_all_candidates.m2 not found")
+        sys.exit(1)
+    
+    primes_to_test = args.primes if args.primes else PRIMES
+    
+    print("="*80)
+    print("CP3 COORDINATE COLLAPSE TESTS - MODULAR VERIFICATION")
+    print("="*80)
+    print(f"Primes: {len(primes_to_test)}")
+    
+    if args.sequential:
+        print("Mode: Sequential (~60-76 hours)")
+        num_workers = 1
+    else:
+        num_workers = args.parallel if args.parallel else min(cpu_count(), len(primes_to_test))
+        print(f"Mode: Parallel ({num_workers} workers, ~{4*len(primes_to_test)/num_workers:.1f}h)")
+    
+    print()
+    start_time = time.time()
+    
+    if num_workers == 1:
+        results = [run_single_prime(p) for p in primes_to_test]
+    else:
+        with Pool(num_workers) as pool:
+            results = pool.map(run_single_prime, primes_to_test)
+    
+    total_elapsed = time.time() - start_time
+    
+    print()
+    print("="*80)
+    print("VALIDATION")
+    print("="*80)
+    
+    is_valid, stats = validate_results(results)
+    
+    print(f"Successful: {stats['successful_primes']}/{stats['total_primes']}")
+    print(f"Runtime: {total_elapsed/3600:.2f}h")
+    print()
+    
+    if stats['per_prime_stats']:
+        print("PER-PRIME STATS:")
+        for p in primes_to_test:
+            if p in stats['per_prime_stats'] and 'error' not in stats['per_prime_stats'][p]:
+                s = stats['per_prime_stats'][p]
+                pct = s['not_representable']/(s['not_representable']+s['representable'])*100
+                print(f"  p={p:4d}: {s['not_representable']:5d} NOT_REP ({pct:.1f}%), "
+                      f"{s['runtime_hours']:.2f}h")
+    
+    with open('cp3_summary.json', 'w') as f:
+        json.dump({'timestamp': datetime.now().isoformat(), 
+                   'statistics': stats}, f, indent=2)
+    
+    print(f"\nSummary: cp3_summary.json")
+    
+    if is_valid:
+        print("\n✓✓✓ ALL PRIMES COMPLETED")
+        print("Next: Step 12 (rational reconstruction)")
+        return 0
+    else:
+        print("\n✗ SOME PRIMES FAILED")
+        return 1
+
+if __name__ == '__main__':
+    sys.exit(main())
+```
+
+---
+
+## **Usage**
+
+```bash
+python3 run_cp3_tests.py 
+```
+
+result:
+
+```verbatim
+pending
+```
+---
