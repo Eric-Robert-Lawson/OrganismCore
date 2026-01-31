@@ -931,7 +931,7 @@ STEP 3 COMPLETE
 
 ---
 
-## **DESCRIPTION (300 WORDS)**
+## **DESCRIPTION**
 
 **Objective:** Establish unconditional certification of dimension = 707 over ℚ by verifying perfect rank agreement across 19 independent prime reductions, achieving cryptographic-grade confidence via the Chinese Remainder Theorem and rank-stability principles.
 
@@ -1895,7 +1895,7 @@ Next step: Step 6 (Structural Isolation Analysis)
 
 ---
 
-## **DESCRIPTION (300 WORDS)**
+## **DESCRIPTION**
 
 **Objective:** Identify the subset of 476 six-variable monomials exhibiting structural isolation—algebraic patterns that resist standard cycle construction methods—by applying combinatorial criteria derived from exponent distribution analysis.
 
@@ -3861,7 +3861,7 @@ All verification reports generated successfully!
 
 ---
 
-## **DESCRIPTION (300 WORDS)**
+## **DESCRIPTION**
 
 **Objective:** Verify the CP1 (Canonical Protocol 1) claim from coordinate_transparency.tex that all 401 structurally isolated classes exhibit perfect variable-count constancy: every isolated monomial uses exactly 6 variables (all projective coordinates z₀, ..., z₅ active), contrasting sharply with algebraic cycle patterns that average 2.88 variables.
 
@@ -4373,7 +4373,7 @@ Next step: Step 9B (CP2 sparsity-1 verification)
 
 ---
 
-## **DESCRIPTION (300 WORDS)**
+## **DESCRIPTION**
 
 **Objective:** Execute the complete CP3 (Coordinate Protocol 3) test battery across all 19 primes, verifying that every one of the 401 structurally isolated classes resists coordinate collapse—the property that no monomial can be re-represented using only 4 of the 6 available variables, thereby establishing the Variable-Count Barrier theorem from variable_count_barrier.tex.
 
