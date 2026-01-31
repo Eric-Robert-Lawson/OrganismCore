@@ -9424,7 +9424,7 @@ python3 STEP_10F_verify_kernel.py \
   --out step10f_verification_results.json
 ```
 
-**Runtime:** ~10-60 seconds  
+**Runtime:** ~1 hour  
 **Expected:** 100% success rate (all 707 vectors satisfy M·k = 0)
 
 ---
