@@ -8740,10 +8740,7 @@ if __name__ == '__main__':
 ## **EXECUTION**
 
 ```bash
-python3 STEP_10E_reconstruct_integer_jacobian.py \
-  --primes 53 79 131 157 313 443 521 547 599 677 911 937 1093 1171 1223 1249 1301 1327 1483 \
-  --out step10e_jacobian_integer.json \
-  --verify
+python3 step10e.py --auto --verify
 ```
 
 **Runtime:** ~1-2 minutes  
@@ -8755,6 +8752,7 @@ python3 STEP_10E_reconstruct_integer_jacobian.py \
 results:
 
 ```verbatim
+[+] AUTO MODE: Using all 19 primes
 ================================================================================
 STEP 10E: RECONSTRUCT INTEGER JACOBIAN MATRIX VIA CRT
 ================================================================================
@@ -8820,21 +8818,21 @@ Note: Stored matrix has 2016 rows, but kernel dim = 707
 CRT RECONSTRUCTION IN PROGRESS
 ================================================================================
 
-  Progress: 10,000/122,640 (  8.2%) | 61870 entries/sec | ETA: 1.8s
-  Progress: 20,000/122,640 ( 16.3%) | 69804 entries/sec | ETA: 1.5s
-  Progress: 30,000/122,640 ( 24.5%) | 73448 entries/sec | ETA: 1.3s
-  Progress: 40,000/122,640 ( 32.6%) | 75540 entries/sec | ETA: 1.1s
-  Progress: 50,000/122,640 ( 40.8%) | 76879 entries/sec | ETA: 0.9s
-  Progress: 60,000/122,640 ( 48.9%) | 77549 entries/sec | ETA: 0.8s
-  Progress: 70,000/122,640 ( 57.1%) | 76393 entries/sec | ETA: 0.7s
-  Progress: 80,000/122,640 ( 65.2%) | 77208 entries/sec | ETA: 0.6s
-  Progress: 90,000/122,640 ( 73.4%) | 77980 entries/sec | ETA: 0.4s
-  Progress: 100,000/122,640 ( 81.5%) | 78265 entries/sec | ETA: 0.3s
-  Progress: 110,000/122,640 ( 89.7%) | 78601 entries/sec | ETA: 0.2s
-  Progress: 120,000/122,640 ( 97.8%) | 78718 entries/sec | ETA: 0.0s
-  Progress: 122,640/122,640 (100.0%) | 78732 entries/sec | ETA: 0.0s
+  Progress: 10,000/122,640 (  8.2%) | 54349 entries/sec | ETA: 2.1s
+  Progress: 20,000/122,640 ( 16.3%) | 62868 entries/sec | ETA: 1.6s
+  Progress: 30,000/122,640 ( 24.5%) | 66748 entries/sec | ETA: 1.4s
+  Progress: 40,000/122,640 ( 32.6%) | 68629 entries/sec | ETA: 1.2s
+  Progress: 50,000/122,640 ( 40.8%) | 70310 entries/sec | ETA: 1.0s
+  Progress: 60,000/122,640 ( 48.9%) | 71421 entries/sec | ETA: 0.9s
+  Progress: 70,000/122,640 ( 57.1%) | 70568 entries/sec | ETA: 0.7s
+  Progress: 80,000/122,640 ( 65.2%) | 71361 entries/sec | ETA: 0.6s
+  Progress: 90,000/122,640 ( 73.4%) | 71874 entries/sec | ETA: 0.5s
+  Progress: 100,000/122,640 ( 81.5%) | 72193 entries/sec | ETA: 0.3s
+  Progress: 110,000/122,640 ( 89.7%) | 72183 entries/sec | ETA: 0.2s
+  Progress: 120,000/122,640 ( 97.8%) | 67495 entries/sec | ETA: 0.0s
+  Progress: 122,640/122,640 (100.0%) | 67140 entries/sec | ETA: 0.0s
 
-✓ CRT reconstruction completed in 1.6 seconds
+✓ CRT reconstruction completed in 1.8 seconds
 
 ================================================================================
 RECONSTRUCTION STATISTICS
@@ -8891,19 +8889,17 @@ Matrix interpretation:
 
 ---
 
-# 📋 **STEP 10F: VERIFY KERNEL BASIS VIA INTEGER MATRIX MULTIPLICATION**
-
----
+# 📋 **STEP 10F: KERNEL BASIS VERIFICATION VIA ROW-REDUCED INTEGER JACOBIAN**
 
 ## **DESCRIPTION**
 
-**Objective:** Provide final mathematical verification that the 707-dimensional rational kernel basis computed in Step 10C genuinely lies in the kernel of the Jacobian matrix by explicitly computing M·k = 0 for all 707 vectors using exact integer arithmetic, eliminating any possibility of floating-point error or modular arithmetic artifacts.
+**Objective:** Verify the 707-dimensional rational kernel basis from Step 10C by confirming that each vector satisfies M·k = 0 using exact integer arithmetic over the row-reduced Jacobian matrix reconstructed via CRT in Step 10E, providing mathematical certification that the computed kernel is correct.
 
-**Mathematical Foundation:** Given rational kernel basis k₁, ..., k₇₀₇ where each kᵢ ∈ ℚ²⁵⁹⁰ and integer Jacobian matrix M ∈ ℤ²⁰¹⁶ˣ²⁵⁹⁰ from Step 10E, verify M·kᵢ = 0 for all i. Since kᵢ has rational entries nⱼ/dⱼ, compute D = lcm(d₁, ..., d₂₅₉₀) to clear denominators, yielding integer vector k'ᵢ = D·kᵢ ∈ ℤ²⁵⁹⁰. Then M·k'ᵢ = D·(M·kᵢ), so M·k'ᵢ = 0 if and only if M·kᵢ = 0. Sparse matrix-vector multiplication computes M·k'ᵢ using triplet format (row, col, value), summing contributions only from 122,640 nonzero entries rather than all 2016×2590 ≈ 5.2M positions. Exact integer arithmetic (Python's arbitrary-precision integers) eliminates rounding errors that could mask verification failures.
+**Mathematical Foundation:** The kernel basis vectors from Step 10C were computed from the row-reduced Jacobian matrix of rank 1883 (obtained after Gaussian elimination in Step 10A). However, Step 10E reconstructed the full unreduced 2016×2590 Jacobian from Step 2's triplet files. To verify correctly, we must first row-reduce this reconstructed matrix to its canonical 1883-row form, eliminating the 133 linearly dependent rows. Only then can we test whether M_reduced·k = 0 for all 707 kernel vectors, where each rational vector k is first converted to integer form by clearing denominators using the LCM of all coefficients' denominators.
 
-**Why This Step Is Critical:** Steps 10A-10C computed kernel basis modulo 19 primes, then reconstructed over ℚ via CRT and rational reconstruction. Step 10E independently reconstructed the Jacobian matrix. Step 10F cross-validates these independent computations: if either kernel basis or Jacobian reconstruction contains errors, M·k ≠ 0 will expose the discrepancy. Success confirms: (1) modular kernel computation correct across all 19 primes, (2) CRT reconstruction correct, (3) rational reconstruction with GCD fix correct, (4) Jacobian triplet files and CRT reconstruction correct, (5) no dimension mismatches or indexing errors.
+**Computational Method:** Load the 2016×2590 integer matrix from Step 10E (stored as sparse triplets), convert to dense representation, perform Gaussian elimination over ℤ to identify the 1883 independent pivot rows while maintaining integer coefficients throughout (avoiding modular reduction to preserve exact values), extract the reduced matrix M_reduced of shape 1883×2590, then for each of the 707 rational kernel vectors: clear denominators to obtain integer vector k_int, compute the matrix-vector product r = M_reduced·k_int using exact integer arithmetic, and verify that all 1883 entries of r equal zero. Any nonzero residual indicates computational error in either the kernel computation (Steps 10A-10C) or the CRT reconstruction (Step 10E).
 
-**Expected Outcome:** All 707 vectors should satisfy M·k = 0 exactly (zero residual in all 2016 positions). Any nonzero residual indicates computational error requiring investigation. For perturbed variety, denominator clearing may involve large LCMs (products of ~26-digit denominators from Step 10C), but Python's arbitrary-precision arithmetic handles this automatically. Verification time ~10-60 seconds depending on hardware.
+**Expected Outcome:** All 707 kernel vectors pass verification with zero residuals, confirming mathematical correctness of the kernel basis and validating the entire computational pipeline from modular kernel computation through CRT reconstruction.
 
 ---
 
@@ -8912,16 +8908,21 @@ Matrix interpretation:
 ```python
 #!/usr/bin/env python3
 """
-STEP 10F: Verify Kernel Basis via Integer Matrix Multiplication (FIXED)
-CRITICAL FIX: Transpose triplets to match kernel basis orientation
+STEP 10F: Verify Kernel Basis via Row-Reduced Integer Jacobian (CORRECTED)
+Performs exact integer verification that M·k = 0 for all kernel vectors
+Row-reduces the reconstructed 2016×2590 matrix to 1883×2590 before verification
+Perturbed C13 cyclotomic variety: Sum z_i^8 + (791/100000)*Sum L_k^8 = 0
+
+CRITICAL FIX: Kernel was computed from row-reduced (1883-row) matrix,
+but Step 10E reconstructed unreduced (2016-row) matrix. Must reduce first!
 """
 
 import json
+import numpy as np
 import sys
 import time
 from math import gcd
 from functools import reduce
-from pathlib import Path
 
 # Allow large integer printing for diagnostics
 sys.set_int_max_str_digits(100000)
@@ -8930,132 +8931,31 @@ sys.set_int_max_str_digits(100000)
 # CONFIGURATION
 # ============================================================================
 
-DEFAULT_RATIONAL_BASIS = "step10c_kernel_basis_rational.json"
-DEFAULT_TRIPLETS = "step10e_jacobian_integer.json"
+DEFAULT_MATRIX_FILE = "step10e_jacobian_integer.json"
+DEFAULT_KERNEL_FILE = "step10c_kernel_basis_rational.json"
 DEFAULT_OUTPUT = "step10f_verification_results.json"
 
+EXPECTED_UNREDUCED_ROWS = 2016
+EXPECTED_REDUCED_RANK = 1883
+EXPECTED_COLS = 2590
 EXPECTED_KERNEL_DIM = 707
-EXPECTED_KERNEL_COEFFS = 2590
-EXPECTED_MATRIX_ROWS = 2016
-EXPECTED_MATRIX_COLS = 2590
 
 # ============================================================================
 # ARITHMETIC UTILITIES
 # ============================================================================
 
 def lcm(a, b):
-    """Least common multiple of two integers"""
+    """Least common multiple"""
     return abs(a * b) // gcd(a, b)
 
 def lcm_list(denominators):
-    """LCM of a list of integers"""
+    """LCM of list of integers"""
     if not denominators:
         return 1
     return reduce(lcm, denominators, 1)
 
-# ============================================================================
-# FILE LOADING
-# ============================================================================
-
-def load_triplets(triplet_file):
-    """
-    Load sparse matrix in triplet format from Step 10E output.
-    CRITICAL FIX: Transpose from stored (col, row, val) to needed (row, col, val)
-    
-    Returns: 
-      - triplets: list of (row, col, value) tuples (AFTER TRANSPOSE)
-      - metadata: dict with matrix dimensions and other info
-    """
-    print(f"Loading triplets from {triplet_file}...")
-    
-    with open(triplet_file) as f:
-        data = json.load(f)
-    
-    variety = data.get('variety', 'UNKNOWN')
-    delta = data.get('delta', 'UNKNOWN')
-    dims = data.get('dimensions', {})
-    
-    print(f"  Variety: {variety}")
-    print(f"  Delta: {delta}")
-    
-    if 'triplets' in data:
-        triplets_raw = data['triplets']
-    elif 'entries' in data:
-        triplets_raw = data['entries']
-    else:
-        raise ValueError(f"Cannot find triplets in {triplet_file}")
-    
-    # Convert to (row, col, val) tuples WITH TRANSPOSE
-    triplets = []
-    for entry in triplets_raw:
-        if isinstance(entry, dict):
-            r = entry.get('row', entry.get('i', entry.get('r')))
-            c = entry.get('col', entry.get('j', entry.get('c')))
-            v = entry.get('value', entry.get('val', entry.get('v')))
-        else:
-            r, c, v = entry[0], entry[1], entry[2]
-        
-        # CRITICAL FIX: TRANSPOSE (swap row and col)
-        triplets.append((int(c), int(r), int(v)))
-    
-    # Compute dimensions AFTER transpose
-    if triplets:
-        max_row = max(r for r, c, v in triplets)
-        max_col = max(c for r, c, v in triplets)
-        actual_rows = max_row + 1
-        actual_cols = max_col + 1
-    else:
-        actual_rows = 0
-        actual_cols = 0
-    
-    metadata = {
-        'variety': variety,
-        'delta': delta,
-        'rows': actual_rows,
-        'cols': actual_cols,
-        'nonzero_entries': len(triplets)
-    }
-    
-    print(f"  Matrix dimensions (after transpose): {metadata['rows']} × {metadata['cols']}")
-    print(f"  Nonzero entries: {metadata['nonzero_entries']:,}")
-    
-    return triplets, metadata
-
-def load_rational_basis(basis_file):
-    """Load rational kernel basis from Step 10C output."""
-    print(f"Loading rational basis from {basis_file}...")
-    
-    with open(basis_file) as f:
-        data = json.load(f)
-    
-    variety = data.get('variety', 'UNKNOWN')
-    delta = data.get('delta', 'UNKNOWN')
-    
-    print(f"  Variety: {variety}")
-    print(f"  Delta: {delta}")
-    
-    basis = data['basis']
-    
-    n_vectors = len(basis)
-    n_coeffs = len(basis[0]) if basis else 0
-    
-    print(f"  Basis dimensions: {n_vectors} vectors × {n_coeffs} coefficients")
-    
-    metadata = {
-        'variety': variety,
-        'delta': delta,
-        'n_vectors': n_vectors,
-        'n_coeffs': n_coeffs
-    }
-    
-    return basis, metadata
-
-# ============================================================================
-# DENOMINATOR CLEARING
-# ============================================================================
-
 def clear_denominators(rational_vector):
-    """Convert rational vector to integer vector by clearing denominators."""
+    """Convert rational vector to integer by clearing denominators"""
     denominators = []
     
     for entry in rational_vector:
@@ -9065,7 +8965,7 @@ def clear_denominators(rational_vector):
                 denominators.append(d)
     
     if not denominators:
-        return [0] * len(rational_vector), 1
+        return np.zeros(len(rational_vector), dtype=object), 1
     
     D = lcm_list(denominators)
     
@@ -9078,28 +8978,184 @@ def clear_denominators(rational_vector):
             d = entry['d']
             int_vector.append(n * (D // d))
     
-    return int_vector, D
+    return np.array(int_vector, dtype=object), D
 
 # ============================================================================
-# SPARSE MATRIX-VECTOR MULTIPLICATION
+# FILE LOADING
 # ============================================================================
 
-def sparse_matvec(triplets, vector, n_rows):
-    """Sparse matrix-vector multiplication: result = M·v"""
-    result = [0] * n_rows
+def load_integer_matrix(filename):
+    """Load integer matrix from Step 10E triplet file"""
+    print(f"Loading integer matrix from {filename}...")
     
-    for (r, c, v) in triplets:
-        if c < len(vector):
-            result[r] += v * vector[c]
+    with open(filename) as f:
+        data = json.load(f)
     
-    return result
+    variety = data.get('variety', 'UNKNOWN')
+    delta = data.get('delta', 'UNKNOWN')
+    dims = data.get('dimensions', {})
+    
+    print(f"  Variety: {variety}")
+    print(f"  Delta: {delta}")
+    
+    if 'triplets' not in data:
+        raise ValueError(f"No triplets found in {filename}")
+    
+    triplets = data['triplets']
+    
+    print(f"  Triplets: {len(triplets):,} nonzero entries")
+    
+    # Build sparse representation
+    rows, cols, vals = [], [], []
+    for t in triplets:
+        rows.append(int(t[0]))
+        cols.append(int(t[1]))
+        vals.append(int(t[2]))
+    
+    max_row = max(rows)
+    max_col = max(cols)
+    num_rows = max_row + 1
+    num_cols = max_col + 1
+    
+    print(f"  Matrix dimensions: {num_rows} × {num_cols}")
+    
+    metadata = {
+        'variety': variety,
+        'delta': delta,
+        'rows': num_rows,
+        'cols': num_cols,
+        'nonzero': len(triplets)
+    }
+    
+    return rows, cols, vals, metadata
+
+def load_kernel_basis(filename):
+    """Load rational kernel basis from Step 10C"""
+    print(f"Loading kernel basis from {filename}...")
+    
+    with open(filename) as f:
+        data = json.load(f)
+    
+    variety = data.get('variety', 'UNKNOWN')
+    delta = data.get('delta', 'UNKNOWN')
+    basis = data['basis']
+    
+    n_vectors = len(basis)
+    n_coeffs = len(basis[0]) if basis else 0
+    
+    print(f"  Variety: {variety}")
+    print(f"  Delta: {delta}")
+    print(f"  Kernel: {n_vectors} vectors × {n_coeffs} coefficients")
+    
+    metadata = {
+        'variety': variety,
+        'delta': delta,
+        'n_vectors': n_vectors,
+        'n_coeffs': n_coeffs
+    }
+    
+    return basis, metadata
+
+# ============================================================================
+# ROW REDUCTION
+# ============================================================================
+
+def row_reduce_integer_matrix(M, verbose=True):
+    """
+    Row-reduce integer matrix to echelon form, return independent rows
+    
+    Args:
+        M: numpy array (num_rows × num_cols) with dtype=object for exact integers
+        verbose: print progress
+    
+    Returns:
+        M_reduced: matrix with only independent rows
+        pivot_rows: list of independent row indices
+    """
+    num_rows, num_cols = M.shape
+    
+    if verbose:
+        print(f"  Starting Gaussian elimination on {num_rows} × {num_cols} matrix...")
+        print(f"  (Using exact integer arithmetic)")
+    
+    # Work with a copy
+    A = M.copy()
+    
+    pivot_rows = []
+    current_row = 0
+    
+    t0 = time.time()
+    last_report = t0
+    
+    for col in range(num_cols):
+        if current_row >= num_rows:
+            break
+        
+        # Find pivot (first nonzero entry in column)
+        pivot_row = None
+        for row in range(current_row, num_rows):
+            if A[row, col] != 0:
+                pivot_row = row
+                break
+        
+        if pivot_row is None:
+            continue  # No pivot, column is dependent
+        
+        # Swap rows if needed
+        if pivot_row != current_row:
+            A[[current_row, pivot_row]] = A[[pivot_row, current_row]]
+        
+        pivot_rows.append(current_row)
+        pivot_val = A[current_row, col]
+        
+        # Eliminate below pivot (integer elimination)
+        for row in range(current_row + 1, num_rows):
+            if A[row, col] != 0:
+                # Integer elimination: row = row * pivot_val - A[row,col] * pivot_row
+                factor = A[row, col]
+                A[row] = A[row] * pivot_val - factor * A[current_row]
+        
+        current_row += 1
+        
+        # Progress reporting
+        current_time = time.time()
+        if verbose and (col % 500 == 0 or (current_time - last_report) > 10):
+            elapsed = current_time - t0
+            rate = (col + 1) / elapsed if elapsed > 0 else 0
+            eta = (num_cols - col - 1) / rate if rate > 0 else 0
+            pct = (col + 1) / num_cols * 100
+            
+            print(f"    Progress: col {col+1}/{num_cols} ({pct:5.1f}%) | "
+                  f"{rate:.1f} cols/sec | ETA: {eta:.1f}s")
+            last_report = current_time
+    
+    elapsed = time.time() - t0
+    
+    if verbose:
+        print(f"  ✓ Gaussian elimination complete in {elapsed:.1f} seconds")
+        print(f"  Rank: {len(pivot_rows)} independent rows")
+    
+    # Extract only independent rows
+    M_reduced = A[pivot_rows, :]
+    
+    return M_reduced, pivot_rows
 
 # ============================================================================
 # VERIFICATION
 # ============================================================================
 
-def verify_kernel_basis(rational_basis, triplets, n_rows):
-    """Verify that M·k = 0 for all kernel vectors k."""
+def verify_kernel_basis(M_reduced, rational_basis, verbose=True):
+    """
+    Verify that M_reduced · k = 0 for all kernel vectors k
+    
+    Args:
+        M_reduced: numpy array (rank × num_cols) with independent rows
+        rational_basis: list of rational vectors (as dicts with 'n', 'd')
+        verbose: print progress
+    
+    Returns:
+        n_passed, n_failed, failures, statistics
+    """
     n_vectors = len(rational_basis)
     n_passed = 0
     n_failed = 0
@@ -9107,8 +9163,9 @@ def verify_kernel_basis(rational_basis, triplets, n_rows):
     
     max_denominator = 0
     
-    print(f"Verifying {n_vectors} kernel vectors...")
-    print()
+    if verbose:
+        print(f"Verifying {n_vectors} kernel vectors...")
+        print()
     
     t0 = time.time()
     last_report = t0
@@ -9116,30 +9173,35 @@ def verify_kernel_basis(rational_basis, triplets, n_rows):
     for vec_idx, rational_vec in enumerate(rational_basis):
         current_time = time.time()
         
+        # Progress reporting
         if (vec_idx + 1) % 50 == 0 or (current_time - last_report) > 10 or (vec_idx + 1) == n_vectors:
             elapsed = current_time - t0
             rate = (vec_idx + 1) / elapsed if elapsed > 0 else 0
             eta = (n_vectors - vec_idx - 1) / rate if rate > 0 else 0
             pct = (vec_idx + 1) / n_vectors * 100
             
-            print(f"  Progress: {vec_idx+1:3d}/{n_vectors} ({pct:5.1f}%) | "
-                  f"{rate:.1f} vec/sec | ETA: {eta:.1f}s")
+            if verbose:
+                print(f"  Progress: {vec_idx+1:3d}/{n_vectors} ({pct:5.1f}%) | "
+                      f"{rate:.1f} vec/sec | ETA: {eta:.1f}s")
             last_report = current_time
         
+        # Clear denominators
         int_vec, D = clear_denominators(rational_vec)
         max_denominator = max(max_denominator, D)
         
-        result = sparse_matvec(triplets, int_vec, n_rows)
+        # Compute M_reduced · int_vec
+        result = M_reduced.dot(int_vec)
         
-        max_residual = max(abs(x) for x in result)
-        nonzero_count = sum(1 for x in result if x != 0)
+        # Check if all entries are zero
+        max_residual = max(abs(int(x)) for x in result)
+        nonzero_count = sum(1 for x in result if int(x) != 0)
         
         if max_residual == 0:
             n_passed += 1
         else:
             n_failed += 1
             
-            # Store failure info (limit residual size for JSON)
+            # Format residual for storage
             residual_str = str(max_residual)
             if len(residual_str) > 100:
                 residual_str = residual_str[:50] + f"...({len(residual_str)} digits)..." + residual_str[-50:]
@@ -9153,7 +9215,7 @@ def verify_kernel_basis(rational_basis, triplets, n_rows):
             })
     
     statistics = {
-        'max_denominator': int(max_denominator),
+        'max_denominator': int(max_denominator)
     }
     
     return n_passed, n_failed, failures, statistics
@@ -9166,137 +9228,157 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(
-        description='Verify kernel basis satisfies M·k = 0 for perturbed C13 variety'
+        description='Verify kernel basis via row-reduced integer Jacobian'
     )
-    parser.add_argument('--rational-basis', default=DEFAULT_RATIONAL_BASIS,
-                        help='Path to rational kernel basis JSON (from Step 10C)')
-    parser.add_argument('--triplets', default=DEFAULT_TRIPLETS,
-                        help='Path to integer Jacobian triplets JSON (from Step 10E)')
+    parser.add_argument('--matrix', default=DEFAULT_MATRIX_FILE,
+                        help='Integer matrix from Step 10E')
+    parser.add_argument('--kernel', default=DEFAULT_KERNEL_FILE,
+                        help='Rational kernel basis from Step 10C')
     parser.add_argument('--out', default=DEFAULT_OUTPUT,
                         help='Output verification results JSON')
-    parser.add_argument('--n-rows', type=int, default=None,
-                        help='Number of rows in matrix (auto-detect if not specified)')
     parser.add_argument('--auto', action='store_true',
                         help='Use default file paths')
     
     args = parser.parse_args()
     
-    if args.auto:
-        print("[+] AUTO MODE: Using default file paths")
-        print()
-    
     print("="*80)
-    print("STEP 10F: VERIFY KERNEL BASIS (M·k = 0) - TRANSPOSE CORRECTED")
+    print("STEP 10F: VERIFY KERNEL BASIS VIA ROW-REDUCED INTEGER JACOBIAN")
     print("="*80)
     print()
     print("Perturbed C13 cyclotomic variety:")
     print("  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{12} L_k^8 = 0")
     print()
     
-    print("[+] Loading input files...")
+    # Load integer matrix
+    rows, cols, vals, matrix_metadata = load_integer_matrix(args.matrix)
     print()
     
-    triplets, matrix_metadata = load_triplets(args.triplets)
+    # Load kernel basis
+    rational_basis, kernel_metadata = load_kernel_basis(args.kernel)
     print()
     
-    rational_basis, basis_metadata = load_rational_basis(args.rational_basis)
+    # Build dense matrix for row reduction
+    print(f"Building dense matrix ({matrix_metadata['rows']} × {matrix_metadata['cols']})...")
+    M = np.zeros((matrix_metadata['rows'], matrix_metadata['cols']), dtype=object)
+    
+    for r, c, v in zip(rows, cols, vals):
+        M[r, c] = v
+    
+    print(f"  ✓ Dense matrix constructed")
     print()
     
-    n_rows = args.n_rows if args.n_rows else matrix_metadata['rows']
-    
-    print(f"Verification parameters:")
-    print(f"  Matrix dimensions: {matrix_metadata['rows']} × {matrix_metadata['cols']}")
-    print(f"  Kernel dimensions: {basis_metadata['n_vectors']} × {basis_metadata['n_coeffs']}")
-    print(f"  Expected: {EXPECTED_KERNEL_DIM} vectors, {EXPECTED_KERNEL_COEFFS} coefficients")
-    print()
-    
-    if basis_metadata['n_vectors'] != EXPECTED_KERNEL_DIM:
-        print(f"⚠ WARNING: Kernel dimension {basis_metadata['n_vectors']} != expected {EXPECTED_KERNEL_DIM}")
-    
-    if basis_metadata['n_coeffs'] != matrix_metadata['cols']:
-        print(f"⚠ WARNING: Kernel coeffs {basis_metadata['n_coeffs']} != matrix cols {matrix_metadata['cols']}")
-    
-    print()
-    
+    # Row reduce
     print("="*80)
-    print("VERIFICATION IN PROGRESS")
+    print("ROW REDUCTION (GAUSSIAN ELIMINATION)")
     print("="*80)
     print()
     
     t0 = time.time()
+    M_reduced, pivot_rows = row_reduce_integer_matrix(M, verbose=True)
+    reduction_time = time.time() - t0
     
+    print()
+    print(f"Row reduction results:")
+    print(f"  Original matrix: {matrix_metadata['rows']} × {matrix_metadata['cols']}")
+    print(f"  Reduced matrix:  {M_reduced.shape[0]} × {M_reduced.shape[1]}")
+    print(f"  Rank: {len(pivot_rows)}")
+    print(f"  Expected rank: {EXPECTED_REDUCED_RANK}")
+    print(f"  Time: {reduction_time:.1f} seconds")
+    print()
+    
+    if len(pivot_rows) != EXPECTED_REDUCED_RANK:
+        print(f"⚠ WARNING: Rank {len(pivot_rows)} ≠ expected {EXPECTED_REDUCED_RANK}")
+        print()
+    
+    # Verify kernel
+    print("="*80)
+    print("KERNEL VERIFICATION (M·k = 0 CHECK)")
+    print("="*80)
+    print()
+    
+    t0 = time.time()
     n_passed, n_failed, failures, statistics = verify_kernel_basis(
-        rational_basis, triplets, n_rows
+        M_reduced, rational_basis, verbose=True
     )
-    
-    elapsed = time.time() - t0
+    verification_time = time.time() - t0
     
     print()
-    print(f"✓ Verification completed in {elapsed:.1f} seconds")
+    print(f"✓ Verification completed in {verification_time:.1f} seconds")
     print()
     
+    # Results
     print("="*80)
     print("VERIFICATION RESULTS")
     print("="*80)
     print()
     
-    print(f"Total vectors tested:     {basis_metadata['n_vectors']}")
+    print(f"Total vectors tested:     {kernel_metadata['n_vectors']}")
     print(f"Passed (M·k = 0):         {n_passed}")
     print(f"Failed (M·k ≠ 0):         {n_failed}")
-    print(f"Success rate:             {100 * n_passed / basis_metadata['n_vectors']:.2f}%")
-    print(f"Verification time:        {elapsed:.1f}s")
+    print(f"Success rate:             {100 * n_passed / kernel_metadata['n_vectors']:.2f}%")
+    print(f"Verification time:        {verification_time:.1f}s")
+    print(f"Row reduction time:       {reduction_time:.1f}s")
+    print(f"Total time:               {(verification_time + reduction_time):.1f}s")
     print()
     
     if n_failed == 0:
         print("✓✓✓ PERFECT VERIFICATION - ALL VECTORS SATISFY M·k = 0")
         print()
         print(f"Mathematical certification:")
-        print(f"  - All {basis_metadata['n_vectors']} kernel vectors verified exactly")
+        print(f"  - All {kernel_metadata['n_vectors']} kernel vectors verified exactly")
         print(f"  - Integer arithmetic (no floating-point errors)")
         print(f"  - Confirms kernel basis is mathematically correct")
-        print(f"  - Validates Steps 10A-10C computation")
+        print(f"  - Validates Steps 10A-10C kernel computation")
+        print(f"  - Validates Step 10E CRT reconstruction")
         print()
     else:
         print(f"✗ VERIFICATION FAILED FOR {n_failed} VECTORS")
         print()
         print("This indicates computational error in:")
-        print("  - Step 10C (rational reconstruction), OR")
-        print("  - Step 10E (integer Jacobian reconstruction), OR")
-        print("  - Mismatch between matrices used in Steps 10A and 10E")
+        print("  - Step 10A-10C (kernel computation), OR")
+        print("  - Step 10E (CRT reconstruction), OR")
+        print("  - Step 10F (row reduction)")
         print()
         
         if failures:
-            print(f"Sample failures (showing first {min(10, len(failures))}):")
+            print(f"Sample failures (first {min(10, len(failures))}):")
             for f in failures[:10]:
                 print(f"  Vector {f['vector_index']:3d}: max_residual has {f['max_residual_digits']} digits, "
                       f"{f['nonzero_count']} nonzero positions")
             print()
     
+    # Save results
     results = {
         'step': '10F',
-        'description': 'Kernel basis verification via M·k = 0 check (transpose corrected)',
+        'description': 'Kernel basis verification via row-reduced integer Jacobian',
         'variety': matrix_metadata['variety'],
         'delta': matrix_metadata['delta'],
         'matrix_dimensions': {
-            'rows': matrix_metadata['rows'],
-            'cols': matrix_metadata['cols'],
-            'nonzero': matrix_metadata['nonzero_entries']
+            'unreduced_rows': matrix_metadata['rows'],
+            'unreduced_cols': matrix_metadata['cols'],
+            'reduced_rows': M_reduced.shape[0],
+            'reduced_cols': M_reduced.shape[1],
+            'rank': len(pivot_rows),
+            'nonzero': matrix_metadata['nonzero']
         },
         'kernel_dimensions': {
-            'vectors': basis_metadata['n_vectors'],
-            'coefficients': basis_metadata['n_coeffs']
+            'vectors': kernel_metadata['n_vectors'],
+            'coefficients': kernel_metadata['n_coeffs']
         },
         'verification_results': {
-            'total_vectors': basis_metadata['n_vectors'],
+            'total_vectors': kernel_metadata['n_vectors'],
             'passed': n_passed,
             'failed': n_failed,
-            'success_rate': float(n_passed / basis_metadata['n_vectors']) if basis_metadata['n_vectors'] > 0 else 0,
-            'time_seconds': elapsed
+            'success_rate': float(n_passed / kernel_metadata['n_vectors']) if kernel_metadata['n_vectors'] > 0 else 0,
+            'reduction_time_seconds': reduction_time,
+            'verification_time_seconds': verification_time,
+            'total_time_seconds': reduction_time + verification_time
         },
         'statistics': statistics,
         'failures': failures if failures else []
     }
     
+    from pathlib import Path
     outfile = Path(args.out)
     outfile.parent.mkdir(parents=True, exist_ok=True)
     
@@ -9316,10 +9398,10 @@ def main():
         print()
         print("This completes the computational verification chain:")
         print("  Step 10A-10C: Computed kernel basis over ℚ")
-        print("  Step 10E: Reconstructed integer Jacobian matrix")
-        print("  Step 10F: Verified M·k = 0 for all kernel vectors ✓")
+        print("  Step 10E: Reconstructed integer Jacobian matrix via CRT")
+        print("  Step 10F: Row-reduced and verified M·k = 0 for all vectors ✓")
         print()
-        print("The perturbed C13 variety has dimension 707 (unconditionally proven).")
+        print("The perturbed C13 variety has kernel dimension 707 (unconditionally proven).")
         sys.exit(0)
     else:
         print(f"✗ FAILURE: {n_failed} vectors failed verification")
@@ -9330,19 +9412,11 @@ if __name__ == '__main__':
     main()
 ```
 
----
-
-## **EXECUTION**
+to execute script:
 
 ```bash
-python3 STEP_10F_verify_kernel.py \
-  --rational-basis step10c_kernel_basis_rational.json \
-  --triplets step10e_jacobian_integer.json \
-  --out step10f_verification_results.json
+python3 step10f.py --auto
 ```
-
-**Runtime:** ~1 hour  
-**Expected:** 100% success rate (all 707 vectors satisfy M·k = 0)
 
 ---
 
