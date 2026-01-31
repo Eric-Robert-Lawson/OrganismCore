@@ -207,7 +207,7 @@ Variety is smooth over ℚ
 
 ---
 
-## **DESCRIPTION (300 WORDS)**
+## **DESCRIPTION**
 
 **Objective:** Compute the dimension of the C₁₃-invariant primitive Hodge cohomology $H^{2,2}_{\text{prim,inv}}(V, \mathbb{Q})$ by determining the cokernel rank of the Jacobian multiplication map over finite fields.
 
@@ -439,7 +439,7 @@ end
 M2 STEP_2_galois_invariant_jacobian.m2
 ```
 
-**Runtime:** 
+**Runtime:** about 2 minutes or so per prime, or about 40 minutes total.
 
 **Output:** 38 JSON files (19 monomial + 19 triplet files)
 
