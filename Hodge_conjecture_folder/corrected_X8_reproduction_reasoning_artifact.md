@@ -9432,6 +9432,987 @@ python3 STEP_10F_verify_kernel.py \
 results:
 
 ```verbatim
+
+```
+
+
+
+---
+
+# 📋 **STEP 11: CP3 COORDINATE COLLAPSE TESTS FOR PERTURBED C₁₃**
+
+---
+
+## **DESCRIPTION**
+
+**Objective:** Systematically test whether 401 candidate isolated monomials in the perturbed C₁₃ cyclotomic variety can be represented using only four of the six ambient coordinates (z₀,...,z₅), thereby detecting CP³ coordinate collapses that would contradict the expected 6-dimensional embedding. This computation validates the coordinate transparency property essential for the variable count barrier argument in `variable_count_barrier.tex`.
+
+**Mathematical Foundation:** For perturbed variety V defined by F = Σᵢ₌₀⁵ zᵢ⁸ + δ·Σₖ₌₁¹² Lₖ⁸ where δ = 791/100000 and Lₖ = Σⱼ ωᵏʲzⱼ (ω primitive 13th root mod p), test 401 isolated monomial classes across 15 four-variable subsets S ⊂ {z₀,...,z₅}. For each monomial m and subset S, compute canonical remainder r ≡ m (mod J) where J = Jacobian ideal of F, then check if r uses only variables in S (coordinate collapse) or requires forbidden variables zᵢ ∉ S (no collapse). Working mod p eliminates rational arithmetic, enabling exact symbolic computation via Gröbner basis division in Macaulay2.
+
+**Perturbation Impact:** The δ-perturbation breaks C₁₃ cyclotomic symmetry, potentially altering collapse patterns compared to non-perturbed variety. The modular delta δₚ = 791·(100000)⁻¹ mod p varies with p, introducing prime-dependent behavior. For primes p | 100000, delta vanishes (reverts to non-perturbed case); otherwise delta is nonzero, activating symmetry breaking. Results expected to differ from non-perturbed baseline, quantifying perturbation's geometric effect on coordinate structure.
+
+**Computational Protocol:** Sequential execution across 19 good primes (p ≡ 1 mod 13, p ≠ 2), testing 401 classes × 15 subsets = 6,015 cases per prime → 114,285 total tests. Macaulay2 computes Jacobian ideal J, performs monomial reduction mod J via Gröbner division, then checks variable support. Python wrapper manages multi-prime execution, aggregates results, tracks delta values mod p, enables resumption from failures. Runtime ~3-4 hours per prime, ~60-76 hours total for 19 primes.
+
+**Output Interpretation:** Each test yields REPRESENTABLE (coordinate collapse detected) or NOT_REPRESENTABLE (no collapse). High NOT_REPRESENTABLE rates confirm coordinate transparency (monomials genuinely require all 6 coordinates), validating the 6-dimensional embedding claimed in papers.
+
+---
+
+## **VERBATIM SCRIPTS**
+
+### **Script 1: Macaulay2 Core Computation**
+
+```m2
+-- STEP_11_cp3_coordinate_tests.m2
+-- Complete CP³ coordinate collapse tests for PERTURBED C13 variety
+-- 
+-- Usage:
+--   echo 'primesList = {53}; load "STEP_11_cp3_coordinate_tests.m2"' > test.m2
+--   m2 --stop --script test.m2 > output.csv 2>&1
+
+-- primesList MUST be set before loading this file
+
+-- ============================================================================
+-- CANDIDATE LIST (401 CLASSES) - Complete list
+-- ============================================================================
+
+candidateList = {
+  {"class0", {5,3,2,2,4,2}},
+  {"class1", {5,2,4,2,2,3}},
+  {"class2", {4,2,5,3,2,2}},
+  {"class3", {3,5,2,4,2,2}},
+  {"class4", {3,2,2,2,5,4}},
+  {"class5", {2,3,2,4,2,5}},
+  {"class6", {2,2,4,3,2,5}},
+  {"class7", {2,2,2,5,4,3}},
+  {"class8", {6,2,2,1,5,2}},
+  {"class9", {2,7,2,2,3,2}},
+  {"class10", {2,6,2,5,1,2}},
+  {"class11", {2,2,5,2,1,6}},
+  {"class12", {2,2,3,2,7,2}},
+  {"class13", {2,2,1,6,5,2}},
+  {"class14", {2,1,6,2,2,5}},
+  {"class15", {1,2,5,2,6,2}},
+  {"class16", {5,4,1,3,1,4}},
+  {"class17", {5,2,3,2,5,1}},
+  {"class18", {5,1,5,2,3,2}},
+  {"class19", {5,1,4,3,4,1}},
+  {"class20", {4,3,4,1,5,1}},
+  {"class21", {4,1,1,4,3,5}},
+  {"class22", {4,1,1,3,5,4}},
+  {"class23", {3,2,1,5,2,5}},
+  {"class24", {3,1,4,1,5,4}},
+  {"class25", {2,5,3,5,2,1}},
+  {"class26", {2,2,5,1,3,5}},
+  {"class27", {2,2,3,5,1,5}},
+  {"class28", {2,1,5,2,5,3}},
+  {"class29", {2,1,3,5,5,2}},
+  {"class30", {1,5,2,2,3,5}},
+  {"class31", {1,5,1,3,4,4}},
+  {"class32", {1,4,4,1,3,5}},
+  {"class33", {1,4,1,5,4,3}},
+  {"class34", {1,3,5,2,2,5}},
+  {"class35", {1,3,5,1,4,4}},
+  {"class36", {1,3,4,4,1,5}},
+  {"class37", {1,3,2,5,5,2}},
+  {"class38", {5,4,2,1,2,4}},
+  {"class39", {5,2,4,1,4,2}},
+  {"class40", {5,2,2,5,2,2}},
+  {"class41", {5,2,2,4,4,1}},
+  {"class42", {5,1,4,4,2,2}},
+  {"class43", {4,5,2,2,1,4}},
+  {"class44", {4,5,1,2,4,2}},
+  {"class45", {4,4,2,2,5,1}},
+  {"class46", {4,4,1,5,2,2}},
+  {"class47", {4,2,5,2,4,1}},
+  {"class48", {4,2,4,5,1,2}},
+  {"class49", {4,1,2,2,4,5}},
+  {"class50", {2,5,5,2,2,2}},
+  {"class51", {2,5,4,4,1,2}},
+  {"class52", {2,4,5,4,2,1}},
+  {"class53", {2,4,2,1,4,5}},
+  {"class54", {2,4,1,2,5,4}},
+  {"class55", {2,1,4,5,2,4}},
+  {"class56", {1,2,5,4,2,4}},
+  {"class57", {1,2,4,4,5,2}},
+  {"class58", {5,4,1,2,3,3}},
+  {"class59", {5,3,3,2,1,4}},
+  {"class60", {5,3,1,4,3,2}},
+  {"class61", {5,2,3,4,1,3}},
+  {"class62", {4,5,2,1,3,3}},
+  {"class63", {4,5,1,3,2,3}},
+  {"class64", {4,3,5,1,2,3}},
+  {"class65", {4,3,2,5,3,1}},
+  {"class66", {3,5,4,1,2,3}},
+  {"class67", {3,5,2,3,4,1}},
+  {"class68", {3,4,5,2,1,3}},
+  {"class69", {3,4,5,1,3,2}},
+  {"class70", {3,4,3,5,1,2}},
+  {"class71", {3,3,5,4,1,2}},
+  {"class72", {3,3,4,5,2,1}},
+  {"class73", {3,3,1,2,4,5}},
+  {"class74", {3,2,3,1,4,5}},
+  {"class75", {3,1,4,2,3,5}},
+  {"class76", {3,1,3,4,2,5}},
+  {"class77", {3,1,2,5,3,4}},
+  {"class78", {3,1,2,4,5,3}},
+  {"class79", {2,5,4,3,3,1}},
+  {"class80", {2,4,1,3,3,5}},
+  {"class81", {2,3,3,1,5,4}},
+  {"class82", {2,3,1,5,3,4}},
+  {"class83", {2,3,1,4,5,3}},
+  {"class84", {2,1,5,3,3,4}},
+  {"class85", {1,4,3,3,2,5}},
+  {"class86", {1,4,2,3,5,3}},
+  {"class87", {1,3,4,2,5,3}},
+  {"class88", {1,3,3,5,2,4}},
+  {"class89", {1,2,5,3,4,3}},
+  {"class90", {1,2,4,5,3,3}},
+  {"class91", {4,4,3,1,4,2}},
+  {"class92", {4,4,2,4,1,3}},
+  {"class93", {4,2,4,4,3,1}},
+  {"class94", {3,4,4,2,4,1}},
+  {"class95", {3,2,1,4,4,4}},
+  {"class96", {2,1,4,4,4,3}},
+  {"class97", {1,4,3,2,4,4}},
+  {"class98", {1,4,2,4,3,4}},
+  {"class99", {5,3,2,3,2,3}},
+  {"class100", {5,2,3,3,3,2}},
+  {"class101", {3,5,3,2,3,2}},
+  {"class102", {3,2,2,3,3,5}},
+  {"class103", {2,3,3,2,3,5}},
+  {"class104", {2,2,3,3,5,3}},
+  {"class105", {4,4,3,2,2,3}},
+  {"class106", {4,4,2,3,3,2}},
+  {"class107", {4,3,4,2,3,2}},
+  {"class108", {4,3,3,4,2,2}},
+  {"class109", {3,4,4,3,2,2}},
+  {"class110", {2,3,2,3,4,4}},
+  {"class111", {2,2,3,4,3,4}},
+  {"class112", {9,2,2,2,1,2}},
+  {"class113", {2,2,9,2,2,1}},
+  {"class114", {1,2,2,2,2,9}},
+  {"class115", {8,3,2,2,2,1}},
+  {"class116", {3,2,8,1,2,2}},
+  {"class117", {3,2,1,2,8,2}},
+  {"class118", {2,8,1,2,2,3}},
+  {"class119", {2,3,8,2,1,2}},
+  {"class120", {2,3,2,1,8,2}},
+  {"class121", {2,2,2,3,8,1}},
+  {"class122", {2,1,2,8,2,3}},
+  {"class123", {1,8,2,3,2,2}},
+  {"class124", {1,2,2,8,3,2}},
+  {"class125", {7,5,2,1,1,2}},
+  {"class126", {7,5,1,2,2,1}},
+  {"class127", {7,2,1,2,1,5}},
+  {"class128", {7,1,1,2,5,2}},
+  {"class129", {5,7,2,2,1,1}},
+  {"class130", {5,2,1,7,1,2}},
+  {"class131", {5,1,2,7,2,1}},
+  {"class132", {5,1,1,2,2,7}},
+  {"class133", {2,7,2,1,5,1}},
+  {"class134", {2,5,2,7,1,1}},
+  {"class135", {2,5,1,2,1,7}},
+  {"class136", {2,2,1,5,7,1}},
+  {"class137", {2,1,5,1,7,2}},
+  {"class138", {1,7,2,5,2,1}},
+  {"class139", {1,5,7,2,1,2}},
+  {"class140", {1,2,7,1,2,5}},
+  {"class141", {1,2,2,7,5,1}},
+  {"class142", {1,2,1,2,5,7}},
+  {"class143", {7,4,3,1,2,1}},
+  {"class144", {7,4,2,3,1,1}},
+  {"class145", {7,3,4,2,1,1}},
+  {"class146", {7,2,1,1,3,4}},
+  {"class147", {7,1,2,1,4,3}},
+  {"class148", {6,4,5,1,1,1}},
+  {"class149", {6,1,1,5,4,1}},
+  {"class150", {5,6,4,1,1,1}},
+  {"class151", {5,1,1,1,4,6}},
+  {"class152", {4,5,1,1,6,1}},
+  {"class153", {4,3,1,7,2,1}},
+  {"class154", {4,2,1,3,1,7}},
+  {"class155", {4,1,3,2,1,7}},
+  {"class156", {4,1,1,5,1,6}},
+  {"class157", {4,1,1,2,7,3}},
+  {"class158", {3,7,1,2,1,4}},
+  {"class159", {3,4,1,1,2,7}},
+  {"class160", {3,2,4,1,1,7}},
+  {"class161", {3,1,1,7,2,4}},
+  {"class162", {2,7,1,3,4,1}},
+  {"class163", {2,4,3,1,1,7}},
+  {"class164", {2,4,1,1,7,3}},
+  {"class165", {2,1,3,7,1,4}},
+  {"class166", {2,1,3,4,7,1}},
+  {"class167", {1,7,3,4,1,2}},
+  {"class168", {1,6,1,1,4,5}},
+  {"class169", {1,3,4,1,7,2}},
+  {"class170", {1,3,2,7,1,4}},
+  {"class171", {1,3,2,4,7,1}},
+  {"class172", {1,3,1,7,4,2}},
+  {"class173", {1,2,4,3,7,1}},
+  {"class174", {1,1,7,3,2,4}},
+  {"class175", {1,1,7,2,4,3}},
+  {"class176", {1,1,6,5,1,4}},
+  {"class177", {1,1,5,4,6,1}},
+  {"class178", {1,1,4,7,3,2}},
+  {"class179", {1,1,4,6,5,1}},
+  {"class180", {1,1,2,3,4,7}},
+  {"class181", {1,1,1,4,5,6}},
+  {"class182", {7,1,2,2,2,4}},
+  {"class183", {4,2,2,1,2,7}},
+  {"class184", {4,1,7,2,2,2}},
+  {"class185", {2,7,1,4,2,2}},
+  {"class186", {2,4,7,1,2,2}},
+  {"class187", {2,1,2,7,4,2}},
+  {"class188", {1,7,4,2,2,2}},
+  {"class189", {1,4,2,2,7,2}},
+  {"class190", {6,5,3,2,1,1}},
+  {"class191", {6,3,2,1,1,5}},
+  {"class192", {6,1,2,5,1,3}},
+  {"class193", {6,1,2,3,5,1}},
+  {"class194", {5,3,2,1,6,1}},
+  {"class195", {5,2,1,6,3,1}},
+  {"class196", {5,1,6,1,2,3}},
+  {"class197", {5,1,3,6,1,2}},
+  {"class198", {3,6,1,2,5,1}},
+  {"class199", {3,5,1,6,1,2}},
+  {"class200", {3,3,2,2,1,7}},
+  {"class201", {3,2,7,3,1,2}},
+  {"class202", {3,2,7,2,3,1}},
+  {"class203", {3,2,5,6,1,1}},
+  {"class204", {3,2,2,1,7,3}},
+  {"class205", {3,1,5,1,2,6}},
+  {"class206", {3,1,2,6,1,5}},
+  {"class207", {3,1,2,3,7,2}},
+  {"class208", {3,1,1,5,6,2}},
+  {"class209", {2,7,3,1,2,3}},
+  {"class210", {2,7,2,3,1,3}},
+  {"class211", {2,5,6,1,1,3}},
+  {"class212", {2,5,1,1,3,6}},
+  {"class213", {2,3,7,3,2,1}},
+  {"class214", {2,3,6,5,1,1}},
+  {"class215", {2,3,1,6,1,5}},
+  {"class216", {2,3,1,3,7,2}},
+  {"class217", {2,2,1,7,3,3}},
+  {"class218", {1,6,5,3,1,2}},
+  {"class219", {1,6,5,2,3,1}},
+  {"class220", {1,5,6,3,2,1}},
+  {"class221", {1,5,3,1,2,6}},
+  {"class222", {1,5,2,3,1,6}},
+  {"class223", {1,5,1,2,6,3}},
+  {"class224", {1,2,6,3,1,5}},
+  {"class225", {1,2,6,1,5,3}},
+  {"class226", {1,2,3,7,2,3}},
+  {"class227", {1,2,3,5,6,1}},
+  {"class228", {1,1,6,3,5,2}},
+  {"class229", {1,1,5,6,2,3}},
+  {"class230", {6,1,4,2,1,4}},
+  {"class231", {4,6,1,1,2,4}},
+  {"class232", {4,1,6,4,1,2}},
+  {"class233", {4,1,2,1,6,4}},
+  {"class234", {2,4,4,6,1,1}},
+  {"class235", {2,4,1,4,1,6}},
+  {"class236", {2,1,6,1,4,4}},
+  {"class237", {1,6,4,4,2,1}},
+  {"class238", {1,4,4,2,1,6}},
+  {"class239", {1,4,1,6,2,4}},
+  {"class240", {1,4,1,4,6,2}},
+  {"class241", {1,2,4,6,1,4}},
+  {"class242", {5,4,1,1,5,2}},
+  {"class243", {5,2,5,1,1,4}},
+  {"class244", {4,2,1,1,5,5}},
+  {"class245", {4,1,5,5,2,1}},
+  {"class246", {2,5,5,1,4,1}},
+  {"class247", {2,1,5,4,1,5}},
+  {"class248", {1,5,2,1,5,4}},
+  {"class249", {1,5,1,4,2,5}},
+  {"class250", {1,4,2,5,1,5}},
+  {"class251", {1,1,5,5,4,2}},
+  {"class252", {6,3,1,2,2,4}},
+  {"class253", {6,2,3,1,2,4}},
+  {"class254", {6,2,2,3,1,4}},
+  {"class255", {6,2,1,4,2,3}},
+  {"class256", {6,2,1,3,4,2}},
+  {"class257", {6,1,3,2,4,2}},
+  {"class258", {6,1,2,4,3,2}},
+  {"class259", {4,3,2,6,1,2}},
+  {"class260", {4,2,6,2,1,3}},
+  {"class261", {4,2,6,1,3,2}},
+  {"class262", {4,2,3,6,2,1}},
+  {"class263", {4,2,1,2,3,6}},
+  {"class264", {4,1,2,3,2,6}},
+  {"class265", {3,6,2,1,4,2}},
+  {"class266", {3,4,2,6,2,1}},
+  {"class267", {3,2,6,4,2,1}},
+  {"class268", {3,2,2,4,1,6}},
+  {"class269", {2,6,4,2,1,3}},
+  {"class270", {2,6,4,1,3,2}},
+  {"class271", {2,6,3,2,4,1}},
+  {"class272", {2,6,2,4,3,1}},
+  {"class273", {2,4,6,3,1,2}},
+  {"class274", {2,4,6,2,3,1}},
+  {"class275", {2,3,4,1,2,6}},
+  {"class276", {2,2,4,1,6,3}},
+  {"class277", {2,1,4,3,6,2}},
+  {"class278", {1,2,6,2,3,4}},
+  {"class279", {1,2,3,6,4,2}},
+  {"class280", {6,2,2,2,3,3}},
+  {"class281", {4,4,4,1,1,4}},
+  {"class282", {4,4,1,4,4,1}},
+  {"class283", {3,6,2,2,2,3}},
+  {"class284", {3,3,6,2,2,2}},
+  {"class285", {3,2,3,2,2,6}},
+  {"class286", {2,6,3,3,2,2}},
+  {"class287", {2,3,2,2,6,3}},
+  {"class288", {4,3,4,3,1,3}},
+  {"class289", {4,3,3,3,4,1}},
+  {"class290", {3,4,3,4,3,1}},
+  {"class291", {3,1,3,3,4,4}},
+  {"class292", {1,3,4,3,3,4}},
+  {"class293", {1,3,3,4,4,3}},
+  {"class294", {10,2,1,1,1,3}},
+  {"class295", {10,1,1,3,1,2}},
+  {"class296", {10,1,1,2,3,1}},
+  {"class297", {3,10,2,1,1,1}},
+  {"class298", {3,2,1,1,10,1}},
+  {"class299", {2,1,10,3,1,1}},
+  {"class300", {2,1,1,10,1,3}},
+  {"class301", {1,3,10,1,2,1}},
+  {"class302", {1,3,1,2,1,10}},
+  {"class303", {1,2,3,1,1,10}},
+  {"class304", {1,1,2,10,3,1}},
+  {"class305", {10,1,2,1,2,2}},
+  {"class306", {2,2,10,1,1,2}},
+  {"class307", {2,2,1,1,2,10}},
+  {"class308", {2,1,2,2,1,10}},
+  {"class309", {1,2,1,10,2,2}},
+  {"class310", {9,1,4,1,1,2}},
+  {"class311", {9,1,2,4,1,1}},
+  {"class312", {4,9,1,2,1,1}},
+  {"class313", {4,1,1,1,9,2}},
+  {"class314", {1,4,9,1,1,2}},
+  {"class315", {1,4,2,1,9,1}},
+  {"class316", {1,2,1,9,4,1}},
+  {"class317", {1,2,1,4,1,9}},
+  {"class318", {1,1,4,1,2,9}},
+  {"class319", {1,1,1,2,9,4}},
+  {"class320", {9,3,1,1,2,2}},
+  {"class321", {9,2,2,1,3,1}},
+  {"class322", {9,2,1,3,2,1}},
+  {"class323", {9,1,3,2,2,1}},
+  {"class324", {3,1,9,2,1,2}},
+  {"class325", {3,1,2,2,9,1}},
+  {"class326", {2,3,1,2,9,1}},
+  {"class327", {2,2,3,1,9,1}},
+  {"class328", {2,1,2,1,3,9}},
+  {"class329", {2,1,1,9,3,2}},
+  {"class330", {2,1,1,3,2,9}},
+  {"class331", {1,9,2,1,2,3}},
+  {"class332", {1,9,1,2,3,2}},
+  {"class333", {1,2,2,9,1,3}},
+  {"class334", {1,1,3,9,2,2}},
+  {"class335", {8,1,5,2,1,1}},
+  {"class336", {8,1,1,1,2,5}},
+  {"class337", {5,8,1,1,2,1}},
+  {"class338", {5,1,2,1,1,8}},
+  {"class339", {2,1,1,8,5,1}},
+  {"class340", {1,8,1,5,1,2}},
+  {"class341", {1,5,1,1,8,2}},
+  {"class342", {1,2,5,1,8,1}},
+  {"class343", {1,1,8,2,1,5}},
+  {"class344", {1,1,2,1,8,5}},
+  {"class345", {8,4,1,1,3,1}},
+  {"class346", {8,3,1,4,1,1}},
+  {"class347", {7,2,6,1,1,1}},
+  {"class348", {6,7,1,1,1,2}},
+  {"class349", {4,8,3,1,1,1}},
+  {"class350", {4,3,1,1,1,8}},
+  {"class351", {4,1,8,1,1,3}},
+  {"class352", {3,4,1,8,1,1}},
+  {"class353", {3,1,1,4,8,1}},
+  {"class354", {2,1,7,1,1,6}},
+  {"class355", {2,1,1,1,6,7}},
+  {"class356", {1,8,1,4,3,1}},
+  {"class357", {1,6,2,1,1,7}},
+  {"class358", {1,4,1,3,8,1}},
+  {"class359", {1,2,1,1,7,6}},
+  {"class360", {1,1,8,1,3,4}},
+  {"class361", {1,1,7,1,6,2}},
+  {"class362", {1,1,6,2,7,1}},
+  {"class363", {1,1,4,8,1,3}},
+  {"class364", {1,1,3,8,4,1}},
+  {"class365", {8,4,1,2,1,2}},
+  {"class366", {8,2,4,1,2,1}},
+  {"class367", {4,2,2,8,1,1}},
+  {"class368", {2,8,2,1,1,4}},
+  {"class369", {2,8,1,1,4,2}},
+  {"class370", {2,2,8,4,1,1}},
+  {"class371", {2,2,1,8,1,4}},
+  {"class372", {2,1,4,2,8,1}},
+  {"class373", {2,1,1,2,4,8}},
+  {"class374", {1,8,2,2,4,1}},
+  {"class375", {1,4,8,2,2,1}},
+  {"class376", {1,2,2,1,4,8}},
+  {"class377", {1,1,2,4,2,8}},
+  {"class378", {8,3,3,1,1,2}},
+  {"class379", {8,2,3,3,1,1}},
+  {"class380", {3,1,8,3,2,1}},
+  {"class381", {3,1,3,1,8,2}},
+  {"class382", {2,3,8,1,3,1}},
+  {"class383", {1,8,3,2,1,3}},
+  {"class384", {1,8,3,1,3,2}},
+  {"class385", {1,3,3,2,8,1}},
+  {"class386", {1,3,1,8,2,3}},
+  {"class387", {1,2,1,3,3,8}},
+  {"class388", {1,1,3,2,3,8}},
+  {"class389", {7,1,3,1,1,5}},
+  {"class390", {3,1,7,5,1,1}},
+  {"class391", {1,7,5,1,1,3}},
+  {"class392", {1,5,7,1,3,1}},
+  {"class393", {1,1,3,1,5,7}},
+  {"class394", {1,1,1,5,3,7}},
+  {"class395", {1,1,1,3,7,5}},
+  {"class396", {7,1,1,4,1,4}},
+  {"class397", {4,1,7,1,4,1}},
+  {"class398", {4,1,4,7,1,1}},
+  {"class399", {1,7,4,1,4,1}},
+  {"class400", {1,4,7,4,1,1}}
+};
+
+-- ============================================================================
+-- FOUR-VARIABLE SUBSETS
+-- ============================================================================
+
+fourSubsets = {
+ {0,1,2,3}, {0,1,2,4}, {0,1,2,5},
+ {0,1,3,4}, {0,1,3,5}, {0,1,4,5},
+ {0,2,3,4}, {0,2,3,5}, {0,2,4,5},
+ {0,3,4,5}, {1,2,3,4}, {1,2,3,5},
+ {1,2,4,5}, {1,3,4,5}, {2,3,4,5}
+};
+
+-- ============================================================================
+-- HELPER FUNCTIONS
+-- ============================================================================
+
+makeSubsetName = idxList -> (
+    s := "(";
+    first := true;
+    for idx in idxList do (
+        elemStr := "z_" | toString(idx);
+        if first then ( s = s | elemStr; first = false ) 
+        else ( s = s | "," | elemStr );
+    );
+    s | ")"
+);
+
+usesVariable = (poly, var) -> (
+    if poly == 0 then return false;
+    mons := if class poly === RingElement then (
+        try (
+            flatten entries monomials poly
+        ) else {poly}
+    ) else {poly};
+    for m in mons do (
+        deg := try degree(m, var) else null;
+        if deg === null then return true;
+        if deg > 0 then return true;
+    );
+    false
+);
+
+-- ============================================================================
+-- MAIN COMPUTATION
+-- ============================================================================
+
+print("PRIME,DELTA,CLASS,SUBSET_IDX,SUBSET,RESULT");
+print("-----------------------------------------");
+
+-- Scan over each prime
+scan(primesList, p -> (
+    local kk; local numerator; local denominator; local deltap;
+    local R; local zVars; local expPow; local omega; local elt;
+    local Llist; local Fmono; local Fcyclo; local F; local J;
+    
+    -- Compute delta inline
+    kk = ZZ/p;
+    numerator = 791_kk;
+    denominator = 100000_kk;
+    
+    if denominator == 0_kk then (
+        print("WARNING: p=" | toString(p) | " divides 100000, using delta=0");
+        deltap = 0_kk;
+    ) else (
+        deltap = numerator / denominator;
+    );
+    
+    R = kk[z0,z1,z2,z3,z4,z5];
+    zVars = {z0,z1,z2,z3,z4,z5};
+
+    -- Find omega
+    expPow = (p - 1) // 13;
+    omega = 0_kk;
+    for t from 2 to p-1 do (
+        elt = (t_kk) ^ expPow;
+        if elt != 1_kk then ( omega = elt; break );
+    );
+    if omega == 0_kk then error("No omega for p=" | toString(p));
+
+    -- Build perturbed polynomial
+    Llist = apply(13, k -> sum(6, j -> (omega^(k*j)) * zVars#j));
+    Fmono = sum(zVars, v -> v^8);
+    Fcyclo = sum(Llist, Lk -> Lk^8);
+    F = Fmono + deltap * Fcyclo;
+    
+    J = ideal jacobian F;
+
+    -- Test all candidates
+    scan(candidateList, cand -> (
+        local cname; local exps; local mon; local rem;
+        
+        cname = cand#0;
+        exps = cand#1;
+
+        mon = 1_R;
+        for i from 0 to 5 do mon = mon * (zVars#i ^ (exps#i));
+        rem = mon % J;
+
+        sidx := 0;
+        scan(fourSubsets, S -> (
+            local forbidden; local usesForbidden; local result; local subsetName;
+            
+            sidx = sidx + 1;
+            
+            forbidden = flatten apply({0,1,2,3,4,5}, x -> 
+                if member(x, S) then {} else {x});
+
+            usesForbidden = false;
+            for forbidIdx in forbidden do (
+                if usesVariable(rem, zVars#forbidIdx) then (
+                    usesForbidden = true;
+                    break;
+                );
+            );
+
+            result = if usesForbidden then "NOT_REPRESENTABLE" else "REPRESENTABLE";
+            subsetName = makeSubsetName(S);
+            
+            print(toString(p) | "," | toString(deltap) | "," | cname | "," 
+                  | toString(sidx) | "," | subsetName | "," | result);
+        ));
+    ));
+));
+
+print("");
+print("Done.");
+exit 0
+```
+
+### **Script 2: Python Wrapper for Multi-Prime Execution**
+
+```python
+#!/usr/bin/env python3
+"""
+STEP_11_run_cp3_tests.py - Run CP3 tests for perturbed C13 variety (sequential)
+
+CORRECTED FOR PERTURBED X8 CASE with FILE LOADING FIX
+
+Usage:
+  python3 STEP_11_run_cp3_tests.py                    # Run all 19 primes
+  python3 STEP_11_run_cp3_tests.py --start-from 313   # Resume from prime 313
+  python3 STEP_11_run_cp3_tests.py --primes 53 79 131 # Run specific primes only
+
+Author: Assistant (corrected for perturbed X8 case + file loading fix)
+Date: 2026-01-31
+"""
+
+import subprocess
+import sys
+import time
+import json
+from pathlib import Path
+from datetime import datetime
+import os
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+PRIMES = [53, 79, 131, 157, 313, 443, 521, 547, 599, 677, 911, 937, 
+          1093, 1171, 1223, 1249, 1301, 1327, 1483]
+
+# Macaulay2 script name (will check for this file)
+M2_SCRIPT = "STEP_11_cp3_coordinate_tests.m2"
+
+# Output file templates
+OUTPUT_CSV_TEMPLATE = "step11_cp3_results_p{prime}.csv"
+PROGRESS_FILE = "step11_cp3_progress.json"
+SUMMARY_FILE = "step11_cp3_summary.json"
+
+# Expected perturbation parameter
+DELTA_NUMERATOR = 791
+DELTA_DENOMINATOR = 100000
+
+# ============================================================================
+# SINGLE PRIME EXECUTION
+# ============================================================================
+
+def run_single_prime(prime, script_path):
+    """
+    Run CP³ test for a single prime.
+    
+    Args:
+        prime: prime number to test
+        script_path: absolute path to M2 script
+    
+    Returns:
+        dict with results and statistics
+    """
+    output_file = OUTPUT_CSV_TEMPLATE.format(prime=prime)
+    
+    print(f"\n{'='*80}")
+    print(f"PRIME {prime} - Started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print('='*80)
+    
+    start_time = time.time()
+    
+    try:
+        # CRITICAL FIX: Use absolute path and proper escaping
+        # Build the M2 command string that will be passed to -e
+        m2_cmd_string = f'primesList = {{{prime}}}; load "{script_path}"'
+        
+        cmd = [
+            "m2",
+            "--stop", 
+            "-e", 
+            m2_cmd_string
+        ]
+        
+        print(f"Running Macaulay2...")
+        print(f"  Script: {script_path}")
+        print(f"  Prime: {prime}")
+        print(f"  Output: {output_file}")
+        print()
+        
+        # Execute M2 script
+        with open(output_file, 'w') as f:
+            result = subprocess.run(
+                cmd, 
+                stdout=f, 
+                stderr=subprocess.PIPE, 
+                text=True,
+                cwd=os.path.dirname(script_path) or '.'  # Run in script directory
+            )
+        
+        elapsed = time.time() - start_time
+        
+        # Check for errors
+        if result.returncode != 0:
+            print(f"✗ FAILED (exit code {result.returncode})")
+            print(f"Error output:")
+            print(result.stderr[:1000])
+            return {
+                'prime': prime,
+                'success': False,
+                'runtime_hours': elapsed / 3600,
+                'error': result.stderr[:500]
+            }
+        
+        # Verify output file exists
+        if not Path(output_file).exists():
+            print(f"✗ FAILED: Output file not created")
+            return {
+                'prime': prime,
+                'success': False,
+                'runtime_hours': elapsed / 3600,
+                'error': 'No output file'
+            }
+        
+        # Analyze results
+        with open(output_file, 'r') as f:
+            lines = f.readlines()
+        
+        # Extract delta value from first data line
+        delta_value = None
+        for line in lines:
+            if line.strip() and not line.startswith('PRIME') and not line.startswith('-'):
+                parts = line.strip().split(',')
+                if len(parts) >= 2:
+                    try:
+                        delta_value = parts[1]  # Second column is DELTA
+                        break
+                    except:
+                        pass
+        
+        # Count results
+        not_rep = sum(1 for l in lines if 'NOT_REPRESENTABLE' in l)
+        rep = sum(1 for l in lines 
+                 if l.strip().endswith('REPRESENTABLE') 
+                 and 'NOT_REPRESENTABLE' not in l)
+        total = not_rep + rep
+        
+        pct_not_rep = (not_rep / total * 100) if total > 0 else 0
+        
+        print(f"✓ COMPLETED in {elapsed/3600:.2f} hours")
+        print(f"  Delta value (mod {prime}): {delta_value}")
+        print(f"  Total lines: {len(lines)}")
+        print(f"  Total tests: {total}")
+        print(f"  NOT_REPRESENTABLE: {not_rep} ({pct_not_rep:.1f}%)")
+        print(f"  REPRESENTABLE: {rep}")
+        
+        return {
+            'prime': prime,
+            'success': True,
+            'delta_value': delta_value,
+            'runtime_hours': elapsed / 3600,
+            'total_lines': len(lines),
+            'total_tests': total,
+            'not_representable': not_rep,
+            'representable': rep,
+            'pct_not_representable': pct_not_rep
+        }
+        
+    except Exception as e:
+        elapsed = time.time() - start_time
+        print(f"✗ EXCEPTION: {e}")
+        import traceback
+        traceback.print_exc()
+        return {
+            'prime': prime,
+            'success': False,
+            'runtime_hours': elapsed / 3600,
+            'error': str(e)
+        }
+
+# ============================================================================
+# MAIN EXECUTION
+# ============================================================================
+
+def main():
+    import argparse
+    
+    parser = argparse.ArgumentParser(
+        description='Run CP³ coordinate collapse tests for perturbed C13 variety'
+    )
+    parser.add_argument('--start-from', type=int, default=None,
+                       help='Resume from this prime (e.g., 313)')
+    parser.add_argument('--primes', nargs='+', type=int, default=None,
+                       help='Specific primes to test')
+    parser.add_argument('--dry-run', action='store_true',
+                       help='Show what would be run without executing')
+    parser.add_argument('--script', default=M2_SCRIPT,
+                       help=f'Path to M2 script (default: {M2_SCRIPT})')
+    args = parser.parse_args()
+    
+    # Check Macaulay2 availability
+    try:
+        result = subprocess.run(['m2', '--version'], 
+                              capture_output=True, 
+                              check=True,
+                              text=True)
+        m2_version = result.stdout.splitlines()[0] if result.stdout else "unknown"
+        print(f"Macaulay2 found: {m2_version}")
+    except Exception as e:
+        print("ERROR: Macaulay2 not found in PATH")
+        print("Install Macaulay2: https://macaulay2.com/")
+        sys.exit(1)
+    
+    # Check M2 script exists and get absolute path
+    script_path = Path(args.script)
+    if not script_path.exists():
+        print(f"ERROR: {args.script} not found")
+        print(f"Current directory: {os.getcwd()}")
+        print(f"Looking for: {script_path.absolute()}")
+        print()
+        print("Make sure the M2 script is in the current directory or provide --script path")
+        sys.exit(1)
+    
+    # Get absolute path for M2 load command
+    script_abs_path = str(script_path.absolute())
+    print(f"M2 script found: {script_abs_path}")
+    print()
+    
+    # Determine which primes to test
+    if args.primes:
+        primes_to_test = args.primes
+    elif args.start_from:
+        primes_to_test = [p for p in PRIMES if p >= args.start_from]
+    else:
+        primes_to_test = PRIMES
+    
+    print("="*80)
+    print("STEP 11: CP³ COORDINATE COLLAPSE TESTS - PERTURBED C13 VARIETY")
+    print("="*80)
+    print()
+    print("Perturbed variety: F = Sum z_i^8 + (791/100000) * Sum L_k^8")
+    print(f"Delta: {DELTA_NUMERATOR}/{DELTA_DENOMINATOR}")
+    print()
+    print(f"Primes to test: {len(primes_to_test)}")
+    print(f"Primes: {primes_to_test}")
+    print(f"Estimated time: ~{len(primes_to_test) * 4} hours")
+    print(f"Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print()
+    
+    if args.dry_run:
+        print("DRY RUN MODE - Commands that would be executed:")
+        print()
+        for prime in primes_to_test:
+            m2_cmd = f'primesList = {{{prime}}}; load "{script_abs_path}"'
+            output = OUTPUT_CSV_TEMPLATE.format(prime=prime)
+            print(f"Prime {prime}:")
+            print(f"  Command: m2 --stop -e '{m2_cmd}'")
+            print(f"  Output: {output}")
+            print()
+        return 0
+    
+    overall_start = time.time()
+    results = []
+    
+    # Process each prime sequentially
+    for i, prime in enumerate(primes_to_test, 1):
+        print(f"\n[{i}/{len(primes_to_test)}] Processing prime {prime}...")
+        
+        result = run_single_prime(prime, script_abs_path)
+        results.append(result)
+        
+        # Save progress after each prime
+        summary = {
+            'step': '11',
+            'description': 'CP³ coordinate collapse tests for perturbed C13 variety',
+            'perturbation': {
+                'delta_numerator': DELTA_NUMERATOR,
+                'delta_denominator': DELTA_DENOMINATOR
+            },
+            'timestamp': datetime.now().isoformat(),
+            'primes_completed': i,
+            'primes_total': len(primes_to_test),
+            'primes_remaining': len(primes_to_test) - i,
+            'cumulative_runtime_hours': (time.time() - overall_start) / 3600,
+            'results': results
+        }
+        
+        with open(PROGRESS_FILE, 'w') as f:
+            json.dump(summary, f, indent=2)
+        
+        print(f"\nProgress: {i}/{len(primes_to_test)} primes completed")
+        print(f"Cumulative runtime: {(time.time() - overall_start)/3600:.2f} hours")
+        
+        # Estimate remaining time
+        if i < len(primes_to_test):
+            avg_time_per_prime = (time.time() - overall_start) / i
+            remaining_time = avg_time_per_prime * (len(primes_to_test) - i)
+            print(f"Estimated time remaining: {remaining_time/3600:.2f} hours")
+    
+    total_elapsed = time.time() - overall_start
+    
+    # Final summary
+    print()
+    print("="*80)
+    print("FINAL SUMMARY")
+    print("="*80)
+    print()
+    
+    successful = [r for r in results if r['success']]
+    failed = [r for r in results if not r['success']]
+    
+    print(f"Total primes: {len(results)}")
+    print(f"Successful: {len(successful)}")
+    print(f"Failed: {len(failed)}")
+    print(f"Total runtime: {total_elapsed/3600:.2f} hours")
+    print()
+    
+    if failed:
+        print("FAILED PRIMES:")
+        for r in failed:
+            print(f"  Prime {r['prime']}: {r.get('error', 'Unknown error')}")
+        print()
+    
+    if successful:
+        print("PER-PRIME STATISTICS:")
+        print("  PRIME | DELTA_MOD_P | NOT_REP | % | REP | TIME")
+        print("  " + "-"*60)
+        for r in successful:
+            delta_str = r.get('delta_value', 'N/A')
+            print(f"  {r['prime']:4d}  | {delta_str:11s} | {r['not_representable']:7d} | "
+                  f"{r['pct_not_representable']:5.1f} | {r['representable']:5d} | "
+                  f"{r['runtime_hours']:5.2f}h")
+        print()
+        
+        # Aggregate statistics
+        total_not_rep = sum(r['not_representable'] for r in successful)
+        total_rep = sum(r['representable'] for r in successful)
+        total_tests = total_not_rep + total_rep
+        
+        if total_tests > 0:
+            print(f"AGGREGATE STATISTICS (across {len(successful)} primes):")
+            print(f"  Total tests: {total_tests:,}")
+            print(f"  NOT_REPRESENTABLE: {total_not_rep:,} ({100*total_not_rep/total_tests:.1f}%)")
+            print(f"  REPRESENTABLE: {total_rep:,} ({100*total_rep/total_tests:.1f}%)")
+    
+    # Save final summary
+    final_summary = {
+        'step': '11',
+        'description': 'CP³ coordinate collapse tests for perturbed C13 variety',
+        'perturbation': {
+            'delta_numerator': DELTA_NUMERATOR,
+            'delta_denominator': DELTA_DENOMINATOR,
+            'note': 'Results expected to differ from non-perturbed case due to symmetry breaking'
+        },
+        'timestamp': datetime.now().isoformat(),
+        'total_primes': len(results),
+        'successful_primes': len(successful),
+        'failed_primes': len(failed),
+        'total_runtime_hours': total_elapsed / 3600,
+        'results': results
+    }
+    
+    with open(SUMMARY_FILE, 'w') as f:
+        json.dump(final_summary, f, indent=2)
+    
+    print()
+    print(f"Summary saved to: {SUMMARY_FILE}")
+    print(f"Progress saved to: {PROGRESS_FILE}")
+    print()
+    
+    if len(successful) == len(results):
+        print("✓✓✓ ALL PRIMES COMPLETED SUCCESSFULLY")
+        print()
+        print("Next steps:")
+        print("  1. Analyze CP³ collapse patterns for perturbed variety")
+        print("  2. Compare with non-perturbed C13 results")
+        print("  3. Identify symmetry-breaking effects from δ perturbation")
+        return 0
+    else:
+        print(f"⚠ {len(failed)} PRIMES FAILED")
+        print("Review failed primes and retry if needed")
+        return 1
+
+if __name__ == '__main__':
+    sys.exit(main())
+```
+
+---
+
+## **EXECUTION**
+
+```bash
+# Run all 19 primes
+python3 STEP_11_run_cp3_tests.py
+
+# Test specific primes
+python3 STEP_11_run_cp3_tests.py --primes 53 79
+
+# Resume from interruption
+python3 STEP_11_run_cp3_tests.py --start-from 313
+```
+
+**Runtime:** ~60-76 hours for all 19 primes
+
+---
+
+results:
+
+```verbatim
 pending
 ```
 
