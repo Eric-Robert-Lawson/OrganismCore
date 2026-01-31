@@ -1,0 +1,8 @@
+{
+  "n_vectors": 707,
+  "n_coeffs": 2590,
+  "triplet_count": 122640,
+  "nonzero_residual_rows": 0,
+  "max_abs_residual": "0",
+  "bad_rows_sample": {}
+}
