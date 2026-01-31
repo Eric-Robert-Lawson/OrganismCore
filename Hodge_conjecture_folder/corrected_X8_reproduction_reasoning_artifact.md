@@ -10314,13 +10314,7 @@ if __name__ == '__main__':
 
 ```bash
 # Run all 19 primes
-python3 STEP_11_run_cp3_tests.py
-
-# Test specific primes
-python3 STEP_11_run_cp3_tests.py --primes 53 79
-
-# Resume from interruption
-python3 STEP_11_run_cp3_tests.py --start-from 313
+python3 STEP_11_run_cp3_tests.py --primes 53 79 131 157 313 443 521 547 599 677 911 937 1093 1171 1223 1249 1301 1327 1483
 ```
 
 **Runtime:** ~60-76 hours for all 19 primes
