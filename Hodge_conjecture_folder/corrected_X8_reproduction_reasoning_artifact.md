@@ -8912,36 +8912,8 @@ Matrix interpretation:
 ```python
 #!/usr/bin/env python3
 """
-STEP 10F: Verify Kernel Basis via Integer Matrix Multiplication
-Verify that rational kernel basis satisfies M·k = 0 using exact integer arithmetic.
-
-Perturbed C13 cyclotomic variety: Sum z_i^8 + (791/100000)*Sum L_k^8 = 0
-
-Method:
-  1. Load integer Jacobian matrix M (from Step 10E, 2016×2590 triplet format)
-  2. Load rational kernel basis (from Step 10C, 707 vectors × 2590 coefficients)
-  3. For each kernel vector k with rational entries n_i/d_i:
-     a. Compute D = lcm(all denominators)
-     b. Clear denominators: k_int = D·k (integer vector)
-     c. Compute M·k_int using sparse matrix-vector multiplication
-     d. Verify M·k_int = 0 (zero vector)
-  4. Report verification statistics
-
-Expected:
-  - All 707 kernel vectors should satisfy M·k = 0 exactly
-  - Any non-zero residuals indicate computational error
-
-Usage:
-  python3 STEP_10F_verify_kernel.py --auto
-
-  OR manual mode:
-  python3 STEP_10F_verify_kernel.py \
-    --rational-basis step10c_kernel_basis_rational.json \
-    --triplets step10e_jacobian_integer.json \
-    --out step10f_verification_results.json
-
-Author: Assistant (modified for perturbed X8 case)
-Date: 2026-01-31
+STEP 10F: Verify Kernel Basis via Integer Matrix Multiplication (FIXED)
+CRITICAL FIX: Transpose triplets to match kernel basis orientation
 """
 
 import json
@@ -8951,6 +8923,9 @@ from math import gcd
 from functools import reduce
 from pathlib import Path
 
+# Allow large integer printing for diagnostics
+sys.set_int_max_str_digits(100000)
+
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
@@ -8959,7 +8934,6 @@ DEFAULT_RATIONAL_BASIS = "step10c_kernel_basis_rational.json"
 DEFAULT_TRIPLETS = "step10e_jacobian_integer.json"
 DEFAULT_OUTPUT = "step10f_verification_results.json"
 
-# Expected dimensions from previous steps
 EXPECTED_KERNEL_DIM = 707
 EXPECTED_KERNEL_COEFFS = 2590
 EXPECTED_MATRIX_ROWS = 2016
@@ -8986,9 +8960,10 @@ def lcm_list(denominators):
 def load_triplets(triplet_file):
     """
     Load sparse matrix in triplet format from Step 10E output.
+    CRITICAL FIX: Transpose from stored (col, row, val) to needed (row, col, val)
     
     Returns: 
-      - triplets: list of (row, col, value) tuples
+      - triplets: list of (row, col, value) tuples (AFTER TRANSPOSE)
       - metadata: dict with matrix dimensions and other info
     """
     print(f"Loading triplets from {triplet_file}...")
@@ -8996,7 +8971,6 @@ def load_triplets(triplet_file):
     with open(triplet_file) as f:
         data = json.load(f)
     
-    # Extract metadata
     variety = data.get('variety', 'UNKNOWN')
     delta = data.get('delta', 'UNKNOWN')
     dims = data.get('dimensions', {})
@@ -9004,7 +8978,6 @@ def load_triplets(triplet_file):
     print(f"  Variety: {variety}")
     print(f"  Delta: {delta}")
     
-    # Handle different possible formats
     if 'triplets' in data:
         triplets_raw = data['triplets']
     elif 'entries' in data:
@@ -9012,48 +8985,44 @@ def load_triplets(triplet_file):
     else:
         raise ValueError(f"Cannot find triplets in {triplet_file}")
     
-    # Convert to (row, col, val) tuples
+    # Convert to (row, col, val) tuples WITH TRANSPOSE
     triplets = []
     for entry in triplets_raw:
         if isinstance(entry, dict):
             r = entry.get('row', entry.get('i', entry.get('r')))
             c = entry.get('col', entry.get('j', entry.get('c')))
             v = entry.get('value', entry.get('val', entry.get('v')))
-        else:  # Assume list/tuple
+        else:
             r, c, v = entry[0], entry[1], entry[2]
-        triplets.append((int(r), int(c), int(v)))
+        
+        # CRITICAL FIX: TRANSPOSE (swap row and col)
+        triplets.append((int(c), int(r), int(v)))
     
-    # Infer dimensions from triplets if not in metadata
+    # Compute dimensions AFTER transpose
     if triplets:
         max_row = max(r for r, c, v in triplets)
         max_col = max(c for r, c, v in triplets)
-        inferred_rows = max_row + 1
-        inferred_cols = max_col + 1
+        actual_rows = max_row + 1
+        actual_cols = max_col + 1
     else:
-        inferred_rows = dims.get('rows', 0)
-        inferred_cols = dims.get('cols', 0)
+        actual_rows = 0
+        actual_cols = 0
     
     metadata = {
         'variety': variety,
         'delta': delta,
-        'rows': dims.get('rows', inferred_rows),
-        'cols': dims.get('cols', inferred_cols),
+        'rows': actual_rows,
+        'cols': actual_cols,
         'nonzero_entries': len(triplets)
     }
     
-    print(f"  Matrix dimensions: {metadata['rows']} × {metadata['cols']}")
+    print(f"  Matrix dimensions (after transpose): {metadata['rows']} × {metadata['cols']}")
     print(f"  Nonzero entries: {metadata['nonzero_entries']:,}")
     
     return triplets, metadata
 
 def load_rational_basis(basis_file):
-    """
-    Load rational kernel basis from Step 10C output.
-    
-    Returns:
-      - basis: list of vectors (each vector is list of {"n": num, "d": den} dicts)
-      - metadata: dict with basis info
-    """
+    """Load rational kernel basis from Step 10C output."""
     print(f"Loading rational basis from {basis_file}...")
     
     with open(basis_file) as f:
@@ -9086,16 +9055,7 @@ def load_rational_basis(basis_file):
 # ============================================================================
 
 def clear_denominators(rational_vector):
-    """
-    Convert rational vector to integer vector by clearing denominators.
-    
-    Args:
-      rational_vector: list of {"n": numerator, "d": denominator} dicts or None
-    
-    Returns: 
-      - int_vector: list of integers
-      - D: common denominator (LCM of all denominators)
-    """
+    """Convert rational vector to integer vector by clearing denominators."""
     denominators = []
     
     for entry in rational_vector:
@@ -9105,7 +9065,6 @@ def clear_denominators(rational_vector):
                 denominators.append(d)
     
     if not denominators:
-        # All zeros
         return [0] * len(rational_vector), 1
     
     D = lcm_list(denominators)
@@ -9117,7 +9076,6 @@ def clear_denominators(rational_vector):
         else:
             n = entry['n']
             d = entry['d']
-            # Multiply by D/d to clear denominator
             int_vector.append(n * (D // d))
     
     return int_vector, D
@@ -9127,17 +9085,7 @@ def clear_denominators(rational_vector):
 # ============================================================================
 
 def sparse_matvec(triplets, vector, n_rows):
-    """
-    Sparse matrix-vector multiplication: result = M·v
-    
-    Args:
-      triplets: list of (row, col, value) representing sparse matrix M
-      vector: dense vector (list of integers)
-      n_rows: number of rows in result
-    
-    Returns: 
-      result vector (list of integers)
-    """
+    """Sparse matrix-vector multiplication: result = M·v"""
     result = [0] * n_rows
     
     for (r, c, v) in triplets:
@@ -9151,27 +9099,13 @@ def sparse_matvec(triplets, vector, n_rows):
 # ============================================================================
 
 def verify_kernel_basis(rational_basis, triplets, n_rows):
-    """
-    Verify that M·k = 0 for all kernel vectors k.
-    
-    Args:
-      rational_basis: list of rational vectors
-      triplets: sparse matrix triplets
-      n_rows: number of rows in matrix M
-    
-    Returns: 
-      - n_passed: number of vectors that passed (M·k = 0)
-      - n_failed: number of vectors that failed
-      - failures: list of failure details
-      - statistics: dict with additional stats
-    """
+    """Verify that M·k = 0 for all kernel vectors k."""
     n_vectors = len(rational_basis)
     n_passed = 0
     n_failed = 0
     failures = []
     
     max_denominator = 0
-    total_nonzero_residuals = 0
     
     print(f"Verifying {n_vectors} kernel vectors...")
     print()
@@ -9182,7 +9116,6 @@ def verify_kernel_basis(rational_basis, triplets, n_rows):
     for vec_idx, rational_vec in enumerate(rational_basis):
         current_time = time.time()
         
-        # Progress reporting
         if (vec_idx + 1) % 50 == 0 or (current_time - last_report) > 10 or (vec_idx + 1) == n_vectors:
             elapsed = current_time - t0
             rate = (vec_idx + 1) / elapsed if elapsed > 0 else 0
@@ -9193,14 +9126,11 @@ def verify_kernel_basis(rational_basis, triplets, n_rows):
                   f"{rate:.1f} vec/sec | ETA: {eta:.1f}s")
             last_report = current_time
         
-        # Clear denominators
         int_vec, D = clear_denominators(rational_vec)
         max_denominator = max(max_denominator, D)
         
-        # Compute M·k_int
         result = sparse_matvec(triplets, int_vec, n_rows)
         
-        # Check if result is zero
         max_residual = max(abs(x) for x in result)
         nonzero_count = sum(1 for x in result if x != 0)
         
@@ -9208,27 +9138,22 @@ def verify_kernel_basis(rational_basis, triplets, n_rows):
             n_passed += 1
         else:
             n_failed += 1
-            total_nonzero_residuals += nonzero_count
             
-            # Find first few non-zero entries
-            nonzero_positions = []
-            for i, val in enumerate(result):
-                if val != 0:
-                    nonzero_positions.append({'position': i, 'value': int(val)})
-                    if len(nonzero_positions) >= 5:
-                        break
+            # Store failure info (limit residual size for JSON)
+            residual_str = str(max_residual)
+            if len(residual_str) > 100:
+                residual_str = residual_str[:50] + f"...({len(residual_str)} digits)..." + residual_str[-50:]
             
             failures.append({
                 'vector_index': vec_idx,
-                'max_residual': int(max_residual),
+                'max_residual': residual_str,
+                'max_residual_digits': len(str(max_residual)),
                 'nonzero_count': nonzero_count,
-                'nonzero_positions': nonzero_positions,
                 'denominator': int(D)
             })
     
     statistics = {
         'max_denominator': int(max_denominator),
-        'avg_denominator_digits': 0  # Could compute if needed
     }
     
     return n_passed, n_failed, failures, statistics
@@ -9261,14 +9186,13 @@ def main():
         print()
     
     print("="*80)
-    print("STEP 10F: VERIFY KERNEL BASIS (M·k = 0)")
+    print("STEP 10F: VERIFY KERNEL BASIS (M·k = 0) - TRANSPOSE CORRECTED")
     print("="*80)
     print()
     print("Perturbed C13 cyclotomic variety:")
     print("  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{12} L_k^8 = 0")
     print()
     
-    # Load files
     print("[+] Loading input files...")
     print()
     
@@ -9278,7 +9202,6 @@ def main():
     rational_basis, basis_metadata = load_rational_basis(args.rational_basis)
     print()
     
-    # Determine number of rows
     n_rows = args.n_rows if args.n_rows else matrix_metadata['rows']
     
     print(f"Verification parameters:")
@@ -9287,7 +9210,6 @@ def main():
     print(f"  Expected: {EXPECTED_KERNEL_DIM} vectors, {EXPECTED_KERNEL_COEFFS} coefficients")
     print()
     
-    # Dimension checks
     if basis_metadata['n_vectors'] != EXPECTED_KERNEL_DIM:
         print(f"⚠ WARNING: Kernel dimension {basis_metadata['n_vectors']} != expected {EXPECTED_KERNEL_DIM}")
     
@@ -9296,7 +9218,6 @@ def main():
     
     print()
     
-    # Verify
     print("="*80)
     print("VERIFICATION IN PROGRESS")
     print("="*80)
@@ -9314,7 +9235,6 @@ def main():
     print(f"✓ Verification completed in {elapsed:.1f} seconds")
     print()
     
-    # Results
     print("="*80)
     print("VERIFICATION RESULTS")
     print("="*80)
@@ -9348,14 +9268,13 @@ def main():
         if failures:
             print(f"Sample failures (showing first {min(10, len(failures))}):")
             for f in failures[:10]:
-                print(f"  Vector {f['vector_index']:3d}: max_residual = {f['max_residual']}, "
+                print(f"  Vector {f['vector_index']:3d}: max_residual has {f['max_residual_digits']} digits, "
                       f"{f['nonzero_count']} nonzero positions")
             print()
     
-    # Prepare output
     results = {
         'step': '10F',
-        'description': 'Kernel basis verification via M·k = 0 check',
+        'description': 'Kernel basis verification via M·k = 0 check (transpose corrected)',
         'variety': matrix_metadata['variety'],
         'delta': matrix_metadata['delta'],
         'matrix_dimensions': {
@@ -9378,7 +9297,6 @@ def main():
         'failures': failures if failures else []
     }
     
-    # Save results
     outfile = Path(args.out)
     outfile.parent.mkdir(parents=True, exist_ok=True)
     
@@ -9388,7 +9306,6 @@ def main():
     print(f"[+] Saved verification results to {outfile}")
     print()
     
-    # Final summary
     print("="*80)
     print("STEP 10F COMPLETE - KERNEL VERIFICATION")
     print("="*80)
@@ -9432,7 +9349,7 @@ python3 STEP_10F_verify_kernel.py \
 results:
 
 ```verbatim
-
+pending
 ```
 
 
