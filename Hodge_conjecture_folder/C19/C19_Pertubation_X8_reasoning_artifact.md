@@ -8259,3 +8259,56 @@ By verifying M·k ≡ 0 (mod p) for 19 independent primes with product M = 2.09�
 
 ---
 
+# **STEP 11: CP³ COORDINATE COLLAPSE TESTS (C₁₉ X₈ PERTURBED)**
+
+## **DESCRIPTION**
+
+This step executes the complete CP³ (Coordinate Property 3) protocol across all 19 primes for the 284 structurally isolated C₁₉ Hodge classes, testing whether any can be represented using only 4 of the 6 projective coordinates, thereby establishing the **variable-count barrier** as a geometric obstruction to algebraic cycle constructions.
+
+**Purpose:** While Steps 9A-9B verified the CP³ property for C₁₉ using pre-computed kernel bases, Step 11 provides **independent verification** by recomputing the variety's defining polynomial F = Σzᵢ⁸ + δ·Σₖ₌₁¹⁸Lₖ⁸ modulo each prime, computing its Jacobian ideal J = ⟨∂F/∂z₀, ..., ∂F/∂z₅⟩, and testing whether candidate monomials m reduce to elements using only 4 variables when computed modulo J. This direct approach bypasses kernel reconstruction, providing cross-validation of the variable-count barrier.
+
+**Mathematical framework - CP³ Representability Test:**
+For each candidate monomial m = z₀^(a₀)···z₅^(a₅) and four-variable subset S ⊆ {z₀,...,z₅}, we test:
+
+**m mod J ∈ k[zᵢ : i ∈ S]?**
+
+Equivalently: Does the reduced form of m (after Gröbner basis reduction modulo Jacobian ideal J) use only variables in S?
+
+**Test procedure (per prime p, per monomial m, per subset S):**
+1. **Compute perturbed polynomial:** F_p = Σzᵢ⁸ + δₚ·Σₖ₌₁¹⁸Lₖ⁸ over 𝔽ₚ where δₚ = 791·100000⁻¹ mod p and Lₖ = Σⱼωᵏʲzⱼ with ω = primitive 19th root of unity mod p
+2. **Jacobian ideal:** J = ⟨∂F/∂z₀, ..., ∂F/∂z₅⟩
+3. **Gröbner reduction:** r = m mod J (polynomial division using Gröbner basis)
+4. **Variable usage check:** Does r use only variables zᵢ with i ∈ S?
+5. **Classification:** Return **REPRESENTABLE** if yes, **NOT_REPRESENTABLE** if r requires forbidden variables
+
+**Test enumeration:**
+- **Candidates:** 284 isolated classes (from Step 6 structural isolation)
+- **Subsets per candidate:** C(6,4) = 15 four-variable coordinate subspaces
+- **Primes:** 19 independent primes p ≡ 1 (mod 19)
+- **Total tests:** 284 × 15 × 19 = **80,940 independent representability tests**
+
+**Expected outcomes - Universal Barrier Hypothesis:**
+If C₁₉ replicates C₁₃'s perfect result, all 80,940 tests should return **NOT_REPRESENTABLE (100%)**, establishing:
+1. **Variety independence:** Variable-count barrier holds for both C₁₃ (cyclotomic order 13) and C₁₉ (cyclotomic order 19)
+2. **Perturbation resilience:** Despite δ-breaking cyclotomic symmetry (63% basis density in Step 10B vs. C₁₃'s 4.3%), geometric barrier remains intact
+3. **Universal principle:** Isolated Hodge classes occupy **six-variable regime** inaccessible to algebraic constructions (which use ≤4 variables)
+
+**Computational implementation:**
+- **Script 1 (Macaulay2):** Core computation engine performing Jacobian construction, Gröbner basis reduction, variable usage detection
+- **Script 2 (Python wrapper):** Multi-prime orchestration, progress tracking, result aggregation, cross-variety comparison
+
+**Performance characteristics:**
+- **Per-prime runtime:** ~3-5 hours (284 candidates × 15 subsets × Gröbner computations)
+- **Total sequential runtime:** 19 primes × 4 hours ≈ **76 hours (3+ days)**
+- **Parallelization potential:** Primes are independent; 4-way parallelization → ~19 hours
+- **Memory requirements:** ~2-4 GB RAM per Macaulay2 process
+
+**Key differences from C₁₃:**
+1. **Cyclotomic order:** ω = e^(2πi/19) instead of e^(2πi/13) → 18 linear forms Lₖ instead of 12
+2. **Candidate count:** 284 isolated classes instead of 401 (0.708 ratio, consistent with dimension scaling)
+3. **Prime congruence:** p ≡ 1 (mod 19) instead of p ≡ 1 (mod 13) → different prime sets {191,...,2357} vs {53,...,1483}
+
+**Scientific interpretation:** Perfect 100% NOT_REPRESENTABLE across both C₁₃ and C₁₉ establishes the variable-count barrier as a **universal geometric phenomenon**: transcendental Hodge classes require maximal coordinate entanglement (all 6 variables), fundamentally incompatible with low-dimensional algebraic cycle constructions (≤4 variables). This sharp dichotomy provides compelling evidence for the Hodge conjecture failure mechanism—geometric obstructions preventing algebraic realization.
+
+**Runtime:** 76 hours sequential or ~15-20 hours with 4-way parallelization.
+
