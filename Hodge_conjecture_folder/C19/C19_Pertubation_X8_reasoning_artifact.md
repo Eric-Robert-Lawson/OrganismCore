@@ -9155,3 +9155,21 @@ def main():
 if __name__ == '__main__':
     sys.exit(main())
 ```
+
+to run script (segmented for parrallel running):
+
+```bash
+python3 step11b_19.py --primes {primes to run}
+```
+
+---
+
+results:
+
+```verbatim
+pending
+```
+
+
+
+---
