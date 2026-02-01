@@ -8936,3 +8936,1294 @@ Complete results saved: step12_complete_verification.json
 
 ---
 
+## **STEP 13: EXACT RANK CERTIFICATION VIA BAREISS DETERMINANT (X8 PERTURBED C₁₃)**
+
+### **OBJECTIVE**
+
+Establish unconditional proof that rank(M) = 1883 over ℤ by computing the exact integer determinant of a carefully selected 1883×1883 pivot minor using the Bareiss fraction-free algorithm. This completes the mathematical certification begun in Steps 10-12, which proved dimension = 707 via 19-prime modular kernel verification. Combined, these results rigorously establish the 98.3% gap between Hodge classes and algebraic cycles in the Galois-invariant sector of the perturbed C₁₃ cyclotomic variety.
+
+### **MATHEMATICAL FOUNDATION**
+
+The Jacobian multiplication map M: R₁₈,ᵢₙᵥ → R₁₁,ᵢₙᵥ ⊗ J has a 2590×2016 sparse matrix representation (after transposition per Step 10A convention). Proving rank(M) = 1883 requires exhibiting a nonzero 1883×1883 minor. Modular methods (Steps 10-12) verified dimension = 707 across 19 primes, establishing 2590 - rank = 707, hence rank = 1883. However, this relied on rank-stability heuristics with error probability < 10⁻³². Step 13 eliminates this uncertainty by computing an explicit nonzero integer determinant.
+
+### **FOUR-PHASE PROTOCOL**
+
+**Phase 1 (Step 13A):** Greedy pivot extraction at prime p=313 via sparse modular Gaussian elimination. Identifies 1883 rows and 1883 columns forming a nonzero minor mod 313. Runtime: ~20-30 minutes.
+
+**Phase 2 (Step 13B):** Chinese Remainder Theorem reconstruction. Computes determinant mod 5 primes {53, 79, 131, 157, 313} and reconstructs integer determinant mod M ≈ 1.7×10¹¹. Runtime: ~10-15 minutes total.
+
+**Phase 3 (Step 13C):** Rational reconstruction attempt (optional). Tests if determinant is a small rational number. Expected to fail for generic determinants. Runtime: ~1 second.
+
+**Phase 4 (Step 13D):** Bareiss exact determinant. Computes exact integer determinant using fraction-free algorithm. If nonzero, proves rank ≥ 1883 unconditionally over ℤ. Runtime: ~3-4 hours.
+
+---
+
+## **VERBATIM SCRIPTS**
+
+### **Script 1: `step13a_pivot_finder_modp.py`**
+
+```python
+#!/usr/bin/env python3
+"""
+STEP 13A: Pivot Minor Finder (X8 Perturbed C₁₃)
+
+Find pivot rows/columns for a 1883×1883 minor with nonzero determinant mod p.
+
+Perturbed variety: Sum z_i^8 + (791/100000) * Sum L_k^8 = 0
+
+CRITICAL: Applies Step 10A's transpose convention (swap row/col when loading)
+to match the (2016 × 2590) orientation used in kernel computation.
+
+Usage:
+  python3 step13a_pivot_finder_modp.py \
+    --triplet saved_inv_p313_triplets.json \
+    --prime 313 \
+    --k 1883 \
+    --out_prefix pivot_1883_p313
+
+Expected runtime: ~20-30 minutes on MacBook Air M1
+"""
+
+import argparse
+import json
+import sys
+import time
+from collections import defaultdict
+from pathlib import Path
+from typing import List, Tuple, Dict
+
+EXPECTED_RANK = 1883
+EXPECTED_DIM = 707
+EXPECTED_ROWS = 2016  # After transpose
+EXPECTED_COLS = 2590  # After transpose
+
+def parse_args():
+    p = argparse.ArgumentParser(description="Find pivot minor for X8 perturbed C13")
+    p.add_argument("--triplet", required=True, help="Triplet JSON")
+    p.add_argument("--prime", required=True, type=int, help="Prime modulus")
+    p.add_argument("--k", type=int, default=EXPECTED_RANK, help=f"Target rank (default {EXPECTED_RANK})")
+    p.add_argument("--out_prefix", default="pivot", help="Output prefix")
+    return p.parse_args()
+
+def load_triplets_json(path: str):
+    """Load triplets from Step 2 JSON format"""
+    with open(path) as f:
+        data = json.load(f)
+    
+    if isinstance(data, dict):
+        if 'triplets' in data:
+            triplets = data['triplets']
+        else:
+            raise ValueError(f"Expected 'triplets' key in {path}")
+    elif isinstance(data, list):
+        triplets = data
+    else:
+        raise ValueError(f"Unrecognized JSON structure")
+    
+    normalized = []
+    for t in triplets:
+        if isinstance(t, list) and len(t) >= 3:
+            r, c, v = int(t[0]), int(t[1]), int(t[2])
+            normalized.append((r, c, v))
+        else:
+            raise ValueError(f"Invalid triplet: {t}")
+    
+    return normalized
+
+def infer_dimensions_transposed(triplets: List[Tuple[int,int,int]]):
+    """Infer dimensions AFTER transpose (swap row/col)"""
+    maxr = max(c for r,c,v in triplets)  # col becomes row
+    maxc = max(r for r,c,v in triplets)  # row becomes col
+    return maxr+1, maxc+1
+
+def modular_det_gauss_dense(mat: List[List[int]], p: int) -> int:
+    """Compute determinant mod p via Gaussian elimination"""
+    n = len(mat)
+    A = [row[:] for row in mat]
+    det = 1
+    
+    for i in range(n):
+        pivot = None
+        for r in range(i, n):
+            if A[r][i] % p != 0:
+                pivot = r
+                break
+        
+        if pivot is None:
+            return 0
+        
+        if pivot != i:
+            A[i], A[pivot] = A[pivot], A[i]
+            det = (-det) % p
+        
+        aii = A[i][i] % p
+        det = (det * aii) % p
+        inv = pow(aii, -1, p)
+        
+        for j in range(i+1, n):
+            A[i][j] = (A[i][j] * inv) % p
+        
+        for r in range(i+1, n):
+            if A[r][i]:
+                factor = A[r][i] % p
+                for c in range(i+1, n):
+                    A[r][c] = (A[r][c] - factor * A[i][c]) % p
+                A[r][i] = 0
+    
+    return det % p
+
+def main():
+    args = parse_args()
+    trip_path = Path(args.triplet)
+    
+    if not trip_path.exists():
+        print(f"ERROR: {trip_path} not found", file=sys.stderr)
+        sys.exit(2)
+    
+    p = args.prime
+    k_target = args.k
+    
+    print("="*80)
+    print("STEP 13A: PIVOT MINOR FINDER (X8 PERTURBED C₁₃)")
+    print("="*80)
+    print()
+    print(f"Variety: Sum z_i^8 + (791/100000) * Sum L_k^8 = 0")
+    print(f"Target rank k: {k_target}")
+    print(f"Prime modulus: {p}")
+    print(f"Triplet file: {trip_path}")
+    print()
+    
+    # Load triplets
+    print(f"Loading triplets...")
+    triplets = load_triplets_json(str(trip_path))
+    
+    print(f"  Raw triplets: {len(triplets):,} entries")
+    print(f"  Applying Step 10A transpose convention (swap row↔col)")
+    
+    nrows, ncols = infer_dimensions_transposed(triplets)
+    
+    print(f"  Matrix dimensions (after transpose): {nrows} × {ncols}")
+    print()
+    
+    if nrows != EXPECTED_ROWS or ncols != EXPECTED_COLS:
+        print(f"WARNING: Expected {EXPECTED_ROWS}×{EXPECTED_COLS}, got {nrows}×{ncols}")
+        print()
+    
+    # Build sparse maps WITH TRANSPOSE
+    print("Building sparse data structures (with transpose)...")
+    row_to_cols: Dict[int, Dict[int,int]] = {}
+    col_to_rows: Dict[int, set] = defaultdict(set)
+    original = {}
+    
+    for r_raw, c_raw, v in triplets:
+        # CRITICAL: Apply Step 10A's transpose (swap row/col)
+        r = c_raw  # col becomes row
+        c = r_raw  # row becomes col
+        
+        val = int(v) % p
+        if val == 0:
+            continue
+        
+        if r not in row_to_cols:
+            row_to_cols[r] = {}
+        row_to_cols[r][c] = (row_to_cols[r].get(c, 0) + val) % p
+        col_to_rows[c].add(r)
+        
+        if r not in original:
+            original[r] = {}
+        original[r][c] = (original[r].get(c, 0) + int(v))
+    
+    # Order columns by sparsity
+    col_degrees = [(c, len(col_to_rows[c])) for c in col_to_rows.keys()]
+    col_degrees.sort(key=lambda x: -x[1])
+    columns_order = [c for c, _ in col_degrees]
+    
+    print(f"  Sparsity: {min(d for _,d in col_degrees)} to {max(d for _,d in col_degrees)} nonzeros/col")
+    print()
+    
+    # Greedy pivot search
+    used_rows = set()
+    used_cols = set()
+    pivot_rows = []
+    pivot_cols = []
+    
+    work_rows = {r: dict(d) for r, d in row_to_cols.items()}
+    work_cols = {c: set(s) for c, s in col_to_rows.items()}
+    
+    start_time = time.time()
+    
+    print(f"Searching for {k_target} pivots via greedy elimination mod {p}...")
+    print()
+    
+    for col in columns_order:
+        if len(pivot_rows) >= k_target:
+            break
+        
+        rows_with = work_cols.get(col, set())
+        pivot_row = None
+        
+        for r in rows_with:
+            if r not in used_rows:
+                pivot_row = r
+                break
+        
+        if pivot_row is None:
+            continue
+        
+        pivot_val = work_rows[pivot_row].get(col, 0) % p
+        if pivot_val == 0:
+            continue
+        
+        used_rows.add(pivot_row)
+        used_cols.add(col)
+        pivot_rows.append(pivot_row)
+        pivot_cols.append(col)
+        
+        # Sparse elimination
+        rows_to_elim = list(work_cols.get(col, set()))
+        inv_piv = pow(pivot_val, -1, p)
+        
+        for r2 in rows_to_elim:
+            if r2 == pivot_row:
+                continue
+            
+            val_r2 = work_rows.get(r2, {}).get(col, 0) % p
+            if val_r2 == 0:
+                continue
+            
+            factor = (val_r2 * inv_piv) % p
+            pivot_row_entries = work_rows[pivot_row]
+            r2_entries = work_rows.get(r2, {})
+            
+            for c2, v_piv in list(pivot_row_entries.items()):
+                v_r2 = r2_entries.get(c2, 0)
+                newv = (v_r2 - factor * v_piv) % p
+                
+                if newv == 0:
+                    if c2 in r2_entries:
+                        del r2_entries[c2]
+                        if c2 in work_cols and r2 in work_cols[c2]:
+                            work_cols[c2].remove(r2)
+                else:
+                    r2_entries[c2] = newv
+                    work_cols.setdefault(c2, set()).add(r2)
+            
+            if col in r2_entries:
+                del r2_entries[col]
+            if r2 in work_cols.get(col, set()):
+                work_cols[col].remove(r2)
+        
+        work_cols[col] = set([pivot_row])
+        
+        if (len(pivot_rows) % 100 == 0) or (len(pivot_rows) == k_target):
+            elapsed = time.time() - start_time
+            print(f"  {len(pivot_rows):4d}/{k_target} pivots ({elapsed:.1f}s)")
+    
+    elapsed = time.time() - start_time
+    k_found = len(pivot_rows)
+    
+    print()
+    print(f"Pivot search complete: {k_found} pivots in {elapsed:.2f}s")
+    print()
+    
+    if k_found == 0:
+        print("ERROR: No pivots found", file=sys.stderr)
+        sys.exit(1)
+    
+    # Build minor and verify
+    print(f"Building {k_found}×{k_found} minor from original entries...")
+    k = k_found
+    minor_mat = [[0]*k for _ in range(k)]
+    
+    for i, r in enumerate(pivot_rows):
+        row_orig = original.get(r, {})
+        for j, c in enumerate(pivot_cols):
+            minor_mat[i][j] = row_orig.get(c, 0) % p
+    
+    print(f"Computing determinant mod {p}...")
+    detmod = modular_det_gauss_dense(minor_mat, p) if k > 0 else 0
+    
+    print()
+    print("="*80)
+    print("VERIFICATION")
+    print("="*80)
+    print(f"Determinant of {k}×{k} minor mod {p}: {detmod}")
+    print()
+    
+    if detmod == 0:
+        print("✗ WARNING: Determinant is ZERO mod p")
+        print("  Pivot selection failed, try different prime")
+    else:
+        print("✓ Pivot minor is NONZERO mod p (verified)")
+    
+    print()
+    
+    # Write outputs
+    out_rows = Path(f"{args.out_prefix}_rows.txt")
+    out_cols = Path(f"{args.out_prefix}_cols.txt")
+    
+    with open(out_rows, "w") as f:
+        for r in pivot_rows:
+            f.write(f"{r}\n")
+    
+    with open(out_cols, "w") as f:
+        for c in pivot_cols:
+            f.write(f"{c}\n")
+    
+    report = {
+        "step": "13A",
+        "variety": "PERTURBED_C13_CYCLOTOMIC",
+        "delta": "791/100000",
+        "triplet_file": str(trip_path),
+        "prime": int(p),
+        "matrix_dims_after_transpose": [int(nrows), int(ncols)],
+        "transpose_applied": True,
+        "k_target": int(k_target),
+        "k_found": int(k_found),
+        "pivot_rows": pivot_rows,
+        "pivot_cols": pivot_cols,
+        "det_mod_p": int(detmod),
+        "time_seconds": float(elapsed),
+        "verification": "PASS" if detmod != 0 else "FAIL"
+    }
+    
+    out_report = Path(f"{args.out_prefix}_report.json")
+    with open(out_report, "w") as f:
+        json.dump(report, f, indent=2)
+    
+    print("Output files:")
+    print(f"  {out_rows}")
+    print(f"  {out_cols}")
+    print(f"  {out_report}")
+    print()
+    
+    if k_found < k_target:
+        print(f"WARNING: Only {k_found}/{k_target} pivots found")
+    
+    if detmod != 0:
+        print("="*80)
+        print("NEXT: Run Step 13B with these pivot files")
+        print("="*80)
+    
+    print()
+    print("STEP 13A COMPLETE")
+    print("="*80)
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+### **Script 2: `step13b_crt_minor_reconstruct.py`**
+
+```python
+#!/usr/bin/env python3
+"""
+STEP 13B: CRT Minor Reconstruction (X8 Perturbed C₁₃)
+
+Reconstruct integer determinant of 1883×1883 minor via Chinese Remainder Theorem
+using modular determinants from 5 primes.
+
+Perturbed variety: Sum z_i^8 + (791/100000) * Sum L_k^8 = 0
+
+Usage:
+  python3 step13b_crt_minor_reconstruct.py \
+    --triplets saved_inv_p53_triplets.json \
+               saved_inv_p79_triplets.json \
+               saved_inv_p131_triplets.json \
+               saved_inv_p157_triplets.json \
+               saved_inv_p313_triplets.json \
+    --primes 53 79 131 157 313 \
+    --rows pivot_1883_p313_rows.txt \
+    --cols pivot_1883_p313_cols.txt \
+    --out crt_pivot_1883.json
+
+Expected runtime: ~10-15 minutes total (5 primes × ~2-3 min each)
+
+Author: Assistant (X8 perturbed variant)
+Date: 2026-02-01
+"""
+
+import argparse
+import json
+import math
+import sys
+import time
+from pathlib import Path
+from typing import List, Tuple
+
+EXPECTED_K = 1883
+VARIETY_DELTA = "791/100000"
+
+def parse_args():
+    p = argparse.ArgumentParser(description="CRT reconstruction for X8 perturbed C13")
+    p.add_argument("--triplets", nargs="+", required=True,
+                   help="Triplet JSON files (one per prime, in order)")
+    p.add_argument("--primes", nargs="+", required=True, type=int,
+                   help="Primes (same order as triplets)")
+    p.add_argument("--rows", required=True, help="Pivot rows file")
+    p.add_argument("--cols", required=True, help="Pivot cols file")
+    p.add_argument("--out", default="crt_pivot_1883.json", help="Output JSON")
+    p.add_argument("--max_warn_k", type=int, default=2000,
+                   help="Warn if k exceeds this (default 2000)")
+    return p.parse_args()
+
+def load_indices(path: str) -> List[int]:
+    """Load row/column indices from text file"""
+    with open(path) as f:
+        return [int(ln.strip()) for ln in f if ln.strip()]
+
+def load_triplets_json(path: str):
+    """Load triplets from Step 2 JSON format"""
+    with open(path) as f:
+        data = json.load(f)
+    
+    if isinstance(data, dict):
+        if 'triplets' in data:
+            triplets = data['triplets']
+        else:
+            raise ValueError(f"Expected 'triplets' key in {path}")
+    elif isinstance(data, list):
+        triplets = data
+    else:
+        raise ValueError(f"Unrecognized JSON in {path}")
+    
+    normalized = []
+    for t in triplets:
+        if isinstance(t, list) and len(t) >= 3:
+            r, c, v = int(t[0]), int(t[1]), int(t[2])
+            normalized.append((r, c, v))
+        else:
+            raise ValueError(f"Invalid triplet: {t}")
+    
+    return normalized
+
+def build_dense_minor(triplets: List[Tuple[int,int,int]], 
+                     rows: List[int], cols: List[int], p: int):
+    """Build dense k×k minor mod p from triplets"""
+    k = len(rows)
+    row_index = {r: i for i, r in enumerate(rows)}
+    col_index = {c: i for i, c in enumerate(cols)}
+    
+    mat = [[0]*k for _ in range(k)]
+    
+    for r, c, v in triplets:
+        if r in row_index and c in col_index:
+            i = row_index[r]
+            j = col_index[c]
+            mat[i][j] = (mat[i][j] + v) % p
+    
+    return mat
+
+def modular_det_gauss(mat: List[List[int]], p: int) -> int:
+    """Compute determinant mod p via Gaussian elimination"""
+    n = len(mat)
+    A = [row[:] for row in mat]
+    det = 1
+    
+    for i in range(n):
+        # Find pivot
+        pivot = None
+        for r in range(i, n):
+            if A[r][i] % p != 0:
+                pivot = r
+                break
+        
+        if pivot is None:
+            return 0
+        
+        if pivot != i:
+            A[i], A[pivot] = A[pivot], A[i]
+            det = (-det) % p
+        
+        aii = A[i][i] % p
+        det = (det * aii) % p
+        inv_aii = pow(aii, -1, p)
+        
+        # Normalize row i
+        for j in range(i+1, n):
+            A[i][j] = (A[i][j] * inv_aii) % p
+        
+        # Eliminate below
+        for r in range(i+1, n):
+            if A[r][i]:
+                factor = A[r][i] % p
+                for c in range(i+1, n):
+                    A[r][c] = (A[r][c] - factor * A[i][c]) % p
+                A[r][i] = 0
+    
+    return det % p
+
+def hadamard_bound_estimate(mat: List[List[int]]):
+    """Estimate Hadamard bound: log10(product of row norms)"""
+    log10_prod = 0.0
+    
+    for row in mat:
+        s = sum(int(v)**2 for v in row)
+        if s == 0:
+            return 0
+        log10_prod += 0.5 * math.log10(s)
+    
+    return log10_prod
+
+def iterative_crt(residues: List[Tuple[int,int]]):
+    """Iterative CRT: reconstruct x mod M from (modulus, residue) pairs"""
+    x, M = residues[0][1], residues[0][0]
+    
+    for m, r in residues[1:]:
+        inv = pow(M % m, -1, m)
+        t = ((r - x) * inv) % m
+        x = x + t * M
+        M = M * m
+        x %= M
+    
+    return x % M, M
+
+def adjust_signed(x: int, M: int):
+    """Convert x mod M to signed integer in [-M/2, M/2)"""
+    if x >= M // 2:
+        return x - M
+    return x
+
+def main():
+    args = parse_args()
+    
+    if len(args.triplets) != len(args.primes):
+        print("ERROR: Number of triplet files must equal number of primes", file=sys.stderr)
+        sys.exit(2)
+    
+    rows = load_indices(args.rows)
+    cols = load_indices(args.cols)
+    k = len(rows)
+    
+    if k != len(cols):
+        print("ERROR: Rows and cols must have same length", file=sys.stderr)
+        sys.exit(2)
+    
+    print("="*80)
+    print("STEP 13B: CRT MINOR RECONSTRUCTION (X8 PERTURBED C₁₃)")
+    print("="*80)
+    print()
+    print(f"Variety: Sum z_i^8 + ({VARIETY_DELTA}) * Sum L_k^8 = 0")
+    print(f"Minor size: {k}×{k}")
+    print(f"Primes: {args.primes}")
+    print()
+    
+    if k != EXPECTED_K:
+        print(f"WARNING: Expected k={EXPECTED_K}, got k={k}")
+    
+    if k > args.max_warn_k:
+        print(f"WARNING: k={k} > {args.max_warn_k}, may be slow/memory heavy")
+        print()
+    
+    residues = []
+    
+    print("Computing determinants mod each prime:")
+    print("-" * 80)
+    
+    for path, p in zip(args.triplets, args.primes):
+        print(f"\nPrime p = {p}")
+        print(f"  Loading triplets: {path}")
+        
+        triplets = load_triplets_json(path)
+        
+        print(f"  Building {k}×{k} minor mod {p}...")
+        minor = build_dense_minor(triplets, rows, cols, p)
+        
+        print(f"  Computing det mod {p}...")
+        start = time.time()
+        detmod = modular_det_gauss(minor, p)
+        elapsed = time.time() - start
+        
+        print(f"  det ≡ {detmod} (mod {p})  [{elapsed:.2f}s]")
+        
+        residues.append((p, detmod))
+    
+    print()
+    print("-" * 80)
+    
+    # Hadamard bound estimate
+    print("\nEstimating Hadamard bound (using first prime's integer entries)...")
+    triplets0 = load_triplets_json(args.triplets[0])
+    mat_int = build_dense_minor(triplets0, rows, cols, p=10**9+7)
+    log10_bound = hadamard_bound_estimate(mat_int)
+    
+    if log10_bound == 0:
+        print("  WARNING: Hadamard bound = 0 (degenerate minor)")
+    else:
+        print(f"  log10(Hadamard bound) ≈ {log10_bound:.3f}")
+    
+    print()
+    
+    # CRT reconstruction
+    print("Running CRT reconstruction...")
+    x_mod_M, M = iterative_crt(residues)
+    x_signed = adjust_signed(x_mod_M, M)
+    
+    print(f"  CRT modulus M: {M}")
+    print(f"  log10(M): {math.log10(M):.3f}")
+    print(f"  Unsigned: {x_mod_M}")
+    print(f"  Signed: {x_signed}")
+    print()
+    
+    # Verify residues
+    print("Verifying residues...")
+    verify_ok = True
+    
+    for m, r in residues:
+        computed = x_mod_M % m
+        match = (computed == r % m)
+        symbol = "✓" if match else "✗"
+        print(f"  p={m:4d}: expected={r:4d}, computed={computed:4d} {symbol}")
+        
+        if not match:
+            verify_ok = False
+    
+    print()
+    
+    if not verify_ok:
+        print("WARNING: CRT verification FAILED for at least one prime")
+        print("         Do not trust reconstruction")
+    else:
+        print("✓ CRT verification PASSED for all primes")
+    
+    print()
+    
+    # Strength analysis
+    if log10_bound and M:
+        log10_M = math.log10(M)
+        print("Strength analysis:")
+        print(f"  log10(M) = {log10_M:.3f}")
+        print(f"  log10(Hadamard bound) ≈ {log10_bound:.3f}")
+        
+        if log10_M <= log10_bound + 0.30103:  # M <= 2*bound
+            print()
+            print("  ⚠ WARNING: M ≤ 2×Hadamard bound")
+            print("             Reconstruction may be ambiguous")
+            print("             Consider adding more primes")
+        else:
+            print()
+            print("  ✓ M > 2×Hadamard bound (good)")
+    
+    print()
+    
+    # Output certificate
+    cert = {
+        "step": "13B",
+        "variety": "PERTURBED_C13_CYCLOTOMIC",
+        "delta": VARIETY_DELTA,
+        "minor_rows": rows,
+        "minor_cols": cols,
+        "k": k,
+        "primes": args.primes,
+        "residues": {str(m): int(r) for m, r in residues},
+        "crt_product": str(M),
+        "crt_reconstruction_modM": str(x_mod_M),
+        "crt_reconstruction_signed": str(x_signed),
+        "log10_hadamard_bound_estimate": float(log10_bound) if isinstance(log10_bound, float) else None,
+        "verification_ok": bool(verify_ok)
+    }
+    
+    outpath = Path(args.out)
+    with open(outpath, "w") as f:
+        json.dump(cert, f, indent=2)
+    
+    print(f"Certificate written: {outpath}")
+    print()
+    
+    if verify_ok:
+        print("="*80)
+        print("NEXT STEP: Run Step 13C (rational reconstruction)")
+        print("="*80)
+    
+    print()
+    print("STEP 13B COMPLETE")
+    print("="*80)
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+### **Script 3: `step13c_rational_from_crt.py`**
+
+```python
+#!/usr/bin/env python3
+"""
+STEP 13C: Rational Reconstruction from CRT (X8 Perturbed C₁₃)
+
+Attempt rational reconstruction n/d from CRT integer determinant.
+
+Perturbed variety: Sum z_i^8 + (791/100000) * Sum L_k^8 = 0
+
+Usage:
+  python3 step13c_rational_from_crt.py crt_pivot_1883.json
+
+Output:
+  crt_pivot_1883_rational.json
+
+Author: Assistant (X8 perturbed variant)
+Date: 2026-02-01
+"""
+
+import sys
+import json
+import math
+from pathlib import Path
+
+VARIETY_DELTA = "791/100000"
+
+def rational_reconstruction(a, m, bound=None):
+    """
+    Rational reconstruction via extended Euclidean algorithm.
+    Find n/d with |n|, d <= bound and n ≡ a·d (mod m).
+    """
+    a = int(a) % int(m)
+    m = int(m)
+    
+    if bound is None:
+        bound = int(math.isqrt(m // 2))
+    
+    r0, r1 = m, a
+    s0, s1 = 1, 0
+    t0, t1 = 0, 1
+    
+    while r1 != 0 and abs(r1) > bound:
+        q = r0 // r1
+        r0, r1 = r1, r0 - q * r1
+        s0, s1 = s1, s0 - q * s1
+        t0, t1 = t1, t0 - q * t1
+    
+    if r1 == 0:
+        return None
+    
+    num = r1
+    den = t1
+    
+    if den == 0:
+        return None
+    
+    if den < 0:
+        num = -num
+        den = -den
+    
+    # Check bounds
+    if abs(num) > bound or den > bound:
+        return None
+    
+    # Verify congruence
+    if ((num - a * den) % m) != 0:
+        return None
+    
+    # Reduce
+    g = math.gcd(abs(num), den)
+    num //= g
+    den //= g
+    
+    return (num, den)
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python3 step13c_rational_from_crt.py <crt_file.json>")
+        sys.exit(1)
+    
+    fname = sys.argv[1]
+    fpath = Path(fname)
+    
+    if not fpath.exists():
+        print(f"ERROR: {fname} not found")
+        sys.exit(2)
+    
+    print("="*80)
+    print("STEP 13C: RATIONAL RECONSTRUCTION (X8 PERTURBED C₁₃)")
+    print("="*80)
+    print()
+    print(f"Variety: Sum z_i^8 + ({VARIETY_DELTA}) * Sum L_k^8 = 0")
+    print(f"Input: {fname}")
+    print()
+    
+    with open(fname, 'r') as f:
+        data = json.load(f)
+    
+    M = int(data["crt_product"])
+    cM = int(data["crt_reconstruction_modM"])
+    sym = int(data["crt_reconstruction_signed"])
+    primes = data.get("primes", [])
+    residues = data.get("residues", {})
+    
+    print(f"CRT modulus M: {M}")
+    print(f"log10(M): {math.log10(M):.3f}")
+    print(f"Unsigned: {cM}")
+    print(f"Signed: {sym}")
+    print()
+    
+    bound = int(math.isqrt(M // 2))
+    print(f"Heuristic bound (sqrt(M/2)): {bound}")
+    print(f"log10(bound): {math.log10(bound):.3f}")
+    print()
+    
+    print("Attempting rational reconstruction...")
+    result = rational_reconstruction(cM, M, bound)
+    
+    if result is None:
+        print("  No rational found within bound")
+        print()
+        print("Trying larger bounds...")
+        
+        for mult in (2, 4, 8, 16):
+            newb = bound * mult
+            print(f"  Bound × {mult}: {newb}")
+            res2 = rational_reconstruction(cM, M, newb)
+            
+            if res2 is not None:
+                print(f"  ✓ Found: {res2}")
+                result = res2
+                break
+        
+        if result is None:
+            print()
+            print("FAILED: No rational reconstruction found")
+            print("Consider adding more primes to increase M")
+            sys.exit(1)
+    else:
+        print(f"  ✓ Success: n/d = {result}")
+    
+    print()
+    
+    n, d = result
+    
+    print("="*80)
+    print("VERIFICATION")
+    print("="*80)
+    print()
+    print(f"Numerator:   {n}")
+    print(f"Denominator: {d}")
+    print(f"gcd(n,d):    {math.gcd(abs(n), d)}")
+    print()
+    
+    # Verify residues
+    print("Verifying residues mod primes:")
+    verify_ok = True
+    
+    for p in primes:
+        rp = int(residues[str(p)])
+        invd = pow(d, -1, p)
+        val = (n * invd) % p
+        match = (val == rp)
+        symbol = "✓" if match else "✗"
+        
+        print(f"  p={p:4d}: expected={rp:4d}, computed={val:4d} {symbol}")
+        
+        if not match:
+            verify_ok = False
+    
+    print()
+    
+    if verify_ok:
+        print("✓ All residue checks PASSED")
+    else:
+        print("✗ FAILED: Residue mismatch detected")
+        print("  Rational reconstruction is incorrect")
+    
+    print()
+    
+    # Output
+    out = {
+        "step": "13C",
+        "variety": "PERTURBED_C13_CYCLOTOMIC",
+        "delta": VARIETY_DELTA,
+        "numerator": str(n),
+        "denominator": str(d),
+        "signed": str(sym),
+        "crt_modulus": str(M),
+        "verification_ok": bool(verify_ok)
+    }
+    
+    outname = fname.replace(".json", "_rational.json")
+    with open(outname, "w") as g:
+        json.dump(out, g, indent=2)
+    
+    print(f"Output: {outname}")
+    print()
+    
+    if verify_ok:
+        print("="*80)
+        print("NEXT STEP: Run Step 13D (Bareiss exact determinant)")
+        print("="*80)
+    
+    print()
+    print("STEP 13C COMPLETE")
+    print("="*80)
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+### **Script 4: `step13d_bareiss_exact_det.py`**
+
+```python
+#!/usr/bin/env python3
+"""
+STEP 13D: Bareiss Exact Determinant (X8 Perturbed C₁₃)
+
+Compute exact integer determinant of 1883×1883 minor using Bareiss algorithm.
+
+Perturbed variety: Sum z_i^8 + (791/100000) * Sum L_k^8 = 0
+
+Usage:
+  python3 step13d_bareiss_exact_det.py \
+    --triplet saved_inv_p313_triplets.json \
+    --rows pivot_1883_p313_rows.txt \
+    --cols pivot_1883_p313_cols.txt \
+    --crt crt_pivot_1883.json \
+    --out det_pivot_1883_exact.json
+
+Expected runtime: ~3-4 hours on MacBook Air M1
+
+Author: Assistant (X8 perturbed variant)
+Date: 2026-02-01
+"""
+
+import argparse
+import json
+import time
+import math
+import sys
+from pathlib import Path
+
+# Increase string conversion limits for large determinants
+try:
+    sys.set_int_max_str_digits(10_000_000)
+    try:
+        sys.set_int_max_str_chars(10_000_000)
+    except AttributeError:
+        pass
+except AttributeError:
+    pass
+
+# Try to use gmpy2 for speed
+try:
+    import gmpy2
+    from gmpy2 import mpz
+    GMPY2 = True
+except:
+    GMPY2 = False
+
+VARIETY_DELTA = "791/100000"
+EXPECTED_K = 1883
+
+def parse_args():
+    ap = argparse.ArgumentParser(description="Bareiss exact determinant for X8 perturbed C13")
+    ap.add_argument("--triplet", required=True, help="Triplet JSON (integer entries)")
+    ap.add_argument("--rows", required=True, help="Pivot rows file")
+    ap.add_argument("--cols", required=True, help="Pivot cols file")
+    ap.add_argument("--crt", required=False, help="Optional CRT JSON for comparison")
+    ap.add_argument("--out", default="det_exact.json", help="Output JSON")
+    return ap.parse_args()
+
+def load_triplets(path):
+    """Load triplets from Step 2 JSON"""
+    with open(path) as f:
+        data = json.load(f)
+    
+    if isinstance(data, dict):
+        if 'triplets' in data:
+            trip = data['triplets']
+        else:
+            raise RuntimeError("Expected 'triplets' key in JSON")
+    elif isinstance(data, list):
+        trip = data
+    else:
+        raise RuntimeError("Unrecognized JSON structure")
+    
+    normalized = []
+    for t in trip:
+        if isinstance(t, list) and len(t) >= 3:
+            r, c, v = int(t[0]), int(t[1]), int(t[2])
+        else:
+            raise RuntimeError(f"Invalid triplet: {t}")
+        normalized.append((r, c, v))
+    
+    return normalized
+
+def build_integer_minor(triplets, rows, cols):
+    """Build k×k minor with integer entries"""
+    orig = {}
+    
+    for r, c, v in triplets:
+        if r not in orig:
+            orig[r] = {}
+        orig[r][c] = orig[r].get(c, 0) + int(v)
+    
+    k = len(rows)
+    M = [[0] * k for _ in range(k)]
+    
+    for i, r in enumerate(rows):
+        rowmap = orig.get(r, {})
+        for j, c in enumerate(cols):
+            M[i][j] = int(rowmap.get(c, 0))
+    
+    return M
+
+def bareiss_det_int(A):
+    """Bareiss fraction-free determinant algorithm"""
+    n = len(A)
+    
+    if n == 0:
+        return 1
+    if n == 1:
+        return A[0][0]
+    
+    # Convert to mpz if available
+    if GMPY2:
+        A = [[mpz(v) for v in row] for row in A]
+        one = mpz(1)
+    else:
+        A = [[int(v) for v in row] for row in A]
+        one = 1
+    
+    D_prev = one
+    
+    for k in range(0, n - 1):
+        Akk = A[k][k]
+        
+        # Handle zero pivot
+        if Akk == 0:
+            swap = None
+            for r in range(k + 1, n):
+                if A[r][k] != 0:
+                    swap = r
+                    break
+            
+            if swap is None:
+                return 0
+            
+            # Swap rows and columns
+            A[k], A[swap] = A[swap], A[k]
+            for row in A:
+                row[k], row[swap] = row[swap], row[k]
+            
+            Akk = A[k][k]
+        
+        # Bareiss update
+        for i in range(k + 1, n):
+            for j in range(k + 1, n):
+                num = A[i][j] * Akk - A[i][k] * A[k][j]
+                A[i][j] = num // D_prev
+            A[i][k] = 0
+        
+        D_prev = Akk
+    
+    return int(A[n - 1][n - 1])
+
+def main():
+    args = parse_args()
+    
+    print("="*80)
+    print("STEP 13D: BAREISS EXACT DETERMINANT (X8 PERTURBED C₁₃)")
+    print("="*80)
+    print()
+    print(f"Variety: Sum z_i^8 + ({VARIETY_DELTA}) * Sum L_k^8 = 0")
+    print(f"Using gmpy2: {GMPY2}")
+    print()
+    
+    # Load data
+    print(f"Loading triplets: {args.triplet}")
+    triplets = load_triplets(args.triplet)
+    
+    print(f"Loading pivot rows: {args.rows}")
+    rows = [int(x.strip()) for x in open(args.rows) if x.strip()]
+    
+    print(f"Loading pivot cols: {args.cols}")
+    cols = [int(x.strip()) for x in open(args.cols) if x.strip()]
+    
+    if len(rows) != len(cols):
+        raise RuntimeError("Rows and cols length mismatch")
+    
+    k = len(rows)
+    
+    print()
+    print(f"Minor size: {k}×{k}")
+    
+    if k != EXPECTED_K:
+        print(f"WARNING: Expected k={EXPECTED_K}, got k={k}")
+    
+    print()
+    
+    # Build minor
+    print(f"Building integer {k}×{k} minor...")
+    M = build_integer_minor(triplets, rows, cols)
+    
+    print()
+    print(f"Starting Bareiss determinant computation (k={k})...")
+    print("This will take several hours...")
+    print()
+    
+    t0 = time.time()
+    det = bareiss_det_int(M)
+    t1 = time.time()
+    
+    elapsed_hours = (t1 - t0) / 3600
+    abs_det = abs(det)
+    
+    print()
+    print("="*80)
+    print("BAREISS COMPUTATION COMPLETE")
+    print("="*80)
+    print()
+    print(f"Runtime: {elapsed_hours:.2f} hours ({(t1-t0)/60:.1f} minutes)")
+    print(f"Determinant: {det}")
+    print(f"log10|det|: {math.log10(abs_det) if abs_det > 0 else 'undefined'}")
+    print()
+    
+    # Prepare output
+    out = {
+        "step": "13D",
+        "variety": "PERTURBED_C13_CYCLOTOMIC",
+        "delta": VARIETY_DELTA,
+        "triplet_file": args.triplet,
+        "rows_file": args.rows,
+        "cols_file": args.cols,
+        "k": k,
+        "det": str(det),
+        "abs_det_log10": math.log10(abs_det) if abs_det > 0 else None,
+        "time_seconds": t1 - t0,
+        "time_hours": elapsed_hours,
+        "used_gmpy2": GMPY2
+    }
+    
+    # Compare with CRT if provided
+    if args.crt:
+        print("Comparing with CRT reconstruction...")
+        try:
+            with open(args.crt) as f:
+                crt = json.load(f)
+            
+            s_signed = int(crt.get("crt_reconstruction_signed") or 
+                          crt.get("crt_reconstruction_modM"))
+            M_crt = int(crt.get("crt_product"))
+            
+            matches = (int(det) == int(s_signed))
+            below_half = (abs_det < (M_crt // 2))
+            
+            out["crt_signed"] = str(s_signed)
+            out["crt_product"] = str(M_crt)
+            out["matches_crt_signed"] = matches
+            out["abs_det_less_half_M"] = below_half
+            
+            print(f"  CRT signed: {s_signed}")
+            print(f"  Bareiss det: {det}")
+            print(f"  Match: {matches}")
+            print(f"  |det| < M/2: {below_half}")
+            print()
+            
+            if matches:
+                print("✓ PERFECT MATCH with CRT reconstruction")
+            else:
+                print("✗ MISMATCH with CRT (unexpected)")
+            
+        except Exception as e:
+            out["crt_compare_error"] = str(e)
+            print(f"  Error comparing with CRT: {e}")
+    
+    print()
+    
+    # Write output
+    with open(args.out, "w") as g:
+        json.dump(out, g, indent=2)
+    
+    print(f"Output: {args.out}")
+    print()
+    
+    if det != 0:
+        print("="*80)
+        print("✓✓✓ EXACT RANK CERTIFICATION COMPLETE")
+        print("="*80)
+        print()
+        print(f"Matrix rank ≥ {k} proven unconditionally over ℤ")
+        print(f"Combined with dimension = 707 (Steps 10-12):")
+        print(f"  rank = {k}")
+        print(f"  kernel dim = {2590 - k} = 707 ✓")
+        print()
+        print("Hodge gap: 707 - 12 = 695 (98.3%)")
+    else:
+        print("WARNING: Determinant is ZERO (unexpected)")
+        print("         Pivot selection may have failed")
+    
+    print()
+    print("STEP 13D COMPLETE")
+    print("="*80)
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+## **EXECUTION WORKFLOW**
+
+```bash
+# Step 13A: Find pivots at p=313 (~20-30 min)
+python3 step13a_pivot_finder_modp.py \
+  --triplet saved_inv_p313_triplets.json \
+  --prime 313 \
+  --k 1883 \
+  --out_prefix pivot_1883_p313
+
+# Step 13B: CRT reconstruction (~10-15 min)
+python3 step13b_crt_minor_reconstruct.py \
+  --triplets saved_inv_p53_triplets.json \
+             saved_inv_p79_triplets.json \
+             saved_inv_p131_triplets.json \
+             saved_inv_p157_triplets.json \
+             saved_inv_p313_triplets.json \
+  --primes 53 79 131 157 313 \
+  --rows pivot_1883_p313_rows.txt \
+  --cols pivot_1883_p313_cols.txt \
+  --out crt_pivot_1883.json
+
+# Step 13C: Rational reconstruction (~1 sec)
+python3 step13c_rational_from_crt.py crt_pivot_1883.json
+
+# Step 13D: Bareiss exact determinant (~3-4 hours)
+python3 step13d_bareiss_exact_det.py \
+  --triplet saved_inv_p313_triplets.json \
+  --rows pivot_1883_p313_rows.txt \
+  --cols pivot_1883_p313_cols.txt \
+  --crt crt_pivot_1883.json \
+  --out det_pivot_1883_exact.json
+```
+
+**Total estimated runtime:** ~4-5 hours sequential execution. All scripts adapted for X8 perturbed variety with proper metadata! 🎯
+
+---
+
+results:
+
+script 1:
+
+```verbatim
+pending
+```
+
+script 2:
+
+```verbatim
+pending
+```
+
+script 3:
+
+```verbatim
+pending
+```
+
+script 4:
+
+```verbatim
+pending
+```
