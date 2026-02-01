@@ -8837,6 +8837,12 @@ if __name__ == '__main__':
     sys.exit(main())
 ```
 
+to run:
+
+```bash
+python3 step12_rational_reconstruction_verification.py --verify-all
+```
+
 ---
 
 results:
@@ -8844,3 +8850,8 @@ results:
 ```verbatim
 pending
 ```
+
+
+
+---
+
