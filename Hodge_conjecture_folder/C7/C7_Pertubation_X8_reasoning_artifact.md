@@ -580,7 +580,7 @@ end
 to run the script:
 
 ```bash
-m2 step2_11.m2
+m2 step2_7.m2
 ```
 
 ---
