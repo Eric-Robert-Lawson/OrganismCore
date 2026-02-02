@@ -3233,3 +3233,94 @@ Next step: Comprehensive pipeline summary / CRT reconstruction
 
 ---
 
+
+```python
+
+```
+
+to run script:
+
+```bash
+python step8_7.py
+```
+
+---
+
+result:
+
+```verbatim
+================================================================================
+STEP 8: COMPREHENSIVE VERIFICATION SUMMARY (C7)
+================================================================================
+
+Perturbed C7 cyclotomic variety:
+  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{6} L_k^8 = 0
+  where L_k = Sum_{j=0}^5 omega^{k*j} z_j, omega = e^{2*pi*i/7}
+
+Loading verification results from Steps 6-7...
+  Loaded: step6_structural_isolation_C7.json
+  Loaded: step7_information_theoretic_analysis_C7.json
+
+================================================================================
+VERIFICATION SUMMARY: STEPS 1-7 (C7 X8 PERTURBED)
+================================================================================
+
+OVERALL STATUS:
+  Variety: PERTURBED_C7_CYCLOTOMIC
+  Perturbation delta: 791/100000
+  Cyclotomic order: 7
+  Galois group: Z/6Z
+  Example invariant count: 4807
+  Example modular rank: 3474
+  Example h^{2,2}_inv dimension: 1333
+
+================================================================================
+STEP-BY-STEP QUICK VIEW
+================================================================================
+Smoothness Verification (multi-prime):
+  Status: ASSUMED_COMPLETED
+
+Galois-Invariant Jacobian Cokernel:
+  Status: COMPUTED
+  Invariant monomials: 4807
+
+Single-Prime Rank Verification (example prime):
+  Status: COMPUTED
+
+Multi-Prime Rank Verification:
+  Status: COMPUTED (user-supplied primes)
+
+Canonical Kernel Basis Identification:
+  Status: COMPUTED
+  Invariant monomials: 4807
+  Expected dimension: 1333
+
+Structural Isolation Analysis:
+  Status: COMPUTED
+  Six-variable total: 884
+  Isolated classes: 751
+
+Information-Theoretic Statistical Analysis:
+  Status: COMPUTED
+  Algebraic patterns: 24
+  Isolated classes analyzed: 751
+
+================================================================================
+CROSS-VARIETY COMPARISON: C13 vs C7
+================================================================================
+Dimension: C13=707, C7=1333, ratio=1.885
+Six-variable totals: C13=476, C7=884, ratio=1.857
+
+Comprehensive report saved to step8_comprehensive_verification_report_C7.json
+
+Markdown report saved to STEP8_VERIFICATION_REPORT_C7.md
+
+================================================================================
+STEP 8 COMPLETE
+================================================================================
+```
+
+
+
+---
+
