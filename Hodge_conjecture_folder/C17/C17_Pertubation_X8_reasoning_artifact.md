@@ -350,7 +350,110 @@ EGA spreading-out principle applies (semi-continuity)
 
 ---
 
-# **Step 2: GALOIS-INVARIANT JACOBIAN COKERNEL COMPUTATION**
+# **STEP 2: GALOIS-INVARIANT JACOBIAN COKERNEL COMPUTATION**
+
+## **DESCRIPTION**
+
+This step computes the dimension of the primitive Galois-invariant Hodge cohomology space H²'²_prim,inv(V,ℚ) for the **perturbed C₁₇ cyclotomic hypersurface** V ⊂ ℙ⁵ via modular rank computation of the Jacobian cokernel matrix across 19 independent primes p ≡ 1 (mod 17).
+
+**Purpose:** While C₁₃ and C₁₉ varieties establish dimensional scaling patterns (707 vs. 487, ratio 0.690), the C₁₇ computation provides **intermediate data point** verification of the conjectured relationship dim H²'²_inv ∝ 1/|Gal(ℚ(ωₙ)/ℚ)| ≈ 1/φ(n), where φ(17) = 16 (Euler totient). This tests whether dimension scales smoothly across cyclotomic orders or exhibits order-dependent irregularities.
+
+**Mathematical Framework - Griffiths Residue Isomorphism:**
+
+For smooth hypersurface V: F = Σzᵢ⁸ + δ·Σₖ₌₁¹⁶Lₖ⁸ = 0 where Lₖ = Σⱼ ω^(kj)zⱼ with ω = e^(2πi/17) and δ = 791/100000:
+
+**H²'²_prim(V) ≅ (R/J)₁₈,inv**
+
+where:
+- R = ℂ[z₀,...,z₅] (polynomial ring)
+- J = ⟨∂F/∂z₀,...,∂F/∂z₅⟩ (Jacobian ideal)
+- (·)₁₈ = degree-18 homogeneous component
+- (·)ᵢₙᵥ = C₁₇-invariant subspace (Galois action)
+
+**C₁₇-Invariance Criterion:** Monomial m = z₀^(a₀)···z₅^(a₅) is C₁₇-invariant iff weight w(m) = Σⱼ j·aⱼ ≡ 0 (mod 17).
+
+**Dimensional Computation (Modular Approach):**
+
+1. **Construct perturbed polynomial mod p:**
+   - Fermat term: Σᵢ zᵢ⁸
+   - Cyclotomic term: Σₖ₌₁¹⁶ Lₖ⁸ (16 linear forms, excluding L₀)
+   - Perturbation: δ ≡ 791·100000⁻¹ (mod p)
+   - Result: F_p = Σzᵢ⁸ + δₚ·Σₖ₌₁¹⁶Lₖ⁸ over 𝔽_p
+
+2. **Jacobian ideal generators:**
+   - Compute ∂F_p/∂zᵢ for i = 0,...,5
+   - Character matching: Filter degree-11 monomials m with weight(m) ≡ i (mod 17) to multiply ∂F_p/∂zᵢ
+   - Result: Filtered Jacobian generators preserving C₁₇-invariance
+
+3. **Coefficient matrix assembly:**
+   - Rows: C₁₇-invariant degree-18 monomials (count ≈ 1/17 of total degree-18 basis)
+   - Columns: Filtered Jacobian generators (degree-11 monomials × 6 partials)
+   - Entries: Coefficients expressing generators in monomial basis (mod p)
+
+4. **Rank computation:**
+   - Gaussian elimination over 𝔽_p
+   - Extract: rank(M_p), dimension = (invariant monomials) - rank
+
+**Expected Dimensional Scaling (Heuristic Prediction):**
+
+| Variety | Order n | φ(n) | Expected Dimension | Scaling Factor |
+|---------|---------|------|--------------------|----------------|
+| C₁₃ | 13 | 12 | 707 (measured) | 1.000 (baseline) |
+| C₁₇ | 17 | 16 | ? | 12/16 = 0.750 |
+| C₁₉ | 19 | 18 | 487 (measured) | 12/18 = 0.667 |
+
+**Predicted C₁₇ dimension:** 707 × (12/16) ≈ **530** (if scaling is exact) or 707 × 0.690 ≈ **488** (if ratio matches C₁₉/C₁₃ ≈ 0.690)
+
+**19-Prime Verification Protocol:**
+
+**Primes selected:** {103, 137, 239, 307, 409, 443, 613, 647, 919, 953, 1021, 1123, 1259, 1327, 1361, 1429, 1531, 1667, 1871} (all p ≡ 1 mod 17)
+
+**Per-prime computation:**
+1. Find primitive 17th root ω_p via a^((p-1)/17) ≠ 1 but a^(p-1) = 1
+2. Construct 16 linear forms Lₖ = Σⱼ ω_p^(kj) zⱼ for k=1,...,16
+3. Build perturbed polynomial F_p with δ_p = 791·100000⁻¹ mod p
+4. Compute Jacobian partial derivatives ∂F_p/∂zᵢ
+5. Filter degree-18 monomials to C₁₇-invariant subset (weight ≡ 0 mod 17)
+6. Assemble sparse coefficient matrix via character-matched Jacobian generators
+7. Compute rank(M_p) over 𝔽_p (Gaussian elimination)
+8. Extract dimension h²'²_inv = (C₁₇-invariant monomials) - rank
+
+**Expected outcome:** Perfect 19-prime unanimous agreement on dimension value, establishing characteristic-zero result via Chinese Remainder Theorem (error probability < 10⁻⁴⁰).
+
+**Perturbation Effect (δ = 791/100000):**
+
+- **Symmetry breaking:** δ ≠ 0 destroys pure cyclotomic structure (where δ=0 gives Fermat-only hypersurface)
+- **Generic behavior:** Perturbation eliminates special cancellations, expected to produce higher basis density (~50-70% nonzero coefficients vs. 4-5% for pure cyclotomic)
+- **Topological invariance:** Despite algebraic complexity increase, dimension and geometric properties (smoothness, variable-count barrier) expected to remain stable
+
+**Cross-Variety Validation Goals:**
+
+1. **Dimensional interpolation:** Verify C₁₇ dimension lies between C₁₃ (707) and C₁₉ (487)
+2. **Scaling law confirmation:** Test whether dim(C₁₇)/dim(C₁₃) ≈ 12/16 = 0.750 or ≈ 0.690 (matching C₁₉/C₁₃)
+3. **Universal barrier hypothesis:** If C₁₇ replicates perfect variable-count separation (Steps 6-12), establishes barrier as **order-independent** universal phenomenon
+
+**Computational Implementation (Macaulay2):**
+
+- **Symbolic computation:** Exact polynomial arithmetic over 𝔽_p
+- **Character matching:** Preserves C₁₇-invariance throughout Jacobian multiplication
+- **Sparse matrix export:** Triplet format (row, col, value) for downstream Python verification
+- **Memory management:** Explicit garbage collection after each prime to handle large matrices
+
+**Output Artifacts (Per Prime):**
+
+1. **`saved_inv_p{prime}_monomials18.json`:** Exponent vectors of C₁₇-invariant degree-18 monomials
+2. **`saved_inv_p{prime}_triplets.json`:** Sparse matrix representation + metadata (rank, dimension, δ mod p)
+
+**Performance Characteristics:**
+
+- **Per-prime runtime:** ~3-8 minutes (varies with prime size, Macaulay2 symbolic overhead)
+- **Total sequential runtime:** 19 × ~5 min average ≈ **1.5-2 hours**
+- **Matrix sparsity:** Expected ~3-5% density (50,000-80,000 nonzero entries for ~1,500 rows × ~1,200 columns)
+- **Rank computation:** Dominant computational cost (dense Gaussian elimination over 𝔽_p)
+
+**Scientific Significance:** C₁₇ provides critical **interpolation data** between C₁₃ and C₁₉, testing whether dimensional scaling follows smooth inverse-Galois-group relationship (dim ∝ 1/φ(n)) or exhibits irregularities. Perfect 19-prime agreement will establish C₁₇ dimension as unconditional fact (pending Bareiss certification in Step 13), enabling three-variety cross-validation of universal barrier hypothesis.
+
+**Runtime:** ~1.5-2 hours (19 primes sequential, Macaulay2 symbolic computation).
 
 ```m2
 -- ============================================================================
@@ -587,6 +690,8 @@ results:
 ```verbatim
 pending execution on mac
 ```
+
+
 
 ---
 
