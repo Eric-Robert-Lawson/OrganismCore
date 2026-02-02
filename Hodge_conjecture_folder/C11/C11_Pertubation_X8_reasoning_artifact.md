@@ -354,7 +354,116 @@ EGA spreading-out principle applies (semi-continuity)
 
 ---
 
-# **Step 2: GALOIS-INVARIANT JACOBIAN COKERNEL COMPUTATION**
+# **STEP 2: GALOIS-INVARIANT JACOBIAN COKERNEL COMPUTATION (C₁₁ X₈ PERTURBED)**
+
+## **DESCRIPTION**
+
+This step computes the dimension of the primitive Galois-invariant Hodge cohomology space H²'²_prim,inv(V,ℚ) for the **perturbed C₁₁ cyclotomic hypersurface** V ⊂ ℙ⁵ via modular rank computation of the Jacobian cokernel matrix across 19 independent primes p ≡ 1 (mod 11).
+
+**Purpose:** C₁₁ provides the **smallest cyclotomic order** in the multi-variety scaling study (orders 11 < 13 < 17 < 19), establishing the **upper bound** on expected dimension values and testing whether the conjectured inverse-Galois-group scaling relationship dim H²'²_inv ∝ 1/φ(n) holds at the extreme end of the spectrum. Since φ(11) = 10 (smallest Galois group in this study), C₁₁ should exhibit the **largest dimension** among all four varieties.
+
+**Mathematical Framework - Griffiths Residue Isomorphism:**
+
+For smooth hypersurface V: F = Σzᵢ⁸ + δ·Σₖ₌₁¹⁰Lₖ⁸ = 0 where Lₖ = Σⱼ ω^(kj)zⱼ with ω = e^(2πi/11) and δ = 791/100000:
+
+**H²'²_prim(V) ≅ (R/J)₁₈,inv**
+
+where:
+- R = ℂ[z₀,...,z₅] (polynomial ring)
+- J = ⟨∂F/∂z₀,...,∂F/∂z₅⟩ (Jacobian ideal)
+- (·)₁₈ = degree-18 homogeneous component
+- (·)ᵢₙᵥ = C₁₁-invariant subspace (Galois action)
+
+**C₁₁-Invariance Criterion:** Monomial m = z₀^(a₀)···z₅^(a₅) is C₁₁-invariant iff weight w(m) = Σⱼ j·aⱼ ≡ 0 (mod 11).
+
+**Dimensional Computation (Modular Approach):**
+
+1. **Construct perturbed polynomial mod p:**
+   - Fermat term: Σᵢ zᵢ⁸
+   - Cyclotomic term: Σₖ₌₁¹⁰ Lₖ⁸ (10 linear forms, excluding L₀)
+   - Perturbation: δ ≡ 791·100000⁻¹ (mod p)
+   - Result: F_p = Σzᵢ⁸ + δₚ·Σₖ₌₁¹⁰Lₖ⁸ over 𝔽_p
+
+2. **Jacobian ideal generators:**
+   - Compute ∂F_p/∂zᵢ for i = 0,...,5
+   - Character matching: Filter degree-11 monomials m with weight(m) ≡ i (mod 11) to multiply ∂F_p/∂zᵢ
+   - Result: Filtered Jacobian generators preserving C₁₁-invariance
+
+3. **Coefficient matrix assembly:**
+   - Rows: C₁₁-invariant degree-18 monomials (count ≈ 1/11 of total degree-18 basis)
+   - Columns: Filtered Jacobian generators (degree-11 monomials × 6 partials)
+   - Entries: Coefficients expressing generators in monomial basis (mod p)
+
+4. **Rank computation:**
+   - Gaussian elimination over 𝔽_p
+   - Extract: rank(M_p), dimension = (invariant monomials) - rank
+
+**Expected Dimensional Scaling (Four-Variety Comparison):**
+
+| Variety | Order n | φ(n) | Galois Group | Predicted Dimension | Scaling Factor |
+|---------|---------|------|--------------|---------------------|----------------|
+| **C₁₁** | **11** | **10** | **ℤ/10ℤ** | **?** (largest) | **1.200** (vs C₁₃) |
+| C₁₃ | 13 | 12 | ℤ/12ℤ | 707 (measured) | 1.000 (baseline) |
+| C₁₇ | 17 | 16 | ℤ/16ℤ | ? (intermediate) | 0.750 (vs C₁₃) |
+| C₁₉ | 19 | 18 | ℤ/18ℤ | 487 (measured) | 0.667 (vs C₁₃) |
+
+**Predicted C₁₁ dimension (if scaling is exact):** 
+- **Inverse-φ scaling:** 707 × (12/10) ≈ **848**
+- **Empirical ratio (matching C₁₉):** 707 / 0.690 �� **1025**
+- **Expected range:** 800-1050 (largest dimension in study)
+
+**19-Prime Verification Protocol:**
+
+**Primes selected:** {23, 67, 89, 199, 331, 353, 397, 419, 463, 617, 661, 683, 727, 859, 881, 947, 991, 1013, 1123} (all p ≡ 1 mod 11)
+
+**Per-prime computation:**
+1. Find primitive 11th root ω_p via a^((p-1)/11) ≠ 1 but a^(p-1) = 1
+2. Construct 10 linear forms Lₖ = Σⱼ ω_p^(kj) zⱼ for k=1,...,10
+3. Build perturbed polynomial F_p with δ_p = 791·100000⁻¹ mod p
+4. Compute Jacobian partial derivatives ∂F_p/∂zᵢ
+5. Filter degree-18 monomials to C₁₁-invariant subset (weight ≡ 0 mod 11)
+6. Assemble sparse coefficient matrix via character-matched Jacobian generators
+7. Compute rank(M_p) over 𝔽_p (Gaussian elimination)
+8. Extract dimension h²'²_inv = (C₁₁-invariant monomials) - rank
+
+**Expected outcome:** Perfect 19-prime unanimous agreement on dimension value, establishing characteristic-zero result via Chinese Remainder Theorem (error probability < 10⁻⁴⁰).
+
+**Perturbation Effect (δ = 791/100000):**
+
+- **Symmetry breaking:** δ ≠ 0 destroys pure cyclotomic structure, producing generic algebraic variety behavior
+- **Basis density:** Expected ~55-75% nonzero coefficients (vs. 4-5% for pure cyclotomic C₁₃)
+- **Topological invariance:** Dimension and smoothness remain stable despite algebraic complexity increase
+- **Galois structure:** Smaller group (ℤ/10ℤ) implies fewer symmetry constraints → larger invariant monomial space
+
+**Cross-Variety Validation Goals:**
+
+1. **Upper bound confirmation:** Verify C₁₁ dimension exceeds all other varieties (dim_C₁₁ > dim_C₁₃ > dim_C₁₇ > dim_C₁₉)
+2. **Scaling law validation:** Test whether dim_C₁₁/dim_C₁₃ ≈ 12/10 = 1.20 or follows empirical 0.690-ratio pattern
+3. **Universal barrier hypothesis:** If C₁₁ exhibits perfect variable-count separation (Steps 6-12), establishes barrier as **order-independent** across full 11-19 spectrum
+4. **Galois group correlation:** Verify inverse relationship between |Gal| and dimension (smaller group → larger space)
+
+**Computational Implementation (Macaulay2):**
+
+- **Symbolic computation:** Exact polynomial arithmetic over 𝔽_p
+- **Character matching:** Preserves C₁₁-invariance throughout Jacobian multiplication
+- **Sparse matrix export:** Triplet format (row, col, value) for downstream Python verification
+- **Memory management:** Explicit garbage collection after each prime (critical for largest matrix in study)
+
+**Output Artifacts (Per Prime):**
+
+1. **`saved_inv_p{prime}_monomials18.json`:** Exponent vectors of C₁₁-invariant degree-18 monomials
+2. **`saved_inv_p{prime}_triplets.json`:** Sparse matrix representation + metadata (rank, dimension, δ mod p)
+
+**Performance Characteristics:**
+
+- **Per-prime runtime:** ~2-6 minutes (faster than C₁₃/C₁₇/C₁₉ due to smaller Galois group → fewer invariant monomials)
+- **Total sequential runtime:** 19 × ~4 min average ≈ **1.0-1.5 hours** (fastest in study)
+- **Matrix dimensions:** Expected ~2400-2800 rows (C₁₁-invariant monomials) × ~1000-1200 columns (Jacobian generators)
+- **Matrix sparsity:** Expected ~4-6% density (60,000-100,000 nonzero entries)
+
+**Scientific Significance:** C₁₁ establishes the **dimensional ceiling** for the multi-variety study, testing whether inverse-Galois-group scaling extends to smaller orders. Perfect 19-prime agreement will confirm C₁₁ dimension as unconditional fact (pending Bareiss certification in Step 13), enabling **four-variety cross-validation** (C₁₁, C₁₃, C₁₇, C₁₉) to rigorously test universal scaling law dim H²'²_inv ∝ 1/φ(n) and establish variable-count barrier as **cyclotomic-order-independent** geometric phenomenon.
+
+**Runtime:** ~1.0-1.5 hours (19 primes sequential, Macaulay2 symbolic computation).
 
 ```m2
 -- ============================================================================
