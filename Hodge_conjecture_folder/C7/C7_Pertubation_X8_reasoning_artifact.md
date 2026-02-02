@@ -245,6 +245,16 @@ resuls:
 
 ```verbatim
 ========================================
+C7 X8 PERTURBED VARIETY SMOOTHNESS TEST
+========================================
+Variety: Sum z_i^8 + (791/100000)*Sum_{k=1}^{18} L_k^8 = 0
+where L_k = Sum_{j=0}^5 omega^{kj}z_j, omega = e^{2*pi*i/7}
+Testing first 19 primes p = 1 (mod 7)
+Prime range: 191 to 2357
+Tests per prime: 10000
+========================================
+
+========================================
 TESTING PRIME p = 29
 ========================================
 omega = 7 (primitive 7th root mod 29)
