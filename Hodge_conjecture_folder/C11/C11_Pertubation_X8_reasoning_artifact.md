@@ -351,3 +351,246 @@ STATISTICS:
 EGA spreading-out principle applies (semi-continuity)
 ============================================
 ```
+
+---
+
+# **Step 2: GALOIS-INVARIANT JACOBIAN COKERNEL COMPUTATION**
+
+```m2
+-- ============================================================================
+-- STEP_2_galois_invariant_jacobian_C11.m2
+-- Compute C11-invariant primitive Hodge cohomology dimension
+-- Variety: Σ z_i^8 + (791/100000)·Σ_{k=1}^{10} L_k^8 = 0
+-- where omega = e^{2*pi*i/11}, delta = 791/100000
+-- Tests performed at supplied primes p ≡ 1 (mod 11)
+-- ============================================================================
+
+needsPackage "JSON";
+
+-- CONFIGURATION: explicit 19 primes p ≡ 1 (mod 11)
+primesToTest = {23, 67, 89, 199, 331, 353, 397, 419, 463, 617, 661, 683, 727, 859, 881, 947, 991, 1013, 1123};
+
+stdio << endl;
+stdio << "============================================================" << endl;
+stdio << "STEP 2: GALOIS-INVARIANT JACOBIAN COKERNEL (C11)" << endl;
+stdio << "============================================================" << endl;
+stdio << "Variety: Sum z_i^8 + (791/100000)*Sum_{k=1}^{10} L_k^8 = 0" << endl;
+stdio << "Cyclotomic order: 11 (Galois group: Z/10Z)" << endl;
+stdio << "Primes to test: " << #primesToTest << endl;
+stdio << "============================================================" << endl;
+stdio << endl;
+
+n = 11; -- cyclotomic order
+
+for p in primesToTest do (
+    if (p % n) != 1 then (
+        stdio << "Skipping p = " << p << " (not = 1 mod " << n << ")" << endl;
+        continue;
+    );
+    
+    stdio << endl;
+    stdio << "------------------------------------------------------------" << endl;
+    stdio << "PRIME p = " << p << endl;
+    stdio << "------------------------------------------------------------" << endl;
+    
+    -- 1. Setup finite field with primitive 11th root
+    Fp := ZZ/p;
+    w := 0_Fp;
+    for a from 2 to p-1 do (
+        cand := (a * 1_Fp)^((p-1)//n);
+        if (cand != 1_Fp) and (cand^n == 1_Fp) then ( 
+            w = cand; 
+            break; 
+        );
+    );
+    stdio << "Primitive 11th root: omega = " << w << endl;
+
+    -- 2. Build polynomial ring
+    S := Fp[z_0..z_5];
+    z := gens S;
+
+    -- 3. Construct linear forms L_k = Sum omega^{k*j} z_j for k=0,...,10
+    stdio << "Building 11 linear forms L_0, ..., L_10..." << endl;
+    linearForms := for k from 0 to (n-1) list (
+        sum(0..5, j -> (w^((k*j) % n)) * z#j)
+    );
+    
+    -- 4. Build PERTURBED variety F = Fermat + epsilon*Cyclotomic
+    stdio << "Building Fermat term (Sum z_i^8)..." << endl;
+    FermatTerm := sum(0..5, i -> z#i^8);
+    
+    stdio << "Building Cyclotomic term (Sum_{k=1}^{10} L_k^8)..." << endl;
+    CyclotomicTerm := sum(1..(n-1), k -> linearForms#k^8);
+    
+    -- Compute epsilon = 791/100000 (mod p) robustly inside Fp and then coerce to S
+    if gcd(100000, p) != 1 then (
+        stdio << "ERROR: 100000 not invertible mod " << p << " (skip prime)" << endl;
+        continue;
+    );
+    aFp = 100000_Fp;
+    inv_aFp = aFp^-1;                -- inverse in Fp
+    epsilonFp = (791_Fp) * inv_aFp;  -- element in Fp representing 791/100000 mod p
+    epsilonInt := lift(epsilonFp, ZZ); -- integer representative 0..p-1
+    epsilon := epsilonFp_S;          -- coerce to S for polynomial assembly
+    
+    stdio << "Perturbation parameter: epsilon = " << epsilon << " (mod " << p << ")" << endl;
+    
+    -- F = Sum z_i^8 + epsilon*Sum_{k=1}^{10} L_k^8
+    fS := FermatTerm + epsilon * CyclotomicTerm;
+    
+    stdio << "Perturbed variety assembled (degree 8)" << endl;
+    
+    -- 5. Compute Jacobian partial derivatives
+    stdio << "Computing Jacobian dF/dz_i..." << endl;
+    partials := for i from 0 to 5 list diff(z#i, fS);
+
+    -- 6. Generate C11-invariant degree-18 monomial basis
+    stdio << "Generating degree-18 monomials..." << endl;
+    mon18List := flatten entries basis(18, S);
+    
+    stdio << "Filtering to C11-invariant (weight = 0 mod 11)..." << endl;
+    invMon18 := select(mon18List, m -> (
+        ev := (exponents m)#0;
+        (sum(for j from 0 to 5 list j * ev#j)) % n == 0
+    ));
+    
+    countInv := #invMon18;
+    stdio << "C11-invariant monomials: " << countInv << endl;
+
+    -- 7. Build monomial to index map
+    stdio << "Building index map..." << endl;
+    monToIndex := new MutableHashTable;
+    for i from 0 to countInv - 1 do (
+        monToIndex#(invMon18#i) = i;
+    );
+
+    -- 8. Filter Jacobian generators by character matching
+    stdio << "Filtering Jacobian generators (character matching)..." << endl;
+    mon11List := flatten entries basis(11, S);
+    
+    filteredGens := {};
+    for i from 0 to 5 do (
+        targetWeight := i;  -- character matching modulo n
+        for m in mon11List do (
+            mWeight := (sum(for j from 0 to 5 list j * (exponents m)#0#j)) % n;
+            if mWeight == targetWeight then (
+                filteredGens = append(filteredGens, m * partials#i);
+            );
+        );
+    );
+    
+    stdio << "Filtered Jacobian generators: " << #filteredGens << endl;
+
+    -- 9. Assemble sparse coefficient matrix
+    stdio << "Assembling coefficient matrix..." << endl;
+    M := mutableMatrix(Fp, countInv, #filteredGens);
+
+    for j from 0 to #filteredGens - 1 do (
+        (mons, coeffs) := coefficients filteredGens#j;
+        mList := flatten entries mons;
+        cList := flatten entries coeffs;
+        for k from 0 to #mList - 1 do (
+            m := mList#k;
+            if monToIndex #? m then (
+                M_(monToIndex#m, j) = sub(cList#k, Fp);
+            );
+        );
+    );
+
+    MatInv := matrix M;
+
+    -- 10. Compute rank via Gaussian elimination
+    stdio << "Computing rank (this may take some time)..." << endl;
+    time rk := rank MatInv;
+    
+    h22inv := countInv - rk;
+
+    -- 11. Display results
+    stdio << endl;
+    stdio << "============================================================" << endl;
+    stdio << "RESULTS FOR PRIME p = " << p << endl;
+    stdio << "============================================================" << endl;
+    stdio << "C11-invariant monomials:    " << countInv << endl;
+    stdio << "Jacobian cokernel rank:     " << rk << endl;
+    stdio << "dim H^{2,2}_inv:            " << h22inv << endl;
+    stdio << "Hodge gap (h22_inv - 12):   " << (h22inv - 12) << endl;
+    if h22inv != 0 then (
+        stdio << "Gap percentage:             " << (100.0 * (h22inv - 12) / h22inv) << "%" << endl;
+    ) else stdio << "Gap percentage:             N/A (h22inv = 0)" << endl;
+    stdio << "============================================================" << endl;
+    stdio << endl;
+
+    -- 12. Export monomial basis (exponent vectors)
+    monFile := "saved_inv_p" | toString p | "_monomials18.json";
+    
+    stdio << "Exporting monomial basis to " << monFile << "..." << endl;
+    
+    monExps := for m in invMon18 list (
+        ev := (exponents m)#0; 
+        for j from 0 to 5 list ev#j
+    );
+    (openOut monFile) << toJSON monExps << close;
+
+    -- 13. Export matrix as sparse triplets
+    triFile := "saved_inv_p" | toString p | "_triplets.json";
+    
+    stdio << "Exporting matrix triplets to " << triFile << "..." << endl;
+    
+    triplets := {};
+    for c from 0 to (numgens source MatInv)-1 do (
+        for r from 0 to (numgens target MatInv)-1 do (
+            if MatInv_(r,c) != 0_Fp then (
+                triplets = append(triplets, {r, c, lift(MatInv_(r,c), ZZ)});
+            );
+        );
+    );
+
+    triData := hashTable {
+        "prime" => p,
+        "h22_inv" => h22inv,
+        "rank" => rk,
+        "countInv" => countInv,
+        "triplets" => triplets,
+        "variety" => "PERTURBED_C11_CYCLOTOMIC",
+        "delta" => "791/100000",
+        "epsilon_mod_p" => epsilonInt
+    };
+    (openOut triFile) << toJSON triData << close;
+
+    -- 14. Memory cleanup
+    stdio << "Cleaning up memory..." << endl;
+    MatInv = null;
+    M = null;
+    collectGarbage;
+    
+    stdio << "Prime p = " << p << " complete." << endl;
+);
+
+stdio << endl;
+stdio << "============================================================" << endl;
+stdio << "STEP 2 COMPLETE - ALL PRIMES PROCESSED" << endl;
+stdio << "============================================================" << endl;
+stdio << endl;
+stdio << "Verification: Check for perfect agreement across the " << #primesToTest << " primes" << endl;
+stdio << "Output files: saved_inv_p{...}_{monomials18,triplets}.json" << endl;
+stdio << endl;
+
+end
+```
+
+to run the script:
+
+```bash
+m2 step2_11.m2
+```
+
+---
+
+results:
+
+```verbatim
+pending execution on mac
+```
+
+---
+
