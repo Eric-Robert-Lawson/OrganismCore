@@ -3138,3 +3138,501 @@ STEP 6 COMPLETE
 
 ---
 
+
+
+```python
+#!/usr/bin/env python3
+"""
+STEP 7: Information-Theoretic Separation Analysis (C11 X8 Perturbed)
+Quantifies complexity gap between isolated classes and algebraic patterns
+
+Perturbed C11 cyclotomic variety:
+  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8 = 0
+"""
+
+import json
+import numpy as np
+from scipy import stats
+from math import gcd, log2
+from functools import reduce
+import warnings
+import os
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+MONOMIAL_FILE = "saved_inv_p23_monomials18.json"
+ISOLATION_FILE = "step6_structural_isolation_C11.json"
+OUTPUT_FILE = "step7_information_theoretic_analysis_C11.json"
+
+# Expected values are empirical / optional
+EXPECTED_ISOLATED = None   # set if you have an expectation from Step 6
+EXPECTED_ALGEBRAIC = 24   # number of algebraic representative patterns used below
+
+CYCLOTOMIC_ORDER = 11
+GAL_GROUP = "Z/10Z"
+
+# ============================================================================
+# MAIN EXECUTION
+# ============================================================================
+
+print("="*70)
+print("STEP 7: INFORMATION-THEORETIC SEPARATION ANALYSIS (C11)")
+print("="*70)
+print()
+print("Perturbed C11 cyclotomic variety:")
+print("  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8 = 0")
+print("  where L_k = Sum_{j=0}^5 omega^{k*j} z_j, omega = e^{2*pi*i/11}")
+print()
+
+# ============================================================================
+# LOAD DATA
+# ============================================================================
+if not os.path.exists(MONOMIAL_FILE):
+    print(f"ERROR: canonical monomial file {MONOMIAL_FILE} not found.")
+    print("Run Step 2 to generate monomial basis JSON.")
+    raise SystemExit(1)
+
+if not os.path.exists(ISOLATION_FILE):
+    print(f"ERROR: isolation file {ISOLATION_FILE} not found.")
+    print("Run Step 6 to identify isolated classes first.")
+    raise SystemExit(1)
+
+print(f"Loading canonical monomials from {MONOMIAL_FILE}...")
+with open(MONOMIAL_FILE, "r") as f:
+    monomials = json.load(f)
+print(f"  Total monomials: {len(monomials)}")
+print()
+
+print(f"Loading isolated class indices from {ISOLATION_FILE}...")
+with open(ISOLATION_FILE, "r") as f:
+    isolation_data = json.load(f)
+isolated_indices = isolation_data.get("isolated_indices", [])
+print(f"  Isolated classes: {len(isolated_indices)}")
+print()
+
+if EXPECTED_ISOLATED is not None and len(isolated_indices) != EXPECTED_ISOLATED:
+    print(f"WARNING: Expected {EXPECTED_ISOLATED} isolated classes, got {len(isolated_indices)}")
+    print()
+
+# ============================================================================
+# DEFINE ALGEBRAIC CYCLE PATTERNS (24 REPRESENTATIVES)
+# ============================================================================
+print("Defining representative algebraic cycle patterns...")
+algebraic_patterns = []
+
+# Type 1: Hyperplane (1 pattern)
+algebraic_patterns.append([18, 0, 0, 0, 0, 0])
+
+# Type 2: Two-variable patterns (8 patterns)
+two_var = [
+    [9, 9, 0, 0, 0, 0],
+    [12, 6, 0, 0, 0, 0],
+    [15, 3, 0, 0, 0, 0],
+    [10, 8, 0, 0, 0, 0],
+    [11, 7, 0, 0, 0, 0],
+    [13, 5, 0, 0, 0, 0],
+    [14, 4, 0, 0, 0, 0],
+    [16, 2, 0, 0, 0, 0]
+]
+algebraic_patterns.extend(two_var)
+
+# Type 3: Three-variable patterns (8 patterns)
+three_var = [
+    [6, 6, 6, 0, 0, 0],
+    [12, 3, 3, 0, 0, 0],
+    [10, 4, 4, 0, 0, 0],
+    [9, 6, 3, 0, 0, 0],
+    [9, 5, 4, 0, 0, 0],
+    [8, 5, 5, 0, 0, 0],
+    [8, 6, 4, 0, 0, 0],
+    [7, 7, 4, 0, 0, 0]
+]
+algebraic_patterns.extend(three_var)
+
+# Type 4: Four-variable patterns (7 patterns)
+four_var = [
+    [9, 3, 3, 3, 0, 0],
+    [6, 6, 3, 3, 0, 0],
+    [8, 4, 3, 3, 0, 0],
+    [7, 5, 3, 3, 0, 0],
+    [6, 5, 4, 3, 0, 0],
+    [6, 4, 4, 4, 0, 0],
+    [5, 5, 4, 4, 0, 0]
+]
+algebraic_patterns.extend(four_var)
+
+print(f"  Total algebraic patterns: {len(algebraic_patterns)}")
+print()
+
+# ============================================================================
+# INFORMATION-THEORETIC METRICS
+# ============================================================================
+def shannon_entropy(exps):
+    nonzero = [e for e in exps if e > 0]
+    if not nonzero:
+        return 0.0
+    total = sum(nonzero)
+    probs = [e / total for e in nonzero]
+    return -sum(p * log2(p) for p in probs if p > 0)
+
+def kolmogorov_complexity(exps):
+    nonzero = [e for e in exps if e > 0]
+    if not nonzero:
+        return 0
+    # Reduce by gcd
+    g = reduce(gcd, nonzero)
+    reduced = [e // g for e in nonzero]
+    # Prime factors
+    def prime_factors(n):
+        factors = set()
+        d = 2
+        while d * d <= n:
+            while n % d == 0:
+                factors.add(d)
+                n //= d
+            d += 1
+        if n > 1:
+            factors.add(n)
+        return factors
+    all_primes = set()
+    for r in reduced:
+        if r > 1:
+            all_primes.update(prime_factors(r))
+    # Encoding length (binary)
+    encoding_length = sum(int(log2(r)) + 1 if r > 0 else 0 for r in reduced)
+    return len(all_primes) + encoding_length
+
+def num_variables(exps):
+    return sum(1 for e in exps if e > 0)
+
+def variance(exps):
+    mean_exp = sum(exps) / 6.0
+    return sum((e - mean_exp)**2 for e in exps) / 6.0
+
+def exponent_range(exps):
+    nonzero = [e for e in exps if e > 0]
+    return max(nonzero) - min(nonzero) if nonzero else 0
+
+# ============================================================================
+# COMPUTE METRICS
+# ============================================================================
+print("Computing metrics for isolated classes...")
+isolated_monomials = [monomials[idx] for idx in isolated_indices]
+
+isolated_metrics = {
+    'entropy': [shannon_entropy(m) for m in isolated_monomials],
+    'kolmogorov': [kolmogorov_complexity(m) for m in isolated_monomials],
+    'num_vars': [num_variables(m) for m in isolated_monomials],
+    'variance': [variance(m) for m in isolated_monomials],
+    'range': [exponent_range(m) for m in isolated_monomials]
+}
+
+print("Computing metrics for algebraic patterns...")
+algebraic_metrics = {
+    'entropy': [shannon_entropy(m) for m in algebraic_patterns],
+    'kolmogorov': [kolmogorov_complexity(m) for m in algebraic_patterns],
+    'num_vars': [num_variables(m) for m in algebraic_patterns],
+    'variance': [variance(m) for m in algebraic_patterns],
+    'range': [exponent_range(m) for m in algebraic_patterns]
+}
+
+# ============================================================================
+# STATISTICAL TESTS
+# ============================================================================
+print("="*70)
+print("STATISTICAL ANALYSIS")
+print("="*70)
+print("Comparing isolated classes vs. algebraic patterns\n")
+
+metrics_names = ['entropy', 'kolmogorov', 'num_vars', 'variance', 'range']
+results = []
+
+for metric in metrics_names:
+    alg_vals = np.array(algebraic_metrics[metric])
+    iso_vals = np.array(isolated_metrics[metric])
+
+    mu_alg = np.mean(alg_vals)
+    mu_iso = np.mean(iso_vals) if len(iso_vals) > 0 else 0.0
+    std_alg = np.std(alg_vals, ddof=1) if len(alg_vals) > 1 else 0.0
+    std_iso = np.std(iso_vals, ddof=1) if len(iso_vals) > 1 else 0.0
+
+    zero_var_iso = std_iso < 1e-10
+    zero_var_alg = std_alg < 1e-10
+
+    # t-test (handle degenerate cases)
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            t_stat, p_value = stats.ttest_ind(iso_vals, alg_vals, equal_var=False)
+    except Exception:
+        t_stat, p_value = float('nan'), 1.0
+
+    # Mann-Whitney U (non-parametric)
+    try:
+        u_stat, p_mw = stats.mannwhitneyu(iso_vals, alg_vals, alternative='two-sided')
+    except Exception:
+        u_stat, p_mw = float('nan'), 1.0
+
+    # KS test
+    try:
+        ks_stat, p_ks = stats.ks_2samp(alg_vals, iso_vals)
+    except Exception:
+        ks_stat, p_ks = float('nan'), 1.0
+
+    # Cohen's d (approx)
+    pooled_std = np.sqrt((std_alg**2 + std_iso**2) / 2) if (std_alg > 0 or std_iso > 0) else 0.0
+    if pooled_std > 1e-10:
+        cohens_d = (mu_iso - mu_alg) / pooled_std
+    else:
+        cohens_d = float('inf') if abs(mu_iso - mu_alg) > 1e-10 else 0.0
+
+    results.append({
+        'metric': metric,
+        'mu_alg': mu_alg,
+        'mu_iso': mu_iso,
+        'std_alg': std_alg,
+        'std_iso': std_iso,
+        'p_value_ttest': p_value,
+        'p_value_mannwhitney': p_mw,
+        'cohens_d': cohens_d,
+        'ks_d': ks_stat,
+        'p_value_ks': p_ks,
+        'zero_var_iso': zero_var_iso,
+        'zero_var_alg': zero_var_alg
+    })
+
+    # Display summary per metric
+    print(f"Metric: {metric}")
+    print(f"  Algebraic: mean={mu_alg:.3f}, std={std_alg:.3f}")
+    print(f"  Isolated : mean={mu_iso:.3f}, std={std_iso:.3f}")
+    if np.isinf(cohens_d):
+        print(f"  Cohen's d: inf")
+    else:
+        print(f"  Cohen's d: {cohens_d:.3f}")
+    print(f"  KS D: {ks_stat:.3f}, KS p-value: {p_ks:.2e}")
+    print()
+
+# ============================================================================
+# COMPARISON TO C13 BENCHMARKS
+# ============================================================================
+print("="*70)
+print("COMPARISON TO C13 BENCHMARKS")
+print("="*70)
+print()
+
+c13_baseline = {
+    'entropy': {'mu_alg': 1.33, 'mu_iso': 2.24, 'd': 2.30, 'ks_d': 0.925},
+    'kolmogorov': {'mu_alg': 8.33, 'mu_iso': 14.57, 'd': 2.22, 'ks_d': 0.837},
+    'num_vars': {'mu_alg': 2.88, 'mu_iso': 6.00, 'd': 4.91, 'ks_d': 1.000},
+    'variance': {'mu_alg': 8.34, 'mu_iso': 4.83, 'd': -0.39, 'ks_d': 0.347},
+    'range': {'mu_alg': 4.79, 'mu_iso': 5.87, 'd': 0.38, 'ks_d': 0.407}
+}
+
+for r in results:
+    metric = r['metric']
+    if metric in c13_baseline:
+        c13 = c13_baseline[metric]
+        print(f"{metric.upper()}:")
+        print(f"  C13 baseline iso-mean = {c13['mu_iso']}, KS_D = {c13['ks_d']}")
+        print(f"  C11 observed iso-mean = {r['mu_iso']:.3f}, KS_D = {r['ks_d']:.3f}")
+        delta_mu_iso = r['mu_iso'] - c13['mu_iso']
+        delta_ks = r['ks_d'] - c13['ks_d']
+        print(f"  Delta (C11 - C13): Δmu_iso={delta_mu_iso:+.3f}, ΔKS_D={delta_ks:+.3f}")
+        print()
+
+# ============================================================================
+# SAVE RESULTS
+# ============================================================================
+results_serializable = []
+for r in results:
+    results_serializable.append({
+        'metric': r['metric'],
+        'mu_alg': float(r['mu_alg']),
+        'mu_iso': float(r['mu_iso']),
+        'std_alg': float(r['std_alg']),
+        'std_iso': float(r['std_iso']),
+        'p_value_ttest': float(r['p_value_ttest']),
+        'p_value_mannwhitney': float(r['p_value_mannwhitney']),
+        'cohens_d': 'inf' if np.isinf(r['cohens_d']) else float(r['cohens_d']),
+        'ks_d': float(r['ks_d']) if not np.isnan(r['ks_d']) else None,
+        'p_value_ks': float(r['p_value_ks']) if not np.isnan(r['p_value_ks']) else None,
+        'zero_var_iso': bool(r['zero_var_iso']),
+        'zero_var_alg': bool(r['zero_var_alg'])
+    })
+
+output = {
+    "step": 7,
+    "description": "Information-theoretic separation analysis (C11)",
+    "variety": f"PERTURBED_C{CYCLOTOMIC_ORDER}_CYCLOTOMIC",
+    "delta": "791/100000",
+    "cyclotomic_order": CYCLOTOMIC_ORDER,
+    "galois_group": GAL_GROUP,
+    "algebraic_patterns_count": len(algebraic_patterns),
+    "isolated_classes_count": len(isolated_indices),
+    "statistical_results": results_serializable,
+    "isolated_metrics_summary": {
+        k: {
+            "mean": float(np.mean(v)) if len(v) > 0 else None,
+            "std": float(np.std(v, ddof=1)) if len(v) > 1 else 0.0,
+            "min": float(np.min(v)) if len(v) > 0 else None,
+            "max": float(np.max(v)) if len(v) > 0 else None
+        } for k, v in isolated_metrics.items()
+    },
+    "algebraic_metrics_summary": {
+        k: {
+            "mean": float(np.mean(v)),
+            "std": float(np.std(v, ddof=1)) if len(v) > 1 else 0.0,
+            "min": float(np.min(v)),
+            "max": float(np.max(v))
+        } for k, v in algebraic_metrics.items()
+    }
+}
+
+with open(OUTPUT_FILE, "w") as f:
+    json.dump(output, f, indent=2)
+
+print(f"Results saved to {OUTPUT_FILE}")
+print()
+
+# ============================================================================
+# SUMMARY
+# ============================================================================
+print("="*70)
+print("STEP 7 COMPLETE")
+print("="*70)
+print()
+print("Summary:")
+print(f"  Isolated classes analyzed:      {len(isolated_indices)}")
+print(f"  Algebraic patterns analyzed:    {len(algebraic_patterns)}")
+print(f"  Metrics computed:               {len(metrics_names)}")
+print()
+# If num_vars metric present, show KS
+num_vars_result = next((r for r in results if r['metric'] == 'num_vars'), None)
+if num_vars_result is not None:
+    print(f"Key finding: variable-count separation KS D = {num_vars_result['ks_d']:.3f}")
+    if num_vars_result['ks_d'] >= 0.999:
+        print("  (PERFECT SEPARATION)")
+print()
+print("Next step: Comprehensive pipeline summary / CRT reconstruction")
+print("="*70)
+```
+
+to run script:
+
+```bash
+python step7_11.py
+```
+
+---
+
+results:
+
+```verbatim
+======================================================================
+STEP 7: INFORMATION-THEORETIC SEPARATION ANALYSIS (C11)
+======================================================================
+
+Perturbed C11 cyclotomic variety:
+  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8 = 0
+  where L_k = Sum_{j=0}^5 omega^{k*j} z_j, omega = e^{2*pi*i/11}
+
+Loading canonical monomials from saved_inv_p23_monomials18.json...
+  Total monomials: 3059
+
+Loading isolated class indices from step6_structural_isolation_C11.json...
+  Isolated classes: 480
+
+Defining representative algebraic cycle patterns...
+  Total algebraic patterns: 24
+
+Computing metrics for isolated classes...
+Computing metrics for algebraic patterns...
+======================================================================
+STATISTICAL ANALYSIS
+======================================================================
+Comparing isolated classes vs. algebraic patterns
+
+Metric: entropy
+  Algebraic: mean=1.329, std=0.538
+  Isolated : mean=2.240, std=0.139
+  Cohen's d: 2.318
+  KS D: 0.917, KS p-value: 7.53e-24
+
+Metric: kolmogorov
+  Algebraic: mean=8.250, std=3.779
+  Isolated : mean=14.596, std=0.902
+  Cohen's d: 2.310
+  KS D: 0.831, KS p-value: 1.22e-17
+
+Metric: num_vars
+  Algebraic: mean=2.875, std=0.900
+  Isolated : mean=6.000, std=0.000
+  Cohen's d: 4.911
+  KS D: 1.000, KS p-value: 3.00e-41
+
+Metric: variance
+  Algebraic: mean=15.542, std=10.340
+  Isolated : mean=4.753, std=2.431
+  Cohen's d: -1.437
+  KS D: 0.677, KS p-value: 8.53e-11
+
+Metric: range
+  Algebraic: mean=4.833, std=3.679
+  Isolated : mean=5.840, std=1.482
+  Cohen's d: 0.359
+  KS D: 0.412, KS p-value: 5.17e-04
+
+======================================================================
+COMPARISON TO C13 BENCHMARKS
+======================================================================
+
+ENTROPY:
+  C13 baseline iso-mean = 2.24, KS_D = 0.925
+  C11 observed iso-mean = 2.240, KS_D = 0.917
+  Delta (C11 - C13): Δmu_iso=+0.000, ΔKS_D=-0.008
+
+KOLMOGOROV:
+  C13 baseline iso-mean = 14.57, KS_D = 0.837
+  C11 observed iso-mean = 14.596, KS_D = 0.831
+  Delta (C11 - C13): Δmu_iso=+0.026, ΔKS_D=-0.006
+
+NUM_VARS:
+  C13 baseline iso-mean = 6.0, KS_D = 1.0
+  C11 observed iso-mean = 6.000, KS_D = 1.000
+  Delta (C11 - C13): Δmu_iso=+0.000, ΔKS_D=+0.000
+
+VARIANCE:
+  C13 baseline iso-mean = 4.83, KS_D = 0.347
+  C11 observed iso-mean = 4.753, KS_D = 0.677
+  Delta (C11 - C13): Δmu_iso=-0.077, ΔKS_D=+0.330
+
+RANGE:
+  C13 baseline iso-mean = 5.87, KS_D = 0.407
+  C11 observed iso-mean = 5.840, KS_D = 0.412
+  Delta (C11 - C13): Δmu_iso=-0.030, ΔKS_D=+0.006
+
+Results saved to step7_information_theoretic_analysis_C11.json
+
+======================================================================
+STEP 7 COMPLETE
+======================================================================
+
+Summary:
+  Isolated classes analyzed:      480
+  Algebraic patterns analyzed:    24
+  Metrics computed:               5
+
+Key finding: variable-count separation KS D = 1.000
+  (PERFECT SEPARATION)
+
+Next step: Comprehensive pipeline summary / CRT reconstruction
+======================================================================
+
+```
+
+
+
+---
+
