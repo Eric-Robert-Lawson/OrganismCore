@@ -1799,3 +1799,941 @@ pending
 
 ---
 
+
+```python
+#!/usr/bin/env python3
+"""
+STEP 5: Canonical Kernel Basis Identification via Free Column Analysis (C7)
+Identifies which of the C7-invariant monomials form the kernel basis
+Perturbed C7 cyclotomic variety: Sum z_i^8 + (791/100000)*Sum_{k=1}^{6} L_k^8 = 0
+"""
+
+import json
+import numpy as np
+from scipy.sparse import csr_matrix
+import os
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+PRIME = 29  # Use p=29 for modular basis computation (first C7 prime)
+TRIPLET_FILE = "saved_inv_p29_triplets.json"
+MONOMIAL_FILE = "saved_inv_p29_monomials18.json"
+OUTPUT_FILE = "step5_canonical_kernel_basis_C7.json"
+
+# Observed values from Step 2 runs
+EXPECTED_DIM = 1333    # observed h22_inv for C7 (example)
+EXPECTED_COUNT_INV = 4807  # observed invariant monomial count for C7
+
+# ============================================================================
+# MAIN EXECUTION
+# ============================================================================
+
+print("="*70)
+print("STEP 5: CANONICAL KERNEL BASIS IDENTIFICATION (C7)")
+print("="*70)
+print()
+print("Perturbed C7 cyclotomic variety:")
+print("  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{6} L_k^8 = 0")
+print("  where L_k = Sum_{j=0}^5 omega^{k*j} z_j, omega = e^{2*pi*i/7}")
+print()
+
+# ============================================================================
+# LOAD MATRIX DATA
+# ============================================================================
+
+print(f"Loading Jacobian matrix from {TRIPLET_FILE}...")
+
+if not os.path.exists(TRIPLET_FILE):
+    print(f"ERROR: File {TRIPLET_FILE} not found")
+    print("Please run Step 2 first to generate matrix triplets")
+    exit(1)
+
+with open(TRIPLET_FILE, "r") as f:
+    data = json.load(f)
+
+prime = int(data.get("prime", PRIME))
+saved_rank = int(data.get("rank"))
+saved_dim = int(data.get("h22_inv"))
+count_inv = int(data.get("countInv"))
+triplets = data.get("triplets", [])
+variety = data.get("variety", "UNKNOWN")
+delta = data.get("delta", "UNKNOWN")
+epsilon_mod_p = data.get("epsilon_mod_p", "UNKNOWN")
+
+print()
+print("Metadata:")
+print(f"  Variety:              {variety}")
+print(f"  Perturbation delta:   {delta}")
+print(f"  Epsilon mod p:        {epsilon_mod_p}")
+print(f"  Prime:                {prime}")
+print(f"  Expected dimension:   {saved_dim}")
+print(f"  Expected rank:        {saved_rank}")
+print(f"  C7-invariant basis:   {count_inv}")
+print()
+
+# Build sparse matrix
+print("Building sparse matrix from triplets...")
+rows = [int(t[0]) for t in triplets]
+cols = [int(t[1]) for t in triplets]
+vals = [int(t[2]) % prime for t in triplets]
+
+max_col = max(cols) + 1 if cols else 0
+M = csr_matrix((vals, (rows, cols)), shape=(count_inv, max_col), dtype=np.int64)
+
+print(f"  Matrix shape:         {M.shape}")
+print(f"  Nonzero entries:      {M.nnz:,}")
+print(f"  Expected rank:        {saved_rank}")
+print()
+
+# ============================================================================
+# LOAD CANONICAL MONOMIAL LIST
+# ============================================================================
+
+print(f"Loading canonical monomial list from {MONOMIAL_FILE}...")
+
+if not os.path.exists(MONOMIAL_FILE):
+    print(f"ERROR: File {MONOMIAL_FILE} not found")
+    print("Please run Step 2 first to generate monomial basis")
+    exit(1)
+
+with open(MONOMIAL_FILE, "r") as f:
+    monomials = json.load(f)
+
+print(f"  Canonical monomials:  {len(monomials)}")
+print()
+
+# Verify monomial count
+if len(monomials) != count_inv:
+    print(f"WARNING: Monomial count mismatch: {len(monomials)} vs {count_inv}")
+
+# ============================================================================
+# COMPUTE FREE COLUMNS VIA ROW REDUCTION
+# ============================================================================
+
+print("Computing free columns via Gaussian elimination on M^T...")
+print()
+
+# Transpose matrix: M^T is (max_col x count_inv)
+M_T = M.T.toarray()
+print(f"  M^T shape: {M_T.shape}")
+print(f"  Processing {M_T.shape[1]} columns to identify free variables...")
+print()
+
+pivot_cols = []
+pivot_row = 0
+working = M_T.copy()
+
+# Row reduction to identify pivot columns
+for col in range(count_inv):
+    if pivot_row >= M_T.shape[0]:
+        break
+
+    # Find pivot (first non-zero entry in column at or below pivot_row)
+    pivot_found = False
+    for row in range(pivot_row, M_T.shape[0]):
+        if working[row, col] % prime != 0:
+            # Swap rows
+            if row != pivot_row:
+                working[[pivot_row, row]] = working[[row, pivot_row]]
+            pivot_found = True
+            break
+
+    if not pivot_found:
+        # Column is all zeros => free column
+        continue
+
+    # Record pivot column
+    pivot_cols.append(col)
+
+    # Normalize pivot row
+    pivot_val = int(working[pivot_row, col] % prime)
+    pivot_inv = pow(pivot_val, -1, prime)
+    working[pivot_row] = (working[pivot_row] * pivot_inv) % prime
+
+    # Eliminate entries in pivot column
+    for row in range(M_T.shape[0]):
+        if row != pivot_row:
+            factor = int(working[row, col] % prime)
+            if factor != 0:
+                working[row] = (working[row] - factor * working[pivot_row]) % prime
+
+    pivot_row += 1
+
+    # Progress indicator
+    if pivot_row % 100 == 0:
+        print(f"    Processed {pivot_row}/{M_T.shape[0]} rows, pivots found: {len(pivot_cols)}")
+
+# Free columns are those NOT in pivot_cols
+free_cols = [i for i in range(count_inv) if i not in pivot_cols]
+
+print()
+print(f"Row reduction complete:")
+print(f"  Pivot columns:        {len(pivot_cols)}")
+print(f"  Free columns:         {len(free_cols)}")
+print(f"  Expected dimension:   {saved_dim}")
+print()
+
+# Verify dimension matches
+if len(free_cols) == saved_dim:
+    print("DIMENSION VERIFIED: Free columns = expected dimension")
+else:
+    print(f"WARNING: Dimension mismatch: {len(free_cols)} vs {saved_dim}")
+
+print()
+
+# ============================================================================
+# ANALYZE VARIABLE DISTRIBUTION IN KERNEL BASIS
+# ============================================================================
+
+print("Analyzing variable distribution in kernel basis (free columns)...")
+print()
+
+var_counts = {}
+for idx in free_cols:
+    exps = monomials[idx]
+    num_vars = sum(1 for e in exps if e > 0)  # Count non-zero exponents
+    var_counts[num_vars] = var_counts.get(num_vars, 0) + 1
+
+print("Variable count distribution in modular kernel basis:")
+print(f"  {'Variables':<12} {'Count':<10} {'Percentage':<12}")
+print("-"*40)
+
+for num_vars in sorted(var_counts.keys()):
+    count = var_counts[num_vars]
+    pct = count / len(free_cols) * 100 if len(free_cols) > 0 else 0.0
+    print(f"  {num_vars:<12} {count:<10} {pct:>10.1f}%")
+
+print()
+
+# ============================================================================
+# SIX-VARIABLE MONOMIAL ANALYSIS
+# ============================================================================
+
+six_var_free = [i for i in free_cols if sum(1 for e in monomials[i] if e > 0) == 6]
+six_var_count = len(six_var_free)
+
+# Count ALL six-variable monomials in canonical list (for comparison)
+all_six_var = [i for i in range(len(monomials)) if sum(1 for e in monomials[i] if e > 0) == 6]
+all_six_var_count = len(all_six_var)
+
+print("Six-variable monomial analysis:")
+print(f"  Total six-var in canonical list:  {all_six_var_count}")
+print(f"  Six-var in free columns (p={prime}):   {six_var_count}")
+if len(free_cols) > 0:
+    print(f"  Percentage of free columns:       {100.0 * six_var_count / len(free_cols):.1f}%")
+print()
+
+# ============================================================================
+# C7 vs C13 COMPARISON
+# ============================================================================
+
+print("C7 vs C13 Comparison:")
+print(f"  C13 dimension:                    707")
+print(f"  C7 dimension:                     {len(free_cols)}")
+print(f"  Ratio (C7/C13):                   {len(free_cols)/707:.3f}")
+print()
+print(f"  C13 total six-var monomials:      ~476")
+print(f"  C7 total six-var monomials:       {all_six_var_count}")
+print(f"  Ratio (C7/C13):                   {all_six_var_count/476:.3f}")
+print()
+
+print("NOTE: Modular vs. Rational Basis Discrepancy")
+print("-"*70)
+print("The modular echelon basis (computed here at p={}) prefers sparser monomials.".format(prime))
+print("The rational kernel basis (reconstructed via CRT from")
+print("19 primes in later steps) may contain dense vectors that")
+print("represent the same space but with different sparsity structure.")
+print()
+print("Both bases span the same {}-dimensional space, but differ in".format(len(free_cols)))
+print("representation. The rational basis reveals the full structural")
+print("complexity of H^{2,2}_inv(V,Q).")
+print()
+
+# ============================================================================
+# SAVE RESULTS
+# ============================================================================
+
+result = {
+    "step": 5,
+    "description": "Canonical kernel basis identification via free column analysis (C7)",
+    "variety": variety,
+    "delta": delta,
+    "epsilon_mod_p": epsilon_mod_p,
+    "cyclotomic_order": 7,
+    "galois_group": "Z/6Z",
+    "prime": int(prime),
+    "dimension": len(free_cols),
+    "rank": len(pivot_cols),
+    "count_inv": count_inv,
+    "matrix_shape": [int(M.shape[0]), int(M.shape[1])],
+    "free_column_indices": [int(i) for i in free_cols],
+    "pivot_column_indices": [int(i) for i in pivot_cols],
+    "variable_count_distribution": {str(k): int(v) for k, v in var_counts.items()},
+    "six_variable_count_free_cols": int(six_var_count),
+    "six_variable_total_canonical": int(all_six_var_count),
+    "six_variable_free_col_indices": [int(i) for i in six_var_free],
+    "all_six_variable_indices": [int(i) for i in all_six_var],
+    "C13_comparison": {
+        "C13_dimension": 707,
+        "C7_dimension": len(free_cols),
+        "ratio": float(len(free_cols) / 707),
+        "C13_six_var_total": 476,
+        "C7_six_var_total": all_six_var_count,
+        "six_var_ratio": float(all_six_var_count / 476) if 476 > 0 else None
+    },
+    "note": f"Modular basis has ~{six_var_count} six-var free columns; rational basis may reveal more six-var structure in dense combinations"
+}
+
+with open(OUTPUT_FILE, "w") as f:
+    json.dump(result, f, indent=2)
+
+print(f"Results saved to {OUTPUT_FILE}")
+print()
+
+# ============================================================================
+# SUMMARY
+# ============================================================================
+
+print("="*70)
+if len(free_cols) == saved_dim:
+    print("*** KERNEL DIMENSION VERIFIED ***")
+    print()
+    print(f"The {saved_dim} kernel basis vectors correspond to free columns")
+    print("of M^T, which map to specific monomials in the canonical list.")
+    print()
+    two_to_five = sum(var_counts.get(i, 0) for i in [2, 3, 4, 5])
+    if len(free_cols) > 0:
+        print(f"Modular basis structure (p={prime}):")
+        print(f"  - {two_to_five} monomials with 2-5 variables ({100.0 * two_to_five / len(free_cols):.1f}%)")
+        print(f"  - {six_var_count} six-variable monomials in free cols ({100.0 * six_var_count / len(free_cols):.1f}%)")
+    print(f"  - {all_six_var_count} total six-variable monomials in canonical list")
+    print()
+    print("For structural isolation (Step 6), analyze all six-variable")
+    print("monomials from canonical list, not just these free columns.")
+else:
+    print(f"WARNING: Dimension mismatch: {len(free_cols)} vs {saved_dim}")
+
+print()
+print("Next step: Step 6 (Structural Isolation Analysis for C7)")
+print("="*70)
+```
+
+to run script:
+
+```
+python step5_7.py
+```
+
+---
+
+result:
+
+```verbatim
+======================================================================
+STEP 5: CANONICAL KERNEL BASIS IDENTIFICATION (C7)
+======================================================================
+
+Perturbed C7 cyclotomic variety:
+  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{6} L_k^8 = 0
+  where L_k = Sum_{j=0}^5 omega^{k*j} z_j, omega = e^{2*pi*i/7}
+
+Loading Jacobian matrix from saved_inv_p29_triplets.json...
+
+Metadata:
+  Variety:              PERTURBED_C7_CYCLOTOMIC
+  Perturbation delta:   791/100000
+  Epsilon mod p:        1
+  Prime:                29
+  Expected dimension:   1333
+  Expected rank:        3474
+  C7-invariant basis:   4807
+
+Building sparse matrix from triplets...
+  Matrix shape:         (4807, 3744)
+  Nonzero entries:      423,696
+  Expected rank:        3474
+
+Loading canonical monomial list from saved_inv_p29_monomials18.json...
+  Canonical monomials:  4807
+
+Computing free columns via Gaussian elimination on M^T...
+
+  M^T shape: (3744, 4807)
+  Processing 4807 columns to identify free variables...
+
+    Processed 100/3744 rows, pivots found: 100
+    Processed 200/3744 rows, pivots found: 200
+    Processed 300/3744 rows, pivots found: 300
+    Processed 400/3744 rows, pivots found: 400
+    Processed 500/3744 rows, pivots found: 500
+    Processed 600/3744 rows, pivots found: 600
+    Processed 700/3744 rows, pivots found: 700
+    Processed 800/3744 rows, pivots found: 800
+    Processed 900/3744 rows, pivots found: 900
+    Processed 1000/3744 rows, pivots found: 1000
+    Processed 1100/3744 rows, pivots found: 1100
+    Processed 1200/3744 rows, pivots found: 1200
+    Processed 1300/3744 rows, pivots found: 1300
+    Processed 1400/3744 rows, pivots found: 1400
+    Processed 1500/3744 rows, pivots found: 1500
+    Processed 1600/3744 rows, pivots found: 1600
+    Processed 1700/3744 rows, pivots found: 1700
+    Processed 1800/3744 rows, pivots found: 1800
+    Processed 1900/3744 rows, pivots found: 1900
+    Processed 2000/3744 rows, pivots found: 2000
+    Processed 2100/3744 rows, pivots found: 2100
+    Processed 2200/3744 rows, pivots found: 2200
+    Processed 2300/3744 rows, pivots found: 2300
+    Processed 2400/3744 rows, pivots found: 2400
+    Processed 2500/3744 rows, pivots found: 2500
+    Processed 2600/3744 rows, pivots found: 2600
+    Processed 2700/3744 rows, pivots found: 2700
+    Processed 2800/3744 rows, pivots found: 2800
+    Processed 2900/3744 rows, pivots found: 2900
+    Processed 3000/3744 rows, pivots found: 3000
+    Processed 3100/3744 rows, pivots found: 3100
+    Processed 3200/3744 rows, pivots found: 3200
+    Processed 3300/3744 rows, pivots found: 3300
+    Processed 3400/3744 rows, pivots found: 3400
+
+Row reduction complete:
+  Pivot columns:        3474
+  Free columns:         1333
+  Expected dimension:   1333
+
+DIMENSION VERIFIED: Free columns = expected dimension
+
+Analyzing variable distribution in kernel basis (free columns)...
+
+Variable count distribution in modular kernel basis:
+  Variables    Count      Percentage  
+----------------------------------------
+  2            26                2.0%
+  3            208              15.6%
+  4            564              42.3%
+  5            473              35.5%
+  6            62                4.7%
+
+Six-variable monomial analysis:
+  Total six-var in canonical list:  884
+  Six-var in free columns (p=29):   62
+  Percentage of free columns:       4.7%
+
+C7 vs C13 Comparison:
+  C13 dimension:                    707
+  C7 dimension:                     1333
+  Ratio (C7/C13):                   1.885
+
+  C13 total six-var monomials:      ~476
+  C7 total six-var monomials:       884
+  Ratio (C7/C13):                   1.857
+
+NOTE: Modular vs. Rational Basis Discrepancy
+----------------------------------------------------------------------
+The modular echelon basis (computed here at p=29) prefers sparser monomials.
+The rational kernel basis (reconstructed via CRT from
+19 primes in later steps) may contain dense vectors that
+represent the same space but with different sparsity structure.
+
+Both bases span the same 1333-dimensional space, but differ in
+representation. The rational basis reveals the full structural
+complexity of H^{2,2}_inv(V,Q).
+
+Results saved to step5_canonical_kernel_basis_C7.json
+
+======================================================================
+*** KERNEL DIMENSION VERIFIED ***
+
+The 1333 kernel basis vectors correspond to free columns
+of M^T, which map to specific monomials in the canonical list.
+
+Modular basis structure (p=29):
+  - 1271 monomials with 2-5 variables (95.3%)
+  - 62 six-variable monomials in free cols (4.7%)
+  - 884 total six-variable monomials in canonical list
+
+For structural isolation (Step 6), analyze all six-variable
+monomials from canonical list, not just these free columns.
+
+Next step: Step 6 (Structural Isolation Analysis for C7)
+======================================================================
+```
+
+
+
+---
+
+
+```python
+#!/usr/bin/env python3
+"""
+STEP 6: Structural Isolation Identification (C7 X8 Perturbed)
+Identifies which of the six-variable monomials are structurally isolated
+Criteria: gcd(non-zero exponents) = 1 AND exponent variance > 1.7
+
+Perturbed C7 cyclotomic variety:
+  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{6} L_k^8 = 0
+"""
+
+import json
+from math import gcd
+from functools import reduce
+import os
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+# Monomial file produced in Step 2 for a chosen prime (use the prime you ran Step 2 with)
+MONOMIAL_FILE = "saved_inv_p29_monomials18.json"   # adjust if you used a different prime
+OUTPUT_FILE = "step6_structural_isolation_C7.json"
+
+# Combinatorial totals:
+# Number of degree-18 monomials in 6 variables with all 6 variables present:
+# C(17,5) = 6188 total six-variable monomials.
+# For C7-invariant subset we expect 6188 / 7 = 884 exactly.
+EXPECTED_SIX_VAR = 6188 // 7  # 884
+EXPECTED_ISOLATED = None  # unknown; will be determined empirically
+
+GCD_THRESHOLD = 1
+VARIANCE_THRESHOLD = 1.7
+
+# Reference C13 numbers for comparison
+C13_SIX_VAR = 476
+C13_ISOLATED = 401
+C13_ISOLATION_PCT = 100.0 * C13_ISOLATED / C13_SIX_VAR if C13_SIX_VAR else 0.0
+
+# ============================================================================
+# MAIN EXECUTION
+# ============================================================================
+
+print("="*70)
+print("STEP 6: STRUCTURAL ISOLATION IDENTIFICATION (C7)")
+print("="*70)
+print()
+print("Perturbed C7 cyclotomic variety:")
+print("  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{6} L_k^8 = 0")
+print("  where L_k = Sum_{j=0}^5 omega^{k*j} z_j, omega = e^{2*pi*i/7}")
+print()
+
+# ============================================================================
+# LOAD CANONICAL MONOMIALS
+# ============================================================================
+
+print(f"Loading canonical monomial list from {MONOMIAL_FILE}...")
+
+try:
+    with open(MONOMIAL_FILE, "r") as f:
+        monomials = json.load(f)
+except FileNotFoundError:
+    print(f"ERROR: File {MONOMIAL_FILE} not found")
+    print("Please run Step 2 first to generate monomial basis")
+    exit(1)
+
+print(f"  Total monomials loaded: {len(monomials)}")
+print()
+
+# ============================================================================
+# FILTER TO SIX-VARIABLE MONOMIALS
+# ============================================================================
+print("Filtering to six-variable monomials...")
+print("  (Monomials with exactly 6 non-zero exponents)")
+print()
+
+six_var_monomials = []
+for idx, exps in enumerate(monomials):
+    num_vars = sum(1 for e in exps if e > 0)
+    if num_vars == 6:
+        six_var_monomials.append({
+            "index": idx,
+            "exponents": exps
+        })
+
+print(f"Six-variable monomials found: {len(six_var_monomials)}")
+print(f"Expected (combinatorial / C7): {EXPECTED_SIX_VAR}")
+print()
+
+if len(six_var_monomials) != EXPECTED_SIX_VAR:
+    print(f"WARNING: Count mismatch (expected {EXPECTED_SIX_VAR}, got {len(six_var_monomials)})")
+    print("Proceeding with the empirical set found in the canonical list.")
+    print()
+
+# ============================================================================
+# APPLY STRUCTURAL ISOLATION CRITERIA
+# ============================================================================
+print("Applying structural isolation criteria:")
+print(f"  1. gcd(non-zero exponents) == {GCD_THRESHOLD}")
+print(f"  2. Exponent variance > {VARIANCE_THRESHOLD}")
+print()
+print("Processing...")
+print()
+
+isolated_classes = []
+non_isolated_classes = []
+
+for mon in six_var_monomials:
+    idx = mon["index"]
+    exps = mon["exponents"]
+    # nonzero_exps length is 6 for six-variable monomials
+    nonzero_exps = [int(e) for e in exps if e > 0]
+    exp_gcd = reduce(gcd, nonzero_exps)
+
+    mean_exp = sum(nonzero_exps) / 6.0
+    variance = sum((e - mean_exp)**2 for e in nonzero_exps) / 6.0
+
+    is_isolated = (exp_gcd == GCD_THRESHOLD) and (variance > VARIANCE_THRESHOLD)
+
+    monomial_data = {
+        "index": int(idx),
+        "exponents": [int(e) for e in exps],
+        "gcd": int(exp_gcd),
+        "variance": round(variance, 4),
+        "mean": round(mean_exp, 3),
+        "isolated": bool(is_isolated)
+    }
+
+    if is_isolated:
+        isolated_classes.append(monomial_data)
+    else:
+        non_isolated_classes.append(monomial_data)
+
+print(f"Classification complete:")
+print(f"  Structurally isolated:    {len(isolated_classes)}")
+print(f"  Non-isolated:             {len(non_isolated_classes)}")
+print(f"  Isolation percentage:     {100.0 * len(isolated_classes) / len(six_var_monomials) if six_var_monomials else 0:.1f}%")
+print()
+
+# ============================================================================
+# C13 COMPARISON
+# ============================================================================
+print("C7 vs C13 Comparison:")
+print(f"  C13 six-variable total:       {C13_SIX_VAR}")
+print(f"  C7 six-variable total:        {len(six_var_monomials)}")
+print(f"  Ratio (C7/C13):               {len(six_var_monomials)/C13_SIX_VAR:.3f}")
+print()
+print(f"  C13 isolated count:           {C13_ISOLATED}")
+print(f"  C7 isolated count:            {len(isolated_classes)}")
+if C13_ISOLATED > 0:
+    print(f"  Ratio (C7/C13):               {len(isolated_classes)/C13_ISOLATED:.3f}")
+print()
+print(f"  C13 isolation percentage:     {C13_ISOLATION_PCT:.1f}%")
+print(f"  C7 isolation percentage:      {100.0 * len(isolated_classes) / len(six_var_monomials) if six_var_monomials else 0:.1f}%")
+print()
+
+# ============================================================================
+# DISPLAY EXAMPLES
+# ============================================================================
+if len(isolated_classes) > 0:
+    print("Examples of ISOLATED monomials (first 10):")
+    print("-"*70)
+    for i, mon in enumerate(isolated_classes[:10], 1):
+        exp_str = str(mon['exponents'])
+        print(f"  {i:2d}. Index {mon['index']:4d}: {exp_str}")
+        print(f"      GCD={mon['gcd']}, Variance={mon['variance']:.4f}")
+    print()
+
+if len(non_isolated_classes) > 0:
+    print("Examples of NON-ISOLATED monomials (first 10):")
+    print("-"*70)
+    for i, mon in enumerate(non_isolated_classes[:10], 1):
+        exp_str = str(mon['exponents'])
+        print(f"  {i:2d}. Index {mon['index']:4d}: {exp_str}")
+        print(f"      GCD={mon['gcd']}, Variance={mon['variance']:.4f}")
+        if mon['gcd'] != GCD_THRESHOLD:
+            print(f"      Reason: Fails gcd=={GCD_THRESHOLD} criterion (gcd={mon['gcd']})")
+        elif mon['variance'] <= VARIANCE_THRESHOLD:
+            print(f"      Reason: Fails variance>{VARIANCE_THRESHOLD} criterion (var={mon['variance']:.4f})")
+    print()
+
+# ============================================================================
+# STATISTICAL ANALYSIS
+# ============================================================================
+print("="*70)
+print("STATISTICAL ANALYSIS")
+print("="*70)
+print()
+
+# Variance distribution
+print("Variance distribution among six-variable monomials:")
+print(f"  {'Range':<15} {'Count':<10} {'Percentage':<12}")
+print("-"*40)
+
+variance_ranges = [
+    (0.0, 1.0, "0.0-1.0"),
+    (1.0, 1.7, "1.0-1.7"),
+    (1.7, 3.0, "1.7-3.0"),
+    (3.0, 5.0, "3.0-5.0"),
+    (5.0, 10.0, "5.0-10.0"),
+    (10.0, float('inf'), ">10.0")
+]
+
+variance_distribution = {}
+for low, high, label in variance_ranges:
+    count = sum(1 for mon in six_var_monomials
+                if low <= sum((e - 3.0)**2 for e in mon['exponents'])/6.0 < high)
+    pct = count / len(six_var_monomials) * 100 if six_var_monomials else 0
+    variance_distribution[label] = count
+    print(f"  {label:<15} {count:<10} {pct:>10.1f}%")
+
+print()
+
+# GCD distribution
+print("GCD distribution among six-variable monomials:")
+print(f"  {'GCD':<10} {'Count':<10} {'Percentage':<12}")
+print("-"*40)
+
+gcd_dist = {}
+for mon in six_var_monomials:
+    nonzero_exps = [e for e in mon['exponents'] if e > 0]
+    exp_gcd = reduce(gcd, nonzero_exps)
+    gcd_dist[exp_gcd] = gcd_dist.get(exp_gcd, 0) + 1
+
+for g in sorted(gcd_dist.keys()):
+    count = gcd_dist[g]
+    pct = count / len(six_var_monomials) * 100 if six_var_monomials else 0
+    print(f"  {g:<10} {count:<10} {pct:>10.1f}%")
+
+print()
+
+# ============================================================================
+# SAVE RESULTS
+# ============================================================================
+result = {
+    "step": 6,
+    "description": "Structural isolation identification via gcd and variance criteria (C7)",
+    "variety": "PERTURBED_C7_CYCLOTOMIC",
+    "delta": "791/100000",
+    "cyclotomic_order": 7,
+    "galois_group": "Z/6Z",
+    "six_variable_total": len(six_var_monomials),
+    "isolated_count": len(isolated_classes),
+    "non_isolated_count": len(non_isolated_classes),
+    "isolation_percentage": round(len(isolated_classes) / len(six_var_monomials) * 100, 2) if six_var_monomials else 0,
+    "criteria": {
+        "gcd_threshold": GCD_THRESHOLD,
+        "variance_threshold": VARIANCE_THRESHOLD,
+        "description": "Monomial is isolated if gcd=1 AND variance>1.7"
+    },
+    "isolated_indices": [mon["index"] for mon in isolated_classes],
+    "non_isolated_indices": [mon["index"] for mon in non_isolated_classes],
+    "isolated_monomials_sample": isolated_classes[:200],
+    "non_isolated_monomials_sample": non_isolated_classes[:200],
+    "variance_distribution": variance_distribution,
+    "gcd_distribution": gcd_dist,
+    "C13_comparison": {
+        "C13_six_var_total": C13_SIX_VAR,
+        "C7_six_var_total": len(six_var_monomials),
+        "six_var_ratio": float(len(six_var_monomials) / C13_SIX_VAR) if C13_SIX_VAR else None,
+        "C13_isolated": C13_ISOLATED,
+        "C7_isolated": len(isolated_classes),
+        "isolated_ratio": float(len(isolated_classes) / C13_ISOLATED) if C13_ISOLATED > 0 else None,
+        "C13_isolation_pct": C13_ISOLATION_PCT,
+        "C7_isolation_pct": round(100.0 * len(isolated_classes) / len(six_var_monomials), 2) if six_var_monomials else 0
+    }
+}
+
+with open(OUTPUT_FILE, "w") as f:
+    json.dump(result, f, indent=2)
+
+print(f"Results saved to {OUTPUT_FILE}")
+print()
+
+# ============================================================================
+# VERIFICATION
+# ============================================================================
+print("="*70)
+print("VERIFICATION RESULTS")
+print("="*70)
+print()
+print(f"Six-variable monomials:       {len(six_var_monomials)}")
+print(f"Structurally isolated:        {len(isolated_classes)}")
+print(f"Isolation percentage:         {len(isolated_classes)/len(six_var_monomials)*100:.1f}%")
+print()
+
+if len(isolated_classes) > 0:
+    print("*** STRUCTURAL ISOLATION CLASSIFICATION COMPLETE ***")
+    print()
+    print(f"Identified {len(isolated_classes)} isolated classes satisfying:")
+    print(f"  - gcd(non-zero exponents) = {GCD_THRESHOLD} (non-factorizable)")
+    print(f"  - Variance > {VARIANCE_THRESHOLD} (high complexity)")
+    print()
+    if EXPECTED_ISOLATED and len(isolated_classes) == EXPECTED_ISOLATED:
+        print(f"✓ Matches expected count: {EXPECTED_ISOLATED}")
+    elif EXPECTED_ISOLATED:
+        diff = abs(len(isolated_classes) - EXPECTED_ISOLATED)
+        print(f"⚠ Differs from expected: {diff} classes (expected {EXPECTED_ISOLATED})")
+    else:
+        print(f"Note: C7 isolated count ({len(isolated_classes)}) determined empirically")
+    print()
+    print("Next step: Step 7 (Information-Theoretic Separation Analysis)")
+else:
+    print("*** NO ISOLATED CLASSES FOUND ***")
+    print()
+    print("All six-variable monomials fail isolation criteria. Consider:")
+    print("  - adjusting thresholds, or")
+    print("  - analyzing different structural invariants")
+print()
+print("="*70)
+print("STEP 6 COMPLETE")
+print("="*70)
+```
+
+to run script:
+
+```bash
+python step6_7.py
+```
+
+---
+
+result:
+
+```verbatim
+======================================================================
+STEP 6: STRUCTURAL ISOLATION IDENTIFICATION (C7)
+======================================================================
+
+Perturbed C7 cyclotomic variety:
+  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{6} L_k^8 = 0
+  where L_k = Sum_{j=0}^5 omega^{k*j} z_j, omega = e^{2*pi*i/7}
+
+Loading canonical monomial list from saved_inv_p29_monomials18.json...
+  Total monomials loaded: 4807
+
+Filtering to six-variable monomials...
+  (Monomials with exactly 6 non-zero exponents)
+
+Six-variable monomials found: 884
+Expected (combinatorial / C7): 884
+
+Applying structural isolation criteria:
+  1. gcd(non-zero exponents) == 1
+  2. Exponent variance > 1.7
+
+Processing...
+
+Classification complete:
+  Structurally isolated:    751
+  Non-isolated:             133
+  Isolation percentage:     85.0%
+
+C7 vs C13 Comparison:
+  C13 six-variable total:       476
+  C7 six-variable total:        884
+  Ratio (C7/C13):               1.857
+
+  C13 isolated count:           401
+  C7 isolated count:            751
+  Ratio (C7/C13):               1.873
+
+  C13 isolation percentage:     84.2%
+  C7 isolation percentage:      85.0%
+
+Examples of ISOLATED monomials (first 10):
+----------------------------------------------------------------------
+   1. Index   79: [11, 2, 1, 1, 1, 2]
+      GCD=1, Variance=13.0000
+   2. Index   87: [11, 1, 2, 1, 2, 1]
+      GCD=1, Variance=13.0000
+   3. Index   89: [11, 1, 1, 3, 1, 1]
+      GCD=1, Variance=13.3333
+   4. Index  127: [10, 3, 1, 1, 2, 1]
+      GCD=1, Variance=10.3333
+   5. Index  135: [10, 2, 2, 2, 1, 1]
+      GCD=1, Variance=10.0000
+   6. Index  145: [10, 1, 4, 1, 1, 1]
+      GCD=1, Variance=11.0000
+   7. Index  153: [10, 1, 1, 2, 1, 3]
+      GCD=1, Variance=10.3333
+   8. Index  154: [10, 1, 1, 1, 3, 2]
+      GCD=1, Variance=10.3333
+   9. Index  197: [9, 4, 1, 2, 1, 1]
+      GCD=1, Variance=8.3333
+  10. Index  203: [9, 3, 3, 1, 1, 1]
+      GCD=1, Variance=8.0000
+
+Examples of NON-ISOLATED monomials (first 10):
+----------------------------------------------------------------------
+   1. Index  964: [5, 4, 3, 2, 1, 3]
+      GCD=1, Variance=1.6667
+      Reason: Fails variance>1.7 criterion (var=1.6667)
+   2. Index  965: [5, 4, 3, 1, 3, 2]
+      GCD=1, Variance=1.6667
+      Reason: Fails variance>1.7 criterion (var=1.6667)
+   3. Index  968: [5, 4, 2, 3, 2, 2]
+      GCD=1, Variance=1.3333
+      Reason: Fails variance>1.7 criterion (var=1.3333)
+   4. Index  995: [5, 3, 4, 2, 2, 2]
+      GCD=1, Variance=1.3333
+      Reason: Fails variance>1.7 criterion (var=1.3333)
+   5. Index  998: [5, 3, 3, 4, 1, 2]
+      GCD=1, Variance=1.6667
+      Reason: Fails variance>1.7 criterion (var=1.6667)
+   6. Index  999: [5, 3, 3, 3, 3, 1]
+      GCD=1, Variance=1.3333
+      Reason: Fails variance>1.7 criterion (var=1.3333)
+   7. Index 1007: [5, 3, 2, 1, 3, 4]
+      GCD=1, Variance=1.6667
+      Reason: Fails variance>1.7 criterion (var=1.6667)
+   8. Index 1012: [5, 3, 1, 3, 2, 4]
+      GCD=1, Variance=1.6667
+      Reason: Fails variance>1.7 criterion (var=1.6667)
+   9. Index 1013: [5, 3, 1, 2, 4, 3]
+      GCD=1, Variance=1.6667
+      Reason: Fails variance>1.7 criterion (var=1.6667)
+  10. Index 1047: [5, 2, 3, 2, 2, 4]
+      GCD=1, Variance=1.3333
+      Reason: Fails variance>1.7 criterion (var=1.3333)
+
+======================================================================
+STATISTICAL ANALYSIS
+======================================================================
+
+Variance distribution among six-variable monomials:
+  Range           Count      Percentage  
+----------------------------------------
+  0.0-1.0         17                1.9%
+  1.0-1.7         111              12.6%
+  1.7-3.0         174              19.7%
+  3.0-5.0         286              32.4%
+  5.0-10.0        248              28.1%
+  >10.0           48                5.4%
+
+GCD distribution among six-variable monomials:
+  GCD        Count      Percentage  
+----------------------------------------
+  1          876              99.1%
+  2          8                 0.9%
+
+Results saved to step6_structural_isolation_C7.json
+
+======================================================================
+VERIFICATION RESULTS
+======================================================================
+
+Six-variable monomials:       884
+Structurally isolated:        751
+Isolation percentage:         85.0%
+
+*** STRUCTURAL ISOLATION CLASSIFICATION COMPLETE ***
+
+Identified 751 isolated classes satisfying:
+  - gcd(non-zero exponents) = 1 (non-factorizable)
+  - Variance > 1.7 (high complexity)
+
+Note: C7 isolated count (751) determined empirically
+
+Next step: Step 7 (Information-Theoretic Separation Analysis)
+
+======================================================================
+STEP 6 COMPLETE
+======================================================================
+```
+
+
+
+
+---
+
