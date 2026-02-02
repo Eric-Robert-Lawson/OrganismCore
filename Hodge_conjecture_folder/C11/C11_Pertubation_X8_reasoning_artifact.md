@@ -2661,3 +2661,480 @@ Next step: Step 6 (Structural Isolation Analysis for C11)
 ---
 
 
+```python
+#!/usr/bin/env python3
+"""
+STEP 6: Structural Isolation Identification (C11 X8 Perturbed)
+Identifies which of the six-variable monomials are structurally isolated
+Criteria: gcd(non-zero exponents) = 1 AND exponent variance > 1.7
+
+Perturbed C11 cyclotomic variety:
+  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8 = 0
+"""
+
+import json
+from math import gcd
+from functools import reduce
+import os
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+# Monomial file produced in Step 2 for a chosen prime (use the prime you ran Step 2 with)
+MONOMIAL_FILE = "saved_inv_p23_monomials18.json"   # adjust if you used a different prime
+OUTPUT_FILE = "step6_structural_isolation_C11.json"
+
+# Combinatorial totals:
+# Number of degree-18 monomials in 6 variables with all 6 variables present:
+# C(17,5) = 6188 total six-variable monomials.
+# For C11-invariant subset we expect approximately 6188 / 11
+EXPECTED_SIX_VAR = int(round(6188.0 / 11.0))  # ≈ 563
+EXPECTED_ISOLATED = None  # unknown; will be determined empirically
+
+GCD_THRESHOLD = 1
+VARIANCE_THRESHOLD = 1.7
+
+# ============================================================================
+# MAIN EXECUTION
+# ============================================================================
+
+print("="*70)
+print("STEP 6: STRUCTURAL ISOLATION IDENTIFICATION (C11)")
+print("="*70)
+print()
+print("Perturbed C11 cyclotomic variety:")
+print("  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8 = 0")
+print("  where L_k = Sum_{j=0}^5 omega^{k*j} z_j, omega = e^{2*pi*i/11}")
+print()
+
+# ============================================================================
+# LOAD CANONICAL MONOMIALS
+# ============================================================================
+print(f"Loading canonical monomial list from {MONOMIAL_FILE}...")
+
+try:
+    with open(MONOMIAL_FILE, "r") as f:
+        monomials = json.load(f)
+except FileNotFoundError:
+    print(f"ERROR: File {MONOMIAL_FILE} not found")
+    print("Please run Step 2 first to generate monomial basis")
+    exit(1)
+
+print(f"  Total monomials loaded: {len(monomials)}")
+print()
+
+# ============================================================================
+# FILTER TO SIX-VARIABLE MONOMIALS
+# ============================================================================
+print("Filtering to six-variable monomials...")
+print("  (Monomials with exactly 6 non-zero exponents)")
+print()
+
+six_var_monomials = []
+for idx, exps in enumerate(monomials):
+    num_vars = sum(1 for e in exps if e > 0)
+    if num_vars == 6:
+        six_var_monomials.append({
+            "index": idx,
+            "exponents": exps
+        })
+
+print(f"Six-variable monomials found: {len(six_var_monomials)}")
+print(f"Expected (combinatorial / C11): {EXPECTED_SIX_VAR}")
+print()
+
+if len(six_var_monomials) != EXPECTED_SIX_VAR:
+    print(f"WARNING: Count mismatch (expected {EXPECTED_SIX_VAR}, got {len(six_var_monomials)})")
+    print("This can occur due to monomial weight filtering; proceed with empirical set.")
+    print()
+
+# ============================================================================
+# APPLY STRUCTURAL ISOLATION CRITERIA
+# ============================================================================
+print("Applying structural isolation criteria:")
+print(f"  1. gcd(non-zero exponents) == {GCD_THRESHOLD}")
+print(f"  2. Exponent variance > {VARIANCE_THRESHOLD}")
+print()
+print("Processing...")
+print()
+
+isolated_classes = []
+non_isolated_classes = []
+
+for mon in six_var_monomials:
+    idx = mon["index"]
+    exps = mon["exponents"]
+
+    # Criterion 1: gcd = 1 (non-factorizable)
+    nonzero_exps = [e for e in exps if e > 0]
+    exp_gcd = reduce(gcd, nonzero_exps)
+
+    # Criterion 2: Variance > threshold
+    # For degree-18 monomials with 6 variables, mean = 18 / 6 = 3.0
+    mean_exp = sum(nonzero_exps) / 6.0
+    variance = sum((e - mean_exp)**2 for e in exps) / 6.0
+
+    # Check both criteria
+    is_isolated = (exp_gcd == GCD_THRESHOLD) and (variance > VARIANCE_THRESHOLD)
+
+    monomial_data = {
+        "index": idx,
+        "exponents": exps,
+        "gcd": int(exp_gcd),
+        "variance": round(variance, 4),
+        "mean": round(mean_exp, 2),
+        "isolated": bool(is_isolated)
+    }
+
+    if is_isolated:
+        isolated_classes.append(monomial_data)
+    else:
+        non_isolated_classes.append(monomial_data)
+
+print(f"Classification complete:")
+print(f"  Structurally isolated:    {len(isolated_classes)}")
+print(f"  Non-isolated:             {len(non_isolated_classes)}")
+print(f"  Isolation percentage:     {100.0 * len(isolated_classes) / len(six_var_monomials) if six_var_monomials else 0:.1f}%")
+print()
+
+# ============================================================================
+# C13 COMPARISON (reference values)
+# ============================================================================
+C13_SIX_VAR = 476
+C13_ISOLATED = 401
+C13_ISOLATION_PCT = 100.0 * C13_ISOLATED / C13_SIX_VAR
+
+print("C11 vs C13 Comparison:")
+print(f"  C13 six-variable total:       {C13_SIX_VAR}")
+print(f"  C11 six-variable total:       {len(six_var_monomials)}")
+print(f"  Ratio (C11/C13):              {len(six_var_monomials)/C13_SIX_VAR:.3f}")
+print()
+print(f"  C13 isolated count:           {C13_ISOLATED}")
+print(f"  C11 isolated count:           {len(isolated_classes)}")
+if C13_ISOLATED > 0:
+    print(f"  Ratio (C11/C13):              {len(isolated_classes)/C13_ISOLATED:.3f}")
+print()
+print(f"  C13 isolation percentage:     {C13_ISOLATION_PCT:.1f}%")
+print(f"  C11 isolation percentage:     {100.0 * len(isolated_classes) / len(six_var_monomials) if six_var_monomials else 0:.1f}%")
+print()
+
+# ============================================================================
+# DISPLAY EXAMPLES
+# ============================================================================
+if len(isolated_classes) > 0:
+    print("Examples of ISOLATED monomials (first 10):")
+    print("-"*70)
+    for i, mon in enumerate(isolated_classes[:10], 1):
+        exp_str = str(mon['exponents'])
+        print(f"  {i:2d}. Index {mon['index']:4d}: {exp_str}")
+        print(f"      GCD={mon['gcd']}, Variance={mon['variance']:.4f}")
+    print()
+
+if len(non_isolated_classes) > 0:
+    print("Examples of NON-ISOLATED monomials (first 10):")
+    print("-"*70)
+    for i, mon in enumerate(non_isolated_classes[:10], 1):
+        exp_str = str(mon['exponents'])
+        print(f"  {i:2d}. Index {mon['index']:4d}: {exp_str}")
+        print(f"      GCD={mon['gcd']}, Variance={mon['variance']:.4f}")
+        # Explain failure reason
+        if mon['gcd'] != GCD_THRESHOLD:
+            print(f"      Reason: Fails gcd=={GCD_THRESHOLD} criterion (gcd={mon['gcd']})")
+        elif mon['variance'] <= VARIANCE_THRESHOLD:
+            print(f"      Reason: Fails variance>{VARIANCE_THRESHOLD} criterion (var={mon['variance']:.4f})")
+    print()
+
+# ============================================================================
+# STATISTICAL ANALYSIS
+# ============================================================================
+print("="*70)
+print("STATISTICAL ANALYSIS")
+print("="*70)
+print()
+
+# Variance distribution
+print("Variance distribution among six-variable monomials:")
+print(f"  {'Range':<15} {'Count':<10} {'Percentage':<12}")
+print("-"*40)
+
+variance_ranges = [
+    (0.0, 1.0, "0.0-1.0"),
+    (1.0, 1.7, "1.0-1.7"),
+    (1.7, 3.0, "1.7-3.0"),
+    (3.0, 5.0, "3.0-5.0"),
+    (5.0, 10.0, "5.0-10.0"),
+    (10.0, float('inf'), ">10.0")
+]
+
+for low, high, label in variance_ranges:
+    count = sum(1 for mon in six_var_monomials
+                if low <= sum((e - 3.0)**2 for e in mon['exponents'])/6.0 < high)
+    pct = count / len(six_var_monomials) * 100 if six_var_monomials else 0
+    print(f"  {label:<15} {count:<10} {pct:>10.1f}%")
+
+print()
+
+# GCD distribution
+print("GCD distribution among six-variable monomials:")
+print(f"  {'GCD':<10} {'Count':<10} {'Percentage':<12}")
+print("-"*40)
+
+gcd_dist = {}
+for mon in six_var_monomials:
+    nonzero_exps = [e for e in mon['exponents'] if e > 0]
+    exp_gcd = reduce(gcd, nonzero_exps)
+    gcd_dist[exp_gcd] = gcd_dist.get(exp_gcd, 0) + 1
+
+for g in sorted(gcd_dist.keys()):
+    count = gcd_dist[g]
+    pct = count / len(six_var_monomials) * 100 if six_var_monomials else 0
+    print(f"  {g:<10} {count:<10} {pct:>10.1f}%")
+
+print()
+
+# ============================================================================
+# SAVE RESULTS
+# ============================================================================
+result = {
+    "step": 6,
+    "description": "Structural isolation identification via gcd and variance criteria (C11)",
+    "variety": "PERTURBED_C11_CYCLOTOMIC",
+    "delta": "791/100000",
+    "cyclotomic_order": 11,
+    "galois_group": "Z/10Z",
+    "six_variable_total": len(six_var_monomials),
+    "isolated_count": len(isolated_classes),
+    "non_isolated_count": len(non_isolated_classes),
+    "isolation_percentage": round(len(isolated_classes) / len(six_var_monomials) * 100, 2) if six_var_monomials else 0,
+    "criteria": {
+        "gcd_threshold": GCD_THRESHOLD,
+        "variance_threshold": VARIANCE_THRESHOLD,
+        "description": "Monomial is isolated if gcd=1 AND variance>1.7"
+    },
+    "isolated_indices": [mon["index"] for mon in isolated_classes],
+    "non_isolated_indices": [mon["index"] for mon in non_isolated_classes],
+    "isolated_monomials_sample": isolated_classes[:200],
+    "non_isolated_monomials_sample": non_isolated_classes[:200],
+    "variance_distribution": {label: sum(1 for mon in six_var_monomials
+                                        if low <= sum((e - 3.0)**2 for e in mon['exponents'])/6.0 < high)
+                              for low, high, label in variance_ranges},
+    "gcd_distribution": gcd_dist,
+    "C13_comparison": {
+        "C13_six_var_total": C13_SIX_VAR,
+        "C11_six_var_total": len(six_var_monomials),
+        "six_var_ratio": float(len(six_var_monomials) / C13_SIX_VAR) if C13_SIX_VAR else None,
+        "C13_isolated": C13_ISOLATED,
+        "C11_isolated": len(isolated_classes),
+        "isolated_ratio": float(len(isolated_classes) / C13_ISOLATED) if C13_ISOLATED > 0 else None,
+        "C13_isolation_pct": C13_ISOLATION_PCT,
+        "C11_isolation_pct": round(100.0 * len(isolated_classes) / len(six_var_monomials), 2) if six_var_monomials else 0
+    }
+}
+
+with open(OUTPUT_FILE, "w") as f:
+    json.dump(result, f, indent=2)
+
+print(f"Results saved to {OUTPUT_FILE}")
+print()
+
+# ============================================================================
+# VERIFICATION
+# ============================================================================
+print("="*70)
+print("VERIFICATION RESULTS")
+print("="*70)
+print()
+print(f"Six-variable monomials:       {len(six_var_monomials)}")
+print(f"Structurally isolated:        {len(isolated_classes)}")
+print(f"Isolation percentage:         {len(isolated_classes)/len(six_var_monomials)*100:.1f}%")
+print()
+
+if len(isolated_classes) > 0:
+    print("*** STRUCTURAL ISOLATION CLASSIFICATION COMPLETE ***")
+    print()
+    print(f"Identified {len(isolated_classes)} isolated classes satisfying:")
+    print(f"  - gcd(non-zero exponents) = {GCD_THRESHOLD} (non-factorizable)")
+    print(f"  - Variance > {VARIANCE_THRESHOLD} (high complexity)")
+    print()
+    if EXPECTED_ISOLATED and len(isolated_classes) == EXPECTED_ISOLATED:
+        print(f"✓ Matches expected count: {EXPECTED_ISOLATED}")
+    elif EXPECTED_ISOLATED:
+        diff = abs(len(isolated_classes) - EXPECTED_ISOLATED)
+        print(f"⚠ Differs from expected: {diff} classes (expected {EXPECTED_ISOLATED})")
+    else:
+        print(f"Note: C11 isolated count ({len(isolated_classes)}) determined empirically")
+    print()
+    print("Next step: Step 7 (Information-Theoretic Separation Analysis)")
+else:
+    print("*** NO ISOLATED CLASSES FOUND ***")
+    print()
+    print("All six-variable monomials fail isolation criteria. Consider:")
+    print("  - adjusting thresholds, or")
+    print("  - analyzing different structural invariants")
+print()
+print("="*70)
+print("STEP 6 COMPLETE")
+print("="*70)
+```
+
+to run script:
+
+```bash
+python step6_11.py
+```
+
+---
+
+result:
+
+```verbatim
+======================================================================
+STEP 6: STRUCTURAL ISOLATION IDENTIFICATION (C11)
+======================================================================
+
+Perturbed C11 cyclotomic variety:
+  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8 = 0
+  where L_k = Sum_{j=0}^5 omega^{k*j} z_j, omega = e^{2*pi*i/11}
+
+Loading canonical monomial list from saved_inv_p23_monomials18.json...
+  Total monomials loaded: 3059
+
+Filtering to six-variable monomials...
+  (Monomials with exactly 6 non-zero exponents)
+
+Six-variable monomials found: 562
+Expected (combinatorial / C11): 563
+
+WARNING: Count mismatch (expected 563, got 562)
+This can occur due to monomial weight filtering; proceed with empirical set.
+
+Applying structural isolation criteria:
+  1. gcd(non-zero exponents) == 1
+  2. Exponent variance > 1.7
+
+Processing...
+
+Classification complete:
+  Structurally isolated:    480
+  Non-isolated:             82
+  Isolation percentage:     85.4%
+
+C11 vs C13 Comparison:
+  C13 six-variable total:       476
+  C11 six-variable total:       562
+  Ratio (C11/C13):              1.181
+
+  C13 isolated count:           401
+  C11 isolated count:           480
+  Ratio (C11/C13):              1.197
+
+  C13 isolation percentage:     84.2%
+  C11 isolation percentage:     85.4%
+
+Examples of ISOLATED monomials (first 10):
+----------------------------------------------------------------------
+   1. Index   54: [11, 1, 2, 1, 1, 2]
+      GCD=1, Variance=13.0000
+   2. Index   57: [11, 1, 1, 2, 2, 1]
+      GCD=1, Variance=13.0000
+   3. Index   78: [10, 3, 1, 1, 1, 2]
+      GCD=1, Variance=10.3333
+   4. Index   85: [10, 2, 2, 1, 2, 1]
+      GCD=1, Variance=10.0000
+   5. Index   87: [10, 2, 1, 3, 1, 1]
+      GCD=1, Variance=10.3333
+   6. Index   93: [10, 1, 3, 2, 1, 1]
+      GCD=1, Variance=10.3333
+   7. Index  124: [9, 4, 1, 1, 2, 1]
+      GCD=1, Variance=8.3333
+   8. Index  130: [9, 3, 2, 2, 1, 1]
+      GCD=1, Variance=7.6667
+   9. Index  137: [9, 2, 4, 1, 1, 1]
+      GCD=1, Variance=8.3333
+  10. Index  154: [9, 1, 1, 2, 1, 4]
+      GCD=1, Variance=8.3333
+
+Examples of NON-ISOLATED monomials (first 10):
+----------------------------------------------------------------------
+   1. Index  613: [5, 4, 3, 3, 1, 2]
+      GCD=1, Variance=1.6667
+      Reason: Fails variance>1.7 criterion (var=1.6667)
+   2. Index  614: [5, 4, 3, 2, 3, 1]
+      GCD=1, Variance=1.6667
+      Reason: Fails variance>1.7 criterion (var=1.6667)
+   3. Index  634: [5, 3, 4, 3, 2, 1]
+      GCD=1, Variance=1.6667
+      Reason: Fails variance>1.7 criterion (var=1.6667)
+   4. Index  671: [5, 2, 2, 2, 3, 4]
+      GCD=1, Variance=1.3333
+      Reason: Fails variance>1.7 criterion (var=1.3333)
+   5. Index  676: [5, 2, 1, 3, 4, 3]
+      GCD=1, Variance=1.6667
+      Reason: Fails variance>1.7 criterion (var=1.6667)
+   6. Index  703: [5, 1, 3, 3, 2, 4]
+      GCD=1, Variance=1.6667
+      Reason: Fails variance>1.7 criterion (var=1.6667)
+   7. Index  704: [5, 1, 3, 2, 4, 3]
+      GCD=1, Variance=1.6667
+      Reason: Fails variance>1.7 criterion (var=1.6667)
+   8. Index  708: [5, 1, 2, 4, 3, 3]
+      GCD=1, Variance=1.6667
+      Reason: Fails variance>1.7 criterion (var=1.6667)
+   9. Index  829: [4, 5, 3, 3, 2, 1]
+      GCD=1, Variance=1.6667
+      Reason: Fails variance>1.7 criterion (var=1.6667)
+  10. Index  860: [4, 4, 1, 2, 3, 4]
+      GCD=1, Variance=1.3333
+      Reason: Fails variance>1.7 criterion (var=1.3333)
+
+======================================================================
+STATISTICAL ANALYSIS
+======================================================================
+
+Variance distribution among six-variable monomials:
+  Range           Count      Percentage  
+----------------------------------------
+  0.0-1.0         11                2.0%
+  1.0-1.7         68               12.1%
+  1.7-3.0         119              21.2%
+  3.0-5.0         178              31.7%
+  5.0-10.0        154              27.4%
+  >10.0           32                5.7%
+
+GCD distribution among six-variable monomials:
+  GCD        Count      Percentage  
+----------------------------------------
+  1          556              98.9%
+  2          6                 1.1%
+
+Results saved to step6_structural_isolation_C11.json
+
+======================================================================
+VERIFICATION RESULTS
+======================================================================
+
+Six-variable monomials:       562
+Structurally isolated:        480
+Isolation percentage:         85.4%
+
+*** STRUCTURAL ISOLATION CLASSIFICATION COMPLETE ***
+
+Identified 480 isolated classes satisfying:
+  - gcd(non-zero exponents) = 1 (non-factorizable)
+  - Variance > 1.7 (high complexity)
+
+Note: C11 isolated count (480) determined empirically
+
+Next step: Step 7 (Information-Theoretic Separation Analysis)
+
+======================================================================
+STEP 6 COMPLETE
+======================================================================
+```
+
+
+
+
+---
+
