@@ -2122,3 +2122,453 @@ Certification:           PASS      ← All criteria met
 
 ---
 
+
+```python
+#!/usr/bin/env python3
+"""
+STEP 5: Canonical Kernel Basis Identification via Free Column Analysis (C17)
+Identifies which of the C17-invariant monomials form the kernel basis
+Perturbed C17 cyclotomic variety: Sum z_i^8 + (791/100000)*Sum_{k=1}^{16} L_k^8 = 0
+"""
+
+import json
+import numpy as np
+from scipy.sparse import csr_matrix
+import os
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+PRIME = 103  # Use p=103 for modular basis computation (first C17 prime)
+TRIPLET_FILE = "saved_inv_p103_triplets.json"
+MONOMIAL_FILE = "saved_inv_p103_monomials18.json"
+OUTPUT_FILE = "step5_canonical_kernel_basis_C17.json"
+
+EXPECTED_DIM = 537    # observed h22_inv for C17
+EXPECTED_COUNT_INV = 1980  # observed invariant monomial count for C17
+
+# ============================================================================
+# MAIN EXECUTION
+# ============================================================================
+
+print("="*70)
+print("STEP 5: CANONICAL KERNEL BASIS IDENTIFICATION (C17)")
+print("="*70)
+print()
+print("Perturbed C17 cyclotomic variety:")
+print("  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{16} L_k^8 = 0")
+print("  where L_k = Sum_{j=0}^5 omega^{k*j} z_j, omega = e^{2*pi*i/17}")
+print()
+
+# ============================================================================
+# LOAD MATRIX DATA
+# ============================================================================
+
+print(f"Loading Jacobian matrix from {TRIPLET_FILE}...")
+
+try:
+    with open(TRIPLET_FILE, "r") as f:
+        data = json.load(f)
+except FileNotFoundError:
+    print(f"ERROR: File {TRIPLET_FILE} not found")
+    print("Please run Step 2 first to generate matrix triplets")
+    exit(1)
+
+prime = int(data["prime"])
+saved_rank = int(data["rank"])
+saved_dim = int(data["h22_inv"])
+count_inv = int(data["countInv"])
+triplets = data["triplets"]
+variety = data.get("variety", "UNKNOWN")
+delta = data.get("delta", "UNKNOWN")
+epsilon_mod_p = data.get("epsilon_mod_p", "UNKNOWN")
+
+print()
+print("Metadata:")
+print(f"  Variety:              {variety}")
+print(f"  Perturbation delta:   {delta}")
+print(f"  Epsilon mod p:        {epsilon_mod_p}")
+print(f"  Prime:                {prime}")
+print(f"  Expected dimension:   {saved_dim}")
+print(f"  Expected rank:        {saved_rank}")
+print(f"  C17-invariant basis:  {count_inv}")
+print()
+
+# Build sparse matrix
+print("Building sparse matrix from triplets...")
+rows = [int(t[0]) for t in triplets]
+cols = [int(t[1]) for t in triplets]
+vals = [int(t[2]) % prime for t in triplets]
+
+# Determine actual column count from data
+max_col = max(cols) + 1 if cols else 0
+
+M = csr_matrix((vals, (rows, cols)), shape=(count_inv, max_col), dtype=np.int64)
+
+print(f"  Matrix shape:         {M.shape}")
+print(f"  Nonzero entries:      {M.nnz:,}")
+print(f"  Expected rank:        {saved_rank}")
+print()
+
+# ============================================================================
+# LOAD CANONICAL MONOMIAL LIST
+# ============================================================================
+
+print(f"Loading canonical monomial list from {MONOMIAL_FILE}...")
+
+try:
+    with open(MONOMIAL_FILE, "r") as f:
+        monomials = json.load(f)
+except FileNotFoundError:
+    print(f"ERROR: File {MONOMIAL_FILE} not found")
+    print("Please run Step 2 first to generate monomial basis")
+    exit(1)
+
+print(f"  Canonical monomials:  {len(monomials)}")
+print()
+
+# Verify monomial count
+if len(monomials) != count_inv:
+    print(f"WARNING: Monomial count mismatch: {len(monomials)} vs {count_inv}")
+
+# ============================================================================
+# COMPUTE FREE COLUMNS VIA ROW REDUCTION
+# ============================================================================
+print("Computing free columns via Gaussian elimination on M^T...")
+print()
+
+# Transpose matrix: M^T is (max_col x count_inv)
+M_T = M.T.toarray()
+print(f"  M^T shape: {M_T.shape}")
+print(f"  Processing {M_T.shape[1]} columns to identify free variables...")
+print()
+
+pivot_cols = []
+pivot_row = 0
+working = M_T.copy()
+
+# Row reduction to identify pivot columns
+for col in range(count_inv):
+    if pivot_row >= M_T.shape[0]:
+        break
+
+    # Find pivot (first non-zero entry in column at or below pivot_row)
+    pivot_found = False
+    for row in range(pivot_row, M_T.shape[0]):
+        if working[row, col] % prime != 0:
+            # Swap rows
+            if row != pivot_row:
+                working[[pivot_row, row]] = working[[row, pivot_row]]
+            pivot_found = True
+            break
+
+    if not pivot_found:
+        # Column is all zeros => free column
+        continue
+
+    # Record pivot column
+    pivot_cols.append(col)
+
+    # Normalize pivot row
+    pivot_val = int(working[pivot_row, col] % prime)
+    pivot_inv = pow(pivot_val, -1, prime)
+    working[pivot_row] = (working[pivot_row] * pivot_inv) % prime
+
+    # Eliminate entries in pivot column
+    for row in range(M_T.shape[0]):
+        if row != pivot_row:
+            factor = int(working[row, col] % prime)
+            if factor != 0:
+                working[row] = (working[row] - factor * working[pivot_row]) % prime
+
+    pivot_row += 1
+
+    # Progress indicator
+    if pivot_row % 100 == 0:
+        print(f"    Processed {pivot_row}/{M_T.shape[0]} rows, pivots found: {len(pivot_cols)}")
+
+# Free columns are those NOT in pivot_cols
+free_cols = [i for i in range(count_inv) if i not in pivot_cols]
+
+print()
+print(f"Row reduction complete:")
+print(f"  Pivot columns:        {len(pivot_cols)}")
+print(f"  Free columns:         {len(free_cols)}")
+print(f"  Expected dimension:   {saved_dim}")
+print()
+
+# Verify dimension matches
+if len(free_cols) == saved_dim:
+    print("DIMENSION VERIFIED: Free columns = expected dimension")
+else:
+    print(f"WARNING: Dimension mismatch: {len(free_cols)} vs {saved_dim}")
+
+print()
+
+# ============================================================================
+# ANALYZE VARIABLE DISTRIBUTION IN KERNEL BASIS
+# ============================================================================
+
+print("Analyzing variable distribution in kernel basis (free columns)...")
+print()
+
+var_counts = {}
+for idx in free_cols:
+    exps = monomials[idx]
+    num_vars = sum(1 for e in exps if e > 0)  # Count non-zero exponents
+    var_counts[num_vars] = var_counts.get(num_vars, 0) + 1
+
+print("Variable count distribution in modular kernel basis:")
+print(f"  {'Variables':<12} {'Count':<10} {'Percentage':<12}")
+print("-"*40)
+
+for num_vars in sorted(var_counts.keys()):
+    count = var_counts[num_vars]
+    pct = count / len(free_cols) * 100 if len(free_cols) > 0 else 0.0
+    print(f"  {num_vars:<12} {count:<10} {pct:>10.1f}%")
+
+print()
+
+# ============================================================================
+# SIX-VARIABLE MONOMIAL ANALYSIS
+# ============================================================================
+
+six_var_free = [i for i in free_cols if sum(1 for e in monomials[i] if e > 0) == 6]
+six_var_count = len(six_var_free)
+
+# Count ALL six-variable monomials in canonical list (for comparison)
+all_six_var = [i for i in range(len(monomials)) if sum(1 for e in monomials[i] if e > 0) == 6]
+all_six_var_count = len(all_six_var)
+
+print("Six-variable monomial analysis:")
+print(f"  Total six-var in canonical list:  {all_six_var_count}")
+print(f"  Six-var in free columns (p={prime}):   {six_var_count}")
+if len(free_cols) > 0:
+    print(f"  Percentage of free columns:       {100.0 * six_var_count / len(free_cols):.1f}%")
+print()
+
+# ============================================================================
+# C17 VS C13 COMPARISON
+# ============================================================================
+
+print("C17 vs C13 Comparison:")
+print(f"  C13 dimension:                    707")
+print(f"  C17 dimension:                    {len(free_cols)}")
+print(f"  Ratio (C17/C13):                  {len(free_cols)/707:.3f}")
+print()
+print(f"  C13 total six-var monomials:      ~476")
+print(f"  C17 total six-var monomials:      {all_six_var_count}")
+print(f"  Ratio (C17/C13):                  {all_six_var_count/476:.3f}")
+print()
+
+print("NOTE: Modular vs. Rational Basis Discrepancy")
+print("-"*70)
+print("The modular echelon basis (computed here at p={}) produces".format(prime))
+print("a set of free columns that tends to prefer sparser monomials.")
+print()
+print("The rational kernel basis (reconstructed via CRT from")
+print("19 primes in later steps) may contain dense vectors that")
+print("represent the same space but with different sparsity structure.")
+print()
+print("Both bases span the same {}-dimensional space, but differ in".format(len(free_cols)))
+print("representation. The rational basis reveals the full structural")
+print("complexity of H^{2,2}_inv(V,Q).")
+print()
+
+# ============================================================================
+# SAVE RESULTS
+# ============================================================================
+
+result = {
+    "step": 5,
+    "description": "Canonical kernel basis identification via free column analysis (C17)",
+    "variety": variety,
+    "delta": delta,
+    "epsilon_mod_p": epsilon_mod_p,
+    "cyclotomic_order": 17,
+    "galois_group": "Z/16Z",
+    "prime": int(prime),
+    "dimension": len(free_cols),
+    "rank": len(pivot_cols),
+    "count_inv": count_inv,
+    "matrix_shape": [int(M.shape[0]), int(M.shape[1])],
+    "free_column_indices": [int(i) for i in free_cols],
+    "pivot_column_indices": [int(i) for i in pivot_cols],
+    "variable_count_distribution": {str(k): int(v) for k, v in var_counts.items()},
+    "six_variable_count_free_cols": int(six_var_count),
+    "six_variable_total_canonical": int(all_six_var_count),
+    "six_variable_free_col_indices": [int(i) for i in six_var_free],
+    "all_six_variable_indices": [int(i) for i in all_six_var],
+    "C13_comparison": {
+        "C13_dimension": 707,
+        "C17_dimension": len(free_cols),
+        "ratio": float(len(free_cols) / 707),
+        "C13_six_var_total": 476,
+        "C17_six_var_total": all_six_var_count,
+        "six_var_ratio": float(all_six_var_count / 476) if 476 > 0 else None
+    },
+    "note": f"Modular basis has ~{six_var_count} six-var free columns; rational basis may reveal more six-var structure in dense combinations"
+}
+
+with open(OUTPUT_FILE, "w") as f:
+    json.dump(result, f, indent=2)
+
+print(f"Results saved to {OUTPUT_FILE}")
+print()
+
+# ============================================================================
+# SUMMARY
+# ============================================================================
+
+print("="*70)
+if len(free_cols) == saved_dim:
+    print("*** KERNEL DIMENSION VERIFIED ***")
+    print()
+    print(f"The {saved_dim} kernel basis vectors correspond to free columns")
+    print("of M^T, which map to specific monomials in the canonical list.")
+    print()
+    two_to_five = sum(var_counts.get(i, 0) for i in [2, 3, 4, 5])
+    if len(free_cols) > 0:
+        print(f"Modular basis structure (p={prime}):")
+        print(f"  - {two_to_five} monomials with 2-5 variables ({100.0 * two_to_five / len(free_cols):.1f}%)")
+        print(f"  - {six_var_count} six-variable monomials in free cols ({100.0 * six_var_count / len(free_cols):.1f}%)")
+    print(f"  - {all_six_var_count} total six-variable monomials in canonical list")
+    print()
+    print("For structural isolation (Step 6), analyze all six-variable")
+    print("monomials from canonical list, not just these free columns.")
+else:
+    print(f"WARNING: Dimension mismatch: {len(free_cols)} vs {saved_dim}")
+
+print()
+print("Next step: Step 6 (Structural Isolation Analysis for C17)")
+print("="*70)
+```
+
+to run script:
+
+```
+python step5_17.py
+```
+
+---
+
+result:
+
+```verbatim
+======================================================================
+STEP 5: CANONICAL KERNEL BASIS IDENTIFICATION (C17)
+======================================================================
+
+Perturbed C17 cyclotomic variety:
+  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{16} L_k^8 = 0
+  where L_k = Sum_{j=0}^5 omega^{k*j} z_j, omega = e^{2*pi*i/17}
+
+Loading Jacobian matrix from saved_inv_p103_triplets.json...
+
+Metadata:
+  Variety:              PERTURBED_C17_CYCLOTOMIC
+  Perturbation delta:   791/100000
+  Epsilon mod p:        -45
+  Prime:                103
+  Expected dimension:   537
+  Expected rank:        1443
+  C17-invariant basis:  1980
+
+Building sparse matrix from triplets...
+  Matrix shape:         (1980, 1541)
+  Nonzero entries:      74,224
+  Expected rank:        1443
+
+Loading canonical monomial list from saved_inv_p103_monomials18.json...
+  Canonical monomials:  1980
+
+Computing free columns via Gaussian elimination on M^T...
+
+  M^T shape: (1541, 1980)
+  Processing 1980 columns to identify free variables...
+
+    Processed 100/1541 rows, pivots found: 100
+    Processed 200/1541 rows, pivots found: 200
+    Processed 300/1541 rows, pivots found: 300
+    Processed 400/1541 rows, pivots found: 400
+    Processed 500/1541 rows, pivots found: 500
+    Processed 600/1541 rows, pivots found: 600
+    Processed 700/1541 rows, pivots found: 700
+    Processed 800/1541 rows, pivots found: 800
+    Processed 900/1541 rows, pivots found: 900
+    Processed 1000/1541 rows, pivots found: 1000
+    Processed 1100/1541 rows, pivots found: 1100
+    Processed 1200/1541 rows, pivots found: 1200
+    Processed 1300/1541 rows, pivots found: 1300
+    Processed 1400/1541 rows, pivots found: 1400
+
+Row reduction complete:
+  Pivot columns:        1443
+  Free columns:         537
+  Expected dimension:   537
+
+DIMENSION VERIFIED: Free columns = expected dimension
+
+Analyzing variable distribution in kernel basis (free columns)...
+
+Variable count distribution in modular kernel basis:
+  Variables    Count      Percentage  
+----------------------------------------
+  2            15                2.8%
+  3            89               16.6%
+  4            242              45.1%
+  5            183              34.1%
+  6            8                 1.5%
+
+Six-variable monomial analysis:
+  Total six-var in canonical list:  364
+  Six-var in free columns (p=103):   8
+  Percentage of free columns:       1.5%
+
+C17 vs C13 Comparison:
+  C13 dimension:                    707
+  C17 dimension:                    537
+  Ratio (C17/C13):                  0.760
+
+  C13 total six-var monomials:      ~476
+  C17 total six-var monomials:      364
+  Ratio (C17/C13):                  0.765
+
+NOTE: Modular vs. Rational Basis Discrepancy
+----------------------------------------------------------------------
+The modular echelon basis (computed here at p=103) produces
+a set of free columns that tends to prefer sparser monomials.
+
+The rational kernel basis (reconstructed via CRT from
+19 primes in later steps) may contain dense vectors that
+represent the same space but with different sparsity structure.
+
+Both bases span the same 537-dimensional space, but differ in
+representation. The rational basis reveals the full structural
+complexity of H^{2,2}_inv(V,Q).
+
+Results saved to step5_canonical_kernel_basis_C17.json
+
+======================================================================
+*** KERNEL DIMENSION VERIFIED ***
+
+The 537 kernel basis vectors correspond to free columns
+of M^T, which map to specific monomials in the canonical list.
+
+Modular basis structure (p=103):
+  - 529 monomials with 2-5 variables (98.5%)
+  - 8 six-variable monomials in free cols (1.5%)
+  - 364 total six-variable monomials in canonical list
+
+For structural isolation (Step 6), analyze all six-variable
+monomials from canonical list, not just these free columns.
+
+Next step: Step 6 (Structural Isolation Analysis for C17)
+======================================================================
+```
+
+
+
+---
+
