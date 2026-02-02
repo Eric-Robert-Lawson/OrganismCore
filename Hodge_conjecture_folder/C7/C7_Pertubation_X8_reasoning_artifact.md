@@ -17,7 +17,7 @@ the first 19 primes mod 7 = 1 are:
 ---
 
 # **Step 1: Smoothness Test**
-this is easy for typical C13 cyclotomic and is not computationally heavy, however for X8 pertubation, the GB blows up the memory far beyond my machines 16gb capacity so we resorted to:
+this is easy for typical C7 cyclotomic and is not computationally heavy, however for X8 pertubation, the GB blows up the memory far beyond my machines 16gb capacity so we resorted to:
 
 ```m2
 -- ============================================================================
