@@ -2059,29 +2059,7 @@ STEP 4 COMPLETE
 - **Hodge gap:** 525 classes (97.77% unexplained, constant across all primes)
 - **Total runtime:** ~50-60 seconds (19 primes × ~2.5-3s average sequential execution)
 
-**Per-Prime Verification (All 19 Primes PASS):**
-
-| Prime | Rank | Dimension | Gap | Gap % | Verdict |
-|-------|------|-----------|-----|-------|---------|
-| 103 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 137 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 239 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 307 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 409 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 443 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 613 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 647 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 919 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 953 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 1021 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 1123 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 1259 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 1327 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 1361 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 1429 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 1531 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 1667 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
-| 1871 | 1443 | 537 | 525 | 97.77% | ✅ PASS |
+**Per-Prime Verification (All 19 Primes PASS)**
 
 **Cryptographic Certification (CRT Modulus Strength):**
 - **CRT modulus M:** ∏₁₉ primes ≈ **10⁶⁰** (200-bit, product of 19 independent primes)
