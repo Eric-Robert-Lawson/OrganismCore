@@ -25,7 +25,7 @@ this is easy for typical C13 cyclotomic and is not computationally heavy, howeve
 -- ============================================================================
 -- Variety: X8: Sum z_i^8 + delta*Sum_{k=1}^{6} (Sum omega^{kj}z_j)^8 = 0
 -- where omega = e^{2*pi*i/7}, delta = 791/100000
--- Test across first 19 primes p = 1 (mod 19)
+-- Test across first 19 primes p = 1 (mod 7)
 -- ============================================================================
 
 primeList = {29, 43, 71, 113, 127, 197, 211, 239, 281, 337, 379, 421, 449, 463, 491, 547, 617, 631, 659};
