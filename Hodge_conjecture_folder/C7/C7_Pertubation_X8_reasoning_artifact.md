@@ -231,7 +231,7 @@ if invalidCount > 0 then (
     stdio << "[!] LIKELY SMOOTH (" << smoothCount << "/19 primes)" << endl;
     stdio << "Recommend investigation of inconclusive primes" << endl;
 ) else (
-    stdio << "[X] SMOOTHNESS UNCERTAIN (only " << smoothCount << "/7 smooth)" << endl;
+    stdio << "[X] SMOOTHNESS UNCERTAIN (only " << smoothCount << "/19 smooth)" << endl;
 );
 
 stdio << "============================================" << endl;
