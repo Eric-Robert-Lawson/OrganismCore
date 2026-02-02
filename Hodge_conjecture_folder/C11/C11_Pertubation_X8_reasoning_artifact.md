@@ -1485,3 +1485,327 @@ STEP 3 COMPLETE
 **Scientific Conclusion:** ✅✅✅ **Verification successful** - Independent Python/NumPy computation **perfectly confirms** Macaulay2 Step 2 results (rank=2215, dimension=844) for C₁₁ perturbed variety at p=23. **Zero discrepancies** across two fundamentally different algorithms (symbolic vs. numerical) establishes rank as **implementation-independent fact**. **CRITICAL FINDING:** Cross-variety comparison (ratio 1.194 vs. theoretical 1.200, deviation **-0.5%**) establishes C₁₁ as **strongest empirical validation** of inverse-Galois-group scaling law **dim H²'²_prim,inv ∝ 1/φ(n)** in entire five-variety study. **Pipeline validated** for multi-prime verification (Step 4) and downstream structural isolation analysis (Steps 6-12). C₁₁ joins C₁₃, C₁₇, C₁₉ as **algorithmically certified** member of five-variety survey, **anchoring scaling law** with unprecedented -0.5% precision.
 
 ---
+
+
+
+```python
+#!/usr/bin/env python3
+"""
+STEP 4: Multi-Prime Rank Verification (C11)
+Verify dimension/rank across 19 primes for perturbed C11 cyclotomic variety
+
+Variety: Sum z_i^8 + (791/100000)*Sum_{k=1}^{10} L_k^8 = 0
+where L_k = Sum_{j=0}^5 omega^{k*j} z_j, omega = e^{2*pi*i/11}
+"""
+
+import json
+import os
+from math import isqrt
+import numpy as np
+from scipy.sparse import csr_matrix
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+# First 19 primes p ≡ 1 (mod 11)
+PRIMES = [23, 67, 89, 199, 331, 353, 397, 419, 463, 617,
+          661, 683, 727, 859, 881, 947, 991, 1013, 1123]
+
+DATA_DIR = "."  # Directory containing saved_inv_p{p}_triplets.json files
+SUMMARY_FILE = "step4_multiprime_verification_summary_C11.json"
+
+CYCLOTOMIC_ORDER = 11
+GAL_GROUP = "Z/10Z"
+
+# ============================================================================
+# UTILITIES
+# ============================================================================
+
+def is_prime(n):
+    """Simple deterministic trial-division primality test suitable for n ~ few thousands."""
+    if n < 2:
+        return False
+    if n % 2 == 0:
+        return n == 2
+    r = isqrt(n)
+    for i in range(3, r + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+def rank_mod_p(matrix, p):
+    """
+    Compute rank of matrix over finite field F_p via Gaussian elimination (row-reduction).
+    matrix: numpy 2D array of integers (copied inside)
+    Returns: integer rank
+    """
+    M = matrix.copy().astype(np.int64) % p
+    nrows, ncols = M.shape
+
+    rank = 0
+    pivot_row = 0
+
+    for col in range(ncols):
+        if pivot_row >= nrows:
+            break
+
+        # Find pivot
+        pivot_found = False
+        for row in range(pivot_row, nrows):
+            if M[row, col] % p != 0:
+                if row != pivot_row:
+                    M[[pivot_row, row]] = M[[row, pivot_row]]
+                pivot_found = True
+                break
+
+        if not pivot_found:
+            continue
+
+        # Normalize pivot row
+        pivot_val = int(M[pivot_row, col] % p)
+        pivot_inv = pow(pivot_val, -1, p)
+        M[pivot_row] = (M[pivot_row] * pivot_inv) % p
+
+        # Eliminate other rows
+        for row in range(nrows):
+            if row != pivot_row:
+                factor = int(M[row, col] % p)
+                if factor != 0:
+                    M[row] = (M[row] - factor * M[pivot_row]) % p
+
+        rank += 1
+        pivot_row += 1
+
+    return rank
+
+# ============================================================================
+# PRIME VERIFICATION
+# ============================================================================
+
+def verify_prime(p, data_dir="."):
+    """
+    Verify rank/dimension for a single prime p using saved triplets file.
+    Returns a dict of results.
+    """
+    print("\n" + "="*70)
+    print(f"VERIFYING PRIME p = {p}")
+    print("="*70 + "\n")
+
+    # Basic prime/mod checks
+    if not is_prime(p):
+        print(f"WARNING: {p} is NOT prime. Skipping.")
+        return {"prime": p, "status": "NOT_PRIME", "match": False}
+
+    if (p % CYCLOTOMIC_ORDER) != 1:
+        print(f"WARNING: {p} mod {CYCLOTOMIC_ORDER} = {p % CYCLOTOMIC_ORDER} (expected 1). Skipping.")
+        return {"prime": p, "status": "WRONG_RESIDUE", "match": False}
+
+    filename = os.path.join(data_dir, f"saved_inv_p{p}_triplets.json")
+    if not os.path.exists(filename):
+        print(f"ERROR: file {filename} not found. Skipping.")
+        return {"prime": p, "status": "FILE_NOT_FOUND", "match": False}
+
+    with open(filename, "r") as f:
+        data = json.load(f)
+
+    # Extract metadata
+    prime = data.get("prime", p)
+    saved_rank = int(data.get("rank"))
+    saved_dim = int(data.get("h22_inv"))
+    count_inv = int(data.get("countInv"))
+    triplets = data.get("triplets", [])
+    variety = data.get("variety", f"PERTURBED_C{CYCLOTOMIC_ORDER}_CYCLOTOMIC")
+    delta = data.get("delta", "791/100000")
+    epsilon_mod_p = data.get("epsilon_mod_p", None)
+
+    print("Metadata:")
+    print(f"  Variety:              {variety}")
+    print(f"  Perturbation delta:   {delta}")
+    print(f"  Epsilon mod p:        {epsilon_mod_p}")
+    print(f"  Prime:                {prime}")
+    print(f"  Triplet count:        {len(triplets):,}")
+    print(f"  Invariant monomials:  {count_inv}")
+    print(f"  Saved rank:           {saved_rank}")
+    print(f"  Saved dimension:      {saved_dim}")
+    print()
+
+    # Build sparse matrix
+    rows = [int(t[0]) for t in triplets]
+    cols = [int(t[1]) for t in triplets]
+    vals = [int(t[2]) % prime for t in triplets]
+
+    max_col = max(cols) + 1 if cols else 0
+    M = csr_matrix((vals, (rows, cols)), shape=(count_inv, max_col), dtype=np.int64)
+
+    print("Matrix properties:")
+    print(f"  Shape:                {M.shape}")
+    print(f"  Nonzero entries:      {M.nnz:,}")
+    density = (M.nnz / (M.shape[0] * M.shape[1]) * 100) if (M.shape[0] * M.shape[1]) > 0 else 0.0
+    print(f"  Density:              {density:.6f}%")
+    print()
+
+    # Compute rank
+    print(f"Computing rank mod {prime} (this may take a moment)...")
+    M_dense = M.toarray()
+    computed_rank = rank_mod_p(M_dense, prime)
+    computed_dim = count_inv - computed_rank
+    gap = computed_dim - 12
+    gap_percent = 100.0 * gap / computed_dim if computed_dim > 0 else 0.0
+
+    print("\nResults:")
+    print(f"  Computed rank:        {computed_rank}")
+    print(f"  Computed dimension:   {computed_dim}")
+    print(f"  Hodge gap:            {gap} ({gap_percent:.2f}%)")
+    print()
+
+    rank_match = (computed_rank == saved_rank)
+    dim_match = (computed_dim == saved_dim)
+    match = rank_match and dim_match
+
+    print("Verification:")
+    print(f"  Rank match:           {'PASS' if rank_match else 'FAIL'}")
+    print(f"  Dimension match:      {'PASS' if dim_match else 'FAIL'}")
+    print(f"  Verdict:              {'PASS' if match else 'FAIL'}")
+
+    return {
+        "prime": p,
+        "variety": variety,
+        "delta": delta,
+        "epsilon_mod_p": epsilon_mod_p,
+        "matrix_shape": [int(M.shape[0]), int(M.shape[1])],
+        "nnz": int(M.nnz),
+        "countInv": count_inv,
+        "computed_rank": int(computed_rank),
+        "saved_rank": int(saved_rank),
+        "computed_dim": int(computed_dim),
+        "saved_dim": int(saved_dim),
+        "rank_match": rank_match,
+        "dim_match": dim_match,
+        "match": match,
+        "gap": int(gap),
+        "gap_percent": float(gap_percent),
+        "status": "PASS" if match else "FAIL"
+    }
+
+# ============================================================================
+# MAIN
+# ============================================================================
+
+def main():
+    print("="*70)
+    print(f"STEP 4: MULTI-PRIME RANK VERIFICATION (C{CYCLOTOMIC_ORDER})")
+    print("="*70)
+    print()
+    print(f"Perturbed C{CYCLOTOMIC_ORDER} cyclotomic variety:")
+    print(f"  V: Sum z_i^8 + (791/100000) * Sum_{{k=1}}^{CYCLOTOMIC_ORDER-1} L_k^8 = 0")
+    print("  where L_k = Sum_{j=0}^5 omega^{k*j} z_j, omega = e^{2*pi*i/11}")
+    print()
+    print(f"Verifying across {len(PRIMES)} provided primes: {PRIMES}")
+    print()
+
+    results = []
+    for i, p in enumerate(PRIMES, 1):
+        print(f"[Prime {i}/{len(PRIMES)}] ")
+        res = verify_prime(p, data_dir=DATA_DIR)
+        results.append(res)
+
+    # Summary
+    print("\n" + "="*70)
+    print(f"VERIFICATION SUMMARY (C{CYCLOTOMIC_ORDER})")
+    print("="*70 + "\n")
+
+    # Header
+    print(f"{'Prime':<8} {'Rank':<8} {'Dim':<10} {'Gap':<8} {'Gap %':<8} {'Status':<8}")
+    print("-"*70)
+
+    rank_values = []
+    dim_values = []
+    passed_count = 0
+
+    for r in results:
+        status = r.get("status", "SKIP")
+        if status in ("FILE_NOT_FOUND", "NOT_PRIME", "WRONG_RESIDUE"):
+            print(f"{r['prime']:<8} {'N/A':<8} {'N/A':<10} {'N/A':<8} {'N/A':<8} {status:<8}")
+            continue
+
+        print(f"{r['prime']:<8} {r['computed_rank']:<8} {r['computed_dim']:<10} {r['gap']:<8} "
+              f"{r['gap_percent']:<8.2f} {('PASS' if r['match'] else 'FAIL'):<8}")
+
+        if r["match"]:
+            rank_values.append(r["computed_rank"])
+            dim_values.append(r["computed_dim"])
+            passed_count += 1
+
+    print("\n" + "="*70)
+
+    # Statistical analysis
+    if rank_values:
+        rank_unique = sorted(set(rank_values))
+        dim_unique = sorted(set(dim_values))
+        print("\nStatistical Analysis:")
+        print(f"  Primes tested:        {len(PRIMES)}")
+        print(f"  Primes verified:      {passed_count}")
+        print(f"  Unique rank values:   {rank_unique}")
+        print(f"  Unique dimensions:    {dim_unique}")
+        print(f"  Perfect agreement:    {'YES' if len(rank_unique) == 1 and len(dim_unique) == 1 else 'NO'}")
+        if len(rank_unique) == 1 and len(dim_unique) == 1:
+            val_dim = dim_values[0]
+            print()
+            print(f"Consensus dimension H^{{2,2}}_inv: {val_dim}")
+            print(f"Hodge gap (val_dim - 12): {val_dim - 12}  Gap %: {100.0 * (val_dim - 12) / val_dim:.2f}%")
+    else:
+        print("\nNo successful prime verifications were recorded.")
+
+    # Certification decision
+    all_match = all(r.get("match", False) for r in results if r.get("status") not in ("FILE_NOT_FOUND", "NOT_PRIME", "WRONG_RESIDUE"))
+    if all_match and passed_count > 0:
+        certification = "PASS"
+    elif passed_count >= max(15, int(len(PRIMES)*0.75)):
+        certification = "MAJORITY"
+    else:
+        certification = "INCOMPLETE"
+
+    # Save summary file
+    summary = {
+        "step": 4,
+        "description": f"Multi-prime rank verification for C{CYCLOTOMIC_ORDER}",
+        "variety": f"PERTURBED_C{CYCLOTOMIC_ORDER}_CYCLOTOMIC",
+        "delta": "791/100000",
+        "cyclotomic_order": CYCLOTOMIC_ORDER,
+        "galois_group": GAL_GROUP,
+        "primes_provided": PRIMES,
+        "primes_verified": passed_count,
+        "certification": certification,
+        "individual_results": results
+    }
+
+    with open(SUMMARY_FILE, "w") as f:
+        json.dump(summary, f, indent=2)
+
+    print(f"\nSummary saved to {SUMMARY_FILE}")
+    print("\nSTEP 4 COMPLETE")
+    print("="*70)
+
+if __name__ == "__main__":
+    main()
+```
+
+to run the script:
+
+```bash
+python step4_11.py
+```
+
+---
+
+result:
+
+```verbatim
+pending
+```
+
+
+
+---
+
