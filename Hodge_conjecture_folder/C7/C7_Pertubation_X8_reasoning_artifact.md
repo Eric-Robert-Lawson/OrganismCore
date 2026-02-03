@@ -749,6 +749,47 @@ Prime p = 29 complete.
 
 .
 
+------------------------------------------------------------
+PRIME p = 659
+------------------------------------------------------------
+Primitive 7th root: omega = 307
+Building 7 linear forms L_0, ..., L_6...
+Building Fermat term (Sum z_i^8)...
+Building Cyclotomic term (Sum_{k=1}^{6} L_k^8)...
+Perturbation parameter: epsilon = -142 (mod 659)
+Perturbed variety assembled (degree 8)
+Computing Jacobian dF/dz_i...
+Generating degree-18 monomials...
+Filtering to C7-invariant (weight = 0 mod 7)...
+C7-invariant monomials: 4807
+Building index map...
+Filtering Jacobian generators (character matching)...
+Filtered Jacobian generators: 3744
+Assembling coefficient matrix...
+Computing rank (this may take some time)...
+ -- used 3.24734s (cpu); 3.24721s (thread); 0s (gc)
+
+============================================================
+RESULTS FOR PRIME p = 659
+============================================================
+C7-invariant monomials:    4807
+Jacobian cokernel rank:     3474
+dim H^{2,2}_inv:            1333
+Hodge gap (h22_inv - 12):   1321
+Gap percentage:             99.0998%
+============================================================
+
+Exporting monomial basis to saved_inv_p659_monomials18.json...
+Exporting matrix triplets to saved_inv_p659_triplets.json...
+Cleaning up memory...
+Prime p = 659 complete.
+
+============================================================
+STEP 2 COMPLETE - ALL PRIMES PROCESSED
+============================================================
+
+Verification: Check for perfect agreement across the 19 primes
+Output files: saved_inv_p{...}_{monomials18,triplets}.json
 
 ```
 
