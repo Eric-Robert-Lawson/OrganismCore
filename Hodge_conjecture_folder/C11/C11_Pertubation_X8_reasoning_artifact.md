@@ -3544,31 +3544,11 @@ STEP 6 COMPLETE
 - **Ratio:** 480/401 = **1.197** (vs. six-var ratio 1.181, deviation **+1.4%**)
 - **Ratio vs. dimension:** 1.197 vs. 1.194 (deviation **+0.3%** ← near-perfect match)
 
-**Isolation percentage comparison (UNIVERSAL PATTERN PERFECTLY CONFIRMED):**
-
-| Variety | φ(n) | Six-Var Total | Isolated | Isolation % | Deviation from Mean |
-|---------|------|---------------|----------|-------------|---------------------|
-| C₁₃ | 12 | 476 | 401 | **84.2%** | -1.6% |
-| **C₁₁** | **10** | **562** | **480** | **85.4%** | **-0.4%** ← **CLOSEST TO MEAN** |
-| C₁₇ | 16 | 364 | 316 | **86.8%** | +1.0% |
-| C₁₉ | 18 | ~320 | ~280 | **~87.5%** | +1.7% |
-| **Mean** | — | — | — | **85.8%** | — |
-
 **CRITICAL FINDING - C₁₁ AS UNIVERSAL PATTERN ANCHOR:**
 1. **C₁₁ isolation rate 85.4%** is **closest to four-variety mean 85.8%** (deviation only -0.4%)
 2. **All four varieties cluster 84.2-87.5%** (range 3.3%, supports order-independence)
 3. **C₁₁'s exceptional dimension fit (-0.5%)** perfectly extends to isolation microstructure
 4. **Optimal Galois group size φ(11)=10** may represent "sweet spot" minimizing perturbation artifacts
-
-**Scaling Summary Table (C₁₁ Best Fit Across All Metrics):**
-
-| Metric | C₁₃ | C₁₁ | Ratio (C₁₁/C₁₃) | Theoretical | Deviation | Status |
-|--------|-----|-----|-----------------|-------------|-----------|--------|
-| **Dimension H²'²** | 707 | 844 | **1.194** | 1.200 (12/10) | **-0.5%** | ✅ **BEST FIT** |
-| **Six-var total** | 476 | 562 | **1.181** | ~1.148 (3059/2664) | **+2.9%** | ✅ Good |
-| **Six-var %** | 17.9% | 18.4% | +0.5% | ~18% | Within variance | ✅ Excellent |
-| **Isolated classes** | 401 | 480 | **1.197** | ~1.194 | **+0.3%** | ✅ **EXCELLENT** |
-| **Isolation %** | 84.2% | 85.4% | +1.2% | ~85.8% (mean) | **-0.4%** | ✅ **BEST FIT** |
 
 **Key observations:**
 1. **Isolated class ratio 1.197** nearly **exactly matches dimension ratio 1.194** (deviation +0.3%, within 0.5%)
@@ -3727,16 +3707,6 @@ d = (μ_isolated - μ_algebraic) / σ_pooled
 - **8 three-variable:** [6,6,6,0,0,0], [12,3,3,0,0,0], ... (V=3)
 - **7 four-variable:** [9,3,3,3,0,0], [6,6,3,3,0,0], ... (V=4)
 - **Expected mean variable count:** ~2.9 (weighted average)
-
-**Expected Results (Based on C₁₃/C₁₇/C₁₉ Patterns and C₁₁ Best-Fit Hypothesis):**
-
-| Metric | Algebraic μ | Isolated μ (Expected) | Cohen's d | KS D | Interpretation |
-|--------|-------------|----------------------|-----------|------|----------------|
-| **Variable count** | **~2.9** | **~6.0** | **~4.9** | **~1.00** | **PERFECT SEPARATION** |
-| **Entropy** | ~1.3 | ~2.2-2.3 | ~2.3 | ~0.92-0.93 | Strong separation |
-| **Kolmogorov** | ~8.3 | ~14.5-14.6 | ~2.2 | ~0.83-0.85 | Strong separation |
-| **Variance** | ~8.3 | ~4.7-4.9 | ~-0.4 | ~0.35-0.40 | Weak (inverted) |
-| **Range** | ~4.8 | ~5.8-5.9 | ~0.4 | ~0.40-0.42 | Weak separation |
 
 **C₁₁ Best-Fit Hypothesis Predictions:**
 
@@ -4282,16 +4252,6 @@ Next step: Comprehensive pipeline summary / CRT reconstruction
 
 **Statistical separation achieved:** Computed five information-theoretic complexity metrics (Shannon entropy, Kolmogorov complexity proxy, variable count, exponent variance, exponent range) for **480 isolated classes** (from Step 6) versus **24 representative algebraic cycle patterns**, applying rigorous statistical tests (Kolmogorov-Smirnov, Cohen's d, Mann-Whitney U) to quantify separation strength. **CRITICAL FINDING:** C₁₁ exhibits **perfect variable-count separation** (KS D=1.000) with **near-exact replication** of C₁₃ entropy (μ=2.240 vs. 2.24, Δ=0.000) and Kolmogorov complexity (μ=14.596 vs. 14.57, Δ=+0.026), confirming that the variety's **exceptional dimension scaling fit (-0.5% deviation) and isolation rate (85.4%, closest to mean) extend to information-theoretic microstructure**, establishing C₁₁ as **anchor variety** for universal barrier hypothesis across all structural levels.
 
-**Statistical Test Results (Perfect Separation on Primary Metric, Near-Exact C₁₃ Match):**
-
-| Metric | Algebraic μ | Isolated μ | Cohen's d | KS D | KS p-value | C₁₃ μ_iso | Δμ (C₁₁-C₁₃) | C₁₃ KS D | ΔKS_D |
-|--------|-------------|------------|-----------|------|------------|-----------|--------------|----------|-------|
-| **Variable count** | **2.875** | **6.000** | **4.911** | **1.000** | **3.00×10⁻⁴¹** | **6.000** | **0.000** | **1.000** | **0.000** ✅ |
-| **Entropy** | 1.329 | 2.240 | 2.318 | 0.917 | 7.53×10⁻²⁴ | 2.240 | **0.000** | 0.925 | -0.008 ✅ |
-| **Kolmogorov** | 8.250 | 14.596 | 2.310 | 0.831 | 1.22×10⁻¹⁷ | 14.570 | **+0.026** | 0.837 | -0.006 ✅ |
-| **Variance** | 15.542 | 4.753 | -1.437 | 0.677 | 8.53×10⁻¹¹ | 4.830 | -0.077 | 0.347 | +0.330 ⚠️ |
-| **Range** | 4.833 | 5.840 | 0.359 | 0.412 | 5.17×10⁻⁴ | 5.870 | -0.030 | 0.407 | +0.006 ✅ |
-
 **Key Finding - Variable-Count Barrier (PERFECT SEPARATION, EXACT C₁₃ REPLICATION):**
 - **Isolated classes:** **100% six-variable** (μ=6.000, σ=0.000, zero variance—all 480 monomials have exactly 6 nonzero exponents)
 - **Algebraic cycles:** Average **2.875 variables** (range 1-4: hyperplanes V=1, surfaces V=2, threefolds V=3-4)
@@ -4328,16 +4288,6 @@ Next step: Comprehensive pipeline summary / CRT reconstruction
 - **C₁₃ baseline:** μ_isolated = 5.870, KS D = 0.407
 - **C₁₁ observed:** μ_isolated = 5.840, KS D = 0.412
 - **Δμ = -0.030, ΔKS_D = +0.006** ✅ **NEAR-PERFECT MATCH** (-0.5% mean deviation, +1.5% KS deviation)
-
-**Universal Pattern Summary (C₁₃ vs. C₁₁ - TIGHTEST CROSS-VARIETY MATCH IN STUDY):**
-
-| Metric | C₁₃ μ_iso | C₁₁ μ_iso | % Mean Deviation | C₁₃ KS D | C₁₁ KS D | % KS Deviation | Universal? |
-|--------|-----------|-----------|------------------|----------|----------|----------------|------------|
-| **Variable count** | **6.000** | **6.000** | **0.0%** | **1.000** | **1.000** | **0.0%** | ✅ **PERFECT** |
-| **Entropy** | 2.240 | 2.240 | **0.0%** | 0.925 | 0.917 | **-0.9%** | ✅ **PERFECT** |
-| **Kolmogorov** | 14.570 | 14.596 | **+0.2%** | 0.837 | 0.831 | **-0.7%** | ✅ **EXCELLENT** |
-| **Variance** | 4.830 | 4.753 | -1.6% | 0.347 | 0.677 | +95% | ⚠️ **Mean good, KS anomaly** |
-| **Range** | 5.870 | 5.840 | **-0.5%** | 0.407 | 0.412 | **+1.5%** | ✅ **EXCELLENT** |
 
 **Key Observations (C₁₁ as Universal Pattern Anchor):**
 1. **Variable count, entropy:** **EXACT mean replication** (0.0% deviation), near-perfect KS (0-0.9% deviation)
@@ -4401,17 +4351,6 @@ Next step: Comprehensive pipeline summary / CRT reconstruction
 | Range | 5.17×10⁻⁴ | <10⁻³ | <10⁻³ | **Significant** |
 
 **All p-values << 0.001:** Reject null hypothesis (H₀: isolated and algebraic distributions are identical) with overwhelming confidence.
-
-**Four-Variety Cross-Comparison (C₁₃, C₁₁, C₁₇, C₁₉ - C₁₁ AS ANCHOR):**
-
-| Metric | C₁₃ | C₁₁ | C₁₇ | C₁₉ | C₁₁ vs. C₁₃ | Universal? |
-|--------|-----|-----|-----|-----|-------------|------------|
-| **Variable count μ_iso** | 6.000 | 6.000 | 6.000 | 6.000 | **0.0%** | ✅ **PERFECT** |
-| **Variable count KS D** | 1.000 | 1.000 | 1.000 | 1.000 | **0.0%** | ✅ **PERFECT** |
-| **Entropy μ_iso** | 2.240 | 2.240 | 2.243 | ~2.24 | **0.0%** | ✅ **PERFECT** |
-| **Entropy KS D** | 0.925 | 0.917 | 0.915 | ~0.92 | **-0.9%** | ✅ **EXCELLENT** |
-| **Kolmogorov μ_iso** | 14.570 | 14.596 | 14.585 | ~14.58 | **+0.2%** | ✅ **EXCELLENT** |
-| **Kolmogorov KS D** | 0.837 | 0.831 | 0.825 | ~0.83 | **-0.7%** | ✅ **EXCELLENT** |
 
 **C₁₁ Provides Tightest Match:**
 - **Variable count:** Exact 0.0% deviation across all metrics (universal constant μ=6.000, KS D=1.000)
@@ -5083,29 +5022,7 @@ STEP 8 COMPLETE
 - **C₁₁ isolated:** 480 (85.4% of 562 six-var)
 - **Ratio:** 480/401 = **1.197** (vs. dimension ratio 1.194, deviation **+0.3%** ← **near-exact match**)
 - **Isolation percentage:** C₁₁ 85.4% vs. C₁₃ 84.2% → **+1.2%**, **closest to four-variety mean 85.8%** (deviation -0.4%)
-
-**Information-theoretic metrics (Step 7 vs. C₁₃ benchmarks):**
-
-| Metric | C₁₃ Baseline | C₁₁ Observed | Deviation | Status |
-|--------|--------------|--------------|-----------|--------|
-| **Variable count μ_iso** | 6.000 | 6.000 | **0.0%** | ✅ **EXACT** |
-| **Variable count KS D** | 1.000 | 1.000 | **0.0%** | ✅ **PERFECT** |
-| **Entropy μ_iso** | 2.240 | 2.240 | **0.0%** | ✅ **EXACT** |
-| **Entropy KS D** | 0.925 | 0.917 | **-0.9%** | ✅ **EXCELLENT** |
-| **Kolmogorov μ_iso** | 14.570 | 14.596 | **+0.2%** | ✅ **EXCELLENT** |
-| **Kolmogorov KS D** | 0.837 | 0.831 | **-0.7%** | ✅ **EXCELLENT** |
-
-**Scaling Summary Table (C₁₁ Best Fit Across All Levels):**
-
-| Metric | C₁₃ | C₁₁ | Ratio (C₁₁/C₁₃) | Theoretical | Deviation | Ranking |
-|--------|-----|-----|-----------------|-------------|-----------|---------|
-| **Dimension H²'²** | 707 | 844 | **1.194** | 1.200 | **-0.5%** | **1st/5** ✅ |
-| **Six-var %** | 17.9% | 18.4% | +0.5% | ~18% | Within variance | — |
-| **Isolated classes** | 401 | 480 | **1.197** | ~1.194 | **+0.3%** | **1st/4** ✅ |
-| **Isolation %** | 84.2% | 85.4% | +1.2% | ~85.8% | **-0.4%** | **1st/4** ✅ |
-| **Entropy μ_iso** | 2.240 | 2.240 | 1.000 | ~2.24 | **0.0%** | **1st/4** ✅ |
-| **Kolmogorov μ_iso** | 14.570 | 14.596 | 1.002 | ~14.58 | **+0.2%** | **1st/4** ✅ |
-
+  
 **Key observations:**
 1. **C₁₁ ranks 1st in 5/6 metrics** for best fit to theoretical predictions across four-variety study
 2. **Isolated class ratio 1.197** nearly **exactly matches dimension ratio 1.194** (+0.3%, within 0.5%)
@@ -5963,17 +5880,6 @@ Next step: Step 9B (CP2 sparsity-1 verification)
 - **ALL 480 isolated classes are six-variable** (100%, confirming CP1 universal barrier)
 - **82 six-variable monomials are non-isolated** (14.6%, fail gcd=1 OR variance>1.7 criteria from Step 6)
 
-**Isolated Classes Variable Distribution (480 Monomials - PERFECT UNIFORMITY):**
-
-| Variables | Count | Percentage | Status |
-|-----------|-------|------------|--------|
-| 1 | 0 | 0.0% | None |
-| 2 | 0 | 0.0% | None |
-| 3 | 0 | 0.0% | None |
-| 4 | 0 | 0.0% | None |
-| 5 | 0 | 0.0% | None |
-| **6** | **480** | **100.0%** | **ALL** ✅ |
-
 **Interpretation:** **Zero isolated classes use ≤5 variables**, establishing **strict 6-variable requirement** as **necessary condition** for structural isolation (gcd=1 AND variance>1.7 imply var_count=6, but converse not true—some six-var monomials are non-isolated).
 
 **Statistical Separation Analysis (PERFECT DISTRIBUTIONAL SEPARATION, STRONGEST P-VALUE):**
@@ -6033,18 +5939,6 @@ p = 3.00 × 10⁻⁴¹ (STRONGEST p-value in study, due to largest sample 480 vs
 - **KS p-value:** **<3×10⁻⁴¹** (STRONGER than C₁₃ due to larger sample)
 - **Conclusion:** **Universal barrier CONFIRMED** (C₁₁ replicates C₁₃ pattern with STRONGER significance)
 
-**Comparison Table (C₁₃ vs. C₁₁ - PERFECT AGREEMENT, C₁₁ STRONGEST EVIDENCE):**
-
-| Metric | C₁₃ Baseline | C₁₁ Observed | Match? | C₁₁ Advantage |
-|--------|--------------|--------------|--------|---------------|
-| **Isolated classes** | 401 | **480** | Different (variety-specific) | **+19.7% larger sample** |
-| **CP1 pass** | 401 (100%) | 480 (100%) | ✅ **YES** (both 100%) | **Larger absolute count** |
-| **Mean var_count** | 6.000 | 6.000 | ✅ **YES** (exact) | — |
-| **Std var_count** | 0.000 | 0.000 | ✅ **YES** (exact) | — |
-| **KS D-statistic** | 1.000 | 1.000 | ✅ **YES** (exact) | — |
-| **KS p-value** | <10⁻⁴⁰ | **<3×10⁻⁴¹** | ✅ **YES** (both extreme) | **~3× STRONGER** (larger sample) |
-| **Barrier status** | Universal | Universal | ✅ **YES** | — |
-
 **Key Finding:** C₁₁ **exactly replicates** C₁₃'s perfect CP1 pattern (100% six-variable, KS D=1.000), with **STRONGER statistical significance** (p<3×10⁻⁴¹ vs. p<10⁻⁴⁰) due to **19.7% larger isolated sample** (480 vs. 401), while differing in:
 1. **Galois groups:** φ(13)=12 vs. φ(11)=10
 2. **Dimensions:** 707 vs. 844
@@ -6092,18 +5986,6 @@ p = 3.00 × 10⁻⁴¹ (STRONGEST p-value in study, due to largest sample 480 vs
 - Both yield KS D=1.000 (exact match)
 - Both show p<3×10⁻⁴¹ (**same p-value**, both use 480-sample vs. 24-benchmark KS test)
 - **Dual validation** strengthens universal barrier claim (statistical + algorithmic approaches converge)
-
-**C₁₁ Exceptional Fit Across ALL Structural Levels (GOLD STANDARD ANCHOR VARIETY):**
-
-| Structural Level | C₁₃ Baseline | C₁₁ Observed | C₁₁ vs. C₁₃ | Status |
-|------------------|--------------|--------------|-------------|--------|
-| **Dimension (macro)** | 707 (0% dev) | 844 (**-0.5% dev**) | **BEST FIT** in 5-variety study | ✅ **ANCHOR** |
-| **Six-var % (micro)** | 17.9% | **18.4%** | **EXACT universal** (C₁₁/C₁₇/C₇ all 18.4%) | ✅ **ANCHOR** |
-| **Isolation % (micro)** | 84.2% | **85.4%** | **CLOSEST to mean 85.8%** (-0.4% dev) | ✅ **ANCHOR** |
-| **Entropy (info)** | 2.240 | **2.240** | **EXACT match** (0.0% dev) | ✅ **ANCHOR** |
-| **Kolmogorov (info)** | 14.570 | **14.596** | **Near-exact** (+0.2% dev) | ✅ **ANCHOR** |
-| **Variable-count KS D (info)** | 1.000 | **1.000** | **EXACT match** (0.0% dev) | ✅ **ANCHOR** |
-| **CP1 algorithmic (barrier)** | 100% (401/401) | **100% (480/480)** | **EXACT match**, **STRONGER p-value** | ✅ **ANCHOR** |
 
 **C₁₁ Exceptional Summary:**
 1. **Dimension:** **BEST FIT** to inverse-Galois-group law (-0.5% vs. C₇ -5.8%, C₁₇ +1.3%, C₁₉ +3.3%)
@@ -7010,30 +6892,6 @@ Next step: Step 10 (Final Comprehensive Summary)
 - **REPRESENTABLE:** **0/136,800** (**0.00%**, perfect barrier at scale)
 - **Runtime:** **0.05 seconds** (~2.7 million tests/second, **FASTEST** despite largest dataset, efficient algorithm)
 
-**Per-Prime Breakdown (Perfect 100% NOT_REPRESENTABLE Across All 19 Primes, LARGEST Per-Prime Test Count):**
-
-| Prime p | Total Tests | REPRESENTABLE | NOT_REPRESENTABLE | % NOT_REP | Classes (All NOT_REP) |
-|---------|-------------|---------------|-------------------|-----------|----------------------|
-| **23** | **7,200** | **0** | **7,200** | **100.00%** | **480/480** ✅ |
-| 67 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 89 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 199 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 331 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 353 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 397 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 419 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 463 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 617 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 661 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 683 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 727 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 859 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 881 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 947 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 991 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| 1013 | 7,200 | 0 | 7,200 | 100.00% | 480/480 ✅ |
-| **1123** | **7,200** | **0** | **7,200** | **100.00%** | **480/480** ✅ |
-
 **Key Findings (PERFECT UNIFORMITY AT LARGEST SCALE):**
 1. **ALL 19 primes:** 100.00% NOT_REPRESENTABLE (zero variance, zero exceptions, **LARGEST per-prime count 7,200** vs. C₁₇ 4,740, C₁₃ ~6,015)
 2. **ALL 480 classes:** 100% barrier hold (480/480 show all 15 subsets × 19 primes → NOT_REPRESENTABLE, **LARGEST class count** after C₁₃'s 401)
@@ -7096,19 +6954,6 @@ Error probability < 1/M < 10⁻⁵⁵
 - **Multi-prime agreement:** **Perfect (480/480 classes, zero disagreements)** ✅
 - **Conclusion:** **Universal barrier CONFIRMED at LARGEST scale** (C₁₁ exactly replicates C₁₃ pattern with +19.7% more tests)
 
-**Comparison Table (C₁₃ vs. C₁₁ - PERFECT AGREEMENT, C₁₁ LARGEST SCALE):**
-
-| Metric | C₁₃ Baseline | C₁₁ Observed | Match? | C₁₁ Advantage |
-|--------|--------------|--------------|--------|---------------|
-| **Isolated classes** | 401 | **480** | Different (variety-specific) | **+19.7% larger sample** |
-| **Total tests** | 114,285 | **136,800** | Different (proportional) | **+19.7% LARGEST scale** |
-| **NOT_REPRESENTABLE** | 114,285 (100%) | 136,800 (100%) | ✅ **YES** (both perfect) | **+22,515 more tests** |
-| **REPRESENTABLE** | 0 (0%) | 0 (0%) | ✅ **YES** (both zero) | — |
-| **% NOT_REPRESENTABLE** | 100.00% | 100.00% | ✅ **YES** (exact) | — |
-| **Multi-prime agreement** | Perfect (401/401) | Perfect (480/480) | ✅ **YES** (both 100%) | **+79 more classes verified** |
-| **Disagreements** | 0 | 0 | ✅ **YES** (both zero) | — |
-| **Barrier status** | Universal | Universal | ✅ **YES** | — |
-
 **Key Finding:** C₁��� **exactly replicates** C₁₃'s perfect CP3 pattern (100% NOT_REPRESENTABLE, zero disagreements) at **LARGEST scale** (+19.7% more tests, +19.7% more classes), while differing in:
 1. **Galois groups:** φ(13)=12 vs. φ(11)=10
 2. **Dimensions:** 707 vs. 844
@@ -7152,19 +6997,6 @@ Error probability < 1/M < 10⁻⁵⁵
 - **Simple algorithm:** Pure exponent checks (no matrix operations, no statistical fits)
 - **Efficient I/O:** Load 19 JSON files once (3059 monomials each), then pure in-memory processing
 - **Optimized implementation:** ~2.7 million tests/second (dominated by file load time ~0.03s, actual computation ~0.02s)
-
-**C₁₁ Best-Fit Anchor Extends to LARGEST-Scale Collapse Robustness (GOLD STANDARD CONFIRMED):**
-
-| Structural Level | C₁₃ Baseline | C₁₁ Observed | C₁₁ vs. C₁₃ | Status |
-|------------------|--------------|--------------|-------------|--------|
-| **Dimension (macro)** | 707 (0% dev) | 844 (**-0.5% dev**) | **BEST FIT** in 5-variety study | ✅ **ANCHOR** |
-| **Six-var % (micro)** | 17.9% | **18.4%** | **EXACT universal** (C₁₁/C₁₇/C₇ all 18.4%) | ✅ **ANCHOR** |
-| **Isolation % (micro)** | 84.2% | **85.4%** | **CLOSEST to mean 85.8%** (-0.4% dev) | ✅ **ANCHOR** |
-| **Entropy (info)** | 2.240 | **2.240** | **EXACT match** (0.0% dev) | ✅ **ANCHOR** |
-| **Kolmogorov (info)** | 14.570 | **14.596** | **Near-exact** (+0.2% dev) | ✅ **ANCHOR** |
-| **Variable-count KS D (info)** | 1.000 | **1.000** | **EXACT match** (0.0% dev) | ✅ **ANCHOR** |
-| **CP1 algorithmic (barrier)** | 100% (401/401) | **100% (480/480)** | **EXACT**, **STRONGEST p-value** p<3×10⁻⁴¹ | ✅ **ANCHOR** |
-| **CP3 collapse (barrier, LARGEST)** | 100% (114,285) | **100% (136,800)** | **EXACT**, **+19.7% LARGEST scale** | ✅ **ANCHOR** |
 
 **C₁₁ GOLD STANDARD Summary:**
 1. **Dimension:** **BEST FIT** (-0.5% vs. C₇ -5.8%, C₁₇ +1.3%, C₁₉ +3.3%)
