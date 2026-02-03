@@ -7846,6 +7846,166 @@ Certificate written to step10f_verification_certificate_C17.json
 
 This step tests whether the 316 structurally isolated Hodge classes from Step 6 can be represented as ℚ-linear combinations of algebraic cycles using only **four variables** from the ambient six-dimensional coordinate space. For each isolated class, we compute its reduction modulo the Jacobian ideal and test whether the remainder can be expressed using any of the 15 possible four-variable subsets `{z_i, z_j, z_k, z_l}`. A `NOT_REPRESENTABLE` result indicates the class **requires all six variables** for algebraic expression, confirming a geometric obstruction. This test is executed across **19 primes** to achieve cryptographic certainty via multi-prime consensus. Perfect 100% `NOT_REPRESENTABLE` agreement would validate the **universal variable-count barrier** discovered in C₁₃ and C₁₉, demonstrating that the 86.8% isolation rate observed in C₁₇ exhibits identical coordinate transparency properties as the universal 85-87% pattern.
 
+script 0:
+
+```python
+#!/usr/bin/env python3
+"""
+Extract C17 candidate structures from monomial file using Step 6 indices.
+
+Adapted for the PERTURBED C17 X^8 case.
+
+Defaults:
+  - monomial file: saved_inv_p103_monomials18.json
+  - step6 file:    step6_structural_isolation_C17.json
+
+Usage:
+  python3 extract_c17_candidates.py \
+      --monomials saved_inv_p103_monomials18.json \
+      --step6 step6_structural_isolation_C17.json \
+      --out step11_candidateList_C17.m2
+
+The script prints an M2 candidateList block to stdout by default, or writes
+to --out if specified.
+"""
+
+import json
+import sys
+import os
+import argparse
+
+parser = argparse.ArgumentParser(description="Extract C17 candidate structures from monomials using Step 6 indices")
+parser.add_argument('--monomials', '-m', default="saved_inv_p103_monomials18.json",
+                    help="JSON file with full monomial list (list of exponent lists)")
+parser.add_argument('--step6', '-s', default="step6_structural_isolation_C17.json",
+                    help="Step 6 JSON file with 'isolated_indices' (C17)")
+parser.add_argument('--out', '-o', default=None,
+                    help="Optional output filename for M2 candidateList (default: stdout)")
+parser.add_argument('--one-based', action='store_true',
+                    help="Interpret isolated_indices in step6 file as 1-based indices (convert to 0-based)")
+args = parser.parse_args()
+
+MONOMIAL_FILE = args.monomials
+STEP6_FILE = args.step6
+
+# Check files exist
+if not os.path.exists(MONOMIAL_FILE):
+    print(f"ERROR: {MONOMIAL_FILE} not found", file=sys.stderr)
+    print("This file should have been created in Step 2 (monomial enumeration)", file=sys.stderr)
+    sys.exit(1)
+
+if not os.path.exists(STEP6_FILE):
+    print(f"ERROR: {STEP6_FILE} not found", file=sys.stderr)
+    sys.exit(1)
+
+# Load monomials
+print("Loading monomials...", file=sys.stderr)
+with open(MONOMIAL_FILE, 'r') as f:
+    monomials = json.load(f)
+
+if not isinstance(monomials, list):
+    print(f"ERROR: Expected monomials JSON to be a list, got {type(monomials)}", file=sys.stderr)
+    sys.exit(1)
+
+print(f"Loaded {len(monomials)} total monomials", file=sys.stderr)
+
+# Load step6 isolation data
+print("Loading Step 6 isolation data...", file=sys.stderr)
+with open(STEP6_FILE, 'r') as f:
+    step6_data = json.load(f)
+
+if 'isolated_indices' not in step6_data:
+    print("ERROR: step6 JSON does not contain 'isolated_indices' key", file=sys.stderr)
+    sys.exit(1)
+
+isolated_indices = step6_data['isolated_indices']
+print(f"Found {len(isolated_indices)} isolated indices", file=sys.stderr)
+
+# Extract structures
+structures = []
+for idx in isolated_indices:
+    try:
+        idx_int = int(idx)
+    except Exception:
+        print(f"WARNING: Skipping non-integer index: {idx}", file=sys.stderr)
+        continue
+
+    if args.one_based:
+        idx_int -= 1
+
+    if idx_int < 0 or idx_int >= len(monomials):
+        print(f"WARNING: Index {idx_int} out of range (0..{len(monomials)-1}) - original index {idx}", file=sys.stderr)
+        continue
+
+    structure = monomials[idx_int]
+
+    # Monomials should be lists/tuples of exponents
+    if not isinstance(structure, (list, tuple)):
+        print(f"WARNING: Index {idx_int} monomial is not a list/tuple (type={type(structure)})", file=sys.stderr)
+        continue
+
+    if len(structure) < 6:
+        print(f"WARNING: Index {idx_int} has only {len(structure)} exponents (expected >=6)", file=sys.stderr)
+        continue
+
+    # Take first 6 exponents and coerce to ints
+    try:
+        exponents = [int(structure[i]) for i in range(6)]
+    except Exception as e:
+        print(f"WARNING: Failed to coerce exponents at index {idx_int}: {e}", file=sys.stderr)
+        continue
+
+    structures.append({
+        'class_id': f'class{len(structures)}',
+        'index': idx_int,
+        'structure': exponents
+    })
+
+print(f"Extracted {len(structures)} structures", file=sys.stderr)
+
+if len(structures) == 0:
+    print("\nERROR: No structures extracted!", file=sys.stderr)
+    print("Debugging info:", file=sys.stderr)
+    if len(monomials) > 0:
+        print(f" First monomial (0): {monomials[0]}", file=sys.stderr)
+        print(f" Type: {type(monomials[0])}", file=sys.stderr)
+    sys.exit(1)
+
+# Verification: compare first extracted structure to expected Step 6 sample (if present)
+# In your earlier C17 candidateList the first representative was [12,1,2,1,1,1]
+expected_sample = [12,1,2,1,1,1]
+first_struct = structures[0]['structure']
+print(f"\nFirst structure verification:", file=sys.stderr)
+print(f"  Index extracted: {structures[0]['index']}", file=sys.stderr)
+print(f"  Structure: {first_struct}", file=sys.stderr)
+print(f"  Expected (approx): {expected_sample}   (if your Step6 sample matches, good)", file=sys.stderr)
+
+# Prepare M2 output
+m2_lines = []
+m2_lines.append("-- CANDIDATE LIST - C17 X8 Perturbed (generated from Step 6 indices)")
+m2_lines.append("")
+m2_lines.append("candidateList = {")
+
+for i, cls in enumerate(structures):
+    struct_str = "{" + ",".join(map(str, cls['structure'])) + "}"
+    comma = "," if i < len(structures) - 1 else ""
+    m2_lines.append(f'  {{"{cls["class_id"]}", {struct_str}}}{comma}')
+
+m2_lines.append("};")
+m2_lines.append("")
+m2_lines.append(f"-- Total: {len(structures)} classes")
+
+output_text = "\n".join(m2_lines)
+
+# Write or print
+if args.out:
+    with open(args.out, 'w') as f:
+        f.write(output_text + "\n")
+    print(f"Wrote M2 candidateList with {len(structures)} classes to {args.out}", file=sys.stderr)
+else:
+    print(output_text)
+```
+
 script 1:
 
 ```
@@ -7888,305 +8048,305 @@ candidateList = {
   {"class14", {7,2,3,1,2,3}},
   {"class15", {7,2,2,3,1,3}},
   {"class16", {7,2,2,2,3,2}},
-  {"class17", {7,2,1,4,1,3}},
-  {"class18", {7,2,1,3,3,2}},
-  {"class19", {7,2,1,1,5,2}},
-  {"class20", {7,1,3,2,1,4}},
-  {"class21", {7,1,3,1,3,3}},
-  {"class22", {7,1,2,4,2,2}},
-  {"class23", {7,1,2,3,4,1}},
-  {"class24", {7,1,2,2,1,5}},
-  {"class25", {7,1,1,5,2,2}},
-  {"class26", {7,1,1,4,4,1}},
-  {"class27", {7,1,1,2,3,4}},
+  {"class17", {7,2,2,1,5,1}},
+  {"class18", {7,2,1,4,2,2}},
+  {"class19", {7,2,1,3,4,1}},
+  {"class20", {7,1,4,2,1,3}},
+  {"class21", {7,1,4,1,3,2}},
+  {"class22", {7,1,3,3,2,2}},
+  {"class23", {7,1,3,2,4,1}},
+  {"class24", {7,1,2,5,1,2}},
+  {"class25", {7,1,2,4,3,1}},
+  {"class26", {7,1,1,6,2,1}},
+  {"class27", {6,5,1,1,1,4}},
   {"class28", {6,4,2,1,2,3}},
-  {"class29", {6,4,1,2,1,4}},
-  {"class30", {6,4,1,1,3,3}},
-  {"class31", {6,3,3,1,1,4}},
-  {"class32", {6,3,2,3,1,3}},
-  {"class33", {6,3,2,2,3,2}},
-  {"class34", {6,3,1,4,2,2}},
-  {"class35", {6,3,1,3,4,1}},
-  {"class36", {6,3,1,1,2,5}},
-  {"class37", {6,2,4,1,2,3}},
-  {"class38", {6,2,3,3,2,2}},
-  {"class39", {6,2,3,2,4,1}},
-  {"class40", {6,2,3,1,1,5}},
-  {"class41", {6,2,2,4,3,1}},
-  {"class42", {6,2,1,2,2,5}},
-  {"class43", {6,1,4,2,1,4}},
-  {"class44", {6,1,4,1,3,3}},
-  {"class45", {6,1,3,4,1,3}},
-  {"class46", {6,1,3,3,3,2}},
-  {"class47", {6,1,2,2,1,6}},
-  {"class48", {6,1,1,3,2,5}},
-  {"class49", {6,1,1,2,4,4}},
+  {"class29", {6,4,1,3,1,3}},
+  {"class30", {6,4,1,2,3,2}},
+  {"class31", {6,4,1,1,5,1}},
+  {"class32", {6,3,3,2,1,3}},
+  {"class33", {6,3,3,1,3,2}},
+  {"class34", {6,3,2,3,2,2}},
+  {"class35", {6,3,2,2,4,1}},
+  {"class36", {6,3,1,5,1,2}},
+  {"class37", {6,3,1,4,3,1}},
+  {"class38", {6,2,5,1,1,3}},
+  {"class39", {6,2,4,1,4,1}},
+  {"class40", {6,2,3,4,1,2}},
+  {"class41", {6,2,3,3,3,1}},
+  {"class42", {6,2,2,5,2,1}},
+  {"class43", {6,2,1,7,1,1}},
+  {"class44", {6,1,6,1,2,2}},
+  {"class45", {6,1,5,3,1,2}},
+  {"class46", {6,1,5,2,3,1}},
+  {"class47", {6,1,4,4,2,1}},
+  {"class48", {6,1,3,6,1,1}},
+  {"class49", {5,6,1,1,2,3}},
   {"class50", {5,5,2,2,1,3}},
   {"class51", {5,5,2,1,3,2}},
   {"class52", {5,5,1,3,2,2}},
   {"class53", {5,5,1,2,4,1}},
-  {"class54", {5,4,3,1,2,3}},
-  {"class55", {5,4,2,3,2,2}},
-  {"class56", {5,4,2,2,4,1}},
-  {"class57", {5,4,1,4,3,1}},
-  {"class58", {5,4,1,3,2,3}},
-  {"class59", {5,4,1,1,4,3}},
-  {"class60", {5,3,4,2,2,2}},
-  {"class61", {5,3,4,1,4,1}},
-  {"class62", {5,3,3,4,1,2}},
-  {"class63", {5,3,3,3,3,1}},
-  {"class64", {5,3,2,5,2,1}},
-  {"class65", {5,3,2,4,1,3}},
-  {"class66", {5,3,2,2,3,3}},
-  {"class67", {5,3,2,1,5,2}},
-  {"class68", {5,3,1,3,2,4}},
-  {"class69", {5,3,1,2,4,3}},
-  {"class70", {5,2,5,1,2,3}},
-  {"class71", {5,2,4,3,3,1}},
-  {"class72", {5,2,4,2,2,3}},
-  {"class73", {5,2,3,5,1,2}},
-  {"class74", {5,2,3,4,3,1}},
-  {"class75", {5,2,3,1,4,3}},
-  {"class76", {5,2,2,3,1,5}},
-  {"class77", {5,2,1,5,3,2}},
-  {"class78", {5,2,1,4,2,4}},
-  {"class79", {5,2,1,2,4,4}},
-  {"class80", {5,1,5,2,1,4}},
-  {"class81", {5,1,5,1,3,3}},
-  {"class82", {5,1,4,4,2,2}},
-  {"class83", {5,1,4,3,4,1}},
-  {"class84", {5,1,4,1,2,5}},
-  {"class85", {5,1,3,3,1,5}},
-  {"class86", {5,1,3,2,3,4}},
-  {"class87", {5,1,2,5,2,3}},
-  {"class88", {5,1,2,4,4,2}},
-  {"class89", {5,1,1,3,3,5}},
-  {"class90", {4,6,2,1,1,4}},
-  {"class91", {4,6,1,2,2,3}},
-  {"class92", {4,6,1,1,4,2}},
-  {"class93", {4,5,3,1,1,4}},
-  {"class94", {4,5,2,3,1,3}},
-  {"class95", {4,5,2,2,3,2}},
-  {"class96", {4,5,1,4,2,2}},
-  {"class97", {4,5,1,3,4,1}},
-  {"class98", {4,5,1,1,2,5}},
-  {"class99", {4,4,4,1,1,4}},
-  {"class100", {4,4,3,3,2,2}},
-  {"class101", {4,4,3,2,4,1}},
-  {"class102", {4,4,3,1,1,5}},
-  {"class103", {4,4,2,4,3,1}},
-  {"class104", {4,4,2,2,2,4}},
-  {"class105", {4,4,1,3,1,5}},
-  {"class106", {4,4,1,2,3,4}},
-  {"class107", {4,3,5,2,1,3}},
-  {"class108", {4,3,5,1,3,2}},
-  {"class109", {4,3,4,3,1,3}},
-  {"class110", {4,3,3,5,2,1}},
-  {"class111", {4,3,3,4,1,3}},
-  {"class112", {4,3,3,2,3,3}},
-  {"class113", {4,3,3,1,5,2}},
-  {"class114", {4,3,2,4,2,3}},
-  {"class115", {4,3,2,1,4,4}},
-  {"class116", {4,3,1,5,3,2}},
-  {"class117", {4,3,1,4,2,4}},
-  {"class118", {4,3,1,3,4,3}},
-  {"class119", {4,2,5,3,2,2}},
-  {"class120", {4,2,5,2,4,1}},
-  {"class121", {4,2,5,1,1,5}},
-  {"class122", {4,2,4,4,3,1}},
-  {"class123", {4,2,4,1,3,4}},
-  {"class124", {4,2,3,3,1,5}},
-  {"class125", {4,2,3,2,3,4}},
-  {"class126", {4,2,2,5,2,3}},
-  {"class127", {4,2,2,1,5,4}},
-  {"class128", {4,2,1,3,2,6}},
-  {"class129", {4,1,5,1,2,5}},
-  {"class130", {4,1,4,3,1,5}},
-  {"class131", {4,1,4,2,3,4}},
-  {"class132", {4,1,3,5,2,3}},
-  {"class133", {4,1,3,4,4,2}},
-  {"class134", {4,1,3,2,2,6}},
-  {"class135", {4,1,2,4,1,6}},
-  {"class136", {4,1,1,5,4,3}},
-  {"class137", {4,1,1,4,3,5}},
-  {"class138", {3,7,1,1,2,4}},
-  {"class139", {3,7,1,1,1,5}},
-  {"class140", {3,6,2,1,2,4}},
-  {"class141", {3,6,2,1,1,5}},
-  {"class142", {3,6,1,2,1,5}},
-  {"class143", {3,5,3,2,1,4}},
-  {"class144", {3,5,3,1,3,3}},
-  {"class145", {3,5,2,4,1,3}},
-  {"class146", {3,5,2,3,3,2}},
-  {"class147", {3,5,2,1,2,5}},
-  {"class148", {3,5,1,4,3,2}},
-  {"class149", {3,5,1,3,2,4}},
-  {"class150", {3,5,1,2,4,3}},
-  {"class151", {3,5,1,1,3,5}},
-  {"class152", {3,4,4,1,2,4}},
-  {"class153", {3,4,4,1,1,5}},
-  {"class154", {3,4,3,3,1,4}},
-  {"class155", {3,4,3,2,3,3}},
-  {"class156", {3,4,3,1,2,5}},
-  {"class157", {3,4,2,5,2,2}},
-  {"class158", {3,4,2,4,4,1}},
-  {"class159", {3,4,2,2,3,4}},
-  {"class160", {3,4,2,1,5,3}},
-  {"class161", {3,4,1,4,1,5}},
-  {"class162", {3,4,1,3,3,4}},
-  {"class163", {3,4,1,2,5,3}},
-  {"class164", {3,3,5,2,2,3}},
-  {"class165", {3,3,5,1,4,2}},
-  {"class166", {3,3,4,4,2,2}},
-  {"class167", {3,3,4,3,4,1}},
-  {"class168", {3,3,4,1,3,4}},
-  {"class169", {3,3,3,5,3,1}},
-  {"class170", {3,3,3,3,2,4}},
-  {"class171", {3,3,3,2,4,3}},
-  {"class172", {3,3,2,5,1,4}},
-  {"class173", {3,3,2,3,3,4}},
-  {"class174", {3,3,2,2,5,3}},
-  {"class175", {3,3,1,5,4,2}},
-  {"class176", {3,3,1,4,3,4}},
-  {"class177", {3,2,5,1,1,6}},
-  {"class178", {3,2,4,3,2,4}},
-  {"class179", {3,2,4,2,4,3}},
-  {"class180", {3,2,4,1,3,5}},
-  {"class181", {3,2,3,5,2,3}},
-  {"class182", {3,2,3,4,4,2}},
-  {"class183", {3,2,3,1,5,4}},
-  {"class184", {3,2,2,4,1,6}},
-  {"class185", {3,2,1,5,3,4}},
-  {"class186", {3,1,5,3,1,5}},
-  {"class187", {3,1,5,2,3,4}},
-  {"class188", {3,1,5,1,2,6}},
-  {"class189", {3,1,4,4,1,5}},
-  {"class190", {3,1,4,3,3,4}},
-  {"class191", {3,1,4,2,5,3}},
-  {"class192", {3,1,3,5,1,5}},
-  {"class193", {3,1,3,4,3,4}},
-  {"class194", {3,1,3,3,5,3}},
-  {"class195", {3,1,2,5,2,5}},
-  {"class196", {3,1,2,4,4,4}},
-  {"class197", {3,1,1,5,5,3}},
-  {"class198", {2,8,1,1,1,5}},
-  {"class199", {2,7,2,1,1,5}},
-  {"class200", {2,7,1,2,2,4}},
-  {"class201", {2,7,1,1,3,4}},
-  {"class202", {2,6,3,1,1,5}},
-  {"class203", {2,6,2,3,1,4}},
-  {"class204", {2,6,2,2,3,3}},
-  {"class205", {2,6,2,1,2,5}},
-  {"class206", {2,6,1,3,3,3}},
-  {"class207", {2,6,1,2,2,5}},
-  {"class208", {2,5,4,1,1,5}},
-  {"class209", {2,5,3,3,2,3}},
-  {"class210", {2,5,3,2,4,2}},
-  {"class211", {2,5,3,1,3,4}},
-  {"class212", {2,5,2,4,3,2}},
-  {"class213", {2,5,2,3,2,4}},
-  {"class214", {2,5,2,2,4,3}},
-  {"class215", {2,5,2,1,3,5}},
-  {"class216", {2,5,1,4,2,4}},
-  {"class217", {2,5,1,3,4,3}},
-  {"class218", {2,5,1,2,3,5}},
-  {"class219", {2,4,5,2,1,4}},
-  {"class220", {2,4,5,1,3,3}},
-  {"class221", {2,4,4,3,1,4}},
-  {"class222", {2,4,4,2,3,3}},
-  {"class223", {2,4,4,1,2,5}},
-  {"class224", {2,4,3,4,2,3}},
-  {"class225", {2,4,3,3,4,2}},
-  {"class226", {2,4,3,1,4,4}},
-  {"class227", {2,4,2,5,3,2}},
-  {"class228", {2,4,2,4,2,4}},
-  {"class229", {2,4,2,2,4,4}},
-  {"class230", {2,4,1,5,2,4}},
-  {"class231", {2,4,1,4,4,3}},
-  {"class232", {2,4,1,2,5,4}},
-  {"class233", {2,3,5,1,2,5}},
-  {"class234", {2,3,4,3,1,5}},
-  {"class235", {2,3,4,2,3,4}},
-  {"class236", {2,3,4,1,5,3}},
-  {"class237", {2,3,3,5,2,3}},
-  {"class238", {2,3,3,4,4,2}},
-  {"class239", {2,3,3,2,3,5}},
-  {"class240", {2,3,2,5,1,5}},
-  {"class241", {2,3,2,4,3,4}},
-  {"class242", {2,3,2,3,5,3}},
-  {"class243", {2,3,1,5,4,3}},
-  {"class244", {2,3,1,4,3,5}},
-  {"class245", {2,2,5,3,1,5}},
-  {"class246", {2,2,5,2,3,4}},
-  {"class247", {2,2,4,4,1,5}},
-  {"class248", {2,2,4,3,3,4}},
-  {"class249", {2,2,4,2,5,3}},
-  {"class250", {2,2,3,5,2,4}},
-  {"class251", {2,2,3,4,4,3}},
-  {"class252", {2,2,3,3,3,5}},
-  {"class253", {2,2,2,5,3,4}},
-  {"class254", {2,1,5,2,2,6}},
-  {"class255", {2,1,5,1,4,5}},
-  {"class256", {2,1,4,4,2,5}},
-  {"class257", {2,1,4,3,4,4}},
-  {"class258", {2,1,4,1,5,5}},
-  {"class259", {2,1,3,5,1,6}},
-  {"class260", {2,1,3,4,3,5}},
-  {"class261", {2,1,3,3,5,4}},
-  {"class262", {2,1,2,5,4,4}},
-  {"class263", {2,1,1,5,5,5}},
-  {"class264", {1,8,2,1,1,5}},
-  {"class265", {1,8,1,2,2,4}},
-  {"class266", {1,8,1,1,3,4}},
-  {"class267", {1,7,3,1,1,5}},
-  {"class268", {1,7,2,3,1,4}},
-  {"class269", {1,7,2,2,3,3}},
-  {"class270", {1,7,2,1,2,5}},
-  {"class271", {1,7,1,3,3,3}},
-  {"class272", {1,7,1,2,2,5}},
-  {"class273", {1,6,4,1,1,5}},
-  {"class274", {1,6,3,3,2,3}},
-  {"class275", {1,6,3,2,4,2}},
-  {"class276", {1,6,3,1,3,4}},
-  {"class277", {1,6,2,4,3,2}},
-  {"class278", {1,6,2,3,2,4}},
-  {"class279", {1,6,2,2,4,3}},
-  {"class280", {1,6,2,1,3,5}},
-  {"class281", {1,6,1,4,2,4}},
-  {"class282", {1,6,1,3,4,3}},
-  {"class283", {1,6,1,2,3,5}},
-  {"class284", {1,5,5,2,1,4}},
-  {"class285", {1,5,5,1,3,3}},
-  {"class286", {1,5,4,3,1,4}},
-  {"class287", {1,5,4,2,3,3}},
-  {"class288", {1,5,4,1,2,5}},
-  {"class289", {1,5,3,4,2,3}},
-  {"class290", {1,5,3,3,4,2}},
-  {"class291", {1,5,3,1,4,4}},
-  {"class292", {1,5,2,5,3,2}},
-  {"class293", {1,5,2,4,2,4}},
-  {"class294", {1,5,2,2,4,4}},
-  {"class295", {1,5,1,5,2,4}},
-  {"class296", {1,5,1,4,4,3}},
-  {"class297", {1,5,1,2,5,4}},
-  {"class298", {1,4,5,1,2,5}},
-  {"class299", {1,4,4,3,1,5}},
-  {"class300", {1,4,4,2,3,4}},
-  {"class301", {1,4,4,1,5,3}},
-  {"class302", {1,4,3,5,2,3}},
-  {"class303", {1,4,3,4,4,2}},
-  {"class304", {1,4,3,2,3,5}},
-  {"class305", {1,4,2,5,1,5}},
-  {"class306", {1,4,2,4,3,4}},
-  {"class307", {1,4,2,3,5,3}},
-  {"class308", {1,4,1,5,4,3}},
-  {"class309", {1,4,1,4,3,5}},
-  {"class310", {1,3,5,3,1,5}},
-  {"class311", {1,3,5,2,3,4}},
-  {"class312", {1,3,4,4,1,5}},
-  {"class313", {1,3,4,3,3,4}},
-  {"class314", {1,3,4,2,5,3}},
-  {"class315", {1,3,3,5,2,4}}
+  {"class54", {5,4,4,1,1,3}},
+  {"class55", {5,4,3,1,4,1}},
+  {"class56", {5,4,2,4,1,2}},
+  {"class57", {5,4,1,5,2,1}},
+  {"class58", {5,3,5,1,2,2}},
+  {"class59", {5,3,2,6,1,1}},
+  {"class60", {5,2,6,2,1,2}},
+  {"class61", {5,2,6,1,3,1}},
+  {"class62", {5,2,5,3,2,1}},
+  {"class63", {5,2,4,5,1,1}},
+  {"class64", {5,2,1,1,1,8}},
+  {"class65", {5,1,8,1,1,2}},
+  {"class66", {5,1,7,2,2,1}},
+  {"class67", {5,1,6,4,1,1}},
+  {"class68", {5,1,2,1,2,7}},
+  {"class69", {5,1,1,3,1,7}},
+  {"class70", {5,1,1,2,3,6}},
+  {"class71", {5,1,1,1,5,5}},
+  {"class72", {4,7,1,2,1,3}},
+  {"class73", {4,7,1,1,3,2}},
+  {"class74", {4,6,3,1,1,3}},
+  {"class75", {4,6,2,1,4,1}},
+  {"class76", {4,6,1,4,1,2}},
+  {"class77", {4,6,1,3,3,1}},
+  {"class78", {4,5,4,1,2,2}},
+  {"class79", {4,5,2,4,2,1}},
+  {"class80", {4,5,1,6,1,1}},
+  {"class81", {4,4,5,2,1,2}},
+  {"class82", {4,4,5,1,3,1}},
+  {"class83", {4,4,3,5,1,1}},
+  {"class84", {4,3,7,1,1,2}},
+  {"class85", {4,3,6,2,2,1}},
+  {"class86", {4,3,5,4,1,1}},
+  {"class87", {4,3,1,1,2,7}},
+  {"class88", {4,2,8,1,2,1}},
+  {"class89", {4,2,7,3,1,1}},
+  {"class90", {4,2,2,2,1,7}},
+  {"class91", {4,2,2,1,3,6}},
+  {"class92", {4,2,1,3,2,6}},
+  {"class93", {4,2,1,2,4,5}},
+  {"class94", {4,2,1,1,6,4}},
+  {"class95", {4,1,9,2,1,1}},
+  {"class96", {4,1,4,1,1,7}},
+  {"class97", {4,1,3,2,2,6}},
+  {"class98", {4,1,3,1,4,5}},
+  {"class99", {4,1,2,4,1,6}},
+  {"class100", {4,1,2,2,5,4}},
+  {"class101", {4,1,2,1,7,3}},
+  {"class102", {4,1,1,5,2,5}},
+  {"class103", {4,1,1,4,4,4}},
+  {"class104", {4,1,1,3,6,3}},
+  {"class105", {4,1,1,2,8,2}},
+  {"class106", {4,1,1,1,10,1}},
+  {"class107", {3,8,2,1,1,3}},
+  {"class108", {3,8,1,2,2,2}},
+  {"class109", {3,8,1,1,4,1}},
+  {"class110", {3,7,3,1,2,2}},
+  {"class111", {3,7,2,3,1,2}},
+  {"class112", {3,7,2,2,3,1}},
+  {"class113", {3,7,1,4,2,1}},
+  {"class114", {3,6,4,2,1,2}},
+  {"class115", {3,6,4,1,3,1}},
+  {"class116", {3,6,3,3,2,1}},
+  {"class117", {3,6,2,5,1,1}},
+  {"class118", {3,5,6,1,1,2}},
+  {"class119", {3,5,5,2,2,1}},
+  {"class120", {3,5,4,4,1,1}},
+  {"class121", {3,4,7,1,2,1}},
+  {"class122", {3,4,6,3,1,1}},
+  {"class123", {3,4,1,2,1,7}},
+  {"class124", {3,4,1,1,3,6}},
+  {"class125", {3,3,8,2,1,1}},
+  {"class126", {3,3,3,1,1,7}},
+  {"class127", {3,3,2,2,2,6}},
+  {"class128", {3,3,1,4,1,6}},
+  {"class129", {3,3,1,1,7,3}},
+  {"class130", {3,2,10,1,1,1}},
+  {"class131", {3,2,4,1,2,6}},
+  {"class132", {3,2,3,3,1,6}},
+  {"class133", {3,2,2,2,6,3}},
+  {"class134", {3,2,2,1,8,2}},
+  {"class135", {3,2,1,6,1,5}},
+  {"class136", {3,2,1,3,7,2}},
+  {"class137", {3,2,1,2,9,1}},
+  {"class138", {3,1,5,2,1,6}},
+  {"class139", {3,1,5,1,3,5}},
+  {"class140", {3,1,4,1,6,3}},
+  {"class141", {3,1,3,5,1,5}},
+  {"class142", {3,1,3,2,7,2}},
+  {"class143", {3,1,3,1,9,1}},
+  {"class144", {3,1,2,6,2,4}},
+  {"class145", {3,1,2,4,6,2}},
+  {"class146", {3,1,2,3,8,1}},
+  {"class147", {3,1,1,8,1,4}},
+  {"class148", {3,1,1,7,3,3}},
+  {"class149", {3,1,1,6,5,2}},
+  {"class150", {3,1,1,5,7,1}},
+  {"class151", {2,10,1,1,1,3}},
+  {"class152", {2,9,2,1,2,2}},
+  {"class153", {2,9,1,3,1,2}},
+  {"class154", {2,9,1,2,3,1}},
+  {"class155", {2,8,3,2,1,2}},
+  {"class156", {2,8,3,1,3,1}},
+  {"class157", {2,8,2,3,2,1}},
+  {"class158", {2,8,1,5,1,1}},
+  {"class159", {2,7,5,1,1,2}},
+  {"class160", {2,7,4,2,2,1}},
+  {"class161", {2,7,3,4,1,1}},
+  {"class162", {2,6,6,1,2,1}},
+  {"class163", {2,6,5,3,1,1}},
+  {"class164", {2,5,7,2,1,1}},
+  {"class165", {2,5,2,1,1,7}},
+  {"class166", {2,5,1,2,2,6}},
+  {"class167", {2,5,1,1,4,5}},
+  {"class168", {2,4,9,1,1,1}},
+  {"class169", {2,4,3,1,2,6}},
+  {"class170", {2,4,2,3,1,6}},
+  {"class171", {2,4,2,1,5,4}},
+  {"class172", {2,4,1,4,2,5}},
+  {"class173", {2,4,1,2,6,3}},
+  {"class174", {2,4,1,1,8,2}},
+  {"class175", {2,3,4,2,1,6}},
+  {"class176", {2,3,3,1,6,3}},
+  {"class177", {2,3,2,5,1,5}},
+  {"class178", {2,3,2,2,7,2}},
+  {"class179", {2,3,2,1,9,1}},
+  {"class180", {2,3,1,6,2,4}},
+  {"class181", {2,3,1,4,6,2}},
+  {"class182", {2,3,1,3,8,1}},
+  {"class183", {2,2,6,1,1,6}},
+  {"class184", {2,2,5,2,2,5}},
+  {"class185", {2,2,5,1,4,4}},
+  {"class186", {2,2,4,4,1,5}},
+  {"class187", {2,2,4,1,7,2}},
+  {"class188", {2,2,3,3,6,2}},
+  {"class189", {2,2,3,2,8,1}},
+  {"class190", {2,2,2,7,1,4}},
+  {"class191", {2,2,2,6,3,3}},
+  {"class192", {2,2,2,5,5,2}},
+  {"class193", {2,2,2,4,7,1}},
+  {"class194", {2,2,1,8,2,3}},
+  {"class195", {2,2,1,7,4,2}},
+  {"class196", {2,2,1,6,6,1}},
+  {"class197", {2,1,7,1,2,5}},
+  {"class198", {2,1,6,3,1,5}},
+  {"class199", {2,1,6,2,3,4}},
+  {"class200", {2,1,6,1,5,3}},
+  {"class201", {2,1,5,4,2,4}},
+  {"class202", {2,1,5,2,6,2}},
+  {"class203", {2,1,5,1,8,1}},
+  {"class204", {2,1,4,6,1,4}},
+  {"class205", {2,1,4,4,5,2}},
+  {"class206", {2,1,4,3,7,1}},
+  {"class207", {2,1,3,7,2,3}},
+  {"class208", {2,1,3,6,4,2}},
+  {"class209", {2,1,3,5,6,1}},
+  {"class210", {2,1,2,9,1,3}},
+  {"class211", {2,1,2,8,3,2}},
+  {"class212", {2,1,2,7,5,1}},
+  {"class213", {2,1,1,10,2,2}},
+  {"class214", {2,1,1,9,4,1}},
+  {"class215", {2,1,1,2,1,11}},
+  {"class216", {2,1,1,1,3,10}},
+  {"class217", {1,11,1,1,2,2}},
+  {"class218", {1,10,2,2,1,2}},
+  {"class219", {1,10,2,1,3,1}},
+  {"class220", {1,10,1,3,2,1}},
+  {"class221", {1,9,4,1,1,2}},
+  {"class222", {1,9,3,2,2,1}},
+  {"class223", {1,9,2,4,1,1}},
+  {"class224", {1,8,5,1,2,1}},
+  {"class225", {1,8,4,3,1,1}},
+  {"class226", {1,7,6,2,1,1}},
+  {"class227", {1,7,1,1,1,7}},
+  {"class228", {1,6,8,1,1,1}},
+  {"class229", {1,6,2,1,2,6}},
+  {"class230", {1,6,1,3,1,6}},
+  {"class231", {1,6,1,2,3,5}},
+  {"class232", {1,6,1,1,5,4}},
+  {"class233", {1,5,3,2,1,6}},
+  {"class234", {1,5,3,1,3,5}},
+  {"class235", {1,5,2,3,2,5}},
+  {"class236", {1,5,2,2,4,4}},
+  {"class237", {1,5,2,1,6,3}},
+  {"class238", {1,5,1,5,1,5}},
+  {"class239", {1,5,1,4,3,4}},
+  {"class240", {1,5,1,3,5,3}},
+  {"class241", {1,5,1,2,7,2}},
+  {"class242", {1,5,1,1,9,1}},
+  {"class243", {1,4,5,1,1,6}},
+  {"class244", {1,4,4,2,2,5}},
+  {"class245", {1,4,4,1,4,4}},
+  {"class246", {1,4,3,4,1,5}},
+  {"class247", {1,4,3,1,7,2}},
+  {"class248", {1,4,2,5,2,4}},
+  {"class249", {1,4,2,3,6,2}},
+  {"class250", {1,4,2,2,8,1}},
+  {"class251", {1,4,1,7,1,4}},
+  {"class252", {1,4,1,6,3,3}},
+  {"class253", {1,4,1,5,5,2}},
+  {"class254", {1,4,1,4,7,1}},
+  {"class255", {1,3,6,1,2,5}},
+  {"class256", {1,3,5,3,1,5}},
+  {"class257", {1,3,5,1,5,3}},
+  {"class258", {1,3,4,2,6,2}},
+  {"class259", {1,3,4,1,8,1}},
+  {"class260", {1,3,3,6,1,4}},
+  {"class261", {1,3,3,3,7,1}},
+  {"class262", {1,3,2,7,2,3}},
+  {"class263", {1,3,2,6,4,2}},
+  {"class264", {1,3,2,5,6,1}},
+  {"class265", {1,3,1,9,1,3}},
+  {"class266", {1,3,1,8,3,2}},
+  {"class267", {1,3,1,7,5,1}},
+  {"class268", {1,2,7,2,1,5}},
+  {"class269", {1,2,7,1,3,4}},
+  {"class270", {1,2,6,3,2,4}},
+  {"class271", {1,2,6,2,4,3}},
+  {"class272", {1,2,6,1,6,2}},
+  {"class273", {1,2,5,5,1,4}},
+  {"class274", {1,2,5,3,5,2}},
+  {"class275", {1,2,5,2,7,1}},
+  {"class276", {1,2,4,6,2,3}},
+  {"class277", {1,2,4,5,4,2}},
+  {"class278", {1,2,4,4,6,1}},
+  {"class279", {1,2,3,8,1,3}},
+  {"class280", {1,2,3,7,3,2}},
+  {"class281", {1,2,3,6,5,1}},
+  {"class282", {1,2,2,9,2,2}},
+  {"class283", {1,2,2,8,4,1}},
+  {"class284", {1,2,2,1,1,11}},
+  {"class285", {1,2,1,11,1,2}},
+  {"class286", {1,2,1,10,3,1}},
+  {"class287", {1,2,1,2,2,10}},
+  {"class288", {1,2,1,1,4,9}},
+  {"class289", {1,1,9,1,1,5}},
+  {"class290", {1,1,8,2,2,4}},
+  {"class291", {1,1,8,1,4,3}},
+  {"class292", {1,1,7,4,1,4}},
+  {"class293", {1,1,7,3,3,3}},
+  {"class294", {1,1,7,2,5,2}},
+  {"class295", {1,1,7,1,7,1}},
+  {"class296", {1,1,6,5,2,3}},
+  {"class297", {1,1,6,4,4,2}},
+  {"class298", {1,1,6,3,6,1}},
+  {"class299", {1,1,5,7,1,3}},
+  {"class300", {1,1,5,6,3,2}},
+  {"class301", {1,1,5,5,5,1}},
+  {"class302", {1,1,4,8,2,2}},
+  {"class303", {1,1,4,7,4,1}},
+  {"class304", {1,1,3,10,1,2}},
+  {"class305", {1,1,3,9,3,1}},
+  {"class306", {1,1,3,1,2,10}},
+  {"class307", {1,1,2,11,2,1}},
+  {"class308", {1,1,2,3,1,10}},
+  {"class309", {1,1,2,2,3,9}},
+  {"class310", {1,1,2,1,5,8}},
+  {"class311", {1,1,1,13,1,1}},
+  {"class312", {1,1,1,4,2,9}},
+  {"class313", {1,1,1,3,4,8}},
+  {"class314", {1,1,1,2,6,7}},
+  {"class315", {1,1,1,1,8,6}}
 };
 
 -- ============================================================================
