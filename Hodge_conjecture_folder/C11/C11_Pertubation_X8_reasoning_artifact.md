@@ -7180,3 +7180,569 @@ Error probability < 1/M < 10⁻⁵⁵
 
 ---
 
+
+
+```python
+#!/usr/bin/env python3
+"""
+STEP 10A: Kernel Basis Computation from Jacobian Matrices (C11 X8 Perturbed)
+Robust kernel computation with orientation detection for triplet files.
+
+This version detects whether the triplet orientation in each JSON file
+matches the expected matrix shape or needs the row/col swap fix. If neither
+orientation exactly matches the expected shape the script expands the matrix
+shape to accommodate the maximal indices found in the triplets (safe fallback).
+
+First 19 primes (p ≡ 1 (mod 11)):
+23, 67, 89, 199, 331, 353, 397, 419, 463, 617,
+661, 683, 727, 859, 881, 947, 991, 1013, 1123
+"""
+
+import json
+import numpy as np
+from scipy.sparse import csr_matrix
+import time
+import os
+from math import isnan
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+PRIMES = [23, 67, 89, 199, 331, 353, 397, 419, 463, 617,
+          661, 683, 727, 859, 881, 947, 991, 1013, 1123]
+
+TRIPLET_FILE_TEMPLATE = "saved_inv_p{}_triplets.json"
+KERNEL_OUTPUT_TEMPLATE = "step10a_kernel_p{}_C11.json"
+SUMMARY_FILE = "step10a_kernel_computation_summary_C11.json"
+
+# Expected invariants can be set if known; otherwise leave as None to let the
+# script infer shapes from triplets (robust fallback).
+EXPECTED_KERNEL_DIM = None
+EXPECTED_RANK = None
+EXPECTED_COLS = None  # expected number of invariant monomials (if known)
+EXPECTED_ROWS = None  # expected matrix rows (often equal to rank)
+
+# ============================================================================
+# HELPERS
+# ============================================================================
+
+def load_triplets(filename):
+    with open(filename, "r") as f:
+        data = json.load(f)
+    p = data.get('prime')
+    rank = int(data.get('rank', -1))
+    h22_inv = int(data.get('h22_inv', -1))
+    triplets = data.get('triplets', [])
+    count_inv = data.get('countInv', None)
+    variety = data.get('variety', 'UNKNOWN')
+    delta = data.get('delta', 'UNKNOWN')
+    cyclotomic_order = int(data.get('cyclotomic_order', 11))
+    return {
+        'prime': p,
+        'rank': rank,
+        'kernel_dim': h22_inv,
+        'triplets': triplets,
+        'count_inv': count_inv,
+        'variety': variety,
+        'delta': delta,
+        'cyclotomic_order': cyclotomic_order
+    }
+
+def compute_nullspace_mod_p(M, p, verbose=True):
+    num_rows, num_cols = M.shape
+    if verbose:
+        print(f"    Starting Gaussian elimination on {num_rows} × {num_cols} matrix...")
+    A = M.copy().astype(np.int64)
+    pivot_cols = []
+    current_row = 0
+    for col in range(num_cols):
+        if current_row >= num_rows:
+            break
+        pivot_row = None
+        for row in range(current_row, num_rows):
+            if int(A[row, col] % p) != 0:
+                pivot_row = row
+                break
+        if pivot_row is None:
+            continue
+        if pivot_row != current_row:
+            A[[current_row, pivot_row]] = A[[pivot_row, current_row]]
+        pivot_cols.append(col)
+        pivot_val = int(A[current_row, col] % p)
+        pivot_inv = pow(pivot_val, p - 2, p)
+        A[current_row] = (A[current_row] * pivot_inv) % p
+        for row in range(current_row + 1, num_rows):
+            if int(A[row, col] % p) != 0:
+                factor = int(A[row, col] % p)
+                A[row] = (A[row] - factor * A[current_row]) % p
+        current_row += 1
+        if verbose and col % 500 == 0 and col > 0:
+            print(f"      Progress: {col}/{num_cols} columns processed...")
+    if verbose:
+        print(f"    Forward elimination complete: {len(pivot_cols)} pivots found")
+    # Back substitution to RREF
+    for i in range(len(pivot_cols) - 1, -1, -1):
+        col = pivot_cols[i]
+        for row in range(i):
+            if int(A[row, col] % p) != 0:
+                factor = int(A[row, col] % p)
+                A[row] = (A[row] - factor * A[i]) % p
+    if verbose:
+        print("    Back substitution complete (RREF)")
+    free_cols = [c for c in range(num_cols) if c not in pivot_cols]
+    kernel_dim = len(free_cols)
+    if verbose:
+        print(f"    Rank (pivots): {len(pivot_cols)}, Kernel dimension: {kernel_dim}")
+    kernel_basis = np.zeros((kernel_dim, num_cols), dtype=np.int64)
+    for i, free_col in enumerate(free_cols):
+        kernel_basis[i, free_col] = 1
+        for j, pivot_col in enumerate(pivot_cols):
+            kernel_basis[i, pivot_col] = (-A[j, free_col]) % p
+    return kernel_basis, pivot_cols, free_cols
+
+def compute_kernel_basis(triplets_file, p):
+    print(f"  Loading triplets from {triplets_file}...")
+    data = load_triplets(triplets_file)
+    triplets = data['triplets']
+    variety = data['variety']
+    delta = data['delta']
+    cyclotomic_order = data['cyclotomic_order']
+    print(f"    Variety: {variety}, Delta: {delta}, Cyclotomic order: {cyclotomic_order}")
+    print(f"    Reported rank: {data['rank']}, reported kernel dim: {data['kernel_dim']}")
+    if len(triplets) == 0:
+        raise RuntimeError("Triplets list is empty")
+    # Inspect triplet indices to decide orientation
+    rows_raw = np.array([int(t[0]) for t in triplets], dtype=np.int64)
+    cols_raw = np.array([int(t[1]) for t in triplets], dtype=np.int64)
+    max_r = int(rows_raw.max())
+    max_c = int(cols_raw.max())
+    print(f"    Triplet max indices: max_row={max_r}, max_col={max_c}")
+    # Decide orientation:
+    # If expected dims provided, prefer matching them. Otherwise choose orientation with smaller matrix size.
+    swap = None
+    if EXPECTED_ROWS is not None and EXPECTED_COLS is not None:
+        if max_r <= EXPECTED_ROWS - 1 and max_c <= EXPECTED_COLS - 1:
+            swap = False
+            print("    Orientation looks like (row, col) matching expected rows × cols -> NO SWAP")
+        elif max_c <= EXPECTED_ROWS - 1 and max_r <= EXPECTED_COLS - 1:
+            swap = True
+            print("    Orientation appears swapped relative to expected shape -> APPLY SWAP")
+        else:
+            # ambiguous; choose orientation that minimizes total size
+            shape_no_swap = (max_r + 1, max_c + 1)
+            shape_swap = (max_c + 1, max_r + 1)
+            size_no_swap = shape_no_swap[0] * shape_no_swap[1]
+            size_swap = shape_swap[0] * shape_swap[1]
+            swap = (size_swap < size_no_swap)
+            print("    Ambiguous orientation relative to expected dims; choosing minimal size orientation.")
+            print(f"      no-swap shape = {shape_no_swap}, swap shape = {shape_swap}, swap={swap}")
+    else:
+        # No expected dims provided: choose orientation that minimizes matrix size
+        shape_no_swap = (max_r + 1, max_c + 1)
+        shape_swap = (max_c + 1, max_r + 1)
+        size_no_swap = shape_no_swap[0] * shape_no_swap[1]
+        size_swap = shape_swap[0] * shape_swap[1]
+        swap = (size_swap < size_no_swap)
+        print("    No expected dims given; choosing orientation that minimizes matrix size.")
+        print(f"      no-swap shape = {shape_no_swap}, swap shape = {shape_swap}, swap={swap}")
+    # Build rows/cols/vals according to chosen orientation
+    rows = []
+    cols = []
+    vals = []
+    if not swap:
+        for r, c, v in triplets:
+            rows.append(int(r))
+            cols.append(int(c))
+            vals.append(int(v % p))
+        inferred_num_rows = max(rows) + 1
+        inferred_num_cols = max(cols) + 1
+    else:
+        for r, c, v in triplets:
+            rows.append(int(c))
+            cols.append(int(r))
+            vals.append(int(v % p))
+        inferred_num_rows = max(rows) + 1
+        inferred_num_cols = max(cols) + 1
+    # Choose final matrix shape: prefer expected dims if provided, else use inferred
+    if EXPECTED_ROWS is not None:
+        num_rows = max(EXPECTED_ROWS, inferred_num_rows)
+    else:
+        num_rows = inferred_num_rows
+    if EXPECTED_COLS is not None:
+        num_cols = max(EXPECTED_COLS, inferred_num_cols)
+    else:
+        num_cols = inferred_num_cols
+    print(f"    Building sparse matrix with shape {num_rows} × {num_cols} (inferred {inferred_num_rows}×{inferred_num_cols})")
+    M_sparse = csr_matrix((vals, (rows, cols)), shape=(num_rows, num_cols), dtype=np.int64)
+    print(f"    Matrix nnz = {M_sparse.nnz:,}")
+    # Convert to dense and reduce modulo p
+    print("  Converting to dense array (mod p)...")
+    M_dense = M_sparse.toarray() % p
+    # Compute kernel
+    print("  Computing kernel via Gaussian elimination mod p...")
+    t0 = time.time()
+    kernel_basis, pivot_cols, free_cols = compute_nullspace_mod_p(M_dense, p, verbose=True)
+    t1 = time.time() - t0
+    metadata = {
+        'prime': p,
+        'variety': variety,
+        'delta': delta,
+        'cyclotomic_order': cyclotomic_order,
+        'matrix_rows': num_rows,
+        'matrix_cols': num_cols,
+        'expected_rank': data['rank'],
+        'computed_rank': len(pivot_cols),
+        'expected_kernel_dim': data['kernel_dim'],
+        'computed_kernel_dim': kernel_basis.shape[0],
+        'pivot_cols': pivot_cols,
+        'free_cols': free_cols,
+        'computation_time': t1,
+        'swap_applied': bool(swap)
+    }
+    print(f"  ✓ Kernel computed in {t1:.1f} seconds (prime {p}, swap_applied={swap})")
+    return kernel_basis, metadata
+
+# ============================================================================
+# PROCESS PRIMES
+# ============================================================================
+
+print("="*80)
+print("COMPUTING KERNEL BASES FOR ALL PRIMES (C11)")
+print("="*80)
+print()
+
+total_start = time.time()
+results = {}
+
+for idx, p in enumerate(PRIMES, 1):
+    print(f"[{idx}/{len(PRIMES)}] Processing prime p = {p}")
+    print("-" * 70)
+    triplets_file = TRIPLET_FILE_TEMPLATE.format(p)
+    if not os.path.exists(triplets_file):
+        print(f"  ✗ File not found: {triplets_file}")
+        results[p] = {"status": "file_not_found"}
+        print()
+        continue
+    print(f"  ✓ Found {triplets_file}")
+    try:
+        kernel_basis, metadata = compute_kernel_basis(triplets_file, p)
+        rank_match = (metadata['expected_rank'] == metadata['computed_rank'])
+        dim_match = (metadata['expected_kernel_dim'] == metadata['computed_kernel_dim'])
+        print()
+        print("  Verification:")
+        print(f"    Computed rank: {metadata['computed_rank']} (reported {metadata['expected_rank']}) - {'✓' if rank_match else '✗'}")
+        print(f"    Computed kernel dim: {metadata['computed_kernel_dim']} (reported {metadata['expected_kernel_dim']}) - {'✓' if dim_match else '✗'}")
+        output_file = KERNEL_OUTPUT_TEMPLATE.format(p)
+        kernel_list = kernel_basis.tolist()
+        output_data = {
+            "step": "10A",
+            "prime": int(p),
+            "variety": metadata['variety'],
+            "delta": metadata['delta'],
+            "cyclotomic_order": int(metadata['cyclotomic_order']),
+            "galois_group": "Z/10Z",
+            "kernel_dimension": int(metadata['computed_kernel_dim']),
+            "rank": int(metadata['computed_rank']),
+            "num_monomials": int(metadata['matrix_cols']),
+            "computation_time_seconds": float(metadata['computation_time']),
+            "free_column_indices": [int(c) for c in metadata['free_cols']],
+            "pivot_column_indices": [int(c) for c in metadata['pivot_cols']],
+            "swap_applied": bool(metadata.get('swap_applied', False)),
+            "kernel_basis": kernel_list
+        }
+        with open(output_file, "w") as f:
+            json.dump(output_data, f, indent=2)
+        file_size_mb = os.path.getsize(output_file) / 1024 / 1024
+        print(f"  ✓ Saved kernel basis to {output_file} ({file_size_mb:.1f} MB)")
+        results[p] = {
+            "status": "success",
+            "rank": metadata['computed_rank'],
+            "dimension": metadata['computed_kernel_dim'],
+            "time": metadata['computation_time'],
+            "rank_match": rank_match,
+            "dim_match": dim_match,
+            "swap_applied": metadata.get('swap_applied', False)
+        }
+    except Exception as e:
+        print(f"  ✗ Error while processing p={p}: {e}")
+        import traceback
+        traceback.print_exc()
+        results[p] = {"status": "failed", "error": str(e)}
+    print()
+
+total_time = time.time() - total_start
+
+# ============================================================================
+# SUMMARY
+# ============================================================================
+
+print("="*80)
+print("STEP 10A COMPLETE - KERNEL BASIS COMPUTATION (C11)")
+print("="*80)
+print()
+
+successful = [p for p, r in results.items() if r.get("status") == "success"]
+failed = [p for p, r in results.items() if r.get("status") != "success"]
+
+print(f"Processed {len(PRIMES)} primes:")
+print(f"  ✓ Successful: {len(successful)}/{len(PRIMES)}")
+print(f"  ✗ Failed: {len(failed)}/{len(PRIMES)}")
+print()
+
+if successful:
+    print("Kernel computation results:")
+    print(f"  {'Prime':<8} {'Rank':<8} {'Kernel Dim':<12} {'Time (s)':<10} {'Swap':<6} {'Verified':<10}")
+    print("-" * 80)
+    for p in successful:
+        r = results[p]
+        verified = '✓' if r['rank_match'] and r['dim_match'] else '✗'
+        swap_flag = 'Y' if r.get('swap_applied') else 'N'
+        print(f"  {p:<8} {r['rank']:<8} {r['dimension']:<12} {r['time']:<10.1f} {swap_flag:<6} {verified:<10}")
+    avg_time = np.mean([results[p]['time'] for p in successful])
+    total_mins = total_time / 60
+    print()
+    print("Performance:")
+    print(f"  Average computation time: {avg_time:.1f} seconds per prime")
+    print(f"  Total runtime: {total_mins:.1f} minutes")
+    print()
+
+# Save summary
+summary = {
+    "step": "10A",
+    "description": "Kernel basis computation for 19 primes (C11) with robust orientation detection",
+    "variety": "PERTURBED_C11_CYCLOTOMIC",
+    "delta": "791/100000",
+    "cyclotomic_order": 11,
+    "galois_group": "Z/10Z",
+    "total_primes": len(PRIMES),
+    "successful": len(successful),
+    "failed": len(failed),
+    "successful_primes": successful,
+    "failed_primes": failed,
+    "expected_rank": EXPECTED_RANK,
+    "expected_kernel_dim": EXPECTED_KERNEL_DIM,
+    "results": {str(p): r for p, r in results.items()},
+    "total_time_seconds": float(total_time),
+    "total_time_minutes": float(total_time / 60),
+    "average_time_per_prime": float(np.mean([results[p]['time'] for p in successful])) if successful else None
+}
+
+with open(SUMMARY_FILE, "w") as f:
+    json.dump(summary, f, indent=2)
+
+print(f"✓ Summary saved to {SUMMARY_FILE}")
+print()
+
+if len(successful) == len(PRIMES):
+    print("="*80)
+    print("*** ALL KERNELS COMPUTED SUCCESSFULLY ***")
+    print("="*80)
+    print()
+    for p in successful:
+        print(f"  - {KERNEL_OUTPUT_TEMPLATE.format(p)}")
+    print()
+    print("Next step: Step 10B (CRT Reconstruction)")
+else:
+    print(f"*** {len(successful)}/{len(PRIMES)} KERNELS COMPUTED SUCCESSFULLY ***")
+    if failed:
+        print(f"Failed primes: {failed}")
+
+print("="*80)
+```
+
+to run script:
+
+```bash
+python step10a_11.py
+```
+
+---
+
+result:
+
+```verbatim
+================================================================================
+COMPUTING KERNEL BASES FOR ALL PRIMES (C11)
+================================================================================
+
+[1/19] Processing prime p = 23
+----------------------------------------------------------------------
+  ✓ Found saved_inv_p23_triplets.json
+  Loading triplets from saved_inv_p23_triplets.json...
+    Variety: PERTURBED_C11_CYCLOTOMIC, Delta: 791/100000, Cyclotomic order: 11
+    Reported rank: 2215, reported kernel dim: 844
+    Triplet max indices: max_row=3058, max_col=2382
+    No expected dims given; choosing orientation that minimizes matrix size.
+      no-swap shape = (3059, 2383), swap shape = (2383, 3059), swap=False
+    Building sparse matrix with shape 3059 × 2383 (inferred 3059×2383)
+    Matrix nnz = 171,576
+  Converting to dense array (mod p)...
+  Computing kernel via Gaussian elimination mod p...
+    Starting Gaussian elimination on 3059 × 2383 matrix...
+      Progress: 500/2383 columns processed...
+      Progress: 1000/2383 columns processed...
+      Progress: 1500/2383 columns processed...
+      Progress: 2000/2383 columns processed...
+    Forward elimination complete: 2215 pivots found
+    Back substitution complete (RREF)
+    Rank (pivots): 2215, Kernel dimension: 168
+  ✓ Kernel computed in 23.0 seconds (prime 23, swap_applied=False)
+
+  Verification:
+    Computed rank: 2215 (reported 2215) - ✓
+    Computed kernel dim: 168 (reported 844) - ✗
+  ✓ Saved kernel basis to step10a_kernel_p23_C11.json (3.5 MB)
+
+.
+
+.
+
+.
+
+.
+
+[19/19] Processing prime p = 1123
+----------------------------------------------------------------------
+  ✓ Found saved_inv_p1123_triplets.json
+  Loading triplets from saved_inv_p1123_triplets.json...
+    Variety: PERTURBED_C11_CYCLOTOMIC, Delta: 791/100000, Cyclotomic order: 11
+    Reported rank: 2215, reported kernel dim: 844
+    Triplet max indices: max_row=3058, max_col=2382
+    No expected dims given; choosing orientation that minimizes matrix size.
+      no-swap shape = (3059, 2383), swap shape = (2383, 3059), swap=False
+    Building sparse matrix with shape 3059 × 2383 (inferred 3059×2383)
+    Matrix nnz = 171,576
+  Converting to dense array (mod p)...
+  Computing kernel via Gaussian elimination mod p...
+    Starting Gaussian elimination on 3059 × 2383 matrix...
+      Progress: 500/2383 columns processed...
+      Progress: 1000/2383 columns processed...
+      Progress: 1500/2383 columns processed...
+      Progress: 2000/2383 columns processed...
+    Forward elimination complete: 2215 pivots found
+    Back substitution complete (RREF)
+    Rank (pivots): 2215, Kernel dimension: 168
+  ✓ Kernel computed in 25.4 seconds (prime 1123, swap_applied=False)
+
+  Verification:
+    Computed rank: 2215 (reported 2215) - ✓
+    Computed kernel dim: 168 (reported 844) - ✗
+  ✓ Saved kernel basis to step10a_kernel_p1123_C11.json (3.7 MB)
+
+================================================================================
+STEP 10A COMPLETE - KERNEL BASIS COMPUTATION (C11)
+================================================================================
+
+Processed 19 primes:
+  ✓ Successful: 19/19
+  ✗ Failed: 0/19
+
+Kernel computation results:
+  Prime    Rank     Kernel Dim   Time (s)   Swap   Verified  
+--------------------------------------------------------------------------------
+  23       2215     168          23.0       N      ✗         
+  67       2215     168          23.9       N      ✗         
+  89       2215     168          23.9       N      ✗         
+  199      2215     168          24.2       N      ✗         
+  331      2215     168          24.6       N      ✗         
+  353      2215     168          24.3       N      ✗         
+  397      2215     168          24.3       N      ✗         
+  419      2215     168          24.2       N      ✗         
+  463      2215     168          24.1       N      ✗         
+  617      2215     168          24.3       N      ✗         
+  661      2215     168          24.4       N      ✗         
+  683      2215     168          24.7       N      ✗         
+  727      2215     168          24.6       N      ✗         
+  859      2215     168          24.9       N      ✗         
+  881      2215     168          25.1       N      ✗         
+  947      2215     168          25.4       N      ✗         
+  991      2215     168          25.6       N      ✗         
+  1013     2215     168          25.8       N      ✗         
+  1123     2215     168          25.4       N      ✗         
+
+Performance:
+  Average computation time: 24.6 seconds per prime
+  Total runtime: 7.8 minutes
+
+✓ Summary saved to step10a_kernel_computation_summary_C11.json
+
+================================================================================
+*** ALL KERNELS COMPUTED SUCCESSFULLY ***
+================================================================================
+
+  - step10a_kernel_p23_C11.json
+  - step10a_kernel_p67_C11.json
+  - step10a_kernel_p89_C11.json
+  - step10a_kernel_p199_C11.json
+  - step10a_kernel_p331_C11.json
+  - step10a_kernel_p353_C11.json
+  - step10a_kernel_p397_C11.json
+  - step10a_kernel_p419_C11.json
+  - step10a_kernel_p463_C11.json
+  - step10a_kernel_p617_C11.json
+  - step10a_kernel_p661_C11.json
+  - step10a_kernel_p683_C11.json
+  - step10a_kernel_p727_C11.json
+  - step10a_kernel_p859_C11.json
+  - step10a_kernel_p881_C11.json
+  - step10a_kernel_p947_C11.json
+  - step10a_kernel_p991_C11.json
+  - step10a_kernel_p1013_C11.json
+  - step10a_kernel_p1123_C11.json
+
+Next step: Step 10B (CRT Reconstruction)
+================================================================================
+```
+
+(skipped for size consideration)
+
+---
+
+
+
+```python
+
+```
+
+to run script:
+
+```bash
+
+```
+
+---
+
+result:
+
+```verbatim
+
+```
+
+(skipped for size consideration)
+
+---
+
+
+
+```python
+
+```
+
+to run script:
+
+```bash
+
+```
+
+---
+
+result:
+
+```verbatim
+
+```
+
+
+
+---
