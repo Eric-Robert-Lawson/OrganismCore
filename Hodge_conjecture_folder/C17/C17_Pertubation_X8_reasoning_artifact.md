@@ -6565,7 +6565,11 @@ Error probability < 1/M < 10⁻⁵⁸
 
 ---
 
+# **STEP 10A: KERNEL BASIS COMPUTATION FROM JACOBIAN MATRICES (C₁₇ X₈ PERTURBED)**
 
+## **DESCRIPTION**
+
+This step computes **explicit kernel bases** for the Jacobian cokernel matrices across **19 independent primes** (p ≡ 1 mod 17, range 103-1871) via **Gaussian elimination over finite fields 𝔽_p**, producing **19 independent 537-dimensional rational vector space representations** of H²'²_prim,inv(V,ℚ) for the perturbed C₁₇ cyclotomic hypersurface, enabling **Chinese Remainder Theorem (CRT) reconstruction** of the **canonical rational kernel basis over ℚ** (Step 10B). Each prime yields **537 kernel vectors** (dimension certified in Step 4 via 19-prime unanimous consensus, **+1.3% deviation from theoretical 12/16 = 0.750**) from **1443×1980 Jacobian matrices** (smallest in study, φ(17)=16 **largest Galois group**), with **automatic orientation detection** handling potential row/column transpositions in triplet files, applying **row-echelon reduction mod p** to identify **1443 pivot columns** (rank) and **537 free columns** (kernel generators), constructing explicit basis vectors via back-substitution, and saving results as **JSON files** (~3-15 MB each, **smallest output files**) for CRT reconstruction (Step 10B) to recover **canonical ℚ-basis** representing the **537-dimensional primitive Hodge cohomology space** for the variety with **largest Galois group φ(17)=16**, **most isolated classes (316)**, and **perfect universal barrier verification** (CP1 100%, CP3 90,060/90,060 NOT_REPRESENTABLE).
 
 ```python
 #!/usr/bin/env python3
