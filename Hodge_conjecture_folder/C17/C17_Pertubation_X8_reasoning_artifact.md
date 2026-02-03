@@ -7849,17 +7849,25 @@ This step tests whether the 316 structurally isolated Hodge classes from Step 6 
 script 1:
 
 ```
--- STEP_11_cp3_coordinate_tests_C17.m2
+-- STEP_11_cp3_coordinate_tests_C17_FINAL.m2
 -- Complete CP³ coordinate collapse tests for PERTURBED C17 variety
+-- MINIMAL FIXES: Added GB timing, progress messages, test limit
 -- 
 -- Usage:
---   echo 'primesList = {103}; load "STEP_11_cp3_coordinate_tests_C17.m2"' > test.m2
---   m2 --stop --script test.m2 > output.csv 2>&1
-
--- primesList MUST be set before loading this file
+--   # Full run
+--   m2 --stop -e 'primesList={103}; load "step11_C17_FINAL.m2"' > output.csv 2>&1
+--
+--   # Benchmark (first 5 classes only)
+--   m2 --stop -e 'testsLimit=5; primesList={103}; load "step11_C17_FINAL.m2"' 2>&1 | tee benchmark.log
 
 -- ============================================================================
--- CANDIDATE LIST (316 CLASSES) - C17 isolated classes from Step 6
+-- OPTIONAL CONTROLS (set from command line)
+-- ============================================================================
+
+testsLimit = if (class testsLimit === Symbol) then 0 else testsLimit;  -- 0 = no limit
+
+-- ============================================================================
+-- CANDIDATE LIST (316 CLASSES)
 -- ============================================================================
 
 candidateList = {
@@ -8173,8 +8181,8 @@ candidateList = {
   {"class307", {1,4,2,3,5,3}},
   {"class308", {1,4,1,5,4,3}},
   {"class309", {1,4,1,4,3,5}},
-  {"class310", {1,3,5,2,2,5}},
-  {"class311", {1,3,5,1,4,4}},
+  {"class310", {1,3,5,3,1,5}},
+  {"class311", {1,3,5,2,3,4}},
   {"class312", {1,3,4,4,1,5}},
   {"class313", {1,3,4,3,3,4}},
   {"class314", {1,3,4,2,5,3}},
@@ -8182,7 +8190,7 @@ candidateList = {
 };
 
 -- ============================================================================
--- FOUR-VARIABLE SUBSETS
+-- FOUR-VARIABLE SUBSETS (15 total)
 -- ============================================================================
 
 fourSubsets = {
@@ -8224,7 +8232,7 @@ usesVariable = (poly, var) -> (
 );
 
 -- ============================================================================
--- MAIN COMPUTATION
+-- MAIN COMPUTATION (WITH MINIMAL FIXES)
 -- ============================================================================
 
 print("PRIME,DELTA,CLASS,SUBSET_IDX,SUBSET,RESULT");
@@ -8232,17 +8240,19 @@ print("-----------------------------------------");
 
 -- Scan over each prime
 scan(primesList, p -> (
+    stderr << ">>> Processing prime p = " << p << endl;
+    
     local kk; local numerator; local denominator; local deltap;
     local R; local zVars; local expPow; local omega; local elt;
     local Llist; local Fmono; local Fcyclo; local F; local J;
     
-    -- Compute delta inline
+    -- Compute delta inline (C17: 791/100000)
     kk = ZZ/p;
     numerator = 791_kk;
     denominator = 100000_kk;
     
     if denominator == 0_kk then (
-        print("WARNING: p=" | toString(p) | " divides 100000, using delta=0");
+        stderr << "WARNING: p=" << p << " divides 100000, using delta=0" << endl;
         deltap = 0_kk;
     ) else (
         deltap = numerator / denominator;
@@ -8251,7 +8261,7 @@ scan(primesList, p -> (
     R = kk[z0,z1,z2,z3,z4,z5];
     zVars = {z0,z1,z2,z3,z4,z5};
 
-    -- Find omega for C17: primitive 17th root of unity
+    -- Find omega (primitive 17th root of unity)
     expPow = (p - 1) // 17;
     omega = 0_kk;
     for t from 2 to p-1 do (
@@ -8260,16 +8270,38 @@ scan(primesList, p -> (
     );
     if omega == 0_kk then error("No omega for p=" | toString(p));
 
-    -- Build perturbed polynomial for C17
+    -- Build perturbed polynomial
+    stderr << ">>> Building perturbed polynomial F..." << endl;
     Llist = apply(17, k -> sum(6, j -> (omega^(k*j)) * zVars#j));
     Fmono = sum(zVars, v -> v^8);
     Fcyclo = sum(Llist, Lk -> Lk^8);
     F = Fmono + deltap * Fcyclo;
     
+    -- Build Jacobian ideal
+    stderr << ">>> Building Jacobian ideal..." << endl;
     J = ideal jacobian F;
+    
+    -- MINIMAL FIX: Force GB computation with timing
+    stderr << ">>> Computing Groebner basis (THIS MAY TAKE HOURS - BE PATIENT)..." << endl;
+    dummy = time gb J;  -- M2's 'time' wrapper prints elapsed time
+    stderr << ">>> Groebner basis complete! Proceeding to CP³ tests..." << endl << endl;
 
     -- Test all candidates
+    classCounter = 0;
     scan(candidateList, cand -> (
+        classCounter = classCounter + 1;
+        
+        -- Early exit if test limit reached
+        if testsLimit > 0 and classCounter > testsLimit then (
+            stderr << ">>> Test limit (" << testsLimit << ") reached. Stopping." << endl;
+            return  -- Exit scan loop
+        );
+        
+        -- Progress message every 10 classes
+        if classCounter % 10 == 1 then (
+            stderr << ">>> Processing class " << classCounter << " / " << #candidateList << " : " << cand#0 << endl;
+        );
+        
         local cname; local exps; local mon; local rem;
         
         cname = cand#0;
@@ -8277,6 +8309,8 @@ scan(primesList, p -> (
 
         mon = 1_R;
         for i from 0 to 5 do mon = mon * (zVars#i ^ (exps#i));
+        
+        -- MINIMAL FIX: Use J directly (GB is cached internally by M2)
         rem = mon % J;
 
         sidx := 0;
@@ -8303,6 +8337,8 @@ scan(primesList, p -> (
                   | toString(sidx) | "," | subsetName | "," | result);
         ));
     ));
+    
+    stderr << ">>> Prime " << p << " completed (" << classCounter << " classes tested)" << endl << endl;
 ));
 
 print("");
