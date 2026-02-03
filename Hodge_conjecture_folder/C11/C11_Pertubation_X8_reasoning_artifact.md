@@ -8201,6 +8201,13 @@ Certificate written to robust_19prime_ver_C11_certificate.json
 
 ---
 
+**STEP 11: CP³ COORDINATE COLLAPSE TESTS FOR PERTURBED C₁₁ X₈ VARIETY (19-PRIME VERIFICATION)**
+
+This step tests the **variable-count barrier hypothesis** for the 480 structurally isolated cohomology classes identified in Step 6 for the perturbed C₁₁ cyclotomic hypersurface. For each class, we verify whether its remainder (mod Jacobian ideal J) can be represented using only 4 of the 6 homogeneous coordinates by testing all 15 possible four-variable subsets.
+
+**Method**: For each prime p ≡ 1 (mod 11), we construct the perturbed polynomial F = Σz_i^8 + (791/100000)·Σ_{k=1}^{10} L_k^8 over Z/pZ, compute the Jacobian ideal J, and test each candidate monomial's remainder for variable usage in each four-variable subset.
+
+**Expected Result**: Perfect 100% NOT_REPRESENTABLE across all 480 classes × 15 subsets × 19 primes (136,800 total tests), confirming that isolated classes require the full six-variable coordinate space and cannot collapse to lower-dimensional representations.
 
 script 1:
 
