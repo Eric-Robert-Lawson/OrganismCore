@@ -7127,16 +7127,331 @@ Next step: Step 10B (CRT Reconstruction)
 
 ---
 
+# **STEP 10B **
 
-
+**IMPORTANT** removed prime 113 as its kernel dimension computation is 0 therefore removing from step 10b!
 ```python
+#!/usr/bin/env python3
+"""
+STEP 10B: CRT Reconstruction from 19-Prime Kernel Bases (C7 X8 Perturbed)
+Applies Chinese Remainder Theorem to combine modular kernel bases
+and produces integer coefficients mod M for rational reconstruction.
 
+Perturbed C7 cyclotomic variety:
+  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{6} L_k^8 = 0
+
+First 19 primes (p ≡ 1 (mod 7)):
+29, 43, 71, 113, 127, 197, 211, 239, 281, 337,
+379, 421, 449, 463, 491, 547, 617, 631, 659
+"""
+
+import json
+import time
+import numpy as np
+import os
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+PRIMES = [29, 43, 71, 127, 197, 211, 239, 281, 337,
+          379, 421, 449, 463, 491, 547, 617, 631, 659]
+
+KERNEL_FILE_TEMPLATE = "step10a_kernel_p{}_C7.json"
+OUTPUT_FILE = "step10b_crt_reconstructed_basis_C7.json"
+SUMMARY_FILE = "step10b_crt_summary_C7.json"
+
+# Optional expected shapes (set to None if unknown)
+EXPECTED_DIM = None         # e.g. kernel dimension if available
+EXPECTED_MONOMIALS = None   # e.g. number of invariant monomials if available
+
+# Interpretation/reference values (adjust if you have local references)
+REFERENCE_NONZERO_C13 = 79137
+REFERENCE_DENSITY_C13 = 4.3
+EXPECTED_DENSITY_PERTURBED_RANGE = (50, 85)  # percent (tunable)
+
+# ============================================================================
+# MAIN EXECUTION
+# ============================================================================
+
+print("=" * 80)
+print("STEP 10B: CRT RECONSTRUCTION FROM 19-PRIME KERNEL BASES (C7)")
+print("=" * 80)
+print()
+print("Perturbed C7 cyclotomic variety:")
+print("  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{6} L_k^8 = 0")
+print()
+print(f"Primes: {PRIMES}")
+if EXPECTED_DIM and EXPECTED_MONOMIALS:
+    print(f"Expected kernel dim: {EXPECTED_DIM}, expected monomials: {EXPECTED_MONOMIALS}")
+print()
+
+# ============================================================================
+# COMPUTE CRT MODULUS M
+# ============================================================================
+
+print("Computing CRT modulus M = ∏ p_i ...")
+M = 1
+for p in PRIMES:
+    M *= p
+
+print(f"  M computed")
+print(f"  Decimal digits: {len(str(M))}")
+print(f"  Bit length: {M.bit_length()} bits")
+print()
+
+# ============================================================================
+# PRECOMPUTE CRT COEFFICIENTS
+# ============================================================================
+
+print("Precomputing CRT coefficients for each prime (M_p, y_p = M_p^{-1} mod p)...")
+crt_coeffs = {}
+for p in PRIMES:
+    M_p = M // p
+    y_p = pow(M_p, p - 2, p)  # Fermat inverse
+    crt_coeffs[p] = (M_p, y_p)
+    print(f"  p = {p:4d}: y_p = {y_p}")
+
+print("✓ CRT coefficients precomputed")
+print()
+
+# ============================================================================
+# LOAD KERNEL BASES
+# ============================================================================
+
+print("=" * 80)
+print("LOADING KERNEL BASES FROM ALL PRIMES")
+print("=" * 80)
+print()
+
+kernels = {}
+kernel_metadata = {}
+
+for p in PRIMES:
+    filename = KERNEL_FILE_TEMPLATE.format(p)
+    if not os.path.exists(filename):
+        raise SystemExit(f"Missing kernel file for p={p}: {filename}")
+    with open(filename, "r") as f:
+        data = json.load(f)
+    # Extract kernel matrix
+    if 'kernel_basis' in data:
+        kernel = data['kernel_basis']
+    elif 'kernel' in data:
+        kernel = data['kernel']
+    else:
+        raise KeyError(f"No kernel data found in {filename}")
+    kernels[p] = np.array(kernel, dtype=object)
+    kernel_metadata[p] = {
+        'variety': data.get('variety', 'UNKNOWN'),
+        'delta': data.get('delta', 'UNKNOWN'),
+        'cyclotomic_order': int(data.get('cyclotomic_order', 7)),
+        'dimension': int(data.get('kernel_dimension', data.get('dimension', 0)))
+    }
+    print(f"  p = {p:4d}: loaded kernel shape {kernels[p].shape}")
+
+print()
+
+# Verify shapes are consistent
+kernel_shapes = [kernels[p].shape for p in PRIMES]
+if len(set(kernel_shapes)) != 1:
+    print("ERROR: Kernel shapes differ across primes!")
+    for p in PRIMES:
+        print(f"  p = {p}: shape = {kernels[p].shape}")
+    raise SystemExit("Inconsistent kernel shapes across primes")
+
+dim, num_monomials = kernel_shapes[0]
+print(f"✓ All kernels have consistent shape: ({dim}, {num_monomials})")
+if EXPECTED_DIM is not None and dim != EXPECTED_DIM:
+    print(f"WARNING: expected dim {EXPECTED_DIM} but found {dim}")
+if EXPECTED_MONOMIALS is not None and num_monomials != EXPECTED_MONOMIALS:
+    print(f"WARNING: expected monomials {EXPECTED_MONOMIALS} but found {num_monomials}")
+print()
+
+sample_meta = kernel_metadata[PRIMES[0]]
+variety = sample_meta['variety']
+delta = sample_meta['delta']
+cyclotomic_order = sample_meta['cyclotomic_order']
+
+# ============================================================================
+# CRT RECONSTRUCTION
+# ============================================================================
+
+print("=" * 80)
+print("PERFORMING CRT RECONSTRUCTION")
+print("=" * 80)
+print()
+
+total_coeffs = dim * num_monomials
+print(f"Reconstructing {dim} × {num_monomials} = {total_coeffs:,} coefficients...")
+print("Using formula: c_M = [Σ_p c_p · M_p · y_p] mod M")
+print()
+
+start_time = time.time()
+reconstructed_basis = []
+nonzero_coeffs = 0
+
+for vec_idx in range(dim):
+    reconstructed_vector = []
+    for coeff_idx in range(num_monomials):
+        c_M = 0
+        for p in PRIMES:
+            c_p = int(kernels[p][vec_idx, coeff_idx]) % p
+            M_p, y_p = crt_coeffs[p]
+            c_M += c_p * M_p * y_p
+        c_M %= M
+        reconstructed_vector.append(int(c_M))
+        if c_M != 0:
+            nonzero_coeffs += 1
+    reconstructed_basis.append(reconstructed_vector)
+    # progress indicator
+    if (vec_idx + 1) % 50 == 0 or (vec_idx + 1) == dim:
+        elapsed = time.time() - start_time
+        pct = (vec_idx + 1) / dim * 100
+        print(f"  Progress: {vec_idx + 1}/{dim} vectors ({pct:.1f}%) | Elapsed: {elapsed:.1f}s")
+
+elapsed_time = time.time() - start_time
+
+print()
+print(f"✓ CRT reconstruction completed in {elapsed_time:.2f} seconds")
+print()
+
+# ============================================================================
+# STATISTICS
+# ============================================================================
+
+zero_coeffs = total_coeffs - nonzero_coeffs
+sparsity = (zero_coeffs / total_coeffs) * 100 if total_coeffs > 0 else 0.0
+density = 100.0 - sparsity
+
+print("=" * 80)
+print("CRT RECONSTRUCTION STATISTICS")
+print("=" * 80)
+print()
+print(f"Total coefficients:     {total_coeffs:,}")
+print(f"Zero coefficients:      {zero_coeffs:,} ({sparsity:.1f}%)")
+print(f"Non-zero coefficients:  {nonzero_coeffs:,} ({density:.1f}%)")
+print()
+
+# ============================================================================
+# INTERPRETATION & COMPARISON
+# ============================================================================
+
+print("=" * 80)
+print("COMPARISON & INTERPRETATION (C7)")
+print("=" * 80)
+print()
+print("Reference (non-perturbed C13):")
+print(f"  Reference non-zero coeffs: ~{REFERENCE_NONZERO_C13:,} ({REFERENCE_DENSITY_C13}% density)")
+print()
+print("Perturbed C7 (this computation):")
+print(f"  Variety: {variety}, delta = {delta}")
+print(f"  Dimension: {dim}")
+print(f"  Total coefficients: {total_coeffs:,}")
+print(f"  Non-zero coefficients: {nonzero_coeffs:,} ({density:.1f}%)")
+print(f"  CRT modulus bits: {M.bit_length()}")
+print()
+
+density_in_range = EXPECTED_DENSITY_PERTURBED_RANGE[0] <= density <= EXPECTED_DENSITY_PERTURBED_RANGE[1]
+if density_in_range:
+    print("*** RESULT CONSISTENT WITH PERTURBED BEHAVIOR ***")
+    verification_status = "CORRECT_FOR_PERTURBED"
+else:
+    print(f"⚠ Density {density:.1f}% outside expected range {EXPECTED_DENSITY_PERTURBED_RANGE}")
+    verification_status = "UNEXPECTED"
+
+print()
+
+# ============================================================================
+# SAVE RESULTS (sparse representation)
+# ============================================================================
+
+print("Saving CRT-reconstructed basis (sparse representation)...")
+sparse_basis = []
+for vec_idx, vec in enumerate(reconstructed_basis):
+    entries = [{"monomial_index": i, "coefficient_mod_M": str(c)} for i, c in enumerate(vec) if c != 0]
+    sparse_basis.append({
+        "vector_index": vec_idx,
+        "num_nonzero": len(entries),
+        "entries": entries
+    })
+
+output_data = {
+    "step": "10B",
+    "description": "CRT-reconstructed kernel basis (integer coefficients mod M, C7)",
+    "variety": variety,
+    "delta": delta,
+    "cyclotomic_order": cyclotomic_order,
+    "galois_group": f"Z/{cyclotomic_order-1}Z",
+    "dimension": dim,
+    "num_monomials": num_monomials,
+    "total_coefficients": total_coeffs,
+    "nonzero_coefficients": nonzero_coeffs,
+    "zero_coefficients": zero_coeffs,
+    "sparsity_percent": float(sparsity),
+    "density_percent": float(density),
+    "crt_modulus_M": str(M),
+    "crt_modulus_bits": M.bit_length(),
+    "primes_used": PRIMES,
+    "reconstruction_time_seconds": float(elapsed_time),
+    "basis_vectors": sparse_basis
+}
+
+with open(OUTPUT_FILE, "w") as f:
+    json.dump(output_data, f, indent=2)
+
+file_size_mb = os.path.getsize(OUTPUT_FILE) / (1024 * 1024)
+print(f"✓ Saved to {OUTPUT_FILE} ({file_size_mb:.1f} MB)")
+print()
+
+summary = {
+    "step": "10B",
+    "variety": variety,
+    "delta": delta,
+    "cyclotomic_order": cyclotomic_order,
+    "galois_group": f"Z/{cyclotomic_order-1}Z",
+    "total_coefficients": total_coeffs,
+    "nonzero_coefficients": nonzero_coeffs,
+    "zero_coefficients": zero_coeffs,
+    "sparsity_percent": float(sparsity),
+    "density_percent": float(density),
+    "crt_modulus_bits": M.bit_length(),
+    "primes": PRIMES,
+    "runtime_seconds": float(elapsed_time),
+    "verification_status": verification_status,
+    "expected_density_range": EXPECTED_DENSITY_PERTURBED_RANGE
+}
+
+with open(SUMMARY_FILE, "w") as f:
+    json.dump(summary, f, indent=2)
+
+print(f"✓ Saved summary to {SUMMARY_FILE}")
+print()
+
+# ============================================================================
+# FINAL SUMMARY
+# ============================================================================
+
+print("=" * 80)
+print("STEP 10B COMPLETE - CRT RECONSTRUCTION (C7)")
+print("=" * 80)
+print()
+print(f"  Total coefficients:     {total_coeffs:,}")
+print(f"  Non-zero coefficients:  {nonzero_coeffs:,} ({density:.1f}%)")
+print(f"  Sparsity:               {sparsity:.1f}%")
+print(f"  CRT modulus bits:       {M.bit_length()} bits")
+print(f"  Runtime:                {elapsed_time:.2f} seconds")
+print(f"  Verification status:    {verification_status}")
+print()
+print("Next step: Step 10C (Rational Reconstruction)")
+print("  - Input: this file")
+print("  - Output: step10c_kernel_basis_rational_C7.json")
+print("=" * 80)
 ```
 
 to run script:
 
 ```bash
-
+python step10b_7.py
 ```
 
 ---
@@ -7144,7 +7459,126 @@ to run script:
 result:
 
 ```verbatim
+================================================================================
+STEP 10B: CRT RECONSTRUCTION FROM 19-PRIME KERNEL BASES (C7)
+================================================================================
 
+Perturbed C7 cyclotomic variety:
+  V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{6} L_k^8 = 0
+
+Primes: [29, 43, 71, 127, 197, 211, 239, 281, 337, 379, 421, 449, 463, 491, 547, 617, 631, 659]
+
+Computing CRT modulus M = ∏ p_i ...
+  M computed
+  Decimal digits: 44
+  Bit length: 145 bits
+
+Precomputing CRT coefficients for each prime (M_p, y_p = M_p^{-1} mod p)...
+  p =   29: y_p = 5
+  p =   43: y_p = 23
+  p =   71: y_p = 20
+  p =  127: y_p = 41
+  p =  197: y_p = 16
+  p =  211: y_p = 55
+  p =  239: y_p = 103
+  p =  281: y_p = 100
+  p =  337: y_p = 21
+  p =  379: y_p = 70
+  p =  421: y_p = 406
+  p =  449: y_p = 141
+  p =  463: y_p = 314
+  p =  491: y_p = 426
+  p =  547: y_p = 5
+  p =  617: y_p = 450
+  p =  631: y_p = 498
+  p =  659: y_p = 633
+✓ CRT coefficients precomputed
+
+================================================================================
+LOADING KERNEL BASES FROM ALL PRIMES
+================================================================================
+
+  p =   29: loaded kernel shape (270, 3744)
+  p =   43: loaded kernel shape (270, 3744)
+  p =   71: loaded kernel shape (270, 3744)
+  p =  127: loaded kernel shape (270, 3744)
+  p =  197: loaded kernel shape (270, 3744)
+  p =  211: loaded kernel shape (270, 3744)
+  p =  239: loaded kernel shape (270, 3744)
+  p =  281: loaded kernel shape (270, 3744)
+  p =  337: loaded kernel shape (270, 3744)
+  p =  379: loaded kernel shape (270, 3744)
+  p =  421: loaded kernel shape (270, 3744)
+  p =  449: loaded kernel shape (270, 3744)
+  p =  463: loaded kernel shape (270, 3744)
+  p =  491: loaded kernel shape (270, 3744)
+  p =  547: loaded kernel shape (270, 3744)
+  p =  617: loaded kernel shape (270, 3744)
+  p =  631: loaded kernel shape (270, 3744)
+  p =  659: loaded kernel shape (270, 3744)
+
+✓ All kernels have consistent shape: (270, 3744)
+
+================================================================================
+PERFORMING CRT RECONSTRUCTION
+================================================================================
+
+Reconstructing 270 × 3744 = 1,010,880 coefficients...
+Using formula: c_M = [Σ_p c_p · M_p · y_p] mod M
+
+  Progress: 50/270 vectors (18.5%) | Elapsed: 0.9s
+  Progress: 100/270 vectors (37.0%) | Elapsed: 1.9s
+  Progress: 150/270 vectors (55.6%) | Elapsed: 2.9s
+  Progress: 200/270 vectors (74.1%) | Elapsed: 3.8s
+  Progress: 250/270 vectors (92.6%) | Elapsed: 4.8s
+  Progress: 270/270 vectors (100.0%) | Elapsed: 5.2s
+
+✓ CRT reconstruction completed in 5.25 seconds
+
+================================================================================
+CRT RECONSTRUCTION STATISTICS
+================================================================================
+
+Total coefficients:     1,010,880
+Zero coefficients:      684,844 (67.7%)
+Non-zero coefficients:  326,036 (32.3%)
+
+================================================================================
+COMPARISON & INTERPRETATION (C7)
+================================================================================
+
+Reference (non-perturbed C13):
+  Reference non-zero coeffs: ~79,137 (4.3% density)
+
+Perturbed C7 (this computation):
+  Variety: PERTURBED_C7_CYCLOTOMIC, delta = 791/100000
+  Dimension: 270
+  Total coefficients: 1,010,880
+  Non-zero coefficients: 326,036 (32.3%)
+  CRT modulus bits: 145
+
+⚠ Density 32.3% outside expected range (50, 85)
+
+Saving CRT-reconstructed basis (sparse representation)...
+✓ Saved to step10b_crt_reconstructed_basis_C7.json (39.8 MB)
+
+✓ Saved summary to step10b_crt_summary_C7.json
+
+================================================================================
+STEP 10B COMPLETE - CRT RECONSTRUCTION (C7)
+================================================================================
+
+  Total coefficients:     1,010,880
+  Non-zero coefficients:  326,036 (32.3%)
+  Sparsity:               67.7%
+  CRT modulus bits:       145 bits
+  Runtime:                5.25 seconds
+  Verification status:    UNEXPECTED
+
+Next step: Step 10C (Rational Reconstruction)
+  - Input: this file
+  - Output: step10c_kernel_basis_rational_C7.json
+================================================================================
 ```
 
 (skipped for size consideration)
