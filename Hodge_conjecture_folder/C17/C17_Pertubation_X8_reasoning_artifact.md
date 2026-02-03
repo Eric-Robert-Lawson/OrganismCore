@@ -6574,357 +6574,217 @@ This step computes **explicit kernel bases** for the Jacobian cokernel matrices 
 ```python
 #!/usr/bin/env python3
 """
-STEP 10A: Kernel Basis Computation from Jacobian Matrices (C17 X8 Perturbed)
-Robust kernel computation with orientation detection for triplet files.
+Recompute Step 10A kernel files for C17 X8-perturbed family using triplet-inferred shapes.
 
-This version detects whether the triplet orientation in each JSON file
-matches the expected matrix shape or needs the row/col swap fix. If neither
-orientation exactly matches the expected shape the script expands the matrix
-shape to accommodate the maximal indices found in the triplets (safe fallback).
+Problem addressed:
+- Earlier runs forced EXPECTED_ROWS = 1443 while triplet data required 1541 rows
+  (after the row/col swap). That produced kernel files incompatible with the
+  original triplets and caused most kernel vectors to fail verification.
+- This script rebuilds the sparse matrix from triplets using the correct
+  orientation (swap applied) and the inferred shape (max indices + 1), then
+  recomputes the nullspace mod p and writes corrected step10a kernel JSONs.
 
-First 19 primes (p ≡ 1 (mod 17)):
-103, 137, 239, 307, 409, 443, 613, 647, 919, 953,
-1021, 1123, 1259, 1327, 1361, 1429, 1531, 1667, 1871
+Usage:
+  python recompute_kernels_C17_fix.py
+
+It will iterate over the PRIMES list and overwrite step10a_kernel_p{p}_C17.json
+with corrected kernel files. Keep an eye on output for any primes that fail.
 """
 
 import json
+import os
+import time
 import numpy as np
 from scipy.sparse import csr_matrix
-import time
-import os
-from math import isnan
 
-# ============================================================================
-# CONFIGURATION
-# ============================================================================
-
+# ---------------------------------------------------------------------------
+# Configuration: C17 primes and filenames
+# ---------------------------------------------------------------------------
 PRIMES = [103, 137, 239, 307, 409, 443, 613, 647, 919, 953,
           1021, 1123, 1259, 1327, 1361, 1429, 1531, 1667, 1871]
 
 TRIPLET_FILE_TEMPLATE = "saved_inv_p{}_triplets.json"
-KERNEL_OUTPUT_TEMPLATE = "step10a_kernel_p{}_C17.json"
-SUMMARY_FILE = "step10a_kernel_computation_summary_C17.json"
+OUTPUT_KERNEL_TEMPLATE = "step10a_kernel_p{}_C17.json"
 
-# Expected invariants (from earlier verification)
-EXPECTED_KERNEL_DIM = 537
-EXPECTED_RANK = 1443
-# Expected canonical monomial count observed earlier
-EXPECTED_COLS = 1980
-# Expected rows = rank (rows in Jacobian matrix)
-EXPECTED_ROWS = EXPECTED_RANK
-
-# ============================================================================
-# HELPERS
-# ============================================================================
-
-def load_triplets(filename):
-    with open(filename, "r") as f:
-        data = json.load(f)
-    p = data.get('prime')
-    rank = int(data.get('rank', -1))
-    h22_inv = int(data.get('h22_inv', -1))
-    triplets = data.get('triplets', [])
-    count_inv = int(data.get('countInv', EXPECTED_COLS))
-    variety = data.get('variety', 'UNKNOWN')
-    delta = data.get('delta', 'UNKNOWN')
-    cyclotomic_order = int(data.get('cyclotomic_order', 17))
-    return {
-        'prime': p,
-        'rank': rank,
-        'kernel_dim': h22_inv,
-        'triplets': triplets,
-        'count_inv': count_inv,
-        'variety': variety,
-        'delta': delta,
-        'cyclotomic_order': cyclotomic_order
-    }
-
-def compute_nullspace_mod_p(M, p, verbose=True):
-    num_rows, num_cols = M.shape
+# ---------------------------------------------------------------------------
+# Linear algebra: nullspace mod p (Gaussian elimination -> RREF)
+# ---------------------------------------------------------------------------
+def compute_nullspace_mod_p(A, p, verbose=False):
+    """
+    Compute nullspace of integer matrix A over F_p.
+    A is a numpy array (num_rows x num_cols) with integer entries.
+    Returns: kernel_basis (kernel_dim x num_cols), pivot_cols, free_cols
+    """
+    A = A.copy().astype(np.int64) % p
+    num_rows, num_cols = A.shape
     if verbose:
-        print(f"    Starting Gaussian elimination on {num_rows} × {num_cols} matrix...")
-    A = M.copy().astype(np.int64)
+        print(f"    Gaussian elimination on {num_rows}x{num_cols} matrix (mod {p})")
+
     pivot_cols = []
-    current_row = 0
+    cur_row = 0
+
     for col in range(num_cols):
-        if current_row >= num_rows:
+        if cur_row >= num_rows:
             break
-        pivot_row = None
-        for row in range(current_row, num_rows):
-            if int(A[row, col] % p) != 0:
-                pivot_row = row
+        # find pivot
+        pivot = None
+        for r in range(cur_row, num_rows):
+            if int(A[r, col] % p) != 0:
+                pivot = r
                 break
-        if pivot_row is None:
+        if pivot is None:
             continue
-        if pivot_row != current_row:
-            A[[current_row, pivot_row]] = A[[pivot_row, current_row]]
+        # swap
+        if pivot != cur_row:
+            A[[cur_row, pivot]] = A[[pivot, cur_row]]
         pivot_cols.append(col)
-        pivot_val = int(A[current_row, col] % p)
-        pivot_inv = pow(pivot_val, p - 2, p)
-        A[current_row] = (A[current_row] * pivot_inv) % p
-        for row in range(current_row + 1, num_rows):
-            if int(A[row, col] % p) != 0:
-                factor = int(A[row, col] % p)
-                A[row] = (A[row] - factor * A[current_row]) % p
-        current_row += 1
-        if verbose and col % 500 == 0 and col > 0:
-            print(f"      Progress: {col}/{num_cols} columns processed...")
-    if verbose:
-        print(f"    Forward elimination complete: {len(pivot_cols)} pivots found")
+        pv = int(A[cur_row, col] % p)
+        inv = pow(pv, p - 2, p)
+        A[cur_row] = (A[cur_row] * inv) % p
+        # eliminate below
+        for r in range(cur_row + 1, num_rows):
+            if int(A[r, col] % p) != 0:
+                factor = int(A[r, col] % p)
+                A[r] = (A[r] - factor * A[cur_row]) % p
+        cur_row += 1
+
+    # back substitution (RREF)
     for i in range(len(pivot_cols) - 1, -1, -1):
         col = pivot_cols[i]
-        for row in range(i):
-            if int(A[row, col] % p) != 0:
-                factor = int(A[row, col] % p)
-                A[row] = (A[row] - factor * A[i]) % p
-    if verbose:
-        print("    Back substitution complete (RREF)")
+        for r in range(i):
+            if int(A[r, col] % p) != 0:
+                factor = int(A[r, col] % p)
+                A[r] = (A[r] - factor * A[i]) % p
+
     free_cols = [c for c in range(num_cols) if c not in pivot_cols]
     kernel_dim = len(free_cols)
-    if verbose:
-        print(f"    Rank (pivots): {len(pivot_cols)}, Kernel dimension: {kernel_dim}")
-    kernel_basis = np.zeros((kernel_dim, num_cols), dtype=np.int64)
-    for i, free_col in enumerate(free_cols):
-        kernel_basis[i, free_col] = 1
-        for j, pivot_col in enumerate(pivot_cols):
-            kernel_basis[i, pivot_col] = (-A[j, free_col]) % p
-    return kernel_basis, pivot_cols, free_cols
 
-def compute_kernel_basis(triplets_file, p):
-    print(f"  Loading triplets from {triplets_file}...")
-    data = load_triplets(triplets_file)
-    triplets = data['triplets']
-    variety = data['variety']
-    delta = data['delta']
-    cyclotomic_order = data['cyclotomic_order']
-    print(f"    Variety: {variety}, Delta: {delta}, Cyclotomic order: {cyclotomic_order}")
-    print(f"    Reported rank: {data['rank']}, reported kernel dim: {data['kernel_dim']}")
-    if len(triplets) == 0:
-        raise RuntimeError("Triplets list is empty")
-    # Inspect triplet indices to decide orientation
-    rows_raw = np.array([int(t[0]) for t in triplets], dtype=np.int64)
-    cols_raw = np.array([int(t[1]) for t in triplets], dtype=np.int64)
-    max_r = int(rows_raw.max())
-    max_c = int(cols_raw.max())
-    print(f"    Triplet max indices: max_row={max_r}, max_col={max_c}")
-    # Determine whether swap is needed by comparing to expected dims
-    swap = None
-    if max_r <= EXPECTED_ROWS - 1 and max_c <= EXPECTED_COLS - 1:
-        swap = False
-        print("    Orientation looks like (row, col) matching expected rows × cols -> NO SWAP")
-    elif max_c <= EXPECTED_ROWS - 1 and max_r <= EXPECTED_COLS - 1:
-        swap = True
-        print("    Orientation appears swapped relative to expected shape -> APPLY SWAP")
-    else:
-        # Neither fits expected dims exactly. Choose orientation that minimizes required shape
-        # Compute shapes for both orientations and pick one with smaller total size
-        shape_no_swap = (max_r + 1, max_c + 1)
-        shape_swap = (max_c + 1, max_r + 1)
-        size_no_swap = shape_no_swap[0] * shape_no_swap[1]
-        size_swap = shape_swap[0] * shape_swap[1]
-        swap = (size_swap < size_no_swap)
-        print("    Ambiguous orientation; choosing orientation that minimizes matrix size.")
-        print(f"      no-swap shape = {shape_no_swap}, swap shape = {shape_swap}, swap={swap}")
-    # Build rows/cols/vals according to chosen orientation
+    if verbose:
+        print(f"    Found {len(pivot_cols)} pivots, kernel dimension {kernel_dim}")
+
+    kernel = np.zeros((kernel_dim, num_cols), dtype=np.int64)
+    for i, fc in enumerate(free_cols):
+        kernel[i, fc] = 1
+        for j, pc in enumerate(pivot_cols):
+            kernel[i, pc] = (-A[j, fc]) % p
+
+    return kernel, pivot_cols, free_cols
+
+# ---------------------------------------------------------------------------
+# Main loop: rebuild and recompute kernels
+# ---------------------------------------------------------------------------
+def process_prime(p):
+    trip_fn = TRIPLET_FILE_TEMPLATE.format(p)
+    out_fn = OUTPUT_KERNEL_TEMPLATE.format(p)
+
+    if not os.path.exists(trip_fn):
+        print(f"  ✗ Triplet file missing: {trip_fn}")
+        return {"status": "missing_triplet"}
+
+    print(f"[p={p}] Loading triplets from {trip_fn} ...")
+    with open(trip_fn) as f:
+        data = json.load(f)
+
+    triplets = data.get("triplets", [])
+    if not triplets:
+        print(f"  ✗ No triplets in {trip_fn}")
+        return {"status": "empty_triplets"}
+
+    # Build lists with SWAP: use (col -> row, row -> col)
     rows = []
     cols = []
     vals = []
-    if not swap:
-        # Use triplets as given: (row, col, val)
-        for r, c, v in triplets:
-            rows.append(int(r))
-            cols.append(int(c))
-            vals.append(int(v % p))
-        inferred_num_rows = max(rows) + 1
-        inferred_num_cols = max(cols) + 1
-    else:
-        # Swap indices: use (col -> row, row -> col)
-        for r, c, v in triplets:
-            rows.append(int(c))
-            cols.append(int(r))
-            vals.append(int(v % p))
-        inferred_num_rows = max(rows) + 1
-        inferred_num_cols = max(cols) + 1
-    # Choose final matrix shape: prefer expected dims, but ensure indices fit
-    num_rows = max(EXPECTED_ROWS, inferred_num_rows)
-    num_cols = max(EXPECTED_COLS, inferred_num_cols)
-    print(f"    Building sparse matrix with shape {num_rows} × {num_cols} (inferred {inferred_num_rows}×{inferred_num_cols})")
-    # Create sparse matrix (safe: indices are within shape)
-    M_sparse = csr_matrix((vals, (rows, cols)), shape=(num_rows, num_cols), dtype=np.int64)
-    print(f"    Matrix nnz = {M_sparse.nnz:,}")
-    # Convert to dense (may be large)
-    print("  Converting to dense array (mod p)...")
+    for t in triplets:
+        r, c, v = int(t[0]), int(t[1]), int(t[2])
+        rows.append(c)      # original column becomes row
+        cols.append(r)      # original row becomes column
+        vals.append(v % p)
+
+    inferred_rows = max(rows) + 1
+    inferred_cols = max(cols) + 1
+
+    print(f"    Inferred (rows,cols) after swap = ({inferred_rows}, {inferred_cols}), nnz = {len(vals)}")
+
+    # Build sparse matrix with inferred shape (ensures indices fit)
+    M_sparse = csr_matrix((vals, (rows, cols)), shape=(inferred_rows, inferred_cols), dtype=np.int64)
+    print(f"    Built CSR matrix: shape={M_sparse.shape}, nnz={M_sparse.nnz}")
+
+    # Convert to dense modulo p
+    print("    Converting to dense (this may be memory heavy)...")
     M_dense = M_sparse.toarray() % p
+
     # Compute kernel
-    print("  Computing kernel via Gaussian elimination mod p...")
+    print("    Computing nullspace (may take time)...")
     t0 = time.time()
-    kernel_basis, pivot_cols, free_cols = compute_nullspace_mod_p(M_dense, p, verbose=True)
-    t1 = time.time() - t0
-    metadata = {
-        'prime': p,
-        'variety': variety,
-        'delta': delta,
-        'cyclotomic_order': cyclotomic_order,
-        'matrix_rows': num_rows,
-        'matrix_cols': num_cols,
-        'expected_rank': data['rank'],
-        'computed_rank': len(pivot_cols),
-        'expected_kernel_dim': data['kernel_dim'],
-        'computed_kernel_dim': kernel_basis.shape[0],
-        'pivot_cols': pivot_cols,
-        'free_cols': free_cols,
-        'computation_time': t1,
-        'swap_applied': bool(swap)
+    kernel, pivots, frees = compute_nullspace_mod_p(M_dense, p, verbose=True)
+    elapsed = time.time() - t0
+    print(f"    Kernel computed: shape={kernel.shape} in {elapsed:.1f}s")
+
+    # Save kernel JSON (overwrite)
+    out = {
+        "step": "10A",
+        "prime": int(p),
+        "variety": data.get("variety", "PERTURBED_C17_CYCLOTOMIC"),
+        "delta": data.get("delta", "791/100000"),
+        "cyclotomic_order": int(data.get("cyclotomic_order", 17)),
+        "galois_group": "Z/16Z",
+        "kernel_dimension": int(kernel.shape[0]),
+        "rank": int(len(pivots)),
+        "num_monomials": int(M_sparse.shape[1]),
+        "computation_time_seconds": float(elapsed),
+        "free_column_indices": [int(x) for x in frees],
+        "pivot_column_indices": [int(x) for x in pivots],
+        "swap_applied": True,
+        "kernel_basis": kernel.tolist()
     }
-    print(f"  ✓ Kernel computed in {t1:.1f} seconds (prime {p}, swap_applied={swap})")
-    return kernel_basis, metadata
 
-# ============================================================================
-# PROCESS PRIMES
-# ============================================================================
+    with open(out_fn, "w") as f:
+        json.dump(out, f, indent=2)
 
-print("="*80)
-print("COMPUTING KERNEL BASES FOR ALL PRIMES (C17)")
-print("="*80)
-print()
+    size_mb = os.path.getsize(out_fn) / (1024 * 1024)
+    print(f"    ✓ Saved corrected kernel to {out_fn} ({size_mb:.2f} MB)")
 
-total_start = time.time()
-results = {}
+    return {
+        "status": "ok",
+        "prime": p,
+        "rows": inferred_rows,
+        "cols": inferred_cols,
+        "nnz": int(M_sparse.nnz),
+        "kernel_dim": int(kernel.shape[0]),
+        "rank": int(len(pivots)),
+        "time_s": elapsed
+    }
 
-for idx, p in enumerate(PRIMES, 1):
-    print(f"[{idx}/{len(PRIMES)}] Processing prime p = {p}")
-    print("-" * 70)
-    triplets_file = TRIPLET_FILE_TEMPLATE.format(p)
-    if not os.path.exists(triplets_file):
-        print(f"  ✗ File not found: {triplets_file}")
-        results[p] = {"status": "file_not_found"}
-        print()
-        continue
-    print(f"  ✓ Found {triplets_file}")
-    try:
-        kernel_basis, metadata = compute_kernel_basis(triplets_file, p)
-        rank_match = (metadata['computed_rank'] == metadata['expected_rank'])
-        dim_match = (metadata['computed_kernel_dim'] == metadata['expected_kernel_dim'])
-        print()
-        print("  Verification:")
-        print(f"    Computed rank: {metadata['computed_rank']} (expected {metadata['expected_rank']}) - {'✓' if rank_match else '✗'}")
-        print(f"    Computed kernel dim: {metadata['computed_kernel_dim']} (expected {metadata['expected_kernel_dim']}) - {'✓' if dim_match else '✗'}")
-        output_file = KERNEL_OUTPUT_TEMPLATE.format(p)
-        kernel_list = kernel_basis.tolist()
-        output_data = {
-            "step": "10A",
-            "prime": int(p),
-            "variety": metadata['variety'],
-            "delta": metadata['delta'],
-            "cyclotomic_order": int(metadata['cyclotomic_order']),
-            "galois_group": "Z/16Z",
-            "kernel_dimension": int(metadata['computed_kernel_dim']),
-            "rank": int(metadata['computed_rank']),
-            "num_monomials": int(metadata['matrix_cols']),
-            "computation_time_seconds": float(metadata['computation_time']),
-            "free_column_indices": [int(c) for c in metadata['free_cols']],
-            "pivot_column_indices": [int(c) for c in metadata['pivot_cols']],
-            "swap_applied": bool(metadata.get('swap_applied', False)),
-            "kernel_basis": kernel_list
-        }
-        with open(output_file, "w") as f:
-            json.dump(output_data, f, indent=2)
-        file_size_mb = os.path.getsize(output_file) / 1024 / 1024
-        print(f"  ✓ Saved kernel basis to {output_file} ({file_size_mb:.1f} MB)")
-        results[p] = {
-            "status": "success",
-            "rank": metadata['computed_rank'],
-            "dimension": metadata['computed_kernel_dim'],
-            "time": metadata['computation_time'],
-            "rank_match": rank_match,
-            "dim_match": dim_match,
-            "swap_applied": metadata.get('swap_applied', False)
-        }
-    except Exception as e:
-        print(f"  ✗ Error while processing p={p}: {e}")
-        import traceback
-        traceback.print_exc()
-        results[p] = {"status": "failed", "error": str(e)}
-    print()
-
-total_time = time.time() - total_start
-
-# ============================================================================
-# SUMMARY
-# ============================================================================
-
-print("="*80)
-print("STEP 10A COMPLETE - KERNEL BASIS COMPUTATION (C17)")
-print("="*80)
-print()
-
-successful = [p for p, r in results.items() if r.get("status") == "success"]
-failed = [p for p, r in results.items() if r.get("status") != "success"]
-
-print(f"Processed {len(PRIMES)} primes:")
-print(f"  ✓ Successful: {len(successful)}/{len(PRIMES)}")
-print(f"  ✗ Failed: {len(failed)}/{len(PRIMES)}")
-print()
-
-if successful:
-    print("Kernel computation results:")
-    print(f"  {'Prime':<8} {'Rank':<8} {'Kernel Dim':<12} {'Time (s)':<10} {'Swap':<6} {'Verified':<10}")
-    print("-" * 80)
-    for p in successful:
-        r = results[p]
-        verified = '✓' if r['rank_match'] and r['dim_match'] else '✗'
-        swap_flag = 'Y' if r.get('swap_applied') else 'N'
-        print(f"  {p:<8} {r['rank']:<8} {r['dimension']:<12} {r['time']:<10.1f} {swap_flag:<6} {verified:<10}")
-    avg_time = np.mean([results[p]['time'] for p in successful])
-    total_mins = total_time / 60
-    print()
-    print("Performance:")
-    print(f"  Average computation time: {avg_time:.1f} seconds per prime")
-    print(f"  Total runtime: {total_mins:.1f} minutes")
-    print()
-
-# Save summary
-summary = {
-    "step": "10A",
-    "description": "Kernel basis computation for 19 primes (C17) with robust orientation detection",
-    "variety": "PERTURBED_C17_CYCLOTOMIC",
-    "delta": "791/100000",
-    "cyclotomic_order": 17,
-    "galois_group": "Z/16Z",
-    "total_primes": len(PRIMES),
-    "successful": len(successful),
-    "failed": len(failed),
-    "successful_primes": successful,
-    "failed_primes": failed,
-    "expected_rank": EXPECTED_RANK,
-    "expected_kernel_dim": EXPECTED_KERNEL_DIM,
-    "results": {str(p): r for p, r in results.items()},
-    "total_time_seconds": float(total_time),
-    "total_time_minutes": float(total_time / 60),
-    "average_time_per_prime": float(np.mean([results[p]['time'] for p in successful])) if successful else None
-}
-
-with open(SUMMARY_FILE, "w") as f:
-    json.dump(summary, f, indent=2)
-
-print(f"✓ Summary saved to {SUMMARY_FILE}")
-print()
-
-if len(successful) == len(PRIMES):
+def main():
     print("="*80)
-    print("*** ALL KERNELS COMPUTED SUCCESSFULLY ***")
+    print("Recompute Step 10A kernels for C17 using triplet-inferred shapes (swap applied)")
     print("="*80)
-    print()
-    for p in successful:
-        print(f"  - {KERNEL_OUTPUT_TEMPLATE.format(p)}")
-    print()
-    print("Next step: Step 10B (CRT Reconstruction)")
-else:
-    print(f"*** {len(successful)}/{len(PRIMES)} KERNELS COMPUTED SUCCESSFULLY ***")
-    if failed:
-        print(f"Failed primes: {failed}")
+    start_all = time.time()
+    results = {}
+    for p in PRIMES:
+        print("-" * 70)
+        try:
+            info = process_prime(p)
+            results[p] = info
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            results[p] = {"status": "error", "error": str(e)}
+    total_time = time.time() - start_all
+    print("="*80)
+    print("Recomputation complete.")
+    print("Summary:")
+    for p in PRIMES:
+        r = results.get(p)
+        print(f"  p={p}: {r}")
+    print(f"Total elapsed: {total_time:.1f}s")
+    # Save a brief report
+    with open("recompute_kernels_C17_fix_summary.json", "w") as f:
+        json.dump(results, f, indent=2)
+    print("Summary saved to recompute_kernels_C17_fix_summary.json")
 
-print("="*80)
+if __name__ == "__main__":
+    main()
 ```
 
 to run script:
@@ -6939,134 +6799,62 @@ results:
 
 ```verbatim
 ================================================================================
-COMPUTING KERNEL BASES FOR ALL PRIMES (C17)
+Recompute Step 10A kernels for C17 using triplet-inferred shapes (swap applied)
 ================================================================================
-
-[1/19] Processing prime p = 103
 ----------------------------------------------------------------------
-  ✓ Found saved_inv_p103_triplets.json
-  Loading triplets from saved_inv_p103_triplets.json...
-    Variety: PERTURBED_C17_CYCLOTOMIC, Delta: 791/100000, Cyclotomic order: 17
-    Reported rank: 1443, reported kernel dim: 537
-    Triplet max indices: max_row=1979, max_col=1540
-    Ambiguous orientation; choosing orientation that minimizes matrix size.
-      no-swap shape = (1980, 1541), swap shape = (1541, 1980), swap=False
-    Building sparse matrix with shape 1980 × 1980 (inferred 1980×1541)
-    Matrix nnz = 74,224
-  Converting to dense array (mod p)...
-  Computing kernel via Gaussian elimination mod p...
-    Starting Gaussian elimination on 1980 × 1980 matrix...
-      Progress: 500/1980 columns processed...
-      Progress: 1000/1980 columns processed...
-      Progress: 1500/1980 columns processed...
-    Forward elimination complete: 1443 pivots found
-    Back substitution complete (RREF)
-    Rank (pivots): 1443, Kernel dimension: 537
-  ✓ Kernel computed in 6.6 seconds (prime 103, swap_applied=False)
-
-  Verification:
-    Computed rank: 1443 (expected 1443) - ✓
-    Computed kernel dim: 537 (expected 537) - ✓
-  ✓ Saved kernel basis to step10a_kernel_p103_C17.json (9.2 MB)
-
-.
-
-.
-
-.
-
-.
-
-[19/19] Processing prime p = 1871
+[p=103] Loading triplets from saved_inv_p103_triplets.json ...
+    Inferred (rows,cols) after swap = (1541, 1980), nnz = 74224
+    Built CSR matrix: shape=(1541, 1980), nnz=74224
+    Converting to dense (this may be memory heavy)...
+    Computing nullspace (may take time)...
+    Gaussian elimination on 1541x1980 matrix (mod 103)
+    Found 1443 pivots, kernel dimension 537
+    Kernel computed: shape=(537, 1980) in 4.9s
+    ✓ Saved corrected kernel to step10a_kernel_p103_C17.json (9.79 MB)
 ----------------------------------------------------------------------
-  ✓ Found saved_inv_p1871_triplets.json
-  Loading triplets from saved_inv_p1871_triplets.json...
-    Variety: PERTURBED_C17_CYCLOTOMIC, Delta: 791/100000, Cyclotomic order: 17
-    Reported rank: 1443, reported kernel dim: 537
-    Triplet max indices: max_row=1979, max_col=1540
-    Ambiguous orientation; choosing orientation that minimizes matrix size.
-      no-swap shape = (1980, 1541), swap shape = (1541, 1980), swap=False
-    Building sparse matrix with shape 1980 × 1980 (inferred 1980×1541)
-    Matrix nnz = 74,224
-  Converting to dense array (mod p)...
-  Computing kernel via Gaussian elimination mod p...
-    Starting Gaussian elimination on 1980 × 1980 matrix...
-      Progress: 500/1980 columns processed...
-      Progress: 1000/1980 columns processed...
-      Progress: 1500/1980 columns processed...
-    Forward elimination complete: 1443 pivots found
-    Back substitution complete (RREF)
-    Rank (pivots): 1443, Kernel dimension: 537
-  ✓ Kernel computed in 6.8 seconds (prime 1871, swap_applied=False)
 
-  Verification:
-    Computed rank: 1443 (expected 1443) - ✓
-    Computed kernel dim: 537 (expected 537) - ✓
-  ✓ Saved kernel basis to step10a_kernel_p1871_C17.json (9.2 MB)
+.
 
+.
+
+.
+
+.
+
+----------------------------------------------------------------------
+[p=1871] Loading triplets from saved_inv_p1871_triplets.json ...
+    Inferred (rows,cols) after swap = (1541, 1980), nnz = 74224
+    Built CSR matrix: shape=(1541, 1980), nnz=74224
+    Converting to dense (this may be memory heavy)...
+    Computing nullspace (may take time)...
+    Gaussian elimination on 1541x1980 matrix (mod 1871)
+    Found 1443 pivots, kernel dimension 537
+    Kernel computed: shape=(537, 1980) in 5.0s
+    ✓ Saved corrected kernel to step10a_kernel_p1871_C17.json (10.81 MB)
 ================================================================================
-STEP 10A COMPLETE - KERNEL BASIS COMPUTATION (C17)
-================================================================================
-
-Processed 19 primes:
-  ✓ Successful: 19/19
-  ✗ Failed: 0/19
-
-Kernel computation results:
-  Prime    Rank     Kernel Dim   Time (s)   Swap   Verified  
---------------------------------------------------------------------------------
-  103      1443     537          6.6        N      ✓         
-  137      1443     537          6.7        N      ✓         
-  239      1443     537          6.8        N      ✓         
-  307      1443     537          6.7        N      ✓         
-  409      1443     537          6.8        N      ✓         
-  443      1443     537          6.7        N      ✓         
-  613      1443     537          6.7        N      ✓         
-  647      1443     537          6.7        N      ✓         
-  919      1443     537          6.7        N      ✓         
-  953      1443     537          6.7        N      ✓         
-  1021     1443     537          6.7        N      ✓         
-  1123     1443     537          6.7        N      ✓         
-  1259     1443     537          6.8        N      ✓         
-  1327     1443     537          6.8        N      ✓         
-  1361     1443     537          6.7        N      ✓         
-  1429     1443     537          6.7        N      ✓         
-  1531     1443     537          6.8        N      ✓         
-  1667     1443     537          6.7        N      ✓         
-  1871     1443     537          6.8        N      ✓         
-
-Performance:
-  Average computation time: 6.7 seconds per prime
-  Total runtime: 2.2 minutes
-
-✓ Summary saved to step10a_kernel_computation_summary_C17.json
-
-================================================================================
-*** ALL KERNELS COMPUTED SUCCESSFULLY ***
-================================================================================
-
-  - step10a_kernel_p103_C17.json
-  - step10a_kernel_p137_C17.json
-  - step10a_kernel_p239_C17.json
-  - step10a_kernel_p307_C17.json
-  - step10a_kernel_p409_C17.json
-  - step10a_kernel_p443_C17.json
-  - step10a_kernel_p613_C17.json
-  - step10a_kernel_p647_C17.json
-  - step10a_kernel_p919_C17.json
-  - step10a_kernel_p953_C17.json
-  - step10a_kernel_p1021_C17.json
-  - step10a_kernel_p1123_C17.json
-  - step10a_kernel_p1259_C17.json
-  - step10a_kernel_p1327_C17.json
-  - step10a_kernel_p1361_C17.json
-  - step10a_kernel_p1429_C17.json
-  - step10a_kernel_p1531_C17.json
-  - step10a_kernel_p1667_C17.json
-  - step10a_kernel_p1871_C17.json
-
-Next step: Step 10B (CRT Reconstruction)
-================================================================================
+Recomputation complete.
+Summary:
+  p=103: {'status': 'ok', 'prime': 103, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.853058099746704}
+  p=137: {'status': 'ok', 'prime': 137, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.90078592300415}
+  p=239: {'status': 'ok', 'prime': 239, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.964477777481079}
+  p=307: {'status': 'ok', 'prime': 307, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.968891143798828}
+  p=409: {'status': 'ok', 'prime': 409, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.98452091217041}
+  p=443: {'status': 'ok', 'prime': 443, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 5.048809051513672}
+  p=613: {'status': 'ok', 'prime': 613, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.995086193084717}
+  p=647: {'status': 'ok', 'prime': 647, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.949682235717773}
+  p=919: {'status': 'ok', 'prime': 919, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 5.00465202331543}
+  p=953: {'status': 'ok', 'prime': 953, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.933140993118286}
+  p=1021: {'status': 'ok', 'prime': 1021, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.956736087799072}
+  p=1123: {'status': 'ok', 'prime': 1123, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.976131916046143}
+  p=1259: {'status': 'ok', 'prime': 1259, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.9754478931427}
+  p=1327: {'status': 'ok', 'prime': 1327, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.952651023864746}
+  p=1361: {'status': 'ok', 'prime': 1361, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.967600107192993}
+  p=1429: {'status': 'ok', 'prime': 1429, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.958203077316284}
+  p=1531: {'status': 'ok', 'prime': 1531, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.954890012741089}
+  p=1667: {'status': 'ok', 'prime': 1667, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 4.914299249649048}
+  p=1871: {'status': 'ok', 'prime': 1871, 'rows': 1541, 'cols': 1980, 'nnz': 74224, 'kernel_dim': 537, 'rank': 1443, 'time_s': 5.0175371170043945}
+Total elapsed: 99.7s
+Summary saved to recompute_kernels_C17_fix_summary.json
 ```
 
 (did not do summary to save room and space)
@@ -7497,27 +7285,27 @@ PERFORMING CRT RECONSTRUCTION
 Reconstructing 537 × 1980 = 1,063,260 coefficients...
 Using formula: c_M = [Σ_p c_p · M_p · y_p] mod M
 
-  Progress: 50/537 vectors (9.3%) | Elapsed: 0.5s
+  Progress: 50/537 vectors (9.3%) | Elapsed: 0.6s
   Progress: 100/537 vectors (18.6%) | Elapsed: 1.1s
-  Progress: 150/537 vectors (27.9%) | Elapsed: 1.6s
-  Progress: 200/537 vectors (37.2%) | Elapsed: 2.1s
-  Progress: 250/537 vectors (46.6%) | Elapsed: 2.6s
-  Progress: 300/537 vectors (55.9%) | Elapsed: 3.1s
-  Progress: 350/537 vectors (65.2%) | Elapsed: 3.6s
-  Progress: 400/537 vectors (74.5%) | Elapsed: 4.2s
-  Progress: 450/537 vectors (83.8%) | Elapsed: 4.7s
-  Progress: 500/537 vectors (93.1%) | Elapsed: 5.2s
-  Progress: 537/537 vectors (100.0%) | Elapsed: 5.6s
+  Progress: 150/537 vectors (27.9%) | Elapsed: 1.7s
+  Progress: 200/537 vectors (37.2%) | Elapsed: 2.3s
+  Progress: 250/537 vectors (46.6%) | Elapsed: 2.9s
+  Progress: 300/537 vectors (55.9%) | Elapsed: 3.5s
+  Progress: 350/537 vectors (65.2%) | Elapsed: 4.0s
+  Progress: 400/537 vectors (74.5%) | Elapsed: 4.6s
+  Progress: 450/537 vectors (83.8%) | Elapsed: 5.2s
+  Progress: 500/537 vectors (93.1%) | Elapsed: 5.8s
+  Progress: 537/537 vectors (100.0%) | Elapsed: 6.2s
 
-✓ CRT reconstruction completed in 5.57 seconds
+✓ CRT reconstruction completed in 6.19 seconds
 
 ================================================================================
 CRT RECONSTRUCTION STATISTICS
 ================================================================================
 
 Total coefficients:     1,063,260
-Zero coefficients:      1,020,923 (96.0%)
-Non-zero coefficients:  42,337 (4.0%)
+Zero coefficients:      338,962 (31.9%)
+Non-zero coefficients:  724,298 (68.1%)
 
 ================================================================================
 COMPARISON & INTERPRETATION (C17)
@@ -7530,13 +7318,13 @@ Perturbed C17 (this computation):
   Variety: PERTURBED_C17_CYCLOTOMIC, delta = 791/100000
   Dimension: 537
   Total coefficients: 1,063,260
-  Non-zero coefficients: 42,337 (4.0%)
+  Non-zero coefficients: 724,298 (68.1%)
   CRT modulus bits: 180
 
-⚠ Density 4.0% outside expected range (50, 80)
+*** RESULT CONSISTENT WITH PERTURBED BEHAVIOR ***
 
 Saving CRT-reconstructed basis (sparse representation)...
-✓ Saved to step10b_crt_reconstructed_basis_C17.json (5.6 MB)
+✓ Saved to step10b_crt_reconstructed_basis_C17.json (98.3 MB)
 
 ✓ Saved summary to step10b_crt_summary_C17.json
 
@@ -7545,11 +7333,11 @@ STEP 10B COMPLETE - CRT RECONSTRUCTION (C17)
 ================================================================================
 
   Total coefficients:     1,063,260
-  Non-zero coefficients:  42,337 (4.0%)
-  Sparsity:               96.0%
+  Non-zero coefficients:  724,298 (68.1%)
+  Sparsity:               31.9%
   CRT modulus bits:       180 bits
-  Runtime:                5.57 seconds
-  Verification status:    UNEXPECTED
+  Runtime:                6.19 seconds
+  Verification status:    CORRECT_FOR_PERTURBED
 
 Next step: Step 10C (Rational Reconstruction)
   - Input: this file
@@ -7561,16 +7349,417 @@ Next step: Step 10C (Rational Reconstruction)
 
 ---
 
+# **STEP 10F: 19-PRIME MODULAR KERNEL VERIFICATION (C₁₇ X₈ PERTURBED)**
 
+## **DESCRIPTION**
+
+This step performs **rigorous modular verification** of the 19 kernel bases computed in Step 10A by testing the fundamental nullspace property **M·v ≡ 0 (mod p)** for all **537 kernel vectors** across **19 independent primes** (p ≡ 1 mod 17, range 103-1871), executing **10,203 total matrix-vector multiplications** (537 vectors × 19 primes) to validate that each kernel basis correctly represents ker(Jacobian) mod p via **robust automatic orientation detection** (handling row/column transposition ambiguities in triplet files), constructing **1443×1980 sparse Jacobian matrices** from saved triplets, computing **residuals res = M·v mod p** for each kernel vector, and verifying **res ≡ 0** (zero residual) for all 10,203 tests, with **SHA-256 provenance tracking** of input files (triplet/kernel JSON hashes) and **per-prime diagnostic reporting** (matrix shape, nnz, passed/failed counts, max residual, swap orientation), saving results as **verification certificate JSON** documenting perfect consensus (expected: **10,203/10,203 passed**, 0 failures) across all primes, certifying kernel bases are valid modular representations ready for **CRT reconstruction** (Step 10B) to recover canonical ℚ-basis for the **537-dimensional primitive Hodge cohomology space** of C₁₇ with **largest Galois group φ(17)=16** and **perfect universal barrier validation** (CP1/CP3 100%).
 
 ```python
+#!/usr/bin/env python3
+"""
+STEP 10F: 19-Prime Modular Kernel Verification (C17 X8 Perturbed) - Robust
 
+Robust verification script for the C17 X8-perturbed family. This version
+automatically detects the correct triplet orientation (swap vs no-swap),
+adapts matrix shape to the triplet indices and the kernel vector length, and
+tries both orientations when necessary. It also records provenance (SHA-256)
+and reports per-prime diagnostics.
+
+First 19 primes (p ≡ 1 (mod 17)):
+103, 137, 239, 307, 409, 443, 613, 647, 919, 953,
+1021, 1123, 1259, 1327, 1361, 1429, 1531, 1667, 1871
+"""
+
+import json
+import time
+import hashlib
+import os
+import numpy as np
+from scipy.sparse import csr_matrix
+from collections import defaultdict
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+PRIMES = [103, 137, 239, 307, 409, 443, 613, 647, 919, 953,
+          1021, 1123, 1259, 1327, 1361, 1429, 1531, 1667, 1871]
+
+TRIPLET_FILE_TEMPLATE = "saved_inv_p{}_triplets.json"
+KERNEL_FILE_TEMPLATE = "step10a_kernel_p{}_C17.json"
+CERTIFICATE_FILE = "step10f_verification_certificate_C17.json"
+
+# Optional expected invariants (informational only)
+EXPECTED_ROWS = None   # e.g. 1443
+EXPECTED_COLS = None   # e.g. 1980
+
+# How many kernel vectors to sample when choosing orientation (keeps work small)
+SAMPLE_VECTORS = 6
+
+# ============================================================================
+# HELPERS
+# ============================================================================
+
+def sha256_of_file(path):
+    try:
+        h = hashlib.sha256()
+        with open(path, "rb") as f:
+            for chunk in iter(lambda: f.read(1 << 20), b""):
+                h.update(chunk)
+        return h.hexdigest()
+    except Exception:
+        return None
+
+def load_json(path):
+    with open(path) as f:
+        return json.load(f)
+
+def build_csr_from_triplets(triplets, p, swap=False, shape=None):
+    """
+    Build a CSR matrix from triplets.
+    If swap==False: triplets are interpreted as (row, col, val)
+    If swap==True: triplets are used as (col -> row, row -> col)
+    shape: optional (nrows, ncols). If None shapes are inferred from indices.
+    """
+    rows = []
+    cols = []
+    vals = []
+    max_r = -1
+    max_c = -1
+    for t in triplets:
+        r, c, v = int(t[0]), int(t[1]), int(t[2]) % p
+        if not swap:
+            rows.append(r); cols.append(c); vals.append(v)
+            if r > max_r: max_r = r
+            if c > max_c: max_c = c
+        else:
+            rows.append(c); cols.append(r); vals.append(v)
+            if c > max_r: max_r = c
+            if r > max_c: max_c = r
+    inferred_rows = max_r + 1 if max_r >= 0 else 0
+    inferred_cols = max_c + 1 if max_c >= 0 else 0
+
+    if shape is None:
+        nrows, ncols = inferred_rows, inferred_cols
+    else:
+        # ensure provided shape is large enough to hold indices
+        nrows = max(shape[0], inferred_rows)
+        ncols = max(shape[1], inferred_cols)
+
+    if nrows == 0 or ncols == 0:
+        raise ValueError("Inferred zero matrix dimension")
+
+    M = csr_matrix((vals, (rows, cols)), shape=(nrows, ncols), dtype=np.int64)
+    return M, (inferred_rows, inferred_cols)
+
+def test_matrix_against_kernel(M, kernel_list, p, max_tests=SAMPLE_VECTORS):
+    """
+    Test M.dot(v) % p == 0 for the first up to max_tests kernel vectors.
+    Returns (passed_count, failed_count, max_residual).
+    """
+    passed = failed = 0
+    max_res = 0
+    ntest = min(max_tests, len(kernel_list))
+    for i in range(ntest):
+        vec = np.array(kernel_list[i], dtype=np.int64)
+        # If vector length doesn't match matrix cols, it's a mismatch
+        if M.shape[1] != vec.shape[0]:
+            # report as all failed for this sample
+            return 0, ntest, None
+        res = M.dot(vec)
+        res_mod = np.remainder(res, p)
+        residual = int(np.max(np.abs(res_mod)))
+        if np.all(res_mod == 0):
+            passed += 1
+        else:
+            failed += 1
+        if residual is not None:
+            max_res = max(max_res, residual)
+    return passed, failed, max_res
+
+# ============================================================================
+# MAIN
+# ============================================================================
+
+print("=" * 80)
+print("STEP 10F: KERNEL VERIFICATION VIA 19-PRIME MODULAR AGREEMENT (C17) - ROBUST")
+print("=" * 80)
+print()
+print("Variety: PERTURBED_C17_CYCLOTOMIC")
+print("Delta: 791/100000")
+print("Cyclotomic order: 17 (Galois group: Z/16Z)")
+print()
+print(f"Primes to verify ({len(PRIMES)}): {PRIMES}")
+if EXPECTED_ROWS and EXPECTED_COLS:
+    print(f"Expected matrix shape: {EXPECTED_ROWS} × {EXPECTED_COLS}")
+print()
+
+results = {}
+start_time = time.time()
+
+for idx, p in enumerate(PRIMES, start=1):
+    print(f"[{idx}/{len(PRIMES)}] p = {p} ...", end=" ", flush=True)
+    triplet_file = TRIPLET_FILE_TEMPLATE.format(p)
+    kernel_file = KERNEL_FILE_TEMPLATE.format(p)
+
+    perprime = {
+        "triplet_file": triplet_file,
+        "kernel_file": kernel_file,
+        "triplet_hash": None,
+        "kernel_hash": None,
+        "inferred_shapes": {},
+        "chosen_orientation": None,
+        "tests": {},
+        "error": None
+    }
+
+    try:
+        if not os.path.exists(triplet_file):
+            raise FileNotFoundError(triplet_file)
+        if not os.path.exists(kernel_file):
+            raise FileNotFoundError(kernel_file)
+
+        perprime["triplet_hash"] = sha256_of_file(triplet_file)
+        perprime["kernel_hash"] = sha256_of_file(kernel_file)
+
+        trip_data = load_json(triplet_file)
+        triplets = trip_data.get("triplets", [])
+        reported_rank = trip_data.get("rank", None)
+
+        kernel_data = load_json(kernel_file)
+        kernel_list = kernel_data.get("kernel_basis") or kernel_data.get("kernel") or []
+        kernel_dim = int(kernel_data.get("kernel_dimension", len(kernel_list)))
+        if len(kernel_list) == 0:
+            raise RuntimeError("kernel file contains no kernel vectors")
+
+        # Compute triplet index maxima
+        rows_idx = [int(t[0]) for t in triplets] if triplets else []
+        cols_idx = [int(t[1]) for t in triplets] if triplets else []
+        max_r = max(rows_idx) if rows_idx else -1
+        max_c = max(cols_idx) if cols_idx else -1
+        perprime["inferred_shapes"]["raw_max_row"] = max_r
+        perprime["inferred_shapes"]["raw_max_col"] = max_c
+
+        # candidate shapes
+        shape_no = (max_r + 1, max_c + 1)
+        shape_swap = (max_c + 1, max_r + 1)
+        perprime["inferred_shapes"]["no_swap"] = shape_no
+        perprime["inferred_shapes"]["swap"] = shape_swap
+
+        # kernel vector length (expected number of columns)
+        sample_vec_len = len(kernel_list[0])
+
+        # Decide which orientation to try first:
+        # Prefer candidate whose num_cols equals kernel vector length
+        candidates = []
+        if shape_no[1] == sample_vec_len:
+            candidates.append(("no_swap", shape_no))
+        if shape_swap[1] == sample_vec_len:
+            candidates.append(("swap", shape_swap))
+        # if none matched exactly, try both, preferring the orientation that
+        # minimizes overall matrix size
+        if not candidates:
+            size_no = shape_no[0] * shape_no[1]
+            size_swap = shape_swap[0] * shape_swap[1]
+            if size_no <= size_swap:
+                candidates = [("no_swap", shape_no), ("swap", shape_swap)]
+            else:
+                candidates = [("swap", shape_swap), ("no_swap", shape_no)]
+
+        best_choice = None
+        best_pass = -1
+        best_failed = None
+        best_maxres = None
+        best_shape_used = None
+        best_swap_flag = None
+
+        # Try candidates; build CSR and test on a small sample of kernel vectors
+        for name, cand_shape in candidates:
+            swap_flag = (name == "swap")
+            # Ensure we allocate enough columns to match kernel vector if needed
+            nrows = cand_shape[0]
+            ncols = max(cand_shape[1], sample_vec_len)
+            # If EXPECTED_ROWS/COLS are provided, ensure at least that big
+            if EXPECTED_ROWS:
+                nrows = max(nrows, EXPECTED_ROWS)
+            if EXPECTED_COLS:
+                ncols = max(ncols, EXPECTED_COLS)
+
+            try:
+                M, inferred = build_csr_from_triplets(triplets, p, swap=swap_flag, shape=(nrows, ncols))
+            except Exception as e:
+                perprime["tests"][name] = {"error_build": str(e)}
+                continue
+
+            # Record actual matrix shape used
+            perprime["tests"][name] = {
+                "matrix_shape": (M.shape[0], M.shape[1]),
+                "nnz": int(M.nnz)
+            }
+
+            # Quick test: ensure matrix.cols matches kernel vector length
+            if M.shape[1] < sample_vec_len:
+                # cannot test with this shape
+                perprime["tests"][name]["note"] = "matrix.num_cols < kernel_vector_length"
+                # still try building with expanded cols? Already ensured ncols >= sample_vec_len
+            # Test sample kernel vectors
+            passed, failed, maxres = test_matrix_against_kernel(M, kernel_list, p, max_tests=SAMPLE_VECTORS)
+            perprime["tests"][name].update({
+                "sample_tested": min(SAMPLE_VECTORS, len(kernel_list)),
+                "sample_passed": passed,
+                "sample_failed": failed,
+                "sample_max_residual": int(maxres) if maxres is not None else None
+            })
+
+            # Choose best candidate (most passed)
+            if passed > best_pass or (passed == best_pass and (best_failed is None or failed < best_failed)):
+                best_pass = passed
+                best_failed = failed
+                best_maxres = maxres
+                best_choice = name
+                best_shape_used = (M.shape[0], M.shape[1])
+                best_swap_flag = swap_flag
+
+            # Early exit if perfect on sample
+            if passed == min(SAMPLE_VECTORS, len(kernel_list)):
+                break
+
+        # If we didn't find any usable candidate, mark as error
+        if best_choice is None:
+            raise RuntimeError("Could not build a compatible matrix orientation for this triplet file")
+
+        # For reporting, set chosen orientation
+        perprime["chosen_orientation"] = best_choice
+        perprime["chosen_shape"] = best_shape_used
+        perprime["chosen_swap_applied"] = bool(best_swap_flag)
+
+        # Final full verification using chosen orientation: build final matrix with chosen shape
+        # Build with columns equal to kernel vector length (exact)
+        final_ncols = len(kernel_list[0])
+        if best_choice == "no_swap":
+            final_nrows = max(max_r + 1, EXPECTED_ROWS or 0)
+            final_ncols = max(final_ncols, max_c + 1)
+            final_shape = (final_nrows, final_ncols)
+            M_final, _ = build_csr_from_triplets(triplets, p, swap=False, shape=final_shape)
+        else:
+            final_nrows = max(max_c + 1, EXPECTED_ROWS or 0)
+            final_ncols = max(final_ncols, max_r + 1)
+            final_shape = (final_nrows, final_ncols)
+            M_final, _ = build_csr_from_triplets(triplets, p, swap=True, shape=final_shape)
+
+        # Now test all kernel vectors
+        passed_full = 0
+        failed_full = 0
+        maxres_full = 0
+        for vec in kernel_list:
+            v = np.array(vec, dtype=np.int64)
+            if M_final.shape[1] != v.shape[0]:
+                # mismatch: cannot test this vector; treat as failure
+                failed_full += 1
+                continue
+            res = M_final.dot(v)
+            res_mod = np.remainder(res, p)
+            res_max = int(np.max(np.abs(res_mod)))
+            if np.all(res_mod == 0):
+                passed_full += 1
+            else:
+                failed_full += 1
+            maxres_full = max(maxres_full, res_max)
+
+        perprime["tests"]["final"] = {
+            "matrix_shape": (M_final.shape[0], M_final.shape[1]),
+            "nnz": int(M_final.nnz),
+            "passed": passed_full,
+            "failed": failed_full,
+            "total": len(kernel_list),
+            "max_residual": int(maxres_full)
+        }
+
+        results[p] = perprime
+
+        if failed_full == 0:
+            print(f"✓ all {passed_full}/{passed_full}")
+        else:
+            print(f"✗ {failed_full}/{len(kernel_list)} failures (max_res={maxres_full})")
+
+    except FileNotFoundError as e:
+        perprime["error"] = "FileNotFoundError"
+        perprime["error_detail"] = str(e)
+        results[p] = perprime
+        print(f"✗ FILE NOT FOUND: {e.filename}")
+    except Exception as e:
+        perprime["error"] = type(e).__name__
+        perprime["error_detail"] = str(e)
+        results[p] = perprime
+        print(f"✗ ERROR: {type(e).__name__}: {e}")
+
+# ============================================================================
+# SUMMARY AND CERTIFICATE
+# ============================================================================
+
+elapsed = time.time() - start_time
+print()
+print("=" * 80)
+print("VERIFICATION SUMMARY (C17)")
+print("=" * 80)
+print()
+
+num_valid = sum(1 for p, r in results.items() if r.get("tests") and r["tests"].get("final"))
+num_all_ok = sum(1 for p, r in results.items() if r.get("tests") and r["tests"]["final"].get("failed", 1) == 0)
+total_vectors_tested = sum(r["tests"]["final"]["total"] for r in results.values() if r.get("tests") and r["tests"]["final"])
+total_vectors_passed = sum(r["tests"]["final"]["passed"] for r in results.values() if r.get("tests") and r["tests"]["final"])
+
+print(f"Primes checked: {len(PRIMES)}")
+print(f"Primes with a valid final test: {num_valid}")
+print(f"Primes with perfect verification: {num_all_ok}")
+print(f"Total kernel vectors tested (sum over valid primes): {total_vectors_tested}")
+print(f"Total vectors passed: {total_vectors_passed}")
+print(f"Elapsed time: {elapsed:.1f}s ({elapsed/60:.1f}m)")
+print()
+
+# Print per-prime short report
+for p in PRIMES:
+    r = results.get(p)
+    if not r:
+        print(f"p={p}: MISSING")
+        continue
+    if r.get("error"):
+        print(f"p={p}: ERROR {r['error']} - {r.get('error_detail')}")
+    else:
+        fin = r["tests"]["final"]
+        ok = fin["failed"] == 0
+        print(f"p={p}: shape={fin['matrix_shape']}, nnz={fin['nnz']}, passed={fin['passed']}/{fin['total']}, ok={ok}, swap={r.get('chosen_swap_applied')}")
+
+# Save certificate
+certificate = {
+    "step": "10F",
+    "description": "Robust 19-prime modular kernel verification (C17 X8 perturbed)",
+    "variety": "PERTURBED_C17_CYCLOTOMIC",
+    "delta": "791/100000",
+    "cyclotomic_order": 17,
+    "primes": PRIMES,
+    "results": results,
+    "num_primes_valid": num_valid,
+    "num_primes_all_ok": num_all_ok,
+    "total_vectors_tested": total_vectors_tested,
+    "total_vectors_passed": total_vectors_passed,
+    "verification_time_seconds": elapsed,
+    "timestamp": time.time()
+}
+
+with open(CERTIFICATE_FILE, "w") as f:
+    json.dump(certificate, f, indent=2)
+
+print()
+print(f"Certificate written to {CERTIFICATE_FILE}")
+print("=" * 80)
 ```
 
 to run script:
 
 ```bash
-
+python step10f_17.py
 ```
 
 ---
@@ -7578,9 +7767,75 @@ to run script:
 result:
 
 ```verbatim
+================================================================================
+STEP 10F: KERNEL VERIFICATION VIA 19-PRIME MODULAR AGREEMENT (C17) - ROBUST
+================================================================================
 
+Variety: PERTURBED_C17_CYCLOTOMIC
+Delta: 791/100000
+Cyclotomic order: 17 (Galois group: Z/16Z)
+
+Primes to verify (19): [103, 137, 239, 307, 409, 443, 613, 647, 919, 953, 1021, 1123, 1259, 1327, 1361, 1429, 1531, 1667, 1871]
+
+[1/19] p = 103 ... ✓ all 537/537
+[2/19] p = 137 ... ✓ all 537/537
+[3/19] p = 239 ... ✓ all 537/537
+[4/19] p = 307 ... ✓ all 537/537
+[5/19] p = 409 ... ✓ all 537/537
+[6/19] p = 443 ... ✓ all 537/537
+[7/19] p = 613 ... ✓ all 537/537
+[8/19] p = 647 ... ✓ all 537/537
+[9/19] p = 919 ... ✓ all 537/537
+[10/19] p = 953 ... ✓ all 537/537
+[11/19] p = 1021 ... ✓ all 537/537
+[12/19] p = 1123 ... ✓ all 537/537
+[13/19] p = 1259 ... ✓ all 537/537
+[14/19] p = 1327 ... ✓ all 537/537
+[15/19] p = 1361 ... ✓ all 537/537
+[16/19] p = 1429 ... ✓ all 537/537
+[17/19] p = 1531 ... ✓ all 537/537
+[18/19] p = 1667 ... ✓ all 537/537
+[19/19] p = 1871 ... ✓ all 537/537
+
+================================================================================
+VERIFICATION SUMMARY (C17)
+================================================================================
+
+Primes checked: 19
+Primes with a valid final test: 19
+Primes with perfect verification: 19
+Total kernel vectors tested (sum over valid primes): 10203
+Total vectors passed: 10203
+Elapsed time: 3.0s (0.0m)
+
+p=103: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=137: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=239: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=307: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=409: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=443: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=613: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=647: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=919: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=953: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=1021: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=1123: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=1259: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=1327: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=1361: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=1429: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=1531: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=1667: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+p=1871: shape=(1541, 1980), nnz=74224, passed=537/537, ok=True, swap=True
+
+Certificate written to step10f_verification_certificate_C17.json
+================================================================================
 ```
 
+# **STEP 10F RESULTS SUMMARY: C₁₇ 19-PRIME MODULAR KERNEL VERIFICATION**
 
+## **Perfect 10,203/10,203 Passed - 100% Modular Nullspace Verification (All 19 Primes Unanimous, Zero Failures)**
+
+**Modular kernel verification complete:** Tested fundamental nullspace property **M·v ≡ 0 (mod p)** for **537 kernel vectors** across **19 independent primes** (p ≡ 1 mod 17, range 103-1871), executing **10,203 total matrix-vector multiplications** (537 × 19), achieving **perfect 10,203/10,203 passed** (100%, zero failures, zero residuals) with **unanimous consensus** across all 19 primes. **All primes** used **1541×1980 matrices** (nnz=74,224, swap orientation applied), verified in **3.0 seconds** (~3,400 tests/second). **Certificate saved** documenting SHA-256 provenance, per-prime diagnostics (all ok=True), certifying kernel bases are **valid modular representations** ready for **CRT reconstruction** (Step 10B) to recover **canonical ℚ-basis** for **537-dimensional H²'²_prim,inv(V,ℚ)** with **largest Galois group φ(17)=16** and **perfect universal barrier** (CP1/CP3 100%).
 
 ---
