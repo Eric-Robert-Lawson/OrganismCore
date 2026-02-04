@@ -4831,12 +4831,12 @@ Canonical Kernel Basis Identification:
 Structural Isolation Analysis:
   Status: COMPUTED
   Six-variable total: 364
-  Isolated classes: 316
+  Isolated classes: 308
 
 Information-Theoretic Statistical Analysis:
   Status: COMPUTED
   Algebraic patterns: 24
-  Isolated classes analyzed: 316
+  Isolated classes analyzed: 308
 
 ================================================================================
 CROSS-VARIETY COMPARISON: C13 vs C17
@@ -5431,7 +5431,7 @@ Loading isolated class indices from step6_structural_isolation_C17.json...
   Variety: PERTURBED_C17_CYCLOTOMIC
   Delta: 791/100000
   Cyclotomic order: 17
-  Isolated classes: 316
+  Isolated classes: 308
 
 ================================================================================
 CP1: CANONICAL BASIS VARIABLE-COUNT VERIFICATION
@@ -5449,23 +5449,23 @@ Variable count distribution (all 1980 monomials):
   5            840              42.4%
   6            364              18.4%
 
-Computing variable counts for 316 isolated classes...
+Computing variable counts for 308 isolated classes...
 
-Variable count distribution (316 isolated classes):
+Variable count distribution (308 isolated classes):
   Variables    Count      Percentage  
 ----------------------------------------------
-  6            316             100.0%
+  6            308             100.0%
 
 ================================================================================
 CP1 VERIFICATION RESULTS
 ================================================================================
 
-Classes with 6 variables:     316/316 (100.0%)
-Classes with <6 variables:    0/316
+Classes with 6 variables:     308/308 (100.0%)
+Classes with <6 variables:    0/308
 
 *** CP1 VERIFIED ***
 
-All 316 isolated classes use exactly 6 variables
+All 308 isolated classes use exactly 6 variables
 Matches coordinate_transparency-style claim (universal pattern)
 
 ================================================================================
@@ -5480,16 +5480,16 @@ Algebraic cycle patterns (24 benchmarks):
   Max variables:        4
   Distribution:         {1: 1, 2: 8, 3: 8, 4: 7}
 
-Isolated classes (316 monomials):
+Isolated classes (308 monomials):
   Mean variables:       6.00
   Std deviation:        0.00
   Min variables:        6
   Max variables:        6
-  Distribution:         {6: 316}
+  Distribution:         {6: 308}
 
 Kolmogorov-Smirnov Test:
   D statistic:          1.0
-  p-value:              5.002668341869744e-37
+  p-value:              9.042633612591468e-37
   Expected D:           1.000
 
 *** PERFECT SEPARATION ***
@@ -5505,8 +5505,8 @@ C13 baseline (from coordinate_transparency.tex):
   KS D:                 1.000 (perfect separation)
 
 C17 observed (this computation):
-  Isolated classes:     316
-  CP1 pass:             316/316
+  Isolated classes:     308
+  CP1 pass:             308/308
   KS D:                 1.0
 
 *** VARIATION / DIFFERENCE DETECTED ***
@@ -5520,7 +5520,7 @@ Expected (C13 baseline):
   KS D: 1.000 (perfect separation)
 
 Observed (C17 perturbed variety):
-  CP1: 316/316 classes with 6 variables (100.0%)
+  CP1: 308/308 classes with 6 variables (100.0%)
   KS D: 1.000
 
 Verification status:
@@ -5535,7 +5535,7 @@ STEP 9A COMPLETE
 ================================================================================
 
 Summary:
-  CP1 verification:     316/316 (100.0%) - PASS
+  CP1 verification:     308/308 (100.0%) - PASS
   KS D-statistic:       1.0 - PERFECT
   Overall status:       FULLY_VERIFIED
   Cross-variety status: VARIATION
@@ -6318,7 +6318,9 @@ Loading isolated class indices from step6_structural_isolation_C17.json...
   Variety: PERTURBED_C17_CYCLOTOMIC
   Delta: 791/100000
   Cyclotomic order: 17
-  Isolated classes: 316
+  Isolated classes: 308
+
+WARNING: Expected 316 isolated classes, got 308
 
 Loading canonical monomial data for all 19 primes...
   p= 103: 1980 monomials loaded
@@ -6362,18 +6364,18 @@ Four-variable subsets (15 total):
   15. {z2, z3, z4, z5}
 
 ================================================================================
-RUNNING 19-PRIME CP3 TESTS (90,060 TOTAL)
+RUNNING 19-PRIME CP3 TESTS (87,780 TOTAL)
 ================================================================================
 
-Testing all 316 classes across 19 primes...
+Testing all 308 classes across 19 primes...
 
-  Progress: 50/316 classes (14,250/90,060 tests, 15.8%, 0.0s)
-  Progress: 100/316 classes (28,500/90,060 tests, 31.6%, 0.0s)
-  Progress: 150/316 classes (42,750/90,060 tests, 47.5%, 0.0s)
-  Progress: 200/316 classes (57,000/90,060 tests, 63.3%, 0.0s)
-  Progress: 250/316 classes (71,250/90,060 tests, 79.1%, 0.0s)
-  Progress: 300/316 classes (85,500/90,060 tests, 94.9%, 0.0s)
-  Progress: 316/316 classes (90,060/90,060 tests, 100.0%, 0.0s)
+  Progress: 50/308 classes (14,250/87,780 tests, 16.2%, 0.0s)
+  Progress: 100/308 classes (28,500/87,780 tests, 32.5%, 0.0s)
+  Progress: 150/308 classes (42,750/87,780 tests, 48.7%, 0.0s)
+  Progress: 200/308 classes (57,000/87,780 tests, 64.9%, 0.0s)
+  Progress: 250/308 classes (71,250/87,780 tests, 81.2%, 0.0s)
+  Progress: 300/308 classes (85,500/87,780 tests, 97.4%, 0.0s)
+  Progress: 308/308 classes (87,780/87,780 tests, 100.0%, 0.0s)
 
 All tests completed in 0.03 seconds
 
@@ -6383,51 +6385,50 @@ PER-PRIME RESULTS
 
 Prime    Total Tests     Representable      Not Representable    Classes (All NOT_REP)    
 ----------------------------------------------------------------------------------------------------
-103      4740            0          ( 0.00%)  4740         (100.00%)  316/316
-137      4740            0          ( 0.00%)  4740         (100.00%)  316/316
-239      4740            0          ( 0.00%)  4740         (100.00%)  316/316
-307      4740            0          ( 0.00%)  4740         (100.00%)  316/316
-409      4740            0          ( 0.00%)  4740         (100.00%)  316/316
-443      4740            0          ( 0.00%)  4740         (100.00%)  316/316
-613      4740            0          ( 0.00%)  4740         (100.00%)  316/316
-647      4740            0          ( 0.00%)  4740         (100.00%)  316/316
-919      4740            0          ( 0.00%)  4740         (100.00%)  316/316
-953      4740            0          ( 0.00%)  4740         (100.00%)  316/316
-1021     4740            0          ( 0.00%)  4740         (100.00%)  316/316
-1123     4740            0          ( 0.00%)  4740         (100.00%)  316/316
-1259     4740            0          ( 0.00%)  4740         (100.00%)  316/316
-1327     4740            0          ( 0.00%)  4740         (100.00%)  316/316
-1361     4740            0          ( 0.00%)  4740         (100.00%)  316/316
-1429     4740            0          ( 0.00%)  4740         (100.00%)  316/316
-1531     4740            0          ( 0.00%)  4740         (100.00%)  316/316
-1667     4740            0          ( 0.00%)  4740         (100.00%)  316/316
-1871     4740            0          ( 0.00%)  4740         (100.00%)  316/316
+103      4620            0          ( 0.00%)  4620         (100.00%)  308/308
+137      4620            0          ( 0.00%)  4620         (100.00%)  308/308
+239      4620            0          ( 0.00%)  4620         (100.00%)  308/308
+307      4620            0          ( 0.00%)  4620         (100.00%)  308/308
+409      4620            0          ( 0.00%)  4620         (100.00%)  308/308
+443      4620            0          ( 0.00%)  4620         (100.00%)  308/308
+613      4620            0          ( 0.00%)  4620         (100.00%)  308/308
+647      4620            0          ( 0.00%)  4620         (100.00%)  308/308
+919      4620            0          ( 0.00%)  4620         (100.00%)  308/308
+953      4620            0          ( 0.00%)  4620         (100.00%)  308/308
+1021     4620            0          ( 0.00%)  4620         (100.00%)  308/308
+1123     4620            0          ( 0.00%)  4620         (100.00%)  308/308
+1259     4620            0          ( 0.00%)  4620         (100.00%)  308/308
+1327     4620            0          ( 0.00%)  4620         (100.00%)  308/308
+1361     4620            0          ( 0.00%)  4620         (100.00%)  308/308
+1429     4620            0          ( 0.00%)  4620         (100.00%)  308/308
+1531     4620            0          ( 0.00%)  4620         (100.00%)  308/308
+1667     4620            0          ( 0.00%)  4620         (100.00%)  308/308
+1871     4620            0          ( 0.00%)  4620         (100.00%)  308/308
 
 ================================================================================
 MULTI-PRIME AGREEMENT ANALYSIS
 ================================================================================
 
-Classes tested:         316
-Perfect agreement:      316/316
-Disagreements:          0/316
+Classes tested:         308
+Perfect agreement:      308/308
+Disagreements:          0/308
 
 *** PERFECT MULTI-PRIME AGREEMENT ***
-All 316 classes show identical results across all 19 primes
+All 308 classes show identical results across all 19 primes
 
 ================================================================================
 OVERALL CP3 VERIFICATION
 ================================================================================
 
-Total tests (all primes):     90,060
-NOT_REPRESENTABLE:            90,060/90,060 (100.00%)
-REPRESENTABLE:                0/90,060 (0.00%)
+Total tests (all primes):     87,780
+NOT_REPRESENTABLE:            87,780/87,780 (100.00%)
+REPRESENTABLE:                0/87,780 (0.00%)
 
 *** CP3 FULLY VERIFIED ***
 
-  • 90,060/90,060 tests → NOT_REPRESENTABLE (100%)
+  • 87,780/87,780 tests → NOT_REPRESENTABLE (100%)
   • Perfect agreement across all 19 primes
-  • All 316 classes require all 6 variables
-  • EXACT MATCH to expected tests (90,060)
+  • All 308 classes require all 6 variables
 
 ================================================================================
 CROSS-VARIETY COMPARISON: C13 vs C17
@@ -6440,10 +6441,10 @@ C13 baseline (from papers):
   Multi-prime agreement: Perfect
 
 C17 observed (this computation):
-  Isolated classes:     316
-  Total tests:          90,060
-  NOT_REPRESENTABLE:    90,060/90,060 (100.00%)
-  Multi-prime agreement: 316/316 classes
+  Isolated classes:     308
+  Total tests:          87,780
+  NOT_REPRESENTABLE:    87,780/87,780 (100.00%)
+  Multi-prime agreement: 308/308 classes
 
 *** UNIVERSAL PATTERN CONFIRMED ***
 
@@ -6462,17 +6463,14 @@ Expected (from 4_obs_1_phenom.tex & variable_count_barrier.tex, C13):
   Multi-prime agreement: Perfect (all 19 primes)
 
 Observed (C17 perturbed variety):
-  Total tests: 90,060
-  NOT_REPRESENTABLE: 90,060/90,060 (100.00%)
-  Multi-prime agreement: 316/316 classes
+  Total tests: 87,780
+  NOT_REPRESENTABLE: 87,780/87,780 (100.00%)
+  Multi-prime agreement: 308/308 classes
   Primes tested: 19/19
 
-*** PERFECT MATCH - EXACT REPRODUCTION (C17 ADAPTATION) ***
+*** STRONG MATCH (19 primes available) ***
 
-Papers FULLY REPRODUCED for C17:
-  • variable_count_barrier.tex: CP3 theorem VERIFIED (19 primes)
-  • 4_obs_1_phenom.tex: Obstruction 4 VERIFIED
-  • Universal barrier confirmed across C13 and C17
+CP3 verified with 19-prime protocol
 
 Summary saved to step9b_cp3_19prime_results_C17.json
 
@@ -6481,21 +6479,16 @@ STEP 9B COMPLETE - CP3 19-PRIME VERIFICATION (C17)
 ================================================================================
 
 Summary:
-  Total tests:            90,060 (316 × 15 × 19)
-  NOT_REPRESENTABLE:      90,060/90,060 (100.0%)
+  Total tests:            87,780 (308 × 15 × 19)
+  NOT_REPRESENTABLE:      87,780/87,780 (100.0%)
   Multi-prime agreement:  PERFECT
   Runtime:                0.03 seconds
   Verification status:    FULLY_VERIFIED
   Cross-variety:          UNIVERSAL_CONFIRMED
 
-*** EXACT MATCH TO PAPERS (C17 ADAPTATION) ***
+*** VERIFIED (19/19 primes) ***
 
-Variable-Count Barrier Theorem FULLY REPRODUCED for C17:
-  • All 316 isolated classes require all 6 variables
-  • Cannot be re-represented with ≤4 variables
-  • Property holds across all 19 independent primes
-  • EXACT MATCH: {EXPECTED_TOTAL_TESTS:,} tests as expected for C17
-  • Universal barrier: C13 and C17 exhibit identical pattern
+Variable-Count Barrier confirmed with 19-prime verification
 
 Next step: Step 10 (Final Comprehensive Summary)
 ================================================================================
@@ -7916,6 +7909,8 @@ Certificate written to step10f_verification_certificate_C17.json
 
 ## **STEP 11: CP³ COORDINATE COLLAPSE TESTS (C₁₇ X₈ PERTURBED)**
 
+**IMPORTANT: I RAN ALL STEPS FROM STEP 6 TO NOW WITH 308 CLASSES CHANGE AND IT WORKED. THEREFORE MOVING ON WITH 308 ISOLATED CLASSES.**
+
 ### **DESCRIPTION**
 
 This step tests whether the 316 structurally isolated Hodge classes from Step 6 can be represented as ℚ-linear combinations of algebraic cycles using only **four variables** from the ambient six-dimensional coordinate space. For each isolated class, we compute its reduction modulo the Jacobian ideal and test whether the remainder can be expressed using any of the 15 possible four-variable subsets `{z_i, z_j, z_k, z_l}`. A `NOT_REPRESENTABLE` result indicates the class **requires all six variables** for algebraic expression, confirming a geometric obstruction. This test is executed across **19 primes** to achieve cryptographic certainty via multi-prime consensus. Perfect 100% `NOT_REPRESENTABLE` agreement would validate the **universal variable-count barrier** discovered in C₁₃ and C₁₉, demonstrating that the 86.8% isolation rate observed in C₁₇ exhibits identical coordinate transparency properties as the universal 85-87% pattern.
@@ -7923,7 +7918,31 @@ This step tests whether the 316 structurally isolated Hodge classes from Step 6 
 script 0:
 
 ```python
+#!/usr/bin/env python3
+"""Extract all 308 C17 candidates for Step 11"""
 
+import json
+
+with open("step6_structural_isolation_C17.json") as f:
+    data = json.load(f)
+
+candidates = data['isolated_monomials_full']
+
+print(f"-- CANDIDATE LIST - C17 X8 Perturbed ({len(candidates)} classes)")
+print(f"-- Max exponent: {data['max_exponent']}")
+print(f"-- Criteria: gcd=1, variance>1.7, max_exp≤10")
+print("")
+print("candidateList = {")
+
+for i, mon in enumerate(candidates):
+    exps = mon['exponents'][:6]
+    s = "{" + ",".join(map(str, exps)) + "}"
+    c = "," if i < len(candidates)-1 else ""
+    print(f'  {{"class{i}", {s}}}{c}')
+
+print("};")
+print("")
+print(f"-- Total: {len(candidates)} classes")
 ```
 
 script 1:
