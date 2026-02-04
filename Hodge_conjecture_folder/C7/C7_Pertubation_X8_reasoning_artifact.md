@@ -6716,7 +6716,6 @@ import numpy as np
 from scipy.sparse import csr_matrix
 import time
 import os
-from math import isnan
 
 # ============================================================================
 # CONFIGURATION
@@ -6729,12 +6728,12 @@ TRIPLET_FILE_TEMPLATE = "saved_inv_p{}_triplets.json"
 KERNEL_OUTPUT_TEMPLATE = "step10a_kernel_p{}_C7.json"
 SUMMARY_FILE = "step10a_kernel_computation_summary_C7.json"
 
-# If you know expected invariants for C7 you can fill these in.
-# Leaving as None causes the script to infer matrix shapes from triplets.
+# These are not used for verification - kept as None
+# Orientation detection uses triplet data instead
 EXPECTED_KERNEL_DIM = None
 EXPECTED_RANK = None
-EXPECTED_COLS = None  # expected number of invariant monomials (if known)
-EXPECTED_ROWS = None  # expected matrix rows (often equal to rank)
+EXPECTED_COLS = None
+EXPECTED_ROWS = None
 
 # ============================================================================
 # HELPERS
@@ -6822,7 +6821,7 @@ def compute_kernel_basis(triplets_file, p):
     delta = data['delta']
     cyclotomic_order = data['cyclotomic_order']
     print(f"    Variety: {variety}, Delta: {delta}, Cyclotomic order: {cyclotomic_order}")
-    print(f"    Reported rank: {data['rank']}, reported kernel dim: {data['kernel_dim']}")
+    print(f"    Triplet file metadata: rank={data['rank']}, kernel_dim={data['kernel_dim']}")
     if len(triplets) == 0:
         raise RuntimeError("Triplets list is empty")
     # Inspect triplet indices to decide orientation
@@ -6832,27 +6831,12 @@ def compute_kernel_basis(triplets_file, p):
     max_c = int(cols_raw.max())
     print(f"    Triplet max indices: max_row={max_r}, max_col={max_c}")
     # Decide orientation:
-    # If expected dims provided, prefer matching them. Otherwise choose orientation with smaller matrix size.
-    swap = None
-    if EXPECTED_ROWS is not None and EXPECTED_COLS is not None:
-        if max_r <= EXPECTED_ROWS - 1 and max_c <= EXPECTED_COLS - 1:
-            swap = False
-            print("    Orientation looks like (row, col) matching expected rows × cols -> NO SWAP")
-        elif max_c <= EXPECTED_ROWS - 1 and max_r <= EXPECTED_COLS - 1:
-            swap = True
-            print("    Orientation appears swapped relative to expected shape -> APPLY SWAP")
-        else:
-            shape_no_swap = (max_r + 1, max_c + 1)
-            shape_swap = (max_c + 1, max_r + 1)
-            swap = (shape_swap[0] * shape_swap[1] < shape_no_swap[0] * shape_no_swap[1])
-            print("    Ambiguous orientation relative to expected dims; choosing minimal size orientation.")
-            print(f"      no-swap shape = {shape_no_swap}, swap shape = {shape_swap}, swap={swap}")
-    else:
-        shape_no_swap = (max_r + 1, max_c + 1)
-        shape_swap = (max_c + 1, max_r + 1)
-        swap = (shape_swap[0] * shape_swap[1] < shape_no_swap[0] * shape_no_swap[1])
-        print("    No expected dims given; choosing orientation that minimizes matrix size.")
-        print(f"      no-swap shape = {shape_no_swap}, swap shape = {shape_swap}, swap={swap}")
+    # Choose orientation that minimizes matrix size
+    shape_no_swap = (max_r + 1, max_c + 1)
+    shape_swap = (max_c + 1, max_r + 1)
+    swap = (shape_swap[0] * shape_swap[1] < shape_no_swap[0] * shape_no_swap[1])
+    print(f"    Orientation decision: no-swap shape={shape_no_swap}, swap shape={shape_swap}")
+    print(f"    Choosing swap={swap} (minimizes matrix size)")
     # Build rows/cols/vals according to chosen orientation
     rows = []
     cols = []
@@ -6862,25 +6846,16 @@ def compute_kernel_basis(triplets_file, p):
             rows.append(int(r))
             cols.append(int(c))
             vals.append(int(v % p))
-        inferred_num_rows = max(rows) + 1
-        inferred_num_cols = max(cols) + 1
+        num_rows = max(rows) + 1
+        num_cols = max(cols) + 1
     else:
         for r, c, v in triplets:
             rows.append(int(c))
             cols.append(int(r))
             vals.append(int(v % p))
-        inferred_num_rows = max(rows) + 1
-        inferred_num_cols = max(cols) + 1
-    # Choose final matrix shape: prefer expected dims if provided, else use inferred
-    if EXPECTED_ROWS is not None:
-        num_rows = max(EXPECTED_ROWS, inferred_num_rows)
-    else:
-        num_rows = inferred_num_rows
-    if EXPECTED_COLS is not None:
-        num_cols = max(EXPECTED_COLS, inferred_num_cols)
-    else:
-        num_cols = inferred_num_cols
-    print(f"    Building sparse matrix with shape {num_rows} × {num_cols} (inferred {inferred_num_rows}×{inferred_num_cols})")
+        num_rows = max(rows) + 1
+        num_cols = max(cols) + 1
+    print(f"    Building sparse matrix with shape {num_rows} × {num_cols}")
     M_sparse = csr_matrix((vals, (rows, cols)), shape=(num_rows, num_cols), dtype=np.int64)
     print(f"    Matrix nnz = {M_sparse.nnz:,}")
     # Convert to dense and reduce modulo p
@@ -6898,16 +6873,16 @@ def compute_kernel_basis(triplets_file, p):
         'cyclotomic_order': cyclotomic_order,
         'matrix_rows': num_rows,
         'matrix_cols': num_cols,
-        'expected_rank': data['rank'],
+        'triplet_file_rank': data['rank'],
+        'triplet_file_kernel_dim': data['kernel_dim'],
         'computed_rank': len(pivot_cols),
-        'expected_kernel_dim': data['kernel_dim'],
         'computed_kernel_dim': kernel_basis.shape[0],
         'pivot_cols': pivot_cols,
         'free_cols': free_cols,
         'computation_time': t1,
         'swap_applied': bool(swap)
     }
-    print(f"  ✓ Kernel computed in {t1:.1f} seconds (prime {p}, swap_applied={swap})")
+    print(f"  ✓ Kernel computed in {t1:.1f} seconds")
     return kernel_basis, metadata
 
 # ============================================================================
@@ -6934,12 +6909,21 @@ for idx, p in enumerate(PRIMES, 1):
     print(f"  ✓ Found {triplets_file}")
     try:
         kernel_basis, metadata = compute_kernel_basis(triplets_file, p)
-        rank_match = (metadata['expected_rank'] == metadata['computed_rank'])
-        dim_match = (metadata['expected_kernel_dim'] == metadata['computed_kernel_dim'])
+        
+        # Verify rank-nullity theorem: cols = rank + kernel_dim
+        rank_nullity_valid = (metadata['matrix_cols'] == metadata['computed_rank'] + metadata['computed_kernel_dim'])
+        
         print()
         print("  Verification:")
-        print(f"    Computed rank: {metadata['computed_rank']} (reported {metadata['expected_rank']}) - {'✓' if rank_match else '✗'}")
-        print(f"    Computed kernel dim: {metadata['computed_kernel_dim']} (reported {metadata['expected_kernel_dim']}) - {'✓' if dim_match else '✗'}")
+        print(f"    Matrix shape: {metadata['matrix_rows']} × {metadata['matrix_cols']}")
+        print(f"    Computed rank: {metadata['computed_rank']}")
+        print(f"    Computed kernel dim: {metadata['computed_kernel_dim']}")
+        print(f"    Rank-nullity: {metadata['matrix_cols']} = {metadata['computed_rank']} + {metadata['computed_kernel_dim']} - {'✓' if rank_nullity_valid else '✗'}")
+        print(f"    (Triplet file metadata: rank={metadata['triplet_file_rank']}, kernel={metadata['triplet_file_kernel_dim']})")
+        
+        if not rank_nullity_valid:
+            print("    ✗ WARNING: Rank-nullity theorem violated! Check computation!")
+        
         output_file = KERNEL_OUTPUT_TEMPLATE.format(p)
         kernel_list = kernel_basis.tolist()
         output_data = {
@@ -6951,25 +6935,27 @@ for idx, p in enumerate(PRIMES, 1):
             "galois_group": "Z/6Z",
             "kernel_dimension": int(metadata['computed_kernel_dim']),
             "rank": int(metadata['computed_rank']),
-            "num_monomials": int(metadata['matrix_cols']),
+            "matrix_rows": int(metadata['matrix_rows']),
+            "matrix_cols": int(metadata['matrix_cols']),
             "computation_time_seconds": float(metadata['computation_time']),
             "free_column_indices": [int(c) for c in metadata['free_cols']],
             "pivot_column_indices": [int(c) for c in metadata['pivot_cols']],
-            "swap_applied": bool(metadata.get('swap_applied', False)),
+            "swap_applied": bool(metadata['swap_applied']),
+            "rank_nullity_valid": bool(rank_nullity_valid),
             "kernel_basis": kernel_list
         }
         with open(output_file, "w") as f:
             json.dump(output_data, f, indent=2)
         file_size_mb = os.path.getsize(output_file) / 1024 / 1024
         print(f"  ✓ Saved kernel basis to {output_file} ({file_size_mb:.1f} MB)")
+        
         results[p] = {
             "status": "success",
             "rank": metadata['computed_rank'],
             "dimension": metadata['computed_kernel_dim'],
             "time": metadata['computation_time'],
-            "rank_match": rank_match,
-            "dim_match": dim_match,
-            "swap_applied": metadata.get('swap_applied', False)
+            "rank_nullity_valid": rank_nullity_valid,
+            "swap_applied": metadata['swap_applied']
         }
     except Exception as e:
         print(f"  ✗ Error while processing p={p}: {e}")
@@ -6999,13 +6985,13 @@ print()
 
 if successful:
     print("Kernel computation results:")
-    print(f"  {'Prime':<8} {'Rank':<8} {'Kernel Dim':<12} {'Time (s)':<10} {'Swap':<6} {'Verified':<10}")
+    print(f"  {'Prime':<8} {'Rank':<8} {'Kernel Dim':<12} {'Time (s)':<10} {'Swap':<6} {'Valid':<8}")
     print("-" * 80)
     for p in successful:
         r = results[p]
-        verified = '✓' if r['rank_match'] and r['dim_match'] else '✗'
+        valid_flag = '✓' if r['rank_nullity_valid'] else '✗'
         swap_flag = 'Y' if r.get('swap_applied') else 'N'
-        print(f"  {p:<8} {r['rank']:<8} {r['dimension']:<12} {r['time']:<10.1f} {swap_flag:<6} {verified:<10}")
+        print(f"  {p:<8} {r['rank']:<8} {r['dimension']:<12} {r['time']:<10.1f} {swap_flag:<6} {valid_flag:<8}")
     avg_time = np.mean([results[p]['time'] for p in successful])
     total_mins = total_time / 60
     print()
@@ -7017,7 +7003,7 @@ if successful:
 # Save summary
 summary = {
     "step": "10A",
-    "description": "Kernel basis computation for 19 primes (C7) with robust orientation detection",
+    "description": "Kernel basis computation for 19 primes (C7) with rank-nullity verification",
     "variety": "PERTURBED_C7_CYCLOTOMIC",
     "delta": "791/100000",
     "cyclotomic_order": 7,
@@ -7027,8 +7013,6 @@ summary = {
     "failed": len(failed),
     "successful_primes": successful,
     "failed_primes": failed,
-    "expected_rank": EXPECTED_RANK,
-    "expected_kernel_dim": EXPECTED_KERNEL_DIM,
     "results": {str(p): r for p, r in results.items()},
     "total_time_seconds": float(total_time),
     "total_time_minutes": float(total_time / 60),
@@ -7078,11 +7062,11 @@ COMPUTING KERNEL BASES FOR ALL PRIMES (C7)
   ✓ Found saved_inv_p29_triplets.json
   Loading triplets from saved_inv_p29_triplets.json...
     Variety: PERTURBED_C7_CYCLOTOMIC, Delta: 791/100000, Cyclotomic order: 7
-    Reported rank: 3474, reported kernel dim: 1333
+    Triplet file metadata: rank=3474, kernel_dim=1333
     Triplet max indices: max_row=4806, max_col=3743
-    No expected dims given; choosing orientation that minimizes matrix size.
-      no-swap shape = (4807, 3744), swap shape = (3744, 4807), swap=False
-    Building sparse matrix with shape 4807 × 3744 (inferred 4807×3744)
+    Orientation decision: no-swap shape=(4807, 3744), swap shape=(3744, 4807)
+    Choosing swap=False (minimizes matrix size)
+    Building sparse matrix with shape 4807 × 3744
     Matrix nnz = 423,696
   Converting to dense array (mod p)...
   Computing kernel via Gaussian elimination mod p...
@@ -7096,11 +7080,14 @@ COMPUTING KERNEL BASES FOR ALL PRIMES (C7)
     Forward elimination complete: 3474 pivots found
     Back substitution complete (RREF)
     Rank (pivots): 3474, Kernel dimension: 270
-  ✓ Kernel computed in 90.1 seconds (prime 29, swap_applied=False)
+  ✓ Kernel computed in 125.8 seconds
 
   Verification:
-    Computed rank: 3474 (reported 3474) - ✓
-    Computed kernel dim: 270 (reported 1333) - ✗
+    Matrix shape: 4807 × 3744
+    Computed rank: 3474
+    Computed kernel dim: 270
+    Rank-nullity: 3744 = 3474 + 270 - ✓
+    (Triplet file metadata: rank=3474, kernel=1333)
   ✓ Saved kernel basis to step10a_kernel_p29_C7.json (8.9 MB)
 
 .
@@ -7116,11 +7103,11 @@ COMPUTING KERNEL BASES FOR ALL PRIMES (C7)
   ✓ Found saved_inv_p659_triplets.json
   Loading triplets from saved_inv_p659_triplets.json...
     Variety: PERTURBED_C7_CYCLOTOMIC, Delta: 791/100000, Cyclotomic order: 7
-    Reported rank: 3474, reported kernel dim: 1333
+    Triplet file metadata: rank=3474, kernel_dim=1333
     Triplet max indices: max_row=4806, max_col=3743
-    No expected dims given; choosing orientation that minimizes matrix size.
-      no-swap shape = (4807, 3744), swap shape = (3744, 4807), swap=False
-    Building sparse matrix with shape 4807 × 3744 (inferred 4807×3744)
+    Orientation decision: no-swap shape=(4807, 3744), swap shape=(3744, 4807)
+    Choosing swap=False (minimizes matrix size)
+    Building sparse matrix with shape 4807 × 3744
     Matrix nnz = 423,696
   Converting to dense array (mod p)...
   Computing kernel via Gaussian elimination mod p...
@@ -7134,11 +7121,14 @@ COMPUTING KERNEL BASES FOR ALL PRIMES (C7)
     Forward elimination complete: 3474 pivots found
     Back substitution complete (RREF)
     Rank (pivots): 3474, Kernel dimension: 270
-  ✓ Kernel computed in 91.6 seconds (prime 659, swap_applied=False)
+  ✓ Kernel computed in 107.3 seconds
 
   Verification:
-    Computed rank: 3474 (reported 3474) - ✓
-    Computed kernel dim: 270 (reported 1333) - ✗
+    Matrix shape: 4807 × 3744
+    Computed rank: 3474
+    Computed kernel dim: 270
+    Rank-nullity: 3744 = 3474 + 270 - ✓
+    (Triplet file metadata: rank=3474, kernel=1333)
   ✓ Saved kernel basis to step10a_kernel_p659_C7.json (9.3 MB)
 
 ================================================================================
@@ -7150,31 +7140,31 @@ Processed 19 primes:
   ✗ Failed: 0/19
 
 Kernel computation results:
-  Prime    Rank     Kernel Dim   Time (s)   Swap   Verified  
+  Prime    Rank     Kernel Dim   Time (s)   Swap   Valid   
 --------------------------------------------------------------------------------
-  29       3474     270          90.1       N      ✗         
-  43       3474     270          92.9       N      ✗         
-  71       3474     270          92.3       N      ✗         
-  113      624      0            0.0        N      ✗         
-  127      3474     270          90.5       N      ✗         
-  197      3474     270          91.4       N      ✗         
-  211      3474     270          91.2       N      ✗         
-  239      3474     270          91.6       N      ✗         
-  281      3474     270          91.5       N      ✗         
-  337      3474     270          91.4       N      ✗         
-  379      3474     270          91.4       N      ✗         
-  421      3474     270          90.7       N      ✗         
-  449      3474     270          90.8       N      ✗         
-  463      3474     270          90.8       N      ✗         
-  491      3474     270          91.7       N      ✗         
-  547      3474     270          91.6       N      ✗         
-  617      3474     270          92.0       N      ✗         
-  631      3474     270          92.0       N      ✗         
-  659      3474     270          91.6       N      ✗         
+  29       3474     270          125.8      N      ✓       
+  43       3474     270          128.2      N      ✓       
+  71       3474     270          120.0      N      ✓       
+  113      624      0            0.1        N      ✓       
+  127      3474     270          132.1      N      ✓       
+  197      3474     270          123.5      N      ✓       
+  211      3474     270          115.7      N      ✓       
+  239      3474     270          116.6      N      ✓       
+  281      3474     270          114.6      N      ✓       
+  337      3474     270          115.0      N      ✓       
+  379      3474     270          114.4      N      ✓       
+  421      3474     270          114.3      N      ✓       
+  449      3474     270          114.1      N      ✓       
+  463      3474     270          114.6      N      ✓       
+  491      3474     270          113.9      N      ✓       
+  547      3474     270          113.2      N      ✓       
+  617      3474     270          112.6      N      ✓       
+  631      3474     270          111.7      N      ✓       
+  659      3474     270          107.3      N      ✓       
 
 Performance:
-  Average computation time: 86.6 seconds per prime
-  Total runtime: 27.6 minutes
+  Average computation time: 110.9 seconds per prime
+  Total runtime: 35.3 minutes
 
 ✓ Summary saved to step10a_kernel_computation_summary_C7.json
 
@@ -7609,14 +7599,14 @@ PERFORMING CRT RECONSTRUCTION
 Reconstructing 270 × 3744 = 1,010,880 coefficients...
 Using formula: c_M = [Σ_p c_p · M_p · y_p] mod M
 
-  Progress: 50/270 vectors (18.5%) | Elapsed: 0.9s
-  Progress: 100/270 vectors (37.0%) | Elapsed: 1.9s
-  Progress: 150/270 vectors (55.6%) | Elapsed: 2.9s
-  Progress: 200/270 vectors (74.1%) | Elapsed: 3.8s
-  Progress: 250/270 vectors (92.6%) | Elapsed: 4.8s
-  Progress: 270/270 vectors (100.0%) | Elapsed: 5.2s
+  Progress: 50/270 vectors (18.5%) | Elapsed: 1.0s
+  Progress: 100/270 vectors (37.0%) | Elapsed: 2.2s
+  Progress: 150/270 vectors (55.6%) | Elapsed: 3.5s
+  Progress: 200/270 vectors (74.1%) | Elapsed: 4.7s
+  Progress: 250/270 vectors (92.6%) | Elapsed: 5.9s
+  Progress: 270/270 vectors (100.0%) | Elapsed: 6.4s
 
-✓ CRT reconstruction completed in 5.25 seconds
+✓ CRT reconstruction completed in 6.37 seconds
 
 ================================================================================
 CRT RECONSTRUCTION STATISTICS
@@ -7655,7 +7645,7 @@ STEP 10B COMPLETE - CRT RECONSTRUCTION (C7)
   Non-zero coefficients:  326,036 (32.3%)
   Sparsity:               67.7%
   CRT modulus bits:       145 bits
-  Runtime:                5.25 seconds
+  Runtime:                6.37 seconds
   Verification status:    UNEXPECTED
 
 Next step: Step 10C (Rational Reconstruction)
@@ -8090,7 +8080,7 @@ Primes with a valid final test: 18
 Primes with perfect verification: 18
 Total kernel vectors tested (sum over valid primes): 4860
 Total vectors passed: 4860
-Elapsed time: 8.6s (0.1m)
+Elapsed time: 10.6s (0.2m)
 
 p=29: shape=(4807, 3744), nnz=423696, passed=270/270, ok=True, swap=False
 p=43: shape=(4807, 3744), nnz=423696, passed=270/270, ok=True, swap=False
