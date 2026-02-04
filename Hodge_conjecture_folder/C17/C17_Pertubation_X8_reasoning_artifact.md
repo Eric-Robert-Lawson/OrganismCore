@@ -8827,7 +8827,55 @@ python step11_17.py --primes {primes to compute}
 results:
 
 ```verbatim
-pending
+Macaulay2 found: 1.25.11
+M2 script found: /Users/ericlawson/c17/step11.m2
+
+================================================================================
+STEP 11: CP³ COORDINATE COLLAPSE TESTS - PERTURBED C17 VARIETY
+================================================================================
+
+Perturbed variety: F = Sum z_i^8 + (791/100000) * Sum_{k=1}^{16} L_k^8
+Delta: 791/100000
+Cyclotomic order: 17
+Galois group: Z/16Z
+
+Primes to test: 19
+Primes: [103, 137, 239, 307, 409, 443, 613, 647, 919, 953, 1021, 1123, 1259, 1327, 1361, 1429, 1531, 1667, 1871]
+Estimated time: ~76 hours
+Started: 2026-02-04 04:35:12
+
+
+[1/19] Processing prime 103...
+
+================================================================================
+PRIME 103 - Started at 2026-02-04 04:35:12
+================================================================================
+Running Macaulay2...
+  Script: /Users/ericlawson/c17/step11.m2
+  Prime: 103
+  Cyclotomic order: 17
+  Output: step11_cp3_results_p103_C17.csv
+
+✓ COMPLETED in 3.85 hours
+  Delta value (mod 103): -45
+  Total lines: 4625
+  Total tests: 4620
+  NOT_REPRESENTABLE: 4620 (100.0%)
+  REPRESENTABLE: 0
+
+Progress: 1/19 primes completed
+Cumulative runtime: 3.85 hours
+Estimated time remaining: 69.22 hours
+
+.
+
+.
+
+.
+
+.
+
+pending (3/19 done so far)
 ```
 
 
@@ -10224,53 +10272,102 @@ Next step: Run Step 13D (Bareiss exact determinant)
 script 4:
 
 ```verbatim
-Macaulay2 found: 1.25.11
-M2 script found: /Users/ericlawson/c17/step11.m2
-
 ================================================================================
-STEP 11: CP³ COORDINATE COLLAPSE TESTS - PERTURBED C17 VARIETY
+STEP 13D: BAREISS EXACT DETERMINANT (X8 PERTURBED C₁₇)
 ================================================================================
 
-Perturbed variety: F = Sum z_i^8 + (791/100000) * Sum_{k=1}^{16} L_k^8
-Delta: 791/100000
+Variety: Sum z_i^8 + (791/100000) * Sum_{k=1}^{16} L_k^8 = 0
 Cyclotomic order: 17
-Galois group: Z/16Z
 
-Primes to test: 19
-Primes: [103, 137, 239, 307, 409, 443, 613, 647, 919, 953, 1021, 1123, 1259, 1327, 1361, 1429, 1531, 1667, 1871]
-Estimated time: ~76 hours
-Started: 2026-02-04 04:35:12
+⚠️  This computation uses EXACT INTEGER ARITHMETIC
+   No modular reduction, no floating point, no rounding
+   Result is UNCONDITIONAL PROOF over Z
 
+Loading minor from crt_pivot_1443_C17.json...
+  Dimension: 1443×1443
+  CRT primes: [103, 137, 239, 307, 409]
 
-[1/19] Processing prime 103...
+Minor statistics:
+  Nonzero entries: 65,414 / 2,082,249 (3.14%)
+  Max entry magnitude: 183,343,345,299
 
 ================================================================================
-PRIME 103 - Started at 2026-02-04 04:35:12
+COMPUTING EXACT INTEGER DETERMINANT
 ================================================================================
-Running Macaulay2...
-  Script: /Users/ericlawson/c17/step11.m2
-  Prime: 103
-  Cyclotomic order: 17
-  Output: step11_cp3_results_p103_C17.csv
 
-✓ COMPLETED in 3.85 hours
-  Delta value (mod 103): -45
-  Total lines: 4625
-  Total tests: 4620
-  NOT_REPRESENTABLE: 4620 (100.0%)
-  REPRESENTABLE: 0
+Starting Bareiss elimination on 1443×1443 matrix...
+Using gmpy2 for integer arithmetic (fast)
 
-Progress: 1/19 primes completed
-Cumulative runtime: 3.85 hours
-Estimated time remaining: 69.22 hours
+  Step    1/1442 (  0.0%) - Elapsed: 0.00h, ETA: 0.00h
+  Step   71/1442 (  4.9%) - Elapsed: 0.02h, ETA: 0.34h
+  Step   91/1442 (  6.2%) - Elapsed: 0.03h, ETA: 0.52h
+  Step  107/1442 (  7.4%) - Elapsed: 0.05h, ETA: 0.65h
+  Step  122/1442 (  8.4%) - Elapsed: 0.07h, ETA: 0.75h
+  Step  134/1442 (  9.2%) - Elapsed: 0.09h, ETA: 0.84h
+  Step  144/1442 (  9.9%) - Elapsed: 0.10h, ETA: 0.94h
+  Step  153/1442 ( 10.5%) - Elapsed: 0.12h, ETA: 1.03h
+  Step  160/1442 ( 11.0%) - Elapsed: 0.14h, ETA: 1.13h
 
-.
+                        .
 
-.
+                        .
 
-.
+                        .
 
-.
+  Step 1238/1442 ( 85.8%) - Elapsed: 10.13h, ETA: 1.68h
+  Step 1245/1442 ( 86.3%) - Elapsed: 10.15h, ETA: 1.61h
+  Step 1253/1442 ( 86.8%) - Elapsed: 10.16h, ETA: 1.54h
+  Step 1261/1442 ( 87.4%) - Elapsed: 10.18h, ETA: 1.47h
+  Step 1270/1442 ( 88.0%) - Elapsed: 10.20h, ETA: 1.39h
+  Step 1280/1442 ( 88.7%) - Elapsed: 10.22h, ETA: 1.30h
+  Step 1291/1442 ( 89.5%) - Elapsed: 10.23h, ETA: 1.21h
+  Step 1305/1442 ( 90.4%) - Elapsed: 10.25h, ETA: 1.08h
+  Step 1322/1442 ( 91.6%) - Elapsed: 10.27h, ETA: 0.94h
+  Step 1342/1442 ( 93.0%) - Elapsed: 10.28h, ETA: 0.77h
+  Step 1376/1442 ( 95.4%) - Elapsed: 10.30h, ETA: 0.50h
 
-pending (3/19 done so far)
+Bareiss elimination complete in 10.31 hours
+
+
+================================================================================
+RESULT
+================================================================================
+
+✓ Determinant ≠ 0
+
+  det(M) = -472763868720057896184317611564432781359597522271237292586072798561760470679381593519480379503946835...
+           ...7680010442532203006402011806083432674383585473751327525331518608148566095948308493538190814740480000
+  (total 16634 digits)
+
+  log₁₀|det(M)| = 16632.675
+  |det(M)| has 16634 digits
+
+  Matrix is NONSINGULAR over Z
+  Rank = 1443 UNCONDITIONALLY PROVEN
+
+Computation time: 10.31 hours (618.5 minutes)
+
+================================================================================
+MATHEMATICAL CERTIFICATION
+================================================================================
+
+Jacobian cokernel dimension = 327
+  (Total monomial space 1770 - rank 1443 = 327)
+
+This is an UNCONDITIONAL THEOREM over Z.
+No probabilistic arguments, no modular assumptions.
+
+Writing certificate to bareiss_det_1443_C17.json...
+
+================================================================================
+STEP 13D COMPLETE
+================================================================================
+Certificate: bareiss_det_1443_C17.json
+
+✓✓✓ RANK CERTIFICATION SUCCESSFUL
+    Rank = 1443 over Z (unconditional)
+    Dimension = 327 (unconditional)
+
 ```
+
+---
