@@ -9090,7 +9090,7 @@ scan(primesList, p -> (
     zVars = {z0,z1,z2,z3,z4,z5};
 
     -- Find omega
-    expPow = (p - 1) // 13;
+    expPow = (p - 1) // 7;
     omega = 0_kk;
     for t from 2 to p-1 do (
         elt = (t_kk) ^ expPow;
@@ -9099,7 +9099,7 @@ scan(primesList, p -> (
     if omega == 0_kk then error("No omega for p=" | toString(p));
 
     -- Build perturbed polynomial
-    Llist = apply(13, k -> sum(6, j -> (omega^(k*j)) * zVars#j));
+    Llist = apply(7, k -> sum(6, j -> (omega^(k*j)) * zVars#j));
     Fmono = sum(zVars, v -> v^8);
     Fcyclo = sum(Llist, Lk -> Lk^8);
     F = Fmono + deltap * Fcyclo;
