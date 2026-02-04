@@ -9436,6 +9436,54 @@ python step11_11.py --primes {prime numbers}
 result:
 
 ```verbatim
+Macaulay2 found: 1.25.11
+M2 script found: /Users/ericlawson/c11/step11.m2
+
+================================================================================
+STEP 11: CP³ COORDINATE COLLAPSE TESTS - PERTURBED C11 VARIETY
+================================================================================
+
+Perturbed variety: F = Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8
+Delta: 791/100000
+Cyclotomic order: 11
+Galois group: Z/10Z
+
+Primes to test: 19
+Primes: [23, 67, 89, 199, 331, 353, 397, 419, 463, 617, 661, 683, 727, 859, 881, 947, 991, 1013, 1123]
+Estimated time: ~76 hours
+Started: 2026-02-04 04:33:15
+
+
+[1/19] Processing prime 23...
+
+================================================================================
+PRIME 23 - Started at 2026-02-04 04:33:15
+================================================================================
+Running Macaulay2...
+  Script: /Users/ericlawson/c11/step11.m2
+  Prime: 23
+  Cyclotomic order: 11
+  Output: step11_cp3_results_p23_C11.csv
+
+✓ COMPLETED in 2.18 hours
+  Delta value (mod 23): -8
+  Total lines: 7085
+  Total tests: 7080
+  NOT_REPRESENTABLE: 7080 (100.0%)
+  REPRESENTABLE: 0
+
+Progress: 1/19 primes completed
+Cumulative runtime: 2.18 hours
+Estimated time remaining: 39.16 hours
+
+.
+
+.
+
+.
+
+.
+
 pending
 ```
 
