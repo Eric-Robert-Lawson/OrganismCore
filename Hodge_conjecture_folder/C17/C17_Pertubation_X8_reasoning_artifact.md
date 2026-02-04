@@ -10224,5 +10224,53 @@ Next step: Run Step 13D (Bareiss exact determinant)
 script 4:
 
 ```verbatim
-pending
+Macaulay2 found: 1.25.11
+M2 script found: /Users/ericlawson/c17/step11.m2
+
+================================================================================
+STEP 11: CP³ COORDINATE COLLAPSE TESTS - PERTURBED C17 VARIETY
+================================================================================
+
+Perturbed variety: F = Sum z_i^8 + (791/100000) * Sum_{k=1}^{16} L_k^8
+Delta: 791/100000
+Cyclotomic order: 17
+Galois group: Z/16Z
+
+Primes to test: 19
+Primes: [103, 137, 239, 307, 409, 443, 613, 647, 919, 953, 1021, 1123, 1259, 1327, 1361, 1429, 1531, 1667, 1871]
+Estimated time: ~76 hours
+Started: 2026-02-04 04:35:12
+
+
+[1/19] Processing prime 103...
+
+================================================================================
+PRIME 103 - Started at 2026-02-04 04:35:12
+================================================================================
+Running Macaulay2...
+  Script: /Users/ericlawson/c17/step11.m2
+  Prime: 103
+  Cyclotomic order: 17
+  Output: step11_cp3_results_p103_C17.csv
+
+✓ COMPLETED in 3.85 hours
+  Delta value (mod 103): -45
+  Total lines: 4625
+  Total tests: 4620
+  NOT_REPRESENTABLE: 4620 (100.0%)
+  REPRESENTABLE: 0
+
+Progress: 1/19 primes completed
+Cumulative runtime: 3.85 hours
+Estimated time remaining: 69.22 hours
+
+.
+
+.
+
+.
+
+.
+
+pending (2/19 done so far)
 ```
