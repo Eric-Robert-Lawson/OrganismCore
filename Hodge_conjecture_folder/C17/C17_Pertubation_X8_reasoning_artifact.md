@@ -8307,23 +8307,8 @@ makeSubsetName = idxList -> (
     s | ")"
 );
 
-usesVariable = (poly, var) -> (
-    if poly == 0 then return false;
-    mons := if class poly === RingElement then (
-        try (
-            flatten entries monomials poly
-        ) else {poly}
-    ) else {poly};
-    for m in mons do (
-        deg := try degree(m, var) else null;
-        if deg === null then return true;
-        if deg > 0 then return true;
-    );
-    false
-);
-
 -- ============================================================================
--- MAIN COMPUTATION (WITH MINIMAL FIXES)
+-- MAIN COMPUTATION (CORRECTED VERSION)
 -- ============================================================================
 
 print("PRIME,DELTA,CLASS,SUBSET_IDX,SUBSET,RESULT");
@@ -8335,7 +8320,7 @@ scan(primesList, p -> (
     
     local kk; local numerator; local denominator; local deltap;
     local R; local zVars; local expPow; local omega; local elt;
-    local Llist; local Fmono; local Fcyclo; local F; local J;
+    local Llist; local Fmono; local Fcyclo; local F; local J; local coordIdeal;
     
     -- Compute delta inline (C17: 791/100000)
     kk = ZZ/p;
@@ -8361,7 +8346,7 @@ scan(primesList, p -> (
     );
     if omega == 0_kk then error("No omega for p=" | toString(p));
 
-    -- Build perturbed polynomial
+    -- Build perturbed polynomial (C17: 17 cyclotomic terms)
     stderr << ">>> Building perturbed polynomial F..." << endl;
     Llist = apply(17, k -> sum(6, j -> (omega^(k*j)) * zVars#j));
     Fmono = sum(zVars, v -> v^8);
@@ -8372,10 +8357,14 @@ scan(primesList, p -> (
     stderr << ">>> Building Jacobian ideal..." << endl;
     J = ideal jacobian F;
     
-    -- MINIMAL FIX: Force GB computation with timing
-    stderr << ">>> Computing Groebner basis (THIS MAY TAKE HOURS - BE PATIENT)..." << endl;
-    dummy = time gb J;  -- M2's 'time' wrapper prints elapsed time
-    stderr << ">>> Groebner basis complete! Proceeding to CP³ tests..." << endl << endl;
+    -- CRITICAL FIX: Build coordinate ideal
+    stderr << ">>> Building coordinate ideal..." << endl;
+    coordIdeal = ideal(z0, z1, z2, z3, z4, z5);
+    
+    -- Force GB computation with timing (ONE TIME ONLY)
+    stderr << ">>> Computing Jacobian Groebner basis..." << endl;
+    dummy = time gb J;
+    stderr << ">>> Jacobian GB complete! Proceeding to CP³ tests..." << endl << endl;
 
     -- Test all candidates
     classCounter = 0;
@@ -8393,35 +8382,34 @@ scan(primesList, p -> (
             stderr << ">>> Processing class " << classCounter << " / " << #candidateList << " : " << cand#0 << endl;
         );
         
-        local cname; local exps; local mon; local rem;
+        local cname; local exps; local mon; local testIdeal;
         
         cname = cand#0;
         exps = cand#1;
 
+        -- Build monomial
         mon = 1_R;
         for i from 0 to 5 do mon = mon * (zVars#i ^ (exps#i));
         
-        -- MINIMAL FIX: Use J directly (GB is cached internally by M2)
-        rem = mon % J;
+        -- CRITICAL FIX: Build test ideal (not remainder!)
+        testIdeal = J + ideal(mon);
 
+        -- Test each four-variable subset
         sidx := 0;
         scan(fourSubsets, S -> (
-            local forbidden; local usesForbidden; local result; local subsetName;
+            local subsetVars; local subsetIdeal; local result; local subsetName;
             
             sidx = sidx + 1;
             
-            forbidden = flatten apply({0,1,2,3,4,5}, x -> 
-                if member(x, S) then {} else {x});
-
-            usesForbidden = false;
-            for forbidIdx in forbidden do (
-                if usesVariable(rem, zVars#forbidIdx) then (
-                    usesForbidden = true;
-                    break;
-                );
-            );
-
-            result = if usesForbidden then "NOT_REPRESENTABLE" else "REPRESENTABLE";
+            -- Build subset ideal (only the 4 variables in subset S)
+            subsetVars = apply(S, idx -> zVars#idx);
+            subsetIdeal = ideal(subsetVars);
+            
+            -- CRITICAL FIX: Use isSubset (not remainder + variable checking)
+            result = if isSubset(testIdeal, subsetIdeal) 
+                     then "REPRESENTABLE" 
+                     else "NOT_REPRESENTABLE";
+            
             subsetName = makeSubsetName(S);
             
             print(toString(p) | "," | toString(deltap) | "," | cname | "," 
