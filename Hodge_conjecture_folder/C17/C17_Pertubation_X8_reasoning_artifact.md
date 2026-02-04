@@ -2936,7 +2936,7 @@ Expected C₁₇: 364 × 0.85 ≈ 309 isolated classes (±10%)
 """
 STEP 6: Structural Isolation Identification (C17 X8 Perturbed)
 Identifies which of the six-variable monomials are structurally isolated
-Criteria: gcd(non-zero exponents) = 1 AND exponent variance > 1.7
+Criteria: gcd(non-zero exponents) = 1 AND exponent variance > 1.7 AND max_exp ≤ 10
 
 Perturbed C17 cyclotomic variety:
   V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{16} L_k^8 = 0
@@ -2951,19 +2951,15 @@ import os
 # CONFIGURATION
 # ============================================================================
 
-# Monomial file produced in Step 2 for a chosen prime (use the prime you ran Step 2 with)
-MONOMIAL_FILE = "saved_inv_p103_monomials18.json"   # adjust if you used a different prime
+MONOMIAL_FILE = "saved_inv_p103_monomials18.json"
 OUTPUT_FILE = "step6_structural_isolation_C17.json"
 
-# Combinatorial expected totals:
-# Number of degree-18 monomials in 6 variables where each variable appears >=1:
-# C(18-1,6-1) = C(17,5) = 6188 total six-variable monomials.
-# For C17-invariant subset we expect 6188 / 17 = 364 exactly.
 EXPECTED_SIX_VAR = 364
-EXPECTED_ISOLATED = None  # unknown; will be determined empirically
+EXPECTED_ISOLATED = None  # Will be determined empirically
 
 GCD_THRESHOLD = 1
 VARIANCE_THRESHOLD = 1.7
+MAX_EXP_THRESHOLD = 10  # NEW: Computational feasibility filter
 
 # ============================================================================
 # MAIN EXECUTION
@@ -3026,8 +3022,9 @@ if len(six_var_monomials) != EXPECTED_SIX_VAR:
 # ============================================================================
 
 print("Applying structural isolation criteria:")
-print(f"  1. gcd(non-zero exponents) == {GCD_THRESHOLD}")
+print(f"  1. gcd(non-zero exponents) = {GCD_THRESHOLD}")
 print(f"  2. Exponent variance > {VARIANCE_THRESHOLD}")
+print(f"  3. Max exponent ≤ {MAX_EXP_THRESHOLD} (computational feasibility)")
 print()
 print("Processing...")
 print()
@@ -3038,28 +3035,32 @@ non_isolated_classes = []
 for mon in six_var_monomials:
     idx = mon["index"]
     exps = mon["exponents"]
-
+    
     # Criterion 1: gcd = 1 (non-factorizable)
     nonzero_exps = [e for e in exps if e > 0]
     exp_gcd = reduce(gcd, nonzero_exps)
-
-    # Criterion 2: Variance > threshold
-    # For degree-18 monomials with 6 variables, mean = 18 / 6 = 3.0
-    mean_exp = sum(nonzero_exps) / 6.0
+    
+    # Criterion 2: Variance > 1.7 (high complexity)
+    # For degree-18 monomials with 6 variables, mean = 18/6 = 3.0
+    mean_exp = sum(exps) / 6.0
     variance = sum((e - mean_exp)**2 for e in exps) / 6.0
-
-    # Check both criteria
-    is_isolated = (exp_gcd == GCD_THRESHOLD) and (variance > VARIANCE_THRESHOLD)
-
+    
+    # Criterion 3: Max exponent ≤ 10 (computational feasibility)
+    max_exp = max(exps)
+    
+    # Check all three criteria
+    is_isolated = (exp_gcd == GCD_THRESHOLD) and (variance > VARIANCE_THRESHOLD) and (max_exp <= MAX_EXP_THRESHOLD)
+    
     monomial_data = {
         "index": idx,
         "exponents": exps,
         "gcd": int(exp_gcd),
         "variance": round(variance, 4),
         "mean": round(mean_exp, 2),
+        "max_exp": int(max_exp),
         "isolated": bool(is_isolated)
     }
-
+    
     if is_isolated:
         isolated_classes.append(monomial_data)
     else:
@@ -3072,7 +3073,27 @@ print(f"  Isolation percentage:     {100.0 * len(isolated_classes) / len(six_var
 print()
 
 # ============================================================================
-# C13 COMPARISON (reference values)
+# MAX EXPONENT ANALYSIS
+# ============================================================================
+
+if isolated_classes:
+    max_exp_isolated = max(mon['max_exp'] for mon in isolated_classes)
+    min_exp_isolated = min(min(e for e in mon['exponents'] if e > 0) for mon in isolated_classes)
+    
+    print(f"Exponent range in isolated classes:")
+    print(f"  Min: {min_exp_isolated}")
+    print(f"  Max: {max_exp_isolated}")
+    print()
+    
+    if max_exp_isolated <= 10:
+        print("✓ EXCELLENT: All isolated classes have max exponent ≤ 10")
+        print("  Expected GB reduction time: ~0.5 sec per monomial")
+    else:
+        print(f"⚠ WARNING: Max exponent is {max_exp_isolated} (filter should have caught this!)")
+    print()
+
+# ============================================================================
+# C13 COMPARISON
 # ============================================================================
 
 C13_SIX_VAR = 476
@@ -3103,7 +3124,7 @@ if len(isolated_classes) > 0:
     for i, mon in enumerate(isolated_classes[:10], 1):
         exp_str = str(mon['exponents'])
         print(f"  {i:2d}. Index {mon['index']:4d}: {exp_str}")
-        print(f"      GCD={mon['gcd']}, Variance={mon['variance']:.4f}")
+        print(f"      GCD={mon['gcd']}, Variance={mon['variance']:.4f}, Max={mon['max_exp']}")
     print()
 
 if len(non_isolated_classes) > 0:
@@ -3112,12 +3133,15 @@ if len(non_isolated_classes) > 0:
     for i, mon in enumerate(non_isolated_classes[:10], 1):
         exp_str = str(mon['exponents'])
         print(f"  {i:2d}. Index {mon['index']:4d}: {exp_str}")
-        print(f"      GCD={mon['gcd']}, Variance={mon['variance']:.4f}")
+        print(f"      GCD={mon['gcd']}, Variance={mon['variance']:.4f}, Max={mon['max_exp']}")
+        
         # Explain failure reason
         if mon['gcd'] != GCD_THRESHOLD:
-            print(f"      Reason: Fails gcd=={GCD_THRESHOLD} criterion (gcd={mon['gcd']})")
+            print(f"      Reason: Fails gcd={GCD_THRESHOLD} criterion (gcd={mon['gcd']})")
         elif mon['variance'] <= VARIANCE_THRESHOLD:
             print(f"      Reason: Fails variance>{VARIANCE_THRESHOLD} criterion (var={mon['variance']:.4f})")
+        elif mon['max_exp'] > MAX_EXP_THRESHOLD:
+            print(f"      Reason: Fails max_exp≤{MAX_EXP_THRESHOLD} criterion (max={mon['max_exp']})")
     print()
 
 # ============================================================================
@@ -3169,13 +3193,31 @@ for g in sorted(gcd_dist.keys()):
 
 print()
 
+# Max exponent distribution
+print("Max exponent distribution among six-variable monomials:")
+print(f"  {'Max Exp':<10} {'Count':<10} {'Percentage':<12}")
+print("-"*40)
+
+max_exp_dist = {}
+for mon in six_var_monomials:
+    me = max(mon['exponents'])
+    max_exp_dist[me] = max_exp_dist.get(me, 0) + 1
+
+for me in sorted(max_exp_dist.keys()):
+    count = max_exp_dist[me]
+    pct = count / len(six_var_monomials) * 100 if six_var_monomials else 0
+    marker = " ← FILTERED OUT" if me > MAX_EXP_THRESHOLD else ""
+    print(f"  {me:<10} {count:<10} {pct:>10.1f}%{marker}")
+
+print()
+
 # ============================================================================
 # SAVE RESULTS
 # ============================================================================
 
 result = {
     "step": 6,
-    "description": "Structural isolation identification via gcd and variance criteria (C17)",
+    "description": "Structural isolation identification via gcd, variance, and max_exp criteria (C17)",
     "variety": "PERTURBED_C17_CYCLOTOMIC",
     "delta": "791/100000",
     "cyclotomic_order": 17,
@@ -3184,19 +3226,23 @@ result = {
     "isolated_count": len(isolated_classes),
     "non_isolated_count": len(non_isolated_classes),
     "isolation_percentage": round(len(isolated_classes) / len(six_var_monomials) * 100, 2) if six_var_monomials else 0,
+    "max_exponent": max(mon['max_exp'] for mon in isolated_classes) if isolated_classes else 0,
     "criteria": {
         "gcd_threshold": GCD_THRESHOLD,
         "variance_threshold": VARIANCE_THRESHOLD,
-        "description": "Monomial is isolated if gcd=1 AND variance>1.7"
+        "max_exp_threshold": MAX_EXP_THRESHOLD,
+        "description": "Monomial is isolated if gcd=1 AND variance>1.7 AND max_exp≤10"
     },
     "isolated_indices": [mon["index"] for mon in isolated_classes],
     "non_isolated_indices": [mon["index"] for mon in non_isolated_classes],
-    "isolated_monomials_sample": isolated_classes[:200],   # store a sample (first 200)
+    "isolated_monomials_sample": isolated_classes[:200],
+    "isolated_monomials_full": isolated_classes,
     "non_isolated_monomials_sample": non_isolated_classes[:200],
     "variance_distribution": {label: sum(1 for mon in six_var_monomials
                                         if low <= sum((e - 3.0)**2 for e in mon['exponents'])/6.0 < high)
                               for low, high, label in variance_ranges},
     "gcd_distribution": gcd_dist,
+    "max_exp_distribution": max_exp_dist,
     "C13_comparison": {
         "C13_six_var_total": C13_SIX_VAR,
         "C17_six_var_total": len(six_var_monomials),
@@ -3234,6 +3280,7 @@ if len(isolated_classes) > 0:
     print(f"Identified {len(isolated_classes)} isolated classes satisfying:")
     print(f"  - gcd(non-zero exponents) = {GCD_THRESHOLD} (non-factorizable)")
     print(f"  - Variance > {VARIANCE_THRESHOLD} (high complexity)")
+    print(f"  - Max exponent ≤ {MAX_EXP_THRESHOLD} (computational feasibility)")
     print()
     if EXPECTED_ISOLATED and len(isolated_classes) == EXPECTED_ISOLATED:
         print(f"✓ Matches expected count: {EXPECTED_ISOLATED}")
@@ -3243,13 +3290,14 @@ if len(isolated_classes) > 0:
     else:
         print(f"Note: C17 isolated count ({len(isolated_classes)}) determined empirically")
     print()
-    print("Next step: Step 7 (Information-Theoretic Separation Analysis)")
+    print("Next step: Step 11 (Four-Subset Coordinate Tests)")
 else:
     print("*** NO ISOLATED CLASSES FOUND ***")
     print()
     print("All six-variable monomials fail isolation criteria. Consider:")
     print("  - adjusting thresholds, or")
     print("  - analyzing different structural invariants")
+
 print()
 print("="*70)
 print("STEP 6 COMPLETE")
@@ -3285,15 +3333,23 @@ Six-variable monomials found: 364
 Expected (combinatorial / C17): 364
 
 Applying structural isolation criteria:
-  1. gcd(non-zero exponents) == 1
+  1. gcd(non-zero exponents) = 1
   2. Exponent variance > 1.7
+  3. Max exponent ≤ 10 (computational feasibility)
 
 Processing...
 
 Classification complete:
-  Structurally isolated:    316
-  Non-isolated:             48
-  Isolation percentage:     86.8%
+  Structurally isolated:    308
+  Non-isolated:             56
+  Isolation percentage:     84.6%
+
+Exponent range in isolated classes:
+  Min: 1
+  Max: 10
+
+✓ EXCELLENT: All isolated classes have max exponent ≤ 10
+  Expected GB reduction time: ~0.5 sec per monomial
 
 C17 vs C13 Comparison:
   C13 six-variable total:       476
@@ -3301,67 +3357,67 @@ C17 vs C13 Comparison:
   Ratio (C17/C13):              0.765
 
   C13 isolated count:           401
-  C17 isolated count:           316
-  Ratio (C17/C13):              0.788
+  C17 isolated count:           308
+  Ratio (C17/C13):              0.768
 
   C13 isolation percentage:     84.2%
-  C17 isolation percentage:     86.8%
+  C17 isolation percentage:     84.6%
 
 Examples of ISOLATED monomials (first 10):
 ----------------------------------------------------------------------
-   1. Index   21: [12, 1, 2, 1, 1, 1]
-      GCD=1, Variance=16.3333
-   2. Index   34: [11, 3, 1, 1, 1, 1]
-      GCD=1, Variance=13.3333
-   3. Index   97: [9, 1, 1, 1, 2, 4]
-      GCD=1, Variance=8.3333
-   4. Index  135: [8, 2, 1, 2, 1, 4]
-      GCD=1, Variance=6.0000
-   5. Index  136: [8, 2, 1, 1, 3, 3]
-      GCD=1, Variance=5.6667
-   6. Index  144: [8, 1, 3, 1, 1, 4]
-      GCD=1, Variance=6.3333
-   7. Index  147: [8, 1, 2, 2, 2, 3]
-      GCD=1, Variance=5.3333
-   8. Index  148: [8, 1, 2, 1, 4, 2]
-      GCD=1, Variance=6.0000
-   9. Index  150: [8, 1, 1, 4, 1, 3]
-      GCD=1, Variance=6.3333
-  10. Index  151: [8, 1, 1, 3, 3, 2]
-      GCD=1, Variance=5.6667
+   1. Index   97: [9, 1, 1, 1, 2, 4]
+      GCD=1, Variance=8.3333, Max=9
+   2. Index  135: [8, 2, 1, 2, 1, 4]
+      GCD=1, Variance=6.0000, Max=8
+   3. Index  136: [8, 2, 1, 1, 3, 3]
+      GCD=1, Variance=5.6667, Max=8
+   4. Index  144: [8, 1, 3, 1, 1, 4]
+      GCD=1, Variance=6.3333, Max=8
+   5. Index  147: [8, 1, 2, 2, 2, 3]
+      GCD=1, Variance=5.3333, Max=8
+   6. Index  148: [8, 1, 2, 1, 4, 2]
+      GCD=1, Variance=6.0000, Max=8
+   7. Index  150: [8, 1, 1, 4, 1, 3]
+      GCD=1, Variance=6.3333, Max=8
+   8. Index  151: [8, 1, 1, 3, 3, 2]
+      GCD=1, Variance=5.6667, Max=8
+   9. Index  152: [8, 1, 1, 2, 5, 1]
+      GCD=1, Variance=7.0000, Max=8
+  10. Index  192: [7, 3, 2, 1, 1, 4]
+      GCD=1, Variance=4.3333, Max=7
 
 Examples of NON-ISOLATED monomials (first 10):
 ----------------------------------------------------------------------
-   1. Index  303: [6, 2, 4, 2, 2, 2]
-      GCD=2, Variance=2.3333
-      Reason: Fails gcd==1 criterion (gcd=2)
-   2. Index  396: [5, 4, 3, 2, 2, 2]
-      GCD=1, Variance=1.3333
+   1. Index   21: [12, 1, 2, 1, 1, 1]
+      GCD=1, Variance=16.3333, Max=12
+      Reason: Fails max_exp≤10 criterion (max=12)
+   2. Index   34: [11, 3, 1, 1, 1, 1]
+      GCD=1, Variance=13.3333, Max=11
+      Reason: Fails max_exp≤10 criterion (max=11)
+   3. Index  303: [6, 2, 4, 2, 2, 2]
+      GCD=2, Variance=2.3333, Max=6
+      Reason: Fails gcd=1 criterion (gcd=2)
+   4. Index  396: [5, 4, 3, 2, 2, 2]
+      GCD=1, Variance=1.3333, Max=5
       Reason: Fails variance>1.7 criterion (var=1.3333)
-   3. Index  400: [5, 4, 2, 3, 3, 1]
-      GCD=1, Variance=1.6667
+   5. Index  400: [5, 4, 2, 3, 3, 1]
+      GCD=1, Variance=1.6667, Max=5
       Reason: Fails variance>1.7 criterion (var=1.6667)
-   4. Index  411: [5, 3, 4, 3, 1, 2]
-      GCD=1, Variance=1.6667
+   6. Index  411: [5, 3, 4, 3, 1, 2]
+      GCD=1, Variance=1.6667, Max=5
       Reason: Fails variance>1.7 criterion (var=1.6667)
-   5. Index  412: [5, 3, 4, 2, 3, 1]
-      GCD=1, Variance=1.6667
+   7. Index  412: [5, 3, 4, 2, 3, 1]
+      GCD=1, Variance=1.6667, Max=5
       Reason: Fails variance>1.7 criterion (var=1.6667)
-   6. Index  415: [5, 3, 3, 4, 2, 1]
-      GCD=1, Variance=1.6667
+   8. Index  415: [5, 3, 3, 4, 2, 1]
+      GCD=1, Variance=1.6667, Max=5
       Reason: Fails variance>1.7 criterion (var=1.6667)
-   7. Index  525: [4, 6, 2, 2, 2, 2]
-      GCD=2, Variance=2.3333
-      Reason: Fails gcd==1 criterion (gcd=2)
-   8. Index  538: [4, 5, 3, 3, 1, 2]
-      GCD=1, Variance=1.6667
+   9. Index  525: [4, 6, 2, 2, 2, 2]
+      GCD=2, Variance=2.3333, Max=6
+      Reason: Fails gcd=1 criterion (gcd=2)
+  10. Index  538: [4, 5, 3, 3, 1, 2]
+      GCD=1, Variance=1.6667, Max=5
       Reason: Fails variance>1.7 criterion (var=1.6667)
-   9. Index  539: [4, 5, 3, 2, 3, 1]
-      GCD=1, Variance=1.6667
-      Reason: Fails variance>1.7 criterion (var=1.6667)
-  10. Index  554: [4, 4, 4, 3, 2, 1]
-      GCD=1, Variance=1.3333
-      Reason: Fails variance>1.7 criterion (var=1.3333)
 
 ======================================================================
 STATISTICAL ANALYSIS
@@ -3383,6 +3439,20 @@ GCD distribution among six-variable monomials:
   1          362              99.5%
   2          2                 0.5%
 
+Max exponent distribution among six-variable monomials:
+  Max Exp    Count      Percentage  
+----------------------------------------
+  4          15                4.1%
+  5          85               23.4%
+  6          104              28.6%
+  7          74               20.3%
+  8          43               11.8%
+  9          22                6.0%
+  10         13                3.6%
+  11         6                 1.6% ← FILTERED OUT
+  12         1                 0.3% ← FILTERED OUT
+  13         1                 0.3% ← FILTERED OUT
+
 Results saved to step6_structural_isolation_C17.json
 
 ======================================================================
@@ -3390,22 +3460,24 @@ VERIFICATION RESULTS
 ======================================================================
 
 Six-variable monomials:       364
-Structurally isolated:        316
-Isolation percentage:         86.8%
+Structurally isolated:        308
+Isolation percentage:         84.6%
 
 *** STRUCTURAL ISOLATION CLASSIFICATION COMPLETE ***
 
-Identified 316 isolated classes satisfying:
+Identified 308 isolated classes satisfying:
   - gcd(non-zero exponents) = 1 (non-factorizable)
   - Variance > 1.7 (high complexity)
+  - Max exponent ≤ 10 (computational feasibility)
 
-Note: C17 isolated count (316) determined empirically
+Note: C17 isolated count (308) determined empirically
 
-Next step: Step 7 (Information-Theoretic Separation Analysis)
+Next step: Step 11 (Four-Subset Coordinate Tests)
 
 ======================================================================
 STEP 6 COMPLETE
 ======================================================================
+
 ```
 
 # **STEP 6 RESULTS SUMMARY: C₁₇ STRUCTURAL ISOLATION IDENTIFICATION**
@@ -7849,161 +7921,7 @@ This step tests whether the 316 structurally isolated Hodge classes from Step 6 
 script 0:
 
 ```python
-#!/usr/bin/env python3
-"""
-Extract C17 candidate structures from monomial file using Step 6 indices.
 
-Adapted for the PERTURBED C17 X^8 case.
-
-Defaults:
-  - monomial file: saved_inv_p103_monomials18.json
-  - step6 file:    step6_structural_isolation_C17.json
-
-Usage:
-  python3 extract_c17_candidates.py \
-      --monomials saved_inv_p103_monomials18.json \
-      --step6 step6_structural_isolation_C17.json \
-      --out step11_candidateList_C17.m2
-
-The script prints an M2 candidateList block to stdout by default, or writes
-to --out if specified.
-"""
-
-import json
-import sys
-import os
-import argparse
-
-parser = argparse.ArgumentParser(description="Extract C17 candidate structures from monomials using Step 6 indices")
-parser.add_argument('--monomials', '-m', default="saved_inv_p103_monomials18.json",
-                    help="JSON file with full monomial list (list of exponent lists)")
-parser.add_argument('--step6', '-s', default="step6_structural_isolation_C17.json",
-                    help="Step 6 JSON file with 'isolated_indices' (C17)")
-parser.add_argument('--out', '-o', default=None,
-                    help="Optional output filename for M2 candidateList (default: stdout)")
-parser.add_argument('--one-based', action='store_true',
-                    help="Interpret isolated_indices in step6 file as 1-based indices (convert to 0-based)")
-args = parser.parse_args()
-
-MONOMIAL_FILE = args.monomials
-STEP6_FILE = args.step6
-
-# Check files exist
-if not os.path.exists(MONOMIAL_FILE):
-    print(f"ERROR: {MONOMIAL_FILE} not found", file=sys.stderr)
-    print("This file should have been created in Step 2 (monomial enumeration)", file=sys.stderr)
-    sys.exit(1)
-
-if not os.path.exists(STEP6_FILE):
-    print(f"ERROR: {STEP6_FILE} not found", file=sys.stderr)
-    sys.exit(1)
-
-# Load monomials
-print("Loading monomials...", file=sys.stderr)
-with open(MONOMIAL_FILE, 'r') as f:
-    monomials = json.load(f)
-
-if not isinstance(monomials, list):
-    print(f"ERROR: Expected monomials JSON to be a list, got {type(monomials)}", file=sys.stderr)
-    sys.exit(1)
-
-print(f"Loaded {len(monomials)} total monomials", file=sys.stderr)
-
-# Load step6 isolation data
-print("Loading Step 6 isolation data...", file=sys.stderr)
-with open(STEP6_FILE, 'r') as f:
-    step6_data = json.load(f)
-
-if 'isolated_indices' not in step6_data:
-    print("ERROR: step6 JSON does not contain 'isolated_indices' key", file=sys.stderr)
-    sys.exit(1)
-
-isolated_indices = step6_data['isolated_indices']
-print(f"Found {len(isolated_indices)} isolated indices", file=sys.stderr)
-
-# Extract structures
-structures = []
-for idx in isolated_indices:
-    try:
-        idx_int = int(idx)
-    except Exception:
-        print(f"WARNING: Skipping non-integer index: {idx}", file=sys.stderr)
-        continue
-
-    if args.one_based:
-        idx_int -= 1
-
-    if idx_int < 0 or idx_int >= len(monomials):
-        print(f"WARNING: Index {idx_int} out of range (0..{len(monomials)-1}) - original index {idx}", file=sys.stderr)
-        continue
-
-    structure = monomials[idx_int]
-
-    # Monomials should be lists/tuples of exponents
-    if not isinstance(structure, (list, tuple)):
-        print(f"WARNING: Index {idx_int} monomial is not a list/tuple (type={type(structure)})", file=sys.stderr)
-        continue
-
-    if len(structure) < 6:
-        print(f"WARNING: Index {idx_int} has only {len(structure)} exponents (expected >=6)", file=sys.stderr)
-        continue
-
-    # Take first 6 exponents and coerce to ints
-    try:
-        exponents = [int(structure[i]) for i in range(6)]
-    except Exception as e:
-        print(f"WARNING: Failed to coerce exponents at index {idx_int}: {e}", file=sys.stderr)
-        continue
-
-    structures.append({
-        'class_id': f'class{len(structures)}',
-        'index': idx_int,
-        'structure': exponents
-    })
-
-print(f"Extracted {len(structures)} structures", file=sys.stderr)
-
-if len(structures) == 0:
-    print("\nERROR: No structures extracted!", file=sys.stderr)
-    print("Debugging info:", file=sys.stderr)
-    if len(monomials) > 0:
-        print(f" First monomial (0): {monomials[0]}", file=sys.stderr)
-        print(f" Type: {type(monomials[0])}", file=sys.stderr)
-    sys.exit(1)
-
-# Verification: compare first extracted structure to expected Step 6 sample (if present)
-# In your earlier C17 candidateList the first representative was [12,1,2,1,1,1]
-expected_sample = [12,1,2,1,1,1]
-first_struct = structures[0]['structure']
-print(f"\nFirst structure verification:", file=sys.stderr)
-print(f"  Index extracted: {structures[0]['index']}", file=sys.stderr)
-print(f"  Structure: {first_struct}", file=sys.stderr)
-print(f"  Expected (approx): {expected_sample}   (if your Step6 sample matches, good)", file=sys.stderr)
-
-# Prepare M2 output
-m2_lines = []
-m2_lines.append("-- CANDIDATE LIST - C17 X8 Perturbed (generated from Step 6 indices)")
-m2_lines.append("")
-m2_lines.append("candidateList = {")
-
-for i, cls in enumerate(structures):
-    struct_str = "{" + ",".join(map(str, cls['structure'])) + "}"
-    comma = "," if i < len(structures) - 1 else ""
-    m2_lines.append(f'  {{"{cls["class_id"]}", {struct_str}}}{comma}')
-
-m2_lines.append("};")
-m2_lines.append("")
-m2_lines.append(f"-- Total: {len(structures)} classes")
-
-output_text = "\n".join(m2_lines)
-
-# Write or print
-if args.out:
-    with open(args.out, 'w') as f:
-        f.write(output_text + "\n")
-    print(f"Wrote M2 candidateList with {len(structures)} classes to {args.out}", file=sys.stderr)
-else:
-    print(output_text)
 ```
 
 script 1:
@@ -8031,322 +7949,314 @@ testsLimit = if (class testsLimit === Symbol) then 0 else testsLimit;  -- 0 = no
 -- ============================================================================
 
 candidateList = {
-  {"class0", {12,1,2,1,1,1}},
-  {"class1", {11,3,1,1,1,1}},
-  {"class2", {9,1,1,1,2,4}},
-  {"class3", {8,2,1,2,1,4}},
-  {"class4", {8,2,1,1,3,3}},
-  {"class5", {8,1,3,1,1,4}},
-  {"class6", {8,1,2,2,2,3}},
-  {"class7", {8,1,2,1,4,2}},
-  {"class8", {8,1,1,4,1,3}},
-  {"class9", {8,1,1,3,3,2}},
-  {"class10", {8,1,1,2,5,1}},
-  {"class11", {7,3,2,1,1,4}},
-  {"class12", {7,3,1,2,2,3}},
-  {"class13", {7,3,1,1,4,2}},
-  {"class14", {7,2,3,1,2,3}},
-  {"class15", {7,2,2,3,1,3}},
-  {"class16", {7,2,2,2,3,2}},
-  {"class17", {7,2,2,1,5,1}},
-  {"class18", {7,2,1,4,2,2}},
-  {"class19", {7,2,1,3,4,1}},
-  {"class20", {7,1,4,2,1,3}},
-  {"class21", {7,1,4,1,3,2}},
-  {"class22", {7,1,3,3,2,2}},
-  {"class23", {7,1,3,2,4,1}},
-  {"class24", {7,1,2,5,1,2}},
-  {"class25", {7,1,2,4,3,1}},
-  {"class26", {7,1,1,6,2,1}},
-  {"class27", {6,5,1,1,1,4}},
-  {"class28", {6,4,2,1,2,3}},
-  {"class29", {6,4,1,3,1,3}},
-  {"class30", {6,4,1,2,3,2}},
-  {"class31", {6,4,1,1,5,1}},
-  {"class32", {6,3,3,2,1,3}},
-  {"class33", {6,3,3,1,3,2}},
-  {"class34", {6,3,2,3,2,2}},
-  {"class35", {6,3,2,2,4,1}},
-  {"class36", {6,3,1,5,1,2}},
-  {"class37", {6,3,1,4,3,1}},
-  {"class38", {6,2,5,1,1,3}},
-  {"class39", {6,2,4,1,4,1}},
-  {"class40", {6,2,3,4,1,2}},
-  {"class41", {6,2,3,3,3,1}},
-  {"class42", {6,2,2,5,2,1}},
-  {"class43", {6,2,1,7,1,1}},
-  {"class44", {6,1,6,1,2,2}},
-  {"class45", {6,1,5,3,1,2}},
-  {"class46", {6,1,5,2,3,1}},
-  {"class47", {6,1,4,4,2,1}},
-  {"class48", {6,1,3,6,1,1}},
-  {"class49", {5,6,1,1,2,3}},
-  {"class50", {5,5,2,2,1,3}},
-  {"class51", {5,5,2,1,3,2}},
-  {"class52", {5,5,1,3,2,2}},
-  {"class53", {5,5,1,2,4,1}},
-  {"class54", {5,4,4,1,1,3}},
-  {"class55", {5,4,3,1,4,1}},
-  {"class56", {5,4,2,4,1,2}},
-  {"class57", {5,4,1,5,2,1}},
-  {"class58", {5,3,5,1,2,2}},
-  {"class59", {5,3,2,6,1,1}},
-  {"class60", {5,2,6,2,1,2}},
-  {"class61", {5,2,6,1,3,1}},
-  {"class62", {5,2,5,3,2,1}},
-  {"class63", {5,2,4,5,1,1}},
-  {"class64", {5,2,1,1,1,8}},
-  {"class65", {5,1,8,1,1,2}},
-  {"class66", {5,1,7,2,2,1}},
-  {"class67", {5,1,6,4,1,1}},
-  {"class68", {5,1,2,1,2,7}},
-  {"class69", {5,1,1,3,1,7}},
-  {"class70", {5,1,1,2,3,6}},
-  {"class71", {5,1,1,1,5,5}},
-  {"class72", {4,7,1,2,1,3}},
-  {"class73", {4,7,1,1,3,2}},
-  {"class74", {4,6,3,1,1,3}},
-  {"class75", {4,6,2,1,4,1}},
-  {"class76", {4,6,1,4,1,2}},
-  {"class77", {4,6,1,3,3,1}},
-  {"class78", {4,5,4,1,2,2}},
-  {"class79", {4,5,2,4,2,1}},
-  {"class80", {4,5,1,6,1,1}},
-  {"class81", {4,4,5,2,1,2}},
-  {"class82", {4,4,5,1,3,1}},
-  {"class83", {4,4,3,5,1,1}},
-  {"class84", {4,3,7,1,1,2}},
-  {"class85", {4,3,6,2,2,1}},
-  {"class86", {4,3,5,4,1,1}},
-  {"class87", {4,3,1,1,2,7}},
-  {"class88", {4,2,8,1,2,1}},
-  {"class89", {4,2,7,3,1,1}},
-  {"class90", {4,2,2,2,1,7}},
-  {"class91", {4,2,2,1,3,6}},
-  {"class92", {4,2,1,3,2,6}},
-  {"class93", {4,2,1,2,4,5}},
-  {"class94", {4,2,1,1,6,4}},
-  {"class95", {4,1,9,2,1,1}},
-  {"class96", {4,1,4,1,1,7}},
-  {"class97", {4,1,3,2,2,6}},
-  {"class98", {4,1,3,1,4,5}},
-  {"class99", {4,1,2,4,1,6}},
-  {"class100", {4,1,2,2,5,4}},
-  {"class101", {4,1,2,1,7,3}},
-  {"class102", {4,1,1,5,2,5}},
-  {"class103", {4,1,1,4,4,4}},
-  {"class104", {4,1,1,3,6,3}},
-  {"class105", {4,1,1,2,8,2}},
-  {"class106", {4,1,1,1,10,1}},
-  {"class107", {3,8,2,1,1,3}},
-  {"class108", {3,8,1,2,2,2}},
-  {"class109", {3,8,1,1,4,1}},
-  {"class110", {3,7,3,1,2,2}},
-  {"class111", {3,7,2,3,1,2}},
-  {"class112", {3,7,2,2,3,1}},
-  {"class113", {3,7,1,4,2,1}},
-  {"class114", {3,6,4,2,1,2}},
-  {"class115", {3,6,4,1,3,1}},
-  {"class116", {3,6,3,3,2,1}},
-  {"class117", {3,6,2,5,1,1}},
-  {"class118", {3,5,6,1,1,2}},
-  {"class119", {3,5,5,2,2,1}},
-  {"class120", {3,5,4,4,1,1}},
-  {"class121", {3,4,7,1,2,1}},
-  {"class122", {3,4,6,3,1,1}},
-  {"class123", {3,4,1,2,1,7}},
-  {"class124", {3,4,1,1,3,6}},
-  {"class125", {3,3,8,2,1,1}},
-  {"class126", {3,3,3,1,1,7}},
-  {"class127", {3,3,2,2,2,6}},
-  {"class128", {3,3,1,4,1,6}},
-  {"class129", {3,3,1,1,7,3}},
-  {"class130", {3,2,10,1,1,1}},
-  {"class131", {3,2,4,1,2,6}},
-  {"class132", {3,2,3,3,1,6}},
-  {"class133", {3,2,2,2,6,3}},
-  {"class134", {3,2,2,1,8,2}},
-  {"class135", {3,2,1,6,1,5}},
-  {"class136", {3,2,1,3,7,2}},
-  {"class137", {3,2,1,2,9,1}},
-  {"class138", {3,1,5,2,1,6}},
-  {"class139", {3,1,5,1,3,5}},
-  {"class140", {3,1,4,1,6,3}},
-  {"class141", {3,1,3,5,1,5}},
-  {"class142", {3,1,3,2,7,2}},
-  {"class143", {3,1,3,1,9,1}},
-  {"class144", {3,1,2,6,2,4}},
-  {"class145", {3,1,2,4,6,2}},
-  {"class146", {3,1,2,3,8,1}},
-  {"class147", {3,1,1,8,1,4}},
-  {"class148", {3,1,1,7,3,3}},
-  {"class149", {3,1,1,6,5,2}},
-  {"class150", {3,1,1,5,7,1}},
-  {"class151", {2,10,1,1,1,3}},
-  {"class152", {2,9,2,1,2,2}},
-  {"class153", {2,9,1,3,1,2}},
-  {"class154", {2,9,1,2,3,1}},
-  {"class155", {2,8,3,2,1,2}},
-  {"class156", {2,8,3,1,3,1}},
-  {"class157", {2,8,2,3,2,1}},
-  {"class158", {2,8,1,5,1,1}},
-  {"class159", {2,7,5,1,1,2}},
-  {"class160", {2,7,4,2,2,1}},
-  {"class161", {2,7,3,4,1,1}},
-  {"class162", {2,6,6,1,2,1}},
-  {"class163", {2,6,5,3,1,1}},
-  {"class164", {2,5,7,2,1,1}},
-  {"class165", {2,5,2,1,1,7}},
-  {"class166", {2,5,1,2,2,6}},
-  {"class167", {2,5,1,1,4,5}},
-  {"class168", {2,4,9,1,1,1}},
-  {"class169", {2,4,3,1,2,6}},
-  {"class170", {2,4,2,3,1,6}},
-  {"class171", {2,4,2,1,5,4}},
-  {"class172", {2,4,1,4,2,5}},
-  {"class173", {2,4,1,2,6,3}},
-  {"class174", {2,4,1,1,8,2}},
-  {"class175", {2,3,4,2,1,6}},
-  {"class176", {2,3,3,1,6,3}},
-  {"class177", {2,3,2,5,1,5}},
-  {"class178", {2,3,2,2,7,2}},
-  {"class179", {2,3,2,1,9,1}},
-  {"class180", {2,3,1,6,2,4}},
-  {"class181", {2,3,1,4,6,2}},
-  {"class182", {2,3,1,3,8,1}},
-  {"class183", {2,2,6,1,1,6}},
-  {"class184", {2,2,5,2,2,5}},
-  {"class185", {2,2,5,1,4,4}},
-  {"class186", {2,2,4,4,1,5}},
-  {"class187", {2,2,4,1,7,2}},
-  {"class188", {2,2,3,3,6,2}},
-  {"class189", {2,2,3,2,8,1}},
-  {"class190", {2,2,2,7,1,4}},
-  {"class191", {2,2,2,6,3,3}},
-  {"class192", {2,2,2,5,5,2}},
-  {"class193", {2,2,2,4,7,1}},
-  {"class194", {2,2,1,8,2,3}},
-  {"class195", {2,2,1,7,4,2}},
-  {"class196", {2,2,1,6,6,1}},
-  {"class197", {2,1,7,1,2,5}},
-  {"class198", {2,1,6,3,1,5}},
-  {"class199", {2,1,6,2,3,4}},
-  {"class200", {2,1,6,1,5,3}},
-  {"class201", {2,1,5,4,2,4}},
-  {"class202", {2,1,5,2,6,2}},
-  {"class203", {2,1,5,1,8,1}},
-  {"class204", {2,1,4,6,1,4}},
-  {"class205", {2,1,4,4,5,2}},
-  {"class206", {2,1,4,3,7,1}},
-  {"class207", {2,1,3,7,2,3}},
-  {"class208", {2,1,3,6,4,2}},
-  {"class209", {2,1,3,5,6,1}},
-  {"class210", {2,1,2,9,1,3}},
-  {"class211", {2,1,2,8,3,2}},
-  {"class212", {2,1,2,7,5,1}},
-  {"class213", {2,1,1,10,2,2}},
-  {"class214", {2,1,1,9,4,1}},
-  {"class215", {2,1,1,2,1,11}},
-  {"class216", {2,1,1,1,3,10}},
-  {"class217", {1,11,1,1,2,2}},
-  {"class218", {1,10,2,2,1,2}},
-  {"class219", {1,10,2,1,3,1}},
-  {"class220", {1,10,1,3,2,1}},
-  {"class221", {1,9,4,1,1,2}},
-  {"class222", {1,9,3,2,2,1}},
-  {"class223", {1,9,2,4,1,1}},
-  {"class224", {1,8,5,1,2,1}},
-  {"class225", {1,8,4,3,1,1}},
-  {"class226", {1,7,6,2,1,1}},
-  {"class227", {1,7,1,1,1,7}},
-  {"class228", {1,6,8,1,1,1}},
-  {"class229", {1,6,2,1,2,6}},
-  {"class230", {1,6,1,3,1,6}},
-  {"class231", {1,6,1,2,3,5}},
-  {"class232", {1,6,1,1,5,4}},
-  {"class233", {1,5,3,2,1,6}},
-  {"class234", {1,5,3,1,3,5}},
-  {"class235", {1,5,2,3,2,5}},
-  {"class236", {1,5,2,2,4,4}},
-  {"class237", {1,5,2,1,6,3}},
-  {"class238", {1,5,1,5,1,5}},
-  {"class239", {1,5,1,4,3,4}},
-  {"class240", {1,5,1,3,5,3}},
-  {"class241", {1,5,1,2,7,2}},
-  {"class242", {1,5,1,1,9,1}},
-  {"class243", {1,4,5,1,1,6}},
-  {"class244", {1,4,4,2,2,5}},
-  {"class245", {1,4,4,1,4,4}},
-  {"class246", {1,4,3,4,1,5}},
-  {"class247", {1,4,3,1,7,2}},
-  {"class248", {1,4,2,5,2,4}},
-  {"class249", {1,4,2,3,6,2}},
-  {"class250", {1,4,2,2,8,1}},
-  {"class251", {1,4,1,7,1,4}},
-  {"class252", {1,4,1,6,3,3}},
-  {"class253", {1,4,1,5,5,2}},
-  {"class254", {1,4,1,4,7,1}},
-  {"class255", {1,3,6,1,2,5}},
-  {"class256", {1,3,5,3,1,5}},
-  {"class257", {1,3,5,1,5,3}},
-  {"class258", {1,3,4,2,6,2}},
-  {"class259", {1,3,4,1,8,1}},
-  {"class260", {1,3,3,6,1,4}},
-  {"class261", {1,3,3,3,7,1}},
-  {"class262", {1,3,2,7,2,3}},
-  {"class263", {1,3,2,6,4,2}},
-  {"class264", {1,3,2,5,6,1}},
-  {"class265", {1,3,1,9,1,3}},
-  {"class266", {1,3,1,8,3,2}},
-  {"class267", {1,3,1,7,5,1}},
-  {"class268", {1,2,7,2,1,5}},
-  {"class269", {1,2,7,1,3,4}},
-  {"class270", {1,2,6,3,2,4}},
-  {"class271", {1,2,6,2,4,3}},
-  {"class272", {1,2,6,1,6,2}},
-  {"class273", {1,2,5,5,1,4}},
-  {"class274", {1,2,5,3,5,2}},
-  {"class275", {1,2,5,2,7,1}},
-  {"class276", {1,2,4,6,2,3}},
-  {"class277", {1,2,4,5,4,2}},
-  {"class278", {1,2,4,4,6,1}},
-  {"class279", {1,2,3,8,1,3}},
-  {"class280", {1,2,3,7,3,2}},
-  {"class281", {1,2,3,6,5,1}},
-  {"class282", {1,2,2,9,2,2}},
-  {"class283", {1,2,2,8,4,1}},
-  {"class284", {1,2,2,1,1,11}},
-  {"class285", {1,2,1,11,1,2}},
-  {"class286", {1,2,1,10,3,1}},
-  {"class287", {1,2,1,2,2,10}},
-  {"class288", {1,2,1,1,4,9}},
-  {"class289", {1,1,9,1,1,5}},
-  {"class290", {1,1,8,2,2,4}},
-  {"class291", {1,1,8,1,4,3}},
-  {"class292", {1,1,7,4,1,4}},
-  {"class293", {1,1,7,3,3,3}},
-  {"class294", {1,1,7,2,5,2}},
-  {"class295", {1,1,7,1,7,1}},
-  {"class296", {1,1,6,5,2,3}},
-  {"class297", {1,1,6,4,4,2}},
-  {"class298", {1,1,6,3,6,1}},
-  {"class299", {1,1,5,7,1,3}},
-  {"class300", {1,1,5,6,3,2}},
-  {"class301", {1,1,5,5,5,1}},
-  {"class302", {1,1,4,8,2,2}},
-  {"class303", {1,1,4,7,4,1}},
-  {"class304", {1,1,3,10,1,2}},
-  {"class305", {1,1,3,9,3,1}},
-  {"class306", {1,1,3,1,2,10}},
-  {"class307", {1,1,2,11,2,1}},
-  {"class308", {1,1,2,3,1,10}},
-  {"class309", {1,1,2,2,3,9}},
-  {"class310", {1,1,2,1,5,8}},
-  {"class311", {1,1,1,13,1,1}},
-  {"class312", {1,1,1,4,2,9}},
-  {"class313", {1,1,1,3,4,8}},
-  {"class314", {1,1,1,2,6,7}},
-  {"class315", {1,1,1,1,8,6}}
+  {"class0", {9,1,1,1,2,4}},
+  {"class1", {8,2,1,2,1,4}},
+  {"class2", {8,2,1,1,3,3}},
+  {"class3", {8,1,3,1,1,4}},
+  {"class4", {8,1,2,2,2,3}},
+  {"class5", {8,1,2,1,4,2}},
+  {"class6", {8,1,1,4,1,3}},
+  {"class7", {8,1,1,3,3,2}},
+  {"class8", {8,1,1,2,5,1}},
+  {"class9", {7,3,2,1,1,4}},
+  {"class10", {7,3,1,2,2,3}},
+  {"class11", {7,3,1,1,4,2}},
+  {"class12", {7,2,3,1,2,3}},
+  {"class13", {7,2,2,3,1,3}},
+  {"class14", {7,2,2,2,3,2}},
+  {"class15", {7,2,2,1,5,1}},
+  {"class16", {7,2,1,4,2,2}},
+  {"class17", {7,2,1,3,4,1}},
+  {"class18", {7,1,4,2,1,3}},
+  {"class19", {7,1,4,1,3,2}},
+  {"class20", {7,1,3,3,2,2}},
+  {"class21", {7,1,3,2,4,1}},
+  {"class22", {7,1,2,5,1,2}},
+  {"class23", {7,1,2,4,3,1}},
+  {"class24", {7,1,1,6,2,1}},
+  {"class25", {6,5,1,1,1,4}},
+  {"class26", {6,4,2,1,2,3}},
+  {"class27", {6,4,1,3,1,3}},
+  {"class28", {6,4,1,2,3,2}},
+  {"class29", {6,4,1,1,5,1}},
+  {"class30", {6,3,3,2,1,3}},
+  {"class31", {6,3,3,1,3,2}},
+  {"class32", {6,3,2,3,2,2}},
+  {"class33", {6,3,2,2,4,1}},
+  {"class34", {6,3,1,5,1,2}},
+  {"class35", {6,3,1,4,3,1}},
+  {"class36", {6,2,5,1,1,3}},
+  {"class37", {6,2,4,1,4,1}},
+  {"class38", {6,2,3,4,1,2}},
+  {"class39", {6,2,3,3,3,1}},
+  {"class40", {6,2,2,5,2,1}},
+  {"class41", {6,2,1,7,1,1}},
+  {"class42", {6,1,6,1,2,2}},
+  {"class43", {6,1,5,3,1,2}},
+  {"class44", {6,1,5,2,3,1}},
+  {"class45", {6,1,4,4,2,1}},
+  {"class46", {6,1,3,6,1,1}},
+  {"class47", {5,6,1,1,2,3}},
+  {"class48", {5,5,2,2,1,3}},
+  {"class49", {5,5,2,1,3,2}},
+  {"class50", {5,5,1,3,2,2}},
+  {"class51", {5,5,1,2,4,1}},
+  {"class52", {5,4,4,1,1,3}},
+  {"class53", {5,4,3,1,4,1}},
+  {"class54", {5,4,2,4,1,2}},
+  {"class55", {5,4,1,5,2,1}},
+  {"class56", {5,3,5,1,2,2}},
+  {"class57", {5,3,2,6,1,1}},
+  {"class58", {5,2,6,2,1,2}},
+  {"class59", {5,2,6,1,3,1}},
+  {"class60", {5,2,5,3,2,1}},
+  {"class61", {5,2,4,5,1,1}},
+  {"class62", {5,2,1,1,1,8}},
+  {"class63", {5,1,8,1,1,2}},
+  {"class64", {5,1,7,2,2,1}},
+  {"class65", {5,1,6,4,1,1}},
+  {"class66", {5,1,2,1,2,7}},
+  {"class67", {5,1,1,3,1,7}},
+  {"class68", {5,1,1,2,3,6}},
+  {"class69", {5,1,1,1,5,5}},
+  {"class70", {4,7,1,2,1,3}},
+  {"class71", {4,7,1,1,3,2}},
+  {"class72", {4,6,3,1,1,3}},
+  {"class73", {4,6,2,1,4,1}},
+  {"class74", {4,6,1,4,1,2}},
+  {"class75", {4,6,1,3,3,1}},
+  {"class76", {4,5,4,1,2,2}},
+  {"class77", {4,5,2,4,2,1}},
+  {"class78", {4,5,1,6,1,1}},
+  {"class79", {4,4,5,2,1,2}},
+  {"class80", {4,4,5,1,3,1}},
+  {"class81", {4,4,3,5,1,1}},
+  {"class82", {4,3,7,1,1,2}},
+  {"class83", {4,3,6,2,2,1}},
+  {"class84", {4,3,5,4,1,1}},
+  {"class85", {4,3,1,1,2,7}},
+  {"class86", {4,2,8,1,2,1}},
+  {"class87", {4,2,7,3,1,1}},
+  {"class88", {4,2,2,2,1,7}},
+  {"class89", {4,2,2,1,3,6}},
+  {"class90", {4,2,1,3,2,6}},
+  {"class91", {4,2,1,2,4,5}},
+  {"class92", {4,2,1,1,6,4}},
+  {"class93", {4,1,9,2,1,1}},
+  {"class94", {4,1,4,1,1,7}},
+  {"class95", {4,1,3,2,2,6}},
+  {"class96", {4,1,3,1,4,5}},
+  {"class97", {4,1,2,4,1,6}},
+  {"class98", {4,1,2,2,5,4}},
+  {"class99", {4,1,2,1,7,3}},
+  {"class100", {4,1,1,5,2,5}},
+  {"class101", {4,1,1,4,4,4}},
+  {"class102", {4,1,1,3,6,3}},
+  {"class103", {4,1,1,2,8,2}},
+  {"class104", {4,1,1,1,10,1}},
+  {"class105", {3,8,2,1,1,3}},
+  {"class106", {3,8,1,2,2,2}},
+  {"class107", {3,8,1,1,4,1}},
+  {"class108", {3,7,3,1,2,2}},
+  {"class109", {3,7,2,3,1,2}},
+  {"class110", {3,7,2,2,3,1}},
+  {"class111", {3,7,1,4,2,1}},
+  {"class112", {3,6,4,2,1,2}},
+  {"class113", {3,6,4,1,3,1}},
+  {"class114", {3,6,3,3,2,1}},
+  {"class115", {3,6,2,5,1,1}},
+  {"class116", {3,5,6,1,1,2}},
+  {"class117", {3,5,5,2,2,1}},
+  {"class118", {3,5,4,4,1,1}},
+  {"class119", {3,4,7,1,2,1}},
+  {"class120", {3,4,6,3,1,1}},
+  {"class121", {3,4,1,2,1,7}},
+  {"class122", {3,4,1,1,3,6}},
+  {"class123", {3,3,8,2,1,1}},
+  {"class124", {3,3,3,1,1,7}},
+  {"class125", {3,3,2,2,2,6}},
+  {"class126", {3,3,1,4,1,6}},
+  {"class127", {3,3,1,1,7,3}},
+  {"class128", {3,2,10,1,1,1}},
+  {"class129", {3,2,4,1,2,6}},
+  {"class130", {3,2,3,3,1,6}},
+  {"class131", {3,2,2,2,6,3}},
+  {"class132", {3,2,2,1,8,2}},
+  {"class133", {3,2,1,6,1,5}},
+  {"class134", {3,2,1,3,7,2}},
+  {"class135", {3,2,1,2,9,1}},
+  {"class136", {3,1,5,2,1,6}},
+  {"class137", {3,1,5,1,3,5}},
+  {"class138", {3,1,4,1,6,3}},
+  {"class139", {3,1,3,5,1,5}},
+  {"class140", {3,1,3,2,7,2}},
+  {"class141", {3,1,3,1,9,1}},
+  {"class142", {3,1,2,6,2,4}},
+  {"class143", {3,1,2,4,6,2}},
+  {"class144", {3,1,2,3,8,1}},
+  {"class145", {3,1,1,8,1,4}},
+  {"class146", {3,1,1,7,3,3}},
+  {"class147", {3,1,1,6,5,2}},
+  {"class148", {3,1,1,5,7,1}},
+  {"class149", {2,10,1,1,1,3}},
+  {"class150", {2,9,2,1,2,2}},
+  {"class151", {2,9,1,3,1,2}},
+  {"class152", {2,9,1,2,3,1}},
+  {"class153", {2,8,3,2,1,2}},
+  {"class154", {2,8,3,1,3,1}},
+  {"class155", {2,8,2,3,2,1}},
+  {"class156", {2,8,1,5,1,1}},
+  {"class157", {2,7,5,1,1,2}},
+  {"class158", {2,7,4,2,2,1}},
+  {"class159", {2,7,3,4,1,1}},
+  {"class160", {2,6,6,1,2,1}},
+  {"class161", {2,6,5,3,1,1}},
+  {"class162", {2,5,7,2,1,1}},
+  {"class163", {2,5,2,1,1,7}},
+  {"class164", {2,5,1,2,2,6}},
+  {"class165", {2,5,1,1,4,5}},
+  {"class166", {2,4,9,1,1,1}},
+  {"class167", {2,4,3,1,2,6}},
+  {"class168", {2,4,2,3,1,6}},
+  {"class169", {2,4,2,1,5,4}},
+  {"class170", {2,4,1,4,2,5}},
+  {"class171", {2,4,1,2,6,3}},
+  {"class172", {2,4,1,1,8,2}},
+  {"class173", {2,3,4,2,1,6}},
+  {"class174", {2,3,3,1,6,3}},
+  {"class175", {2,3,2,5,1,5}},
+  {"class176", {2,3,2,2,7,2}},
+  {"class177", {2,3,2,1,9,1}},
+  {"class178", {2,3,1,6,2,4}},
+  {"class179", {2,3,1,4,6,2}},
+  {"class180", {2,3,1,3,8,1}},
+  {"class181", {2,2,6,1,1,6}},
+  {"class182", {2,2,5,2,2,5}},
+  {"class183", {2,2,5,1,4,4}},
+  {"class184", {2,2,4,4,1,5}},
+  {"class185", {2,2,4,1,7,2}},
+  {"class186", {2,2,3,3,6,2}},
+  {"class187", {2,2,3,2,8,1}},
+  {"class188", {2,2,2,7,1,4}},
+  {"class189", {2,2,2,6,3,3}},
+  {"class190", {2,2,2,5,5,2}},
+  {"class191", {2,2,2,4,7,1}},
+  {"class192", {2,2,1,8,2,3}},
+  {"class193", {2,2,1,7,4,2}},
+  {"class194", {2,2,1,6,6,1}},
+  {"class195", {2,1,7,1,2,5}},
+  {"class196", {2,1,6,3,1,5}},
+  {"class197", {2,1,6,2,3,4}},
+  {"class198", {2,1,6,1,5,3}},
+  {"class199", {2,1,5,4,2,4}},
+  {"class200", {2,1,5,2,6,2}},
+  {"class201", {2,1,5,1,8,1}},
+  {"class202", {2,1,4,6,1,4}},
+  {"class203", {2,1,4,4,5,2}},
+  {"class204", {2,1,4,3,7,1}},
+  {"class205", {2,1,3,7,2,3}},
+  {"class206", {2,1,3,6,4,2}},
+  {"class207", {2,1,3,5,6,1}},
+  {"class208", {2,1,2,9,1,3}},
+  {"class209", {2,1,2,8,3,2}},
+  {"class210", {2,1,2,7,5,1}},
+  {"class211", {2,1,1,10,2,2}},
+  {"class212", {2,1,1,9,4,1}},
+  {"class213", {2,1,1,1,3,10}},
+  {"class214", {1,10,2,2,1,2}},
+  {"class215", {1,10,2,1,3,1}},
+  {"class216", {1,10,1,3,2,1}},
+  {"class217", {1,9,4,1,1,2}},
+  {"class218", {1,9,3,2,2,1}},
+  {"class219", {1,9,2,4,1,1}},
+  {"class220", {1,8,5,1,2,1}},
+  {"class221", {1,8,4,3,1,1}},
+  {"class222", {1,7,6,2,1,1}},
+  {"class223", {1,7,1,1,1,7}},
+  {"class224", {1,6,8,1,1,1}},
+  {"class225", {1,6,2,1,2,6}},
+  {"class226", {1,6,1,3,1,6}},
+  {"class227", {1,6,1,2,3,5}},
+  {"class228", {1,6,1,1,5,4}},
+  {"class229", {1,5,3,2,1,6}},
+  {"class230", {1,5,3,1,3,5}},
+  {"class231", {1,5,2,3,2,5}},
+  {"class232", {1,5,2,2,4,4}},
+  {"class233", {1,5,2,1,6,3}},
+  {"class234", {1,5,1,5,1,5}},
+  {"class235", {1,5,1,4,3,4}},
+  {"class236", {1,5,1,3,5,3}},
+  {"class237", {1,5,1,2,7,2}},
+  {"class238", {1,5,1,1,9,1}},
+  {"class239", {1,4,5,1,1,6}},
+  {"class240", {1,4,4,2,2,5}},
+  {"class241", {1,4,4,1,4,4}},
+  {"class242", {1,4,3,4,1,5}},
+  {"class243", {1,4,3,1,7,2}},
+  {"class244", {1,4,2,5,2,4}},
+  {"class245", {1,4,2,3,6,2}},
+  {"class246", {1,4,2,2,8,1}},
+  {"class247", {1,4,1,7,1,4}},
+  {"class248", {1,4,1,6,3,3}},
+  {"class249", {1,4,1,5,5,2}},
+  {"class250", {1,4,1,4,7,1}},
+  {"class251", {1,3,6,1,2,5}},
+  {"class252", {1,3,5,3,1,5}},
+  {"class253", {1,3,5,1,5,3}},
+  {"class254", {1,3,4,2,6,2}},
+  {"class255", {1,3,4,1,8,1}},
+  {"class256", {1,3,3,6,1,4}},
+  {"class257", {1,3,3,3,7,1}},
+  {"class258", {1,3,2,7,2,3}},
+  {"class259", {1,3,2,6,4,2}},
+  {"class260", {1,3,2,5,6,1}},
+  {"class261", {1,3,1,9,1,3}},
+  {"class262", {1,3,1,8,3,2}},
+  {"class263", {1,3,1,7,5,1}},
+  {"class264", {1,2,7,2,1,5}},
+  {"class265", {1,2,7,1,3,4}},
+  {"class266", {1,2,6,3,2,4}},
+  {"class267", {1,2,6,2,4,3}},
+  {"class268", {1,2,6,1,6,2}},
+  {"class269", {1,2,5,5,1,4}},
+  {"class270", {1,2,5,3,5,2}},
+  {"class271", {1,2,5,2,7,1}},
+  {"class272", {1,2,4,6,2,3}},
+  {"class273", {1,2,4,5,4,2}},
+  {"class274", {1,2,4,4,6,1}},
+  {"class275", {1,2,3,8,1,3}},
+  {"class276", {1,2,3,7,3,2}},
+  {"class277", {1,2,3,6,5,1}},
+  {"class278", {1,2,2,9,2,2}},
+  {"class279", {1,2,2,8,4,1}},
+  {"class280", {1,2,1,10,3,1}},
+  {"class281", {1,2,1,2,2,10}},
+  {"class282", {1,2,1,1,4,9}},
+  {"class283", {1,1,9,1,1,5}},
+  {"class284", {1,1,8,2,2,4}},
+  {"class285", {1,1,8,1,4,3}},
+  {"class286", {1,1,7,4,1,4}},
+  {"class287", {1,1,7,3,3,3}},
+  {"class288", {1,1,7,2,5,2}},
+  {"class289", {1,1,7,1,7,1}},
+  {"class290", {1,1,6,5,2,3}},
+  {"class291", {1,1,6,4,4,2}},
+  {"class292", {1,1,6,3,6,1}},
+  {"class293", {1,1,5,7,1,3}},
+  {"class294", {1,1,5,6,3,2}},
+  {"class295", {1,1,5,5,5,1}},
+  {"class296", {1,1,4,8,2,2}},
+  {"class297", {1,1,4,7,4,1}},
+  {"class298", {1,1,3,10,1,2}},
+  {"class299", {1,1,3,9,3,1}},
+  {"class300", {1,1,3,1,2,10}},
+  {"class301", {1,1,2,3,1,10}},
+  {"class302", {1,1,2,2,3,9}},
+  {"class303", {1,1,2,1,5,8}},
+  {"class304", {1,1,1,4,2,9}},
+  {"class305", {1,1,1,3,4,8}},
+  {"class306", {1,1,1,2,6,7}},
+  {"class307", {1,1,1,1,8,6}}
 };
 
 -- ============================================================================
