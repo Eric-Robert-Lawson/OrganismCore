@@ -10019,7 +10019,7 @@ python3 step13b_17.py --triplets saved_inv_p103_triplets.json saved_inv_p137_tri
 
 python3 step13c_17.py --minor crt_pivot_1443_C17.json
 
-python3 step13d_19.py --triplet saved_inv_p103_triplets.json --rows pivot_1443_p103_C17_rows.txt --cols pivot_1443_p103_C17_cols.txt --crt crt_pivot_1443_C17.json --out det_pivot_1443_C17_exact.json
+python3 step13d_17.py --triplet saved_inv_p103_triplets.json --rows pivot_1443_p103_C17_rows.txt --cols pivot_1443_p103_C17_cols.txt --crt crt_pivot_1443_C17.json --out det_pivot_1443_C17_exact.json
 ```
 
 ---
