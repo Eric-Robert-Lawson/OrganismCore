@@ -6800,7 +6800,7 @@ shape to accommodate the maximal indices found in the triplets (safe fallback).
 
 First 19 primes (p ≡ 1 (mod 11)):
 23, 67, 89, 199, 331, 353, 397, 419, 463, 617,
-661, 683, 727, 859, 881, 991, 1013, 1069, 1123
+661, 683, 727, 859, 881, 947, 991, 1013, 1123
 """
 
 import json
@@ -6814,7 +6814,7 @@ import os
 # ============================================================================
 
 PRIMES = [23, 67, 89, 199, 331, 353, 397, 419, 463, 617,
-          661, 683, 727, 859, 881, 991, 1013, 1069, 1123]
+          661, 683, 727, 859, 881, 947, 991, 1013, 1123]
 
 TRIPLET_FILE_TEMPLATE = "saved_inv_p{}_triplets.json"
 KERNEL_OUTPUT_TEMPLATE = "step10a_kernel_p{}_C11.json"
@@ -7154,11 +7154,11 @@ COMPUTING KERNEL BASES FOR ALL PRIMES (C11)
   ✓ Found saved_inv_p23_triplets.json
   Loading triplets from saved_inv_p23_triplets.json...
     Variety: PERTURBED_C11_CYCLOTOMIC, Delta: 791/100000, Cyclotomic order: 11
-    Reported rank: 2215, reported kernel dim: 844
+    Triplet file metadata: rank=2215, kernel_dim=844
     Triplet max indices: max_row=3058, max_col=2382
-    No expected dims given; choosing orientation that minimizes matrix size.
-      no-swap shape = (3059, 2383), swap shape = (2383, 3059), swap=False
-    Building sparse matrix with shape 3059 × 2383 (inferred 3059×2383)
+    Orientation decision: no-swap shape=(3059, 2383), swap shape=(2383, 3059)
+    Choosing swap=False (minimizes matrix size)
+    Building sparse matrix with shape 3059 × 2383
     Matrix nnz = 171,576
   Converting to dense array (mod p)...
   Computing kernel via Gaussian elimination mod p...
@@ -7170,11 +7170,14 @@ COMPUTING KERNEL BASES FOR ALL PRIMES (C11)
     Forward elimination complete: 2215 pivots found
     Back substitution complete (RREF)
     Rank (pivots): 2215, Kernel dimension: 168
-  ✓ Kernel computed in 23.0 seconds (prime 23, swap_applied=False)
+  ✓ Kernel computed in 28.6 seconds
 
   Verification:
-    Computed rank: 2215 (reported 2215) - ✓
-    Computed kernel dim: 168 (reported 844) - ✗
+    Matrix shape: 3059 × 2383
+    Computed rank: 2215
+    Computed kernel dim: 168
+    Rank-nullity: 2383 = 2215 + 168 - ✓
+    (Triplet file metadata: rank=2215, kernel=844)
   ✓ Saved kernel basis to step10a_kernel_p23_C11.json (3.5 MB)
 
 .
@@ -7190,11 +7193,11 @@ COMPUTING KERNEL BASES FOR ALL PRIMES (C11)
   ✓ Found saved_inv_p1123_triplets.json
   Loading triplets from saved_inv_p1123_triplets.json...
     Variety: PERTURBED_C11_CYCLOTOMIC, Delta: 791/100000, Cyclotomic order: 11
-    Reported rank: 2215, reported kernel dim: 844
+    Triplet file metadata: rank=2215, kernel_dim=844
     Triplet max indices: max_row=3058, max_col=2382
-    No expected dims given; choosing orientation that minimizes matrix size.
-      no-swap shape = (3059, 2383), swap shape = (2383, 3059), swap=False
-    Building sparse matrix with shape 3059 × 2383 (inferred 3059×2383)
+    Orientation decision: no-swap shape=(3059, 2383), swap shape=(2383, 3059)
+    Choosing swap=False (minimizes matrix size)
+    Building sparse matrix with shape 3059 × 2383
     Matrix nnz = 171,576
   Converting to dense array (mod p)...
   Computing kernel via Gaussian elimination mod p...
@@ -7206,11 +7209,14 @@ COMPUTING KERNEL BASES FOR ALL PRIMES (C11)
     Forward elimination complete: 2215 pivots found
     Back substitution complete (RREF)
     Rank (pivots): 2215, Kernel dimension: 168
-  ✓ Kernel computed in 25.4 seconds (prime 1123, swap_applied=False)
+  ✓ Kernel computed in 42.4 seconds
 
   Verification:
-    Computed rank: 2215 (reported 2215) - ✓
-    Computed kernel dim: 168 (reported 844) - ✗
+    Matrix shape: 3059 × 2383
+    Computed rank: 2215
+    Computed kernel dim: 168
+    Rank-nullity: 2383 = 2215 + 168 - ✓
+    (Triplet file metadata: rank=2215, kernel=844)
   ✓ Saved kernel basis to step10a_kernel_p1123_C11.json (3.7 MB)
 
 ================================================================================
@@ -7222,31 +7228,31 @@ Processed 19 primes:
   ✗ Failed: 0/19
 
 Kernel computation results:
-  Prime    Rank     Kernel Dim   Time (s)   Swap   Verified  
+  Prime    Rank     Kernel Dim   Time (s)   Swap   Valid   
 --------------------------------------------------------------------------------
-  23       2215     168          23.0       N      ✗         
-  67       2215     168          23.9       N      ✗         
-  89       2215     168          23.9       N      ✗         
-  199      2215     168          24.2       N      ✗         
-  331      2215     168          24.6       N      ✗         
-  353      2215     168          24.3       N      ✗         
-  397      2215     168          24.3       N      ✗         
-  419      2215     168          24.2       N      ✗         
-  463      2215     168          24.1       N      ✗         
-  617      2215     168          24.3       N      ✗         
-  661      2215     168          24.4       N      ✗         
-  683      2215     168          24.7       N      ✗         
-  727      2215     168          24.6       N      ✗         
-  859      2215     168          24.9       N      ✗         
-  881      2215     168          25.1       N      ✗         
-  947      2215     168          25.4       N      ✗         
-  991      2215     168          25.6       N      ✗         
-  1013     2215     168          25.8       N      ✗         
-  1123     2215     168          25.4       N      ✗         
+  23       2215     168          30.3       N      ✓       
+  67       2215     168          31.2       N      ✓       
+  89       2215     168          31.0       N      ✓       
+  199      2215     168          31.8       N      ✓       
+  331      2215     168          32.1       N      ✓       
+  353      2215     168          31.5       N      ✓       
+  397      2215     168          31.3       N      ✓       
+  419      2215     168          31.2       N      ✓       
+  463      2215     168          32.0       N      ✓       
+  617      2215     168          31.4       N      ✓       
+  661      2215     168          31.8       N      ✓       
+  683      2215     168          31.2       N      ✓       
+  727      2215     168          32.7       N      ✓       
+  859      2215     168          31.6       N      ✓       
+  881      2215     168          34.4       N      ✓       
+  947      2215     168          34.0       N      ✓       
+  991      2215     168          33.0       N      ✓       
+  1013     2215     168          37.2       N      ✓       
+  1123     2215     168          42.4       N      ✓       
 
 Performance:
-  Average computation time: 24.6 seconds per prime
-  Total runtime: 7.8 minutes
+  Average computation time: 32.7 seconds per prime
+  Total runtime: 10.5 minutes
 
 ✓ Summary saved to step10a_kernel_computation_summary_C11.json
 
@@ -7691,12 +7697,12 @@ PERFORMING CRT RECONSTRUCTION
 Reconstructing 168 × 2383 = 400,344 coefficients...
 Using formula: c_M = [Σ_p c_p · M_p · y_p] mod M
 
-  Progress: 50/168 vectors (29.8%) | Elapsed: 0.6s
-  Progress: 100/168 vectors (59.5%) | Elapsed: 1.3s
-  Progress: 150/168 vectors (89.3%) | Elapsed: 1.9s
-  Progress: 168/168 vectors (100.0%) | Elapsed: 2.2s
+  Progress: 50/168 vectors (29.8%) | Elapsed: 0.9s
+  Progress: 100/168 vectors (59.5%) | Elapsed: 2.5s
+  Progress: 150/168 vectors (89.3%) | Elapsed: 3.7s
+  Progress: 168/168 vectors (100.0%) | Elapsed: 4.2s
 
-✓ CRT reconstruction completed in 2.17 seconds
+✓ CRT reconstruction completed in 4.21 seconds
 
 ================================================================================
 CRT RECONSTRUCTION STATISTICS
@@ -7735,7 +7741,7 @@ STEP 10B COMPLETE - CRT RECONSTRUCTION (C11)
   Non-zero coefficients:  140,202 (35.0%)
   Sparsity:               65.0%
   CRT modulus bits:       165 bits
-  Runtime:                2.17 seconds
+  Runtime:                4.21 seconds
   Verification status:    UNEXPECTED
 
 Next step: Step 10C (Rational Reconstruction)
@@ -8206,7 +8212,7 @@ Primes with a valid final test: 19
 Primes with perfect verification: 19
 Total kernel vectors tested (sum over valid primes): 3192
 Total vectors passed: 3192
-Elapsed time: 3.8s (0.1m)
+Elapsed time: 6.4s (0.1m)
 
 p=23: shape=(3059, 2383), nnz=171576, passed=168/168, ok=True, swap=False
 p=67: shape=(3059, 2383), nnz=171576, passed=168/168, ok=True, swap=False
