@@ -9020,7 +9020,7 @@ candidateList = {
 };
 
 -- ============================================================================
--- FOUR-VARIABLE SUBSETS (15 total)
+-- FOUR-VARIABLE SUBSETS
 -- ============================================================================
 
 fourSubsets = {
@@ -9046,8 +9046,23 @@ makeSubsetName = idxList -> (
     s | ")"
 );
 
+usesVariable = (poly, var) -> (
+    if poly == 0 then return false;
+    mons := if class poly === RingElement then (
+        try (
+            flatten entries monomials poly
+        ) else {poly}
+    ) else {poly};
+    for m in mons do (
+        deg := try degree(m, var) else null;
+        if deg === null then return true;
+        if deg > 0 then return true;
+    );
+    false
+);
+
 -- ============================================================================
--- MAIN COMPUTATION (CORRECTED VERSION)
+-- MAIN COMPUTATION
 -- ============================================================================
 
 print("PRIME,DELTA,CLASS,SUBSET_IDX,SUBSET,RESULT");
@@ -9055,19 +9070,17 @@ print("-----------------------------------------");
 
 -- Scan over each prime
 scan(primesList, p -> (
-    stderr << ">>> Processing prime p = " << p << endl;
-    
     local kk; local numerator; local denominator; local deltap;
     local R; local zVars; local expPow; local omega; local elt;
-    local Llist; local Fmono; local Fcyclo; local F; local J; local coordIdeal;
+    local Llist; local Fmono; local Fcyclo; local F; local J;
     
-    -- Compute delta inline (C7: 791/100000)
+    -- Compute delta inline
     kk = ZZ/p;
     numerator = 791_kk;
     denominator = 100000_kk;
     
     if denominator == 0_kk then (
-        stderr << "WARNING: p=" << p << " divides 100000, using delta=0" << endl;
+        print("WARNING: p=" | toString(p) | " divides 100000, using delta=0");
         deltap = 0_kk;
     ) else (
         deltap = numerator / denominator;
@@ -9076,8 +9089,8 @@ scan(primesList, p -> (
     R = kk[z0,z1,z2,z3,z4,z5];
     zVars = {z0,z1,z2,z3,z4,z5};
 
-    -- Find omega (primitive 7th root of unity)
-    expPow = (p - 1) // 7;
+    -- Find omega
+    expPow = (p - 1) // 13;
     omega = 0_kk;
     for t from 2 to p-1 do (
         elt = (t_kk) ^ expPow;
@@ -9085,78 +9098,49 @@ scan(primesList, p -> (
     );
     if omega == 0_kk then error("No omega for p=" | toString(p));
 
-    -- Build perturbed polynomial (C7: 7 cyclotomic terms)
-    stderr << ">>> Building perturbed polynomial F..." << endl;
-    Llist = apply(7, k -> sum(6, j -> (omega^(k*j)) * zVars#j));
+    -- Build perturbed polynomial
+    Llist = apply(13, k -> sum(6, j -> (omega^(k*j)) * zVars#j));
     Fmono = sum(zVars, v -> v^8);
     Fcyclo = sum(Llist, Lk -> Lk^8);
     F = Fmono + deltap * Fcyclo;
     
-    -- Build Jacobian ideal
-    stderr << ">>> Building Jacobian ideal..." << endl;
     J = ideal jacobian F;
-    
-    -- CRITICAL FIX: Build coordinate ideal
-    stderr << ">>> Building coordinate ideal..." << endl;
-    coordIdeal = ideal(z0, z1, z2, z3, z4, z5);
-    
-    -- Force GB computation with timing (ONE TIME ONLY)
-    stderr << ">>> Computing Jacobian Groebner basis..." << endl;
-    dummy = time gb J;
-    stderr << ">>> Jacobian GB complete! Proceeding to CP³ tests..." << endl << endl;
 
     -- Test all candidates
-    classCounter = 0;
     scan(candidateList, cand -> (
-        classCounter = classCounter + 1;
-        
-        -- Early exit if test limit reached
-        if testsLimit > 0 and classCounter > testsLimit then (
-            stderr << ">>> Test limit (" << testsLimit << ") reached. Stopping." << endl;
-            return  -- Exit scan loop
-        );
-        
-        -- Progress message every 10 classes
-        if classCounter % 10 == 1 then (
-            stderr << ">>> Processing class " << classCounter << " / " << #candidateList << " : " << cand#0 << endl;
-        );
-        
-        local cname; local exps; local mon; local testIdeal;
+        local cname; local exps; local mon; local rem;
         
         cname = cand#0;
         exps = cand#1;
 
-        -- Build monomial
         mon = 1_R;
         for i from 0 to 5 do mon = mon * (zVars#i ^ (exps#i));
-        
-        -- CRITICAL FIX: Build test ideal (not remainder!)
-        testIdeal = J + ideal(mon);
+        rem = mon % J;
 
-        -- Test each four-variable subset
         sidx := 0;
         scan(fourSubsets, S -> (
-            local subsetVars; local subsetIdeal; local result; local subsetName;
+            local forbidden; local usesForbidden; local result; local subsetName;
             
             sidx = sidx + 1;
             
-            -- Build subset ideal (only the 4 variables in subset S)
-            subsetVars = apply(S, idx -> zVars#idx);
-            subsetIdeal = ideal(subsetVars);
-            
-            -- CRITICAL FIX: Use isSubset (not remainder + variable checking)
-            result = if isSubset(testIdeal, subsetIdeal) 
-                     then "REPRESENTABLE" 
-                     else "NOT_REPRESENTABLE";
-            
+            forbidden = flatten apply({0,1,2,3,4,5}, x -> 
+                if member(x, S) then {} else {x});
+
+            usesForbidden = false;
+            for forbidIdx in forbidden do (
+                if usesVariable(rem, zVars#forbidIdx) then (
+                    usesForbidden = true;
+                    break;
+                );
+            );
+
+            result = if usesForbidden then "NOT_REPRESENTABLE" else "REPRESENTABLE";
             subsetName = makeSubsetName(S);
             
             print(toString(p) | "," | toString(deltap) | "," | cname | "," 
                   | toString(sidx) | "," | subsetName | "," | result);
         ));
     ));
-    
-    stderr << ">>> Prime " << p << " completed (" << classCounter << " classes tested)" << endl << endl;
 ));
 
 print("");
