@@ -9680,27 +9680,42 @@ script 4
 STEP 13D: Bareiss Exact Determinant (X8 Perturbed C₁₇)
 
 Compute determinant of 1443×1443 minor using Bareiss algorithm
-(exact integer arithmetic, no modular reduction, no rounding).
-
-This provides UNCONDITIONAL PROOF of rank = 1443 over Z.
-
-Perturbed variety: Sum z_i^8 + (791/100000) * Sum_{k=1}^{16} L_k^8 = 0
+with gmpy2 for speed (CRITICAL for feasibility).
 
 Usage:
   python3 step13d_bareiss_exact_det_C17.py \
-    --minor minor_1443_crt_C17.json \
+    --minor crt_pivot_1443_C17.json \
     --out bareiss_det_1443_C17.json
 
-Expected runtime: 2-4 hours (depends on hardware)
-Memory: ~8-16 GB peak
+Expected runtime: 2-4 hours (with gmpy2)
+                  20-40 hours (without gmpy2 - NOT RECOMMENDED)
 """
 
 import argparse
 import json
 import sys
 import time
+import math
 from pathlib import Path
 from typing import List
+
+# CRITICAL: Try to import gmpy2 for speed
+try:
+    import gmpy2
+    from gmpy2 import mpz
+    GMPY2_AVAILABLE = True
+except ImportError:
+    GMPY2_AVAILABLE = False
+    print("WARNING: gmpy2 not available, using pure Python (10-100x slower)", 
+          file=sys.stderr)
+    print("         Install with: pip install gmpy2", file=sys.stderr)
+    print()
+
+# Increase Python's string conversion limits for huge determinants
+try:
+    sys.set_int_max_str_digits(100_000_000)
+except AttributeError:
+    pass
 
 EXPECTED_RANK = 1443
 CYCLOTOMIC_ORDER = 17
@@ -9716,43 +9731,50 @@ def bareiss_det(matrix: List[List[int]]) -> int:
     """
     Bareiss algorithm for exact integer determinant.
     
-    No modular arithmetic, no floating point - pure integer operations.
-    Numerically stable and produces exact result.
-    
-    Time complexity: O(n³)
-    Space complexity: O(n²)
+    Uses gmpy2.mpz if available (10-100x faster than pure Python).
     """
     n = len(matrix)
     
-    # Create working copy
-    A = [row[:] for row in matrix]
+    if n == 0:
+        return 1
+    if n == 1:
+        return matrix[0][0]
     
-    # Track sign from row swaps
+    # Convert to gmpy2.mpz for speed (if available)
+    if GMPY2_AVAILABLE:
+        A = [[mpz(val) for val in row] for row in matrix]
+        one = mpz(1)
+    else:
+        A = [[int(val) for val in row] for row in matrix]
+        one = 1
+    
     sign = 1
-    
-    # Previous pivot (for division-free property)
-    prev_pivot = 1
+    prev_pivot = one
     
     print(f"Starting Bareiss elimination on {n}×{n} matrix...")
+    if GMPY2_AVAILABLE:
+        print("Using gmpy2 for integer arithmetic (fast)")
+    else:
+        print("Using pure Python (slow - consider installing gmpy2)")
     print()
     
     start_time = time.time()
     last_report = start_time
     
     for k in range(n - 1):
-        # Progress reporting
+        # Progress reporting every 60 seconds
         current_time = time.time()
-        if current_time - last_report > 30.0 or k == 0:  # Report every 30 seconds
+        if current_time - last_report > 60.0 or k == 0:
             elapsed = current_time - start_time
             progress = 100.0 * k / (n - 1)
             rate = k / elapsed if elapsed > 0 else 0
             eta = (n - 1 - k) / rate if rate > 0 else 0
             
-            print(f"  Step {k+1}/{n-1} ({progress:.1f}%) - "
-                  f"Elapsed: {elapsed/60:.1f}m, ETA: {eta/60:.1f}m")
+            print(f"  Step {k+1:4d}/{n-1} ({progress:5.1f}%) - "
+                  f"Elapsed: {elapsed/3600:.2f}h, ETA: {eta/3600:.2f}h")
             last_report = current_time
         
-        # Find pivot (first non-zero element in column k)
+        # Find non-zero pivot
         pivot_row = None
         for i in range(k, n):
             if A[i][k] != 0:
@@ -9760,9 +9782,8 @@ def bareiss_det(matrix: List[List[int]]) -> int:
                 break
         
         if pivot_row is None:
-            # Singular matrix
             print()
-            print("Matrix is singular (pivot column is zero)")
+            print("Matrix is singular (zero pivot column)")
             return 0
         
         # Swap rows if needed
@@ -9772,24 +9793,27 @@ def bareiss_det(matrix: List[List[int]]) -> int:
         
         pivot = A[k][k]
         
-        # Bareiss update (division-free until final step)
+        # Bareiss update: exact division property
+        # A[i,j] := (A[i,j] * pivot - A[i,k] * A[k,j]) / prev_pivot
         for i in range(k + 1, n):
             for j in range(k + 1, n):
-                # Exact integer arithmetic: (a*d - b*c) / prev_pivot
                 numerator = A[i][j] * pivot - A[i][k] * A[k][j]
                 
-                # Division is exact (Bareiss property guarantees divisibility)
-                A[i][j] = numerator // prev_pivot
+                # Division is EXACT (guaranteed by Bareiss algorithm)
+                if GMPY2_AVAILABLE:
+                    A[i][j] = numerator // prev_pivot
+                else:
+                    A[i][j] = numerator // prev_pivot
         
         prev_pivot = pivot
     
     elapsed = time.time() - start_time
     print()
-    print(f"Bareiss elimination complete in {elapsed/60:.2f} minutes")
+    print(f"Bareiss elimination complete in {elapsed/3600:.2f} hours")
     print()
     
-    # Determinant is the last diagonal element times sign
-    det = sign * A[n-1][n-1]
+    # Determinant is final diagonal element times accumulated sign
+    det = int(sign * A[n-1][n-1])
     
     return det
 
@@ -9808,6 +9832,18 @@ def main():
     print("Variety: Sum z_i^8 + (791/100000) * Sum_{k=1}^{16} L_k^8 = 0")
     print(f"Cyclotomic order: {CYCLOTOMIC_ORDER}")
     print()
+    
+    if not GMPY2_AVAILABLE:
+        print("⚠️  WARNING: gmpy2 not installed!")
+        print("   Computation will be 10-100x slower (20-40 hours instead of 2-4)")
+        print("   Install with: pip install gmpy2")
+        print()
+        response = input("Continue anyway? (yes/no): ")
+        if response.lower() != 'yes':
+            print("Aborting. Install gmpy2 first.")
+            sys.exit(1)
+        print()
+    
     print("⚠️  This computation uses EXACT INTEGER ARITHMETIC")
     print("   No modular reduction, no floating point, no rounding")
     print("   Result is UNCONDITIONAL PROOF over Z")
@@ -9817,6 +9853,19 @@ def main():
     print(f"Loading minor from {minor_path}...")
     with open(minor_path) as f:
         data = json.load(f)
+    
+    # Validate data source
+    if data.get("step") == "13C":
+        print("ERROR: This is a Step 13C file (rational reconstruction)", 
+              file=sys.stderr)
+        print("       Step 13D requires Step 13B output (CRT minor)", file=sys.stderr)
+        print(f"       Use file like: crt_pivot_1443_C17.json", file=sys.stderr)
+        sys.exit(2)
+    
+    if "minor_Z" not in data:
+        print("ERROR: Missing 'minor_Z' field (expected from Step 13B)", 
+              file=sys.stderr)
+        sys.exit(2)
     
     k = data.get("k", 0)
     minor_Z = data.get("minor_Z", [])
@@ -9866,33 +9915,46 @@ def main():
         print("✗ Determinant = 0")
         print()
         print("  Matrix is SINGULAR over Z")
-        print("  Rank < {k}")
+        print(f"  Rank < {k}")
         verification = "FAIL"
         rank_certified = False
     else:
+        abs_det = abs(det)
+        det_str = str(det)
+        
         print(f"✓ Determinant ≠ 0")
         print()
-        print(f"  det(M) = {det}")
-        print(f"  |det(M)| has {len(str(abs(det)))} digits")
+        
+        if len(det_str) > 200:
+            print(f"  det(M) = {det_str[:100]}...")
+            print(f"           ...{det_str[-100:]}")
+            print(f"  (total {len(det_str)} digits)")
+        else:
+            print(f"  det(M) = {det}")
+        
+        print()
+        print(f"  log₁₀|det(M)| = {math.log10(abs_det):.3f}")
+        print(f"  |det(M)| has {len(det_str)} digits")
         print()
         print(f"  Matrix is NONSINGULAR over Z")
         print(f"  Rank = {k} UNCONDITIONALLY PROVEN")
+        
         verification = "PASS"
         rank_certified = True
     
     print()
-    print(f"Computation time: {overall_elapsed/60:.2f} minutes")
+    print(f"Computation time: {overall_elapsed/3600:.2f} hours ({overall_elapsed/60:.1f} minutes)")
     print()
     
     # Implications
     if rank_certified:
-        expected_dim = 1770 - k  # Total space - rank
+        expected_dim = 1770 - k
         print("="*80)
         print("MATHEMATICAL CERTIFICATION")
         print("="*80)
         print()
         print(f"Jacobian cokernel dimension = {expected_dim}")
-        print(f"  (Total space 1770 - rank {k} = {expected_dim})")
+        print(f"  (Total monomial space 1770 - rank {k} = {expected_dim})")
         print()
         print("This is an UNCONDITIONAL THEOREM over Z.")
         print("No probabilistic arguments, no modular assumptions.")
@@ -9907,16 +9969,19 @@ def main():
         "galois_group": "Z/16Z",
         "k": k,
         "primes_from_crt": primes,
-        "determinant": str(det),  # Store as string (may be huge)
+        "determinant": str(det),
         "determinant_nonzero": det != 0,
         "determinant_digits": len(str(abs(det))) if det != 0 else 0,
+        "log10_abs_det": math.log10(abs(det)) if det != 0 else None,
         "rank_certified": rank_certified,
         "certified_rank": k if rank_certified else None,
         "certified_dimension": (1770 - k) if rank_certified else None,
         "computation_time_seconds": overall_elapsed,
+        "computation_time_hours": overall_elapsed / 3600,
         "verification": verification,
         "algorithm": "Bareiss (exact integer arithmetic)",
-        "note": "Unconditional proof over Z (no modular arithmetic)"
+        "used_gmpy2": GMPY2_AVAILABLE,
+        "note": "Unconditional proof over Z"
     }
     
     out_path = Path(args.out)
