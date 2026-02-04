@@ -14,6 +14,8 @@ The first 19 primes mod 17=1 are:
 103, 137, 239, 307, 409, 443, 613, 647, 919, 953, 1021, 1123, 1259, 1327, 1361, 1429, 1531, 1667, 1871
 ```
 
+**IMPORTANT** I used 308 instead of 316 candidate classes in order to make steps easier to do. In some areas it may still say 316 classes, we are using 308. This was discovered to be an issue at step 11 due to computational blowup with exponents being larger as only reason for slowdown from 3-4 hours a prime to over 12 hours a prime. This is why there may be some inconsistencies but we still can run with 308 classes through the pipeline and will do it post-hoc. However it may still reference 316 classes when it is really 308 we are using!
+
 ---
 
 # **Step 1: Smoothness Test**
@@ -4118,7 +4120,7 @@ Loading canonical monomials from saved_inv_p103_monomials18.json...
   Total monomials: 1980
 
 Loading isolated class indices from step6_structural_isolation_C17.json...
-  Isolated classes: 316
+  Isolated classes: 308
 
 Defining representative algebraic cycle patterns...
   Total algebraic patterns: 24
@@ -4132,33 +4134,33 @@ Comparing isolated classes vs. algebraic patterns
 
 Metric: entropy
   Algebraic: mean=1.329, std=0.538
-  Isolated : mean=2.243, std=0.148
-  Cohen's d: 2.317
-  KS D: 0.915, KS p-value: 1.15e-22
+  Isolated : mean=2.256, std=0.126
+  Cohen's d: 2.371
+  KS D: 0.938, KS p-value: 7.24e-25
 
 Metric: kolmogorov
   Algebraic: mean=8.250, std=3.779
-  Isolated : mean=14.585, std=0.937
-  Cohen's d: 2.301
-  KS D: 0.825, KS p-value: 8.94e-17
+  Isolated : mean=14.643, std=0.863
+  Cohen's d: 2.332
+  KS D: 0.848, KS p-value: 3.96e-18
 
 Metric: num_vars
   Algebraic: mean=2.875, std=0.900
   Isolated : mean=6.000, std=0.000
   Cohen's d: 4.911
-  KS D: 1.000, KS p-value: 5.00e-37
+  KS D: 1.000, KS p-value: 9.04e-37
 
 Metric: variance
   Algebraic: mean=15.542, std=10.340
-  Isolated : mean=4.724, std=2.633
-  Cohen's d: -1.434
-  KS D: 0.677, KS p-value: 1.45e-10
+  Isolated : mean=4.474, std=2.120
+  Cohen's d: -1.483
+  KS D: 0.701, KS p-value: 2.32e-11
 
 Metric: range
   Algebraic: mean=4.833, std=3.679
-  Isolated : mean=5.810, std=1.542
-  Cohen's d: 0.346
-  KS D: 0.404, KS p-value: 8.52e-04
+  Isolated : mean=5.692, std=1.367
+  Cohen's d: 0.309
+  KS D: 0.404, KS p-value: 8.77e-04
 
 ======================================================================
 COMPARISON TO C13 BENCHMARKS
@@ -4166,13 +4168,13 @@ COMPARISON TO C13 BENCHMARKS
 
 ENTROPY:
   C13 baseline iso-mean = 2.24, KS_D = 0.925
-  C17 observed iso-mean = 2.243, KS_D = 0.915
-  Delta (C17 - C13): Δmu_iso=+0.003, ΔKS_D=-0.010
+  C17 observed iso-mean = 2.256, KS_D = 0.938
+  Delta (C17 - C13): Δmu_iso=+0.016, ΔKS_D=+0.013
 
 KOLMOGOROV:
   C13 baseline iso-mean = 14.57, KS_D = 0.837
-  C17 observed iso-mean = 14.585, KS_D = 0.825
-  Delta (C17 - C13): Δmu_iso=+0.015, ΔKS_D=-0.012
+  C17 observed iso-mean = 14.643, KS_D = 0.848
+  Delta (C17 - C13): Δmu_iso=+0.073, ΔKS_D=+0.011
 
 NUM_VARS:
   C13 baseline iso-mean = 6.0, KS_D = 1.0
@@ -4181,13 +4183,13 @@ NUM_VARS:
 
 VARIANCE:
   C13 baseline iso-mean = 4.83, KS_D = 0.347
-  C17 observed iso-mean = 4.724, KS_D = 0.677
-  Delta (C17 - C13): Δmu_iso=-0.106, ΔKS_D=+0.330
+  C17 observed iso-mean = 4.474, KS_D = 0.701
+  Delta (C17 - C13): Δmu_iso=-0.356, ΔKS_D=+0.354
 
 RANGE:
   C13 baseline iso-mean = 5.87, KS_D = 0.407
-  C17 observed iso-mean = 5.810, KS_D = 0.404
-  Delta (C17 - C13): Δmu_iso=-0.060, ΔKS_D=-0.003
+  C17 observed iso-mean = 5.692, KS_D = 0.404
+  Delta (C17 - C13): Δmu_iso=-0.178, ΔKS_D=-0.003
 
 Results saved to step7_information_theoretic_analysis_C17.json
 
@@ -4196,7 +4198,7 @@ STEP 7 COMPLETE
 ======================================================================
 
 Summary:
-  Isolated classes analyzed:      316
+  Isolated classes analyzed:      308
   Algebraic patterns analyzed:    24
   Metrics computed:               5
 
