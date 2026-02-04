@@ -9950,9 +9950,9 @@ to run scripts:
 ```bash
 python3 step13a_17.py --triplet saved_inv_p103_triplets.json --prime 103 --k 1443 --out_prefix pivot_1443_p103_C17
 
-python3 step13b_17.py --triplets saved_inv_p103_triplets.json saved_inv_p137_triplets.json saved_inv_p239_triplets.json saved_inv_p307_triplets.json saved_inv_p409_triplets.json --primes 103 137 239 307 409 --rows pivot_1443_p103_C17_rows.txt --cols pivot_1443_p103_C17_cols.txt --out crt_pivot_1443_C17.json
+python3 step13b_17.py --triplets saved_inv_p103_triplets.json saved_inv_p137_triplets.json saved_inv_p239_triplets.json saved_inv_p307_triplets.json saved_inv_p409_triplets.json --primes 103 137 239 307 409 --pivot_rows pivot_1443_p103_C17_rows.txt --pivot_cols pivot_1443_p103_C17_cols.txt --out crt_pivot_1443_C17.json
 
-python3 step13c_17.py crt_pivot_1443_C17.json
+python3 step13c_17.py --minor crt_pivot_1443_C17.json
 
 python3 step13d_19.py --triplet saved_inv_p103_triplets.json --rows pivot_1443_p103_C17_rows.txt --cols pivot_1443_p103_C17_cols.txt --crt crt_pivot_1443_C17.json --out det_pivot_1443_C17_exact.json
 ```
@@ -10098,7 +10098,62 @@ Output: crt_pivot_1443_C17.json
 script 3
 
 ```verbatim
-pending
+================================================================================
+STEP 13C: RATIONAL RECONSTRUCTION (X8 PERTURBED C₁₇)
+================================================================================
+
+⚠️  WARNING: This step is EXPECTED TO FAIL
+    Perturbed varieties have coefficient explosion
+    Step 13D (Bareiss) provides definitive certificate
+
+Variety: Sum z_i^8 + (791/100000) * Sum_{k=1}^{16} L_k^8 = 0
+Cyclotomic order: 17
+
+Loading CRT minor from crt_pivot_1443_C17.json...
+  Dimension: 1443×1443
+  Primes used: [103, 137, 239, 307, 409]
+  Modulus M: 423,464,858,827
+
+Attempting rational reconstruction (max denominator: 1,000,000,000,000)...
+
+  Row 1/1443 (successes: 0, failures: 0)...
+  Row 100/1443 (successes: 139759, failures: 3098)...
+  Row 200/1443 (successes: 281007, failures: 6150)...
+  Row 300/1443 (successes: 422280, failures: 9177)...
+  Row 400/1443 (successes: 563608, failures: 12149)...
+  Row 500/1443 (successes: 704891, failures: 15166)...
+  Row 600/1443 (successes: 846168, failures: 18189)...
+  Row 700/1443 (successes: 987381, failures: 21276)...
+  Row 800/1443 (successes: 1128534, failures: 24423)...
+  Row 900/1443 (successes: 1269746, failures: 27511)...
+  Row 1000/1443 (successes: 1411368, failures: 30189)...
+  Row 1100/1443 (successes: 1553190, failures: 32667)...
+  Row 1200/1443 (successes: 1695021, failures: 35136)...
+  Row 1300/1443 (successes: 1837113, failures: 37344)...
+  Row 1400/1443 (successes: 1979123, failures: 39634)...
+
+================================================================================
+RECONSTRUCTION RESULTS
+================================================================================
+Total entries: 2,082,249
+Successful: 2,041,719 (98.05%)
+Failed: 40,530 (1.95%)
+
+✗ RECONSTRUCTION FAILED (as expected)
+  Coefficient denominators exceed reconstruction bounds
+  This is normal for perturbed varieties
+
+➜ Proceed to Step 13D (Bareiss exact determinant)
+
+Writing results to minor_1443_rational_C17.json...
+
+================================================================================
+STEP 13C COMPLETE
+================================================================================
+Output: minor_1443_rational_C17.json
+
+Next step: Run Step 13D (Bareiss exact determinant)
+  This will provide unconditional rank certificate over Z
 ```
 
 script 4:
