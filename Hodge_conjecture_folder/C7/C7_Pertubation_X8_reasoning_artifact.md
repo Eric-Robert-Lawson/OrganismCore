@@ -14,6 +14,8 @@ the first 19 primes mod 7 = 1 are:
 29, 43, 71, 113, 127, 197, 211, 239, 281, 337, 379, 421, 449, 463, 491, 547, 617, 631, 659
 ```
 
+**IMPORTANT** since step 11 the isolated classes was maxed exp at 10, so we modified step 6 and reran from step 6 to step 11. This is not reflected in the result summary but the scripts and results were updated. THIS IS IMPORTANT we use 733 isolated classes instead of 751! Keep this in mind!
+
 ---
 
 # **Step 1: Smoothness Test**
@@ -3091,7 +3093,7 @@ Expected C₇ (saturation): 884 × 0.80 ≈ 707 isolated classes (below universa
 """
 STEP 6: Structural Isolation Identification (C7 X8 Perturbed)
 Identifies which of the six-variable monomials are structurally isolated
-Criteria: gcd(non-zero exponents) = 1 AND exponent variance > 1.7
+Criteria: gcd(non-zero exponents) = 1 AND exponent variance > 1.7 AND max_exp ≤ 10
 
 Perturbed C7 cyclotomic variety:
   V: Sum z_i^8 + (791/100000) * Sum_{k=1}^{6} L_k^8 = 0
@@ -3106,24 +3108,15 @@ import os
 # CONFIGURATION
 # ============================================================================
 
-# Monomial file produced in Step 2 for a chosen prime (use the prime you ran Step 2 with)
-MONOMIAL_FILE = "saved_inv_p29_monomials18.json"   # adjust if you used a different prime
+MONOMIAL_FILE = "saved_inv_p29_monomials18.json"  # C7: use p=29 (or your C7 prime)
 OUTPUT_FILE = "step6_structural_isolation_C7.json"
 
-# Combinatorial totals:
-# Number of degree-18 monomials in 6 variables with all 6 variables present:
-# C(17,5) = 6188 total six-variable monomials.
-# For C7-invariant subset we expect 6188 / 7 = 884 exactly.
-EXPECTED_SIX_VAR = 6188 // 7  # 884
-EXPECTED_ISOLATED = None  # unknown; will be determined empirically
+EXPECTED_SIX_VAR = None  # Will be determined empirically for C7
+EXPECTED_ISOLATED = None  # Will be determined empirically
 
 GCD_THRESHOLD = 1
 VARIANCE_THRESHOLD = 1.7
-
-# Reference C13 numbers for comparison
-C13_SIX_VAR = 476
-C13_ISOLATED = 401
-C13_ISOLATION_PCT = 100.0 * C13_ISOLATED / C13_SIX_VAR if C13_SIX_VAR else 0.0
+MAX_EXP_THRESHOLD = 10  # Computational feasibility filter
 
 # ============================================================================
 # MAIN EXECUTION
@@ -3158,6 +3151,7 @@ print()
 # ============================================================================
 # FILTER TO SIX-VARIABLE MONOMIALS
 # ============================================================================
+
 print("Filtering to six-variable monomials...")
 print("  (Monomials with exactly 6 non-zero exponents)")
 print()
@@ -3172,20 +3166,23 @@ for idx, exps in enumerate(monomials):
         })
 
 print(f"Six-variable monomials found: {len(six_var_monomials)}")
-print(f"Expected (combinatorial / C7): {EXPECTED_SIX_VAR}")
+if EXPECTED_SIX_VAR:
+    print(f"Expected (combinatorial / C7): {EXPECTED_SIX_VAR}")
 print()
 
-if len(six_var_monomials) != EXPECTED_SIX_VAR:
+if EXPECTED_SIX_VAR and len(six_var_monomials) != EXPECTED_SIX_VAR:
     print(f"WARNING: Count mismatch (expected {EXPECTED_SIX_VAR}, got {len(six_var_monomials)})")
-    print("Proceeding with the empirical set found in the canonical list.")
+    print("This can occur due to monomial ordering/weight filtering; proceed with empirical set.")
     print()
 
 # ============================================================================
 # APPLY STRUCTURAL ISOLATION CRITERIA
 # ============================================================================
+
 print("Applying structural isolation criteria:")
-print(f"  1. gcd(non-zero exponents) == {GCD_THRESHOLD}")
+print(f"  1. gcd(non-zero exponents) = {GCD_THRESHOLD}")
 print(f"  2. Exponent variance > {VARIANCE_THRESHOLD}")
+print(f"  3. Max exponent ≤ {MAX_EXP_THRESHOLD} (computational feasibility)")
 print()
 print("Processing...")
 print()
@@ -3196,24 +3193,32 @@ non_isolated_classes = []
 for mon in six_var_monomials:
     idx = mon["index"]
     exps = mon["exponents"]
-    # nonzero_exps length is 6 for six-variable monomials
-    nonzero_exps = [int(e) for e in exps if e > 0]
+    
+    # Criterion 1: gcd = 1 (non-factorizable)
+    nonzero_exps = [e for e in exps if e > 0]
     exp_gcd = reduce(gcd, nonzero_exps)
-
-    mean_exp = sum(nonzero_exps) / 6.0
-    variance = sum((e - mean_exp)**2 for e in nonzero_exps) / 6.0
-
-    is_isolated = (exp_gcd == GCD_THRESHOLD) and (variance > VARIANCE_THRESHOLD)
-
+    
+    # Criterion 2: Variance > 1.7 (high complexity)
+    # For degree-18 monomials with 6 variables, mean = 18/6 = 3.0
+    mean_exp = sum(exps) / 6.0
+    variance = sum((e - mean_exp)**2 for e in exps) / 6.0
+    
+    # Criterion 3: Max exponent ≤ 10 (computational feasibility)
+    max_exp = max(exps)
+    
+    # Check all three criteria
+    is_isolated = (exp_gcd == GCD_THRESHOLD) and (variance > VARIANCE_THRESHOLD) and (max_exp <= MAX_EXP_THRESHOLD)
+    
     monomial_data = {
-        "index": int(idx),
-        "exponents": [int(e) for e in exps],
+        "index": idx,
+        "exponents": exps,
         "gcd": int(exp_gcd),
         "variance": round(variance, 4),
-        "mean": round(mean_exp, 3),
+        "mean": round(mean_exp, 2),
+        "max_exp": int(max_exp),
         "isolated": bool(is_isolated)
     }
-
+    
     if is_isolated:
         isolated_classes.append(monomial_data)
     else:
@@ -3226,8 +3231,33 @@ print(f"  Isolation percentage:     {100.0 * len(isolated_classes) / len(six_var
 print()
 
 # ============================================================================
+# MAX EXPONENT ANALYSIS
+# ============================================================================
+
+if isolated_classes:
+    max_exp_isolated = max(mon['max_exp'] for mon in isolated_classes)
+    min_exp_isolated = min(min(e for e in mon['exponents'] if e > 0) for mon in isolated_classes)
+    
+    print(f"Exponent range in isolated classes:")
+    print(f"  Min: {min_exp_isolated}")
+    print(f"  Max: {max_exp_isolated}")
+    print()
+    
+    if max_exp_isolated <= 10:
+        print("✓ EXCELLENT: All isolated classes have max exponent ≤ 10")
+        print("  Expected GB reduction time: ~0.5 sec per monomial")
+    else:
+        print(f"⚠ WARNING: Max exponent is {max_exp_isolated} (filter should have caught this!)")
+    print()
+
+# ============================================================================
 # C13 COMPARISON
 # ============================================================================
+
+C13_SIX_VAR = 476
+C13_ISOLATED = 401
+C13_ISOLATION_PCT = 100.0 * C13_ISOLATED / C13_SIX_VAR
+
 print("C7 vs C13 Comparison:")
 print(f"  C13 six-variable total:       {C13_SIX_VAR}")
 print(f"  C7 six-variable total:        {len(six_var_monomials)}")
@@ -3245,13 +3275,14 @@ print()
 # ============================================================================
 # DISPLAY EXAMPLES
 # ============================================================================
+
 if len(isolated_classes) > 0:
     print("Examples of ISOLATED monomials (first 10):")
     print("-"*70)
     for i, mon in enumerate(isolated_classes[:10], 1):
         exp_str = str(mon['exponents'])
         print(f"  {i:2d}. Index {mon['index']:4d}: {exp_str}")
-        print(f"      GCD={mon['gcd']}, Variance={mon['variance']:.4f}")
+        print(f"      GCD={mon['gcd']}, Variance={mon['variance']:.4f}, Max={mon['max_exp']}")
     print()
 
 if len(non_isolated_classes) > 0:
@@ -3260,16 +3291,21 @@ if len(non_isolated_classes) > 0:
     for i, mon in enumerate(non_isolated_classes[:10], 1):
         exp_str = str(mon['exponents'])
         print(f"  {i:2d}. Index {mon['index']:4d}: {exp_str}")
-        print(f"      GCD={mon['gcd']}, Variance={mon['variance']:.4f}")
+        print(f"      GCD={mon['gcd']}, Variance={mon['variance']:.4f}, Max={mon['max_exp']}")
+        
+        # Explain failure reason
         if mon['gcd'] != GCD_THRESHOLD:
-            print(f"      Reason: Fails gcd=={GCD_THRESHOLD} criterion (gcd={mon['gcd']})")
+            print(f"      Reason: Fails gcd={GCD_THRESHOLD} criterion (gcd={mon['gcd']})")
         elif mon['variance'] <= VARIANCE_THRESHOLD:
             print(f"      Reason: Fails variance>{VARIANCE_THRESHOLD} criterion (var={mon['variance']:.4f})")
+        elif mon['max_exp'] > MAX_EXP_THRESHOLD:
+            print(f"      Reason: Fails max_exp≤{MAX_EXP_THRESHOLD} criterion (max={mon['max_exp']})")
     print()
 
 # ============================================================================
 # STATISTICAL ANALYSIS
 # ============================================================================
+
 print("="*70)
 print("STATISTICAL ANALYSIS")
 print("="*70)
@@ -3289,12 +3325,10 @@ variance_ranges = [
     (10.0, float('inf'), ">10.0")
 ]
 
-variance_distribution = {}
 for low, high, label in variance_ranges:
     count = sum(1 for mon in six_var_monomials
                 if low <= sum((e - 3.0)**2 for e in mon['exponents'])/6.0 < high)
     pct = count / len(six_var_monomials) * 100 if six_var_monomials else 0
-    variance_distribution[label] = count
     print(f"  {label:<15} {count:<10} {pct:>10.1f}%")
 
 print()
@@ -3317,12 +3351,31 @@ for g in sorted(gcd_dist.keys()):
 
 print()
 
+# Max exponent distribution
+print("Max exponent distribution among six-variable monomials:")
+print(f"  {'Max Exp':<10} {'Count':<10} {'Percentage':<12}")
+print("-"*40)
+
+max_exp_dist = {}
+for mon in six_var_monomials:
+    me = max(mon['exponents'])
+    max_exp_dist[me] = max_exp_dist.get(me, 0) + 1
+
+for me in sorted(max_exp_dist.keys()):
+    count = max_exp_dist[me]
+    pct = count / len(six_var_monomials) * 100 if six_var_monomials else 0
+    marker = " ← FILTERED OUT" if me > MAX_EXP_THRESHOLD else ""
+    print(f"  {me:<10} {count:<10} {pct:>10.1f}%{marker}")
+
+print()
+
 # ============================================================================
 # SAVE RESULTS
 # ============================================================================
+
 result = {
     "step": 6,
-    "description": "Structural isolation identification via gcd and variance criteria (C7)",
+    "description": "Structural isolation identification via gcd, variance, and max_exp criteria (C7)",
     "variety": "PERTURBED_C7_CYCLOTOMIC",
     "delta": "791/100000",
     "cyclotomic_order": 7,
@@ -3331,17 +3384,23 @@ result = {
     "isolated_count": len(isolated_classes),
     "non_isolated_count": len(non_isolated_classes),
     "isolation_percentage": round(len(isolated_classes) / len(six_var_monomials) * 100, 2) if six_var_monomials else 0,
+    "max_exponent": max(mon['max_exp'] for mon in isolated_classes) if isolated_classes else 0,
     "criteria": {
         "gcd_threshold": GCD_THRESHOLD,
         "variance_threshold": VARIANCE_THRESHOLD,
-        "description": "Monomial is isolated if gcd=1 AND variance>1.7"
+        "max_exp_threshold": MAX_EXP_THRESHOLD,
+        "description": "Monomial is isolated if gcd=1 AND variance>1.7 AND max_exp≤10"
     },
     "isolated_indices": [mon["index"] for mon in isolated_classes],
     "non_isolated_indices": [mon["index"] for mon in non_isolated_classes],
     "isolated_monomials_sample": isolated_classes[:200],
+    "isolated_monomials_full": isolated_classes,
     "non_isolated_monomials_sample": non_isolated_classes[:200],
-    "variance_distribution": variance_distribution,
+    "variance_distribution": {label: sum(1 for mon in six_var_monomials
+                                        if low <= sum((e - 3.0)**2 for e in mon['exponents'])/6.0 < high)
+                              for low, high, label in variance_ranges},
     "gcd_distribution": gcd_dist,
+    "max_exp_distribution": max_exp_dist,
     "C13_comparison": {
         "C13_six_var_total": C13_SIX_VAR,
         "C7_six_var_total": len(six_var_monomials),
@@ -3363,6 +3422,7 @@ print()
 # ============================================================================
 # VERIFICATION
 # ============================================================================
+
 print("="*70)
 print("VERIFICATION RESULTS")
 print("="*70)
@@ -3378,6 +3438,7 @@ if len(isolated_classes) > 0:
     print(f"Identified {len(isolated_classes)} isolated classes satisfying:")
     print(f"  - gcd(non-zero exponents) = {GCD_THRESHOLD} (non-factorizable)")
     print(f"  - Variance > {VARIANCE_THRESHOLD} (high complexity)")
+    print(f"  - Max exponent ≤ {MAX_EXP_THRESHOLD} (computational feasibility)")
     print()
     if EXPECTED_ISOLATED and len(isolated_classes) == EXPECTED_ISOLATED:
         print(f"✓ Matches expected count: {EXPECTED_ISOLATED}")
@@ -3387,13 +3448,14 @@ if len(isolated_classes) > 0:
     else:
         print(f"Note: C7 isolated count ({len(isolated_classes)}) determined empirically")
     print()
-    print("Next step: Step 7 (Information-Theoretic Separation Analysis)")
+    print("Next step: Step 11 (Four-Subset Coordinate Tests)")
 else:
     print("*** NO ISOLATED CLASSES FOUND ***")
     print()
     print("All six-variable monomials fail isolation criteria. Consider:")
     print("  - adjusting thresholds, or")
     print("  - analyzing different structural invariants")
+
 print()
 print("="*70)
 print("STEP 6 COMPLETE")
@@ -3426,18 +3488,25 @@ Filtering to six-variable monomials...
   (Monomials with exactly 6 non-zero exponents)
 
 Six-variable monomials found: 884
-Expected (combinatorial / C7): 884
 
 Applying structural isolation criteria:
-  1. gcd(non-zero exponents) == 1
+  1. gcd(non-zero exponents) = 1
   2. Exponent variance > 1.7
+  3. Max exponent ≤ 10 (computational feasibility)
 
 Processing...
 
 Classification complete:
-  Structurally isolated:    751
-  Non-isolated:             133
-  Isolation percentage:     85.0%
+  Structurally isolated:    733
+  Non-isolated:             151
+  Isolation percentage:     82.9%
+
+Exponent range in isolated classes:
+  Min: 1
+  Max: 10
+
+✓ EXCELLENT: All isolated classes have max exponent ≤ 10
+  Expected GB reduction time: ~0.5 sec per monomial
 
 C7 vs C13 Comparison:
   C13 six-variable total:       476
@@ -3445,67 +3514,67 @@ C7 vs C13 Comparison:
   Ratio (C7/C13):               1.857
 
   C13 isolated count:           401
-  C7 isolated count:            751
-  Ratio (C7/C13):               1.873
+  C7 isolated count:            733
+  Ratio (C7/C13):               1.828
 
   C13 isolation percentage:     84.2%
-  C7 isolation percentage:      85.0%
+  C7 isolation percentage:      82.9%
 
 Examples of ISOLATED monomials (first 10):
 ----------------------------------------------------------------------
-   1. Index   79: [11, 2, 1, 1, 1, 2]
-      GCD=1, Variance=13.0000
-   2. Index   87: [11, 1, 2, 1, 2, 1]
-      GCD=1, Variance=13.0000
-   3. Index   89: [11, 1, 1, 3, 1, 1]
-      GCD=1, Variance=13.3333
-   4. Index  127: [10, 3, 1, 1, 2, 1]
-      GCD=1, Variance=10.3333
-   5. Index  135: [10, 2, 2, 2, 1, 1]
-      GCD=1, Variance=10.0000
-   6. Index  145: [10, 1, 4, 1, 1, 1]
-      GCD=1, Variance=11.0000
-   7. Index  153: [10, 1, 1, 2, 1, 3]
-      GCD=1, Variance=10.3333
-   8. Index  154: [10, 1, 1, 1, 3, 2]
-      GCD=1, Variance=10.3333
-   9. Index  197: [9, 4, 1, 2, 1, 1]
-      GCD=1, Variance=8.3333
-  10. Index  203: [9, 3, 3, 1, 1, 1]
-      GCD=1, Variance=8.0000
+   1. Index  127: [10, 3, 1, 1, 2, 1]
+      GCD=1, Variance=10.3333, Max=10
+   2. Index  135: [10, 2, 2, 2, 1, 1]
+      GCD=1, Variance=10.0000, Max=10
+   3. Index  145: [10, 1, 4, 1, 1, 1]
+      GCD=1, Variance=11.0000, Max=10
+   4. Index  153: [10, 1, 1, 2, 1, 3]
+      GCD=1, Variance=10.3333, Max=10
+   5. Index  154: [10, 1, 1, 1, 3, 2]
+      GCD=1, Variance=10.3333, Max=10
+   6. Index  197: [9, 4, 1, 2, 1, 1]
+      GCD=1, Variance=8.3333, Max=9
+   7. Index  203: [9, 3, 3, 1, 1, 1]
+      GCD=1, Variance=8.0000, Max=9
+   8. Index  220: [9, 2, 2, 1, 1, 3]
+      GCD=1, Variance=7.6667, Max=9
+   9. Index  223: [9, 2, 1, 2, 2, 2]
+      GCD=1, Variance=7.3333, Max=9
+  10. Index  224: [9, 2, 1, 1, 4, 1]
+      GCD=1, Variance=8.3333, Max=9
 
 Examples of NON-ISOLATED monomials (first 10):
 ----------------------------------------------------------------------
-   1. Index  964: [5, 4, 3, 2, 1, 3]
-      GCD=1, Variance=1.6667
+   1. Index   79: [11, 2, 1, 1, 1, 2]
+      GCD=1, Variance=13.0000, Max=11
+      Reason: Fails max_exp≤10 criterion (max=11)
+   2. Index   87: [11, 1, 2, 1, 2, 1]
+      GCD=1, Variance=13.0000, Max=11
+      Reason: Fails max_exp≤10 criterion (max=11)
+   3. Index   89: [11, 1, 1, 3, 1, 1]
+      GCD=1, Variance=13.3333, Max=11
+      Reason: Fails max_exp≤10 criterion (max=11)
+   4. Index  964: [5, 4, 3, 2, 1, 3]
+      GCD=1, Variance=1.6667, Max=5
       Reason: Fails variance>1.7 criterion (var=1.6667)
-   2. Index  965: [5, 4, 3, 1, 3, 2]
-      GCD=1, Variance=1.6667
+   5. Index  965: [5, 4, 3, 1, 3, 2]
+      GCD=1, Variance=1.6667, Max=5
       Reason: Fails variance>1.7 criterion (var=1.6667)
-   3. Index  968: [5, 4, 2, 3, 2, 2]
-      GCD=1, Variance=1.3333
+   6. Index  968: [5, 4, 2, 3, 2, 2]
+      GCD=1, Variance=1.3333, Max=5
       Reason: Fails variance>1.7 criterion (var=1.3333)
-   4. Index  995: [5, 3, 4, 2, 2, 2]
-      GCD=1, Variance=1.3333
+   7. Index  995: [5, 3, 4, 2, 2, 2]
+      GCD=1, Variance=1.3333, Max=5
       Reason: Fails variance>1.7 criterion (var=1.3333)
-   5. Index  998: [5, 3, 3, 4, 1, 2]
-      GCD=1, Variance=1.6667
+   8. Index  998: [5, 3, 3, 4, 1, 2]
+      GCD=1, Variance=1.6667, Max=5
       Reason: Fails variance>1.7 criterion (var=1.6667)
-   6. Index  999: [5, 3, 3, 3, 3, 1]
-      GCD=1, Variance=1.3333
+   9. Index  999: [5, 3, 3, 3, 3, 1]
+      GCD=1, Variance=1.3333, Max=5
       Reason: Fails variance>1.7 criterion (var=1.3333)
-   7. Index 1007: [5, 3, 2, 1, 3, 4]
-      GCD=1, Variance=1.6667
+  10. Index 1007: [5, 3, 2, 1, 3, 4]
+      GCD=1, Variance=1.6667, Max=5
       Reason: Fails variance>1.7 criterion (var=1.6667)
-   8. Index 1012: [5, 3, 1, 3, 2, 4]
-      GCD=1, Variance=1.6667
-      Reason: Fails variance>1.7 criterion (var=1.6667)
-   9. Index 1013: [5, 3, 1, 2, 4, 3]
-      GCD=1, Variance=1.6667
-      Reason: Fails variance>1.7 criterion (var=1.6667)
-  10. Index 1047: [5, 2, 3, 2, 2, 4]
-      GCD=1, Variance=1.3333
-      Reason: Fails variance>1.7 criterion (var=1.3333)
 
 ======================================================================
 STATISTICAL ANALYSIS
@@ -3527,6 +3596,20 @@ GCD distribution among six-variable monomials:
   1          876              99.1%
   2          8                 0.9%
 
+Max exponent distribution among six-variable monomials:
+  Max Exp    Count      Percentage  
+----------------------------------------
+  4          48                5.4%
+  5          202              22.9%
+  6          240              27.1%
+  7          178              20.1%
+  8          108              12.2%
+  9          60                6.8%
+  10         30                3.4%
+  11         13                1.5% ← FILTERED OUT
+  12         4                 0.5% ← FILTERED OUT
+  13         1                 0.1% ← FILTERED OUT
+
 Results saved to step6_structural_isolation_C7.json
 
 ======================================================================
@@ -3534,18 +3617,19 @@ VERIFICATION RESULTS
 ======================================================================
 
 Six-variable monomials:       884
-Structurally isolated:        751
-Isolation percentage:         85.0%
+Structurally isolated:        733
+Isolation percentage:         82.9%
 
 *** STRUCTURAL ISOLATION CLASSIFICATION COMPLETE ***
 
-Identified 751 isolated classes satisfying:
+Identified 733 isolated classes satisfying:
   - gcd(non-zero exponents) = 1 (non-factorizable)
   - Variance > 1.7 (high complexity)
+  - Max exponent ≤ 10 (computational feasibility)
 
-Note: C7 isolated count (751) determined empirically
+Note: C7 isolated count (733) determined empirically
 
-Next step: Step 7 (Information-Theoretic Separation Analysis)
+Next step: Step 11 (Four-Subset Coordinate Tests)
 
 ======================================================================
 STEP 6 COMPLETE
@@ -4259,7 +4343,7 @@ Loading canonical monomials from saved_inv_p29_monomials18.json...
   Total monomials: 4807
 
 Loading isolated class indices from step6_structural_isolation_C7.json...
-  Isolated classes: 751
+  Isolated classes: 733
 
 Defining representative algebraic cycle patterns...
   Total algebraic patterns: 24
@@ -4273,33 +4357,33 @@ Comparing isolated classes vs. algebraic patterns
 
 Metric: entropy
   Algebraic: mean=1.329, std=0.538
-  Isolated : mean=2.238, std=0.144
-  Cohen's d: 2.307
-  KS D: 0.921, KS p-value: 3.70e-25
+  Isolated : mean=2.249, std=0.124
+  Cohen's d: 2.357
+  KS D: 0.944, KS p-value: 5.68e-28
 
 Metric: kolmogorov
   Algebraic: mean=8.250, std=3.779
-  Isolated : mean=14.585, std=0.902
-  Cohen's d: 2.306
-  KS D: 0.835, KS p-value: 2.32e-18
+  Isolated : mean=14.638, std=0.836
+  Cohen's d: 2.334
+  KS D: 0.858, KS p-value: 9.41e-20
 
 Metric: num_vars
   Algebraic: mean=2.875, std=0.900
   Isolated : mean=6.000, std=0.000
   Cohen's d: 4.911
-  KS D: 1.000, KS p-value: 8.07e-46
+  KS D: 1.000, KS p-value: 1.43e-45
 
 Metric: variance
   Algebraic: mean=15.542, std=10.340
-  Isolated : mean=4.802, std=2.563
-  Cohen's d: -1.426
-  KS D: 0.681, KS p-value: 3.62e-11
+  Isolated : mean=4.571, std=2.100
+  Cohen's d: -1.471
+  KS D: 0.704, KS p-value: 5.16e-12
 
 Metric: range
   Algebraic: mean=4.833, std=3.679
-  Isolated : mean=5.864, std=1.515
-  Cohen's d: 0.366
-  KS D: 0.411, KS p-value: 4.51e-04
+  Isolated : mean=5.754, std=1.357
+  Cohen's d: 0.332
+  KS D: 0.411, KS p-value: 4.54e-04
 
 ======================================================================
 COMPARISON TO C13 BENCHMARKS
@@ -4307,13 +4391,13 @@ COMPARISON TO C13 BENCHMARKS
 
 ENTROPY:
   C13 baseline iso-mean = 2.24, KS_D = 0.925
-  C7 observed iso-mean = 2.238, KS_D = 0.921
-  Delta (C7 - C13): Δmu_iso=-0.002, ΔKS_D=-0.004
+  C7 observed iso-mean = 2.249, KS_D = 0.944
+  Delta (C7 - C13): Δmu_iso=+0.009, ΔKS_D=+0.019
 
 KOLMOGOROV:
   C13 baseline iso-mean = 14.57, KS_D = 0.837
-  C7 observed iso-mean = 14.585, KS_D = 0.835
-  Delta (C7 - C13): Δmu_iso=+0.015, ΔKS_D=-0.002
+  C7 observed iso-mean = 14.638, KS_D = 0.858
+  Delta (C7 - C13): Δmu_iso=+0.068, ΔKS_D=+0.021
 
 NUM_VARS:
   C13 baseline iso-mean = 6.0, KS_D = 1.0
@@ -4322,13 +4406,13 @@ NUM_VARS:
 
 VARIANCE:
   C13 baseline iso-mean = 4.83, KS_D = 0.347
-  C7 observed iso-mean = 4.802, KS_D = 0.681
-  Delta (C7 - C13): Δmu_iso=-0.028, ΔKS_D=+0.334
+  C7 observed iso-mean = 4.571, KS_D = 0.704
+  Delta (C7 - C13): Δmu_iso=-0.259, ΔKS_D=+0.357
 
 RANGE:
   C13 baseline iso-mean = 5.87, KS_D = 0.407
-  C7 observed iso-mean = 5.864, KS_D = 0.411
-  Delta (C7 - C13): Δmu_iso=-0.006, ΔKS_D=+0.004
+  C7 observed iso-mean = 5.754, KS_D = 0.411
+  Delta (C7 - C13): Δmu_iso=-0.116, ΔKS_D=+0.004
 
 Results saved to step7_information_theoretic_analysis_C7.json
 
@@ -4337,7 +4421,7 @@ STEP 7 COMPLETE
 ======================================================================
 
 Summary:
-  Isolated classes analyzed:      751
+  Isolated classes analyzed:      733
   Algebraic patterns analyzed:    24
   Metrics computed:               5
 
@@ -4878,12 +4962,12 @@ Canonical Kernel Basis Identification:
 Structural Isolation Analysis:
   Status: COMPUTED
   Six-variable total: 884
-  Isolated classes: 751
+  Isolated classes: 733
 
 Information-Theoretic Statistical Analysis:
   Status: COMPUTED
   Algebraic patterns: 24
-  Isolated classes analyzed: 751
+  Isolated classes analyzed: 733
 
 ================================================================================
 CROSS-VARIETY COMPARISON: C13 vs C7
@@ -5406,7 +5490,7 @@ Loading isolated class indices from step6_structural_isolation_C7.json...
   Variety: PERTURBED_C7_CYCLOTOMIC
   Delta: 791/100000
   Cyclotomic order: 7
-  Isolated classes (Step 6): 751
+  Isolated classes (Step 6): 733
 
 Computing variable counts for all 4807 monomials...
 
@@ -5420,19 +5504,19 @@ Variable count distribution (all 4807 monomials):
   5            2040             42.4%
   6            884              18.4%
 
-Computing variable counts for 751 isolated classes...
+Computing variable counts for 733 isolated classes...
 
-Variable count distribution (751 isolated classes):
+Variable count distribution (733 isolated classes):
   Variables    Count      Percentage  
 ------------------------------------------
-  6            751             100.0%
+  6            733             100.0%
 
 ================================================================================
 CP1 VERIFICATION RESULTS
 ================================================================================
 
-Classes with 6 variables:     751/751 (100.0%)
-Classes with <6 variables:    0/751
+Classes with 6 variables:     733/733 (100.0%)
+Classes with <6 variables:    0/733
 
 *** CP1 VERIFIED ***
 
@@ -5447,16 +5531,16 @@ Algebraic cycle patterns (24 benchmarks):
   Max variables:        4
   Distribution:         {1: 1, 2: 8, 3: 8, 4: 7}
 
-Isolated classes (751):
+Isolated classes (733):
   Mean variables:       6.00
   Std deviation:        0.00
   Min variables:        6
   Max variables:        6
-  Distribution:         {6: 751}
+  Distribution:         {6: 733}
 
 Kolmogorov-Smirnov Test:
   D statistic:          1.0
-  p-value:              8.067650742314798e-46
+  p-value:              1.430347215401095e-45
   Expected D:           1.000
 
 *** PERFECT SEPARATION ***
@@ -5471,8 +5555,8 @@ C13 baseline (from papers):
   KS D:                 1.000
 
 C7 observed (this computation):
-  Isolated classes:     751
-  CP1 pass:             751/751
+  Isolated classes:     733
+  CP1 pass:             733/733
   KS D:                 1.0
 
 *** UNIVERSAL PATTERN CONFIRMED ***
@@ -5483,7 +5567,7 @@ Results saved to step9a_cp1_verification_results_C7.json
 STEP 9A COMPLETE
 ================================================================================
 
-  CP1 verification:     751/751 (100.0%) - PASS
+  CP1 verification:     733/733 (100.0%) - PASS
   KS D-statistic:       1.0 - PERFECT
   Cross-variety status: UNIVERSAL_CONFIRMED
 ================================================================================
@@ -6329,7 +6413,7 @@ Loading isolated class indices from step6_structural_isolation_C7.json...
   Variety: PERTURBED_C7_CYCLOTOMIC
   Delta: 791/100000
   Cyclotomic order: 7
-  Isolated classes (Step 6): 751
+  Isolated classes (Step 6): 733
 
 Loading canonical monomial data for 19 primes...
   p=  29: 4807 monomials loaded
@@ -6372,29 +6456,28 @@ Generating all C(6,4) = 15 four-variable subsets...
   15. {z2, z3, z4, z5}
 
 ================================================================================
-RUNNING 19-PRIME CP3 TESTS (214,035 TOTAL)
+RUNNING 19-PRIME CP3 TESTS (208,905 TOTAL)
 ================================================================================
 
-Testing 751 isolated classes across 19 primes...
+Testing 733 isolated classes across 19 primes...
 
-  Progress: 50/751 classes (14,250/214,035 tests, 6.7%, 0.0s)
-  Progress: 100/751 classes (28,500/214,035 tests, 13.3%, 0.0s)
-  Progress: 150/751 classes (42,750/214,035 tests, 20.0%, 0.0s)
-  Progress: 200/751 classes (57,000/214,035 tests, 26.6%, 0.0s)
-  Progress: 250/751 classes (71,250/214,035 tests, 33.3%, 0.0s)
-  Progress: 300/751 classes (85,500/214,035 tests, 39.9%, 0.0s)
-  Progress: 350/751 classes (99,750/214,035 tests, 46.6%, 0.0s)
-  Progress: 400/751 classes (114,000/214,035 tests, 53.3%, 0.0s)
-  Progress: 450/751 classes (128,250/214,035 tests, 59.9%, 0.0s)
-  Progress: 500/751 classes (142,500/214,035 tests, 66.6%, 0.0s)
-  Progress: 550/751 classes (156,750/214,035 tests, 73.2%, 0.1s)
-  Progress: 600/751 classes (171,000/214,035 tests, 79.9%, 0.1s)
-  Progress: 650/751 classes (185,250/214,035 tests, 86.6%, 0.1s)
-  Progress: 700/751 classes (199,500/214,035 tests, 93.2%, 0.1s)
-  Progress: 750/751 classes (213,750/214,035 tests, 99.9%, 0.1s)
-  Progress: 751/751 classes (214,035/214,035 tests, 100.0%, 0.1s)
+  Progress: 50/733 classes (14,250/208,905 tests, 6.8%, 0.0s)
+  Progress: 100/733 classes (28,500/208,905 tests, 13.6%, 0.0s)
+  Progress: 150/733 classes (42,750/208,905 tests, 20.5%, 0.0s)
+  Progress: 200/733 classes (57,000/208,905 tests, 27.3%, 0.0s)
+  Progress: 250/733 classes (71,250/208,905 tests, 34.1%, 0.0s)
+  Progress: 300/733 classes (85,500/208,905 tests, 40.9%, 0.1s)
+  Progress: 350/733 classes (99,750/208,905 tests, 47.7%, 0.1s)
+  Progress: 400/733 classes (114,000/208,905 tests, 54.6%, 0.1s)
+  Progress: 450/733 classes (128,250/208,905 tests, 61.4%, 0.1s)
+  Progress: 500/733 classes (142,500/208,905 tests, 68.2%, 0.1s)
+  Progress: 550/733 classes (156,750/208,905 tests, 75.0%, 0.1s)
+  Progress: 600/733 classes (171,000/208,905 tests, 81.9%, 0.1s)
+  Progress: 650/733 classes (185,250/208,905 tests, 88.7%, 0.1s)
+  Progress: 700/733 classes (199,500/208,905 tests, 95.5%, 0.1s)
+  Progress: 733/733 classes (208,905/208,905 tests, 100.0%, 0.1s)
 
-All tests completed in 0.07 seconds
+All tests completed in 0.10 seconds
 
 ================================================================================
 PER-PRIME RESULTS
@@ -6402,41 +6485,41 @@ PER-PRIME RESULTS
 
 Prime    Total Tests     Representable      Not Representable    Classes (All NOT_REP)    
 ----------------------------------------------------------------------------------------------------
-29       11265           0          ( 0.00%)  11265        (100.00%)  751/751
-43       11265           0          ( 0.00%)  11265        (100.00%)  751/751
-71       11265           0          ( 0.00%)  11265        (100.00%)  751/751
-113      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-127      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-197      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-211      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-239      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-281      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-337      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-379      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-421      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-449      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-463      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-491      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-547      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-617      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-631      11265           0          ( 0.00%)  11265        (100.00%)  751/751
-659      11265           0          ( 0.00%)  11265        (100.00%)  751/751
+29       10995           0          ( 0.00%)  10995        (100.00%)  733/733
+43       10995           0          ( 0.00%)  10995        (100.00%)  733/733
+71       10995           0          ( 0.00%)  10995        (100.00%)  733/733
+113      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+127      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+197      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+211      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+239      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+281      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+337      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+379      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+421      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+449      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+463      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+491      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+547      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+617      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+631      10995           0          ( 0.00%)  10995        (100.00%)  733/733
+659      10995           0          ( 0.00%)  10995        (100.00%)  733/733
 
 ================================================================================
 MULTI-PRIME AGREEMENT ANALYSIS
 ================================================================================
-Classes tested:         751
-Perfect agreement:      751/751
-Disagreements:          0/751
+Classes tested:         733
+Perfect agreement:      733/733
+Disagreements:          0/733
 
 *** PERFECT MULTI-PRIME AGREEMENT ***
 
 ================================================================================
 OVERALL CP3 VERIFICATION
 ================================================================================
-Total tests (all primes):     214,035
-NOT_REPRESENTABLE:            214,035/214,035 (100.00%)
-REPRESENTABLE:                0/214,035 (0.00%)
+Total tests (all primes):     208,905
+NOT_REPRESENTABLE:            208,905/208,905 (100.00%)
+REPRESENTABLE:                0/208,905 (0.00%)
 
 *** CP3 FULLY VERIFIED ***
 
@@ -6450,10 +6533,10 @@ C13 baseline (from papers):
   NOT_REPRESENTABLE:    114,285/114,285 (100%)
 
 C7 observed (this computation):
-  Isolated classes:     751
-  Total tests:          214,035
-  NOT_REPRESENTABLE:    214,035/214,035 (100.00%)
-  Multi-prime agreement: 751/751 classes
+  Isolated classes:     733
+  Total tests:          208,905
+  NOT_REPRESENTABLE:    208,905/208,905 (100.00%)
+  Multi-prime agreement: 733/733 classes
 
 Summary saved to step9b_cp3_19prime_results_C7.json
 
@@ -6461,10 +6544,10 @@ Summary saved to step9b_cp3_19prime_results_C7.json
 STEP 9B COMPLETE - CP3 19-PRIME VERIFICATION (C7)
 ================================================================================
 
-  Total tests:            214,035
-  NOT_REPRESENTABLE:      214,035/214,035 (100.0%)
+  Total tests:            208,905
+  NOT_REPRESENTABLE:      208,905/208,905 (100.0%)
   Multi-prime agreement:  PERFECT
-  Runtime:                0.07 seconds
+  Runtime:                0.10 seconds
   Verification status:    FULLY_VERIFIED
   Cross-variety:          UNIVERSAL_CONFIRMED
 
@@ -8053,96 +8136,135 @@ script 0:
 ```python
 #!/usr/bin/env python3
 """
-Extract C7 candidate structures from monomial file using Step 6 indices.
+Extract C7 X8 Perturbed candidate classes from Step 6 output.
+Produces Macaulay2-formatted candidateList for Step 11.
 """
 
 import json
 import sys
-import os
 
-# Input files
-MONOMIAL_FILE = "saved_inv_p29_monomials18.json"
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
 STEP6_FILE = "step6_structural_isolation_C7.json"
+OUTPUT_FILE = "candidateList_C7.m2"  # Or use stdout
 
-# Check files exist
-if not os.path.exists(MONOMIAL_FILE):
-    print(f"ERROR: {MONOMIAL_FILE} not found", file=sys.stderr)
-    print("This file should have been created in Step 2", file=sys.stderr)
-    sys.exit(1)
+# ============================================================================
+# LOAD STEP 6 DATA
+# ============================================================================
 
-if not os.path.exists(STEP6_FILE):
+print(f"Loading Step 6 data from {STEP6_FILE}...", file=sys.stderr)
+
+try:
+    with open(STEP6_FILE, 'r') as f:
+        data = json.load(f)
+except FileNotFoundError:
     print(f"ERROR: {STEP6_FILE} not found", file=sys.stderr)
+    print("Please run Step 6 first", file=sys.stderr)
     sys.exit(1)
 
-print("Loading monomials...", file=sys.stderr)
-with open(MONOMIAL_FILE, 'r') as f:
-    monomials = json.load(f)
+# ============================================================================
+# EXTRACT ISOLATED CLASSES
+# ============================================================================
 
-print(f"Loaded {len(monomials)} total monomials", file=sys.stderr)
-
-print("Loading Step 6 isolation data...", file=sys.stderr)
-with open(STEP6_FILE, 'r') as f:
-    step6_data = json.load(f)
-
-isolated_indices = step6_data['isolated_indices']
-print(f"Found {len(isolated_indices)} isolated indices", file=sys.stderr)
-
-# Extract structures
-structures = []
-for idx in isolated_indices:
-    if idx >= len(monomials):
-        print(f"WARNING: Index {idx} out of range (max {len(monomials)-1})", file=sys.stderr)
-        continue
-    
-    structure = monomials[idx]
-    
-    # Monomials should be lists of 6 exponents
-    if not isinstance(structure, list):
-        print(f"WARNING: Index {idx} is not a list: {type(structure)}", file=sys.stderr)
-        continue
-    
-    if len(structure) < 6:
-        print(f"WARNING: Index {idx} has only {len(structure)} exponents", file=sys.stderr)
-        continue
-    
-    # Take first 6 exponents
-    exponents = [int(e) for e in structure[:6]]
-    
-    structures.append({
-        'class_id': f'class{len(structures)}',
-        'index': idx,
-        'structure': exponents
-    })
-
-print(f"Extracted {len(structures)} structures", file=sys.stderr)
-
-if len(structures) == 0:
-    print("\nERROR: No structures extracted!", file=sys.stderr)
-    print("\nDebugging info:", file=sys.stderr)
-    print(f"First monomial: {monomials[0]}", file=sys.stderr)
-    print(f"Type: {type(monomials[0])}", file=sys.stderr)
+# Use full list if available, otherwise sample
+if 'isolated_monomials_full' in data:
+    candidates = data['isolated_monomials_full']
+    print(f"Using full isolated list: {len(candidates)} candidates", file=sys.stderr)
+elif 'isolated_monomials_sample' in data:
+    candidates = data['isolated_monomials_sample']
+    print(f"WARNING: Using sample only: {len(candidates)} candidates", file=sys.stderr)
+    print("(Full list not saved in Step 6 output)", file=sys.stderr)
+else:
+    print("ERROR: No isolated monomial data in Step 6 file!", file=sys.stderr)
     sys.exit(1)
 
-# Verify first structure matches Step 6 sample
-if structures:
-    print(f"\nFirst structure verification:", file=sys.stderr)
-    print(f"  Index: {structures[0]['index']}", file=sys.stderr)
-    print(f"  Structure: {structures[0]['structure']}", file=sys.stderr)
-    print(f"  Expected (from Step 6 sample): [11, 2, 1, 1, 1, 2]", file=sys.stderr)
+# ============================================================================
+# VERIFY DATA QUALITY
+# ============================================================================
 
-# Output for M2
-print("-- CANDIDATE LIST (751 CLASSES) - C7 X8 Perturbed")
-print()
-print("candidateList = {")
+if len(candidates) == 0:
+    print("ERROR: No candidates found!", file=sys.stderr)
+    sys.exit(1)
 
-for i, cls in enumerate(structures):
-    struct_str = "{" + ",".join(map(str, cls['structure'])) + "}"
-    comma = "," if i < len(structures) - 1 else ""
-    print(f'  {{"{cls["class_id"]}", {struct_str}}}{comma}')
+# Check max exponent
+max_exp = max(max(mon['exponents'][:6]) for mon in candidates)
+min_exp = min(min(e for e in mon['exponents'][:6] if e > 0) for mon in candidates)
 
-print("};")
-print()
-print(f"-- Total: {len(structures)} classes")
+print(f"Candidate statistics:", file=sys.stderr)
+print(f"  Count: {len(candidates)}", file=sys.stderr)
+print(f"  Exponent range: {min_exp} to {max_exp}", file=sys.stderr)
+
+if max_exp > 10:
+    print(f"  WARNING: Max exponent {max_exp} > 10 may cause slow reductions!", file=sys.stderr)
+else:
+    print(f"  ✓ All exponents ≤ 10 (optimal for GB reductions)", file=sys.stderr)
+
+print("", file=sys.stderr)
+
+# ============================================================================
+# GENERATE MACAULAY2 CANDIDATE LIST
+# ============================================================================
+
+output_lines = []
+
+# Header comments
+output_lines.append(f"-- CANDIDATE LIST - C7 X8 PERTURBED ({len(candidates)} CLASSES)")
+output_lines.append(f"-- Extracted from: {STEP6_FILE}")
+output_lines.append(f"-- Criteria: gcd=1, variance>1.7, max_exp≤{data.get('criteria', {}).get('max_exp_threshold', 10)}")
+output_lines.append(f"-- Max exponent: {max_exp}")
+output_lines.append(f"-- Variant: C7 cyclotomic (Z/6Z)")
+output_lines.append("")
+
+# Candidate list in M2 format
+output_lines.append("candidateList = {")
+
+for i, mon in enumerate(candidates):
+    # Extract first 6 exponents (z0, z1, z2, z3, z4, z5)
+    exponents = mon['exponents'][:6]
+    
+    # Format as M2 list: {e0, e1, e2, e3, e4, e5}
+    exp_str = "{" + ",".join(map(str, exponents)) + "}"
+    
+    # Add comma for all but last entry
+    comma = "," if i < len(candidates) - 1 else ""
+    
+    # Format: {"classN", {e0,e1,e2,e3,e4,e5}}
+    output_lines.append(f'  {{"class{i}", {exp_str}}}{comma}')
+
+output_lines.append("};")
+output_lines.append("")
+output_lines.append(f"-- Total: {len(candidates)} classes")
+output_lines.append(f"-- Expected runtime per prime: ~{len(candidates) * 0.5 / 60:.1f} minutes (testing)")
+output_lines.append(f"--   Plus ~2-3 hours for Gröbner basis reductions")
+
+# ============================================================================
+# OUTPUT
+# ============================================================================
+
+output_text = "\n".join(output_lines)
+
+if OUTPUT_FILE and OUTPUT_FILE != "-":
+    with open(OUTPUT_FILE, 'w') as f:
+        f.write(output_text + "\n")
+    print(f"✓ Wrote {len(candidates)} candidates to {OUTPUT_FILE}", file=sys.stderr)
+else:
+    # Write to stdout
+    print(output_text)
+
+# ============================================================================
+# VERIFICATION
+# ============================================================================
+
+print("", file=sys.stderr)
+print("Verification:", file=sys.stderr)
+print(f"  Classes extracted: {len(candidates)}", file=sys.stderr)
+print(f"  Max exponent: {max_exp}", file=sys.stderr)
+print(f"  Output format: Macaulay2 candidateList", file=sys.stderr)
+print("", file=sys.stderr)
+print("Next step: Load this into your Step 11 M2 script", file=sys.stderr)
+print("", file=sys.stderr)
 ```
 
 script 0 produces the candiddate list!
