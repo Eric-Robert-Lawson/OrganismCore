@@ -9964,7 +9964,64 @@ results:
 script 1
 
 ```verbatim
-pending
+================================================================================
+STEP 13A: PIVOT MINOR FINDER (X8 PERTURBED C₁₇)
+================================================================================
+
+Variety: Sum z_i^8 + (791/100000) * Sum_{{k=1}}^{{16}} L_k^8 = 0
+Cyclotomic order: 17
+Target rank k: 1443
+Prime modulus: 103
+Triplet file: saved_inv_p103_triplets.json
+
+Loading triplets...
+  Raw triplets: 74,224 entries
+  Applying Step 10A transpose convention (swap row↔col)
+  Matrix dimensions (after transpose): 1541 × 1980
+
+WARNING: Expected 1443×1770, got 1541×1980
+
+Building sparse data structures (with transpose)...
+  Sparsity: 1 to 169 nonzeros/col
+
+Searching for 1443 pivots via greedy elimination mod 103...
+
+   100/1443 pivots (7.0s)
+   200/1443 pivots (41.9s)
+   300/1443 pivots (109.4s)
+   400/1443 pivots (183.4s)
+   500/1443 pivots (275.0s)
+   600/1443 pivots (362.8s)
+   700/1443 pivots (436.5s)
+   800/1443 pivots (500.4s)
+   900/1443 pivots (561.6s)
+  1000/1443 pivots (616.7s)
+  1100/1443 pivots (665.4s)
+  1200/1443 pivots (707.3s)
+  1300/1443 pivots (743.7s)
+  1400/1443 pivots (773.5s)
+  1443/1443 pivots (783.1s)
+
+Pivot search complete: 1443 pivots in 783.07s
+
+Building 1443×1443 minor from original entries...
+Computing determinant mod 103...
+
+================================================================================
+VERIFICATION
+================================================================================
+Determinant of 1443×1443 minor mod 103: 37
+
+✓ Pivot minor is NONZERO mod p (verified)
+
+Outputs written:
+  Pivot rows: pivot_1443_p103_C17_rows.txt
+  Pivot cols: pivot_1443_p103_C17_cols.txt
+  Report: pivot_1443_p103_C17_report.json
+
+================================================================================
+STEP 13A COMPLETE
+================================================================================
 ```
 
 script 2
