@@ -9484,7 +9484,7 @@ Estimated time remaining: 39.16 hours
 
 .
 
-pending
+pending (4/19 done so far)
 ```
 
 
