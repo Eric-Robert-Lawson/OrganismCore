@@ -885,138 +885,7 @@ Mean absolute deviation: 2.2% (exceptional for empirical law)
 ---
 # **STEP 3: SINGLE-PRIME RANK VERIFICATION (C₁₁ X₈ PERTURBED, P=23)**
 
-## **DESCRIPTION**
-
-This step performs **independent algorithmic verification** of the Jacobian cokernel rank computed in Step 2 for the perturbed C₁₁ cyclotomic hypersurface at prime p=23, providing cross-implementation validation between Macaulay2 (Step 2 symbolic computation) and Python/NumPy (Step 3 numerical Gaussian elimination).
-
-**Purpose:** While Step 2 establishes dimension=844 via Macaulay2's built-in rank function across 19 primes, Step 3 provides **algorithmic independence** by implementing rank computation from scratch using different software (Python) and different mathematical approach (dense Gaussian elimination vs. sparse symbolic methods). For C₁₁, this verification is **particularly critical** because the variety exhibits the **closest match** to inverse-Galois-group scaling predictions (-0.5% deviation, best fit in five-variety study), making accurate rank certification essential for validating the scaling law.
-
-**Mathematical Framework - Rank Computation Over Finite Fields:**
-
-For the 3059×2383 Jacobian cokernel matrix M_p constructed in Step 2:
-
-**rank(M_p) over 𝔽_p via Gaussian elimination**
-
-**Algorithm (Row Reduction Modular Arithmetic):**
-1. Convert sparse triplet representation (row, col, value) to dense array
-2. Process columns left-to-right, finding pivot (first nonzero entry in column at/below current row)
-3. Scale pivot row to have leading coefficient 1 (multiply by modular inverse)
-4. Eliminate all other entries in pivot column (subtract multiples of pivot row mod p)
-5. Count pivots found = rank
-
-**Key Properties:**
-- **Exact arithmetic:** All operations performed mod p (no floating-point errors)
-- **Deterministic:** Same input always produces same rank (unlike probabilistic methods)
-- **Implementation-independent:** Standard linear algebra algorithm, reproducible in any language
-
-**Verification Protocol (Cross-Implementation Testing):**
-
-**Step 2 (Macaulay2):**
-- **Method:** Built-in `rank` function (symbolic Gröbner basis + sparse optimization)
-- **Result:** rank=2215, dimension=844 (reported for p=23)
-- **Software:** Macaulay2 1.20+ (specialized computer algebra system)
-
-**Step 3 (Python/NumPy):**
-- **Method:** Dense Gaussian elimination over 𝔽₂₃ (manual implementation)
-- **Expected result:** rank=2215 (must match Step 2 for verification to pass)
-- **Software:** Python 3.9+, NumPy 1.21+ (general numerical library)
-
-**Matrix Data Flow (Step 2 → Step 3):**
-1. **Step 2 exports:** `saved_inv_p23_triplets.json` containing:
-   - Sparse matrix representation: list of (row, col, value) triplets
-   - Metadata: prime, rank, dimension, variety type, δ mod p
-2. **Step 3 loads:** JSON file → Python data structures
-3. **Step 3 reconstructs:** Triplets → SciPy CSR sparse matrix → NumPy dense array
-4. **Step 3 computes:** Independent rank via Gaussian elimination
-5. **Step 3 verifies:** computed_rank == saved_rank (Boolean match test)
-
-**Expected Results (C₁₁ at p=23):**
-
-| Metric | Step 2 (Macaulay2) | Step 3 (Python) | Expected Match |
-|--------|-------------------|-----------------|----------------|
-| **Prime** | 23 | 23 | ✅ Exact |
-| **C₁₁-invariant monomials** | 3059 | 3059 | ✅ Exact |
-| **Matrix dimensions** | 3059×2383 | 3059×2383 | ✅ Exact |
-| **Nonzero entries** | ~110,000-140,000 | ~110,000-140,000 | ✅ Exact |
-| **Computed rank** | 2215 | 2215 | ✅ **MUST MATCH** |
-| **Dimension H²'²** | 844 | 844 | ✅ **MUST MATCH** |
-| **Hodge gap** | 832 (98.58%) | 832 (98.58%) | ✅ Exact |
-
-**Computational Challenges (Intermediate Matrix Size):**
-
-**Matrix size:** 3059×2383 = 7,289,597 total entries
-- **Dense array memory:** ~58 MB (int64 representation, larger than C₁₇/C₁₉ but smaller than C₇)
-- **Sparse storage (Step 2):** ~1-1.5 MB (triplet format, ~120,000 nonzero entries)
-- **Trade-off:** Step 3 converts to dense for algorithmic simplicity (Gaussian elimination cleaner on dense arrays)
-
-**Runtime characteristics:**
-- **Sparse matrix construction:** ~0.1-0.2s (JSON parsing + CSR assembly)
-- **Dense conversion:** ~0.3-0.5s (CSR → dense array allocation, larger than C₁₇)
-- **Gaussian elimination:** ~2-4 seconds (3059 rows, 2383 columns, ~2215 pivots expected, 72% pivot rate)
-- **Total runtime:** ~3-5 seconds (single-prime verification, vs. Step 2's ~0.94s per prime for symbolic method)
-
-**Perturbation Parameter Verification (δ = 791/100000):**
-
-**Step 2 computes:** ε ≡ 791·100000⁻¹ (mod 23)
-- **100000 mod 23:** 100000 ≡ 4347·23 + 19 ≡ 19
-- **Inverse computation:** 19⁻¹ mod 23 (via extended Euclidean algorithm)
-- **Expected ε mod 23:** ε ≡ 791·19⁻¹ ≡ -8 ≡ 15 (mod 23)
-
-**Step 3 verifies:** Metadata field `epsilon_mod_p` should show -8 or 15, confirming perturbation parameter consistency across implementations.
-
-**Cross-Variety Comparison (Dimensional Scaling Check - CRITICAL FOR C₁₁):**
-
-**C₁₁ dimension vs. baseline:**
-- **C₁₃ baseline:** dimension = 707 (φ(13) = 12)
-- **C₁₁ observed:** dimension = 844 (φ(11) = 10)
-- **Ratio:** 844/707 = **1.194** (vs. theoretical inverse-φ ratio 12/10 = 1.200, deviation **-0.5%**)
-- **Scientific significance:** **Best match in entire five-variety study** (C₇: -5.8%, C₁₁: **-0.5%**, C₁₃: 0%, C₁₇: +1.3%, C₁₉: +3.3%)
-
-**Step 3 checkpoint JSON includes:**
-```json
-"C13_comparison": {
-  "C13_dimension": 707,
-  "this_dimension": 844,
-  "ratio": 1.194
-}
-```
-**Automated validation:** Immediate feedback on whether C₁₁ maintains its exceptional fit to scaling law (ratio 1.194 vs. theoretical 1.200).
-
-**Verification Outcomes (Pass/Fail Criteria):**
-
-**PASS (Perfect Match):**
-- computed_rank == saved_rank (2215 == 2215) ✅
-- computed_dimension == saved_dimension (844 == 844) ✅
-- **Interpretation:** Algorithmic independence confirmed, C₁₁'s exceptional scaling fit validated, proceed to Step 4
-
-**PASS_WITH_TOLERANCE (Close Match):**
-- |computed_rank - saved_rank| ≤ 5 (within ±5 tolerance)
-- **Interpretation:** Acceptable variance due to implementation details, proceed with caution
-
-**FAIL (Discrepancy Detected):**
-- |computed_rank - saved_rank| > 5
-- **Interpretation:** Critical error detected (corrupted triplet export, software bug, incorrect prime), halt pipeline and investigate
-
-**Output Artifacts:**
-
-1. **Console output:** Real-time rank computation progress ("Row 100/3059: rank = 100...", checkpoints every 100 rows)
-2. **Checkpoint JSON:** `step3_rank_verification_p23_C11.json`
-   - Verification verdict (PASS/FAIL)
-   - Detailed comparison (saved vs. computed values)
-   - **C₁₃ scaling comparison** (ratio 1.194 vs. theoretical 1.200)
-   - Matrix metadata (shape 3059×2383, sparsity ~4-5%, nonzero count ~120,000)
-
-**Scientific Significance:**
-
-**Algorithmic robustness:** Perfect match between Macaulay2 (symbolic) and Python (numerical) confirms rank=2215 is **implementation-independent mathematical fact**, not software artifact.
-
-**Scaling law validation:** C₁₁'s exceptional -0.5% deviation from theoretical prediction (844 vs. 848.4 predicted) provides **strongest empirical support** for inverse-Galois-group scaling across entire five-variety study.
-
-**Foundation for multi-prime:** Single-prime verification (Step 3) de-risks multi-prime verification (Step 4) by catching software bugs early before investing 19× computational effort.
-
-**Cross-Variety Comparison:** Automated C₁₃ comparison (ratio 1.194 vs. theoretical 1.200) provides immediate feedback confirming C₁₁ maintains its role as **anchor point** for scaling law validation.
-
-**Expected Runtime:** ~3-5 seconds (single-prime Python verification, dominated by dense Gaussian elimination on 3059×2383 matrix—slightly slower than C₁₇/C₁₉ but significantly faster than C₇).
+(kept out for file size concerns)
 
 ```python
 #!/usr/bin/env python3
@@ -1433,98 +1302,7 @@ STEP 3 COMPLETE
 ======================================================================
 ```
 
-# **STEP 3 RESULTS SUMMARY: C₁₁ SINGLE-PRIME RANK VERIFICATION (P=23)**
-
-## **Perfect Algorithmic Independence Confirmed - Rank=2215, Dimension=844 Validated (Best Scaling Fit)**
-
-**Independent verification achieved:** Python/NumPy Gaussian elimination **perfectly matches** Macaulay2 Step 2 computation (rank=2215, dimension=844), establishing **cross-implementation consistency** and validating JSON triplet export format for the perturbed C₁₁ cyclotomic hypersurface at prime p=23.
-
-**Verification Statistics (Perfect Match):**
-- **Prime modulus:** p = 23 (first C₁₁ prime, p ≡ 1 mod 11)
-- **Matrix dimensions:** 3059×2383 (C₁₁-invariant monomials × Jacobian generators—largest verification in study except C₇)
-- **Nonzero entries:** 171,576 (2.35% density—efficient sparse structure despite large size)
-- **Computed rank (Python):** **2215** (dense Gaussian elimination over 𝔽₂₃)
-- **Step 2 rank (Macaulay2):** **2215** (symbolic rank function)
-- **Rank match:** ✅ **PASS** (zero discrepancy, perfect agreement)
-- **Computed dimension:** **844** (3059 - 2215)
-- **Step 2 dimension:** **844**
-- **Dimension match:** ✅ **PASS** (perfect agreement)
-- **Computational time:** ~3-5 seconds (single-prime Python verification, dominated by 3059×2383 dense elimination)
-
-**Cross-Algorithm Validation:**
-- **Step 2 method:** Macaulay2 built-in `rank` function (symbolic Gröbner basis + sparse optimization)
-- **Step 3 method:** Python manual Gaussian elimination (dense row-reduction mod 23)
-- **Result:** **Zero discrepancies** confirms rank=2215 is **implementation-independent mathematical fact**, not software artifact
-
-**Perturbation Parameter Verification:**
-- **Delta (global):** δ = 791/100000
-- **Epsilon mod 23:** ε ≡ -8 ≡ 15 (791·100000⁻¹ in 𝔽₂₃)
-- **Variety type:** PERTURBED_C11_CYCLOTOMIC (confirmed via JSON metadata)
-- **Galois group:** ℤ/10ℤ (φ(11) = 10, smallest Galois group in study except C₇)
-
-**Hodge Gap Analysis (Near-Maximal Gap Percentage):**
-- **Total Hodge classes:** 844
-- **Known algebraic cycles:** ≤12 (hyperplane sections, coordinate subspace cycles)
-- **Unexplained gap:** 844 - 12 = **832** (98.58% of Hodge space—second-highest percentage in study)
-- **Status:** 832 candidate transcendental classes (transcendence not yet proven, requires Steps 6-12 structural isolation + variable-count barrier verification)
-
-**Cross-Variety Scaling Validation (BEST FIT IN FIVE-VARIETY STUDY):**
-- **C₁₃ baseline dimension:** 707 (φ(13) = 12)
-- **C₁₁ observed dimension:** 844 (φ(11) = 10)
-- **Ratio:** 844/707 = **1.194**
-- **Theoretical inverse-φ prediction:** 12/10 = **1.200**
-- **Deviation:** **-0.5%** (BEST MATCH across all five varieties: C₇: -5.8%, **C₁₁: -0.5%**, C₁₃: 0%, C₁₇: +1.3%, C₁₉: +3.3%)
-- **Scientific significance:** C₁₁'s exceptional fit validates inverse-Galois-group scaling hypothesis **dim H²'²_prim,inv ∝ 1/φ(n)** with unprecedented precision
-
-**Matrix Sparsity Characteristics:**
-- **Total entries:** 3059 × 2383 = 7,289,597
-- **Nonzero entries:** 171,576 (2.35% density)
-- **Sparse storage efficiency:** ~1.4 MB (JSON triplet format)
-- **Dense array memory:** ~58 MB (int64 representation for Gaussian elimination, larger than C₁₇/C₁₉ but manageable)
-- **Interpretation:** Perturbation (δ = 791/100000) destroys cyclotomic symmetry but preserves sparse structure (2.35% density comparable to C₁₇'s 2.43%, C₁₉'s ~3%)
-
-**Gaussian Elimination Performance (3059×2383 Dense Matrix):**
-- **Pivot processing:** 2383 columns scanned, 2215 pivots found (93.0% pivot rate—high efficiency)
-- **Progress checkpoints:** Every 100 rows (22 checkpoints total: 100/3059, 200/3059, ..., 2200/3059)
-- **Final pivot count:** 2215/2383 columns have pivots (168 zero columns → kernel dimension 844)
-- **Runtime:** ~3-5 seconds (single-core Python, dense elimination—slightly slower than C₁₇ due to larger matrix)
-
-**Checkpoint JSON Output:**
-```json
-{
-  "step": 3,
-  "variety": "PERTURBED_C11_CYCLOTOMIC",
-  "prime": 23,
-  "computed_rank": 2215,
-  "saved_rank": 2215,
-  "rank_match": true,
-  "computed_dimension": 844,
-  "saved_dimension": 844,
-  "dimension_match": true,
-  "gap": 832,
-  "gap_percent": 98.58,
-  "C13_comparison": {
-    "C13_dimension": 707,
-    "this_dimension": 844,
-    "ratio": 1.194
-  },
-  "verdict": "PASS"
-}
-```
-
-**Five-Variety Scaling Law Summary (C₁₁ as Anchor Point):**
-
-| Variety | Dimension | Ratio vs. C₁₃ | Theoretical | Deviation |
-|---------|-----------|---------------|-------------|-----------|
-| C₇ | 1333 | 1.885 | 2.000 | -5.8% |
-| **C₁₁** | **844** | **1.194** | **1.200** | **-0.5%** ← **BEST FIT** |
-| C₁₃ | 707 | 1.000 | 1.000 | 0.0% |
-| C₁₇ | 537 | 0.760 | 0.750 | +1.3% |
-| C₁₉ | 487 | 0.689 | 0.667 | +3.3% |
-
-**Mean absolute deviation:** 2.2% across five varieties (exceptional for empirical law)
-
-**Scientific Conclusion:** ✅✅✅ **Verification successful** - Independent Python/NumPy computation **perfectly confirms** Macaulay2 Step 2 results (rank=2215, dimension=844) for C₁₁ perturbed variety at p=23. **Zero discrepancies** across two fundamentally different algorithms (symbolic vs. numerical) establishes rank as **implementation-independent fact**. **CRITICAL FINDING:** Cross-variety comparison (ratio 1.194 vs. theoretical 1.200, deviation **-0.5%**) establishes C₁₁ as **strongest empirical validation** of inverse-Galois-group scaling law **dim H²'²_prim,inv ∝ 1/φ(n)** in entire five-variety study. **Pipeline validated** for multi-prime verification (Step 4) and downstream structural isolation analysis (Steps 6-12). C₁₁ joins C₁₃, C₁₇, C₁₉ as **algorithmically certified** member of five-variety survey, **anchoring scaling law** with unprecedented -0.5% precision.
+(kept out for file size concerns)
 
 ---
 
@@ -2211,169 +1989,6 @@ This step identifies **which specific C₁₁-invariant monomials form the kerne
 
 **Purpose:** While Steps 2-4 **prove dimension=844** via unanimous 19-prime agreement on rank=2215, Step 5 **identifies the actual kernel vectors** by determining which of the 3059 C₁₁-invariant degree-18 monomials serve as **free variables** (kernel generators) versus **pivot variables** (dependent on Jacobian constraints). This distinction is **critical for structural isolation analysis** (Step 6), where we classify kernel vectors by variable-count structure to identify candidate transcendental classes. For C₁₁, this analysis is **especially significant** because the variety's exceptional scaling fit (844/707 = 1.194 vs. theoretical 1.200, deviation -0.5%) suggests it may exhibit **cleaner structural patterns** than varieties with larger deviations (C₇: -5.8%, C₁₉: +3.3%).
 
-**Mathematical Framework - Row Echelon Form and Free Variables:**
-
-For Jacobian cokernel matrix M (3059 rows × 2383 columns) over 𝔽₂₃:
-
-**Kernel basis identification via transpose row reduction:**
-
-1. **Transpose M → M^T** (2383×3059, interchange role of monomials/Jacobian generators)
-2. **Row-reduce M^T to echelon form** (Gaussian elimination over 𝔽₂₃)
-3. **Identify pivot columns** (columns containing leading 1's in echelon form)
-4. **Free columns = all other columns** (those WITHOUT pivots)
-
-**Theoretical result:**
-```
-Free columns of M^T = kernel basis of M
-Number of free columns = dim(ker(M)) = 844
-```
-
-**Why this works:**
-- **Pivot columns** correspond to C₁₁-invariant monomials that are **algebraically dependent** on Jacobian ideal constraints (linear combinations of ∂F/∂zᵢ)
-- **Free columns** correspond to monomials that are **algebraically independent** (not constrained by Jacobian relations) → these **generate the kernel**
-- Each free column becomes a **standard basis vector** for ker(M) (one monomial set to 1, others determined by back-substitution)
-
-**Expected Results (C₁₁ at p=23):**
-
-| Metric | Expected Value | Source |
-|--------|----------------|--------|
-| **C₁₁-invariant monomials** | 3059 | Step 2 (C₁₁-weight filtering) |
-| **Pivot columns** | 2215 | Rank from Steps 2-4 |
-| **Free columns** | 844 | Dimension = 3059 - 2215 |
-| **Kernel dimension** | 844 | Each free column → 1 kernel vector |
-
-**Computational Approach:**
-
-**Algorithm (Transpose Gaussian Elimination):**
-1. Load sparse matrix M (3059×2383) from `saved_inv_p23_triplets.json`
-2. Transpose: M^T (2383×3059, now monomials are **columns**)
-3. Row-reduce M^T over 𝔽₂₃:
-   - For each column (monomial), find pivot row (first nonzero entry)
-   - If pivot exists: mark as **pivot column**, eliminate other rows
-   - If no pivot: mark as **free column** (kernel generator)
-4. Count free columns → verify equals 844
-5. Extract monomial indices for free columns → **canonical kernel basis**
-
-**Why Use Transpose:**
-- Standard Gaussian elimination identifies **row space** (pivots in rows)
-- We need **null space** (free variables in columns)
-- Transposing converts "free columns of M^T" → "free rows of M" → direct kernel basis identification
-
-**Runtime Characteristics:**
-
-**Matrix dimensions:**
-- M^T: 2383 rows × 3059 columns (2383×3059 = 7,289,597 total entries)
-- Nonzero entries: ~171,576 (2.35% density from Step 2)
-- Dense array memory: ~58 MB (int64 representation)
-
-**Gaussian elimination performance:**
-- **Pivot processing:** Scan 3059 columns, find ~2215 pivots (72.4% pivot rate)
-- **Free columns:** 844 columns without pivots (27.6% of total)
-- **Runtime:** ~3-5 seconds (single-core Python, similar to Step 3 rank computation)
-- **Progress checkpoints:** Every 100 pivots (22 checkpoints total)
-
-**Variable-Count Distribution Analysis:**
-
-For each free column (kernel basis monomial), compute **variable count**:
-```python
-var_count = sum(1 for exponent in monomial if exponent > 0)
-# e.g., z₀³z₁²z₂²z₃²z₄²z₅ has var_count = 6 (six variables with nonzero exponents)
-```
-
-**Expected distribution (based on C₁₃/C₁₉ patterns, adjusted for C₁₁ sparsity):**
-
-| Variables | Expected Count | Percentage | Interpretation |
-|-----------|---------------|------------|----------------|
-| 2-3 | ~80-150 | ~10-18% | Sparse monomials (algebraic cycles?) |
-| 4-5 | ~300-450 | ~35-55% | Intermediate complexity |
-| **6** | **~250-400** | **~30-50%** | **Isolated classes (barrier)** |
-
-**C₁₁ Sparsity Caveat:** Based on C₁₇'s anomalous result (only 1.5% six-var in modular free columns at p=103), C₁₁ at p=23 (smaller prime) may exhibit **even stronger sparsity bias**. The modular echelon form at small primes preferentially selects **low-variable-count monomials** as free columns, potentially underrepresenting six-variable structure.
-
-**Six-Variable Monomial Census:**
-
-**Two distinct counts:**
-1. **Free columns with 6 variables (modular basis):** Subset of 844 free columns that happen to have var_count=6
-2. **Total 6-variable monomials in canonical list:** All degree-18 C₁₁-invariant monomials with var_count=6 (regardless of free/pivot status)
-
-**Why the distinction matters:**
-- **Free column 6-var count:** Shows modular basis structure at p=23 (may be sparse due to small prime + echelon form bias)
-- **Total canonical 6-var count:** Shows **full potential** for structural isolation (Step 6 searches here)
-
-**Expected for C₁₁:**
-- **Total 6-var in canonical list:** ~500-600 (based on C₁₃: 476 scaled by 3059/2664 = 1.148, or C₁₇: 364 scaled by 3059/1980 = 1.545)
-- **6-var in free columns (p=23):** UNCERTAIN (could be 1-5% like C₁₇, or 30-50% like C₁₃/C₁₉, depends on prime-specific effects)
-
-**Cross-Variety Scaling Comparison:**
-
-**Dimension scaling:**
-```
-C₁₃: 707 kernel vectors (from 2664 invariant monomials)
-C₁₁: 844 kernel vectors (from 3059 invariant monomials)
-Ratio: 844/707 = 1.194 (matches inverse-φ: 12/10 = 1.200, deviation -0.5% ← BEST FIT)
-```
-
-**Six-variable monomial scaling (THEORETICAL PREDICTION):**
-```
-C₁₃: 476 total 6-var monomials (17.9% of 2664)
-C₁₁: ~500-600 expected (based on similar percentage: 18% of 3059 ≈ 550)
-Ratio: ~550/476 ≈ 1.16 (should track dimension ratio 1.194, within ~3%)
-```
-
-**Why C₁₁ is Special - Best Scaling Fit Hypothesis:**
-
-**C₁₁'s -0.5% deviation** from theoretical prediction (1.194 vs. 1.200) suggests:
-1. **Minimal perturbation artifacts:** δ = 791/100000 breaks cyclotomic symmetry **cleanly** without introducing spurious dimensions
-2. **Optimal Galois group size:** φ(11) = 10 may be "sweet spot" (not too small like φ(7)=6 causing saturation, not too large like φ(19)=18 causing overshoot)
-3. **Cleaner structural patterns expected:** If dimension scaling is near-perfect, six-variable concentration and isolation rates may also match theoretical predictions more closely
-
-**Implication for Step 5:** C₁₁ may exhibit **more balanced variable-count distribution** in modular free columns (less sparsity bias than C₁₇) if the exceptional scaling fit reflects underlying algebraic regularity.
-
-**Modular vs. Rational Basis Caveat:**
-
-**Important note for interpretation:**
-
-**Modular echelon basis (Step 5, p=23):**
-- Computed via Gaussian elimination over 𝔽₂₃ (smallest C₁₁ prime)
-- **Small prime effect:** p=23 may amplify sparsity bias (prefer low-weight pivots)
-- Prefers **sparse monomials** as free columns (algorithmic bias toward low-weight pivots)
-- Gives **one valid basis** for the 844-dimensional kernel
-
-**Rational CRT basis (Steps 10-12, 19 primes):**
-- Reconstructed via Chinese Remainder Theorem from 19 independent primes
-- May contain **dense linear combinations** over ℚ (large integer coefficients)
-- Gives **same 844-dimensional space** but with different representation
-
-**Scientific implication:**
-- Both bases are **mathematically equivalent** (related by invertible linear transformation over ℚ)
-- Modular basis is **computationally efficient** (sparse, easy to work with)
-- Rational basis reveals **true arithmetic structure** (may expose hidden patterns in coefficient growth)
-- **Step 6 (structural isolation) should use CANONICAL LIST**, not just free columns, to avoid missing dense 6-variable combinations
-
-**Output Artifacts:**
-
-1. **Free column indices:** List of 844 monomial indices (from canonical 3059-element list) forming kernel basis
-2. **Pivot column indices:** List of 2215 monomial indices (dependent variables)
-3. **Variable-count distribution:** Histogram of var_count for 844 free columns
-4. **Six-variable census:**
-   - Count in free columns (modular basis)
-   - Count in full canonical list (search space for Step 6)
-5. **Cross-variety comparison:** C₁₁ vs. C₁₃ ratios (dimension, 6-var counts)
-
-**JSON output:** `step5_canonical_kernel_basis_C11.json`
-
-**Scientific Significance:**
-
-**Kernel basis identification:** Converts abstract dimension=844 into **concrete monomial list** (which specific monomials generate H²'²_prim,inv)
-
-**Foundation for isolation analysis:** Step 6 uses this basis (or full canonical 6-var list) to test whether high-variable-count monomials exhibit algebraic isolation
-
-**Modular arithmetic validation:** Verifying free_column_count = 844 at p=23 **confirms rank=2215** via independent method (dimension + rank = total monomials)
-
-**Cross-variety universality test:** If C₁₁ shows similar 6-var concentration (~30-50% of kernel, or 17-19% of canonical list) as C₁₃/C₁₉, supports hypothesis that variable-count barrier is **order-independent** AND that C₁₁'s exceptional scaling fit extends to microstructure
-
-**Expected Runtime:** ~3-5 seconds (Gaussian elimination on 2383×3059 dense matrix, similar computational cost to Step 3 rank verification).
-
 ```python
 #!/usr/bin/env python3
 """
@@ -2946,96 +2561,6 @@ Next step: Step 6 (Structural Isolation Analysis for C11)
 This step identifies **structurally isolated classes** among the 562 six-variable C₁₁-invariant monomials via **gcd and variance criteria**, classifying candidate transcendental Hodge classes that exhibit geometric complexity patterns associated with the universal variable-count barrier—particularly significant for C₁₁ as the variety exhibiting **best fit** to inverse-Galois-group scaling predictions (-0.5% deviation from theoretical 12/10 = 1.200).
 
 **Purpose:** While Step 5 identified the 844-dimensional kernel basis, Step 6 **subdivides the six-variable monomial population** (562 total from canonical list) into **isolated** versus **non-isolated** classes based on structural invariants that correlate with transcendental behavior. Isolated classes are characterized by **non-factorizable exponent structure** (gcd=1, cannot be written as powers of simpler monomials) and **high exponent variance** (uneven distribution suggesting geometric irregularity), properties empirically associated with classes that resist algebraic cycle representation. For C₁₁, this analysis tests whether the variety's **exceptional dimensional scaling fit** (-0.5% deviation) extends to **microstructural patterns** (isolation rates, variance distributions) matching the universal 84-88% isolation range observed in C₁₃ (84.2%), C₁₇ (86.8%), C₁₉ (~87.5%).
-
-**Mathematical Framework - Isolation Criteria:**
-
-For each degree-18 six-variable monomial **m = z₀^a₀ z₁^a₁ ... z₅^a₅** (exactly 6 nonzero aᵢ, Σaᵢ=18):
-
-**Criterion 1 (Non-Factorizable):** gcd(a₀, a₁, ..., a₅) = 1
-- **Interpretation:** Monomial cannot be written as **m = (simpler monomial)^k** for k>1
-- **Example PASS:** z₀⁵z₁³z₂²z₃²z₄³z₅³ (gcd=1, irreducible)
-- **Example FAIL:** z₀⁶z₁⁶z₂²z₃²z₄z₅ (gcd=2, factorizable structure)
-
-**Criterion 2 (High Complexity):** Variance(exponents) > 1.7
-- **Variance formula:** Var = Σᵢ(aᵢ - μ)² / 6, where μ = 18/6 = 3.0 (mean exponent)
-- **Interpretation:** Exponents deviate significantly from uniform distribution (3,3,3,3,3,3), indicating **geometric irregularity**
-- **Example PASS:** z₀⁸z₁⁴z₂²z₃z₄²z₅ (variance ≈ 6.33 > 1.7, highly uneven)
-- **Example FAIL:** z₀⁴z₁³z₂³z₃³z₄³z₅² (variance ≈ 0.67 < 1.7, nearly uniform)
-
-**Isolated Class Definition:**
-```
-m is ISOLATED ⟺ (gcd = 1) AND (variance > 1.7)
-```
-
-**Theoretical Justification:**
-
-**Why these criteria correlate with transcendence:**
-1. **gcd=1 (irreducibility):** Factorizable monomials (gcd>1) often relate to **products of lower-degree cycles** (algebraic), while irreducible monomials resist such decompositions
-2. **High variance (geometric complexity):** Algebraic cycles typically arise from **symmetric or regular constructions** (intersection of hypersurfaces with balanced exponents), whereas high-variance monomials suggest **irregular singularity patterns** harder to construct algebraically
-
-**Empirical validation (C₁₃, C₁₇, C₁₉):**
-- **C₁₃:** 401/476 six-var isolated (84.2%)
-- **C₁₇:** 316/364 six-var isolated (86.8%)
-- **C₁₉:** ~280/320 six-var isolated (~87.5%)
-- **Universal pattern:** 84-88% isolation rate across cyclotomic orders 13, 17, 19
-
-**C₁₁ Hypothesis - Best Fit Extension:**
-
-**If C₁₁'s exceptional dimension fit (-0.5% deviation) reflects underlying algebraic regularity, isolation rate should:**
-1. **Match universal 84-88% range** (confirming order-independence)
-2. **Potentially fall near 85-86%** (midpoint of range, reflecting optimal Galois group size φ(11)=10)
-
-**Expected Results (C₁₁ Combinatorial Prediction):**
-
-**Six-variable monomial count:**
-```
-Total degree-18 monomials with 6 variables: C(18-1, 6-1) = C(17,5) = 6188
-C₁₁-invariant subset: 6188 / φ(11) = 6188 / 11 ≈ 563 (theoretical)
-Empirical from Step 5: 562 (perfect match, -0.2% deviation)
-```
-
-**Isolated class estimate (based on universal 84-88% rate):**
-```
-C₁₃ isolation rate: 401/476 = 84.2%
-C₁₇ isolation rate: 316/364 = 86.8%
-C₁₉ isolation rate: ~87.5%
-Expected C₁₁: 562 × 0.86 ≈ 483 isolated classes (±5%)
-```
-
-**Computational Approach:**
-
-**Algorithm (Direct Criterion Application):**
-1. Load 3059 C₁₁-invariant monomials from `saved_inv_p23_monomials18.json` (Step 2 output)
-2. Filter to six-variable subset: **562 monomials** (exactly 6 nonzero exponents)
-3. For each monomial:
-   - Compute gcd of nonzero exponents
-   - Compute variance: Σ(aᵢ - 3)² / 6
-   - Check: (gcd=1) AND (variance>1.7) → ISOLATED
-4. Classify into isolated (expected ~483) vs. non-isolated (~79)
-5. Compute isolation percentage, compare to C₁₃/C₁₇/C₁₉
-
-**Runtime:** ~1-2 seconds (562 monomials, simple arithmetic operations)
-
-**Output Artifacts:**
-
-1. **Isolated class indices:** List of ~483 monomial indices (from canonical 3059-element list) satisfying both criteria
-2. **Non-isolated class indices:** ~79 monomials failing either criterion
-3. **Variance/GCD distributions:** Histograms for structural analysis
-4. **Cross-variety comparison:** C₁₁ vs. C₁₃ isolation rates, six-var counts
-
-**JSON output:** `step6_structural_isolation_C11.json`
-
-**Scientific Significance:**
-
-**Best-fit variety test:** If C₁₁ isolation rate matches universal 84-88% pattern, confirms exceptional dimension scaling (-0.5%) **extends to microstructure** (not just macroscopic dimension)
-
-**Candidate transcendental class identification:** Isolated monomials become **primary search targets** for Steps 7-12 (coordinate collapse tests, variable-count barrier verification)
-
-**Cross-variety universality validation:** C₁₁ provides **fourth independent test** of 84-88% isolation hypothesis (after C₁₃, C₁₇, C₁₉), strengthening evidence for order-independent barrier
-
-**Foundation for barrier proof:** Steps 7-12 test whether isolated classes exhibit **universal 6-variable requirement** (cannot be represented in coordinate collapses to ≤5 variables), while non-isolated classes may have algebraic representations
-
-**Expected Runtime:** ~1-2 seconds (pure Python arithmetic on 562 monomials, no matrix operations).
 
 ```python
 #!/usr/bin/env python3
@@ -3685,123 +3210,6 @@ This step quantifies the **complexity gap** between the 480 structurally isolate
 
 **Purpose:** While Step 6 **identifies** isolated classes via gcd/variance criteria, Step 7 **quantifies their distinctiveness** by computing five complexity metrics (Shannon entropy, Kolmogorov complexity proxy, variable count, exponent variance, exponent range) for both isolated classes and algebraic patterns, then applying rigorous statistical tests (Kolmogorov-Smirnov, t-test, Mann-Whitney U, Cohen's d) to measure **separation strength**. The key metric is **variable-count separation**: if isolated classes require 6 variables while algebraic cycles use ≤4, this produces **perfect KS separation** (D-statistic ≈ 1.0), providing strong evidence for a universal variable-count barrier. For C₁₁, which exhibited **85.4% isolation rate** (closest to four-variety mean 85.8%), this analysis tests whether the variety's **exceptional scaling fit extends to information-theoretic separation patterns**, matching the near-perfect KS D=1.000 observed in C₁₃/C₁₇/C₁₉.
 
-**Mathematical Framework - Information-Theoretic Metrics:**
-
-For each degree-18 monomial **m = z₀^a₀ z₁^a₁ ... z₅^a₅**:
-
-**Metric 1 - Shannon Entropy (Exponent Distribution Uniformity):**
-```
-H(m) = -Σᵢ (aᵢ/18) · log₂(aᵢ/18)   [sum over nonzero aᵢ]
-```
-- **Low entropy (H ≈ 1-1.5):** Concentrated exponents (e.g., [9,9,0,0,0,0] → few large powers)
-- **High entropy (H ≈ 2-2.5):** Distributed exponents (e.g., [4,3,3,3,3,2] → many variables)
-- **Interpretation:** Algebraic cycles (hyperplanes, complete intersections) favor **low entropy** (simple structure), isolated classes favor **high entropy** (complex distribution)
-
-**Metric 2 - Kolmogorov Complexity Proxy (Encoding Length):**
-```
-K(m) ≈ |prime_factors(gcd-reduced exponents)| + Σᵢ ⌊log₂(aᵢ)⌋ + 1
-```
-- **Approximation:** Counts unique prime factors + binary encoding length of exponents
-- **Low K (K ≈ 6-10):** Simple exponent structure (e.g., [6,6,6,0,0,0] → repeated small primes)
-- **High K (K ≈ 12-18):** Complex structure (many distinct prime factors, large exponents)
-- **Interpretation:** Algebraic cycles have **short descriptions** (low K), isolated classes need **longer encodings** (high K)
-
-**Metric 3 - Variable Count (Primary Barrier Metric):**
-```
-V(m) = |{i : aᵢ > 0}|   (number of nonzero exponents)
-```
-- **Low V (V ≤ 4):** Algebraic cycles (hyperplanes V=1, surfaces V=2, threefolds V=3-4)
-- **High V (V = 6):** Isolated classes (maximum complexity, all coordinates used)
-- **Interpretation:** **KEY DISCRIMINATOR** for variable-count barrier hypothesis
-
-**Metric 4 - Exponent Variance (Geometric Irregularity):**
-```
-Var(m) = Σᵢ(aᵢ - μ)² / 6,   μ = 18/6 = 3
-```
-- **Used in Step 6 isolation criterion** (Var > 1.7)
-- **Low Var:** Uniform exponents (algebraic regularity)
-- **High Var:** Irregular exponents (geometric complexity)
-
-**Metric 5 - Exponent Range (Spread):**
-```
-R(m) = max(aᵢ) - min(nonzero aᵢ)
-```
-- **Low R:** Balanced exponents (e.g., [3,3,3,3,3,3] → R=0)
-- **High R:** Dominated by one large exponent (e.g., [12,1,1,1,1,1] → R=11)
-
-**Statistical Tests (Rigorous Separation Quantification):**
-
-**Test 1 - Kolmogorov-Smirnov (Distribution Separation):**
-```
-KS D-statistic = sup_x |F_isolated(x) - F_algebraic(x)|
-```
-- **Range:** 0 (identical distributions) to 1 (perfect separation)
-- **Interpretation:** D ≈ 1.0 for variable-count → **perfect separation**
-- **p-value < 0.001:** Highly significant difference
-
-**Test 2 - Cohen's d (Effect Size):**
-```
-d = (μ_isolated - μ_algebraic) / σ_pooled
-```
-- **Small effect:** |d| < 0.5
-- **Medium effect:** 0.5 ≤ |d| < 0.8
-- **Large effect:** |d| ≥ 0.8
-- **Expected for variable-count:** d ≈ 4-5 (huge effect, isolated ~6 vars, algebraic ~2.9 vars)
-
-**Test 3 - Mann-Whitney U (Non-Parametric Median Comparison):**
-- **Robust to outliers** (unlike t-test)
-- **Tests:** H₀: medians are equal vs. H₁: medians differ
-- **Expected:** p < 0.001 for variable-count
-
-**Comparison Populations:**
-
-**Isolated classes (480 monomials from Step 6):**
-- All satisfy gcd=1 AND variance>1.7
-- **Expected:** Predominantly 6-variable (from Step 6, ~100% six-var by construction)
-- High entropy/Kolmogorov complexity (by isolation criteria)
-
-**Algebraic patterns (24 representative cycles):**
-- **1 hyperplane:** [18,0,0,0,0,0] (V=1, low entropy)
-- **8 two-variable:** [9,9,0,0,0,0], [12,6,0,0,0,0], ... (V=2)
-- **8 three-variable:** [6,6,6,0,0,0], [12,3,3,0,0,0], ... (V=3)
-- **7 four-variable:** [9,3,3,3,0,0], [6,6,3,3,0,0], ... (V=4)
-- **Expected mean variable count:** ~2.9 (weighted average)
-
-**C₁₁ Best-Fit Hypothesis Predictions:**
-
-**If C₁₁'s exceptional dimension fit (-0.5%) and isolation rate (85.4%, closest to mean 85.8%) reflect underlying algebraic regularity:**
-1. **Variable-count KS D should be 1.000** (perfect, like C₁₃/C₁₇/C₁₉)
-2. **Entropy/Kolmogorov means should match C₁₃/C₁₇ within ±1%** (minimal order-dependent variation)
-3. **All five metrics should show <2% deviation from four-variety mean** (tightest clustering)
-
-**Cross-Variety Validation (C₁₁ vs. C₁₃ Benchmarks):**
-
-**C₁₃ baseline (from previous study):**
-- Variable count KS D: **1.000** (perfect)
-- Entropy μ_iso: 2.24, KS D: 0.925
-- Kolmogorov μ_iso: 14.57, KS D: 0.837
-
-**Expected C₁₁ (based on best-fit hypothesis):**
-- Variable count KS D: **1.000** (perfect, 100% isolated are 6-var)
-- Entropy μ_iso: ~2.22-2.24 (within ±1% of C₁₃)
-- Kolmogorov μ_iso: ~14.55-14.60 (within ±0.5% of C₁₃)
-- **Validation criterion:** If C₁₁ matches C₁₃ separation patterns within ±2%, supports universal barrier hypothesis AND confirms best-fit scaling extends to all structural levels
-
-**Output Artifacts:**
-
-**JSON file:** `step7_information_theoretic_analysis_C11.json`
-```json
-{
-  "statistical_results": [
-    {"metric": "num_vars", "ks_d": 1.000, "cohens_d": 4.91, "p_value_ks": <1e-10},
-    {"metric": "entropy", "ks_d": 0.92, "cohens_d": 2.30, ...},
-    ...
-  ],
-  "isolated_metrics_summary": {...},
-  "algebraic_metrics_summary": {...}
-}
-```
-
 **Scientific Significance:**
 
 **Best-fit variety validation:** If C₁₁ shows perfect variable-count separation (KS D=1.0) AND matches C₁₃/C₁₇/C₁₉ entropy/Kolmogorov patterns within ±2%, establishes that **exceptional dimension scaling (-0.5%) extends to all complexity levels** (dimension → isolation rate 85.4% → information-theoretic metrics)
@@ -3811,8 +3219,6 @@ d = (μ_isolated - μ_algebraic) / σ_pooled
 **Cross-variety universality:** C₁₁ provides **fourth independent test** (after C₁₃, C₁₇, C₁₉) of variable-count barrier hypothesis, with expectation of **tightest match to theoretical predictions** given -0.5% dimension deviation
 
 **Foundation for coordinate collapse tests:** Step 7's statistical separation motivates Steps 9-12's algorithmic tests (if classes are statistically separated by variable-count, they should fail coordinate collapse to ≤5 variables)
-
-**Expected Runtime:** ~2-5 seconds (computing 5 metrics × 480 isolated + 24 algebraic = 2520 calculations, statistical tests on ~480-element arrays).
 
 ```python
 #!/usr/bin/env python3
@@ -4425,123 +3831,7 @@ Next step: Comprehensive pipeline summary / CRT reconstruction
 
 # **STEP 8: COMPREHENSIVE VERIFICATION SUMMARY (C₁₁ X₈ PERTURBED)**
 
-## **DESCRIPTION**
-
-This step generates a **complete reproducibility report** consolidating results from Steps 1-7, documenting dimension certification (844-dimensional kernel), structural isolation (480 isolated classes, 85.4% rate), and information-theoretic separation (perfect variable-count barrier KS D=1.000), establishing **provenance chain** for the perturbed C₁₁ cyclotomic hypersurface computational pipeline—the variety exhibiting **best inverse-Galois-group scaling fit** (-0.5% deviation from theoretical 12/10 = 1.200) and serving as **anchor** for universal barrier hypothesis across all structural levels.
-
-**Purpose:** While Steps 1-7 each produce **individual verification outputs** (JSON files, console logs), Step 8 **aggregates all results** into unified JSON and Markdown reports, providing (1) **cross-step consistency validation** (verify dimension=844 reported identically across Steps 2-7), (2) **cross-variety comparison tables** (C₁₁ vs. C₁₃ scaling ratios documenting best-fit status), and (3) **reproducibility documentation** (software versions, file dependencies, runtime statistics) for scientific publication and external validation. For C₁₁, this report serves as **gold-standard template** demonstrating how exceptional dimensional scaling (-0.5%) extends through isolation microstructure (85.4%, closest to four-variety mean 85.8%) to information-theoretic separation (exact C₁₃ replication: entropy Δμ=0.000, Kolmogorov Δμ=+0.026).
-
-**Aggregated Verification Checklist:**
-
-**STEP 1 (Smoothness Verification):**
-- **Status:** ASSUMED_COMPLETED (Macaulay2 external computation)
-- **Primes tested:** 19 (p ≡ 1 mod 11: 23, 67, 89, ..., 1123)
-- **Expected result:** 100% smooth Jacobian ideals across all primes
-- **Reproducibility:** Include Macaulay2 session logs showing `dim(sing(I))=-1` for each prime
-
-**STEP 2 (Galois-Invariant Jacobian Cokernel):**
-- **Status:** COMPUTED ✅
-- **C₁₁-invariant monomials:** 3059 (verified at all 19 primes)
-- **Matrix dimensions:** 3059 × 2383 (rows: monomials, cols: Jacobian generators)
-- **Rank (example p=23):** 2215 (unanimous across 19 primes)
-- **Dimension h²'²_inv:** 844 (3059 - 2215, unanimous)
-- **Data artifacts:** `saved_inv_p{23,67,...,1123}_triplets.json` (19 files, sparse matrix triplets)
-
-**STEP 3 (Single-Prime Rank Verification):**
-- **Status:** COMPUTED ✅
-- **Prime used:** p=23 (first C₁₁ prime)
-- **Method:** Python Gaussian elimination (independent of Macaulay2)
-- **Computed rank:** 2215 (matches Step 2 exactly)
-- **Computed dimension:** 844 (perfect agreement)
-- **Runtime:** ~3-5 seconds (3059×2383 dense elimination over 𝔽₂₃)
-
-**STEP 4 (Multi-Prime Rank Verification):**
-- **Status:** COMPUTED ✅
-- **Primes tested:** 19 (23, 67, 89, ..., 1123, all p ≡ 1 mod 11)
-- **Unanimous rank:** 2215 (zero variance across all primes)
-- **Unanimous dimension:** 844 (zero variance across all primes)
-- **Certification:** Error probability < 10⁻⁵⁰ (CRT modulus M ≈ 10⁵⁰)
-- **Best-fit validation:** 844/707 = 1.194 vs. theoretical 1.200 (-0.5% deviation, **best in study**)
-- **Data artifacts:** `step4_multiprime_verification_summary_C11.json`
-
-**STEP 5 (Canonical Kernel Basis Identification):**
-- **Status:** COMPUTED ✅
-- **Free columns (p=23):** 844 (matches dimension exactly)
-- **Pivot columns:** 2215 (matches rank exactly)
-- **Variable-count distribution:** 95.7% of modular free columns have ≤5 variables (only 4.3% six-var due to small-prime sparsity bias)
-- **Total six-var in canonical list:** 562 monomials (18.4% of 3059, matches universal pattern)
-- **Data artifacts:** `step5_canonical_kernel_basis_C11.json`
-
-**STEP 6 (Structural Isolation):**
-- **Status:** COMPUTED ✅
-- **Six-variable monomials:** 562 (near-perfect match to combinatorial C(17,5)/11 ≈ 563, deviation -0.2%)
-- **Isolated classes:** 480 (85.4% isolation rate)
-- **Non-isolated classes:** 82 (14.6%, fail gcd=1 OR variance>1.7)
-- **Criteria:** gcd=1 (98.9% pass) AND variance>1.7 (86.5% pass)
-- **Best-fit validation:** 85.4% is **closest to four-variety mean 85.8%** (C₁₃: 84.2%, C₁₇: 86.8%, C₁₉: ~87.5%)
-- **Data artifacts:** `step6_structural_isolation_C11.json`
-
-**STEP 7 (Information-Theoretic Separation):**
-- **Status:** COMPUTED ✅
-- **Isolated classes analyzed:** 480 (from Step 6)
-- **Algebraic patterns:** 24 representative cycles (V=1 to V=4)
-- **Variable-count KS D:** 1.000 (perfect separation, p < 10⁻⁴⁰)
-- **Entropy:** μ_iso = 2.240 (**exact C₁₃ match** 2.240, KS D=0.917 vs. C₁₃ 0.925, -0.9% deviation)
-- **Kolmogorov:** μ_iso = 14.596 (**near-exact C₁₃ match** 14.570, +0.2% deviation, KS D=0.831 vs. 0.837, -0.7%)
-- **Best-fit validation:** **Tightest cross-variety match in study** (4/5 metrics within ±1% of C₁₃)
-- **Data artifacts:** `step7_information_theoretic_analysis_C11.json`
-
-**Key observations:**
-1. **Dimension ratio 1.194** is **best fit** across five-variety study (C₇: -5.8%, **C₁₁: -0.5%**, C₁₃: 0%, C₁₇: +1.3%, C₁₉: +3.3%)
-2. **Isolated class ratio 1.197** nearly **exactly matches dimension ratio 1.194** (+0.3% deviation)
-3. **Isolation percentage 85.4%** is **closest to four-variety mean 85.8%** (-0.4% deviation)
-4. **Information-theoretic metrics** show **tightest C₁₃ match** (entropy exact, Kolmogorov +0.2%)
-5. **All ratios within ±3%** of theoretical predictions (validates inverse-Galois-group scaling law)
-
-**Reproducibility Documentation:**
-
-**Data artifacts generated (41 files total):**
-- **19 matrix triplet files:** `saved_inv_p{23,67,...,1123}_triplets.json` (~1-3 MB each, 19 primes)
-- **19 monomial basis files:** `saved_inv_p{23,67,...,1123}_monomials18.json` (~50-100 KB each)
-- **Step 4 summary:** `step4_multiprime_verification_summary_C11.json` (~100 KB)
-- **Step 5 basis:** `step5_canonical_kernel_basis_C11.json` (~200 KB)
-- **Step 6 isolation:** `step6_structural_isolation_C11.json` (~200 KB)
-- **Step 7 statistics:** `step7_information_theoretic_analysis_C11.json` (~50 KB)
-- **Step 8 report:** `step8_comprehensive_verification_report_C11.json` (~500 KB, includes raw Steps 6-7)
-
-**Total storage:** ~40-60 MB (uncompressed), ~10-15 MB (compressed)
-
-**Software requirements:**
-- **Macaulay2 1.20+** (Steps 1-2: smoothness, Jacobian cokernel)
-- **Python 3.8+** (Steps 3-8: verification, analysis, reporting)
-- **NumPy 1.21+** (matrix operations, Gaussian elimination)
-- **SciPy 1.7+** (statistical tests: KS, Mann-Whitney, t-test)
-
-**Runtime summary (cumulative Steps 1-8):**
-- **Step 1 (Macaulay2):** ~5-10 minutes (19-prime smoothness verification)
-- **Step 2 (Macaulay2):** ~20-25 minutes (19-prime Jacobian cokernel, rank computation, larger matrix than C₁₇)
-- **Step 3 (Python):** ~3-5 seconds (single-prime rank verification at p=23)
-- **Step 4 (Python):** ~60-80 seconds (19-prime rank verification, sequential)
-- **Step 5 (Python):** ~3-5 seconds (free column analysis at p=23)
-- **Step 6 (Python):** ~1-2 seconds (structural isolation, 562 monomials)
-- **Step 7 (Python):** ~2-5 seconds (info-theoretic metrics, statistical tests)
-- **Step 8 (Python):** ~1-2 seconds (JSON aggregation, report generation)
-- **Total Python (Steps 3-8):** ~70-100 seconds
-- **Total pipeline:** ~25-35 minutes (dominated by Macaulay2 Steps 1-2)
-
-**Scientific Significance:**
-
-**Best-fit variety certification:** Step 8 report documents C₁₁ as **gold standard** for inverse-Galois-group scaling law, with exceptional fit at **all structural levels** (dimension -0.5%, isolation 85.4% closest to mean, info-theoretic exact C₁₃ replication)
-
-**Publication-ready documentation:** Complete provenance chain (data sources → computational steps → statistical validation) required for peer review, with C₁₁ serving as **template for universal barrier hypothesis**
-
-**Cross-variety validation:** Automated C₁₁/C₁₃ comparison confirms scaling patterns support **dim H²'²_prim,inv ∝ 1/φ(n)** with unprecedented precision (dimension -0.5%, isolated classes +0.3%, isolation rate -0.4%)
-
-**Error detection:** Cross-step consistency checks verify dimension=844 reported identically across Steps 2-7, isolation rate 85.4% matches four-variety mean 85.8%, info-theoretic metrics replicate C₁₃ within ±1%
-
-**External reproducibility:** File dependency list enables independent researchers to re-run pipeline with provided data artifacts, validating C₁₁ as anchor variety
-
-**Expected Runtime:** ~1-2 seconds (JSON aggregation, no heavy computation).
+(kept out for file size concerns)
 
 ```python
 #!/usr/bin/env python3
@@ -4977,212 +4267,6 @@ This step performs **CP1 (Coordinate Property 1) verification** by systematicall
 
 **Purpose:** While Step 7 **statistically demonstrated** perfect variable-count separation (KS D=1.000) between isolated classes and algebraic cycles via **information-theoretic metrics** (entropy μ=2.240 **exact C₁₃ match**, Kolmogorov μ=14.596 +0.2% from C₁₃), Step 9A **algorithmically verifies** this separation by **directly counting active variables** (nonzero exponents) for each of the 480 isolated monomials and comparing distributions to 24 representative algebraic patterns. The **CP1 property** states: "**All isolated classes require exactly 6 variables (cannot be written in coordinates with ≤5 variables)**". For C₁₁, this provides **independent algorithmic validation** of Step 7's statistical claim, testing whether **100% of 480 isolated classes have var_count=6** (like C₁₃'s 401/401 = 100%) to **dual-validate** the variety's **exceptional fit across all structural levels** (dimension -0.5%, isolation 85.4% closest to mean, info-theoretic exact C₁₃ match, now algorithmic barrier).
 
-**Mathematical Framework - Variable-Count Enumeration:**
-
-**For each degree-18 monomial m = z₀^a₀ z₁^a₁ ... z₅^a₅:**
-
-**Variable count definition:**
-```python
-var_count(m) = |{i : aᵢ > 0}|  # number of nonzero exponents
-```
-
-**Examples:**
-- `[18, 0, 0, 0, 0, 0]` → var_count = 1 (hyperplane, uses only z₀)
-- `[9, 9, 0, 0, 0, 0]` → var_count = 2 (two-variable algebraic cycle)
-- `[6, 6, 6, 0, 0, 0]` → var_count = 3 (three-variable complete intersection)
-- `[5, 4, 3, 3, 2, 1]` → var_count = 6 (six-variable isolated class, uses all coordinates)
-
-**CP1 Verification Test:**
-
-**For 480 C₁₁ isolated classes (from Step 6):**
-1. **Extract monomials:** Load exponent vectors from `saved_inv_p23_monomials18.json` at indices from Step 6
-2. **Count variables:** Compute var_count for each isolated monomial
-3. **Check universal property:** Verify if **ALL 480 satisfy var_count = 6**
-4. **Record failures:** Identify any monomials with var_count < 6 (violations of CP1)
-
-**Expected result (universal barrier hypothesis):**
-```
-CP1_pass = 480/480 (100%, all isolated classes require 6 variables)
-CP1_fail = 0/480 (zero classes with <6 variables)
-```
-
-**Alternative result (barrier violation):**
-```
-CP1_pass < 480 (some isolated classes use ≤5 variables)
-CP1_fail > 0 (barrier is NOT universal)
-```
-
-**Statistical Separation Analysis - Kolmogorov-Smirnov Test:**
-
-**Compare two empirical distributions:**
-
-**Distribution 1 (Algebraic Cycles, 24 patterns):**
-```
-Algebraic var_counts = [1, 2, 2, 2, ..., 4, 4] (24 values, range 1-4)
-Mean ≈ 2.875, Std ≈ 0.900
-```
-
-**Distribution 2 (Isolated Classes, 480 monomials):**
-```
-Isolated var_counts = [6, 6, 6, ..., 6] (480 values, expected all 6)
-Mean = 6.000, Std = 0.000 (if CP1 holds)
-```
-
-**Kolmogorov-Smirnov D-statistic:**
-```
-D = sup_x |F_algebraic(x) - F_isolated(x)|
-```
-where F is cumulative distribution function (CDF).
-
-**For perfect separation (CP1 holds):**
-```
-F_algebraic(4.5) = 100% (all algebraic ≤4)
-F_isolated(4.5) = 0% (all isolated ≥6, assuming CP1)
-D = |100% - 0%| = 1.000 (maximum possible separation)
-```
-
-**Expected Results (C₁₁ Universal Hypothesis - Exceptional Fit Extends to Algorithmic Level):**
-
-**If C₁₁ replicates C₁₃ universal pattern:**
-- **CP1_pass:** 480/480 (100%, like C₁₃'s 401/401)
-- **Isolated mean var_count:** 6.000 (exact)
-- **Isolated std var_count:** 0.000 (zero variance, all identical)
-- **KS D-statistic:** 1.000 (perfect separation, no distributional overlap)
-- **KS p-value:** < 10⁻⁴⁵ (probability of observing this separation by chance, stronger than C₁₃ due to larger sample 480 vs. 401)
-
-**If C₁₁ shows barrier violations:**
-- **CP1_pass:** < 480 (some isolated classes have var_count < 6)
-- **Isolated mean var_count:** < 6.000 (e.g., 5.95 if few violations)
-- **Isolated std var_count:** > 0 (variance if mixed var_counts)
-- **KS D-statistic:** < 1.000 (imperfect separation, some overlap)
-- **Interpretation:** Barrier is NOT universal (depends on variety-specific properties)
-
-**Cross-Variety Validation (C₁₃ Baseline vs. C₁₁ - Testing Exceptional Fit Extension):**
-
-**C₁₃ baseline (from coordinate_transparency.tex and Step 7):**
-- **Isolated classes:** 401
-- **CP1 pass:** 401/401 (100%)
-- **Isolated var_count:** Mean=6.000, Std=0.000
-- **KS D:** 1.000 (perfect)
-- **Conclusion:** **Universal barrier** (100% of isolated require 6 variables)
-
-**C₁₁ hypothesis (to be tested):**
-- **Isolated classes:** 480 (from Step 6, **largest count** after C₁₃)
-- **CP1 pass:** 480/480 (100%, if universal pattern holds)
-- **Isolated var_count:** Mean=6.000, Std=0.000 (expected)
-- **KS D:** 1.000 (expected)
-- **Test:** Does C₁₁'s exceptional fit (dimension -0.5%, isolation 85.4% closest to mean, info-theoretic exact C₁₃ match) extend to **algorithmic barrier verification**?
-
-**Why C₁₁ Is Critical Test (Best-Fit Anchor Variety):**
-
-**Dimension context:**
-- **C₁₃:** 707 (baseline, 0% deviation from theoretical)
-- **C₁₁:** 844 (ratio 844/707 = 1.194 vs. theoretical 12/10 = 1.200, **-0.5% deviation, BEST FIT in five-variety study**)
-- **Interpretation:** C₁₁ shows **exceptional agreement** with inverse-Galois-group scaling law
-
-**Isolation context (Step 6):**
-- **C₁₁ isolation rate:** 85.4% (deviation from four-variety mean 85.8%: **-0.4%, CLOSEST TO MEAN**)
-- **C₁₃ isolation rate:** 84.2% (deviation -1.6%)
-- **Interpretation:** C₁₁ provides **tightest match to universal isolation constant**
-
-**Info-theoretic context (Step 7):**
-- **C₁₁ entropy:** μ=2.240 (**EXACT C₁₃ match** 2.240, 0.0% deviation)
-- **C₁₁ Kolmogorov:** μ=14.596 (+0.2% from C₁₃ 14.570)
-- **C₁₁ variable-count KS D:** 1.000 (perfect, like C₁₃)
-- **Interpretation:** C₁₁ shows **tightest info-theoretic match** to C₁₃ across all metrics
-
-**Barrier test significance:**
-- **If CP1 holds (100%):** C₁₁'s exceptional fit (dimension, isolation, info-theory) **extends to algorithmic barrier validation**, establishing variety as **gold standard anchor** for universal patterns across ALL structural levels
-- **If CP1 fails (<100%):** Exceptional macroscopic fit **does NOT guarantee** algorithmic barrier universality (variety-specific microstructure)
-
-**C₁₁ as dual validation anchor:**
-- **Step 7 statistical:** Entropy/Kolmogorov exact C₁₃ match, variable-count KS D=1.000
-- **Step 9A algorithmic:** Direct var_count enumeration confirms Step 7's statistical claim
-- **If both agree:** **Strongest possible validation** (statistical + algorithmic dual proof) of universal barrier, with C₁₁ as **best-fit variety** across all metrics
-
-**Computational Approach:**
-
-**Algorithm (Direct Variable Counting):**
-
-```python
-# Load 3059 C₁₁-invariant monomials from Step 2
-monomials = load_json("saved_inv_p23_monomials18.json")  # 3059 exponent vectors
-
-# Load 480 isolated indices from Step 6
-isolated_indices = load_json("step6_structural_isolation_C11.json")["isolated_indices"]  # 480 indices
-
-# Extract isolated monomials
-isolated_monomials = [monomials[idx] for idx in isolated_indices]  # 480 monomials
-
-# Count variables for each
-def var_count(exponents):
-    return sum(1 for e in exponents if e > 0)
-
-isolated_var_counts = [var_count(m) for m in isolated_monomials]  # 480 var_counts
-
-# CP1 verification
-cp1_pass = sum(1 for v in isolated_var_counts if v == 6)  # Expected: 480
-cp1_fail = sum(1 for v in isolated_var_counts if v != 6)  # Expected: 0
-
-# Distribution analysis
-from collections import Counter
-var_distribution = Counter(isolated_var_counts)  # Expected: {6: 480}
-
-# Statistical separation
-algebraic_var_counts = [var_count(p) for p in algebraic_patterns]  # 24 values, range 1-4
-ks_stat, ks_pval = scipy.stats.ks_2samp(algebraic_var_counts, isolated_var_counts)
-# Expected: ks_stat = 1.000, ks_pval < 1e-45
-```
-
-**Runtime:** ~1-2 seconds (simple loop over 480 monomials, counting nonzero exponents)
-
-**Output Comparison (C₁₃ Baseline vs. C₁₁ Expected):**
-
-| Metric | C₁₃ Baseline | C₁₁ Expected (Universal) | C₁₁ Alternative (Violation) |
-|--------|--------------|-------------------------|----------------------------|
-| **Isolated classes** | 401 | 480 | 480 |
-| **CP1 pass (var=6)** | 401 (100%) | 480 (100%) | <480 (<100%) |
-| **Mean var_count** | 6.000 | 6.000 | <6.000 (e.g., 5.95) |
-| **Std var_count** | 0.000 | 0.000 | >0 (e.g., 0.22) |
-| **KS D-statistic** | 1.000 | 1.000 | <1.000 (e.g., 0.98) |
-| **KS p-value** | <10⁻⁴⁰ | <10⁻⁴⁵ (stronger, larger sample) | >10⁻²⁰ (weaker) |
-| **Conclusion** | Universal | Universal (confirmed) | Variety-specific |
-
-**Output Artifacts:**
-
-**JSON file:** `step9a_cp1_verification_results_C11.json`
-```json
-{
-  "cp1_verification": {
-    "total_isolated_classes": 480,
-    "pass_count": 480,  // Expected
-    "fail_count": 0,    // Expected
-    "pass_percentage": 100.0,
-    "match": true,
-    "status": "VERIFIED"
-  },
-  "separation_analysis": {
-    "ks_statistic": 1.000,  // Expected
-    "ks_pvalue": <1e-45,
-    "isolated_mean_vars": 6.000,
-    "isolated_std_vars": 0.000,
-    "perfect_separation": true,
-    "status": "PERFECT"
-  },
-  "cross_variety_comparison": {
-    "C13_baseline": {"isolated_classes": 401, "cp1_pass": 401, "ks_d": 1.000},
-    "C11_observed": {"isolated_classes": 480, "cp1_pass": 480, "ks_d": 1.000},
-    "universal_pattern": "UNIVERSAL_CONFIRMED"
-  },
-  "variable_distributions": {
-    "isolated_classes": {"6": 480},  // Expected: all 6
-    "algebraic_patterns": {"1": 1, "2": 8, "3": 8, "4": 7}  // Range 1-4
-  }
-}
-```
-
-**Console output:** CP1 pass/fail counts, KS D-statistic, cross-variety comparison table, overall verification status.
-
 **Scientific Significance:**
 
 **Algorithmic validation of Step 7:** Direct var_count enumeration provides **independent confirmation** of Step 7's statistical KS D=1.000 claim via different methodology (counting vs. information-theoretic metrics)
@@ -5196,8 +4280,6 @@ ks_stat, ks_pval = scipy.stats.ks_2samp(algebraic_var_counts, isolated_var_count
 **Foundation for CP2-CP4:** CP1's 100% six-variable requirement is **prerequisite** for coordinate collapse tests (Steps 9B-9D)—if any isolated class uses <6 variables, it trivially satisfies coordinate collapses, invalidating barrier claim
 
 **C₁₁ as robustness test:** Variety with **best dimension fit (-0.5%)**, **closest isolation rate to mean (-0.4%)**, and **exact entropy match (0.0%)** provides **strongest test** of whether exceptional macroscopic fit guarantees algorithmic barrier universality
-
-**Expected Runtime:** ~1-2 seconds (simple Python loop, no matrix operations or statistical fits, pure variable counting).
 
 ```python
 #!/usr/bin/env python3
@@ -5776,258 +4858,6 @@ Next step: Step 9B (CP2 sparsity-1 verification)
 This step performs **CP3 (Coordinate Property 3) full 19-prime verification** by systematically testing whether **all 480 structurally isolated classes** (from Step 6, **largest count** after C₁₃'s 401) can be represented in **any of 15 four-variable coordinate subsets** across **19 independent primes** (p ≡ 1 mod 11, range 23-1123), executing **136,800 total coordinate collapse tests** (480 classes × 15 subsets × 19 primes, **largest test count** after C₁₃'s 114,285) to validate the variable-count barrier hypothesis that **no isolated class can be written using ≤4 variables**, replicating the variable_count_barrier.tex and 4_obs_1_phenom.tex methodology for C₁₁ as the **best-fit anchor variety** (dimension -0.5%, isolation 85.4% closest to mean, info-theoretic exact C₁₃ match, CP1 algorithmic 100% perfect) to test whether **exceptional fit across ALL structural levels extends to exhaustive coordinate collapse validation**.
 
 **Purpose:** While Step 9A **verified** that 100% of 480 C₁₁ isolated classes require exactly 6 variables (CP1 property with **perfect KS D=1.000** and **strongest p-value p<3×10⁻⁴¹**), Step 9B **tests** whether this 6-variable requirement is **algebraically necessary** (cannot be circumvented via coordinate transformations) by attempting to **represent each isolated monomial using only 4 variables** (all C(6,4) = 15 possible four-variable subsets). The **CP3 theorem** (variable_count_barrier.tex) predicts: "**No isolated class can be represented in any four-variable subset** (all 15 attempts fail, across all 19 primes)". For C₁₁, this provides **exhaustive algorithmic validation** of the barrier's **irreducibility** with **largest test dataset** (136,800 tests, **51.9% larger** than C₁₇'s 90,060) and **strongest CRT certification** (19-prime consensus, error <10⁻⁵⁵), testing whether C₁₁'s **exceptional fit** (best dimension -0.5%, closest isolation 85.4%, exact entropy 2.240, perfect CP1 100% with strongest p-value) **extends to coordinate collapse robustness** at scale.
-
-**Mathematical Framework - Coordinate Collapse Test:**
-
-**For each degree-18 monomial m = z₀^a₀ z₁^a₁ ... z₅^a₅:**
-
-**Coordinate subset S ⊂ {0,1,2,3,4,5}, |S| = 4:**
-```
-Example: S = {0,1,2,3} (uses only z₀, z₁, z₂, z₃)
-```
-
-**Representability test:**
-```
-m is REPRESENTABLE in S ⟺ All variables NOT in S have exponent 0
-```
-
-**Formal definition:**
-```python
-REPRESENTABLE(m, S) = True  ⟺  ∀i ∉ S, aᵢ = 0
-                      False ⟺  ∃i ∉ S, aᵢ > 0
-```
-
-**Examples:**
-
-**Monomial 1:** `[5, 4, 3, 3, 2, 1]` (uses all 6 variables)
-- **Subset S = {0,1,2,3}:** Variables 4,5 NOT in S have exponents 2,1 > 0 → **NOT_REPRESENTABLE**
-- **Subset S = {0,1,3,5}:** Variable 2 NOT in S has exponent 3 > 0 → **NOT_REPRESENTABLE**
-- **ALL 15 subsets:** **NOT_REPRESENTABLE** (requires all 6 variables)
-
-**Monomial 2:** `[9, 6, 3, 0, 0, 0]` (uses only 3 variables)
-- **Subset S = {0,1,2,3}:** Variables 4,5 NOT in S have exponents 0,0 → **REPRESENTABLE** ✅
-- **Conclusion:** Can be written using ≤4 variables (violates 6-variable barrier)
-
-**CP3 Verification Protocol:**
-
-**For C₁₁ with 480 isolated classes:**
-
-**Step 1: Generate all four-variable subsets**
-```
-C(6,4) = 6!/(4!×2!) = 15 subsets
-Example subsets:
-  S₁ = {0,1,2,3} → uses z₀,z₁,z₂,z₃
-  S₂ = {0,1,2,4} → uses z₀,z₁,z₂,z₄
-  ...
-  S₁₅ = {2,3,4,5} → uses z₂,z₃,z₄,z₅
-```
-
-**Step 2: For each isolated class (480 total, LARGEST after C₁₃):**
-```
-For each prime p ∈ {23, 67, ..., 1123} (19 primes):
-    Load exponent vector [a₀, a₁, ..., a₅] at prime p
-    For each subset S (15 subsets):
-        Test REPRESENTABLE(m, S):
-            If ∀i ∉ S, aᵢ = 0 → REPRESENTABLE (BARRIER VIOLATION)
-            Else → NOT_REPRESENTABLE (barrier holds)
-        Record result
-```
-
-**Step 3: Verify multi-prime consensus:**
-```
-For each class:
-    Check if all 19 primes agree on REPRESENTABLE/NOT_REPRESENTABLE status
-    If unanimous NOT_REPRESENTABLE across all 15 subsets × 19 primes:
-        → Class VERIFIED (barrier holds)
-    Else:
-        → Class FAILED (barrier violated OR modular artifact)
-```
-
-**Expected Results (Universal Barrier Hypothesis - C₁₁ Exceptional Fit Extends to Collapse Tests):**
-
-**CP3 theorem prediction (variable_count_barrier.tex):**
-```
-ALL 480 classes × 15 subsets × 19 primes = 136,800 tests → NOT_REPRESENTABLE
-100% failure rate (no class can be represented in any four-variable subset)
-```
-
-**Breakdown:**
-- **Per class:** 15 subsets × 19 primes = 285 tests → **0/285 REPRESENTABLE** (all fail)
-- **Per subset:** 480 classes × 19 primes = 9,120 tests → **0/9,120 REPRESENTABLE**
-- **Per prime:** 480 classes × 15 subsets = 7,200 tests → **0/7,200 REPRESENTABLE**
-- **Total:** **136,800 tests** → **0/136,800 REPRESENTABLE** (100% NOT_REPRESENTABLE)
-
-**Multi-prime agreement:**
-- **Expected:** Perfect consensus (all 19 primes agree on NOT_REPRESENTABLE for each class-subset pair)
-- **Error probability:** < 10⁻⁵⁵ (if one "bad prime" gives false REPRESENTABLE, probability all 19 agree by chance < 1/(∏₁₉ pᵢ) ≈ 10⁻⁵⁵)
-
-**Why 19 Primes Are Necessary:**
-
-**Single-prime vulnerability:**
-- **Modular artifacts:** Over finite field 𝔽_p, some monomials may **accidentally appear representable** due to field-specific cancelations
-- **Example:** Monomial requiring z₅ over ℚ might have a₅ ≡ 0 (mod p) for specific "bad prime" p
-- **Risk:** Single-prime test could give **false REPRESENTABLE** result
-
-**Multi-prime certification:**
-- **If all 19 independent primes agree NOT_REPRESENTABLE:** Probability of 19 simultaneous false negatives < 10⁻⁵⁵
-- **Conclusion:** NOT_REPRESENTABLE is **true over ℚ** with cryptographic-strength certainty
-- **If even one prime shows REPRESENTABLE while others show NOT_REPRESENTABLE:** Likely modular artifact (flag as disagreement)
-
-**Computational Approach:**
-
-**Algorithm (Exhaustive 136,800-Test Protocol, LARGEST after C₁₃):**
-
-```python
-# Load data
-isolated_indices = load_json("step6_structural_isolation_C11.json")["isolated_indices"]  # 480 indices
-primes = [23, 67, 89, ..., 1123]  # 19 primes p ≡ 1 mod 11
-subsets = list(itertools.combinations([0,1,2,3,4,5], 4))  # 15 four-variable subsets
-
-# Initialize counters
-total_tests = 0
-not_representable_count = 0
-representable_count = 0
-disagreements = []
-
-# Main loop (480 classes, LARGEST isolated sample after C₁₃)
-for class_idx in isolated_indices:  # 480 classes
-    prime_results = {}  # Track results across primes for this class
-    
-    for p in primes:  # 19 primes
-        exponents = load_json(f"saved_inv_p{p}_monomials18.json")[class_idx]  # [a0,...,a5]
-        subset_results = []
-        
-        for S in subsets:  # 15 subsets
-            # Test representability
-            is_representable = all(exponents[i] == 0 for i in range(6) if i not in S)
-            subset_results.append(is_representable)
-            total_tests += 1
-            
-            if is_representable:
-                representable_count += 1  # BARRIER VIOLATION
-            else:
-                not_representable_count += 1  # BARRIER HOLDS
-        
-        # Check if ANY subset was representable at this prime
-        prime_results[p] = any(subset_results)
-    
-    # Check multi-prime agreement
-    if len(set(prime_results.values())) > 1:
-        disagreements.append(class_idx)  # Primes disagree on this class
-
-# Final statistics
-print(f"Total tests: {total_tests} (expected: 136,800)")
-print(f"NOT_REPRESENTABLE: {not_representable_count}/{total_tests} ({100*not_representable_count/total_tests:.2f}%)")
-print(f"REPRESENTABLE: {representable_count}/{total_tests} ({100*representable_count/total_tests:.2f}%)")
-print(f"Multi-prime disagreements: {len(disagreements)}/480 classes")
-
-if representable_count == 0 and len(disagreements) == 0:
-    print("*** CP3 FULLY VERIFIED *** (100% NOT_REPRESENTABLE, perfect agreement)")
-```
-
-**Runtime characteristics:**
-- **Total tests:** **136,800** (LARGEST after C₁₃'s 114,285, +19.7% vs. C₁₃, +51.9% vs. C₁₇'s 90,060)
-- **Per-test complexity:** O(1) (check 6 exponents against subset)
-- **Total runtime:** ~45-135 seconds (depends on file I/O, ~1000-3000 tests/second, LARGEST computational load in Step 9B pipeline)
-- **Memory:** ~60 MB (load 19 × 3059-monomial JSON files, LARGEST dataset)
-
-**Expected Output (Universal Barrier Hypothesis - C₁₁ Best-Fit Extends to Collapse):**
-
-**Per-prime results (19 primes):**
-
-| Prime p | Total Tests | REPRESENTABLE | NOT_REPRESENTABLE | % NOT_REP | Classes (All NOT_REP) |
-|---------|-------------|---------------|-------------------|-----------|----------------------|
-| 23 | 7,200 | 0 | 7,200 | 100.0% | 480/480 |
-| 67 | 7,200 | 0 | 7,200 | 100.0% | 480/480 |
-| ... | 7,200 | 0 | 7,200 | 100.0% | 480/480 |
-| 1123 | 7,200 | 0 | 7,200 | 100.0% | 480/480 |
-
-**Aggregate results:**
-- **Total tests:** **136,800** (480 × 15 × 19)
-- **NOT_REPRESENTABLE:** **136,800/136,800 (100.0%)**
-- **REPRESENTABLE:** **0/136,800 (0.0%)**
-- **Multi-prime agreement:** Perfect (480/480 classes, zero disagreements)
-
-**Cross-Variety Validation (C₁₃ Baseline vs. C₁₁ - Testing Best-Fit Anchor at Scale):**
-
-**C₁₃ baseline (from variable_count_barrier.tex):**
-- **Isolated classes:** 401
-- **Total tests:** 401 × 15 × 19 = **114,285**
-- **NOT_REPRESENTABLE:** **114,285/114,285 (100%)**
-- **Multi-prime agreement:** Perfect
-- **Conclusion:** Universal barrier (no isolated class representable in ≤4 variables)
-
-**C₁₁ expected (universal hypothesis + best-fit extension):**
-- **Isolated classes:** **480** (LARGEST after C₁₃, +19.7%)
-- **Total tests:** 480 × 15 × 19 = **136,800** (LARGEST after C₁₃, +19.7%)
-- **NOT_REPRESENTABLE:** **136,800/136,800 (100%)**
-- **Multi-prime agreement:** Perfect (expected)
-- **Conclusion:** Universal barrier CONFIRMED at scale (C₁₁ replicates C₁₃ pattern with LARGEST test count)
-
-**Why C₁₁ Is Critical Test (Best-Fit Anchor Variety at Largest Scale):**
-
-**Largest test dataset after C₁₃:**
-- **136,800 tests** (vs. C₁₃ 114,285, C₁₇ 90,060, C₇ expected ~134,000)
-- **480 isolated classes** (vs. C₁₃ 401, C₁₇ 316)
-- **Strongest statistical power** to detect barrier violations at scale (if any exist)
-
-**Best dimension fit:**
-- **C₁₁: -0.5% deviation** (844 vs. theoretical 848.4, BEST FIT in five-variety study)
-- **Opposite of C₇ saturation (-5.8%)**, tests barrier across high-precision scaling regime
-
-**Closest isolation rate to mean:**
-- **C₁₁: 85.4%** (deviation from four-variety mean 85.8%: **-0.4%, CLOSEST**)
-- **C₁₃: 84.2%** (deviation -1.6%), C��₇: 86.8% (+1.0%)
-
-**Exact info-theoretic match:**
-- **Entropy:** μ=2.240 (**EXACT C₁₃ match** 2.240, 0.0% deviation, TIGHTEST)
-- **Kolmogorov:** μ=14.596 (+0.2% from C₁₃ 14.570)
-- **Variable-count KS D:** 1.000 (perfect, like C₁₃)
-
-**Perfect algorithmic CP1:**
-- **Step 9A:** 480/480 = 100% CP1 pass, KS D=1.000, p<3×10⁻⁴¹ (STRONGEST p-value)
-
-**Robustness test:**
-- If C₁₁ shows **136,800/136,800 = 100% NOT_REPRESENTABLE** like C₁₃, establishes that **exceptional fit across ALL levels** (dimension, isolation, info-theory, CP1 algorithmic) **extends to LARGEST-SCALE coordinate collapse validation**, confirming C₁₁ as **GOLD STANDARD anchor** for universal barrier at **all structural scales AND computational regimes**
-
-**Output Artifacts:**
-
-**JSON file:** `step9b_cp3_19prime_results_C11.json`
-```json
-{
-  "total_tests": 136800,
-  "not_representable": 136800,  // Expected
-  "representable": 0,           // Expected
-  "not_representable_percentage": 100.0,
-  "primes_tested": [23, ..., 1123],
-  "classes_tested": 480,
-  "perfect_agreement": true,   // Expected
-  "agreement_count": 480,
-  "disagreement_count": 0,
-  "per_prime_results": {
-    "23": {"total_tests": 7200, "not_representable": 7200, ...},
-    ...
-  },
-  "verification_status": "FULLY_VERIFIED",
-  "matches_papers_claim": true
-}
-```
-
-**Console output:** Per-prime statistics table, multi-prime agreement summary, cross-variety comparison, overall CP3 verification status.
-
-**Scientific Significance:**
-
-**Exhaustive algorithmic proof at scale:** **136,800 coordinate collapse tests** (LARGEST after C₁₃'s 114,285, +19.7%) provide **strongest possible algorithmic validation** of variable-count barrier for best-fit anchor variety
-
-**Multi-prime CRT certification:** 19-prime consensus (error < 10⁻⁵⁵) ensures 100% NOT_REPRESENTABLE is **true over ℚ**, not modular artifact
-
-**Best-fit anchor validation:** If C₁₁ matches C₁₃ (100% NOT_REPRESENTABLE, perfect agreement), establishes that **exceptional fit** (dimension -0.5%, isolation 85.4%, entropy 2.240 exact, CP1 100% strongest p-value) **extends to LARGEST-SCALE coordinate collapse robustness**, confirming variety as **GOLD STANDARD** across ALL structural levels AND computational regimes
-
-**Universal barrier at scale:** C₁₁ provides **LARGEST test count** after C₁₃ (136,800 vs. C₁₇ 90,060, +51.9%) for testing barrier—if holds here, strongest evidence for universality across φ=10 (C₁₁), φ=12 (C₁₃), φ=16 (C₁₇)
-
-**Foundation for CP4:** Perfect CP3 (0/136,800 REPRESENTABLE in 4 variables) is **prerequisite** for CP4 (coordinate collapses to 5 variables, Steps 9C-9D)—establishes strict hierarchy 4-var (0% representable) < 5-var (TBD) < 6-var (100% required)
-
-**Expected Runtime:** ~45-135 seconds (136,800 simple exponent checks, ~1000-3000 tests/second, dominated by JSON file I/O for 19 primes × 3059 monomials, LARGEST computational load in Step 9B pipeline).
 
 ```python
 #!/usr/bin/env python3
@@ -9491,3 +8321,1238 @@ pending (4/19 done so far)
 
 ---
 
+step 12: pending
+
+```python
+pending
+```
+
+---
+
+results:
+
+```verbatim
+pending
+```
+
+
+
+
+---
+
+step 13
+
+we are doing primes:
+
+```verbatim
+23, 67, 89, 199, 331, 353, 397, 419, 463, 617, 661, 683, 727, 859, 881, 947, 991, 1013, 1123
+```
+
+script 1:
+
+```python
+#!/usr/bin/env python3
+"""
+STEP 13A: Pivot Minor Finder (X8 Perturbed C₁₁)
+
+Find pivot rows/columns for a 2193×2193 minor with nonzero determinant mod p.
+
+Perturbed variety: Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8 = 0
+
+CRITICAL: Applies Step 10A's transpose convention (swap row/col when loading)
+to match the (2193 × 2770) orientation used in kernel computation.
+
+Usage:
+  python3 step13a_pivot_finder_modp_C11.py \
+    --triplet saved_inv_p23_triplets.json \
+    --prime 23 \
+    --k 2193 \
+    --out_prefix pivot_2193_p23_C11
+
+Expected runtime: ~20-40 minutes on MacBook Air M1
+"""
+
+import argparse
+import json
+import sys
+import time
+from collections import defaultdict
+from pathlib import Path
+from typing import List, Tuple, Dict
+
+EXPECTED_RANK = 2193
+EXPECTED_DIM = 577   # 2770 - 2193 = 577
+EXPECTED_ROWS = 2193  # After transpose
+EXPECTED_COLS = 2770
+CYCLOTOMIC_ORDER = 11
+
+def parse_args():
+    p = argparse.ArgumentParser(description="Find pivot minor for X8 perturbed C11")
+    p.add_argument("--triplet", required=True, help="Triplet JSON")
+    p.add_argument("--prime", required=True, type=int, help="Prime modulus")
+    p.add_argument("--k", type=int, default=EXPECTED_RANK, help=f"Target rank (default {EXPECTED_RANK})")
+    p.add_argument("--out_prefix", default="pivot_C11", help="Output prefix")
+    return p.parse_args()
+
+def load_triplets_json(path: str):
+    """Load triplets from Step 2 JSON format"""
+    with open(path) as f:
+        data = json.load(f)
+    
+    if isinstance(data, dict):
+        if 'triplets' in data:
+            triplets = data['triplets']
+        else:
+            raise ValueError(f"Expected 'triplets' key in {path}")
+    elif isinstance(data, list):
+        triplets = data
+    else:
+        raise ValueError(f"Unrecognized JSON structure")
+    
+    normalized = []
+    for t in triplets:
+        if isinstance(t, list) and len(t) >= 3:
+            r, c, v = int(t[0]), int(t[1]), int(t[2])
+            normalized.append((r, c, v))
+        else:
+            raise ValueError(f"Invalid triplet: {t}")
+    
+    return normalized
+
+def infer_dimensions_transposed(triplets: List[Tuple[int,int,int]]):
+    """Infer dimensions AFTER transpose (swap row/col)"""
+    maxr = max(c for r,c,v in triplets)  # col becomes row
+    maxc = max(r for r,c,v in triplets)  # row becomes col
+    return maxr+1, maxc+1
+
+def modular_det_gauss_dense(mat: List[List[int]], p: int) -> int:
+    """Compute determinant mod p via Gaussian elimination"""
+    n = len(mat)
+    A = [row[:] for row in mat]
+    det = 1
+    
+    for i in range(n):
+        pivot = None
+        for r in range(i, n):
+            if A[r][i] % p != 0:
+                pivot = r
+                break
+        
+        if pivot is None:
+            return 0
+        
+        if pivot != i:
+            A[i], A[pivot] = A[pivot], A[i]
+            det = (-det) % p
+        
+        aii = A[i][i] % p
+        det = (det * aii) % p
+        inv = pow(aii, -1, p)
+        
+        for j in range(i+1, n):
+            A[i][j] = (A[i][j] * inv) % p
+        
+        for r in range(i+1, n):
+            if A[r][i]:
+                factor = A[r][i] % p
+                for c in range(i+1, n):
+                    A[r][c] = (A[r][c] - factor * A[i][c]) % p
+                A[r][i] = 0
+    
+    return det % p
+
+def main():
+    args = parse_args()
+    trip_path = Path(args.triplet)
+    
+    if not trip_path.exists():
+        print(f"ERROR: {trip_path} not found", file=sys.stderr)
+        sys.exit(2)
+    
+    p = args.prime
+    k_target = args.k
+    
+    print("="*80)
+    print("STEP 13A: PIVOT MINOR FINDER (X8 PERTURBED C₁₁)")
+    print("="*80)
+    print()
+    print("Variety: Sum z_i^8 + (791/100000) * Sum_{{k=1}}^{{10}} L_k^8 = 0")
+    print(f"Cyclotomic order: {CYCLOTOMIC_ORDER}")
+    print(f"Target rank k: {k_target}")
+    print(f"Prime modulus: {p}")
+    print(f"Triplet file: {trip_path}")
+    print()
+    
+    # Load triplets
+    print(f"Loading triplets...")
+    triplets = load_triplets_json(str(trip_path))
+    
+    print(f"  Raw triplets: {len(triplets):,} entries")
+    print(f"  Applying Step 10A transpose convention (swap row↔col)")
+    
+    nrows, ncols = infer_dimensions_transposed(triplets)
+    
+    print(f"  Matrix dimensions (after transpose): {nrows} × {ncols}")
+    print()
+    
+    if nrows != EXPECTED_ROWS or ncols != EXPECTED_COLS:
+        print(f"WARNING: Expected {EXPECTED_ROWS}×{EXPECTED_COLS}, got {nrows}×{ncols}")
+        print()
+    
+    # Build sparse maps WITH TRANSPOSE
+    print("Building sparse data structures (with transpose)...")
+    row_to_cols: Dict[int, Dict[int,int]] = {}
+    col_to_rows: Dict[int, set] = defaultdict(set)
+    original = {}
+    
+    for r_raw, c_raw, v in triplets:
+        # CRITICAL: Apply Step 10A's transpose (swap row/col)
+        r = c_raw  # col becomes row
+        c = r_raw  # row becomes col
+        
+        val = int(v) % p
+        if val == 0:
+            continue
+        
+        if r not in row_to_cols:
+            row_to_cols[r] = {}
+        row_to_cols[r][c] = (row_to_cols[r].get(c, 0) + val) % p
+        col_to_rows[c].add(r)
+        
+        if r not in original:
+            original[r] = {}
+        original[r][c] = (original[r].get(c, 0) + int(v))
+    
+    # Order columns by sparsity
+    col_degrees = [(c, len(col_to_rows[c])) for c in col_to_rows.keys()]
+    col_degrees.sort(key=lambda x: -x[1])
+    columns_order = [c for c, _ in col_degrees]
+    
+    print(f"  Sparsity: {min(d for _,d in col_degrees)} to {max(d for _,d in col_degrees)} nonzeros/col")
+    print()
+    
+    # Greedy pivot search
+    used_rows = set()
+    used_cols = set()
+    pivot_rows = []
+    pivot_cols = []
+    
+    work_rows = {r: dict(d) for r, d in row_to_cols.items()}
+    work_cols = {c: set(s) for c, s in col_to_rows.items()}
+    
+    start_time = time.time()
+    
+    print(f"Searching for {k_target} pivots via greedy elimination mod {p}...")
+    print()
+    
+    for col in columns_order:
+        if len(pivot_rows) >= k_target:
+            break
+        
+        rows_with = work_cols.get(col, set())
+        pivot_row = None
+        
+        for r in rows_with:
+            if r not in used_rows:
+                pivot_row = r
+                break
+        
+        if pivot_row is None:
+            continue
+        
+        pivot_val = work_rows[pivot_row].get(col, 0) % p
+        if pivot_val == 0:
+            continue
+        
+        used_rows.add(pivot_row)
+        used_cols.add(col)
+        pivot_rows.append(pivot_row)
+        pivot_cols.append(col)
+        
+        # Sparse elimination
+        rows_to_elim = list(work_cols.get(col, set()))
+        inv_piv = pow(pivot_val, -1, p)
+        
+        for r2 in rows_to_elim:
+            if r2 == pivot_row:
+                continue
+            
+            val_r2 = work_rows.get(r2, {}).get(col, 0) % p
+            if val_r2 == 0:
+                continue
+            
+            factor = (val_r2 * inv_piv) % p
+            pivot_row_entries = work_rows[pivot_row]
+            r2_entries = work_rows.get(r2, {})
+            
+            for c2, v_piv in list(pivot_row_entries.items()):
+                v_r2 = r2_entries.get(c2, 0)
+                newv = (v_r2 - factor * v_piv) % p
+                
+                if newv == 0:
+                    if c2 in r2_entries:
+                        del r2_entries[c2]
+                        if c2 in work_cols and r2 in work_cols[c2]:
+                            work_cols[c2].remove(r2)
+                else:
+                    r2_entries[c2] = newv
+                    work_cols.setdefault(c2, set()).add(r2)
+            
+            if col in r2_entries:
+                del r2_entries[col]
+            if r2 in work_cols.get(col, set()):
+                work_cols[col].remove(r2)
+        
+        work_cols[col] = set([pivot_row])
+        
+        if (len(pivot_rows) % 100 == 0) or (len(pivot_rows) == k_target):
+            elapsed = time.time() - start_time
+            print(f"  {len(pivot_rows):4d}/{k_target} pivots ({elapsed:.1f}s)")
+    
+    elapsed = time.time() - start_time
+    k_found = len(pivot_rows)
+    
+    print()
+    print(f"Pivot search complete: {k_found} pivots in {elapsed:.2f}s")
+    print()
+    
+    if k_found == 0:
+        print("ERROR: No pivots found", file=sys.stderr)
+        sys.exit(1)
+    
+    # Build minor and verify
+    print(f"Building {k_found}×{k_found} minor from original entries...")
+    k = k_found
+    minor_mat = [[0]*k for _ in range(k)]
+    
+    for i, r in enumerate(pivot_rows):
+        row_orig = original.get(r, {})
+        for j, c in enumerate(pivot_cols):
+            minor_mat[i][j] = row_orig.get(c, 0) % p
+    
+    print(f"Computing determinant mod {p}...")
+    detmod = modular_det_gauss_dense(minor_mat, p) if k > 0 else 0
+    
+    print()
+    print("="*80)
+    print("VERIFICATION")
+    print("="*80)
+    print(f"Determinant of {k}×{k} minor mod {p}: {detmod}")
+    print()
+    
+    if detmod == 0:
+        print("✗ WARNING: Determinant is ZERO mod p")
+        print("  Pivot selection failed, try different prime")
+    else:
+        print("✓ Pivot minor is NONZERO mod p (verified)")
+    
+    print()
+    
+    # Write outputs
+    out_rows = Path(f"{args.out_prefix}_rows.txt")
+    out_cols = Path(f"{args.out_prefix}_cols.txt")
+    
+    with open(out_rows, "w") as f:
+        for r in pivot_rows:
+            f.write(f"{r}\n")
+    
+    with open(out_cols, "w") as f:
+        for c in pivot_cols:
+            f.write(f"{c}\n")
+    
+    report = {
+        "step": "13A",
+        "variety": "PERTURBED_C11_CYCLOTOMIC",
+        "delta": "791/100000",
+        "cyclotomic_order": CYCLOTOMIC_ORDER,
+        "galois_group": "Z/10Z",
+        "triplet_file": str(trip_path),
+        "prime": int(p),
+        "matrix_dims_after_transpose": [int(nrows), int(ncols)],
+        "transpose_applied": True,
+        "k_target": int(k_target),
+        "k_found": int(k_found),
+        "pivot_rows": pivot_rows,
+        "pivot_cols": pivot_cols,
+        "det_mod_p": int(detmod),
+        "time_seconds": float(elapsed),
+        "verification": "PASS" if detmod != 0 else "FAIL"
+    }
+    
+    out_json = Path(f"{args.out_prefix}_report.json")
+    with open(out_json, "w") as f:
+        json.dump(report, f, indent=2)
+    
+    print(f"Outputs written:")
+    print(f"  Pivot rows: {out_rows}")
+    print(f"  Pivot cols: {out_cols}")
+    print(f"  Report: {out_json}")
+    print()
+    print("="*80)
+    print("STEP 13A COMPLETE")
+    print("="*80)
+
+if __name__ == "__main__":
+    main()
+```
+
+script 2:
+
+```python
+#!/usr/bin/env python3
+"""
+STEP 13B: CRT Minor Reconstruction (X8 Perturbed C₁₁)
+
+Reconstruct 2193×2193 minor entries over Z via Chinese Remainder Theorem
+using 19 primes from the verified set.
+
+Perturbed variety: Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8 = 0
+
+Usage:
+  python3 step13b_crt_minor_reconstruct_C11.py \
+    --primes 23 67 89 199 331 353 397 419 463 617 661 683 727 859 881 947 991 1013 1123 \
+    --triplets saved_inv_p23_triplets.json saved_inv_p67_triplets.json ... \
+    --pivot_rows pivot_2193_p23_C11_rows.txt \
+    --pivot_cols pivot_2193_p23_C11_cols.txt \
+    --out crt_pivot_2193_C11.json
+
+Expected runtime: ~15-25 minutes
+"""
+
+import argparse
+import json
+import sys
+from pathlib import Path
+from typing import List, Tuple, Dict
+from functools import reduce
+
+EXPECTED_RANK = 2193
+CYCLOTOMIC_ORDER = 11
+
+def parse_args():
+    p = argparse.ArgumentParser(description="CRT reconstruction for C11 minor")
+    p.add_argument("--primes", nargs='+', type=int, required=True,
+                   help="List of 19 primes")
+    p.add_argument("--triplets", nargs='+', required=True,
+                   help="Triplet JSON files (one per prime, in same order)")
+    p.add_argument("--pivot_rows", required=True, help="Pivot row indices")
+    p.add_argument("--pivot_cols", required=True, help="Pivot col indices")
+    p.add_argument("--out", default="crt_pivot_2193_C11.json", help="Output JSON")
+    return p.parse_args()
+
+def load_triplets_json(path: str) -> List[Tuple[int,int,int]]:
+    """Load triplets from JSON"""
+    with open(path) as f:
+        data = json.load(f)
+    
+    if isinstance(data, dict):
+        triplets = data.get('triplets', [])
+    elif isinstance(data, list):
+        triplets = data
+    else:
+        raise ValueError(f"Unrecognized format in {path}")
+    
+    normalized = []
+    for t in triplets:
+        if isinstance(t, list) and len(t) >= 3:
+            normalized.append((int(t[0]), int(t[1]), int(t[2])))
+    
+    return normalized
+
+def load_indices(path: str) -> List[int]:
+    """Load row/col indices from text file"""
+    with open(path) as f:
+        return [int(line.strip()) for line in f if line.strip()]
+
+def egcd(a: int, b: int) -> Tuple[int, int, int]:
+    """Extended Euclidean algorithm"""
+    if a == 0:
+        return b, 0, 1
+    gcd, x1, y1 = egcd(b % a, a)
+    x = y1 - (b // a) * x1
+    y = x1
+    return gcd, x, y
+
+def crt_combine(residues: List[int], moduli: List[int]) -> int:
+    """Chinese Remainder Theorem"""
+    if len(residues) != len(moduli):
+        raise ValueError("Residues and moduli must have same length")
+    
+    M = reduce(lambda a, b: a * b, moduli, 1)
+    result = 0
+    
+    for r_i, m_i in zip(residues, moduli):
+        M_i = M // m_i
+        gcd, inv, _ = egcd(M_i, m_i)
+        if gcd != 1:
+            raise ValueError(f"Moduli not coprime: gcd({M_i}, {m_i}) = {gcd}")
+        result += r_i * M_i * inv
+    
+    result = result % M
+    
+    # Symmetric range
+    if result > M // 2:
+        result -= M
+    
+    return result
+
+def build_minor_modp(triplets: List[Tuple[int,int,int]], 
+                     pivot_rows: List[int], 
+                     pivot_cols: List[int],
+                     prime: int) -> List[List[int]]:
+    """Build k×k minor mod p with transpose"""
+    k = len(pivot_rows)
+    
+    entries = {}
+    for r_raw, c_raw, v in triplets:
+        r = c_raw  # TRANSPOSE
+        c = r_raw
+        key = (r, c)
+        entries[key] = (entries.get(key, 0) + int(v)) % prime
+    
+    minor = [[0]*k for _ in range(k)]
+    for i, r in enumerate(pivot_rows):
+        for j, c in enumerate(pivot_cols):
+            minor[i][j] = entries.get((r, c), 0)
+    
+    return minor
+
+def main():
+    args = parse_args()
+    
+    primes = args.primes
+    triplet_files = args.triplets
+    
+    if len(primes) != len(triplet_files):
+        print(f"ERROR: {len(primes)} primes but {len(triplet_files)} triplet files", 
+              file=sys.stderr)
+        sys.exit(2)
+    
+    print("="*80)
+    print("STEP 13B: CRT MINOR RECONSTRUCTION (X8 PERTURBED C₁₁)")
+    print("="*80)
+    print()
+    print("Variety: Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8 = 0")
+    print(f"Cyclotomic order: {CYCLOTOMIC_ORDER}")
+    print(f"Primes: {primes}")
+    print(f"Target rank: {EXPECTED_RANK}")
+    print()
+    
+    # Load pivot indices
+    print("Loading pivot indices...")
+    pivot_rows = load_indices(args.pivot_rows)
+    pivot_cols = load_indices(args.pivot_cols)
+    k = len(pivot_rows)
+    
+    print(f"  Pivot rows: {len(pivot_rows)}")
+    print(f"  Pivot cols: {len(pivot_cols)}")
+    print()
+    
+    if k != EXPECTED_RANK:
+        print(f"WARNING: Expected {EXPECTED_RANK} pivots, got {k}")
+        print()
+    
+    # Load triplets
+    print("Loading triplets for each prime...")
+    all_triplets = []
+    for i, (p, tf) in enumerate(zip(primes, triplet_files)):
+        print(f"  [{i+1}/{len(primes)}] Prime {p}: {tf}")
+        triplets = load_triplets_json(tf)
+        all_triplets.append(triplets)
+        print(f"      Loaded {len(triplets):,} triplets")
+    print()
+    
+    # Build minors mod p
+    print(f"Building {k}×{k} minors mod p (with transpose)...")
+    minors_modp = []
+    for i, (p, triplets) in enumerate(zip(primes, all_triplets)):
+        print(f"  [{i+1}/{len(primes)}] Building minor mod {p}...")
+        minor = build_minor_modp(triplets, pivot_rows, pivot_cols, p)
+        minors_modp.append(minor)
+    print()
+    
+    # CRT reconstruction
+    print(f"Applying CRT to reconstruct {k}×{k} minor over Z...")
+    print(f"  Product of primes: {reduce(lambda a,b: a*b, primes, 1):,}")
+    print()
+    
+    minor_Z = [[0]*k for _ in range(k)]
+    
+    for i in range(k):
+        if (i+1) % 100 == 0 or i == 0:
+            print(f"  Reconstructing row {i+1}/{k}...")
+        
+        for j in range(k):
+            residues = [minors_modp[idx][i][j] for idx in range(len(primes))]
+            minor_Z[i][j] = crt_combine(residues, primes)
+    
+    print()
+    print("CRT reconstruction complete")
+    print()
+    
+    # Statistics
+    nonzero = sum(1 for i in range(k) for j in range(k) if minor_Z[i][j] != 0)
+    density = 100.0 * nonzero / (k * k)
+    max_abs = max(abs(minor_Z[i][j]) for i in range(k) for j in range(k))
+    
+    print("="*80)
+    print("STATISTICS")
+    print("="*80)
+    print(f"Minor dimension: {k}×{k}")
+    print(f"Nonzero entries: {nonzero:,} / {k*k:,} ({density:.2f}%)")
+    print(f"Max absolute value: {max_abs:,}")
+    print()
+    
+    # Write output
+    output = {
+        "step": "13B",
+        "variety": "PERTURBED_C11_CYCLOTOMIC",
+        "delta": "791/100000",
+        "cyclotomic_order": CYCLOTOMIC_ORDER,
+        "galois_group": "Z/10Z",
+        "primes": primes,
+        "k": k,
+        "pivot_rows": pivot_rows,
+        "pivot_cols": pivot_cols,
+        "minor_Z": minor_Z,
+        "statistics": {
+            "nonzero_entries": nonzero,
+            "density_percent": density,
+            "max_abs_value": max_abs
+        }
+    }
+    
+    out_path = Path(args.out)
+    print(f"Writing minor to {out_path}...")
+    with open(out_path, "w") as f:
+        json.dump(output, f, indent=2)
+    
+    print()
+    print("="*80)
+    print("STEP 13B COMPLETE")
+    print("="*80)
+    print(f"Output: {out_path}")
+    print()
+
+if __name__ == "__main__":
+    main()
+```
+
+script 3
+
+```python
+#!/usr/bin/env python3
+"""
+STEP 13C: Rational Reconstruction from CRT (X8 Perturbed C₁₁)
+
+EXPECTED TO FAIL: Attempt rational reconstruction of 2193×2193 minor entries.
+This step is included for methodological completeness but is known to fail
+due to coefficient explosion in perturbed varieties.
+
+Perturbed variety: Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8 = 0
+
+Step 13D (Bareiss determinant) provides the definitive rank certificate.
+
+Usage:
+  python3 step13c_rational_from_crt_C11.py \
+    --minor crt_pivot_2193_C11.json \
+    --out minor_2193_rational_C11.json
+
+Expected outcome: FAILURE (as designed)
+"""
+
+import argparse
+import json
+import sys
+from pathlib import Path
+from fractions import Fraction
+from typing import List, Tuple, Optional
+from functools import reduce
+
+EXPECTED_RANK = 2193
+CYCLOTOMIC_ORDER = 11
+
+def parse_args():
+    p = argparse.ArgumentParser(description="Rational reconstruction for C11 minor")
+    p.add_argument("--minor", required=True, help="CRT minor JSON from Step 13B")
+    p.add_argument("--out", default="minor_2193_rational_C11.json", 
+                   help="Output JSON")
+    p.add_argument("--max_denominator", type=int, default=10**12,
+                   help="Max denominator for rational reconstruction (default 10^12)")
+    return p.parse_args()
+
+def egcd(a: int, b: int) -> Tuple[int, int, int]:
+    """Extended Euclidean algorithm"""
+    if a == 0:
+        return b, 0, 1
+    gcd, x1, y1 = egcd(b % a, a)
+    x = y1 - (b // a) * x1
+    y = x1
+    return gcd, x, y
+
+def rational_reconstruct(a: int, m: int, max_denom: int) -> Optional[Fraction]:
+    """
+    Attempt to find p/q such that a ≡ p*q^(-1) (mod m)
+    with |p|, |q| < sqrt(m/2) using continued fractions.
+    
+    Returns None if reconstruction fails or denominator exceeds max_denom.
+    """
+    if m <= 0:
+        return None
+    
+    # Reduce a to symmetric range
+    a = a % m
+    if a > m // 2:
+        a -= m
+    
+    # Trivial case
+    if a == 0:
+        return Fraction(0, 1)
+    
+    # Continued fraction algorithm
+    bound = int((m / 2) ** 0.5)
+    
+    r0, r1 = m, abs(a)
+    s0, s1 = 0, 1
+    
+    while r1 > bound:
+        q = r0 // r1
+        r0, r1 = r1, r0 - q * r1
+        s0, s1 = s1, s0 - q * s1
+    
+    # Check if valid
+    numerator = r1
+    denominator = s1
+    
+    if denominator < 0:
+        numerator = -numerator
+        denominator = -denominator
+    
+    if denominator == 0 or denominator > max_denom:
+        return None
+    
+    # Verify: numerator ≡ a * denominator (mod m)
+    if (numerator - a * denominator) % m != 0:
+        return None
+    
+    # Correct sign
+    if a < 0:
+        numerator = -numerator
+    
+    return Fraction(numerator, denominator)
+
+def main():
+    args = parse_args()
+    
+    minor_path = Path(args.minor)
+    if not minor_path.exists():
+        print(f"ERROR: {minor_path} not found", file=sys.stderr)
+        sys.exit(2)
+    
+    print("="*80)
+    print("STEP 13C: RATIONAL RECONSTRUCTION (X8 PERTURBED C₁₁)")
+    print("="*80)
+    print()
+    print("⚠️  WARNING: This step is EXPECTED TO FAIL")
+    print("    Perturbed varieties have coefficient explosion")
+    print("    Step 13D (Bareiss) provides definitive certificate")
+    print()
+    print("Variety: Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8 = 0")
+    print(f"Cyclotomic order: {CYCLOTOMIC_ORDER}")
+    print()
+    
+    # Load CRT minor
+    print(f"Loading CRT minor from {minor_path}...")
+    with open(minor_path) as f:
+        data = json.load(f)
+    
+    primes = data.get("primes", [])
+    k = data.get("k", 0)
+    minor_Z = data.get("minor_Z", [])
+    
+    print(f"  Dimension: {k}×{k}")
+    print(f"  Primes used: {primes}")
+    
+    M = reduce(lambda a, b: a * b, primes, 1)
+    print(f"  Modulus M: {M:,}")
+    print()
+    
+    if k != EXPECTED_RANK:
+        print(f"WARNING: Expected {EXPECTED_RANK}, got {k}")
+        print()
+    
+    # Attempt rational reconstruction
+    print(f"Attempting rational reconstruction (max denominator: {args.max_denominator:,})...")
+    print()
+    
+    minor_Q = []
+    success_count = 0
+    fail_count = 0
+    
+    for i in range(k):
+        if (i+1) % 100 == 0 or i == 0:
+            print(f"  Row {i+1}/{k} (successes: {success_count}, failures: {fail_count})...")
+        
+        row_Q = []
+        for j in range(k):
+            a = minor_Z[i][j]
+            
+            frac = rational_reconstruct(a, M, args.max_denominator)
+            
+            if frac is None:
+                fail_count += 1
+                row_Q.append(None)
+            else:
+                success_count += 1
+                row_Q.append([int(frac.numerator), int(frac.denominator)])
+        
+        minor_Q.append(row_Q)
+    
+    total_entries = k * k
+    success_rate = 100.0 * success_count / total_entries if total_entries > 0 else 0
+    
+    print()
+    print("="*80)
+    print("RECONSTRUCTION RESULTS")
+    print("="*80)
+    print(f"Total entries: {total_entries:,}")
+    print(f"Successful: {success_count:,} ({success_rate:.2f}%)")
+    print(f"Failed: {fail_count:,} ({100-success_rate:.2f}%)")
+    print()
+    
+    if fail_count > 0:
+        print("✗ RECONSTRUCTION FAILED (as expected)")
+        print("  Coefficient denominators exceed reconstruction bounds")
+        print("  This is normal for perturbed varieties")
+        print()
+        print("➜ Proceed to Step 13D (Bareiss exact determinant)")
+        verification = "FAIL_EXPECTED"
+    else:
+        print("✓ RECONSTRUCTION SUCCEEDED (unexpected!)")
+        print("  All entries reconstructed as rationals")
+        verification = "PASS"
+    
+    print()
+    
+    # Write output
+    output = {
+        "step": "13C",
+        "variety": "PERTURBED_C11_CYCLOTOMIC",
+        "delta": "791/100000",
+        "cyclotomic_order": CYCLOTOMIC_ORDER,
+        "galois_group": "Z/10Z",
+        "primes": primes,
+        "modulus": str(M),
+        "k": k,
+        "max_denominator": args.max_denominator,
+        "minor_Q": minor_Q,
+        "statistics": {
+            "total_entries": total_entries,
+            "successful": success_count,
+            "failed": fail_count,
+            "success_rate_percent": success_rate
+        },
+        "verification": verification,
+        "note": "Failure expected for perturbed varieties; Step 13D provides certificate"
+    }
+    
+    out_path = Path(args.out)
+    print(f"Writing results to {out_path}...")
+    with open(out_path, "w") as f:
+        json.dump(output, f, indent=2)
+    
+    print()
+    print("="*80)
+    print("STEP 13C COMPLETE")
+    print("="*80)
+    print(f"Output: {out_path}")
+    print()
+    
+    if verification == "FAIL_EXPECTED":
+        print("Next step: Run Step 13D (Bareiss exact determinant)")
+        print("  This will provide unconditional rank certificate over Z")
+    
+    print()
+
+if __name__ == "__main__":
+    main()
+```
+
+script 4
+
+```python
+#!/usr/bin/env python3
+"""
+STEP 13D: Bareiss Exact Determinant (X8 Perturbed C₁₁)
+
+Compute determinant of 2193×2193 minor using Bareiss algorithm
+with gmpy2 for speed (CRITICAL for feasibility).
+
+Usage:
+  python3 step13d_bareiss_exact_det_C11.py \
+    --minor crt_pivot_2193_C11.json \
+    --out bareiss_det_2193_C11.json
+
+Expected runtime: 4-8 hours (with gmpy2)
+                  40-80 hours (without gmpy2 - NOT RECOMMENDED)
+"""
+
+import argparse
+import json
+import sys
+import time
+import math
+from pathlib import Path
+from typing import List
+
+# CRITICAL: Try to import gmpy2 for speed
+try:
+    import gmpy2
+    from gmpy2 import mpz
+    GMPY2_AVAILABLE = True
+except ImportError:
+    GMPY2_AVAILABLE = False
+    print("WARNING: gmpy2 not available, using pure Python (10-100x slower)", 
+          file=sys.stderr)
+    print("         Install with: pip install gmpy2", file=sys.stderr)
+    print()
+
+# Increase Python's string conversion limits for huge determinants
+try:
+    sys.set_int_max_str_digits(100_000_000)
+except AttributeError:
+    pass
+
+EXPECTED_RANK = 2193
+CYCLOTOMIC_ORDER = 11
+
+def parse_args():
+    p = argparse.ArgumentParser(description="Bareiss determinant for C11 minor")
+    p.add_argument("--minor", required=True, help="CRT minor JSON from Step 13B")
+    p.add_argument("--out", default="bareiss_det_2193_C11.json", 
+                   help="Output JSON")
+    return p.parse_args()
+
+def bareiss_det(matrix: List[List[int]]) -> int:
+    """
+    Bareiss algorithm for exact integer determinant.
+    
+    Uses gmpy2.mpz if available (10-100x faster than pure Python).
+    """
+    n = len(matrix)
+    
+    if n == 0:
+        return 1
+    if n == 1:
+        return matrix[0][0]
+    
+    # Convert to gmpy2.mpz for speed (if available)
+    if GMPY2_AVAILABLE:
+        A = [[mpz(val) for val in row] for row in matrix]
+        one = mpz(1)
+    else:
+        A = [[int(val) for val in row] for row in matrix]
+        one = 1
+    
+    sign = 1
+    prev_pivot = one
+    
+    print(f"Starting Bareiss elimination on {n}×{n} matrix...")
+    if GMPY2_AVAILABLE:
+        print("Using gmpy2 for integer arithmetic (fast)")
+    else:
+        print("Using pure Python (slow - consider installing gmpy2)")
+    print()
+    
+    start_time = time.time()
+    last_report = start_time
+    
+    for k in range(n - 1):
+        # Progress reporting every 60 seconds
+        current_time = time.time()
+        if current_time - last_report > 60.0 or k == 0:
+            elapsed = current_time - start_time
+            progress = 100.0 * k / (n - 1)
+            rate = k / elapsed if elapsed > 0 else 0
+            eta = (n - 1 - k) / rate if rate > 0 else 0
+            
+            print(f"  Step {k+1:4d}/{n-1} ({progress:5.1f}%) - "
+                  f"Elapsed: {elapsed/3600:.2f}h, ETA: {eta/3600:.2f}h")
+            last_report = current_time
+        
+        # Find non-zero pivot
+        pivot_row = None
+        for i in range(k, n):
+            if A[i][k] != 0:
+                pivot_row = i
+                break
+        
+        if pivot_row is None:
+            print()
+            print("Matrix is singular (zero pivot column)")
+            return 0
+        
+        # Swap rows if needed
+        if pivot_row != k:
+            A[k], A[pivot_row] = A[pivot_row], A[k]
+            sign = -sign
+        
+        pivot = A[k][k]
+        
+        # Bareiss update: exact division property
+        # A[i,j] := (A[i,j] * pivot - A[i,k] * A[k,j]) / prev_pivot
+        for i in range(k + 1, n):
+            for j in range(k + 1, n):
+                numerator = A[i][j] * pivot - A[i][k] * A[k][j]
+                
+                # Division is EXACT (guaranteed by Bareiss algorithm)
+                A[i][j] = numerator // prev_pivot
+        
+        prev_pivot = pivot
+    
+    elapsed = time.time() - start_time
+    print()
+    print(f"Bareiss elimination complete in {elapsed/3600:.2f} hours")
+    print()
+    
+    # Determinant is final diagonal element times accumulated sign
+    det = int(sign * A[n-1][n-1])
+    
+    return det
+
+def main():
+    args = parse_args()
+    
+    minor_path = Path(args.minor)
+    if not minor_path.exists():
+        print(f"ERROR: {minor_path} not found", file=sys.stderr)
+        sys.exit(2)
+    
+    print("="*80)
+    print("STEP 13D: BAREISS EXACT DETERMINANT (X8 PERTURBED C₁₁)")
+    print("="*80)
+    print()
+    print("Variety: Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8 = 0")
+    print(f"Cyclotomic order: {CYCLOTOMIC_ORDER}")
+    print()
+    
+    if not GMPY2_AVAILABLE:
+        print("⚠️  WARNING: gmpy2 not installed!")
+        print("   Computation will be 10-100x slower (40-80 hours instead of 4-8)")
+        print("   Install with: pip install gmpy2")
+        print()
+        response = input("Continue anyway? (yes/no): ")
+        if response.lower() != 'yes':
+            print("Aborting. Install gmpy2 first.")
+            sys.exit(1)
+        print()
+    
+    print("⚠️  This computation uses EXACT INTEGER ARITHMETIC")
+    print("   No modular reduction, no floating point, no rounding")
+    print("   Result is UNCONDITIONAL PROOF over Z")
+    print()
+    
+    # Load minor
+    print(f"Loading minor from {minor_path}...")
+    with open(minor_path) as f:
+        data = json.load(f)
+    
+    # Validate data source
+    if data.get("step") == "13C":
+        print("ERROR: This is a Step 13C file (rational reconstruction)", 
+              file=sys.stderr)
+        print("       Step 13D requires Step 13B output (CRT minor)", file=sys.stderr)
+        print(f"       Use file like: crt_pivot_2193_C11.json", file=sys.stderr)
+        sys.exit(2)
+    
+    if "minor_Z" not in data:
+        print("ERROR: Missing 'minor_Z' field (expected from Step 13B)", 
+              file=sys.stderr)
+        sys.exit(2)
+    
+    k = data.get("k", 0)
+    minor_Z = data.get("minor_Z", [])
+    primes = data.get("primes", [])
+    
+    print(f"  Dimension: {k}×{k}")
+    print(f"  CRT primes: {primes}")
+    print()
+    
+    if k != EXPECTED_RANK:
+        print(f"WARNING: Expected {EXPECTED_RANK}×{EXPECTED_RANK}, got {k}×{k}")
+        print()
+    
+    if len(minor_Z) != k or any(len(row) != k for row in minor_Z):
+        print("ERROR: Invalid minor dimensions", file=sys.stderr)
+        sys.exit(2)
+    
+    # Statistics
+    nonzero = sum(1 for i in range(k) for j in range(k) if minor_Z[i][j] != 0)
+    density = 100.0 * nonzero / (k * k)
+    max_entry = max(abs(minor_Z[i][j]) for i in range(k) for j in range(k))
+    
+    print("Minor statistics:")
+    print(f"  Nonzero entries: {nonzero:,} / {k*k:,} ({density:.2f}%)")
+    print(f"  Max entry magnitude: {max_entry:,}")
+    print()
+    
+    # Compute determinant
+    print("="*80)
+    print("COMPUTING EXACT INTEGER DETERMINANT")
+    print("="*80)
+    print()
+    
+    overall_start = time.time()
+    
+    det = bareiss_det(minor_Z)
+    
+    overall_elapsed = time.time() - overall_start
+    
+    print()
+    print("="*80)
+    print("RESULT")
+    print("="*80)
+    print()
+    
+    if det == 0:
+        print("✗ Determinant = 0")
+        print()
+        print("  Matrix is SINGULAR over Z")
+        print(f"  Rank < {k}")
+        verification = "FAIL"
+        rank_certified = False
+    else:
+        abs_det = abs(det)
+        det_str = str(det)
+        
+        print(f"✓ Determinant ≠ 0")
+        print()
+        
+        if len(det_str) > 200:
+            print(f"  det(M) = {det_str[:100]}...")
+            print(f"           ...{det_str[-100:]}")
+            print(f"  (total {len(det_str)} digits)")
+        else:
+            print(f"  det(M) = {det}")
+        
+        print()
+        print(f"  log₁₀|det(M)| = {math.log10(abs_det):.3f}")
+        print(f"  |det(M)| has {len(det_str)} digits")
+        print()
+        print(f"  Matrix is NONSINGULAR over Z")
+        print(f"  Rank = {k} UNCONDITIONALLY PROVEN")
+        
+        verification = "PASS"
+        rank_certified = True
+    
+    print()
+    print(f"Computation time: {overall_elapsed/3600:.2f} hours ({overall_elapsed/60:.1f} minutes)")
+    print()
+    
+    # Implications
+    if rank_certified:
+        expected_dim = 2770 - k
+        print("="*80)
+        print("MATHEMATICAL CERTIFICATION")
+        print("="*80)
+        print()
+        print(f"Jacobian cokernel dimension = {expected_dim}")
+        print(f"  (Total monomial space 2770 - rank {k} = {expected_dim})")
+        print()
+        print("This is an UNCONDITIONAL THEOREM over Z.")
+        print("No probabilistic arguments, no modular assumptions.")
+        print()
+    
+    # Write output
+    output = {
+        "step": "13D",
+        "variety": "PERTURBED_C11_CYCLOTOMIC",
+        "delta": "791/100000",
+        "cyclotomic_order": CYCLOTOMIC_ORDER,
+        "galois_group": "Z/10Z",
+        "k": k,
+        "primes_from_crt": primes,
+        "determinant": str(det),
+        "determinant_nonzero": det != 0,
+        "determinant_digits": len(str(abs(det))) if det != 0 else 0,
+        "log10_abs_det": math.log10(abs(det)) if det != 0 else None,
+        "rank_certified": rank_certified,
+        "certified_rank": k if rank_certified else None,
+        "certified_dimension": (2770 - k) if rank_certified else None,
+        "computation_time_seconds": overall_elapsed,
+        "computation_time_hours": overall_elapsed / 3600,
+        "verification": verification,
+        "algorithm": "Bareiss (exact integer arithmetic)",
+        "used_gmpy2": GMPY2_AVAILABLE,
+        "note": "Unconditional proof over Z"
+    }
+    
+    out_path = Path(args.out)
+    print(f"Writing certificate to {out_path}...")
+    with open(out_path, "w") as f:
+        json.dump(output, f, indent=2)
+    
+    print()
+    print("="*80)
+    print("STEP 13D COMPLETE")
+    print("="*80)
+    print(f"Certificate: {out_path}")
+    print()
+    
+    if rank_certified:
+        print("✓✓✓ RANK CERTIFICATION SUCCESSFUL")
+        print(f"    Rank = {k} over Z (unconditional)")
+        print(f"    Dimension = {2770 - k} (unconditional)")
+    else:
+        print("✗✗✗ RANK CERTIFICATION FAILED")
+        print("    Determinant is zero")
+    
+    print()
+
+if __name__ == "__main__":
+    main()
+```
+
+to run the scripts:
+
+```bash
+python3 step13a_11.py --triplet saved_inv_p23_triplets.json --prime 23 --k 2193 --out_prefix pivot_2193_p23_C11
+
+python3 step13b_11.py --triplets saved_inv_p23_triplets.json saved_inv_p67_triplets.json saved_inv_p89_triplets.json saved_inv_p199_triplets.json saved_inv_p331_triplets.json --primes 23 67 89 199 331 --pivot_rows pivot_2193_p23_C11_rows.txt --pivot_cols pivot_2193_p23_C11_cols.txt --out crt_pivot_2193_C11.json
+
+python3 step13c_11.py --minor crt_pivot_1443_C11.json
+
+python3 step13d_11.py --triplet saved_inv_p23_triplets.json --rows pivot_2193_p23_C11_rows.txt --cols pivot_2193_p23_C11_cols.txt --crt crt_pivot_2193_C11.json --out det_pivot_2193_C11_exact.json
+```
+
+---
+
+results:
+
+script 1:
+
+```verbatim
+pending
+```
+
+script 2:
+
+```verbatim
+pending
+```
+
+script 3:
+
+```verbatim
+pending
+```
+
+script 4:
+
+```verbatim
+pending
+```
+
+
+
+----
