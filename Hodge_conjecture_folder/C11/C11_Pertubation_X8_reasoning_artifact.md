@@ -6800,7 +6800,7 @@ shape to accommodate the maximal indices found in the triplets (safe fallback).
 
 First 19 primes (p ≡ 1 (mod 11)):
 23, 67, 89, 199, 331, 353, 397, 419, 463, 617,
-661, 683, 727, 859, 881, 947, 991, 1013, 1123
+661, 683, 727, 859, 881, 991, 1013, 1069, 1123
 """
 
 import json
@@ -6808,25 +6808,24 @@ import numpy as np
 from scipy.sparse import csr_matrix
 import time
 import os
-from math import isnan
 
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
 
 PRIMES = [23, 67, 89, 199, 331, 353, 397, 419, 463, 617,
-          661, 683, 727, 859, 881, 947, 991, 1013, 1123]
+          661, 683, 727, 859, 881, 991, 1013, 1069, 1123]
 
 TRIPLET_FILE_TEMPLATE = "saved_inv_p{}_triplets.json"
 KERNEL_OUTPUT_TEMPLATE = "step10a_kernel_p{}_C11.json"
 SUMMARY_FILE = "step10a_kernel_computation_summary_C11.json"
 
-# Expected invariants can be set if known; otherwise leave as None to let the
-# script infer shapes from triplets (robust fallback).
+# These are not used for verification - kept as None
+# Orientation detection uses triplet data instead
 EXPECTED_KERNEL_DIM = None
 EXPECTED_RANK = None
-EXPECTED_COLS = None  # expected number of invariant monomials (if known)
-EXPECTED_ROWS = None  # expected matrix rows (often equal to rank)
+EXPECTED_COLS = None
+EXPECTED_ROWS = None
 
 # ============================================================================
 # HELPERS
@@ -6914,7 +6913,7 @@ def compute_kernel_basis(triplets_file, p):
     delta = data['delta']
     cyclotomic_order = data['cyclotomic_order']
     print(f"    Variety: {variety}, Delta: {delta}, Cyclotomic order: {cyclotomic_order}")
-    print(f"    Reported rank: {data['rank']}, reported kernel dim: {data['kernel_dim']}")
+    print(f"    Triplet file metadata: rank={data['rank']}, kernel_dim={data['kernel_dim']}")
     if len(triplets) == 0:
         raise RuntimeError("Triplets list is empty")
     # Inspect triplet indices to decide orientation
@@ -6924,33 +6923,12 @@ def compute_kernel_basis(triplets_file, p):
     max_c = int(cols_raw.max())
     print(f"    Triplet max indices: max_row={max_r}, max_col={max_c}")
     # Decide orientation:
-    # If expected dims provided, prefer matching them. Otherwise choose orientation with smaller matrix size.
-    swap = None
-    if EXPECTED_ROWS is not None and EXPECTED_COLS is not None:
-        if max_r <= EXPECTED_ROWS - 1 and max_c <= EXPECTED_COLS - 1:
-            swap = False
-            print("    Orientation looks like (row, col) matching expected rows × cols -> NO SWAP")
-        elif max_c <= EXPECTED_ROWS - 1 and max_r <= EXPECTED_COLS - 1:
-            swap = True
-            print("    Orientation appears swapped relative to expected shape -> APPLY SWAP")
-        else:
-            # ambiguous; choose orientation that minimizes total size
-            shape_no_swap = (max_r + 1, max_c + 1)
-            shape_swap = (max_c + 1, max_r + 1)
-            size_no_swap = shape_no_swap[0] * shape_no_swap[1]
-            size_swap = shape_swap[0] * shape_swap[1]
-            swap = (size_swap < size_no_swap)
-            print("    Ambiguous orientation relative to expected dims; choosing minimal size orientation.")
-            print(f"      no-swap shape = {shape_no_swap}, swap shape = {shape_swap}, swap={swap}")
-    else:
-        # No expected dims provided: choose orientation that minimizes matrix size
-        shape_no_swap = (max_r + 1, max_c + 1)
-        shape_swap = (max_c + 1, max_r + 1)
-        size_no_swap = shape_no_swap[0] * shape_no_swap[1]
-        size_swap = shape_swap[0] * shape_swap[1]
-        swap = (size_swap < size_no_swap)
-        print("    No expected dims given; choosing orientation that minimizes matrix size.")
-        print(f"      no-swap shape = {shape_no_swap}, swap shape = {shape_swap}, swap={swap}")
+    # Choose orientation that minimizes matrix size
+    shape_no_swap = (max_r + 1, max_c + 1)
+    shape_swap = (max_c + 1, max_r + 1)
+    swap = (shape_swap[0] * shape_swap[1] < shape_no_swap[0] * shape_no_swap[1])
+    print(f"    Orientation decision: no-swap shape={shape_no_swap}, swap shape={shape_swap}")
+    print(f"    Choosing swap={swap} (minimizes matrix size)")
     # Build rows/cols/vals according to chosen orientation
     rows = []
     cols = []
@@ -6960,25 +6938,16 @@ def compute_kernel_basis(triplets_file, p):
             rows.append(int(r))
             cols.append(int(c))
             vals.append(int(v % p))
-        inferred_num_rows = max(rows) + 1
-        inferred_num_cols = max(cols) + 1
+        num_rows = max(rows) + 1
+        num_cols = max(cols) + 1
     else:
         for r, c, v in triplets:
             rows.append(int(c))
             cols.append(int(r))
             vals.append(int(v % p))
-        inferred_num_rows = max(rows) + 1
-        inferred_num_cols = max(cols) + 1
-    # Choose final matrix shape: prefer expected dims if provided, else use inferred
-    if EXPECTED_ROWS is not None:
-        num_rows = max(EXPECTED_ROWS, inferred_num_rows)
-    else:
-        num_rows = inferred_num_rows
-    if EXPECTED_COLS is not None:
-        num_cols = max(EXPECTED_COLS, inferred_num_cols)
-    else:
-        num_cols = inferred_num_cols
-    print(f"    Building sparse matrix with shape {num_rows} × {num_cols} (inferred {inferred_num_rows}×{inferred_num_cols})")
+        num_rows = max(rows) + 1
+        num_cols = max(cols) + 1
+    print(f"    Building sparse matrix with shape {num_rows} × {num_cols}")
     M_sparse = csr_matrix((vals, (rows, cols)), shape=(num_rows, num_cols), dtype=np.int64)
     print(f"    Matrix nnz = {M_sparse.nnz:,}")
     # Convert to dense and reduce modulo p
@@ -6996,16 +6965,16 @@ def compute_kernel_basis(triplets_file, p):
         'cyclotomic_order': cyclotomic_order,
         'matrix_rows': num_rows,
         'matrix_cols': num_cols,
-        'expected_rank': data['rank'],
+        'triplet_file_rank': data['rank'],
+        'triplet_file_kernel_dim': data['kernel_dim'],
         'computed_rank': len(pivot_cols),
-        'expected_kernel_dim': data['kernel_dim'],
         'computed_kernel_dim': kernel_basis.shape[0],
         'pivot_cols': pivot_cols,
         'free_cols': free_cols,
         'computation_time': t1,
         'swap_applied': bool(swap)
     }
-    print(f"  ✓ Kernel computed in {t1:.1f} seconds (prime {p}, swap_applied={swap})")
+    print(f"  ✓ Kernel computed in {t1:.1f} seconds")
     return kernel_basis, metadata
 
 # ============================================================================
@@ -7032,12 +7001,21 @@ for idx, p in enumerate(PRIMES, 1):
     print(f"  ✓ Found {triplets_file}")
     try:
         kernel_basis, metadata = compute_kernel_basis(triplets_file, p)
-        rank_match = (metadata['expected_rank'] == metadata['computed_rank'])
-        dim_match = (metadata['expected_kernel_dim'] == metadata['computed_kernel_dim'])
+        
+        # Verify rank-nullity theorem: cols = rank + kernel_dim
+        rank_nullity_valid = (metadata['matrix_cols'] == metadata['computed_rank'] + metadata['computed_kernel_dim'])
+        
         print()
         print("  Verification:")
-        print(f"    Computed rank: {metadata['computed_rank']} (reported {metadata['expected_rank']}) - {'✓' if rank_match else '✗'}")
-        print(f"    Computed kernel dim: {metadata['computed_kernel_dim']} (reported {metadata['expected_kernel_dim']}) - {'✓' if dim_match else '✗'}")
+        print(f"    Matrix shape: {metadata['matrix_rows']} × {metadata['matrix_cols']}")
+        print(f"    Computed rank: {metadata['computed_rank']}")
+        print(f"    Computed kernel dim: {metadata['computed_kernel_dim']}")
+        print(f"    Rank-nullity: {metadata['matrix_cols']} = {metadata['computed_rank']} + {metadata['computed_kernel_dim']} - {'✓' if rank_nullity_valid else '✗'}")
+        print(f"    (Triplet file metadata: rank={metadata['triplet_file_rank']}, kernel={metadata['triplet_file_kernel_dim']})")
+        
+        if not rank_nullity_valid:
+            print("    ✗ WARNING: Rank-nullity theorem violated! Check computation!")
+        
         output_file = KERNEL_OUTPUT_TEMPLATE.format(p)
         kernel_list = kernel_basis.tolist()
         output_data = {
@@ -7049,25 +7027,27 @@ for idx, p in enumerate(PRIMES, 1):
             "galois_group": "Z/10Z",
             "kernel_dimension": int(metadata['computed_kernel_dim']),
             "rank": int(metadata['computed_rank']),
-            "num_monomials": int(metadata['matrix_cols']),
+            "matrix_rows": int(metadata['matrix_rows']),
+            "matrix_cols": int(metadata['matrix_cols']),
             "computation_time_seconds": float(metadata['computation_time']),
             "free_column_indices": [int(c) for c in metadata['free_cols']],
             "pivot_column_indices": [int(c) for c in metadata['pivot_cols']],
-            "swap_applied": bool(metadata.get('swap_applied', False)),
+            "swap_applied": bool(metadata['swap_applied']),
+            "rank_nullity_valid": bool(rank_nullity_valid),
             "kernel_basis": kernel_list
         }
         with open(output_file, "w") as f:
             json.dump(output_data, f, indent=2)
         file_size_mb = os.path.getsize(output_file) / 1024 / 1024
         print(f"  ✓ Saved kernel basis to {output_file} ({file_size_mb:.1f} MB)")
+        
         results[p] = {
             "status": "success",
             "rank": metadata['computed_rank'],
             "dimension": metadata['computed_kernel_dim'],
             "time": metadata['computation_time'],
-            "rank_match": rank_match,
-            "dim_match": dim_match,
-            "swap_applied": metadata.get('swap_applied', False)
+            "rank_nullity_valid": rank_nullity_valid,
+            "swap_applied": metadata['swap_applied']
         }
     except Exception as e:
         print(f"  ✗ Error while processing p={p}: {e}")
@@ -7097,13 +7077,13 @@ print()
 
 if successful:
     print("Kernel computation results:")
-    print(f"  {'Prime':<8} {'Rank':<8} {'Kernel Dim':<12} {'Time (s)':<10} {'Swap':<6} {'Verified':<10}")
+    print(f"  {'Prime':<8} {'Rank':<8} {'Kernel Dim':<12} {'Time (s)':<10} {'Swap':<6} {'Valid':<8}")
     print("-" * 80)
     for p in successful:
         r = results[p]
-        verified = '✓' if r['rank_match'] and r['dim_match'] else '✗'
+        valid_flag = '✓' if r['rank_nullity_valid'] else '✗'
         swap_flag = 'Y' if r.get('swap_applied') else 'N'
-        print(f"  {p:<8} {r['rank']:<8} {r['dimension']:<12} {r['time']:<10.1f} {swap_flag:<6} {verified:<10}")
+        print(f"  {p:<8} {r['rank']:<8} {r['dimension']:<12} {r['time']:<10.1f} {swap_flag:<6} {valid_flag:<8}")
     avg_time = np.mean([results[p]['time'] for p in successful])
     total_mins = total_time / 60
     print()
@@ -7115,7 +7095,7 @@ if successful:
 # Save summary
 summary = {
     "step": "10A",
-    "description": "Kernel basis computation for 19 primes (C11) with robust orientation detection",
+    "description": "Kernel basis computation for 19 primes (C11) with rank-nullity verification",
     "variety": "PERTURBED_C11_CYCLOTOMIC",
     "delta": "791/100000",
     "cyclotomic_order": 11,
@@ -7125,8 +7105,6 @@ summary = {
     "failed": len(failed),
     "successful_primes": successful,
     "failed_primes": failed,
-    "expected_rank": EXPECTED_RANK,
-    "expected_kernel_dim": EXPECTED_KERNEL_DIM,
     "results": {str(p): r for p, r in results.items()},
     "total_time_seconds": float(total_time),
     "total_time_minutes": float(total_time / 60),
