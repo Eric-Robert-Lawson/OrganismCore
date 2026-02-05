@@ -9748,7 +9748,7 @@ Next step: Run Step 13D (Bareiss exact determinant)
 script 4:
 
 ```verbatim
-pending
+HOLDING OFF FOR NOW (may do on cloud, may not do at all)
 ```
 
 
