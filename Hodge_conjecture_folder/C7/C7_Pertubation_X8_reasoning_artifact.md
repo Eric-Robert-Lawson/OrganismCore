@@ -10186,7 +10186,7 @@ pending
 script 4:
 
 ```verbatim
-pending
+NOT POSSIBLE ON 16GB MACBOOK AIR
 ```
 
 
