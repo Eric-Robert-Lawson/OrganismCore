@@ -8968,6 +8968,51 @@ pending
 results:
 
 ```verbatim
+================================================================================
+STEP 11: CP³ COORDINATE COLLAPSE TESTS - PERTURBED C7 VARIETY
+================================================================================
+
+Perturbed variety: F = Sum z_i^8 + (791/100000) * Sum_{k=1}^{6} L_k^8
+Delta: 791/100000
+Cyclotomic order: 7
+Galois group: Z/6Z
+
+Primes to test: 18
+Primes: [29, 43, 71, 127, 197, 211, 239, 281, 337, 379, 421, 449, 463, 491, 547, 617, 631, 659]
+Estimated time: ~72 hours
+Started: 2026-02-04 23:18:37
+
+
+[1/18] Processing prime 29...
+
+================================================================================
+PRIME 29 - Started at 2026-02-04 23:18:37
+================================================================================
+Running Macaulay2...
+  Script: /Users/ericlawson/c7/step11.m2
+  Prime: 29
+  Cyclotomic order: 7
+  Output: step11_cp3_results_p29_C7.csv
+
+✓ COMPLETED in 2.56 hours
+  Delta value (mod 29): 1
+  Total lines: 11000
+  Total tests: 10995
+  NOT_REPRESENTABLE: 10995 (100.0%)
+  REPRESENTABLE: 0
+
+Progress: 1/18 primes completed
+Cumulative runtime: 2.56 hours
+Estimated time remaining: 43.60 hours
+
+.
+
+.
+
+.
+
+.
+
 pending
 ```
 
@@ -10168,7 +10213,67 @@ results:
 script 1:
 
 ```verbatim
-pending
+================================================================================
+STEP 13A: PIVOT MINOR FINDER (X8 PERTURBED C₇)
+================================================================================
+
+Variety: Sum z_i^8 + (791/100000) * Sum_{{k=1}}^{{6}} L_k^8 = 0
+Cyclotomic order: 7
+Target rank k: 3474
+Prime modulus: 29
+Triplet file: saved_inv_p29_triplets.json
+
+Loading triplets...
+  Raw triplets: 423,696 entries
+  Applying Step 10A transpose convention (swap row↔col)
+  Matrix dimensions (after transpose): 3744 × 4807
+
+WARNING: Expected 3474×3807, got 3744×4807
+
+Building sparse data structures (with transpose)...
+  Sparsity: 1 to 365 nonzeros/col
+
+Searching for 3474 pivots via greedy elimination mod 29...
+
+   200/3474 pivots (153.1s)
+   400/3474 pivots (694.9s)
+   600/3474 pivots (1587.3s)
+   800/3474 pivots (2360.8s)
+  1000/3474 pivots (3213.2s)
+  1200/3474 pivots (4053.0s)
+  1400/3474 pivots (4776.0s)
+  1600/3474 pivots (5394.4s)
+  1800/3474 pivots (5969.0s)
+  2000/3474 pivots (6501.2s)
+  2200/3474 pivots (6987.7s)
+  2400/3474 pivots (7473.2s)
+  2600/3474 pivots (7956.1s)
+  2800/3474 pivots (8390.4s)
+  3000/3474 pivots (8788.1s)
+  3200/3474 pivots (9136.5s)
+  3400/3474 pivots (9441.5s)
+  3474/3474 pivots (9543.2s)
+
+Pivot search complete: 3474 pivots in 9543.19s
+
+Building 3474×3474 minor from original entries...
+Computing determinant mod 29...
+
+================================================================================
+VERIFICATION
+================================================================================
+Determinant of 3474×3474 minor mod 29: 20
+
+✓ Pivot minor is NONZERO mod p (verified)
+
+Outputs written:
+  Pivot rows: pivot_3474_p29_C7_rows.txt
+  Pivot cols: pivot_3474_p29_C7_cols.txt
+  Report: pivot_3474_p29_C7_report.json
+
+================================================================================
+STEP 13A COMPLETE
+================================================================================
 ```
 
 script 2:
