@@ -9522,7 +9522,7 @@ python3 step13b_11.py --triplets saved_inv_p23_triplets.json saved_inv_p67_tripl
 
 python3 step13c_11.py --minor crt_pivot_2193_C11.json
 
-python3 step13d_11.py --triplet saved_inv_p23_triplets.json --rows pivot_2193_p23_C11_rows.txt --cols pivot_2193_p23_C11_cols.txt --crt crt_pivot_2193_C11.json --out det_pivot_2193_C11_exact.json
+python step13d.py --minor crt_pivot_2193_C11.json --out bareiss_det_2193_C11.json
 ```
 
 ---
