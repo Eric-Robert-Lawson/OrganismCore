@@ -9520,7 +9520,7 @@ python3 step13a_11.py --triplet saved_inv_p23_triplets.json --prime 23 --k 2193 
 
 python3 step13b_11.py --triplets saved_inv_p23_triplets.json saved_inv_p67_triplets.json saved_inv_p89_triplets.json saved_inv_p199_triplets.json saved_inv_p331_triplets.json --primes 23 67 89 199 331 --pivot_rows pivot_2193_p23_C11_rows.txt --pivot_cols pivot_2193_p23_C11_cols.txt --out crt_pivot_2193_C11.json
 
-python3 step13c_11.py --minor crt_pivot_1443_C11.json
+python3 step13c_11.py --minor crt_pivot_2193_C11.json
 
 python3 step13d_11.py --triplet saved_inv_p23_triplets.json --rows pivot_2193_p23_C11_rows.txt --cols pivot_2193_p23_C11_cols.txt --crt crt_pivot_2193_C11.json --out det_pivot_2193_C11_exact.json
 ```
@@ -9532,19 +9532,217 @@ results:
 script 1:
 
 ```verbatim
-pending
+================================================================================
+STEP 13A: PIVOT MINOR FINDER (X8 PERTURBED C₁₁)
+================================================================================
+
+Variety: Sum z_i^8 + (791/100000) * Sum_{{k=1}}^{{10}} L_k^8 = 0
+Cyclotomic order: 11
+Target rank k: 2193
+Prime modulus: 23
+Triplet file: saved_inv_p23_triplets.json
+
+Loading triplets...
+  Raw triplets: 171,576 entries
+  Applying Step 10A transpose convention (swap row↔col)
+  Matrix dimensions (after transpose): 2383 × 3059
+
+WARNING: Expected 2193×2770, got 2383×3059
+
+Building sparse data structures (with transpose)...
+  Sparsity: 1 to 237 nonzeros/col
+
+Searching for 2193 pivots via greedy elimination mod 23...
+
+   100/2193 pivots (14.5s)
+   200/2193 pivots (53.4s)
+   300/2193 pivots (127.3s)
+   400/2193 pivots (271.1s)
+   500/2193 pivots (445.9s)
+   600/2193 pivots (630.1s)
+   700/2193 pivots (808.4s)
+   800/2193 pivots (961.8s)
+   900/2193 pivots (1105.8s)
+  1000/2193 pivots (1245.2s)
+  1100/2193 pivots (1376.7s)
+  1200/2193 pivots (1495.2s)
+  1300/2193 pivots (1612.5s)
+  1400/2193 pivots (1723.0s)
+  1500/2193 pivots (1827.6s)
+  1600/2193 pivots (1923.7s)
+  1700/2193 pivots (2014.5s)
+  1800/2193 pivots (2095.5s)
+  1900/2193 pivots (2170.6s)
+  2000/2193 pivots (2242.3s)
+  2100/2193 pivots (2306.0s)
+  2193/2193 pivots (2356.9s)
+
+Pivot search complete: 2193 pivots in 2356.95s
+
+Building 2193×2193 minor from original entries...
+Computing determinant mod 23...
+
+================================================================================
+VERIFICATION
+================================================================================
+Determinant of 2193×2193 minor mod 23: 10
+
+✓ Pivot minor is NONZERO mod p (verified)
+
+Outputs written:
+  Pivot rows: pivot_2193_p23_C11_rows.txt
+  Pivot cols: pivot_2193_p23_C11_cols.txt
+  Report: pivot_2193_p23_C11_report.json
+
+================================================================================
+STEP 13A COMPLETE
+================================================================================
 ```
 
 script 2:
 
 ```verbatim
-pending
+================================================================================
+STEP 13B: CRT MINOR RECONSTRUCTION (X8 PERTURBED C₁₁)
+================================================================================
+
+Variety: Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8 = 0
+Cyclotomic order: 11
+Primes: [23, 67, 89, 199, 331]
+Target rank: 2193
+
+Loading pivot indices...
+  Pivot rows: 2193
+  Pivot cols: 2193
+
+Loading triplets for each prime...
+  [1/5] Prime 23: saved_inv_p23_triplets.json
+      Loaded 171,576 triplets
+  [2/5] Prime 67: saved_inv_p67_triplets.json
+      Loaded 171,576 triplets
+  [3/5] Prime 89: saved_inv_p89_triplets.json
+      Loaded 171,576 triplets
+  [4/5] Prime 199: saved_inv_p199_triplets.json
+      Loaded 171,576 triplets
+  [5/5] Prime 331: saved_inv_p331_triplets.json
+      Loaded 171,576 triplets
+
+Building 2193×2193 minors mod p (with transpose)...
+  [1/5] Building minor mod 23...
+  [2/5] Building minor mod 67...
+  [3/5] Building minor mod 89...
+  [4/5] Building minor mod 199...
+  [5/5] Building minor mod 331...
+
+Applying CRT to reconstruct 2193×2193 minor over Z...
+  Product of primes: 9,033,867,481
+
+  Reconstructing row 1/2193...
+  Reconstructing row 100/2193...
+  Reconstructing row 200/2193...
+  Reconstructing row 300/2193...
+  Reconstructing row 400/2193...
+  Reconstructing row 500/2193...
+  Reconstructing row 600/2193...
+  Reconstructing row 700/2193...
+  Reconstructing row 800/2193...
+  Reconstructing row 900/2193...
+  Reconstructing row 1000/2193...
+  Reconstructing row 1100/2193...
+  Reconstructing row 1200/2193...
+  Reconstructing row 1300/2193...
+  Reconstructing row 1400/2193...
+  Reconstructing row 1500/2193...
+  Reconstructing row 1600/2193...
+  Reconstructing row 1700/2193...
+  Reconstructing row 1800/2193...
+  Reconstructing row 1900/2193...
+  Reconstructing row 2000/2193...
+  Reconstructing row 2100/2193...
+
+CRT reconstruction complete
+
+================================================================================
+STATISTICS
+================================================================================
+Minor dimension: 2193×2193
+Nonzero entries: 145,840 / 4,809,249 (3.03%)
+Max absolute value: 4,119,443,970
+
+Writing minor to crt_pivot_2193_C11.json...
+
+================================================================================
+STEP 13B COMPLETE
+================================================================================
+Output: crt_pivot_2193_C11.json
 ```
 
 script 3:
 
 ```verbatim
-pending
+================================================================================
+STEP 13C: RATIONAL RECONSTRUCTION (X8 PERTURBED C₁₁)
+================================================================================
+
+⚠️  WARNING: This step is EXPECTED TO FAIL
+    Perturbed varieties have coefficient explosion
+    Step 13D (Bareiss) provides definitive certificate
+
+Variety: Sum z_i^8 + (791/100000) * Sum_{k=1}^{10} L_k^8 = 0
+Cyclotomic order: 11
+
+Loading CRT minor from crt_pivot_2193_C11.json...
+  Dimension: 2193×2193
+  Primes used: [23, 67, 89, 199, 331]
+  Modulus M: 9,033,867,481
+
+Attempting rational reconstruction (max denominator: 1,000,000,000,000)...
+
+  Row 1/2193 (successes: 0, failures: 0)...
+  Row 100/2193 (successes: 215403, failures: 1704)...
+  Row 200/2193 (successes: 433174, failures: 3233)...
+  Row 300/2193 (successes: 650883, failures: 4824)...
+  Row 400/2193 (successes: 868619, failures: 6388)...
+  Row 500/2193 (successes: 1086475, failures: 7832)...
+  Row 600/2193 (successes: 1304076, failures: 9531)...
+  Row 700/2193 (successes: 1521640, failures: 11267)...
+  Row 800/2193 (successes: 1739200, failures: 13007)...
+  Row 900/2193 (successes: 1956823, failures: 14684)...
+  Row 1000/2193 (successes: 2174423, failures: 16384)...
+  Row 1100/2193 (successes: 2392185, failures: 17922)...
+  Row 1200/2193 (successes: 2609913, failures: 19494)...
+  Row 1300/2193 (successes: 2827623, failures: 21084)...
+  Row 1400/2193 (successes: 3045414, failures: 22593)...
+  Row 1500/2193 (successes: 3263204, failures: 24103)...
+  Row 1600/2193 (successes: 3480932, failures: 25675)...
+  Row 1700/2193 (successes: 3698575, failures: 27332)...
+  Row 1800/2193 (successes: 3916223, failures: 28984)...
+  Row 1900/2193 (successes: 4133888, failures: 30619)...
+  Row 2000/2193 (successes: 4351585, failures: 32222)...
+  Row 2100/2193 (successes: 4569098, failures: 34009)...
+
+================================================================================
+RECONSTRUCTION RESULTS
+================================================================================
+Total entries: 4,809,249
+Successful: 4,773,567 (99.26%)
+Failed: 35,682 (0.74%)
+
+✗ RECONSTRUCTION FAILED (as expected)
+  Coefficient denominators exceed reconstruction bounds
+  This is normal for perturbed varieties
+
+➜ Proceed to Step 13D (Bareiss exact determinant)
+
+Writing results to minor_2193_rational_C11.json...
+
+================================================================================
+STEP 13C COMPLETE
+================================================================================
+Output: minor_2193_rational_C11.json
+
+Next step: Run Step 13D (Bareiss exact determinant)
+  This will provide unconditional rank certificate over Z
 ```
 
 script 4:
