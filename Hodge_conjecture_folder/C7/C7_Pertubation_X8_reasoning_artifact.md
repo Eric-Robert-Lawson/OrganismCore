@@ -8950,24 +8950,6 @@ python step11_7.py --primes {primes to run}
 results:
 
 ```verbatim
-pending
-```
-
-
-
----
-
-step 12: pending
-
-```python
-pending
-```
-
----
-
-results:
-
-```verbatim
 ================================================================================
 STEP 11: CP³ COORDINATE COLLAPSE TESTS - PERTURBED C7 VARIETY
 ================================================================================
@@ -9013,6 +8995,24 @@ Estimated time remaining: 43.60 hours
 
 .
 
+pending (4/18 done so far)
+```
+
+
+
+---
+
+step 12: pending
+
+```python
+pending
+```
+
+---
+
+results:
+
+```verbatim
 pending
 ```
 
