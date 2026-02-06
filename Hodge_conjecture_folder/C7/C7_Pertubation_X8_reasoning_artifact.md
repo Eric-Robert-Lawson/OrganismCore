@@ -10279,13 +10279,13 @@ STEP 13A COMPLETE
 script 2:
 
 ```verbatim
-pending
+holding off since cannot do step 13d
 ```
 
 script 3:
 
 ```verbatim
-pending
+holding off since cannot do step 13d
 ```
 
 script 4:
