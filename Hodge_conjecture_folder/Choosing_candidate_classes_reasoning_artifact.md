@@ -91,7 +91,7 @@ Across ALL five variants, Step 6 identified a **universal structural pattern**:
 
 | Variant | Rank Certified | Dimension Certified | Determinant Digits | Status |
 |---------|----------------|---------------------|-------------------|--------|
-| **C₁₃** | 1983 | 707 | ~17,000 | ✅ Complete |
+| **C₁₃** | 1883 | 707 | ~17,000 | ✅ Complete |
 | **C₁₇** | 1443 | 327 | 16,634 | ✅ Complete |
 | **C₁₉** | 1283 | 488 | ~16,000 | ✅ Complete |
 | **C₁₁** | TBD | 844 | TBD | 🟡 Stopped (cloud recommended) |
