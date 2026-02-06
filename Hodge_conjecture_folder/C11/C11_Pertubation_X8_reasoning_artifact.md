@@ -8314,7 +8314,24 @@ Estimated time remaining: 39.16 hours
 
 .
 
-pending (14/19 done so far)
+================================================================================
+PRIME 1123 - Started at 2026-02-06 04:07:17
+================================================================================
+Running Macaulay2...
+  Script: /Users/ericlawson/c11/step11.m2
+  Prime: 1123
+  Cyclotomic order: 11
+  Output: step11_cp3_results_p1123_C11.csv
+
+✓ COMPLETED in 2.00 hours
+  Delta value (mod 1123): 248
+  Total lines: 7085
+  Total tests: 7080
+  NOT_REPRESENTABLE: 7080 (100.0%)
+  REPRESENTABLE: 0
+
+Progress: 15/15 primes completed
+Cumulative runtime: 30.89 hours
 ```
 
 
