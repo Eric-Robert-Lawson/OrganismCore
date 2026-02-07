@@ -8875,7 +8875,24 @@ Estimated time remaining: 69.22 hours
 
 .
 
-pending (9/19 done so far)
+================================================================================
+PRIME 1871 - Started at 2026-02-06 21:11:30
+================================================================================
+Running Macaulay2...
+  Script: /Users/ericlawson/c17/step11.m2
+  Prime: 1871
+  Cyclotomic order: 17
+  Output: step11_cp3_results_p1871_C17.csv
+
+✓ COMPLETED in 1.77 hours
+  Delta value (mod 1871): -122
+  Total lines: 4625
+  Total tests: 4620
+  NOT_REPRESENTABLE: 4620 (100.0%)
+  REPRESENTABLE: 0
+
+Progress: 16/16 primes completed
+Cumulative runtime: 47.57 hours
 ```
 
 
