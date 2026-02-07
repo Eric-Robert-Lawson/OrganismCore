@@ -8995,7 +8995,77 @@ Estimated time remaining: 43.60 hours
 
 .
 
-pending (8/18 done so far)
+================================================================================
+PRIME 659 - Started at 2026-02-06 14:50:32
+================================================================================
+Running Macaulay2...
+  Script: /Users/ericlawson/c7/step11.m2
+  Prime: 659
+  Cyclotomic order: 7
+  Output: step11_cp3_results_p659_C7.csv
+
+✓ COMPLETED in 1.53 hours
+  Delta value (mod 659): -142
+  Total lines: 11000
+  Total tests: 10995
+  NOT_REPRESENTABLE: 10995 (100.0%)
+  REPRESENTABLE: 0
+
+Progress: 18/18 primes completed
+Cumulative runtime: 41.06 hours
+
+================================================================================
+FINAL SUMMARY
+================================================================================
+
+Total primes: 18
+Successful: 18
+Failed: 0
+Total runtime: 41.06 hours
+
+PER-PRIME STATISTICS:
+  PRIME | DELTA_MOD_P | NOT_REP | % | REP | TIME
+  ------------------------------------------------------------
+    29  | 1           |   10995 | 100.0 |     0 |  2.56h
+    43  | 11          |   10995 | 100.0 |     0 |  2.37h
+    71  | -13         |   10995 | 100.0 |     0 |  2.30h
+   127  | 18          |   10995 | 100.0 |     0 |  6.03h
+   197  | -13         |   10995 | 100.0 |     0 |  2.22h
+   211  | 49          |   10995 | 100.0 |     0 |  2.19h
+   239  | -9          |   10995 | 100.0 |     0 |  2.19h
+   281  | -61         |   10995 | 100.0 |     0 |  2.17h
+   337  | 135         |   10995 | 100.0 |     0 |  2.35h
+   379  | 128         |   10995 | 100.0 |     0 |  2.51h
+   421  | 198         |   10995 | 100.0 |     0 |  2.32h
+   449  | -183        |   10995 | 100.0 |     0 |  2.21h
+   463  | -41         |   10995 | 100.0 |     0 |  1.67h
+   491  | 82          |   10995 | 100.0 |     0 |  1.67h
+   547  | 3           |   10995 | 100.0 |     0 |  1.61h
+   617  | -184        |   10995 | 100.0 |     0 |  1.57h
+   631  | 105         |   10995 | 100.0 |     0 |  1.57h
+   659  | -142        |   10995 | 100.0 |     0 |  1.53h
+
+AGGREGATE STATISTICS (across 18 primes):
+  Total tests: 197,910
+  NOT_REPRESENTABLE: 197,910 (100.0%)
+  REPRESENTABLE: 0 (0.0%)
+
+*** PERFECT VARIABLE-COUNT BARRIER CONFIRMED ***
+
+All tests returned NOT_REPRESENTABLE (100%)
+This establishes:
+  - All isolated classes require full variable count
+  - Cannot be represented using fewer variables
+
+Summary saved to: step11_cp3_summary_C7.json
+Progress saved to: step11_cp3_progress_C7.json
+
+✓✓✓ ALL PRIMES COMPLETED SUCCESSFULLY
+
+Next steps:
+  1. Analyze CP³ collapse patterns for perturbed C7 variety
+  2. Compare with other cyclotomic families for cross-validation
+  3. Generate final verification certificate
 ```
 
 
