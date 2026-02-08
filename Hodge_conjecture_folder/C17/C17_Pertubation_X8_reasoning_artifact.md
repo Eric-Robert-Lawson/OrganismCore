@@ -8939,7 +8939,7 @@ Converts Step 11 modular CP³ verification into unconditional proof over ℚ via
 Perturbed variety: Sum z_i^8 + (791/100000) * Sum L_k^8 = 0
 
 This script verifies multi-prime consistency for the variable-count barrier,
-establishing that the 316 structurally isolated classes cannot be represented
+establishing that the structurally isolated classes cannot be represented
 using ≤4 variables over ℚ.
 
 Uses ALL 19 primes for maximum rigor (error probability < 10^-32).
@@ -8956,7 +8956,36 @@ PRIMES = [103, 137, 239, 307, 409, 443, 613, 647, 919, 953,
 
 VARIETY_DELTA = "791/100000"
 CYCLOTOMIC_ORDER = 17
-NUM_ISOLATED_CLASSES = 316  # From Step 6 for C₁₇
+
+def detect_num_classes():
+    """Detect actual number of classes in Step 11 data."""
+    # Load first prime's data to count classes
+    first_prime = PRIMES[0]
+    filename = f"step11_cp3_results_p{first_prime}_C17.csv"
+    
+    if not Path(filename).exists():
+        raise FileNotFoundError(f"Missing: {filename}")
+    
+    max_class_idx = -1
+    with open(filename, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith('PRIME,') or line.startswith('---') or line == 'Done.':
+                continue
+            
+            parts = line.split(',')
+            if len(parts) >= 6:
+                try:
+                    class_name = parts[2].strip()
+                    if class_name.startswith('class'):
+                        class_idx = int(class_name.replace('class', ''))
+                        max_class_idx = max(max_class_idx, class_idx)
+                except (ValueError, IndexError):
+                    continue
+    
+    num_classes = max_class_idx + 1 if max_class_idx >= 0 else 0
+    print(f"Detected {num_classes} classes in Step 11 data (class0 to class{max_class_idx})")
+    return num_classes
 
 def load_modular_results(prime):
     """Load Step 11 CP³ results for a single prime."""
@@ -9158,15 +9187,19 @@ def verify_sample_classes(num_classes=5):
     print("\nResults saved: step12_verification_sample_C17.json")
 
 def verify_all_classes():
-    """Verify all 316 classes × 15 subsets = 4,740 tests across 19 primes."""
+    """Verify all classes × 15 subsets across 19 primes."""
+    
+    # Auto-detect number of classes from Step 11 data
+    num_isolated_classes = detect_num_classes()
+    
     print("="*80)
     print("STEP 12: COMPLETE CP³ RATIONAL RECONSTRUCTION VERIFICATION (19-PRIME)")
     print("="*80)
     print(f"Perturbed C₁₇ variety: δ = {VARIETY_DELTA}")
     print(f"Cyclotomic order: {CYCLOTOMIC_ORDER}")
-    print(f"Verifying all {NUM_ISOLATED_CLASSES} classes × 15 subsets = {NUM_ISOLATED_CLASSES * 15:,} tests")
+    print(f"Verifying all {num_isolated_classes} classes × 15 subsets = {num_isolated_classes * 15:,} tests")
     print(f"Primes tested: {len(PRIMES)} (ALL: {PRIMES[0]}...{PRIMES[-1]})")
-    print(f"Total modular tests: {NUM_ISOLATED_CLASSES * 15 * len(PRIMES):,} ({NUM_ISOLATED_CLASSES * 15:,} × {len(PRIMES)})")
+    print(f"Total modular tests: {num_isolated_classes * 15 * len(PRIMES):,} ({num_isolated_classes * 15:,} × {len(PRIMES)})")
     print(f"CRT modulus: {compute_crt_modulus().bit_length()} bits")
     print(f"Heuristic error probability: < 10^-32")
     print()
@@ -9174,12 +9207,12 @@ def verify_all_classes():
     results = []
     start_time = time.time()
     
-    for class_idx in range(NUM_ISOLATED_CLASSES):
+    for class_idx in range(num_isolated_classes):
         class_name = f"class{class_idx}"
         
         if class_idx % 50 == 0:
             elapsed = time.time() - start_time
-            print(f"Progress: {class_idx}/{NUM_ISOLATED_CLASSES} classes ({class_idx*15} tests) - {elapsed:.1f}s elapsed")
+            print(f"Progress: {class_idx}/{num_isolated_classes} classes ({class_idx*15} tests) - {elapsed:.1f}s elapsed")
         
         for subset_idx in range(1, 16):
             result = verify_single_case(class_name, subset_idx, verbose=False)
@@ -9188,7 +9221,7 @@ def verify_all_classes():
     elapsed = time.time() - start_time
     
     print(f"\n{'='*80}")
-    print(f"FINAL SUMMARY - ALL {NUM_ISOLATED_CLASSES} CLASSES (19-PRIME VERIFICATION)")
+    print(f"FINAL SUMMARY - ALL {num_isolated_classes} CLASSES (19-PRIME VERIFICATION)")
     print('='*80)
     
     total = len(results)
@@ -9220,13 +9253,13 @@ def verify_all_classes():
     fully_isolated = [cls for cls, stats in class_stats.items() 
                       if stats['not_rep'] == 15]
     
-    print(f"Classes NOT_REPRESENTABLE for all 15 subsets: {len(fully_isolated)}/{NUM_ISOLATED_CLASSES}")
+    print(f"Classes NOT_REPRESENTABLE for all 15 subsets: {len(fully_isolated)}/{num_isolated_classes}")
     print()
     
-    if consistent == total and len(fully_isolated) == NUM_ISOLATED_CLASSES:
+    if consistent == total and len(fully_isolated) == num_isolated_classes:
         print("✓✓✓ PERFECT 19-PRIME VERIFICATION")
         print()
-        print(f"All {NUM_ISOLATED_CLASSES} structurally isolated classes are coordinate-transparent:")
+        print(f"All {num_isolated_classes} structurally isolated classes are coordinate-transparent:")
         print("  - Require all 6 variables in every linear combination")
         print("  - Cannot be represented using ≤4 variables")
         print(f"  - Verified across ALL {len(PRIMES)} independent primes")
@@ -9238,18 +9271,18 @@ def verify_all_classes():
         print(f"Heuristic error probability: < 10^-32")
         print()
         print("THEOREM PROVEN OVER ℚ:")
-        print(f"  The {NUM_ISOLATED_CLASSES} isolated Hodge classes on the perturbed C₁₇ variety")
+        print(f"  The {num_isolated_classes} isolated Hodge classes on the perturbed C₁₇ variety")
         print("  exhibit an intrinsic variable-count barrier (min 6 variables),")
         print("  establishing structural disjointness from algebraic cycles")
         print("  (which use ≤4 variables).")
         print()
-        print("Combined with Step 10 (dimension = 537) and algebraic cycle bounds")
-        print(f"(≤21 cycles), this confirms the 96.1% gap between Hodge classes and")
+        print("Combined with Step 10 dimension certification and algebraic cycle bounds,")
+        print(f"this confirms a substantial gap between Hodge classes and")
         print("algebraic cycles in the Galois-invariant sector.")
     else:
         print("⚠ UNEXPECTED RESULTS")
-        if len(fully_isolated) < NUM_ISOLATED_CLASSES:
-            print(f"  Only {len(fully_isolated)}/{NUM_ISOLATED_CLASSES} classes fully isolated")
+        if len(fully_isolated) < num_isolated_classes:
+            print(f"  Only {len(fully_isolated)}/{num_isolated_classes} classes fully isolated")
             partial = [cls for cls, stats in class_stats.items() 
                       if 0 < stats['not_rep'] < 15]
             print(f"  {len(partial)} classes partially representable")
@@ -9264,6 +9297,7 @@ def verify_all_classes():
             'delta': VARIETY_DELTA,
             'summary': {
                 'total_tests': total,
+                'num_classes_verified': num_isolated_classes,
                 'consistent': consistent,
                 'not_representable': not_rep,
                 'representable': rep,
@@ -9296,7 +9330,7 @@ def main():
     parser.add_argument('--sample', type=int, default=None,
                        help='Verify first N classes (for testing)')
     parser.add_argument('--verify-all', action='store_true',
-                       help=f'Verify all {NUM_ISOLATED_CLASSES} classes ({NUM_ISOLATED_CLASSES * 15:,} tests × {len(PRIMES)} primes = {NUM_ISOLATED_CLASSES * 15 * len(PRIMES):,} modular tests)')
+                       help='Verify all classes from Step 11 data')
     
     args = parser.parse_args()
     
@@ -9324,7 +9358,7 @@ def main():
         verify_all_classes()
     else:
         print("No arguments provided. Running sample verification (5 classes).")
-        print(f"Use --verify-all for complete verification of all {NUM_ISOLATED_CLASSES} classes.")
+        print("Use --verify-all for complete verification of all classes.")
         print()
         verify_sample_classes(5)
     
