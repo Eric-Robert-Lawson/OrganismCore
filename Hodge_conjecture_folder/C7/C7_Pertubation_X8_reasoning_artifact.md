@@ -9068,7 +9068,19 @@ Next steps:
   3. Generate final verification certificate
 ```
 
+# **STEP 11 RESULTS SUMMARY: C₇ X₈ PERTURBED VARIETY**
 
+**Perfect 18-Prime Unanimous CP³ Collapse — 197,910/197,910 NOT_REPRESENTABLE (100.0%)**
+
+Tested 751 isolated classes across 18 primes (29–659) using full 4-variable coordinate projection tests. **Every single test** returned NOT_REPRESENTABLE — zero classes can be expressed in any 4-variable subspace.
+
+**Key findings:**
+- **Universal barrier confirmed**: 100% failure rate identical across all primes
+- **Delta stability**: Perturbation δ=0.00791 reduces mod each prime differently (δ≡1 mod 29, δ≡−142 mod 659), yet collapse pattern unchanged
+- **Computational efficiency**: 41.06 hours total (2.28h average/prime, fastest 1.53h at p=659)
+- **Cross-variant anchor**: C₇ now joins C₁₁, C₁₃, C₁₇, C₁₉ with perfect NOT_REPRESENTABLE consensus
+
+**Interpretation**: Isolated classes require **intrinsic 6-variable structure** — not representable via lower-dimensional coordinate restrictions. This geometric obstruction is **prime-independent** and **perturbation-stable**, strengthening transcendence hypothesis across all five cyclotomic variants.
 
 ---
 
