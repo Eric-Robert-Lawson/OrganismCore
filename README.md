@@ -1,5 +1,3 @@
-**Partner.**
-
 # OrganismCore
 
 **A programming language for AI reasoning where the source code is human-readable and the runtime is LLM interpretation.**
