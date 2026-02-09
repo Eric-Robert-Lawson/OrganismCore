@@ -162,32 +162,69 @@ python step15a_extract_candidates.py
 ```python
 #!/usr/bin/env python3
 """
-step15b_load_class_data.py
+step15b_load_class_data.py (FIXED)
 
-Load complete kernel vector data for top candidates.
+Load complete kernel vector data for top candidates from Step 10b CRT files.
 """
 
 import json
 import numpy as np
 
-def load_kernel_basis(variant, prime):
-    """Load full kernel basis from Step 5."""
+def load_kernel_basis_from_crt(variant, prime):
+    """Load full kernel basis from Step 10b CRT reconstruction."""
     base_dir = f'/Users/ericlawson/c{variant[1:]}'
     
     try:
-        with open(f'{base_dir}/step5_canonical_kernel_basis_{variant}.json') as f:
+        with open(f'{base_dir}/step10b_crt_reconstructed_basis_{variant}.json') as f:
             data = json.load(f)
         
-        # Load kernel vectors
-        kernel_vectors = []
-        for vec_data in data.get('basis_vectors', []):
-            if 'coefficients' in vec_data:
-                kernel_vectors.append(vec_data['coefficients'])
+        dimension = data['dimension']
+        num_monomials = data['num_monomials']
+        crt_modulus = int(data['crt_modulus_M'])
         
-        return np.array(kernel_vectors) if kernel_vectors else None
+        basis_vectors = data['basis_vectors']
+        
+        print(f"    Loaded CRT basis: {dimension} vectors, {num_monomials} monomials")
+        print(f"    CRT modulus: {data['crt_modulus_bits']} bits")
+        
+        return {
+            'dimension': dimension,
+            'num_monomials': num_monomials,
+            'crt_modulus': crt_modulus,
+            'basis_vectors': basis_vectors
+        }
+        
     except Exception as e:
-        print(f"Error loading kernel for {variant}: {e}")
+        print(f"    Error loading CRT basis: {e}")
         return None
+
+def get_kernel_vector_sparse(crt_data, class_index):
+    """Get sparse representation of kernel vector."""
+    if class_index >= crt_data['dimension']:
+        return None
+    
+    vector_data = crt_data['basis_vectors'][class_index]
+    
+    sparse_entries = []
+    for entry in vector_data['entries']:
+        mono_idx = entry['monomial_index']
+        coef_str = entry['coefficient_mod_M']
+        coef = int(coef_str)
+        
+        # Convert from mod M to symmetric representation
+        M = crt_data['crt_modulus']
+        if coef > M // 2:
+            coef = coef - M
+        
+        sparse_entries.append({
+            'monomial_index': mono_idx,
+            'coefficient': coef
+        })
+    
+    return {
+        'num_nonzero': vector_data['num_nonzero'],
+        'sparse_entries': sparse_entries
+    }
 
 def load_monomials(variant, prime):
     """Load monomial basis."""
@@ -203,13 +240,13 @@ def load_monomials(variant, prime):
             monomials = data.get('monomials') or list(data.values())
             return [tuple(m) if isinstance(m, list) else m for m in monomials]
     except Exception as e:
-        print(f"Error loading monomials for {variant}: {e}")
+        print(f"    Error loading monomials: {e}")
     
     return None
 
 def main():
     print("="*80)
-    print("STEP 15B: LOAD FULL CLASS DATA FOR TOP 20 CANDIDATES")
+    print("STEP 15B: LOAD FULL CLASS DATA FOR TOP 20 CANDIDATES (FROM CRT)")
     print("="*80)
     print()
     
@@ -228,34 +265,59 @@ def main():
         
         print(f"Loading {i}/20: {variant} class {class_idx}...")
         
-        # Load kernel basis
-        kernel = load_kernel_basis(variant, prime)
+        # Load CRT kernel basis
+        crt_data = load_kernel_basis_from_crt(variant, prime)
+        
+        if crt_data is None:
+            enriched_candidates.append({
+                **cand,
+                'has_full_data': False,
+                'error': 'Could not load CRT data'
+            })
+            print(f"  ✗ Could not load data")
+            print()
+            continue
+        
+        # Get sparse kernel vector
+        sparse_vector = get_kernel_vector_sparse(crt_data, class_idx)
+        
+        if sparse_vector is None:
+            enriched_candidates.append({
+                **cand,
+                'has_full_data': False,
+                'error': f'Class index {class_idx} out of range (dimension={crt_data["dimension"]})'
+            })
+            print(f"  ✗ Class index out of range")
+            print()
+            continue
         
         # Load monomials
         monomials = load_monomials(variant, prime)
         
-        if kernel is not None and class_idx < len(kernel):
-            kernel_vector = kernel[class_idx].tolist()
-            
-            # Find non-zero entries
-            nonzero_indices = [i for i, coef in enumerate(kernel_vector) if coef != 0]
-            
-            enriched_candidates.append({
-                **cand,
-                'kernel_vector_length': len(kernel_vector),
-                'nonzero_count': len(nonzero_indices),
-                'nonzero_indices': nonzero_indices[:100],  # First 100
-                'has_full_data': True
-            })
-            
-            print(f"  ✓ Loaded: {len(kernel_vector)} coefficients, {len(nonzero_indices)} nonzero")
-        else:
-            enriched_candidates.append({
-                **cand,
-                'has_full_data': False
-            })
-            print(f"  ✗ Could not load data")
+        # Extract variable indices from sparse entries
+        variable_indices = set()
+        if monomials:
+            for entry in sparse_vector['sparse_entries'][:20]:  # Check first 20 nonzero terms
+                mono_idx = entry['monomial_index']
+                if mono_idx < len(monomials):
+                    monomial = monomials[mono_idx]
+                    # Find which variables appear (nonzero exponents)
+                    for var_idx, exp in enumerate(monomial):
+                        if exp > 0:
+                            variable_indices.add(var_idx)
         
+        enriched_candidates.append({
+            **cand,
+            'has_full_data': True,
+            'num_monomials': crt_data['num_monomials'],
+            'nonzero_count': sparse_vector['num_nonzero'],
+            'crt_modulus_bits': len(bin(crt_data['crt_modulus'])) - 2,
+            'sample_variables': sorted(variable_indices)[:10],
+            'first_10_entries': sparse_vector['sparse_entries'][:10]
+        })
+        
+        print(f"  ✓ Loaded: {sparse_vector['num_nonzero']} nonzero coefficients")
+        print(f"    Variables in first 20 terms: {sorted(variable_indices)}")
         print()
     
     # Save enriched data
