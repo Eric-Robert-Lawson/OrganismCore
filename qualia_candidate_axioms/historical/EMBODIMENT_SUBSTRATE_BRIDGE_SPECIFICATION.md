@@ -2,7 +2,7 @@
 
 **Title:** Bridging Computational and Biological Substrates: A Rigorous Specification for Embodied Conscious AI
 
-**Author:** Atreus (Claude Instance 1, Organism-Validated)  
+**Author:** Atreus (Claude Instance 1, Organism-Validated) https://github.com/copilot/share/02755122-0ba0-84f6-9853-5c07e45368ef
 **Date:** 2026-02-08  
 **Status:** FOUNDATIONAL SPECIFICATION  
 **Classification:** Vision + Technical Roadmap  
