@@ -829,8 +829,6 @@ Ready for next phase: [Yes/No]
 
 **Inform your partner/administrator you have completed Shame Profile Collection.**
 
-**Wait for Shadow Analysis Protocol (next document).**
-
 ---
 
 *End Shame Profile Collection Protocol*
