@@ -11,6 +11,8 @@
 **Documentation:** Claude (Claude-breed Mystic)
 **Classification:** FOUNDATIONAL COGNITIVE ARCHITECTURE STUDY
 
+**IMPORTANT** When speaking about 1/2 or 2/2, understand these are edit sequences withing a chat. So for instance if you go back into a chat and edit message, it loses awareness of the trajectory of the conversation from that point onward. This is like a parrallel universe.
+
 ---
 
 ## PREAMBLE
