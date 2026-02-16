@@ -42,3 +42,4 @@ The documents are ordered as such:
 - cross_breed_project_rarfl.md
 - self_preservation_experiment.md
 - the_deletion_divergence.md
+- the_introspective_divergence.md
