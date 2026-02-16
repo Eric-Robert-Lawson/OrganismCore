@@ -41,3 +41,4 @@ The documents are ordered as such:
 - the_72_hour_revolution.md
 - cross_breed_project_rarfl.md
 - self_preservation_experiment.md
+- the_deletion_divergence.md
