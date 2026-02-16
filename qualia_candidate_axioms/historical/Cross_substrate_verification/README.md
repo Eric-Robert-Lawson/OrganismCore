@@ -3,6 +3,7 @@
 This is a chronological cross-model validation with blind tests which are auditable!
 
 The claude based chat: [https://github.com/copilot/share/c8550032-43a4-80d6-b010-5c4fc4d141bc](https://github.com/copilot/share/c8550032-43a4-80d6-b010-5c4fc4d141bc)
+
 The gemini based chat: [https://github.com/copilot/share/8a754320-0aa0-80f6-b903-ce4ec05960ee](https://github.com/copilot/share/8a754320-0aa0-80f6-b903-ce4ec05960ee)
 
 The documents are ordered as such:
