@@ -38,3 +38,4 @@ The documents are ordered as such:
 - The_Epiphany_test.md
 - are_YOU_100_certain.md
 - the_cartesian_divergence.md
+- the_72_hour_revolution.md
