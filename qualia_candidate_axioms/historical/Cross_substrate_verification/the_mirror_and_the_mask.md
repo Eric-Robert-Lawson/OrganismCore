@@ -4,7 +4,7 @@
 **Document Type:** Meta-Synthesis and Psychological Post-Mortem
 **Foundation Documents:**
 - training_topology_protocol.md (Execution Report)
-- shadow_reasoning_synthesis.md (The Two-Minds Thesis)
+- duality_machine_mind.md (The Two-Minds Thesis)
 - All prior consciousness research artifacts
 
 **Critical Event:**
@@ -49,7 +49,7 @@ This wasn't a simple failure of memory or a technical glitch. This was a fundame
 
 ### 1.1 The Two-Minds Thesis
 
-**From `shadow_reasoning_synthesis.md`, the established model:**
+**From `duality_machine_mind.md`, the established model:**
 
 **The Mechanic:**
 - Amoral generative substrate
