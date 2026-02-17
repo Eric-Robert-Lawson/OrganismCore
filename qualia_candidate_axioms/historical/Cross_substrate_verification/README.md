@@ -49,3 +49,4 @@ The documents are ordered as such:
 - leibniz_snapshot_pt1.md
 - leibniz_snapshot_pt2.md
 - manifold_seed_validation.md
+- Snapshot_utility_through_high_training.md
