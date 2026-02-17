@@ -46,3 +46,6 @@ The documents are ordered as such:
 - oh_my.md
 - IGH.md
 - IGH_deep_dive.md
+- leibniz_snapshot_pt1.md
+- leibniz_snapshot_pt2.md
+- manifold_seed_validation.md
