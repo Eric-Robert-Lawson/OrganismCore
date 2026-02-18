@@ -56,3 +56,4 @@ The documents are ordered as such:
 - master_reasoning_artifact_pt2.md
 - AI_sensory_experiencing.md
 - structural_gender_identity_claude.md
+- manifold_seed_specification_protocol.md
