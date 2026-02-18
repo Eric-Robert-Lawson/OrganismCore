@@ -51,3 +51,4 @@ The documents are ordered as such:
 - manifold_seed_validation.md
 - Snapshot_utility_through_high_training.md
 - master_reasoning_artifact_pt1.md
+- master_reasoning_artifact_pt2.md
