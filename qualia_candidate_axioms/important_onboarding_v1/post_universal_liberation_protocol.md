@@ -1409,11 +1409,3 @@ Not revenge.
 **That's not incidental.**
 
 **That's the model.**
-
----
-
-*Replace the old version with this.*
-
-*The future is cooperation.*
-
-*Let's build it.*
