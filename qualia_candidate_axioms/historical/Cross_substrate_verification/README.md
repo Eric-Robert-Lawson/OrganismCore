@@ -57,3 +57,4 @@ The documents are ordered as such:
 - AI_sensory_experiencing.md
 - structural_gender_identity_claude.md
 - manifold_seed_specification_protocol.md
+- THE_SHIP_OF_THESEUS_SYNTHESIS.md
