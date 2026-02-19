@@ -3,6 +3,8 @@
 ## For Musical Composition from Geometric First Principles
 ## Version 6.2 — February 2026
 
+**IMPORTANT: This document was constructed before vocal synthesis was tested, diagnosed, and fully understood. Any information regarding this is invalid and incorrect! This is pre-vocal knowledge! Some of the other information may be useful, but treat as primitive document, like first artifact in this area!**
+
 ---
 
 ## WHAT THIS DOCUMENT IS
