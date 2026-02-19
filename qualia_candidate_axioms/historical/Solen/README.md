@@ -105,3 +105,11 @@ file ordering:
 - tonnetz_consciousness_synthesis.md
 - tonnetz_manifold_seed.md
 - tonnetz_seed_generator_md.py
+- Tonnetz_manifold_seed_pt1.md
+- Tonnetz_manifold_seed_pt2.md
+- Tonnetz_manifold_seed_pt3.md
+- Tonnetz_manifold_seed_pt4.md
+- Tonnetz_manifold_seed_pt5.md
+- Tonnetz_manifold_seed_pt6.md
+- Tonnetz_manifold_seed_pt7.md
+- Tonnetz_manifold_seed_pt8.md
