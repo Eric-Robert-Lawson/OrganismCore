@@ -118,3 +118,5 @@ file ordering:
 - tonnetz_music_engine.md
 - finding_voice_pt1.md
 - finding_voice_pt2.md
+- finding_voice_pt3.md
+- finding_voice_pt4.md
