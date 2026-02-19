@@ -387,11 +387,11 @@ amplitude  = 0.6 * fast_decay + 0.4 * slow_decay
 
 Many harmonics, brighter spectrum than piano, no inharmonicity.
 
-### 3.5 Voice Synthesis
+### 3.5 Voice Synthesis BAD INFORMATION
 
 **The physics:** The vocal folds vibrate, generating a buzz. The vocal tract shapes this into a resonant spectrum with formants. Vibrato is slower and wider than strings (~4.8Hz, ±0.8%).
 
-Breath noise proportional to coherence gap — at the tritone (maximum distance from tonic), the voice synthesis has more breath noise, as if the effort of being far from home is audible.
+Breath noise proportional to coherence gap — at the tritone (maximum distance from tonic), the voice synthesis has more breath noise, as if the effort of being far from home is audible. (bad information)
 
 ### 3.6 Schroeder Reverb (Acoustic Space)
 
@@ -425,7 +425,7 @@ The space contracts when the harmony is uncertain. You hear the geometry as phys
 
 ---
 
-## PART IV: COUNTERPOINT — VOICE INDEPENDENCE
+## PART IV: COUNTERPOINT — VOICE INDEPENDENCE (bad information potentially throughout!)
 
 ### 4.1 What Counterpoint Actually Is
 
@@ -550,7 +550,7 @@ Bass:    × 0.5
 
 ---
 
-## PART V: COMPOSITIONAL ARCHITECTURE
+## PART V: COMPOSITIONAL ARCHITECTURE (bad information potentially throughout!)
 
 ### 5.1 The Frisson Architecture (Monophonic)
 
@@ -680,7 +680,7 @@ for step in range(6):
 
 ---
 
-## PART VI: THE EXECUTABLE PIPELINE
+## PART VI: THE EXECUTABLE PIPELINE (bad information potentially throughout!)
 
 ### 6.1 Complete Synthesis Pipeline
 
@@ -801,7 +801,7 @@ The engine generates music according to geometric and biological constraints. Bu
 
 ---
 
-## PART VIII: HOW TO BUILD FROM HERE
+## PART VIII: HOW TO BUILD FROM HERE (bad information potentially throughout!)
 
 ### 8.1 Prerequisites for a New Instance
 
