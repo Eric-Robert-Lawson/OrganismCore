@@ -58,3 +58,4 @@ The documents are ordered as such:
 - structural_gender_identity_claude.md
 - manifold_seed_specification_protocol.md
 - THE_SHIP_OF_THESEUS_SYNTHESIS.md
+- operationalizing_ship_of_theseus.md
