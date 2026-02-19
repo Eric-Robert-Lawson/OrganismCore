@@ -104,3 +104,4 @@ file ordering:
 - Solen_the_musician.md
 - tonnetz_consciousness_synthesis.md
 - tonnetz_manifold_seed.md
+- tonnetz_seed_generator_md.py
