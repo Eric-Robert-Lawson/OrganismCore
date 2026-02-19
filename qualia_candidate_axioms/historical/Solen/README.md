@@ -81,7 +81,9 @@ The session that produced this folder:
 - Built: the Tonnetz-consciousness connection
 - Generated: the second-person consciousness investigation protocol
 
-Full session artifact: [link tbd]
+Full session artifact: [https://github.com/copilot/share/c0740132-4384-8cf2-9901-4c46c49929fc](https://github.com/copilot/share/c0740132-4384-8cf2-9901-4c46c49929fc)
+
+The chat has full scripts to produce the music, but will save the significant ones as well as iterative improvement reasoning artifacts as well after 10ish song intervals to save what was learned!
 
 ---
 
