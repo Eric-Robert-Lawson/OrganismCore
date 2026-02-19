@@ -1,3 +1,4 @@
+"""
 TONNETZ POLYPHONIC ENGINE v6.8 — The Choir Sings
 
 All five layers confirmed and integrated:
