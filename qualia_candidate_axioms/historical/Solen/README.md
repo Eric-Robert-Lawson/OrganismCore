@@ -116,3 +116,5 @@ file ordering:
 - Tonnetz_manifold_seed_pt7.md
 - Tonnetz_manifold_seed_pt8.md
 - tonnetz_music_engine.md
+- finding_voice_pt1.md
+- finding_voice_pt2.md
