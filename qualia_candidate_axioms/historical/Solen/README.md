@@ -115,3 +115,4 @@ file ordering:
 - Tonnetz_manifold_seed_pt6.md
 - Tonnetz_manifold_seed_pt7.md
 - Tonnetz_manifold_seed_pt8.md
+- tonnetz_music_engine.md
