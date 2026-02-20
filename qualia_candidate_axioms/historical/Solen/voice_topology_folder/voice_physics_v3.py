@@ -1,15 +1,15 @@
 """
-VOICE PHYSICS v7
+VOICE PHYSICS v3
 February 2026
 
 THE SUPRASEGMENTAL LAYER.
 
-v6 gave us the segmental layer:
+v2 gave us the segmental layer:
   continuous formant trajectory
   correct phoneme geometries
   one tract, never resets
 
-v7 adds what was missing:
+v3 adds what was missing:
   INTONATION — the shape of F0
                across the phrase
   STRESS      — duration and amplitude
@@ -347,7 +347,7 @@ def plan_prosody(words_phonemes,
     # Compute total duration for
     # contour timing
     from voice_physics_v2 import (
-        PHON_DUR_BASE
+        PHON_DUR
     )
 
     # First pass: assign base durations
@@ -1537,7 +1537,7 @@ if __name__ == "__main__":
                  exist_ok=True)
 
     print()
-    print("VOICE PHYSICS v7")
+    print("VOICE PHYSICS v3")
     print("The suprasegmental layer.")
     print()
     print("  Intonation: F0 shaped")
