@@ -1,5 +1,5 @@
 """
-VOICE PHYSICS v6
+VOICE PHYSICS v2
 February 2026
 
 THE PHRASE MODEL:
@@ -445,7 +445,7 @@ def trajectory(F_tgt, B_tgt,
 
 # ============================================================
 # PHONEME SYNTHESIS
-# (same as v6 pre — all fixes retained)
+# (same as v2 pre — all fixes retained)
 # ============================================================
 
 def synth_vowel(v, pitch=PITCH,
