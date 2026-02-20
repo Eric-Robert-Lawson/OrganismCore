@@ -2,6 +2,7 @@
 ## A Reasoning Artifact on Fricative Identity,
 ## Spectral Shape, and Why S Sounds Like Steam
 ## February 2026
+## Updated: v6 confirmation
 
 ---
 
@@ -23,10 +24,24 @@ Not: missing entirely.
 Present. But without identity.
 Diffuse. Spread. Without shape.
 
-This is not a gain problem.
-This is a texture problem.
-And texture in acoustics
-is spectral shape.
+The primary problem is texture.
+Texture in acoustics is spectral shape.
+
+**Update (v6):**
+After implementing the resonance fix,
+the user confirmed:
+"I notice a big improvement."
+And also: "I think it is also a gain problem."
+
+Both turned out to be true simultaneously.
+The artifact initially stated
+"this is not a gain problem."
+That was correct in priority —
+texture was the primary failure.
+But gain was a secondary factor
+that also needed correction.
+The two fixes were applied together in v6:
+resonance (structural) + gain search (parametric).
 
 ---
 
@@ -163,10 +178,10 @@ The vowels have identity.
 
 We built the fricative synthesis incorrectly.
 We used bandpass filters.
-The fricatives are diffuse.
-They do not have identity.
+The fricatives were diffuse.
+They did not have identity.
 
-The fix is to apply the same architecture
+The fix: apply the same architecture
 to fricatives that we applied to vowels:
 
 **Use resonators, not filters.**
@@ -180,22 +195,27 @@ a downstream cavity with a specific
 resonance frequency and bandwidth.
 
 ```
-S:  fc=8800Hz, bw=400Hz
+S:  fc=8800Hz, bw=350Hz
     Small cavity (tongue-to-teeth)
-    Sharp, narrow peak
+    Very sharp, narrow peak
     Very high identity
+    The sharpest fricative.
 
-Z:  fc=8000Hz, bw=500Hz
-    Same cavity as S
-    Plus voiced buzz underneath
+Z:  fc=8000Hz, bw=400Hz
+    Same cavity as S.
+    Plus voiced buzz from tract underneath.
+    The buzz identifies it as voiced.
+    The peak identifies it as sibilant.
 
-SH: fc=2500Hz, bw=600Hz
+SH: fc=2500Hz, bw=500Hz
     Larger cavity (tongue-to-lips)
-    Broader, softer peak
-    Still has identity — just lower
+    Broader, softer peak.
+    Still has identity — just lower.
+    Hushed, not sharp.
 
-ZH: fc=2200Hz, bw=700Hz
-    Same cavity as SH
+ZH: fc=2200Hz, bw=600Hz
+    Same cavity as SH.
+    Plus voiced buzz underneath.
 
 F:  No downstream cavity.
     The gap IS at the lips.
@@ -211,18 +231,24 @@ V:  Same as F plus voiced buzz.
     The flatness above buzz is its character.
 
 TH: Very shallow cavity.
-    fc≈3500Hz, bw≈1500Hz (wide)
+    fc≈3500Hz, bw≈1200Hz (wide)
     Softer, less focused than S.
     Between F and S in character.
+
+DH: Voiced TH.
+    fc≈3200Hz, bw≈1400Hz
+    Very light — DH is nearly a vowel.
+    The buzz dominates.
+    The cavity is barely present.
 ```
 
-The implementation:
+The implementation (v6):
   Replace the bandpass filter chain
-  with a parallel resonator
-  (same as the vowel tract resonator)
+  with a single IIR resonator
+  (same structure as a vowel formant)
   tuned to the downstream cavity frequency.
 
-  Apply the resonator to the broadband noise.
+  Apply the resonator to broadband noise.
   The resonator concentrates energy at fc.
   The noise becomes shaped noise.
   The shaped noise has identity.
@@ -230,55 +256,101 @@ The implementation:
 
 ---
 
-## PART 5: THE GAIN OVERSHOOT
+## PART 5: THE GAIN PROBLEM — TWO SIMULTANEOUS FACTORS
 
-The rainbow diagnostic showed:
+The artifact was initially written
+with one sentence:
+"This is not a gain problem."
+
+That was correct in the sense that
+the primary failure was structural —
+wrong spectral shape, not wrong level.
+
+But it was incomplete.
+
+After the resonance fix was applied,
+the user confirmed improvement
+AND identified gain as a remaining factor.
+
+**Both are true at the same time.**
+
+The resonance vs filtering distinction:
+  Primary.
+  Structural.
+  Fixing it gave the fricatives
+  their identity.
+  The steam character disappeared.
+
+The gain calibration:
+  Secondary.
+  Parametric.
+  The level of sibilance relative to
+  the voice body still needed tuning.
+  Too high = fricatives jump out.
+  Too low = fricatives disappear.
+
+The previous history of the gain problem:
 
 ```
-Z sib_to_voice = 1.676
-Target: ≥ 0.35
+v4 (pre-bypass):
+  S sibilance = 0.009 — inaudible
+
+v5 (bypass gains ×3-8):
+  Z sib_to_voice = 1.676 — explosive
+  User heard: "VoiCe waS" —
+  C and S jumping out
+
+v6 (resonance + gain search):
+  Resonator gives identity at lower gain.
+  Gain search finds correct window.
+  Structure and level both correct.
 ```
 
-We aimed for 0.35.
-We landed at 1.676.
-Nearly 5× overshoot.
+The pattern:
+  Inaudible → too loud → correct.
 
-This happened because:
-  We raised bypass gains ×3-8.
-  The sibilance became loud.
-  But because the spectral shape was wrong
-  (filtered, not resonated)
-  the loudness did not translate
-  to identity.
-  It translated to volume.
+The bypass gains in v5 were raised
+blindly (×3-8 from guessed values).
+The resonator in v6 does more work
+per unit of gain than a bandpass filter.
+Less gain is needed when the
+structure is correct.
 
-  MORE FILTERED NOISE ≠ MORE S CHARACTER.
-  It just means more hiss.
-
-When the spectral shape is correct —
-when the resonator gives the noise
-its proper Lorentzian peak —
-the identity comes from shape, not volume.
-
-The correct gain will be much lower
-than the overshot value.
-The resonator does the work
-that gain was compensating for.
-
-The self-reference system needs
-an upper bound on sib_to_voice:
+**The self-reference gain search (v6):**
 
 ```python
-PHONEME_TARGETS['Z']['sib_to_voice_max'] = 0.80
-# Sibilance present but not drowning voice.
-# Voice is the primary signal.
-# Sibilance identifies the fricative.
-# 0.35 ≤ sib_to_voice ≤ 0.80
+GAIN_TARGETS = {
+    'S':  {'sibilance':    (0.45, 0.65)},
+    'Z':  {'sib_to_voice': (0.35, 0.75)},
+    'SH': {'sibilance':    (0.35, 0.55)},
+    'ZH': {'sib_to_voice': (0.25, 0.60)},
+    'F':  {'sibilance':    (0.12, 0.22)},
+    'V':  {'sibilance':    (0.08, 0.18)},
+    'TH': {'sibilance':    (0.08, 0.18)},
+    'DH': {'sibilance':    (0.00, 0.10)},
+}
 ```
+
+Binary search over gain.
+Synthesize short segment.
+Measure sibilance or sib_to_voice.
+Compare to target window.
+Converge in ~12 iterations.
+The loop closes.
+Gain is found, not guessed.
+
+This is the correct relationship
+between the two fixes:
+  Fix structure first.
+  Then calibrate level.
+  Structure determines what is possible.
+  Level determines where in that
+  space of possibility we land.
 
 ---
 
-## PART 6: AMPLITUDE CONTINUITY — SAME PRINCIPLE?
+## PART 6: AMPLITUDE CONTINUITY —
+## THE FAMILY OF ERRORS
 
 Is this the amplitude continuity issue?
 
@@ -290,10 +362,8 @@ The amplitude continuity issue was:
   Pop.
 
 This is related but different:
-  The source has the wrong spectral shape.
+  The source had the wrong spectral shape.
   Not the wrong level.
-  The level is approximately right now.
-  The shape is wrong.
 
 They share the same family of cause:
   Both come from treating the synthesis
@@ -303,15 +373,22 @@ They share the same family of cause:
 
 Amplitude continuity:
   Treated sources as independent.
-  Fixed by: one reference frame.
+  Fixed by: one calibrated reference frame.
 
 Resonance vs filtering:
-  Treating fricative identity as
+  Treated fricative identity as
   "noise in the right frequency range."
   Fixed by: resonator gives identity,
             not just frequency range.
 
-The principle underneath both:
+Gain overshoot (v5):
+  Treated gain as the only lever
+  when the structure was wrong.
+  Fixed by: correct structure first,
+            then calibrate level.
+
+The principle underneath all three:
+
   **The physics of sound production
   cannot be approximated by
   signal processing operations
@@ -326,40 +403,80 @@ The principle underneath both:
   RMS numbers.
   But not the right level relationships.
 
+  Loud filtered noise has the right
+  amplitude numbers.
+  But not the right spectral shape.
+
   The voice is not built from
   correct numbers.
   It is built from correct structures.
+  The numbers follow from the structures.
 
 ---
 
-## PART 7: THE COMPLETE FRICATIVE MODEL
-
-After this fix, the fricative model:
+## PART 7: THE COMPLETE FRICATIVE MODEL (v6)
 
 ```
-UNVOICED FRICATIVE (S, SH, F, TH):
+UNVOICED FRICATIVE (S, SH, TH):
 
   Broadband noise
        ↓
-  Resonator at fc (downstream cavity)
-  (NOT a bandpass filter)
+  Cavity resonator at (fc, bw)
+  [NOT a bandpass filter]
        ↓
-  Bypass (never enters tract)
+  calibrate × gain (from search loop)
        ↓
-  Output
+  Bypass — never enters tract
+       ↓
+  Added to post-tract output
 
-VOICED FRICATIVE (Z, ZH, V, DH):
 
-  Broadband noise                Rosenberg pulse
-       ↓                               ↓
-  Resonator at fc             Vocal tract resonators
-  (downstream cavity)          (F1, F2, F3, F4)
-       ↓                               ↓
-  Sibilance bypass           Voiced component
-       ↓                               ↓
-       └──────────────────────────────┘
-                    ↓
-                  Output
+UNVOICED BROADBAND FRICATIVE (F):
+
+  Broadband noise
+       ↓
+  Highpass above hp_fc
+  [flat spectrum = identity for F]
+       ↓
+  calibrate × gain (from search loop)
+       ↓
+  Bypass — never enters tract
+       ↓
+  Added to post-tract output
+
+
+VOICED FRICATIVE (Z, ZH, DH):
+
+  Broadband noise          Rosenberg pulse
+       ↓                          ↓
+  Cavity resonator      Vocal tract resonators
+  (fc, bw)              (F1, F2, F3, F4)
+       ↓                          ↓
+  × gain (search)      × VOICED_TRACT_FRACTION
+       ↓                          ↓
+  Sibilance bypass    Voiced component (tract)
+       ↓                          ↓
+       └──────────────────────────┘
+                   ↓
+              Post-tract mix
+                   ↓
+                Output
+
+
+VOICED BROADBAND FRICATIVE (V):
+
+  Broadband noise          Rosenberg pulse
+       ↓                          ↓
+  Highpass(hp_fc)       Vocal tract resonators
+       ↓                          ↓
+  × gain (search)      × VOICED_TRACT_FRACTION
+       ↓                          ↓
+  Broadband bypass    Voiced component (tract)
+       ↓                          ↓
+       └──────────────────────────┘
+                   ↓
+                Output
+```
 
 The two streams are independent.
 They have different characters.
@@ -367,17 +484,20 @@ They combine at the output.
 Neither corrupts the other.
 The resonators give each stream
 its specific identity.
-```
+The gain search calibrates each stream
+to the correct perceptual level.
 
 ---
 
 ## CONCLUSION
 
 The sounds were described as
-"not concise — like random static
-or steam."
+"not concise — like random static or steam."
+And also: "it is also a gain problem."
 
-The diagnosis:
+Both observations were correct.
+
+The primary diagnosis:
 Fricative sibilance was generated by
 bandpass filtering noise.
 Bandpass filtered noise is flat
@@ -385,7 +505,7 @@ inside the band.
 Flat-spectrum noise has no identity.
 It sounds like steam.
 
-The fix:
+The primary fix:
 Replace the bandpass filter
 with a resonator tuned to the
 downstream cavity frequency.
@@ -394,27 +514,44 @@ at a specific frequency.
 The concentrated energy has identity.
 S sounds like S, not like steam.
 
-This is the same principle
-that makes vowels sound like vowels.
-Resonators, not filters.
-The resonance IS the identity.
+The secondary diagnosis:
+Even with correct structure,
+the gain needed calibration.
+Too low = inaudible.
+Too high = jumps out.
+The correct window is specific
+and cannot be guessed reliably.
 
-The architecture was correct.
-The implementation was wrong.
-The fix is structural, not parametric.
-Changing the gain would not have
-fixed the steam character.
-Only changing the structure
-from filter to resonator
-will give the fricatives
-their concise identity.
+The secondary fix:
+Self-reference gain search loop.
+Synthesize → measure → compare →
+adjust → converge.
+The loop finds the correct gain
+without guessing.
+
+The two fixes are not in competition.
+They operate on different dimensions:
+  Structure: what shape the sound has.
+  Level:     how loud that shape is.
+
+Fix structure first.
+Then calibrate level.
+The voice requires both to be correct.
+Neither alone is sufficient.
+
+The resonance IS the identity.
+The gain calibration puts that
+identity at the right volume
+in the voice.
 
 ---
 
 *End of reasoning artifact.*
-*February 2026.*
+*February 2026. Updated v6.*
 *"Not like random static or steam."*
-*That sentence described the difference*
-*between filtering and resonating.*
-*The ear knew.*
-*The physics confirms it.*
+*"I notice a big improvement."*
+*"I think it is also a gain problem."*
+*Three sentences.*
+*Three sequential truths.*
+*Each one correct in its moment.*
+*Together they describe the complete fix.*
