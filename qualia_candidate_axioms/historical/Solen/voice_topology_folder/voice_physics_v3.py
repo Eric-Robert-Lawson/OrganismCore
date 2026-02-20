@@ -346,7 +346,7 @@ def plan_prosody(words_phonemes,
 
     # Compute total duration for
     # contour timing
-    from voice_physics_v6 import (
+    from voice_physics_v2 import (
         PHON_DUR_BASE
     )
 
