@@ -866,4 +866,4 @@ Hierarchy:
     Connected to all prior artifacts
     in the voice topology folder.
     Open questions recorded.
-````{"repoID":0,"ref":"","type":"repo-instructions","url":"/Eric-Robert-Lawson/OrganismCore/blob/refs/heads/main/.github/copilot-instructions.md"}
+````
