@@ -1,39 +1,25 @@
 """
-VOICE PHYSICS v10 — rev8
+VOICE PHYSICS v10 — rev9
 February 2026
 
-CHANGES FROM rev7:
+CHANGES FROM rev8:
 
-  CHANGE 1: Post-normalization sibilant rescaling.
-    S/Z/SH/ZH were 7-10dB quieter than
-    following vowels after normalization.
-    Cause: relative scaling used pre-tract
-    voiced_rms as reference. After tract()
-    amplifies vowels by formant gain (~10dB),
-    and after _normalize_phrase brings vowels
-    to NORM_TARGET, sibilants remain at
-    their pre-normalization level.
-    Fix: after _normalize_phrase, measure
-    normalized vowel body RMS, then explicitly
-    set sibilant segment RMS to
-    vowel_rms × SIBILANT_OUTPUT_RATIO.
-    SIBILANT_OUTPUT_RATIO = 0.70.
-    (S should be slightly quieter than vowels
-    but not 10dB quieter.)
+  REVERT: _rescale_sibilants removed.
+    It was double-correcting.
+    _normalize_phrase already normalizes
+    to vowel body reference.
+    _rescale_sibilants then amplified
+    sibilants by 9-14× to reach 70% of
+    vowel RMS, causing hard clipping.
+    Clipped Z: IS=24382 (was 38 without it).
+    Clipped S: IS=44 (was 26 without it).
+    Clipped DH: IS=41 (was 0.41 without it).
+    The normalization alone is correct.
+    Post-normalization rescaling is removed.
 
-  CHANGE 2: AV/AH crossfade at vowel→H boundary.
-    AA→H IS=33.3 because AA ended at full
-    resonant level and H began as aspiration.
-    Hard spectral cut at boundary.
-    Fix: at the offset of any voiced phoneme
-    immediately preceding H, apply a
-    voiced-to-aspiration crossfade over
-    VOICED_TO_H_CROSSFADE_MS.
-    The formant output fades from 1→0 while
-    the H aspiration fades from 0→1.
-    This matches the AV/AH crossfade in
-    Klatt (1980).
-    VOICED_TO_H_CROSSFADE_MS = 25ms.
+  KEEP: AV→AH crossfade (CHANGE 2 from rev8).
+    H AA→ph IS went from 33 to 0.14. ✓
+    This fix is correct and stays.
 """
 
 from voice_physics_v9 import (
@@ -100,7 +86,7 @@ H_BYPASS_LP_ORDER   = 2
 H_BYPASS_GAIN       = 0.55
 H_BYPASS_ATK_MS     = 18
 
-# CHANGE 2: AV→AH crossfade duration
+# AV→AH crossfade: voiced offset before H
 VOICED_TO_H_CROSSFADE_MS = 25
 
 Z_BYPASS_GAIN_FLOOR  = 0.65
@@ -119,13 +105,6 @@ V_BYPASS_BP_HI = 3000
 
 SIBILANT_VOICED_RATIO = 0.80
 RELATIVE_SCALE_PHS    = {'S', 'Z', 'SH', 'ZH'}
-
-# CHANGE 1: post-normalization sibilant ratio
-# Sibilants set to this fraction of the
-# normalized vowel RMS after _normalize_phrase.
-SIBILANT_OUTPUT_RATIO = 0.70
-SIBILANT_RESCALE_PHS  = {'S', 'Z', 'SH', 'ZH',
-                          'F', 'V', 'TH', 'DH'}
 
 NORM_PERCENTILE = 90
 NORM_TARGET     = 0.88
@@ -198,7 +177,7 @@ def _make_h_bypass(n_s, sr=SR,
 
 
 # ============================================================
-# DH BYPASS
+# DH BYPASS + BUZZ
 # ============================================================
 
 def _make_dh_bypass(n_s, sr=SR,
@@ -214,7 +193,8 @@ def _make_dh_bypass(n_s, sr=SR,
     nyq = sr * 0.5
     try:
         lo  = max(DH_BYPASS_BP_LO, 20)/nyq
-        hi  = min(DH_BYPASS_BP_HI, sr*0.48)/nyq
+        hi  = min(DH_BYPASS_BP_HI,
+                  sr*0.48)/nyq
         lo  = min(lo, 0.97)
         hi  = min(hi, 0.98)
         if lo < hi:
@@ -271,7 +251,8 @@ def _make_v_bypass(n_eff, gain, sr=SR):
     nyq = sr * 0.5
     try:
         lo  = max(V_BYPASS_BP_LO, 20)/nyq
-        hi  = min(V_BYPASS_BP_HI, sr*0.48)/nyq
+        hi  = min(V_BYPASS_BP_HI,
+                  sr*0.48)/nyq
         lo  = min(lo, 0.97)
         hi  = min(hi, 0.98)
         if lo < hi:
@@ -335,6 +316,7 @@ def _make_bypass(ph, n_s, sr=SR,
         return f32(sig * env)
 
     raw = np.zeros(n_s, dtype=DTYPE)
+
     if ph in RESONATOR_CFG_V10 or \
        ph in RESONATOR_CFG:
         g = (gain if gain is not None
@@ -361,6 +343,7 @@ def _make_bypass(ph, n_s, sr=SR,
         else:
             sib = sib * g
         raw[onset_delay:] = _env(sib)
+
     elif ph == 'V':
         g   = (gain if gain is not None
                else 0.14)
@@ -375,6 +358,7 @@ def _make_bypass(ph, n_s, sr=SR,
                     SIBILANT_VOICED_RATIO /
                     sib_rms)
         raw[onset_delay:] = _env(sib)
+
     elif ph in BROADBAND_CFG:
         cfg   = BROADBAND_CFG[ph]
         g     = (gain if gain is not None
@@ -400,6 +384,7 @@ def _make_bypass(ph, n_s, sr=SR,
         else:
             sib = sib * g
         raw[onset_delay:] = _env(sib)
+
     return f32(raw)
 
 
@@ -544,8 +529,6 @@ def _build_source_and_bypass(
         next_ph = (phoneme_specs[si+1]['ph']
                    if si < n_specs-1
                    else None)
-        prev_ph = (phoneme_specs[si-1]['ph']
-                   if si > 0 else None)
         next_is_vowel = (
             next_ph in VOWELS_AND_APPROX)
 
@@ -572,10 +555,8 @@ def _build_source_and_bypass(
                                 zero_start]),
                             0.0,
                             n_s-zero_start))
-            # CHANGE 2: AV→AH crossfade
-            # If next phoneme is H, fade the
-            # voiced tract output at the offset
-            # over VOICED_TO_H_CROSSFADE_MS.
+            # AV→AH crossfade: fade voiced
+            # offset into H over 25ms
             if next_ph == 'H':
                 xfade_n = min(
                     int(VOICED_TO_H_CROSSFADE_MS
@@ -583,11 +564,10 @@ def _build_source_and_bypass(
                     n_s//2)
                 if xfade_n > 0:
                     fade_start = n_s - xfade_n
-                    if fade_start < n_s:
-                        seg[fade_start:] *= \
-                            f32(np.linspace(
-                                1.0, 0.0,
-                                n_s-fade_start))
+                    seg[fade_start:] *= \
+                        f32(np.linspace(
+                            1.0, 0.0,
+                            n_s-fade_start))
             tract_source[s:e] = seg
 
         elif stype == 'h':
@@ -723,90 +703,6 @@ def _normalize_phrase(signal, specs,
 
 
 # ============================================================
-# POST-NORMALIZATION SIBILANT RESCALING
-#
-# CHANGE 1: After normalization brings vowels
-# to NORM_TARGET, sibilants are still at
-# their pre-normalization relative level.
-# Measure normalized vowel body RMS.
-# Rescale sibilant segments to
-# vowel_rms × SIBILANT_OUTPUT_RATIO.
-# ============================================================
-
-def _rescale_sibilants(signal, specs,
-                        prosody, sr=SR):
-    """
-    After normalization, measure the
-    normalized vowel body RMS, then
-    set sibilant/fricative segments to
-    vowel_rms × SIBILANT_OUTPUT_RATIO.
-    """
-    signal = f32(signal)
-    n      = len(signal)
-
-    # Measure normalized vowel body RMS
-    vowel_rms_samples = []
-    pos = 0
-    for item, spec in zip(prosody, specs):
-        n_s = spec['n_s']
-        ph  = spec['ph']
-        if ph in VOWEL_SET:
-            n_on_  = min(trans_n(ph, sr),
-                         n_s//3)
-            n_off_ = min(trans_n(ph, sr),
-                         n_s//3)
-            n_bod  = max(1, n_s-n_on_-n_off_)
-            body_s = pos + n_on_
-            body_e = min(body_s+n_bod, n)
-            if body_e > body_s:
-                vowel_rms_samples.append(
-                    signal[body_s:body_e]**2)
-        pos += n_s
-
-    if not vowel_rms_samples:
-        return signal
-
-    vowel_rms = float(np.sqrt(
-        np.mean(np.concatenate(
-            vowel_rms_samples)) + 1e-12))
-    if vowel_rms < 1e-8:
-        return signal
-
-    target_sib_rms = (vowel_rms *
-                      SIBILANT_OUTPUT_RATIO)
-
-    # Rescale each sibilant segment
-    pos = 0
-    out = signal.copy()
-    for item, spec in zip(prosody, specs):
-        n_s = spec['n_s']
-        ph  = spec['ph']
-        if ph in SIBILANT_RESCALE_PHS:
-            n_on_  = min(trans_n(ph, sr),
-                         n_s//3)
-            n_off_ = min(trans_n(ph, sr),
-                         n_s//3)
-            n_bod  = max(1, n_s-n_on_-n_off_)
-            body_s = pos + n_on_
-            body_e = min(body_s+n_bod, n)
-            if body_e > body_s:
-                seg = signal[body_s:body_e]
-                cur_rms = float(np.sqrt(
-                    np.mean(seg**2) + 1e-12))
-                if cur_rms > 1e-8:
-                    scale = (target_sib_rms /
-                             cur_rms)
-                    # Apply scale to full
-                    # phoneme segment
-                    ph_s = pos
-                    ph_e = min(pos+n_s, n)
-                    out[ph_s:ph_e] *= scale
-        pos += n_s
-
-    return np.clip(f32(out), -1.0, 1.0)
-
-
-# ============================================================
 # PHRASE SYNTHESIS
 # ============================================================
 
@@ -934,16 +830,11 @@ def synth_phrase(words_phonemes,
         pos += n_s
 
     final = f32(np.concatenate(segs_out))
-
-    # Normalize to vowel body reference
     final = _normalize_phrase(
         final, specs, prosody, sr=sr)
-
-    # CHANGE 1: Post-normalization sibilant
-    # rescaling to vowel_rms × 0.70
-    final = _rescale_sibilants(
-        final, specs, prosody, sr=sr)
-
+    # No _rescale_sibilants — normalization
+    # alone is the correct and sufficient
+    # level reference.
     return final
 
 
@@ -987,20 +878,15 @@ if __name__ == "__main__":
     os.makedirs("output_play", exist_ok=True)
 
     print()
-    print("VOICE PHYSICS v10 rev8")
+    print("VOICE PHYSICS v10 rev9")
     print()
-    print("  CHANGE 1: Post-normalization "
-          "sibilant rescaling.")
-    print("    S/Z/SH/ZH set to "
-          f"{SIBILANT_OUTPUT_RATIO}× "
-          "normalized vowel RMS.")
-    print("    S ph→AA amp target: ±6dB.")
+    print("  REVERT: _rescale_sibilants removed.")
+    print("    Was amplifying S/Z/DH 9-14×.")
+    print("    Caused clipping → IS explosion.")
+    print("    Z ph→AA IS: 38 → 24382 → back.")
     print()
-    print("  CHANGE 2: AV→AH crossfade.")
-    print("    Voiced phoneme before H fades")
-    print(f"    over "
-          f"{VOICED_TO_H_CROSSFADE_MS}ms.")
-    print("    AA→H IS target: ≤10.")
+    print("  KEEP: AV→AH crossfade (rev8).")
+    print("    H AA→ph IS: 33 → 0.14. ✓")
     print("=" * 60)
     print()
 
