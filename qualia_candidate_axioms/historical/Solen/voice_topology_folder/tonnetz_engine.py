@@ -418,7 +418,7 @@ def render_note(freq, amp, dur_s,
         ga = np.zeros(n_s)
     excitation = source + ga * 0.05
 
-    # ── 7. Vowel trajectory ───────────���─────────
+    # ── 7. Vowel trajectory ──────────────────────
     # Sigmoid glide — not linear.
     # Linear = mechanism audible.
     # Sigmoid = articulation audible.
@@ -513,7 +513,7 @@ def render_note(freq, amp, dur_s,
         turb = np.zeros(n_s)
     voiced = voiced + turb * 0.8
 
-    # ── 10. Amplitude envelope ──────────────────
+    # ── 10. Amplitude envelope ────────���─────────
     atk_s = min(0.28 + (1-vel_norm)*0.10,
                 dur_s*0.40)
     atk_n = int(atk_s * sr)
@@ -844,3 +844,527 @@ def render_score(voices,
     print(f"  Duration: {int(dur//60)}m "
           f"{dur%60:.0f}s  at {bpm}bpm")
     return output
+
+
+# ============================================================
+# VOCAL DISTANCE LAYER
+# Added: February 2026
+#
+# H Ghost Topology established that:
+#   H is the Tonnetz origin (0, 0).
+#   Every vowel is a distance from H.
+#   Every consonant is a path through
+#   constriction space toward a vowel.
+#   The ghost between syllables is the
+#   acoustic trace of the Tonnetz
+#   distance being traversed.
+#
+# This section adds:
+#   VOWEL_TONNETZ   — ARPAbet vowels mapped
+#                     to Tonnetz coordinates.
+#   CONSONANT_TONNETZ — consonant constriction
+#                     positions in the same space.
+#   vocal_distance()  — measurable distance
+#                     between two phonemes.
+#   distance_from_H() — departure from origin.
+#   ghost_duration_from_distance() — the distance
+#                     made temporal.
+#   GHOST_PROFILES  — arc-typed ghost signatures.
+#   ghost_at_boundary() — per-syllable ghost params.
+#   ghost_formant_interp() — Tonnetz traversal
+#                     made acoustic.
+#
+# NOTE ON TWO VOWEL SYSTEMS:
+#   This engine uses VOWEL_DATA (above) with
+#   keys 'ah', 'ee', 'oh', 'oo', 'eh', 'pre'
+#   for choral synthesis.
+#   The voice_physics chain uses ARPAbet symbols
+#   ('AH', 'IY', 'OH', 'UW', 'EH') for speech.
+#   VOWEL_TONNETZ uses ARPAbet — the speech system.
+#   The two systems share the same Tonnetz space.
+#   They are different symbol sets for the same
+#   physical instrument.
+#
+# INVARIANTS: unchanged. This section is purely
+# additive. Nothing above this line is modified.
+# ============================================================
+
+# ── H ORIGIN ─────────────────────────────────────────────
+# The baseline state of the voice.
+# Unobstructed tract. Tongue at rest.
+# Tonnetz position: (0, 0).
+# All distances are measured from here.
+
+H_FORMANTS  = [500.0, 1500.0, 2500.0, 3500.0]
+H_BANDWIDTHS= [200.0,  220.0,  350.0,  450.0]
+
+# ── VOWEL TONNETZ COORDINATES ─────────────────────────────
+#
+# ARPAbet vowels mapped to integer Tonnetz grid (a, b).
+#
+# a = fifth-axis  (positive = front, high F2)
+#                 (negative = back,  low  F2)
+# b = third-axis  (positive = open,  high F1)
+#                 (negative = high,  low  F1)
+#
+# H = (0, 0) — the origin. Neutral open tract.
+#
+# Derivation: F1 and F2 from VOWEL_DATA / VOWEL_F
+# in voice_physics are the acoustic coordinates.
+# The Tonnetz grid is a quantized map of that space
+# centered on H baseline.
+#
+# These are ordinal positions — relative distance
+# and direction matter, not cardinal magnitude.
+# Perceptual verification is the ground truth.
+
+VOWEL_TONNETZ = {
+    # ── HIGH FRONT (low F1, high F2) ──────────────
+    'IY': ( 3, -2),   # beet   F1~270  F2~2290
+                      # Maximum front departure.
+                      # Tongue high and front.
+                      # Far from H in both axes.
+    'IH': ( 2, -1),   # bit    F1~390  F2~1990
+                      # Lax. Closer to H than IY.
+    'EY': ( 2, -1),   # bait   diphthong onset position.
+                      # Shares IH onset topology.
+
+    # ── MID FRONT ─────────────────────────────────
+    'EH': ( 1,  0),   # bed    F1~530  F2~1840
+                      # One step front of H.
+                      # Moderate distance.
+    'AE': ( 1,  1),   # bat    F1~660  F2~1720
+                      # Front and open.
+                      # Jaw lower than EH.
+
+    # ── LOW / DIPHTHONG ONSET ─────────────────────
+    'AY': ( 1,  1),   # high   diphthong onset ~AE.
+    'AW': (-1,  2),   # how    diphthong onset ~AA.
+    'OY': (-1,  1),   # boy    diphthong onset ~AO.
+
+    # ── CENTRAL ───────────────────────────────────
+    'AH': ( 0,  1),   # but    F1~520  F2~1190
+                      # One step open from H.
+                      # Schwa territory.
+                      # Closest vowel to origin.
+    'ER': ( 0, -1),   # bird   F1~490  F2~1350
+                      # Retroflex. F3 suppressed.
+                      # One step high from H.
+                      # Distinctive F3 axis
+                      # not captured in 2D grid —
+                      # ER is acoustically unique.
+
+    # ── LOW BACK ──────────────────────────────────
+    'AA': (-1,  2),   # father F1~730  F2~1090
+                      # Open and back.
+                      # Jaw fully dropped.
+    'AO': (-1,  1),   # bought F1~570  F2~ 840
+                      # Back and moderately open.
+                      # Rounded.
+
+    # ── MID BACK ──────────────────────────────────
+    'OW': (-2,  0),   # boat   F1~450  F2~ 800
+                      # Back, not very open.
+                      # Lips rounding.
+    'OH': (-2,  0),   # legacy alias for OW.
+
+    # ── HIGH BACK ─────────────────────────────────
+    'UH': (-2, -1),   # book   F1~440  F2~1020
+                      # Back and high. Lax.
+    'UW': (-3, -2),   # boot   F1~300  F2~ 870
+                      # Maximum back departure.
+                      # Tongue high and back.
+                      # Mirror of IY across origin.
+
+    # ── H ORIGIN ──────────────────────────────────
+    'H':  ( 0,  0),   # The origin. No position.
+    'HH': ( 0,  0),   # ARPAbet alias.
+}
+
+# ── CONSONANT TONNETZ POSITIONS ───────────────────────────
+#
+# Consonants are paths through constriction space.
+# These positions represent the constriction point —
+# where the tract is maximally modified during
+# the consonant gesture.
+#
+# Used for distance calculation only.
+# The consonant is not a stable position —
+# it is a path FROM H THROUGH this position
+# TO the following vowel.
+
+CONSONANT_TONNETZ = {
+    # ── DENTAL / ALVEOLAR ─────────────────────────
+    # Tongue tip constriction. Near front axis.
+    'DH': ( 1,  0),   # voiced dental fricative
+    'TH': ( 1,  0),   # unvoiced dental fricative
+                      # Same articulation. Glottis differs.
+    'D':  ( 1,  0),   # alveolar stop voiced
+    'T':  ( 1,  0),   # alveolar stop unvoiced
+    'N':  ( 1,  0),   # alveolar nasal
+    'L':  ( 1,  0),   # lateral approximant
+    'S':  ( 1,  0),   # alveolar fricative unvoiced
+    'Z':  ( 1,  0),   # alveolar fricative voiced
+
+    # ── BILABIAL ──────────────────────────────────
+    # Lip closure. Near central axis.
+    # Lips are near H-position articulatorily.
+    'B':  ( 0,  0),   # bilabial stop voiced
+    'P':  ( 0,  0),   # bilabial stop unvoiced
+    'M':  ( 0,  0),   # bilabial nasal
+
+    # ── LABIODENTAL ───────────────────────────────
+    'V':  ( 0,  0),   # voiced labiodental
+    'F':  ( 0,  0),   # unvoiced labiodental
+
+    # ── VELAR ─────────────────────────────────────
+    # Back of tongue raised to velum. Back axis.
+    'G':  (-2,  0),   # velar stop voiced
+    'K':  (-2,  0),   # velar stop unvoiced
+    'NG': (-2,  0),   # velar nasal
+
+    # ── PALATAL / POST-ALVEOLAR ───────────────────
+    # Tongue body raised toward palate. Far front.
+    'JH': ( 2,  0),   # palatal affricate voiced
+    'CH': ( 2,  0),   # palatal affricate unvoiced
+    'SH': ( 1,  0),   # post-alveolar fricative unvoiced
+    'ZH': ( 1,  0),   # post-alveolar fricative voiced
+    'Y':  ( 2, -1),   # palatal approximant
+                      # Shares IY/IH onset topology.
+
+    # ── APPROXIMANTS ──────────────────────────────
+    'W':  (-1, -1),   # labio-velar approximant
+                      # Lip rounding + back tongue.
+                      # Between bilabial and velar.
+    'R':  ( 0, -1),   # rhotic approximant
+                      # Near H but F3-suppressed.
+                      # Shares ER topology.
+}
+
+# Combined lookup for distance calculations.
+ALL_TONNETZ = {**VOWEL_TONNETZ,
+               **CONSONANT_TONNETZ}
+
+
+def vocal_distance(ph1, ph2):
+    """
+    Euclidean Tonnetz distance between two phonemes.
+
+    ph1, ph2: ARPAbet symbol strings.
+
+    Returns float >= 0.0.
+
+    Representative values:
+      H  → H  :  0.00  (at rest, no movement)
+      H  → AH :  1.00  (schwa, near origin)
+      H  → EH :  1.00  (mid front, one step)
+      H  → AO :  1.41  (back open, moderate)
+      H  → IY :  3.61  (far front high, maximum)
+      H  → UW :  3.61  (far back high, maximum)
+      H  → AA :  2.24  (open back, large)
+      IY → UW :  6.08  (maximum cross-space)
+      AH → IY :  2.83  (central to far front)
+
+    Used to:
+      1. Determine ghost duration at syllable
+         boundary (larger = longer ghost).
+      2. Determine ghost filter position
+         (interpolation between nucleus formants).
+      3. Verify Tonnetz coordinate assignments
+         — if a distance feels perceptually wrong,
+         the coordinate needs revision.
+    """
+    p1 = ALL_TONNETZ.get(ph1, (0, 0))
+    p2 = ALL_TONNETZ.get(ph2, (0, 0))
+    return float(np.sqrt(
+        (p2[0] - p1[0])**2 +
+        (p2[1] - p1[1])**2))
+
+
+def distance_from_H(ph):
+    """
+    Tonnetz distance of phoneme from H origin (0,0).
+
+    This is the magnitude of the voice's departure
+    from baseline to produce this phoneme.
+    The ghost at a syllable boundary scales with
+    this value: larger departure = longer ghost,
+    because the tract has further to travel.
+
+    H  → 0.00  (at origin)
+    AH → 1.00  (near — small departure)
+    EH → 1.00  (near — front)
+    AO → 1.41  (moderate)
+    AA → 2.24  (large open-back)
+    IY → 3.61  (maximum departure)
+    UW → 3.61  (maximum departure)
+    """
+    return vocal_distance('H', ph)
+
+
+def print_vocal_distances():
+    """
+    Diagnostic: print distance table for all vowels.
+    Run once to verify Tonnetz coordinate assignments.
+    Expected: AH nearest, IY and UW furthest and equal.
+    """
+    vowels = ['IY','IH','EY','EH','AE',
+              'AH','ER','AA','AO','OW',
+              'OH','UH','UW']
+    print("\nVocal distances from H origin:")
+    print(f"  {'Phoneme':8s}  {'(a,b)':10s}  "
+          f"{'dist':6s}  {'coherence':10s}")
+    print("  " + "-"*42)
+    for ph in vowels:
+        pos  = VOWEL_TONNETZ.get(ph, (0,0))
+        dist = distance_from_H(ph)
+        coh  = coherence(pos[0], pos[1])
+        print(f"  {ph:8s}  {str(pos):10s}  "
+              f"{dist:6.3f}  {coh:10.4f}")
+    print()
+
+
+# ── GHOST DURATION FROM DISTANCE ─────────────────────────
+#
+# Ghost duration scales with Tonnetz distance traversed.
+# Larger Tonnetz jump = tract travels further = longer
+# ghost needed for the traversal.
+#
+# Calibration:
+#   distance = 0.0 → ~3ms  (minimum, H→H)
+#   distance = 1.0 → ~7ms  (near, H→AH)
+#   distance = 2.2 → ~12ms (moderate, H→AA)
+#   distance = 3.6 → ~18ms (far, H→IY or H→UW)
+#   Maximum ghost capped at 35ms.
+#
+# These are further scaled by arc_type and dil
+# in ghost_at_boundary().
+
+GHOST_DUR_BASE_MS  = 3.0
+GHOST_DUR_SCALE_MS = 4.2
+GHOST_DUR_MAX_MS   = 35.0
+GHOST_DUR_MIN_MS   = 2.0
+
+
+def ghost_duration_from_distance(distance, dil=6.0):
+    """
+    Base ghost duration for a Tonnetz distance.
+
+    distance : float — from vocal_distance().
+    dil      : float — speaking rate (DIL from
+               voice_physics). Higher = slower.
+               DIL=6 is normal rate.
+               DIL=3 is fast. DIL=12 is slow.
+
+    Returns duration_ms.
+    """
+    dur = GHOST_DUR_BASE_MS + \
+          GHOST_DUR_SCALE_MS * distance
+    dur *= (dil / 6.0)
+    return float(np.clip(
+        dur, GHOST_DUR_MIN_MS, GHOST_DUR_MAX_MS))
+
+
+# ── GHOST PROFILES BY ARC TYPE ───────────────────────────
+#
+# Each arc type is a ghost signature:
+# the characteristic profile of the inter-syllable
+# H-traversal that persists across the phrase.
+#
+# Keys:
+#   duration_mult    : multiplier on base duration.
+#   amplitude        : absolute amplitude (0–1).
+#   variability      : std dev of per-boundary noise.
+#                      Grief: uneven. Normal: steady.
+#   phrase_final_mult: multiplier for phrase-final ghost.
+#   pre_stress_mult  : eureka only — ghost before
+#                      primary-stressed syllable.
+#   position_scale   : recognition only — ghost grows
+#                      through phrase by this factor.
+
+GHOST_PROFILES = {
+    'normal': {
+        'duration_mult':     1.00,
+        'amplitude':         0.055,
+        'variability':       0.10,
+        'phrase_final_mult': 1.50,
+    },
+    'weight': {
+        'duration_mult':     1.60,
+        'amplitude':         0.072,
+        'variability':       0.08,
+        'phrase_final_mult': 2.00,
+    },
+    'grief': {
+        'duration_mult':     2.40,
+        'amplitude':         0.038,
+        'variability':       0.25,  # uneven
+        'phrase_final_mult': 3.00,
+    },
+    'containment': {
+        'duration_mult':     0.35,
+        'amplitude':         0.022,
+        'variability':       0.05,
+        'phrase_final_mult': 0.80,
+    },
+    'eureka': {
+        'duration_mult':     0.70,
+        'amplitude':         0.065,
+        'variability':       0.12,
+        'phrase_final_mult': 1.20,
+        'pre_stress_mult':   3.50,
+    },
+    'recognition': {
+        'duration_mult':     0.80,
+        'amplitude':         0.042,
+        'variability':       0.08,
+        'phrase_final_mult': 2.50,
+        'position_scale':    1.80,
+    },
+}
+
+
+def ghost_at_boundary(prev_nucleus_ph,
+                       next_nucleus_ph,
+                       position_in_phrase,
+                       stress_prev,
+                       stress_next,
+                       arc_type,
+                       dil=6.0,
+                       phrase_final=False):
+    """
+    Compute ghost (duration_ms, amplitude) at a
+    syllable boundary.
+
+    prev_nucleus_ph : ARPAbet vowel completing.
+    next_nucleus_ph : ARPAbet vowel arriving.
+                      None if phrase_final=True.
+    position_in_phrase : float 0.0–1.0.
+    stress_prev     : 0/1/2 (stress of prev syl).
+    stress_next     : 0/1/2 (stress of next syl).
+    arc_type        : ARC_* string constant.
+    dil             : speaking rate dilution.
+    phrase_final    : True at end of last syllable.
+
+    Returns (duration_ms, amplitude).
+    """
+    profile = GHOST_PROFILES.get(
+        arc_type, GHOST_PROFILES['normal'])
+
+    if phrase_final or next_nucleus_ph is None:
+        # Returning to H from prev nucleus.
+        distance = distance_from_H(prev_nucleus_ph)
+        dur = ghost_duration_from_distance(
+            distance, dil)
+        dur *= profile['phrase_final_mult']
+    else:
+        # Traversing from prev through H to next.
+        # Total path = dist(prev→H) + dist(H→next).
+        # Mean of two departures = representative
+        # distance for timing.
+        d1 = distance_from_H(prev_nucleus_ph)
+        d2 = distance_from_H(next_nucleus_ph)
+        dur = ghost_duration_from_distance(
+            (d1 + d2) / 2.0, dil)
+
+    # Arc type duration multiplier
+    dur *= profile['duration_mult']
+
+    # Recognition: ghost grows through phrase
+    if arc_type == 'recognition':
+        scale = profile.get('position_scale', 1.8)
+        dur  *= (1.0 + (scale - 1.0)
+                 * position_in_phrase)
+
+    # Eureka: ghost elongates before primary stress
+    if arc_type == 'eureka' and stress_next == 2:
+        dur *= profile.get('pre_stress_mult', 3.5)
+
+    # Stress transition modulation
+    # Unstressed → stressed: ghost lengthens
+    #   (preparation, gathering)
+    # Stressed → unstressed: ghost shortens
+    #   (release, continuation)
+    if stress_prev == 0 and stress_next == 2:
+        dur *= 1.35
+    elif stress_prev == 2 and stress_next == 0:
+        dur *= 0.75
+
+    # Human variability
+    var = profile.get('variability', 0.10)
+    if var > 0:
+        dur *= float(np.clip(
+            np.random.normal(1.0, var),
+            0.5, 2.0))
+
+    amp = float(profile['amplitude'])
+    if phrase_final:
+        amp *= 0.60  # phrase-final ghost is softest
+
+    dur = float(np.clip(
+        dur, GHOST_DUR_MIN_MS, GHOST_DUR_MAX_MS))
+    amp = float(np.clip(amp, 0.01, 0.20))
+
+    return dur, amp
+
+
+def ghost_formant_interp(F_prev, F_next, n_s,
+                          sr=SR):
+    """
+    Build time-varying formant arrays for the
+    ghost segment — the Tonnetz traversal made
+    acoustic.
+
+    The ghost filter interpolates between the
+    formant targets of the completing syllable's
+    nucleus (F_prev) and the arriving syllable's
+    nucleus (F_next), passing through H_FORMANTS
+    at the midpoint.
+
+    F_prev : list of 4 floats (completing nucleus).
+    F_next : list of 4 floats (arriving nucleus).
+             Pass None for phrase-final ghost
+             (interpolates to H_FORMANTS instead).
+    n_s    : int, number of samples.
+    sr     : sample rate.
+
+    Returns list of 4 numpy float32 arrays,
+    each length n_s. Pass directly to the
+    resonator bank.
+
+    Physics:
+      At ghost start  : near F_prev
+      At ghost middle : near H_FORMANTS (origin)
+      At ghost end    : near F_next
+      This is the acoustic trace of returning
+      to H and departing toward the next nucleus.
+    """
+    if F_next is None:
+        F_next = list(H_FORMANTS)
+
+    F_arrays = []
+    for fi in range(4):
+        f_s = float(F_prev[fi]) \
+              if fi < len(F_prev) \
+              else H_FORMANTS[fi]
+        f_h = H_FORMANTS[fi]   # origin midpoint
+        f_e = float(F_next[fi]) \
+              if fi < len(F_next) \
+              else H_FORMANTS[fi]
+
+        # Two-segment interpolation:
+        # first half: F_prev → H_FORMANTS
+        # second half: H_FORMANTS → F_next
+        n_half = n_s // 2
+        n_rem  = n_s - n_half
+
+        seg1 = np.linspace(f_s, f_h,
+                           n_half,
+                           dtype=np.float32)
+        seg2 = np.linspace(f_h, f_e,
+                           n_rem,
+                           dtype=np.float32)
+        F_arrays.append(
+            np.concatenate([seg1, seg2]))
+
+    return F_arrays
