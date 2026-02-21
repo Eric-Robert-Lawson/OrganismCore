@@ -1,44 +1,40 @@
 """
-CONTINUITY DIAGNOSTIC — rev2
+CONTINUITY DIAGNOSTIC — rev3
 February 2026
 
-FIXES FROM rev1 RESULTS:
+FIXES FROM rev2 RESULTS:
 
-  BUG 1: Boundary detection found phrase
-  attack fade-in instead of AA→ph boundary.
-  All AA→ph measurements were empty.
-  Fix: search for boundaries only AFTER
-  phrase_atk + 50ms. The fade-in is
-  over by then. The first real phoneme
-  boundary is somewhere after that.
+  BUG: ph→AA boundary was measuring
+  the phrase-level release envelope
+  (55ms fade-out at end of signal),
+  not the actual phoneme→vowel transition.
+  Result: every ph→AA IS_ratio was 200-8000×.
+  Even AA→AA measured 540×.
+  All were measuring silence, not transitions.
 
-  BUG 2: Periodicity target was 0.70
-  for vowels. Rosenberg pulse with harmonics
-  measures 0.3-0.5 by autocorrelation.
-  Target was calibrated for pure tones.
-  Fix: lower vowel periodicity targets
-  to 0.40. Consonant targets adjusted
-  proportionally.
+  FIX: Two separate synthesis calls
+  per phoneme.
 
-  BUG 3: IS threshold was 2.0.
-  Real phoneme boundaries measure 100-10000.
-  Within-phoneme IS is ~1-10.
-  Fix: compute a BASELINE IS within the
-  AA body itself, then express boundary
-  IS as a ratio: boundary_IS / baseline_IS.
-  A ratio > 10 = perceptibly discontinuous.
-  A ratio < 5  = continuous enough.
-  This is self-referential: the system
-  calibrates its own continuity threshold
-  against its own voiced output quality.
+    For AA→ph boundary:
+      Synthesize [AA, ph]
+      ph is last. AA→ph boundary is
+      in the middle of the signal.
+      Measure here.
 
-  BUG 4: amplitude_continuity returned nan
-  when before-segment was empty.
-  Fix: guard against empty segments.
+    For ph→AA boundary:
+      Synthesize [ph, AA]
+      ph is first. ph→AA boundary is
+      in the middle of the signal.
+      Measure here.
+
+  Neither boundary is near the phrase
+  release envelope (55ms at end).
+  The measurements are clean.
+
+  Everything else from rev2 preserved.
 """
 
 import numpy as np
-from scipy.signal import lfilter, butter
 import os
 
 try:
@@ -54,10 +50,7 @@ except ImportError as e:
 SR_D = SR
 
 # ============================================================
-# IDENTITY TARGETS — rev2
-#
-# Periodicity targets lowered to match
-# Rosenberg pulse autocorrelation reality.
+# IDENTITY TARGETS
 # ============================================================
 
 PHONEME_IDENTITY_TARGETS = {
@@ -77,7 +70,6 @@ PHONEME_IDENTITY_TARGETS = {
             'centroid < 800Hz = tract dominating.'
         ),
     },
-
     'H': {
         'centroid_hz':    1200,
         'centroid_tol':    600,
@@ -89,10 +81,9 @@ PHONEME_IDENTITY_TARGETS = {
             'H: aperiodic aspiration. '
             'Centroid 600-1800Hz. '
             'Near-zero periodicity. '
-            'periodicity > 0.15 = voiced leaking in.'
+            'periodicity > 0.15 = voiced leaking.'
         ),
     },
-
     'S': {
         'centroid_hz':    7000,
         'centroid_tol':   2500,
@@ -102,11 +93,9 @@ PHONEME_IDENTITY_TARGETS = {
         'f1_ratio_tol':   0.04,
         'notes': (
             'S: high-freq noise 5000-9000Hz. '
-            'Near-zero periodicity. '
-            'periodicity > 0.10 = voiced leaking.'
+            'Near-zero periodicity.'
         ),
     },
-
     'Z': {
         'centroid_hz':    5000,
         'centroid_tol':   2500,
@@ -121,7 +110,6 @@ PHONEME_IDENTITY_TARGETS = {
             'centroid < 2000Hz = buzz dominating.'
         ),
     },
-
     'V': {
         'centroid_hz':    1500,
         'centroid_tol':   1000,
@@ -130,16 +118,13 @@ PHONEME_IDENTITY_TARGETS = {
         'f1_ratio':       0.20,
         'f1_ratio_tol':   0.15,
         'notes': (
-            'V: voiced labiodental. '
-            'Lower centroid than F. '
-            'Moderate periodicity.'
+            'V: voiced labiodental friction. '
+            'Centroid 500-2500Hz. '
+            'Moderate periodicity. '
+            'f1_ratio > 0.5 = pure vowel, '
+            'no friction = wrong.'
         ),
     },
-
-    # Vowels — periodicity target 0.40
-    # (Rosenberg pulse with harmonics
-    #  measures ~0.35-0.55 by lag-T0
-    #  autocorrelation)
     'AH': {
         'centroid_hz':    900,
         'centroid_tol':   500,
@@ -201,27 +186,14 @@ PHONEME_IDENTITY_TARGETS = {
         'periodicity_tol': 0.25,
         'f1_ratio':       0.15,
         'f1_ratio_tol':   0.15,
-        'notes': 'High front vowel.',
+        'notes': 'High front vowel. High F2.',
     },
 }
 
-# ============================================================
-# IS CONTINUITY THRESHOLD
-#
-# Expressed as a ratio over the
-# within-AA baseline IS.
-# AA body IS (frame-to-frame) is
-# computed first as the baseline.
-# Boundary IS / baseline IS:
-#   < 5   = continuous
-#   5-10  = marginal
-#   > 10  = discontinuous
-# ============================================================
-
-IS_RATIO_THRESHOLD    = 10.0
-AMPLITUDE_DB          = 6.0
-CENTROID_JUMP_HZ      = 1500
-PHRASE_ATK_MS         = 25
+PHRASE_ATK_MS      = 25
+IS_RATIO_THRESHOLD = 10.0
+AMPLITUDE_DB       = 6.0
+CENTROID_JUMP_HZ   = 1500
 
 
 # ============================================================
@@ -289,7 +261,8 @@ def itakura_saito(spec_p, spec_q):
         np.array(spec_q, dtype=np.float64),
         1e-10)
     r = p / q
-    return float(np.mean(r - np.log(r) - 1))
+    v = float(np.mean(r - np.log(r) - 1))
+    return v if np.isfinite(v) else 999.0
 
 
 def rms_val(seg):
@@ -301,22 +274,15 @@ def rms_val(seg):
 
 
 # ============================================================
-# BASELINE IS
-#
-# Compute the typical IS divergence
-# WITHIN the AA body — frame to frame.
-# This is the natural floor.
-# All boundary measurements are
-# expressed as multiples of this floor.
+# IS BASELINE
 # ============================================================
 
-_baseline_is_cache = {}
+_baseline_cache = {}
 
 def get_baseline_is(sr=SR_D):
-    if sr in _baseline_is_cache:
-        return _baseline_is_cache[sr]
+    if sr in _baseline_cache:
+        return _baseline_cache[sr]
 
-    # Synthesize AA alone
     sig = synth_phrase(
         [('b', ['AA', 'AA'])],
         punctuation='.',
@@ -325,177 +291,129 @@ def get_baseline_is(sr=SR_D):
     sig = f32(sig)
     n   = len(sig)
 
-    atk_n    = int(PHRASE_ATK_MS/1000.0*sr)
-    frame_n  = int(0.020 * sr)
-    hop_n    = int(0.010 * sr)
+    atk_n   = int(PHRASE_ATK_MS/1000.0*sr)
+    frame_n = int(0.020 * sr)
+    hop_n   = int(0.010 * sr)
 
-    # Measure IS between adjacent frames
-    # inside the AA body
     is_vals = []
     pos = atk_n + frame_n
-    while pos + frame_n < n - frame_n:
-        seg_a = sig[pos-frame_n : pos]
-        seg_b = sig[pos : pos+frame_n]
+    while pos + frame_n < n - int(0.060*sr):
+        seg_a = sig[pos-frame_n:pos]
+        seg_b = sig[pos:pos+frame_n]
         sp_a, _ = get_spectrum(seg_a, sr)
         sp_b, _ = get_spectrum(seg_b, sr)
         if sp_a is not None and \
            sp_b is not None:
-            n_min = min(len(sp_a), len(sp_b))
+            n_min = min(len(sp_a),
+                        len(sp_b))
             v = itakura_saito(
                 sp_a[:n_min],
                 sp_b[:n_min])
-            if np.isfinite(v):
+            if np.isfinite(v) and v < 900:
                 is_vals.append(v)
         pos += hop_n
 
-    if not is_vals:
-        baseline = 1.0
-    else:
-        baseline = float(np.median(is_vals))
-        baseline = max(baseline, 0.1)
+    baseline = float(np.median(is_vals)) \
+               if is_vals else 1.0
+    baseline = max(baseline, 0.1)
+    _baseline_cache[sr] = baseline
 
-    _baseline_is_cache[sr] = baseline
     print(f"  IS baseline (AA body): "
           f"{baseline:.3f}")
     return baseline
 
 
 # ============================================================
-# BOUNDARY DETECTION — rev2
+# FIND SINGLE BOUNDARY
 #
-# Fixed: skip phrase_atk zone.
-# Search starts at atk_n + 50ms.
+# Used when the signal is [X, Y].
+# Returns the sample position of the
+# X→Y transition.
+# Searches from phrase_atk+50ms to
+# avoid the attack envelope.
+# Stops before the last 60ms to avoid
+# the release envelope.
 # ============================================================
 
-def find_boundaries(sig, sr=SR_D):
+def find_single_boundary(sig, sr=SR_D):
     """
-    Find AA→ph and ph→AA boundary positions.
-
-    Strategy:
-      Compute RMS envelope.
-      Skip the phrase attack zone.
-      Find the peak RMS in the first
-      third of the signal (= AA body).
-      Find where RMS drops to < 50%
-      of that peak = AA→ph boundary.
-      Find where RMS recovers to > 50%
-      of the FINAL AA peak = ph→AA boundary.
+    Find the single transition point
+    in a two-phoneme signal [A, B].
 
     Returns:
-      b1: AA→ph boundary sample
-      b2: ph→AA boundary sample
+      boundary_sample: int
       valid: bool
     """
-    sig    = f32(sig)
-    n      = len(sig)
-    hop_ms = 5
-    hop_n  = int(hop_ms / 1000.0 * sr)
+    sig   = f32(sig)
+    n     = len(sig)
+    hop_n = int(0.005 * sr)
 
-    # Skip phrase attack
-    atk_n    = int(
-        PHRASE_ATK_MS / 1000.0 * sr)
-    skip_n   = atk_n + int(0.050 * sr)
+    # Safe search region:
+    # skip attack + 50ms at start
+    # skip release + 10ms at end
+    search_start = int(
+        PHRASE_ATK_MS/1000.0*sr) + \
+        int(0.050 * sr)
+    search_end   = n - int(0.070 * sr)
 
-    # RMS envelope
+    if search_start >= search_end:
+        return n // 2, False
+
+    # RMS envelope within search region
     env    = []
     frames = []
-    i      = 0
-    while i + hop_n <= n:
+    i      = search_start
+    while i + hop_n <= search_end:
         seg = sig[i:i+hop_n]
         env.append(rms_val(seg))
         frames.append(i)
         i += hop_n
+
+    if not env:
+        return n // 2, False
+
     env    = np.array(env)
     frames = np.array(frames)
 
-    if len(env) < 4:
-        return n//3, 2*n//3, False
+    # Peak in the first half of the
+    # search region = first phoneme body
+    half   = len(env) // 2
+    if half < 1:
+        half = 1
+    peak   = float(np.max(env[:half]))
+    if peak < 1e-8:
+        return n // 2, False
 
-    # First third = AA region
-    first_third = len(env) // 3
-    skip_frame  = 0
-    for fi, fs in enumerate(frames):
-        if fs >= skip_n:
-            skip_frame = fi
-            break
+    threshold = peak * 0.50
 
-    aa_env = env[skip_frame:first_third]
-    if len(aa_env) == 0:
-        aa_env = env[skip_frame:]
-    if len(aa_env) == 0:
-        return n//3, 2*n//3, False
+    # Find where signal crosses threshold
+    # (either up or down) = boundary
+    # Look for the largest RMS change
+    # between adjacent frames
+    diffs  = np.abs(np.diff(env))
+    if len(diffs) == 0:
+        return n // 2, False
 
-    aa_peak = float(np.max(aa_env))
-    if aa_peak < 1e-8:
-        return n//3, 2*n//3, False
+    max_idx = int(np.argmax(diffs))
+    b_sample = int(frames[max_idx])
 
-    threshold = aa_peak * 0.50
-
-    # Find b1: first drop below threshold
-    # after skip_frame
-    b1_frame = None
-    for fi in range(skip_frame, len(env)):
-        if env[fi] < threshold:
-            b1_frame = fi
-            break
-
-    # Last third = final AA region
-    last_third_start = 2 * len(env) // 3
-    final_aa_env = env[last_third_start:]
-    if len(final_aa_env) == 0:
-        final_aa_peak = aa_peak
-    else:
-        final_aa_peak = float(
-            np.max(final_aa_env))
-    final_threshold = (
-        max(final_aa_peak, aa_peak) * 0.50)
-
-    # Find b2: last point below threshold
-    # before the final AA recovery
-    b2_frame = None
-    for fi in range(len(env)-1,
-                     last_third_start, -1):
-        if env[fi] < final_threshold:
-            b2_frame = fi
-            break
-
-    if b1_frame is None:
-        b1 = n // 3
-    else:
-        b1 = int(frames[b1_frame])
-
-    if b2_frame is None:
-        b2 = 2 * n // 3
-    else:
-        b2 = int(frames[b2_frame])
-
-    if b1 >= b2:
-        b1 = n // 3
-        b2 = 2 * n // 3
-
-    return b1, b2, True
+    return b_sample, True
 
 
-def measure_boundary(sig, pos,
-                      baseline_is,
-                      sr=SR_D,
-                      frame_ms=20):
-    """
-    Measure spectral and amplitude
-    discontinuity at pos.
-    Returns IS ratio, centroid jump, amp dB.
-    """
+# ============================================================
+# MEASURE AT BOUNDARY
+# ============================================================
+
+def measure_at_boundary(sig, pos,
+                         baseline_is,
+                         sr=SR_D,
+                         frame_ms=20):
     sig     = f32(sig)
     n       = len(sig)
     frame_n = int(frame_ms/1000.0*sr)
 
-    b_start = max(0, pos - frame_n)
-    b_end   = pos
-    a_start = pos
-    a_end   = min(n, pos + frame_n)
-
-    seg_b = sig[b_start:b_end]
-    seg_a = sig[a_start:a_end]
+    seg_b = sig[max(0, pos-frame_n):pos]
+    seg_a = sig[pos:min(n, pos+frame_n)]
 
     if len(seg_b) < 32 or len(seg_a) < 32:
         return None, None, None
@@ -508,16 +426,12 @@ def measure_boundary(sig, pos,
     n_min  = min(len(sp_b), len(sp_a))
     raw_is = itakura_saito(
         sp_b[:n_min], sp_a[:n_min])
-
-    if not np.isfinite(raw_is):
-        return None, None, None
-
     is_ratio = raw_is / max(baseline_is,
                              0.001)
 
-    c_b = spectral_centroid(seg_b, sr)
-    c_a = spectral_centroid(seg_a, sr)
-    c_jump = abs(c_a - c_b)
+    c_jump = abs(
+        spectral_centroid(seg_a, sr) -
+        spectral_centroid(seg_b, sr))
 
     rms_b = rms_val(seg_b)
     rms_a = rms_val(seg_a)
@@ -540,11 +454,10 @@ def check_phoneme_identity(
     target = PHONEME_IDENTITY_TARGETS.get(ph)
     if target is None:
         if verbose:
-            print(f"  [--] {ph}: "
-                  f"no identity targets")
+            print(f"  [--] {ph}")
         return {}, True
 
-    # Synthesize ph first, AH following
+    # ph first, AH following
     sig = synth_phrase(
         [('t', [ph, 'AH'])],
         punctuation='.',
@@ -556,10 +469,9 @@ def check_phoneme_identity(
     atk_n  = int(PHRASE_ATK_MS/1000.0*sr)
     body_s = atk_n + int(0.020*sr)
     body_e = atk_n + int(0.060*sr)
-    body_s = min(body_s, n-1)
     body_e = min(body_e, n)
     if body_e <= body_s:
-        body_e = min(body_s + int(0.020*sr), n)
+        body_e = min(body_s+int(0.020*sr), n)
 
     body = sig[body_s:body_e]
 
@@ -571,50 +483,31 @@ def check_phoneme_identity(
     results = {}
     failed  = []
 
-    c_tgt = target['centroid_hz']
-    c_tol = target['centroid_tol']
-    c_ok  = abs(c - c_tgt) <= c_tol
-    results['centroid'] = {
-        'measured':  round(c, 0),
-        'target':    c_tgt,
-        'tolerance': c_tol,
-        'distance':  round(abs(c-c_tgt), 0),
-        'pass':      c_ok,
-    }
-    if not c_ok:
-        failed.append('centroid')
-
-    p_tgt = target['periodicity']
-    p_tol = target['periodicity_tol']
-    p_ok  = abs(p - p_tgt) <= p_tol
-    results['periodicity'] = {
-        'measured':  round(p, 3),
-        'target':    p_tgt,
-        'tolerance': p_tol,
-        'distance':  round(abs(p-p_tgt), 3),
-        'pass':      p_ok,
-    }
-    if not p_ok:
-        failed.append('periodicity')
-
-    f_tgt = target['f1_ratio']
-    f_tol = target['f1_ratio_tol']
-    f_ok  = abs(f1 - f_tgt) <= f_tol
-    results['f1_ratio'] = {
-        'measured':  round(f1, 3),
-        'target':    f_tgt,
-        'tolerance': f_tol,
-        'distance':  round(abs(f1-f_tgt), 3),
-        'pass':      f_ok,
-    }
-    if not f_ok:
-        failed.append('f1_ratio')
+    for key, measured, tgt, tol in [
+        ('centroid',    c,  target['centroid_hz'],
+                            target['centroid_tol']),
+        ('periodicity', p,  target['periodicity'],
+                            target['periodicity_tol']),
+        ('f1_ratio',    f1, target['f1_ratio'],
+                            target['f1_ratio_tol']),
+    ]:
+        ok = abs(measured - tgt) <= tol
+        results[key] = {
+            'measured':  round(measured, 3),
+            'target':    tgt,
+            'tolerance': tol,
+            'distance':  round(
+                abs(measured-tgt), 3),
+            'pass':      ok,
+        }
+        if not ok:
+            failed.append(key)
 
     all_pass = len(failed) == 0
 
     if verbose:
-        status = '✓' if all_pass else '✗'
-        print(f"  [{status}] {ph}")
+        st = '✓' if all_pass else '✗'
+        print(f"  [{st}] {ph}")
         for k, v in results.items():
             ps = '    ✓' if v['pass'] \
                  else '    ✗'
@@ -632,29 +525,47 @@ def check_phoneme_identity(
 
 
 # ============================================================
-# CONTINUITY CHECK
+# CONTINUITY CHECK — rev3
+#
+# Two separate synthesis calls.
+# AA→ph: synthesize [AA, ph]
+#        find boundary in middle.
+# ph→AA: synthesize [ph, AA]
+#        find boundary in middle.
+# Neither boundary near phrase envelope.
 # ============================================================
 
 def check_continuity(
         ph, baseline_is,
         sr=SR_D, verbose=True):
 
-    sig = synth_phrase(
-        [('t', ['AA', ph, 'AA'])],
+    # ── AA → ph ───────────────────────────
+    sig_in = synth_phrase(
+        [('t', ['AA', ph])],
         punctuation='.',
         pitch_base=PITCH,
         dil=DIL, sr=sr)
-    sig = f32(sig)
+    sig_in = f32(sig_in)
 
-    b1, b2, valid = find_boundaries(
-        sig, sr=sr)
+    b_in, valid_in = find_single_boundary(
+        sig_in, sr=sr)
+    isr1, cj1, adb1 = measure_at_boundary(
+        sig_in, b_in, baseline_is, sr=sr)
 
-    isr1, cj1, adb1 = measure_boundary(
-        sig, b1, baseline_is, sr=sr)
-    isr2, cj2, adb2 = measure_boundary(
-        sig, b2, baseline_is, sr=sr)
+    # ── ph → AA ───────────────────────────
+    sig_out = synth_phrase(
+        [('t', [ph, 'AA'])],
+        punctuation='.',
+        pitch_base=PITCH,
+        dil=DIL, sr=sr)
+    sig_out = f32(sig_out)
 
-    def make_result(isr, cj, adb):
+    b_out, valid_out = find_single_boundary(
+        sig_out, sr=sr)
+    isr2, cj2, adb2 = measure_at_boundary(
+        sig_out, b_out, baseline_is, sr=sr)
+
+    def make_r(isr, cj, adb):
         if isr is None:
             return {
                 'is_ratio': None,
@@ -667,46 +578,38 @@ def check_continuity(
             }
         return {
             'is_ratio': round(isr, 2),
-            'centroid_jump_hz':
-                round(cj, 0) if cj else None,
-            'amplitude_db':
-                round(adb, 1)
+            'centroid_jump_hz': round(cj, 0),
+            'amplitude_db': round(adb, 1)
                 if adb is not None else None,
-            'is_pass':
-                isr <= IS_RATIO_THRESHOLD,
+            'is_pass': isr <= IS_RATIO_THRESHOLD,
             'centroid_pass':
-                (cj <= CENTROID_JUMP_HZ
-                 if cj is not None else False),
+                cj <= CENTROID_JUMP_HZ,
             'amplitude_pass':
                 (abs(adb) <= AMPLITUDE_DB
-                 if adb is not None else False),
+                 if adb is not None
+                 else False),
         }
 
     results = {
-        'AA_to_ph': make_result(
-            isr1, cj1, adb1),
-        'ph_to_AA': make_result(
-            isr2, cj2, adb2),
-        'boundary_valid': valid,
+        'AA_to_ph': make_r(isr1, cj1, adb1),
+        'ph_to_AA': make_r(isr2, cj2, adb2),
     }
 
-    b1_pass = (
-        results['AA_to_ph']['is_pass'] and
-        results['AA_to_ph']['centroid_pass'])
-    b2_pass = (
-        results['ph_to_AA']['is_pass'] and
-        results['ph_to_AA']['centroid_pass'])
-    all_pass = b1_pass and b2_pass
+    b1p = (results['AA_to_ph']['is_pass']
+           and results['AA_to_ph']
+           ['centroid_pass'])
+    b2p = (results['ph_to_AA']['is_pass']
+           and results['ph_to_AA']
+           ['centroid_pass'])
+    all_pass = b1p and b2p
 
     if verbose:
-        status = '✓' if all_pass else '✗'
-        bv     = '✓' if valid else '?'
-        print(f"  [{status}] {ph} "
-              f"continuity  "
-              f"[boundary_detect={bv}]")
+        st = '✓' if all_pass else '✗'
+        vi = '✓' if valid_in else '?'
+        vo = '✓' if valid_out else '?'
+        print(f"  [{st}] {ph} continuity  "
+              f"[in={vi} out={vo}]")
         for bname, bdata in results.items():
-            if bname == 'boundary_valid':
-                continue
             arrow = ('AA→ph'
                      if bname == 'AA_to_ph'
                      else 'ph→AA')
@@ -716,8 +619,8 @@ def check_continuity(
                 continue
             bp = '✓' if (
                 bdata['is_pass'] and
-                bdata['centroid_pass']) \
-                else '✗'
+                bdata['centroid_pass']
+            ) else '✗'
             print(f"    [{bp}] {arrow}")
             ip = '✓' if bdata['is_pass'] \
                  else '✗'
@@ -726,19 +629,15 @@ def check_continuity(
             ap = '✓' if bdata[
                 'amplitude_pass'] else '✗'
             print(
-                f"      [{ip}] "
-                f"IS_ratio="
+                f"      [{ip}] IS_ratio="
                 f"{bdata['is_ratio']}  "
                 f"target<={IS_RATIO_THRESHOLD}")
             print(
-                f"      [{cp}] "
-                f"centroid_jump="
+                f"      [{cp}] centroid_jump="
                 f"{bdata['centroid_jump_hz']}"
-                f"Hz  "
-                f"target<={CENTROID_JUMP_HZ}")
+                f"Hz  target<={CENTROID_JUMP_HZ}")
             print(
-                f"      [{ap}] "
-                f"amp="
+                f"      [{ap}] amp="
                 f"{bdata['amplitude_db']}dB"
                 f"  target±{AMPLITUDE_DB}dB")
 
@@ -753,22 +652,23 @@ def run_continuity_diagnostic(
         sr=SR_D, verbose=True):
 
     print()
-    print("CONTINUITY DIAGNOSTIC rev2")
-    print("Self-referential.")
-    print("IS threshold relative to "
-          "AA body baseline.")
+    print("CONTINUITY DIAGNOSTIC rev3")
+    print("Two synthesis calls per phoneme.")
+    print("[AA,ph] for AA→ph boundary.")
+    print("[ph,AA] for ph→AA boundary.")
+    print("No phrase-envelope contamination.")
     print("="*50)
 
     TEST_PHS = list(
         PHONEME_IDENTITY_TARGETS.keys())
 
-    # Compute baseline IS first
     print()
     print("  Computing IS baseline...")
     baseline_is = get_baseline_is(sr=sr)
-    print(f"  Threshold = baseline × "
-          f"{IS_RATIO_THRESHOLD} = "
-          f"{baseline_is * IS_RATIO_THRESHOLD:.3f}")
+    print(
+        f"  Threshold = baseline × "
+        f"{IS_RATIO_THRESHOLD} = "
+        f"{baseline_is*IS_RATIO_THRESHOLD:.3f}")
     print()
 
     total_id = pass_id = 0
@@ -804,30 +704,24 @@ def run_continuity_diagnostic(
     print("="*50)
     print()
     print("  SUMMARY")
-    print(f"  Identity:   "
-          f"{pass_id}/{total_id}")
-    print(f"  Continuity: "
-          f"{pass_ct}/{total_ct}")
+    print(f"  Identity:   {pass_id}/{total_id}")
+    print(f"  Continuity: {pass_ct}/{total_ct}")
     print()
 
     print("  IDENTITY FAILURES:")
     any_fail = False
     for ph, r in all_id.items():
-        fails = [
-            k for k, v in r.items()
-            if not v.get('pass', True)]
+        fails = [k for k, v in r.items()
+                 if not v.get('pass', True)]
         if fails:
             any_fail = True
             print(f"    {ph}:")
             for k in fails:
                 print(
                     f"      {k}: "
-                    f"measured="
-                    f"{r[k]['measured']}  "
-                    f"target="
-                    f"{r[k]['target']}  "
-                    f"dist="
-                    f"{r[k]['distance']}")
+                    f"measured={r[k]['measured']}"
+                    f"  target={r[k]['target']}"
+                    f"  dist={r[k]['distance']}")
     if not any_fail:
         print("    All passing.")
     print()
@@ -836,8 +730,6 @@ def run_continuity_diagnostic(
     any_fail = False
     for ph, r in all_ct.items():
         for bname, bdata in r.items():
-            if bname == 'boundary_valid':
-                continue
             if bdata.get('error'):
                 any_fail = True
                 arrow = ('AA→ph'
@@ -846,12 +738,15 @@ def run_continuity_diagnostic(
                 print(f"    {ph} {arrow}: "
                       f"measurement failed")
                 continue
+            if bdata is None:
+                continue
             fails = []
-            if not bdata['is_pass']:
+            if not bdata.get('is_pass', True):
                 fails.append(
                     f"IS_ratio="
                     f"{bdata['is_ratio']}")
-            if not bdata['centroid_pass']:
+            if not bdata.get(
+                    'centroid_pass', True):
                 fails.append(
                     f"jump="
                     f"{bdata['centroid_jump_hz']}"
