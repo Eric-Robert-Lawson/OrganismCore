@@ -172,7 +172,7 @@ WORD_SYLLABLES = {
     'been':     [['B','IH','N']],
     'named':    [['N','EH','M','D']],
     'i':        [['AY']],
-    'am':       [['AH','M']],
+    'am':       [['AE','M']],
     'solid':    [['S','AA'],
                   ['L','IH','D']],
 }
