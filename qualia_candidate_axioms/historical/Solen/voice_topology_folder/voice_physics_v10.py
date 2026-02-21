@@ -1,25 +1,42 @@
 """
-VOICE PHYSICS v10 — rev9
+VOICE PHYSICS v10 — rev10
 February 2026
 
-CHANGES FROM rev8:
+CHANGES FROM rev9:
 
-  REVERT: _rescale_sibilants removed.
-    It was double-correcting.
-    _normalize_phrase already normalizes
-    to vowel body reference.
-    _rescale_sibilants then amplified
-    sibilants by 9-14× to reach 70% of
-    vowel RMS, causing hard clipping.
-    Clipped Z: IS=24382 (was 38 without it).
-    Clipped S: IS=44 (was 26 without it).
-    Clipped DH: IS=41 (was 0.41 without it).
-    The normalization alone is correct.
-    Post-normalization rescaling is removed.
+  FIX 1: Phrase-attack artifact on H and DH.
+    H and DH in phrase-initial position
+    produced "artifact noise few frames"
+    before the phoneme body.
+    Cause: phrase_atk envelope (25ms, 0→1)
+    gates a near-zero tract output.
+    Float32 IIR resonators produce a brief
+    transient from numerical noise even
+    at zero input during this ramp.
+    Fix: for H and DH, the bypass onset
+    is delayed by phrase_atk_n samples
+    when the phoneme is phrase-initial
+    (si == 0). The listener hears silence
+    then H/DH onset. No pre-phoneme burst.
+    Also: H_BYPASS_ATK_MS increased from
+    18ms to 30ms so the onset is softer.
 
-  KEEP: AV→AH crossfade (CHANGE 2 from rev8).
-    H AA→ph IS went from 33 to 0.14. ✓
-    This fix is correct and stays.
+  FIX 2: Z buzz too quiet.
+    "Z-like air with no voice."
+    Z_BUZZ_GAIN: 0.55 → 1.20.
+    Z_BYPASS_GAIN_FLOOR: 0.65 → 0.35.
+    Buzz louder than bypass → voiced Z.
+
+  FIX 3: V sounds like static buzz.
+    BP too broad (500-3000Hz).
+    Narrowed to 800-2200Hz.
+    V_BUZZ_GAIN: 0.35 → 0.25.
+    More focused labiodental friction.
+
+  FIX 4: S too long in word-final position.
+    FINAL_FRIC_MAX_MS set to 100ms.
+    Was hitting 180ms cap.
+    100ms is correct for word-final /s/.
 """
 
 from voice_physics_v9 import (
@@ -47,7 +64,6 @@ from voice_physics_v9 import (
     VOWEL_PHONEMES, DIPHTHONG_PHONEMES,
     VOWEL_MAX_MS, DIPHTHONG_MAX_MS,
     APPROX_MAX_MS, FRIC_MAX_MS,
-    FINAL_FRIC_MAX_MS,
     DH_MAX_MS, H_MAX_MS,
     H_ASPIRATION_GAIN,
     RESONATOR_CFG, BROADBAND_CFG,
@@ -71,6 +87,8 @@ os.makedirs("output_play", exist_ok=True)
 # CONSTANTS
 # ============================================================
 
+PHRASE_ATK_MS       = 25   # phrase onset ramp
+
 DH_TRACT_BYPASS_MS  = 25
 DH_BYPASS_BP_LO     = 1800
 DH_BYPASS_BP_HI     = 6500
@@ -84,24 +102,28 @@ H_BYPASS_HP_HZ      = 200
 H_BYPASS_LP_HZ      = 1500
 H_BYPASS_LP_ORDER   = 2
 H_BYPASS_GAIN       = 0.55
-H_BYPASS_ATK_MS     = 18
+H_BYPASS_ATK_MS     = 30   # FIX 1: was 18
 
-# AV→AH crossfade: voiced offset before H
-VOICED_TO_H_CROSSFADE_MS = 25
-
-Z_BYPASS_GAIN_FLOOR  = 0.65
+# FIX 2: Z buzz louder, bypass floor lower
+Z_BYPASS_GAIN_FLOOR  = 0.35   # was 0.65
 ZH_BYPASS_GAIN_FLOOR = 0.40
 
 FRIC_BUZZ_GAINS = {
     'DH': 0.45,
-    'Z':  0.55,
+    'Z':  1.20,   # FIX 2: was 0.55
     'ZH': 0.30,
-    'V':  0.35,
+    'V':  0.25,   # FIX 3: was 0.35
 }
 FRIC_BUZZ_GAIN_DEFAULT = 0.20
 
-V_BYPASS_BP_LO = 500
-V_BYPASS_BP_HI = 3000
+# FIX 3: V narrower bandpass
+V_BYPASS_BP_LO = 800    # was 500
+V_BYPASS_BP_HI = 2200   # was 3000
+
+# FIX 4: word-final fricative cap
+FINAL_FRIC_MAX_MS = 100  # was effectively 180
+
+VOICED_TO_H_CROSSFADE_MS = 25
 
 SIBILANT_VOICED_RATIO = 0.80
 RELATIVE_SCALE_PHS    = {'S', 'Z', 'SH', 'ZH'}
@@ -138,11 +160,20 @@ def _cavity_resonator_v10(noise, ph, sr=SR):
 
 # ============================================================
 # H BYPASS
+# FIX 1: onset_offset parameter added.
+# When H is phrase-initial, bypass starts
+# after the phrase_atk zone.
 # ============================================================
 
 def _make_h_bypass(n_s, sr=SR,
                     next_is_vowel=False,
-                    next_ph=None):
+                    next_ph=None,
+                    onset_offset=0):
+    """
+    onset_offset: samples of silence before
+    bypass starts. Used to skip phrase_atk
+    transient when H is phrase-initial.
+    """
     n_s   = int(n_s)
     noise = calibrate(
         f32(np.random.normal(0, 1, n_s)))
@@ -160,6 +191,7 @@ def _make_h_bypass(n_s, sr=SR,
     except:
         pass
     broad = calibrate(broad) * H_BYPASS_GAIN
+
     rel_ms = 20 if next_is_vowel else 12
     rel    = min(int(rel_ms/1000.0*sr),
                  n_s//4)
@@ -173,7 +205,19 @@ def _make_h_bypass(n_s, sr=SR,
     if rel > 0:
         env[-rel:] = f32(
             np.linspace(1.0, 0.0, rel))
-    return f32(broad * env)
+
+    raw = f32(broad * env)
+
+    # Apply onset_offset: silence before bypass
+    if onset_offset > 0:
+        onset_offset = min(onset_offset, n_s)
+        out = np.zeros(n_s, dtype=DTYPE)
+        remaining = n_s - onset_offset
+        if remaining > 0:
+            out[onset_offset:] = \
+                raw[:remaining]
+        return f32(out)
+    return raw
 
 
 # ============================================================
@@ -242,7 +286,7 @@ def _make_dh_buzz(voiced_seg, n_s, sr=SR):
 
 
 # ============================================================
-# V BYPASS
+# V BYPASS — FIX 3: narrower BP
 # ============================================================
 
 def _make_v_bypass(n_eff, gain, sr=SR):
@@ -274,7 +318,8 @@ def _make_bypass(ph, n_s, sr=SR,
                   next_is_vowel=False,
                   onset_delay=0,
                   voiced_rms=None,
-                  next_ph=None):
+                  next_ph=None,
+                  onset_offset=0):
     if ph == 'DH':
         return _make_dh_bypass(
             n_s, sr,
@@ -284,7 +329,9 @@ def _make_bypass(ph, n_s, sr=SR,
         return _make_h_bypass(
             n_s, sr,
             next_is_vowel=next_is_vowel,
-            next_ph=next_ph)
+            next_ph=next_ph,
+            onset_offset=onset_offset)
+
     gains = get_calibrated_gains_v8(sr=sr)
     gain  = gains.get(ph, None)
     if ph == 'Z':
@@ -295,6 +342,7 @@ def _make_bypass(ph, n_s, sr=SR,
         if gain is None or \
            gain < ZH_BYPASS_GAIN_FLOOR:
             gain = ZH_BYPASS_GAIN_FLOOR
+
     n_s         = int(n_s)
     onset_delay = max(0, int(onset_delay))
     if onset_delay >= n_s:
@@ -498,6 +546,8 @@ def _build_source_and_bypass(
 
     n_dh_bypass  = int(
         DH_TRACT_BYPASS_MS/1000.0*sr)
+    phrase_atk_n = int(
+        PHRASE_ATK_MS/1000.0*sr)
 
     voiced_rms_per_spec = []
     pos = 0
@@ -536,6 +586,8 @@ def _build_source_and_bypass(
         n_off  = min(trans_n(ph, sr), n_s//3)
         n_body = max(0, n_s-n_on-n_off)
 
+        is_phrase_initial = (si == 0)
+
         if si > 0:
             ref_vrms = voiced_rms_per_spec[si-1]
         elif si < n_specs-1:
@@ -555,8 +607,6 @@ def _build_source_and_bypass(
                                 zero_start]),
                             0.0,
                             n_s-zero_start))
-            # AV→AH crossfade: fade voiced
-            # offset into H over 25ms
             if next_ph == 'H':
                 xfade_n = min(
                     int(VOICED_TO_H_CROSSFADE_MS
@@ -571,22 +621,38 @@ def _build_source_and_bypass(
             tract_source[s:e] = seg
 
         elif stype == 'h':
+            # FIX 1: phrase-initial H onset
+            # offset skips phrase_atk transient
+            h_onset_offset = (
+                phrase_atk_n
+                if is_phrase_initial
+                else 0)
             byp = _make_h_bypass(
                 n_s, sr,
                 next_is_vowel=next_is_vowel,
-                next_ph=next_ph)
+                next_ph=next_ph,
+                onset_offset=h_onset_offset)
             bypass_segs.append((s, byp))
 
         elif stype == 'dh':
+            # FIX 1: phrase-initial DH
+            # also offset by phrase_atk
             buzz = _make_dh_buzz(
                 voiced_full[s:e], n_s, sr=sr)
-            buzz_segs.append((s, buzz))
-            byp = _make_bypass(
-                'DH', n_s, sr,
+            if is_phrase_initial:
+                # Silence buzz during phrase_atk
+                silence = min(phrase_atk_n,
+                              len(buzz))
+                buzz[:silence] = 0.0
+            buzz_segs.append((s, f32(buzz)))
+
+            byp = _make_dh_bypass(
+                n_s, sr,
                 next_is_vowel=next_is_vowel,
-                onset_delay=0,
-                voiced_rms=None,
-                next_ph=next_ph)
+                onset_delay=(
+                    phrase_atk_n
+                    if is_phrase_initial
+                    else 0))
             bypass_segs.append((s, byp))
 
         elif stype in ('fric_u', 'fric_v'):
@@ -704,6 +770,9 @@ def _normalize_phrase(signal, specs,
 
 # ============================================================
 # PHRASE SYNTHESIS
+# FIX 4: word-final fricatives use
+# FINAL_FRIC_MAX_MS cap via ph_spec_v9
+# word_final flag.
 # ============================================================
 
 def synth_phrase(words_phonemes,
@@ -736,6 +805,14 @@ def synth_phrase(words_phonemes,
         next_ph    = (prosody[i+1]['ph']
                       if i < n_items-1
                       else None)
+
+        # FIX 4: cap word-final fricatives
+        FRICS = {'S','Z','SH','ZH',
+                 'F','V','TH','DH'}
+        if word_final and ph in FRICS:
+            dur_ms = min(dur_ms,
+                         FINAL_FRIC_MAX_MS)
+
         spec = ph_spec_v9(
             ph, dur_ms,
             pitch=pitch_, oq=oq_,
@@ -832,9 +909,6 @@ def synth_phrase(words_phonemes,
     final = f32(np.concatenate(segs_out))
     final = _normalize_phrase(
         final, specs, prosody, sr=sr)
-    # No _rescale_sibilants — normalization
-    # alone is the correct and sufficient
-    # level reference.
     return final
 
 
@@ -870,7 +944,7 @@ def save(name, sig, room=True,
 
 
 # ============================================================
-# MAIN
+# MAIN — renders and runs slow diagnostic
 # ============================================================
 
 if __name__ == "__main__":
@@ -878,30 +952,25 @@ if __name__ == "__main__":
     os.makedirs("output_play", exist_ok=True)
 
     print()
-    print("VOICE PHYSICS v10 rev9")
+    print("VOICE PHYSICS v10 rev10")
     print()
-    print("  REVERT: _rescale_sibilants removed.")
-    print("    Was amplifying S/Z/DH 9-14×.")
-    print("    Caused clipping → IS explosion.")
-    print("    Z ph→AA IS: 38 → 24382 → back.")
-    print()
-    print("  KEEP: AV→AH crossfade (rev8).")
-    print("    H AA→ph IS: 33 → 0.14. ✓")
+    print("  FIX 1: H/DH phrase-initial "
+          "onset offset")
+    print("    Phrase-attack artifact suppressed.")
+    print("  FIX 2: Z_BUZZ_GAIN=1.20, "
+          "Z floor=0.35")
+    print("    Z should now sound voiced.")
+    print("  FIX 3: V BP(800-2200Hz), "
+          "buzz=0.25")
+    print("    V more focused labiodental.")
+    print("  FIX 4: word-final fric "
+          "cap=100ms")
+    print("    S in 'voice' shorter.")
     print("=" * 60)
     print()
 
     print("  Calibrating gains...")
     recalibrate_gains_v8(sr=SR)
-    print()
-
-    print("  Running continuity diagnostic...")
-    try:
-        from continuity_diagnostic import \
-            run_continuity_diagnostic
-        run_continuity_diagnostic(sr=SR)
-    except ImportError:
-        print("  continuity_diagnostic.py "
-              "not found.")
     print()
 
     PHRASE = [
@@ -913,36 +982,77 @@ if __name__ == "__main__":
         ('here',    ['H',  'IH', 'R']),
     ]
 
-    print("  Primary phrase...")
+    # OLA stretch
+    def ola_stretch(sig, factor,
+                    win_ms=25, sr=SR):
+        sig   = np.array(sig,
+                         dtype=np.float32)
+        n_in  = len(sig)
+        win_n = int(win_ms/1000.0*sr)
+        if win_n % 2 != 0:
+            win_n += 1
+        hop_in  = win_n // 4
+        hop_out = int(hop_in * factor)
+        n_frames = max(1,
+            (n_in-win_n)//hop_in + 1)
+        n_out = hop_out*(n_frames-1)+win_n
+        out  = np.zeros(n_out,
+                        dtype=np.float64)
+        norm = np.zeros(n_out,
+                        dtype=np.float64)
+        window = np.hanning(win_n)
+        for i in range(n_frames):
+            i0 = i * hop_in
+            i1 = i0 + win_n
+            if i1 > n_in:
+                frame = np.zeros(win_n)
+                av = n_in - i0
+                if av > 0:
+                    frame[:av] = sig[i0:i0+av]
+            else:
+                frame = sig[i0:i1].astype(
+                    np.float64)
+            o0 = i * hop_out
+            o1 = o0 + win_n
+            out[o0:o1]  += frame * window
+            norm[o0:o1] += window
+        norm = np.where(
+            norm < 1e-8, 1.0, norm)
+        return (out/norm).astype(np.float32)
+
+    print("  Full phrase (normal speed)...")
     seg = synth_phrase(
         PHRASE, punctuation='.',
         pitch_base=PITCH)
     write_wav(
         "output_play/"
         "the_voice_was_already_here.wav",
-        apply_room(seg, rt60=1.5, dr=0.50))
+        apply_room(f32(seg),
+                   rt60=1.5, dr=0.50))
     print("    the_voice_was_already_here.wav")
 
     print()
-    print("  Isolation...")
-    for label, words in [
-        ('test_the',
-         [('the',   ['DH', 'AH'])]),
-        ('test_here',
-         [('here',  ['H', 'IH', 'R'])]),
-        ('test_was',
-         [('was',   ['W', 'AH', 'Z'])]),
-        ('test_voice',
-         [('voice', ['V', 'OY', 'S'])]),
-    ]:
-        seg = synth_phrase(
-            words, pitch_base=PITCH)
+    print("  4× OLA slow — word by word...")
+    for word, phones in PHRASE:
+        sig_w = synth_phrase(
+            [(word, phones)],
+            pitch_base=PITCH)
+        sig_w = ola_stretch(
+            f32(sig_w), factor=4.0)
+        sig_w = apply_room(
+            sig_w, rt60=0.8, dr=0.65)
         write_wav(
-            f"output_play/{label}.wav",
-            apply_room(seg, rt60=1.2,
-                        dr=0.55))
-        print(f"    {label}.wav")
+            f"output_play/slow_{word}.wav",
+            sig_w, SR)
+        dur = len(sig_w)/SR
+        print(f"    slow_{word}.wav  "
+              f"({dur:.1f}s)  {phones}")
 
     print()
+    print("  PLAY:")
     print("  afplay output_play/"
           "the_voice_was_already_here.wav")
+    print()
+    for word, _ in PHRASE:
+        print(f"  afplay output_play/"
+              f"slow_{word}.wav")
