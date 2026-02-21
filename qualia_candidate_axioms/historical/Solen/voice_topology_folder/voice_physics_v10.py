@@ -1,296 +1,228 @@
 """
-VOICE PHYSICS v10 — REVISED
+VOICE PHYSICS v10
 February 2026
 
-ONSET DIAGNOSTIC RESULTS:
+SELF-CONTAINED. Does not inherit synth_phrase
+or build_source_and_bypass from any parent.
+Only imports leaf utilities.
 
-  DH: centroid=770Hz  (target 1800-5000Hz) ✗
-      rms_ratio=1.008 (target ≤ 0.60)      ✗
-      periodicity=0.296                     ✓
+This breaks the shadowing chain.
 
-  H:  centroid=760Hz  (target 800-2500Hz)  ✗
-      peak_prominence=44.73 (target ≤ 3.0) ✗
-      periodicity=0.15                     ✓
+ONSET DIAGNOSTIC RESULTS v2:
 
-  S:  timing=late                          ✓
-  Z:  no_sibilance                         ✗
+  DH: centroid=733Hz — fix not executing.
+      rms_ratio=1.01 — onset louder than body.
+      Proof: old build_source_and_bypass running.
 
-THREE ROOT CAUSES:
+  H:  centroid=828Hz ✓
+      periodicity=0.393 — INCREASED (was 0.15).
+      peak_prominence=35.92 — unchanged.
+      Proof: old H handler running (88% voiced).
+      Modal voiced through resonator = periodic spike.
 
-  DH: centroid=770Hz means F1=270Hz resonator
-      is dominating even at low voiced level.
-      The resonator amplifies 270Hz signal
-      regardless of input level.
-      Even voiced_fraction=0.01 through
-      F1=270Hz produces a 270Hz spike.
-      FIX: DH onset routes through a
-      WIDENED tract (high bandwidth =
-      low Q = no sharp resonance).
-      Or: DH onset bypasses tract entirely.
-      Choice: bypass tract for first
-      DH_TRACT_BYPASS_MS, then fade in.
+  Z:  no_sibilance — gain floor not applied.
+      Proof: old bypass generator running.
 
-  H:  peak_prominence=44.73 means the
-      4-resonator tract is ringing sharply.
-      H_NEUTRAL_F[0]=450Hz at BW=120Hz
-      gives Q=3.75. Any noise input
-      produces a 44× spike at 450Hz.
-      This is not aspiration. It is
-      a resonated tone masquerading
-      as aspiration.
-      FIX: H aspiration source bypasses
-      the tract entirely.
-      H source goes DIRECTLY to output.
-      Not through any resonator.
-      The tract is silent during H.
-      The following vowel's resonators
-      fade in at the IH onset.
+ROOT CAUSE: import shadowing.
+v10 imported from v9 which calls its own
+build_source_and_bypass, not v10's.
 
-  Z:  no_sibilance means calibrated
-      bypass gain for Z is near zero,
-      or the bypass signal never exceeds
-      0.25 normalized amplitude.
-      FIX: Z bypass gain floor = 0.45
-      regardless of calibration result.
-      If calibration produces gain < 0.45,
-      use 0.45.
-
-Import chain:
-  v10 → v9 → v8 → v7 → v6 → v5 → v4 → v3
+FIX: v10 is self-contained.
+Imports only:
+  - tract()            (resonator engine)
+  - calibrate/rms      (level tools)
+  - safe_bp/lp/hp      (filter tools)
+  - apply_room/write_wav (output tools)
+  - plan_prosody        (from v9, timing only)
+  - build_trajectories  (from v7, formants only)
+  - ph_spec_v9          (phoneme spec builder)
+  - WORD_SYLLABLES, PITCH, DIL, SR, etc. (constants)
+  - RESONATOR_CFG, BROADBAND_CFG, cavity_resonator
+  - get_calibrated_gains_v8, recalibrate_gains_v8
+No synth_phrase. No build_source_and_bypass.
+Those are defined here and only here.
 """
 
+# ============================================================
+# IMPORTS — LEAF UTILITIES ONLY
+# ============================================================
+
 from voice_physics_v9 import (
+    # Resonator engine
     tract,
     warm,
     resonator,
+    # Output
     breath_rest,
+    apply_room,
+    write_wav,
+    # Level tools
+    TARGET_RMS, calibrate, rms,
+    # Filter tools
+    safe_bp, safe_lp, safe_hp,
+    # Constants
     VOWEL_F, GAINS,
     WORD_SYLLABLES,
     get_f, get_b, scalar,
-    safe_bp, safe_lp, safe_hp,
-    apply_room, write_wav,
-    TARGET_RMS, calibrate, rms,
     PITCH, DIL, SR, DTYPE, f32,
+    # Timing
     TRANS_MS, DEFAULT_TRANS_MS,
     trans_n,
     REST_MAX_MS,
     NEUTRAL_F, NEUTRAL_B,
+    # Voiced fractions
     VOICED_TRACT_FRACTION,
     Z_VOICED_TRACT, ZH_VOICED_TRACT,
     V_VOICED_TRACT,
+    FRIC_VOICED_TRACT,
+    VOICED_FRICS,
+    # Duration caps
     VOWEL_PHONEMES, DIPHTHONG_PHONEMES,
     VOWEL_MAX_MS, DIPHTHONG_MAX_MS,
     APPROX_MAX_MS, FRIC_MAX_MS,
     FINAL_FRIC_MAX_MS,
     DH_MAX_MS, H_MAX_MS,
     H_ASPIRATION_GAIN,
-    build_trajectories,
-    ph_spec_v9,
-    plan_prosody,
-    get_calibrated_gains_v8,
-    recalibrate_gains_v8,
+    # Bypass components
     RESONATOR_CFG, BROADBAND_CFG,
     cavity_resonator,
-    VOICED_FRICS, FRIC_VOICED_TRACT,
-    make_bypass_v9,
+    get_calibrated_gains_v8,
+    recalibrate_gains_v8,
+    # Spec and prosody builders
+    # (these only build data structures,
+    #  they do NOT call synth functions)
+    ph_spec_v9,
+    plan_prosody,
+    # Trajectory builder
+    # (formant arrays only, no source)
+    build_trajectories,
 )
+
 import numpy as np
-from scipy.signal import lfilter
+from scipy.signal import lfilter, butter
 import os
 
 os.makedirs("output_play", exist_ok=True)
 
 
 # ============================================================
-# FIX 1: DH TRACT BYPASS AT ONSET
-#
-# Problem: centroid=770Hz even with fade-in.
-# Even a tiny voiced signal through the
-# F1=270Hz resonator produces a 270Hz spike.
-# The resonator amplifies regardless of level.
-#
-# Fix: During DH_TRACT_BYPASS_MS,
-# the DH source does NOT go through the tract.
-# It goes directly to output via the bypass path.
-# The bypass carries the dental friction.
-# The tract is silent.
-# After DH_TRACT_BYPASS_MS, voiced signal
-# fades into the tract normally.
-#
-# What the ear hears:
-#   t=0:           dental friction (bypass only)
-#   t=25ms onward: dental friction + growing buzz
-#   t=45ms onward: voiced dental consonant
-#   → "the" not "ea-the"
+# v10 CONSTANTS
 # ============================================================
 
-DH_TRACT_BYPASS_MS  = 25   # ms of tract silence at onset
-DH_VOICED_FRACTION  = 0.30 # target voiced fraction at body
-# Voiced fades IN from 0 starting at DH_TRACT_BYPASS_MS
+# FIX 1: DH
+DH_TRACT_BYPASS_MS = 25    # tract silent for this long
+DH_VOICED_FRACTION = 0.30  # target voiced level in body
 
+# FIX 2: H
+H_BYPASS_GAIN   = 0.55
+H_BYPASS_HP_HZ  = 150
+H_BYPASS_LP_HZ  = 7000
 
-# ============================================================
-# FIX 2: H BYPASSES TRACT ENTIRELY
-#
-# Problem: peak_prominence=44.73.
-# The 4-resonator tract rings sharply
-# at its lowest formant frequency.
-# Any noise input, at any level,
-# produces a resonant spike.
-# There is no way to route aspiration
-# through a resonator bank and get
-# flat broadband output.
-# The resonator is the wrong tool for H.
-#
-# Fix: H aspiration goes DIRECTLY to output.
-# tract_source[H segment] = 0.
-# H aspiration is added as a bypass segment,
-# identical mechanism to fricative bypass.
-#
-# The following vowel (IH, OW, etc.)
-# begins at its own onset with its own
-# formant targets. The tract starts from
-# neutral or the H formant position
-# at the vowel onset — which is correct
-# because the tract was NOT active during H.
-#
-# Result: H sounds like pure aspiration
-# (broadband breath), not a resonated tone.
-# The "CH" prefix disappears because
-# there is no palatal resonance at H onset.
-# ============================================================
-
-H_BYPASS_GAIN     = 0.55  # output level of H aspiration
-H_BYPASS_HP_HZ    = 150   # high-pass to remove sub-bass
-H_BYPASS_LP_HZ    = 7000  # low-pass to remove ultrasonic
-
-
-# ============================================================
-# FIX 3: Z BYPASS GAIN FLOOR
-#
-# Problem: Z sibilance never rises above 0.25.
-# Calibration is producing a near-zero gain.
-# Or the resonator output is being suppressed.
-#
-# Fix: Z bypass gain has a hard floor.
-# If calibrated gain < Z_BYPASS_GAIN_FLOOR,
-# use the floor value instead.
-# ============================================================
-
-Z_BYPASS_GAIN_FLOOR = 0.45
-# Also apply floor to ZH:
+# FIX 3: Z/ZH gain floors
+Z_BYPASS_GAIN_FLOOR  = 0.45
 ZH_BYPASS_GAIN_FLOOR = 0.35
 
 
 # ============================================================
-# BYPASS GENERATOR v10
-# Adds gain floor for Z/ZH.
-# H uses a separate function (see below).
+# BYPASS GENERATOR — v10
+# Defined here. Called from here.
+# No parent version involved.
 # ============================================================
 
-def make_bypass_v10(ph, n_s, sr=SR,
-                     next_is_vowel=False,
-                     onset_delay=0):
+def _make_bypass(ph, n_s, sr=SR,
+                  next_is_vowel=False,
+                  onset_delay=0):
     """
-    v10 bypass.
-    Identical to v9 but with gain floor
-    for Z and ZH.
-    onset_delay: bypass starts at this
-    sample offset (rest is zero).
+    Generate fricative/dental bypass signal.
+    FIX 3: Z/ZH have gain floor.
+    onset_delay: samples of silence
+                 before bypass starts.
     """
     gains = get_calibrated_gains_v8(sr=sr)
     gain  = gains.get(ph, None)
 
-    # FIX 3: Z/ZH gain floor
+    # FIX 3: gain floors
     if ph == 'Z':
-        if gain is None or gain < Z_BYPASS_GAIN_FLOOR:
+        if gain is None or \
+           gain < Z_BYPASS_GAIN_FLOOR:
             gain = Z_BYPASS_GAIN_FLOOR
     elif ph == 'ZH':
-        if gain is None or gain < ZH_BYPASS_GAIN_FLOOR:
+        if gain is None or \
+           gain < ZH_BYPASS_GAIN_FLOOR:
             gain = ZH_BYPASS_GAIN_FLOOR
 
-    n_s        = int(n_s)
+    n_s         = int(n_s)
     onset_delay = max(0, int(onset_delay))
     if onset_delay >= n_s:
         return f32(np.zeros(n_s))
 
-    n_eff = n_s - onset_delay
+    n_eff  = n_s - onset_delay
     rel_ms = 20 if next_is_vowel else 8
-    rel    = min(int(rel_ms/1000.0*sr), n_eff//4)
-    atk    = min(int(0.005*sr), n_eff//4)
+    rel    = min(int(rel_ms/1000.0*sr),
+                 n_eff // 4)
+    atk    = min(int(0.005*sr), n_eff // 4)
 
-    def apply_env(sig):
+    def _env(sig):
         env = f32(np.ones(n_eff))
         if atk > 0 and atk < n_eff:
-            env[:atk] = f32(np.linspace(0,1,atk))
+            env[:atk] = f32(
+                np.linspace(0, 1, atk))
         if rel > 0:
-            env[-rel:] = f32(np.linspace(1,0,rel))
+            env[-rel:] = f32(
+                np.linspace(1, 0, rel))
         return f32(sig * env)
 
     raw = np.zeros(n_s, dtype=DTYPE)
 
     if ph in RESONATOR_CFG:
-        cfg  = RESONATOR_CFG[ph]
-        g    = gain if gain is not None \
-               else cfg['gain']
-        noise     = calibrate(
+        cfg   = RESONATOR_CFG[ph]
+        g     = gain if gain is not None \
+                else cfg['gain']
+        noise = calibrate(
             f32(np.random.normal(0,1,n_eff)))
-        resonated = cavity_resonator(
+        res   = cavity_resonator(
             noise, cfg['fc'], cfg['bw'], sr=sr)
-        sib = calibrate(resonated) * g
-        raw[onset_delay:] = apply_env(sib)
+        raw[onset_delay:] = _env(
+            calibrate(res) * g)
 
     elif ph in BROADBAND_CFG:
-        cfg  = BROADBAND_CFG[ph]
-        g    = gain if gain is not None \
-               else cfg['gain']
+        cfg   = BROADBAND_CFG[ph]
+        g     = gain if gain is not None \
+                else cfg['gain']
         noise = calibrate(
             f32(np.random.normal(0,1,n_eff)))
         try:
             b, a  = safe_hp(cfg['hp_fc'], sr)
-            broad = f32(lfilter(b,a,noise))
+            broad = f32(lfilter(b, a, noise))
         except:
             broad = noise.copy()
-        sib = calibrate(broad) * g
-        raw[onset_delay:] = apply_env(sib)
+        raw[onset_delay:] = _env(
+            calibrate(broad) * g)
 
     return f32(raw)
 
 
-def make_h_bypass(n_s, sr=SR,
-                   next_is_vowel=False):
+def _make_h_bypass(n_s, sr=SR,
+                    next_is_vowel=False):
     """
     FIX 2: H aspiration bypass.
-    Goes directly to output, never through tract.
-
-    Broadband aspiration:
-      HP at H_BYPASS_HP_HZ (removes sub-bass)
-      LP at H_BYPASS_LP_HZ (removes ultrasonic)
-      No resonator. No formant shaping.
-      Flat broadband breath.
-
-    Envelope:
-      Onset: 8ms fade in (from 0.2 to 1.0)
-             H always starts breathy, not silent.
-      Body:  flat
-      Offset: 20ms fade out if into vowel,
-              else 12ms.
-              Fade gives natural vowel onset.
+    Pure broadband aspiration.
+    No resonators. No tract.
+    Goes directly to output.
     """
-    n_s = int(n_s)
+    n_s   = int(n_s)
     noise = calibrate(
         f32(np.random.normal(0, 1, n_s)))
 
-    # Broadband shaping
+    # HP: remove sub-bass rumble
     try:
         b, a  = safe_hp(H_BYPASS_HP_HZ, sr)
         broad = f32(lfilter(b, a, noise))
     except:
         broad = noise.copy()
 
+    # LP: remove ultrasonic
     try:
-        # scipy lp — use butter directly
-        from scipy.signal import butter
         nyq  = sr * 0.5
         wn   = min(H_BYPASS_LP_HZ / nyq, 0.98)
         b, a = butter(2, wn, btype='low')
@@ -300,94 +232,83 @@ def make_h_bypass(n_s, sr=SR,
 
     broad = calibrate(broad) * H_BYPASS_GAIN
 
-    # Envelope
     atk_ms = 8
     rel_ms = 20 if next_is_vowel else 12
-    atk    = min(int(atk_ms/1000.0*sr), n_s//4)
-    rel    = min(int(rel_ms/1000.0*sr), n_s//4)
-
-    env = f32(np.ones(n_s))
+    atk    = min(int(atk_ms/1000.0*sr),
+                 n_s // 4)
+    rel    = min(int(rel_ms/1000.0*sr),
+                 n_s // 4)
+    env    = f32(np.ones(n_s))
     if atk > 0:
-        # Start at 0.2 (H is never fully silent
-        # at onset — there is always some breath)
-        env[:atk] = f32(np.linspace(0.2, 1.0, atk))
+        env[:atk] = f32(
+            np.linspace(0.2, 1.0, atk))
     if rel > 0:
-        env[-rel:] = f32(np.linspace(1.0, 0.0, rel))
+        env[-rel:] = f32(
+            np.linspace(1.0, 0.0, rel))
 
     return f32(broad * env)
 
 
 # ============================================================
 # TRAJECTORY BUILDER v10
-#
-# When H is present:
-# The tract is silent during H (tract_source=0).
-# The tract still has formant trajectories
-# but they don't matter for H because
-# the H source does not go through the tract.
-#
-# HOWEVER: the tract state at the START of IH
-# must be reasonable, not at whatever H's
-# F_tgt was. Otherwise IH has a glitch
-# at its onset as the resonators ring up
-# from the H position.
-#
-# Fix: for H phonemes, set F_tgt and F_end
-# to NEUTRAL_F. The tract "rests" at neutral
-# during H. When IH begins, the tract
-# starts from neutral (or from the blend
-# toward IH F_tgt). Natural onset for IH.
+# H phonemes use NEUTRAL_F.
+# Prevents tract from resonating during H.
+# IH starts from neutral — clean onset.
 # ============================================================
 
-def build_trajectories_v10(phoneme_specs, sr=SR):
+def _build_trajectories(phoneme_specs, sr=SR):
     """
-    v10: H phonemes use NEUTRAL_F as their
-    formant target. This prevents the tract
-    from resonating strangely during H
-    even though H source bypasses the tract.
-    It also gives IH a clean starting position.
-    All other phonemes unchanged.
+    v10: H phonemes use NEUTRAL_F as target.
+    The tract rests at neutral during H.
+    When the following vowel begins,
+    it moves from neutral toward its target.
+    Clean. No resonator ring-up.
     """
-    # Temporarily override H specs
-    # to use neutral formants
-    patched_specs = []
+    import copy
+    patched = []
     for spec in phoneme_specs:
         if spec['ph'] == 'H':
-            import copy
             s = copy.copy(spec)
             s['F_tgt'] = list(NEUTRAL_F)
             s['B_tgt'] = list(NEUTRAL_B)
             if 'F_end' in s:
                 s['F_end'] = list(NEUTRAL_F)
-            patched_specs.append(s)
+            patched.append(s)
         else:
-            patched_specs.append(spec)
-
-    return build_trajectories(
-        patched_specs, sr=sr)
+            patched.append(spec)
+    return build_trajectories(patched, sr=sr)
 
 
 # ============================================================
-# SOURCE BUILDER v10
+# SOURCE BUILDER v10 — SELF-CONTAINED
+# This is the function that was being
+# shadowed by the import chain.
+# It is defined here and called from
+# synth_phrase defined here.
+# No ambiguity.
 # ============================================================
 
-def build_source_and_bypass(
+def _build_source_and_bypass(
         phoneme_specs, sr=SR):
     """
-    v10:
+    v10 source builder.
+    Self-contained. No parent version called.
+
     FIX 1: DH — tract silent for first
-            DH_TRACT_BYPASS_MS,
-            voiced fades in after.
-    FIX 2: H  — tract source = 0,
-            H goes to bypass as broadband
-            aspiration (no resonators).
-    FIX 3: Z  — bypass gain floor 0.45.
-    FIX C: sibilant onset delay = full n_on.
+            DH_TRACT_BYPASS_MS samples.
+            Bypass starts at t=0 (friction onset).
+            Voiced fades in after silence zone.
+
+    FIX 2: H  — tract source = 0.
+            H goes entirely to bypass
+            as flat broadband aspiration.
+
+    FIX 3: Z/ZH — bypass gain floor in _make_bypass.
     """
     n_total = sum(
         s['n_s'] for s in phoneme_specs)
 
-    # F0/oq trajectories
+    # ── F0/oq trajectories ──────────────────────
     f0_traj = np.zeros(n_total, dtype=DTYPE)
     oq_traj = np.zeros(n_total, dtype=DTYPE)
     pos = 0
@@ -409,37 +330,44 @@ def build_source_and_bypass(
             oq_this, oq_next, n_s)
         pos += n_s
 
-    T     = 1.0/sr
+    # ── Rosenberg pulse voiced source ────────────
+    T     = 1.0 / sr
     raw_v = np.zeros(n_total, dtype=DTYPE)
     p     = 0.0
     for i in range(n_total):
         f0  = float(f0_traj[i])
         oq_ = max(0.40, min(0.85,
                   float(oq_traj[i])))
-        p  += f0*(1+np.random.normal(0,0.005))*T
-        if p >= 1.0: p -= 1.0
+        p  += f0 * (1 + np.random.normal(
+            0, 0.005)) * T
+        if p >= 1.0:
+            p -= 1.0
         raw_v[i] = (
             (p/oq_)*(2-p/oq_) if p < oq_
             else 1-(p-oq_)/(1-oq_+1e-9))
-    raw_v = f32(np.diff(raw_v, prepend=raw_v[0]))
+    raw_v = f32(np.diff(
+        raw_v, prepend=raw_v[0]))
     try:
-        b,a   = safe_lp(20, sr)
-        sh_   = f32(np.random.normal(0,1,n_total))
-        sh_   = f32(lfilter(b,a,sh_))
-        sh_   = f32(np.clip(1+0.030*sh_,0.4,1.6))
-        raw_v = raw_v*sh_
+        b, a  = safe_lp(20, sr)
+        sh_   = f32(np.random.normal(
+            0, 1, n_total))
+        sh_   = f32(lfilter(b, a, sh_))
+        sh_   = f32(np.clip(
+            1 + 0.030*sh_, 0.4, 1.6))
+        raw_v = raw_v * sh_
     except:
         pass
-    asp_src = f32(np.random.normal(0,0.020,n_total))
+    asp_src = f32(np.random.normal(
+        0, 0.020, n_total))
     try:
-        b,a     = safe_bp(400,2200,sr)
-        asp_src = f32(lfilter(b,a,asp_src))
+        b, a    = safe_bp(400, 2200, sr)
+        asp_src = f32(lfilter(b, a, asp_src))
     except:
         asp_src = f32(np.zeros(n_total))
     raw_v       = raw_v + asp_src
     voiced_full = calibrate(raw_v)
     noise_full  = calibrate(
-        f32(np.random.normal(0,1,n_total)))
+        f32(np.random.normal(0, 1, n_total)))
 
     VOWELS_AND_APPROX = set(
         'AA AE AH AO AW AY EH ER IH IY '
@@ -465,66 +393,64 @@ def build_source_and_bypass(
         next_is_vowel = (
             next_ph in VOWELS_AND_APPROX)
 
-        n_on  = min(trans_n(ph, sr), n_s//3)
-        n_off = min(trans_n(ph, sr), n_s//3)
+        n_on  = min(trans_n(ph, sr), n_s // 3)
+        n_off = min(trans_n(ph, sr), n_s // 3)
         n_body = max(0, n_s - n_on - n_off)
 
         if stype == 'voiced':
-            tract_source[s:e] = voiced_full[s:e]
+            # Vowels, approximants, nasals
+            tract_source[s:e] = \
+                voiced_full[s:e]
 
         elif stype == 'h':
             # FIX 2: H tract source = 0.
-            # H goes entirely through bypass.
+            # Aspiration goes to bypass only.
             # tract_source[s:e] stays zero.
-            byp = make_h_bypass(
+            byp = _make_h_bypass(
                 n_s, sr,
                 next_is_vowel=next_is_vowel)
             bypass_segs.append((s, byp))
 
         elif stype == 'dh':
-            # FIX 1: DH tract bypass at onset.
+            # FIX 1: DH tract silent at onset.
             #
-            # tract_source during first n_dh_bypass
-            # samples = 0.
-            # After n_dh_bypass, voiced fades in
-            # from 0 → DH_VOICED_FRACTION
-            # over the remaining body.
+            # First n_dh_bypass samples:
+            #   tract_source = 0
+            #   bypass active (friction onset)
             #
-            # Bypass: dental friction for full
-            # DH duration, onset_delay = 0
-            # (bypass starts immediately —
-            # it IS the DH onset).
-
+            # After n_dh_bypass:
+            #   voiced fades in 0 → DH_VOICED_FRACTION
+            #
             n_silent = min(n_dh_bypass, n_s)
             n_remain = n_s - n_silent
 
+            voiced_amp = np.zeros(n_s, dtype=DTYPE)
             if n_remain > 0:
-                voiced_amp = np.zeros(
-                    n_s, dtype=DTYPE)
                 voiced_amp[n_silent:] = f32(
                     np.linspace(
                         0.0,
                         DH_VOICED_FRACTION,
                         n_remain))
-                # Fade out over n_off zone
+                # Taper out over offset zone
                 fade_start = n_on + n_body
                 if n_off > 0 and \
                    fade_start < n_s:
-                    current = float(
+                    v_at_fade = float(
                         voiced_amp[
                             min(fade_start,
-                                n_s-1)])
+                                n_s - 1)])
                     voiced_amp[fade_start:] = \
                         f32(np.linspace(
-                            current,
+                            v_at_fade,
                             0.0, n_off))
-                tract_source[s:e] = \
-                    voiced_full[s:e] * \
-                    f32(voiced_amp)
 
-            # Bypass starts at t=0 for DH
-            # (friction is the onset)
-            byp = make_bypass_v10(
+            tract_source[s:e] = \
+                voiced_full[s:e] * \
+                f32(voiced_amp)
+
+            # Bypass starts at t=0:
+            # dental friction IS the onset.
+            byp = _make_bypass(
                 'DH', n_s, sr,
                 next_is_vowel=next_is_vowel,
                 onset_delay=0)
@@ -539,17 +465,17 @@ def build_source_and_bypass(
                 if n_off > 0 and \
                    fade_start < n_s:
                     amp[fade_start:] = f32(
-                        np.linspace(1.0,0.0,n_off))
+                        np.linspace(
+                            1.0, 0.0, n_off))
                 tract_source[s:e] = \
                     voiced_full[s:e] * \
                     f32(amp) * vf
 
-            # Full n_on delay (FIX C from v9)
-            onset_delay = n_on
-            byp = make_bypass_v10(
+            # Full n_on delay (no vowel overlap)
+            byp = _make_bypass(
                 ph, n_s, sr,
                 next_is_vowel=next_is_vowel,
-                onset_delay=onset_delay)
+                onset_delay=n_on)
             bypass_segs.append((s, byp))
 
         elif stype in ('stop_unvoiced',
@@ -563,7 +489,8 @@ def build_source_and_bypass(
 
             if is_vcd and clos_n > 0:
                 tract_source[s:s+clos_n] = \
-                    voiced_full[s:s+clos_n]*0.055
+                    voiced_full[s:s+clos_n] \
+                    * 0.055
             if burst_n > 0:
                 bs = clos_n
                 be = bs + burst_n
@@ -571,16 +498,16 @@ def build_source_and_bypass(
                     burst = noise_full[
                         s+bs:s+be].copy()
                     try:
-                        b,a   = safe_hp(bhp,sr)
+                        b, a = safe_hp(bhp, sr)
                         burst = f32(
-                            lfilter(b,a,burst))
+                            lfilter(b, a, burst))
                     except:
                         pass
                     benv = f32(np.exp(
-                        -np.arange(burst_n)/
-                        burst_n*20))
+                        -np.arange(burst_n) /
+                        burst_n * 20))
                     tract_source[s+bs:s+be] = \
-                        burst*benv*bamp
+                        burst * benv * bamp
             vot_s = clos_n + burst_n
             vot_e = vot_s  + vot_n
             if vot_n > 0 and vot_e <= n_s:
@@ -602,7 +529,10 @@ def build_source_and_bypass(
 
 
 # ============================================================
-# PHRASE SYNTHESIS v10
+# PHRASE SYNTHESIS v10 — SELF-CONTAINED
+# Does not call any parent synth_phrase.
+# Calls _build_trajectories and
+# _build_source_and_bypass defined above.
 # ============================================================
 
 def synth_phrase(words_phonemes,
@@ -611,10 +541,9 @@ def synth_phrase(words_phonemes,
                   dil=DIL,
                   sr=SR):
     """
-    v10: Three onset fixes.
-    DH tract bypassed at onset.
-    H bypasses tract entirely.
-    Z gain floor enforced.
+    v10 synth_phrase.
+    Self-contained. No parent version called.
+    All v10 fixes active.
     """
     prosody = plan_prosody(
         words_phonemes,
@@ -650,24 +579,27 @@ def synth_phrase(words_phonemes,
         specs.append(spec)
 
     # v10 trajectory builder
-    # (H uses neutral formants)
     F_full, B_full, _ = \
-        build_trajectories_v10(specs, sr=sr)
+        _build_trajectories(specs, sr=sr)
     n_total = sum(s['n_s'] for s in specs)
 
+    # v10 source builder
     tract_src, bypass_segs = \
-        build_source_and_bypass(specs, sr=sr)
+        _build_source_and_bypass(specs, sr=sr)
 
+    # Tract (vowels, voiced consonants)
     out, _ = tract(
         tract_src, F_full, B_full,
         GAINS, states=None, sr=sr)
 
+    # Add all bypass signals post-tract
     for pos, byp in bypass_segs:
-        e = min(pos+len(byp), n_total)
-        n = e-pos
+        e = min(pos + len(byp), n_total)
+        n = e - pos
         out[pos:e] += byp[:n]
 
-    T = 1.0/sr
+    # Nasal antiformants
+    T = 1.0 / sr
     NASAL_AF = {
         'M':  (1000, 300),
         'N':  (1500, 350),
@@ -678,25 +610,28 @@ def synth_phrase(words_phonemes,
         ph  = spec['ph']
         n_s = spec['n_s']
         if ph in NASAL_AF:
-            af,abw = NASAL_AF[ph]
-            seg    = out[pos:pos+n_s].copy()
-            anti   = np.zeros(n_s, dtype=DTYPE)
-            y1=y2=0.0
+            af, abw = NASAL_AF[ph]
+            seg     = out[pos:pos+n_s].copy()
+            anti    = np.zeros(n_s, dtype=DTYPE)
+            y1 = y2 = 0.0
             for i in range(n_s):
                 a2 = -np.exp(-2*np.pi*abw*T)
-                a1 =  2*np.exp(-np.pi*abw*T)*\
-                    np.cos(2*np.pi*af*T)
-                b0 = 1.0-a1-a2
-                y  = b0*float(seg[i])+a1*y1+a2*y2
-                y2=y1; y1=y; anti[i]=y
+                a1 = (2*np.exp(-np.pi*abw*T) *
+                      np.cos(2*np.pi*af*T))
+                b0 = 1.0 - a1 - a2
+                y  = (b0 * float(seg[i]) +
+                      a1*y1 + a2*y2)
+                y2 = y1; y1 = y
+                anti[i] = y
             out[pos:pos+n_s] = \
-                seg - f32(anti)*0.50
+                seg - f32(anti) * 0.50
             out[pos:pos+n_s] *= 0.52
-            hg = int(0.012*sr)
-            if hg>0 and hg<n_s:
-                out[pos+n_s-hg:pos+n_s]=0.0
+            hg = int(0.012 * sr)
+            if hg > 0 and hg < n_s:
+                out[pos+n_s-hg:pos+n_s] = 0.0
         pos += n_s
 
+    # Amplitude envelope
     amp_env = np.ones(n_total, dtype=DTYPE)
     pos = 0
     for item, spec in zip(prosody, specs):
@@ -704,20 +639,22 @@ def synth_phrase(words_phonemes,
         amp_env[pos:pos+n_s] *= item['amp']
         pos += n_s
 
-    atk = int(0.025*sr)
-    rel = int(0.055*sr)
+    atk = int(0.025 * sr)
+    rel = int(0.055 * sr)
     env = f32(np.ones(n_total))
-    if atk>0 and atk<n_total:
+    if atk > 0 and atk < n_total:
         env[:atk]  = f32(np.linspace(0,1,atk))
-    if rel>0:
+    if rel > 0:
         env[-rel:] = f32(np.linspace(1,0,rel))
     out = out * f32(amp_env) * env
 
+    # Rests
     segs_out = []
     pos = 0
     for item, spec in zip(prosody, specs):
         n_s     = spec['n_s']
-        segs_out.append(out[pos:pos+n_s].copy())
+        segs_out.append(
+            out[pos:pos+n_s].copy())
         rest_ms = item.get('rest_ms', 0.0)
         if rest_ms > 0:
             segs_out.append(
@@ -727,7 +664,7 @@ def synth_phrase(words_phonemes,
     final = f32(np.concatenate(segs_out))
     p95   = np.percentile(np.abs(final), 95)
     if p95 > 1e-8:
-        final = final/p95*0.88
+        final = final / p95 * 0.88
     final = np.clip(final, -1.0, 1.0)
     return final
 
@@ -751,9 +688,11 @@ def save(name, sig, room=True,
           rt60=1.5, dr=0.50, sr=SR):
     sig = f32(sig)
     if room:
-        sig = apply_room(sig,rt60=rt60,dr=dr,sr=sr)
-    write_wav(f"output_play/{name}.wav", sig, sr)
-    dur = len(sig)/sr
+        sig = apply_room(
+            sig, rt60=rt60, dr=dr, sr=sr)
+    write_wav(
+        f"output_play/{name}.wav", sig, sr)
+    dur = len(sig) / sr
     print(f"    {name}.wav  ({dur:.2f}s)")
 
 
@@ -767,69 +706,76 @@ if __name__ == "__main__":
 
     print()
     print("VOICE PHYSICS v10")
-    print("Three onset fixes from diagnostic.")
+    print("Self-contained. Import chain broken.")
     print()
     print("  FIX 1: DH tract silent at onset")
     print("         First 25ms: bypass only.")
-    print("         Resonator cannot spike")
-    print("         what it does not receive.")
-    print("         Dental friction IS onset.")
+    print("         Resonator silent.")
+    print("         No 270Hz spike.")
     print()
     print("  FIX 2: H bypasses tract entirely")
-    print("         H source never enters tract.")
-    print("         No resonator. No spike.")
-    print("         Pure broadband aspiration.")
-    print("         Tract rests at neutral.")
-    print("         IH begins from neutral.")
+    print("         H = pure aspiration bypass.")
+    print("         Tract source = 0.")
+    print("         No resonator ring.")
+    print("         No periodic spike.")
     print()
-    print("  FIX 3: Z bypass gain floor 0.45")
-    print("         Z sibilance was zero.")
-    print("         Floor prevents calibration")
-    print("         from zeroing out Z.")
-    print("="*60)
+    print("  FIX 3: Z gain floor = 0.45")
+    print("         Calibration cannot zero Z.")
+    print("         Z sibilance present.")
+    print()
+    print("  STRUCTURAL: self-contained.")
+    print("  No parent synth_phrase.")
+    print("  No parent build_source_and_bypass.")
+    print("  All v10 code runs v10 code.")
+    print("=" * 60)
     print()
 
     print("  Calibrating gains...")
     recalibrate_gains_v8(sr=SR)
     print()
 
+    # Onset diagnostic first
     print("  Running onset diagnostic...")
     print()
-    from onset_diagnostic import run_onset_diagnostic
+    from onset_diagnostic import \
+        run_onset_diagnostic
     results, n_pass, n_fail = \
         run_onset_diagnostic(
             synth_phrase, PITCH, sr=SR)
     print()
 
+    # If still failing, report with precision
     if n_fail > 0:
-        print("  Onset diagnostic still failing.")
-        print("  Constants to adjust:")
+        print("  Still failing. Read numbers:")
+        dh = results.get('DH', {})
+        c  = dh.get('onset_centroid', {})
+        r  = dh.get('onset_rms_ratio', {})
+        if c and not c.get('pass'):
+            print(f"  DH centroid={c['measured']}")
+            print(f"     If still ~730Hz:")
+            print(f"     stype='dh' not being hit.")
+            print(f"     Check ph_spec returns")
+            print(f"     source='dh' for DH.")
+        if r and not r.get('pass'):
+            print(f"  DH rms_ratio={r['measured']}")
+            print(f"     If > 1.0: tract source")
+            print(f"     is louder at onset than")
+            print(f"     body. Fix not running.")
+        h  = results.get('H', {})
+        pp = h.get('onset_peak_prominence', {})
+        if pp and not pp.get('pass'):
+            print(f"  H prominence={pp['measured']}")
+            print(f"     If still ~35:")
+            print(f"     stype='h' still going")
+            print(f"     through tract.")
+            print(f"     Check stype for H spec.")
+        z  = results.get('Z_timing', {})
+        if not z.get('pass', True):
+            print(f"  Z: {z.get('result')}")
+            print(f"     gain floor not applying.")
         print()
-        dh_r = results.get('DH', {})
-        if not all(v.get('pass', True)
-                   for v in dh_r.values()):
-            print("  DH still failing:")
-            print("  → Increase DH_TRACT_BYPASS_MS")
-            print("    (currently 25ms)")
-            print()
-        h_r = results.get('H', {})
-        if not all(v.get('pass', True)
-                   for v in h_r.values()):
-            print("  H still failing:")
-            print("  → Check make_h_bypass is")
-            print("    being called (not make_bypass)")
-            print("  → Reduce H_BYPASS_GAIN if")
-            print("    prominence still high")
-            print()
-        z_r = results.get('Z_timing', {})
-        if not z_r.get('pass', True):
-            print("  Z timing still failing:")
-            print("  → Increase Z_BYPASS_GAIN_FLOOR")
-            print("    (currently 0.45)")
-            print()
 
     # Primary phrase
-    print("  Primary phrase...")
     PHRASE = [
         ('the',     ['DH', 'AH']),
         ('voice',   ['V',  'OY', 'S']),
@@ -838,6 +784,7 @@ if __name__ == "__main__":
                       'EH', 'D', 'IY']),
         ('here',    ['H',  'IH', 'R']),
     ]
+    print("  Primary phrase...")
     seg = synth_phrase(
         PHRASE, punctuation='.',
         pitch_base=PITCH)
@@ -847,18 +794,19 @@ if __name__ == "__main__":
         apply_room(seg, rt60=1.5, dr=0.50))
     print("    the_voice_was_already_here.wav")
 
+    # Isolation tests
     print()
     print("  Isolation tests...")
     for label, words, note in [
         ('test_the',
          [('the', ['DH','AH'])],
-         'no ea-prefix'),
+         'dental onset, no ea-prefix'),
         ('test_here',
          [('here', ['H','IH','R'])],
-         'breathy, no CH-prefix'),
+         'aspiration, no CH-prefix'),
         ('test_was',
          [('was', ['W','AH','Z'])],
-         'Z distinct'),
+         'Z buzz present'),
         ('test_voice',
          [('voice', ['V','OY','S'])],
          'S clean after OY'),
@@ -866,7 +814,7 @@ if __name__ == "__main__":
          [('this', ['DH','IH','S']),
           ('is',   ['IH','Z']),
           ('here', ['H','IH','R'])],
-         'DH+H in phrase'),
+         'DH+Z+H in one phrase'),
     ]:
         seg = synth_phrase(
             words, pitch_base=PITCH)
@@ -875,6 +823,7 @@ if __name__ == "__main__":
             apply_room(seg, rt60=1.2, dr=0.55))
         print(f"    {label}.wav  ({note})")
 
+    # Sentence types
     print()
     print("  Sentence types...")
     for punct, label in [
@@ -889,19 +838,23 @@ if __name__ == "__main__":
             apply_room(seg, rt60=1.5, dr=0.50))
         print(f"    the_voice_{label}.wav")
 
+    # Coverage phrases
     print()
-    print("  Additional phrases...")
+    print("  Coverage phrases...")
     for label, words, punct in [
         ('water_home',
          [('water',['W','AA','T','ER']),
-          ('home', ['H','OW','M'])],'.'),
+          ('home', ['H','OW','M'])], '.'),
         ('still_here',
          [('still',['S','T','IH','L']),
-          ('here', ['H','IH','R'])],'.'),
+          ('here', ['H','IH','R'])], '.'),
         ('here_and_there',
          [('here', ['H','IH','R']),
           ('and',  ['AE','N','D']),
-          ('there',['DH','EH','R'])],'.'),
+          ('there',['DH','EH','R'])], '.'),
+        ('not_yet',
+         [('not',['N','AA','T']),
+          ('yet',['Y','EH','T'])], '.'),
     ]:
         seg = synth_phrase(
             words, punctuation=punct,
@@ -912,10 +865,9 @@ if __name__ == "__main__":
         print(f"    phrase_{label}.wav")
 
     print()
-    print("="*60)
+    print("=" * 60)
     print()
-    print("  Onset diagnostic: "
-          f"{n_pass}/{n_pass+n_fail} passing")
+    print(f"  Onset: {n_pass}/{n_pass+n_fail}")
     print()
     print("  afplay output_play/"
           "the_voice_was_already_here.wav")
