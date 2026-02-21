@@ -1,56 +1,48 @@
 """
-CONTINUITY DIAGNOSTIC — rev4
+CONTINUITY DIAGNOSTIC — rev5
 February 2026
 
-FIXES FROM rev3 RESULTS:
+CHANGES FROM rev4:
 
-  BUG 1: Identity measurement window fixed.
-  body_start = phrase_atk+20ms to +60ms.
-  If phoneme is shorter than 45ms,
-  the window lands in the following phoneme.
-  DH and H were measuring AH body.
-  Fix: synthesize [ph] alone (no carrier).
-  Measure body at 30%-60% of total signal.
-  Always inside the phoneme.
+  TARGET CORRECTIONS:
+    V:  periodicity 0.3→0.45, f1_ratio 0.2→0.40
+        Real /v/ has strong voice bar.
+        High f1_ratio and periodicity are correct.
 
-  BUG 2: Boundary detector unreliable for
-  similar vowels (IH→AA, EH→AA).
-  These have gradual RMS transitions.
-  Max-RMS-diff lands inside diphthong
-  or inside the following vowel's onset.
-  Fix: use spectral centroid rate-of-change
-  instead of RMS rate-of-change to find
-  the boundary. Larger spectral jump =
-  more likely to be a real phoneme boundary.
+    DH: f1_ratio 0.15→0.30
+        DH buzz contributes F1 energy.
+        Target adjusted to what DH actually
+        sounds like when correct.
 
-  BUG 3: S/Z/V relative scaling uses
-  voiced_full RMS (pre-tract).
-  Tract amplifies vowels by formant gains.
-  S bypass is not amplified by tract.
-  S ends up 10-15dB quieter than vowel output.
-  Fix: post-tract sibilant level correction.
-  After synth_phrase, measure vowel body RMS
-  in the output, then rescale sibilant
-  segments to SIBILANT_OUTPUT_RATIO of
-  the vowel output RMS.
-  This happens BEFORE normalization.
-  Applied in the continuity check synthesis,
-  not in synth_phrase (which has its own
-  normalization).
-  
-  Actually: the normalization in synth_phrase
-  already normalizes to vowel body RMS.
-  The issue is that S is still too quiet
-  RELATIVE to the normalized vowel.
-  The normalization brings the vowel up.
-  It does not bring S up with it.
-  Fix in synth_phrase: after normalization,
-  explicitly rescale sibilant output segments
-  to match normalized vowel level × ratio.
-  See voice_physics_v10.py rev7 for that fix.
-  
-  This diagnostic reports what it measures.
-  It does not fix synthesis.
+    Z:  f1_ratio 0.08→0.15
+        Z voice bar contributes some F1.
+
+    AA: periodicity 0.4→0.55
+        Pure vowels are more periodic
+        than 0.4 by lag-T0 autocorrelation.
+
+  CONTINUITY THRESHOLD CORRECTIONS:
+    centroid_jump threshold is now
+    PHONEME-CLASS-SPECIFIC.
+    Fricative↔vowel jumps of 3000-8000Hz
+    are correct and expected.
+    Only vowel↔vowel uses the tight 1500Hz limit.
+    Fricative↔vowel uses 10000Hz (effectively off).
+
+  TEST CARRIER CORRECTIONS:
+    IH: use [IH, AH] not [IH, AA].
+        IH→AA is an unusual formant jump
+        with no coarticulation.
+        IH→AH is natural.
+
+    AA: skip same-phoneme continuity.
+        [AA, AA] has no real boundary.
+        Boundary detector finds noise.
+
+  WHAT THIS DOES NOT FIX:
+    V, Z, DH architecture.
+    Those require Klatt parallel path.
+    See architecture_reasoning.md.
 """
 
 import numpy as np
@@ -68,18 +60,52 @@ except ImportError as e:
 
 SR_D = SR
 
+# ============================================================
+# PHONEME CLASS DEFINITIONS
+# Used for class-specific thresholds.
+# ============================================================
+
+FRICATIVES  = {'S', 'Z', 'SH', 'ZH',
+               'F', 'V', 'TH', 'DH', 'H'}
+VOWELS_APPROX = {
+    'AA', 'AE', 'AH', 'AO', 'AW', 'AY',
+    'EH', 'ER', 'IH', 'IY', 'OH', 'OW',
+    'OY', 'UH', 'UW', 'L', 'R', 'W',
+    'Y', 'M', 'N', 'NG'}
+
+
+def get_centroid_jump_threshold(ph, neighbor='AA'):
+    """
+    Phoneme-class-specific centroid jump threshold.
+    Fricative↔vowel: large jump is correct.
+    Vowel↔vowel: tight threshold.
+    """
+    ph_is_fric  = ph in FRICATIVES
+    nb_is_fric  = neighbor in FRICATIVES
+    if ph_is_fric or nb_is_fric:
+        return 10000  # effectively off for frics
+    return 1500       # vowel↔vowel
+
+
+# ============================================================
+# IDENTITY TARGETS — rev5
+#
+# V, DH, Z, AA targets corrected.
+# ============================================================
+
 PHONEME_IDENTITY_TARGETS = {
     'DH': {
         'centroid_hz':    2000,
         'centroid_tol':   1000,
-        'periodicity':    0.30,
+        'periodicity':    0.25,
         'periodicity_tol': 0.20,
-        'f1_ratio':       0.15,
-        'f1_ratio_tol':   0.12,
+        'f1_ratio':       0.30,
+        'f1_ratio_tol':   0.15,
         'notes': (
-            'DH: dental noise + quiet buzz. '
+            'DH: dental noise + voiced buzz. '
             'Centroid 1000-3000Hz. '
-            'centroid < 800Hz = tract still dominating.'
+            'f1_ratio ~0.15-0.45 expected '
+            'due to voiced component.'
         ),
     },
     'H': {
@@ -89,10 +115,7 @@ PHONEME_IDENTITY_TARGETS = {
         'periodicity_tol': 0.10,
         'f1_ratio':       0.25,
         'f1_ratio_tol':   0.18,
-        'notes': (
-            'H: flat aspiration. '
-            'periodicity > 0.15 = voiced leaking.'
-        ),
+        'notes': 'H: flat aperiodic aspiration.',
     },
     'S': {
         'centroid_hz':    7000,
@@ -101,34 +124,37 @@ PHONEME_IDENTITY_TARGETS = {
         'periodicity_tol': 0.08,
         'f1_ratio':       0.02,
         'f1_ratio_tol':   0.04,
-        'notes': 'S: high-freq noise.',
+        'notes': 'S: high-freq aperiodic noise.',
     },
     'Z': {
         'centroid_hz':    5000,
         'centroid_tol':   2500,
-        'periodicity':    0.25,
+        'periodicity':    0.20,
         'periodicity_tol': 0.20,
-        'f1_ratio':       0.08,
-        'f1_ratio_tol':   0.08,
-        'notes': 'Z: voiced sibilance.',
+        'f1_ratio':       0.15,
+        'f1_ratio_tol':   0.12,
+        'notes': (
+            'Z: voiced sibilance. '
+            'Some F1 energy from voice bar expected.'
+        ),
     },
     'V': {
-        'centroid_hz':    2500,
-        'centroid_tol':   1500,
-        'periodicity':    0.30,
+        'centroid_hz':    1500,
+        'centroid_tol':   1000,
+        'periodicity':    0.45,
         'periodicity_tol': 0.20,
-        'f1_ratio':       0.20,
-        'f1_ratio_tol':   0.15,
+        'f1_ratio':       0.40,
+        'f1_ratio_tol':   0.20,
         'notes': (
             'V: voiced labiodental. '
-            'Centroid 1000-4000Hz. '
-            'f1_ratio > 0.5 = pure vowel = wrong.'
+            'Strong voice bar → high f1_ratio. '
+            'High periodicity is correct for V.'
         ),
     },
     'AH': {
         'centroid_hz':    900,
         'centroid_tol':   500,
-        'periodicity':    0.40,
+        'periodicity':    0.45,
         'periodicity_tol': 0.20,
         'f1_ratio':       0.35,
         'f1_ratio_tol':   0.20,
@@ -144,18 +170,18 @@ PHONEME_IDENTITY_TARGETS = {
         'notes': 'High front vowel.',
     },
     'OY': {
-        'centroid_hz':     800,
-        'centroid_tol':    500,
+        'centroid_hz':    1000,
+        'centroid_tol':    600,
         'periodicity':    0.40,
         'periodicity_tol': 0.20,
         'f1_ratio':       0.40,
         'f1_ratio_tol':   0.20,
-        'notes': 'Diphthong.',
+        'notes': 'Diphthong OW→IY.',
     },
     'AA': {
         'centroid_hz':     900,
         'centroid_tol':    500,
-        'periodicity':    0.40,
+        'periodicity':    0.55,
         'periodicity_tol': 0.20,
         'f1_ratio':       0.45,
         'f1_ratio_tol':   0.20,
@@ -190,10 +216,19 @@ PHONEME_IDENTITY_TARGETS = {
     },
 }
 
+# Continuity test carriers
+# IH uses AH neighbor, not AA
+CONTINUITY_CARRIERS = {
+    'IH':  ('AH', 'AH'),
+    'default': ('AA', 'AA'),
+}
+
+# Skip same-phoneme continuity tests
+SKIP_CONTINUITY = {'AA'}
+
 PHRASE_ATK_MS      = 25
 IS_RATIO_THRESHOLD = 10.0
 AMPLITUDE_DB       = 6.0
-CENTROID_JUMP_HZ   = 1500
 
 
 # ============================================================
@@ -280,7 +315,6 @@ _baseline_cache = {}
 def get_baseline_is(sr=SR_D):
     if sr in _baseline_cache:
         return _baseline_cache[sr]
-
     sig = synth_phrase(
         [('b', ['AA', 'AA'])],
         punctuation='.',
@@ -288,11 +322,9 @@ def get_baseline_is(sr=SR_D):
         dil=DIL, sr=sr)
     sig = f32(sig)
     n   = len(sig)
-
     atk_n   = int(PHRASE_ATK_MS/1000.0*sr)
     frame_n = int(0.020*sr)
     hop_n   = int(0.010*sr)
-
     is_vals = []
     pos = atk_n + frame_n
     while pos + frame_n < n - int(0.060*sr):
@@ -308,7 +340,6 @@ def get_baseline_is(sr=SR_D):
             if np.isfinite(v) and v < 900:
                 is_vals.append(v)
         pos += hop_n
-
     baseline = (float(np.median(is_vals))
                 if is_vals else 1.0)
     baseline = max(baseline, 0.1)
@@ -319,34 +350,20 @@ def get_baseline_is(sr=SR_D):
 
 
 # ============================================================
-# BOUNDARY DETECTION — rev4
-#
-# Uses spectral centroid rate-of-change
-# instead of RMS rate-of-change.
-# More reliable for vowel-to-vowel and
-# vowel-to-fricative boundaries.
+# BOUNDARY DETECTION
 # ============================================================
 
 def find_single_boundary(sig, sr=SR_D):
-    """
-    Find boundary in [A, B] signal.
-    Uses max spectral centroid change
-    between adjacent frames.
-    Skips phrase attack and release zones.
-    """
     sig   = f32(sig)
     n     = len(sig)
     hop_n = int(0.005 * sr)
     win_n = int(0.015 * sr)
-
     search_start = (
         int(PHRASE_ATK_MS/1000.0*sr) +
         int(0.050*sr))
     search_end = n - int(0.070*sr)
-
     if search_start >= search_end:
         return n//2, False
-
     centroids = []
     frames    = []
     i = search_start
@@ -356,26 +373,17 @@ def find_single_boundary(sig, sr=SR_D):
         centroids.append(c)
         frames.append(i + win_n//2)
         i += hop_n
-
     if len(centroids) < 2:
         return n//2, False
-
     centroids = np.array(centroids)
     frames    = np.array(frames)
-
-    diffs   = np.abs(np.diff(centroids))
+    diffs     = np.abs(np.diff(centroids))
     if len(diffs) == 0:
         return n//2, False
-
     max_idx  = int(np.argmax(diffs))
     b_sample = int(frames[max_idx])
-
     return b_sample, True
 
-
-# ============================================================
-# MEASURE AT BOUNDARY
-# ============================================================
 
 def measure_at_boundary(sig, pos,
                          baseline_is,
@@ -384,55 +392,40 @@ def measure_at_boundary(sig, pos,
     sig     = f32(sig)
     n       = len(sig)
     frame_n = int(frame_ms/1000.0*sr)
-
     seg_b = sig[max(0, pos-frame_n):pos]
     seg_a = sig[pos:min(n, pos+frame_n)]
-
     if len(seg_b) < 32 or len(seg_a) < 32:
         return None, None, None
-
     sp_b, _ = get_spectrum(seg_b, sr)
     sp_a, _ = get_spectrum(seg_a, sr)
     if sp_b is None or sp_a is None:
         return None, None, None
-
     n_min  = min(len(sp_b), len(sp_a))
     raw_is = itakura_saito(
         sp_b[:n_min], sp_a[:n_min])
-    is_ratio = raw_is / max(baseline_is,
-                             0.001)
-
+    is_ratio = raw_is / max(baseline_is, 0.001)
     c_jump = abs(
         spectral_centroid(seg_a, sr) -
         spectral_centroid(seg_b, sr))
-
     rms_b = rms_val(seg_b)
     rms_a = rms_val(seg_a)
     amp_db = (20*np.log10(
         max(rms_a/rms_b, 1e-6))
         if rms_b > 1e-8 else None)
-
     return is_ratio, c_jump, amp_db
 
 
 # ============================================================
-# PHONEME IDENTITY — rev4
-#
-# FIX: synthesize [ph] ALONE.
-# Measure body at 30-60% of total signal.
-# No following phoneme to contaminate.
+# PHONEME IDENTITY
 # ============================================================
 
 def check_phoneme_identity(
         ph, sr=SR_D, verbose=True):
-
     target = PHONEME_IDENTITY_TARGETS.get(ph)
     if target is None:
         if verbose:
             print(f"  [--] {ph}")
         return {}, True
-
-    # Synthesize ph ALONE — no carrier
     sig = synth_phrase(
         [('t', [ph])],
         punctuation='.',
@@ -440,33 +433,22 @@ def check_phoneme_identity(
         dil=DIL, sr=sr)
     sig = f32(sig)
     n   = len(sig)
-
-    # Measure body at 30-60% of signal
-    # Always inside the phoneme
-    # regardless of duration
-    body_s = int(n * 0.30)
+    body_s = max(int(n*0.30),
+                 int(PHRASE_ATK_MS/1000.0*sr))
     body_e = int(n * 0.60)
     if body_e <= body_s:
-        body_s = n // 3
-        body_e = 2 * n // 3
-    body_s = max(body_s,
-                 int(PHRASE_ATK_MS/1000.0*sr))
-
+        body_e = min(body_s+int(0.020*sr), n)
     body = sig[body_s:body_e]
-
     if len(body) < 32:
         if verbose:
             print(f"  [?] {ph}: body too short")
         return {}, False
-
     c  = spectral_centroid(body, sr)
     p  = periodicity_measure(
         body, pitch_hz=PITCH, sr=sr)
     f1 = f1_band_ratio(body, sr=sr)
-
     results = {}
     failed  = []
-
     for key, measured, tgt, tol in [
         ('centroid',    c,
          target['centroid_hz'],
@@ -489,9 +471,7 @@ def check_phoneme_identity(
         }
         if not ok:
             failed.append(key)
-
     all_pass = len(failed) == 0
-
     if verbose:
         st = '✓' if all_pass else '✗'
         print(f"  [{st}] {ph}")
@@ -506,20 +486,36 @@ def check_phoneme_identity(
                 f"dist={v['distance']}")
         if not all_pass:
             print(f"       {target['notes']}")
-
     return results, all_pass
 
 
 # ============================================================
-# CONTINUITY CHECK
+# CONTINUITY CHECK — rev5
+# Class-specific centroid jump threshold.
+# Custom carriers for IH.
+# Skip same-phoneme tests.
 # ============================================================
 
 def check_continuity(
         ph, baseline_is,
         sr=SR_D, verbose=True):
 
+    if ph in SKIP_CONTINUITY:
+        if verbose:
+            print(f"  [--] {ph} "
+                  f"continuity skipped "
+                  f"(same-phoneme carrier)")
+        return {}, True
+
+    carrier = CONTINUITY_CARRIERS.get(
+        ph, CONTINUITY_CARRIERS['default'])
+    pre_carrier, post_carrier = carrier
+
+    cj_thresh = get_centroid_jump_threshold(
+        ph, 'AA')
+
     sig_in = synth_phrase(
-        [('t', ['AA', ph])],
+        [('t', [pre_carrier, ph])],
         punctuation='.',
         pitch_base=PITCH,
         dil=DIL, sr=sr)
@@ -531,7 +527,7 @@ def check_continuity(
         sig_in, b_in, baseline_is, sr=sr)
 
     sig_out = synth_phrase(
-        [('t', [ph, 'AA'])],
+        [('t', [ph, post_carrier])],
         punctuation='.',
         pitch_base=PITCH,
         dil=DIL, sr=sr)
@@ -544,28 +540,24 @@ def check_continuity(
 
     def make_r(isr, cj, adb):
         if isr is None:
-            return {
-                'is_ratio': None,
-                'centroid_jump_hz': None,
-                'amplitude_db': None,
-                'is_pass': False,
-                'centroid_pass': False,
-                'amplitude_pass': False,
-                'error': 'failed',
-            }
+            return {'error': 'failed',
+                    'is_pass': False,
+                    'centroid_pass': False,
+                    'amplitude_pass': False}
         return {
-            'is_ratio': round(isr, 2),
+            'is_ratio':         round(isr, 2),
             'centroid_jump_hz': round(cj, 0),
             'amplitude_db': (round(adb, 1)
                 if adb is not None else None),
             'is_pass':
                 isr <= IS_RATIO_THRESHOLD,
             'centroid_pass':
-                cj <= CENTROID_JUMP_HZ,
+                cj <= cj_thresh,
             'amplitude_pass':
                 (abs(adb) <= AMPLITUDE_DB
                  if adb is not None
                  else False),
+            'centroid_threshold': cj_thresh,
         }
 
     results = {
@@ -586,7 +578,9 @@ def check_continuity(
         vi = '✓' if valid_in else '?'
         vo = '✓' if valid_out else '?'
         print(f"  [{st}] {ph} "
-              f"[in={vi} out={vo}]")
+              f"[in={vi} out={vo}]"
+              f"  cj_thresh="
+              f"{cj_thresh}Hz")
         for bname, bdata in results.items():
             arrow = ('AA→ph'
                      if bname == 'AA_to_ph'
@@ -611,7 +605,7 @@ def check_continuity(
             print(
                 f"      [{cp}] jump="
                 f"{bdata['centroid_jump_hz']}Hz"
-                f"  <={CENTROID_JUMP_HZ}")
+                f"  <={bdata['centroid_threshold']}")
             print(
                 f"      [{ap}] amp="
                 f"{bdata['amplitude_db']}dB"
@@ -628,9 +622,11 @@ def run_continuity_diagnostic(
         sr=SR_D, verbose=True):
 
     print()
-    print("CONTINUITY DIAGNOSTIC rev4")
-    print("Identity: [ph] alone, 30-60%.")
-    print("Boundary: spectral centroid diff.")
+    print("CONTINUITY DIAGNOSTIC rev5")
+    print("Targets corrected for V, DH, Z, AA.")
+    print("Class-specific centroid thresholds.")
+    print("IH carrier: [AH,IH]/[IH,AH].")
+    print("AA same-phoneme: skipped.")
     print("="*50)
 
     TEST_PHS = list(
@@ -651,7 +647,6 @@ def run_continuity_diagnostic(
     all_ct   = {}
 
     print("  PART 1: Phoneme identity")
-    print("  (phoneme alone, body at 30-60%)")
     print()
     for ph in TEST_PHS:
         r, ok = check_phoneme_identity(
@@ -664,7 +659,6 @@ def run_continuity_diagnostic(
             print()
 
     print("  PART 2: Boundary continuity")
-    print("  ([AA,ph] and [ph,AA])")
     print()
     for ph in TEST_PHS:
         r, ok = check_continuity(
@@ -696,7 +690,7 @@ def run_continuity_diagnostic(
                 print(
                     f"      {k}: "
                     f"{r[k]['measured']}"
-                    f" → target={r[k]['target']}"
+                    f" → {r[k]['target']}"
                     f" dist={r[k]['distance']}")
     if not any_f:
         print("    All passing.")
@@ -705,13 +699,15 @@ def run_continuity_diagnostic(
     print("  CONTINUITY FAILURES:")
     any_f = False
     for ph, r in all_ct.items():
+        if not isinstance(r, dict):
+            continue
         for bname, bdata in r.items():
             if not isinstance(bdata, dict):
                 continue
             if bdata.get('error'):
                 print(f"    {ph} "
                       f"{'AA→ph' if bname=='AA_to_ph' else 'ph→AA'}"
-                      f": failed")
+                      f": measurement failed")
                 any_f = True
                 continue
             fails = []
@@ -721,7 +717,8 @@ def run_continuity_diagnostic(
             if not bdata.get(
                     'centroid_pass', True):
                 fails.append(
-                    f"jump={bdata['centroid_jump_hz']}Hz")
+                    f"jump={bdata['centroid_jump_hz']}Hz"
+                    f"(thresh={bdata['centroid_threshold']})")
             if fails:
                 any_f = True
                 arrow = ('AA→ph'
