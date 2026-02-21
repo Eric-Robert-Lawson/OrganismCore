@@ -4,115 +4,64 @@ February 2026
 
 FIX 12: ANTICIPATORY COARTICULATION
 
-  REVISION 2 — "i um here" diagnosis:
+  REVISION 3 — still hearing "um"
 
-  The first run of v14 was heard as
-  "I um here" instead of "I am here."
+  ROOT CAUSE (rev 2 post-mortem):
+    Even with NASAL_COART_BLEND = 0.18,
+    the F2 shift was too large.
 
-  ROOT CAUSE:
-    Two independent effects both collapsed
-    AE toward AH (schwa):
+    AE F2 = 1720 Hz.
+    M-closure approach F2 = 900 Hz.
+    Blend: 1720 * 0.82 + 900 * 0.18 = 1571 Hz.
 
-    1. NASAL_COART_BLEND = 0.40
-       Blended AE formants 40% toward
-       NASAL_MURMUR_F = [250, 1000, ...].
-       NASAL_MURMUR_F[0] = 250Hz is the
-       nasal resonance frequency, not the
-       vowel onset position.
-       AE F1 = 660Hz.
-       Blended: 660*0.6 + 250*0.4 = 496Hz.
-       496Hz is AH (520Hz). The ear hears AH.
-       That is "um", not "am."
+    The ear identifies AE vs AH primarily
+    by F2, not F1.
+    AH F2 = 1190 Hz.
+    1571 Hz is perceptually closer to AH
+    than to AE. The listener hears "um."
 
-    2. NASAL_MURMUR re-filtering in FIX 12C
-       passed the tract output through
-       nasal resonators at 250Hz etc,
-       adding further low-frequency weight
-       to the vowel tail, darkening it
-       further toward AH.
+    No blend factor applied to a target
+    of 900 Hz will preserve AE identity.
+    The target was wrong, not the factor.
 
-    Both effects firing together = AE → AH
-    = "I um here."
+  THE CORRECT PHYSICS (revised):
 
-  THE CORRECT PHYSICS:
-    Anticipatory nasalization has two
-    separable acoustic effects:
+    During anticipatory nasalization,
+    the ORAL formants change very little
+    until the physical closure occurs.
+    What changes is:
+      - A low-amplitude nasal murmur
+        is ADDED (velum opening). ← FIX 12C
+      - F1 drops slightly (jaw closes
+        fractionally as lips approach).
+      - F2 is nearly UNCHANGED until
+        the closure is complete.
 
-    A. VELUM OPENING (the murmur):
-       The velum begins to lower during
-       the vowel tail. This adds a LOW-
-       AMPLITUDE nasal murmur that is
-       ADDITIVE to the oral vowel signal.
-       It does NOT replace the oral vowel
-       formants. F1/F2 of the oral vowel
-       remain largely intact until the
-       full nasal closure occurs.
-       The dominant percept is still the
-       oral vowel with a slight nasal
-       quality added.
+    The dominant vowel identity (F2)
+    is preserved through the anticipatory
+    phase. Only F1 moves, and only slightly.
 
-    B. FORMANT MODIFICATION:
-       Oral cavity formants do shift
-       slightly toward the nasal
-       configuration — but the shift is
-       SMALL in the vowel body and only
-       becomes large at the very end of
-       the vowel (at the M closure itself).
-       For AE before M:
-         F1 moves slightly toward 550Hz
-         (not toward 250Hz — that is the
-         nasal resonance, not the
-         approaching closure position).
-         F2 moves slightly toward 1500Hz
-         (lips beginning to close).
-       The shift is ~15% at most during
-       the vowel body.
+  THE FIX — rev3:
 
-  THE FIXES:
+    PER-FORMANT BLEND FACTORS:
+      F1 blend: 0.12  (small jaw closure)
+      F2 blend: 0.00  (F2 unchanged — key)
+      F3 blend: 0.00
+      F4 blend: 0.00
 
-    FIX 12B CORRECTION:
-      NASAL_COART_BLEND: 0.40 → 0.18
-      NASAL_MURMUR_F target for F_end
-      blend replaced with CLOSURE_F:
-        M closure: F1 → 550, F2 → 900
-          (lips closing — not nasal
-           resonance, but bilabial
-           closure approach)
-        N closure: F1 → 500, F2 → 1200
-          (alveolar approach)
-        NG closure: F1 → 480, F2 → 1000
-          (velar approach)
-      These are where the vowel tract
-      is HEADING, not where the nasal
-      tract resonates.
+    For stops: same principle.
+      F1 blend: 0.08
+      F2 blend: 0.00
 
-    FIX 12C CORRECTION:
-      NASAL_ANTICIPATION_GAIN: 0.12 → 0.07
-      Murmur is additive but subtle.
-      It should add nasality without
-      darkening the vowel.
-      The murmur filter still uses
-      NASAL_MURMUR_F (correct — that is
-      the nasal tract resonance), but
-      its gain is low enough that it
-      colors without replacing.
+    For L: F2 blend 0.15 (lateral
+      does genuinely lower F2 slightly
+      during the vowel — less than before).
 
-    FIX 12A CORRECTION:
-      COART_DUR_COMPRESS: 0.82 → 0.88
-      Less duration loss.
-      The clean vowel is audible
-      for longer before the tail begins
-      its transition.
-      The "um" percept was partly caused
-      by the vowel being too short to
-      establish its identity before
-      the compressed tail dominated.
+    FIX 12C unchanged from rev2.
+    FIX 12A unchanged from rev2
+    (COART_DUR_COMPRESS = 0.88).
 
-  All other v13 fixes unchanged.
-
-BUG FIXED (v14 rev1):
-  get_b(ph, i) → TypeError.
-  Fixed to get_b(ph)[i] pattern.
+  All v13 fixes unchanged.
 """
 
 from voice_physics_v13 import (
@@ -177,91 +126,68 @@ VOICE_VERSION = 'v14'
 
 
 # ============================================================
-# FIX 12 CONSTANTS — REVISED
+# FIX 12 CONSTANTS — REVISION 3
 # ============================================================
 
-# All phonemes that cause anticipatory
-# coarticulation in a preceding vowel.
 CLOSING_PHS = {
-    'M', 'N', 'NG',          # nasal closures
-    'B', 'D', 'G', 'P', 'T', 'K',  # stops
-    'L',                      # lateral
+    'M', 'N', 'NG',
+    'B', 'D', 'G', 'P', 'T', 'K',
+    'L',
 }
-
 NASAL_CLOSING_PHS = {'M', 'N', 'NG'}
 STOP_CLOSING_PHS  = {
     'B', 'D', 'G', 'P', 'T', 'K'}
 
-# ── FIX 12A ──────────────────────────────
-# Vowel duration compression factor.
-# REVISED: 0.82 → 0.88
-# Less compression = cleaner vowel body
-# = AE is recognisably AE before tail.
+# Vowel duration compression.
+# 0.88 — only 12% of duration lost.
 COART_DUR_COMPRESS = 0.88
 
-# ── FIX 12C ──────────────────────────────
 # Nasal murmur additive gain.
-# REVISED: 0.12 → 0.07
-# Low enough to add nasal color
-# without darkening the vowel body.
+# Low — colors without darkening.
 NASAL_ANTICIPATION_GAIN = 0.07
-
-# Duration of nasal anticipation zone (ms).
 NASAL_ANTICIPATION_MS   = 28.0
 
-# Nasal tract resonance — used for the
-# ADDITIVE murmur in FIX 12C only.
-# NOT used as F_end blend target
-# (that caused the AE → AH collapse).
+# Nasal tract resonance �� additive
+# murmur only (FIX 12C). NOT used
+# as F_end blend target.
 NASAL_MURMUR_F = [250.0, 1000.0,
                    2200.0, 3300.0]
 NASAL_MURMUR_B = [ 80.0,  150.0,
                     200.0,  250.0]
 
-# ── FIX 12B ──────────────────────────────
-# CLOSURE APPROACH TARGETS
-# These are where the oral tract is
-# HEADING as the articulator closes,
-# NOT the nasal resonance frequencies.
-# The vowel tract moves toward these
-# as the closure forms.
+# ── PER-FORMANT BLEND FACTORS ────────────
 #
-#   M (bilabial): lips approaching closure
-#     F1 drops slightly (lip closure
-#     raises jaw slightly)
-#     F2 drops toward ~900 (lips rounding)
-#   N (alveolar): tongue tip rising
-#     F1 drops slightly
-#     F2 moves toward ~1200
-#   NG (velar): tongue back rising
-#     F1 drops slightly
-#     F2 moves toward ~1000
-NASAL_CLOSURE_APPROACH = {
-    'M':  [550,  900, 2200, 3300],
-    'N':  [500, 1200, 2200, 3300],
-    'NG': [480, 1000, 2200, 3300],
+# REVISION 3: Apply blend per-formant.
+# F2 identity is preserved (blend=0).
+# Only F1 moves slightly.
+#
+# Nasals (M, N, NG):
+#   F1: small jaw/lip closure movement
+#   F2: ZERO — vowel identity preserved
+NASAL_BLEND_PER_FORMANT = [0.12, 0.00,
+                             0.00, 0.00]
+
+# Stops (B, D, G, P, T, K):
+#   F1: tiny movement
+#   F2: ZERO
+STOP_BLEND_PER_FORMANT  = [0.08, 0.00,
+                             0.00, 0.00]
+
+# Lateral (L):
+#   F2 does lower slightly into L —
+#   less than before, but non-zero.
+L_BLEND_PER_FORMANT     = [0.08, 0.15,
+                             0.00, 0.00]
+
+# Oral closure approach targets.
+# These matter only for F1 now
+# since F2+ blends are 0.
+# F1 targets: where jaw/lips are heading.
+NASAL_CLOSURE_F1 = {
+    'M':  550,   # bilabial — lip closure
+    'N':  510,   # alveolar — tongue tip up
+    'NG': 490,   # velar — tongue back up
 }
-NASAL_CLOSURE_APPROACH_B = {
-    'M':  [100, 150, 220, 320],
-    'N':  [100, 150, 220, 320],
-    'NG': [100, 150, 220, 320],
-}
-
-# Blend toward nasal closure approach.
-# REVISED: 0.40 → 0.18
-# Small shift — the vowel identity is
-# maintained until the closure itself.
-NASAL_COART_BLEND = 0.18
-
-# Stop closure approach: neutral.
-# REVISED: 0.25 → 0.15
-# Stops compress the tract slightly
-# but the vowel identity is maintained.
-STOP_COART_BLEND  = 0.15
-
-# Lateral F2 target and blend.
-L_COART_F2_TARGET = 1000.0
-L_COART_BLEND     = 0.22
 
 
 # ============================================================
@@ -270,10 +196,6 @@ L_COART_BLEND     = 0.22
 
 def _coart_compress_dur(dur_ms, ph,
                          next_ph):
-    """
-    Compress vowel duration before closing
-    consonant. Only for vowels/diphthongs.
-    """
     if next_ph not in CLOSING_PHS:
         return dur_ms
     if ph not in VOWEL_PHONEMES and \
@@ -284,28 +206,24 @@ def _coart_compress_dur(dur_ms, ph,
 
 # ============================================================
 # FIX 12B: FORMANT TRAJECTORY CLOSURE
+# Per-formant blending.
+# F2 identity preserved.
 # ============================================================
 
 def _coart_f_end(ph, next_ph,
                   current_f, current_b):
     """
-    Return modified (f_end, b_end) for a
-    vowel preceding a closing consonant.
+    Per-formant blend toward closure.
 
-    CRITICAL DISTINCTION:
-      For nasals: blend toward
-        NASAL_CLOSURE_APPROACH[next_ph],
-        NOT toward NASAL_MURMUR_F.
-        NASAL_MURMUR_F is the nasal
-        tract resonance (F1=250Hz).
-        NASAL_CLOSURE_APPROACH is where
-        the ORAL TRACT is heading.
-        These are different.
+    CRITICAL: F2 blend is 0.00 for nasals
+    and stops. The vowel identity (which
+    the ear reads primarily from F2) is
+    not changed during the anticipatory
+    phase. Only F1 moves slightly.
 
-      For stops: blend toward NEUTRAL_F
-        with small factor.
-
-      For L: lower F2 toward ~1000Hz.
+    For AE (F2=1720) before M:
+      Old (broken): F2 → 1571 (heard as AH)
+      New (correct): F2 → 1720 (AE preserved)
     """
     if next_ph not in CLOSING_PHS:
         return None, None
@@ -316,55 +234,63 @@ def _coart_f_end(ph, next_ph,
     n_f = len(current_f)
 
     if next_ph in NASAL_CLOSING_PHS:
-        blend     = NASAL_COART_BLEND
-        tgt_f     = NASAL_CLOSURE_APPROACH.get(
-            next_ph,
-            NASAL_CLOSURE_APPROACH['N'])
-        tgt_b     = NASAL_CLOSURE_APPROACH_B.get(
-            next_ph,
-            NASAL_CLOSURE_APPROACH_B['N'])
+        blends = NASAL_BLEND_PER_FORMANT
+        f1_tgt = NASAL_CLOSURE_F1.get(
+            next_ph, 510)
         f_end = []
         b_end = []
         for i in range(n_f):
-            tf = tgt_f[i] \
-                 if i < len(tgt_f) \
-                 else current_f[i]
-            tb = tgt_b[i] \
-                 if i < len(tgt_b) \
-                 else current_b[i]
-            f_end.append(
-                current_f[i] * (1 - blend)
-                + tf * blend)
-            b_end.append(
-                current_b[i] * (1 - blend)
-                + tb * blend)
+            b = blends[i] \
+                if i < len(blends) else 0.0
+            if i == 0:
+                # F1: blend toward closure
+                f_end.append(
+                    current_f[0] * (1 - b)
+                    + f1_tgt * b)
+            else:
+                # F2, F3, F4: unchanged
+                f_end.append(current_f[i])
+            b_end.append(current_b[i])
         return f_end, b_end
 
     if next_ph in STOP_CLOSING_PHS:
-        blend = STOP_COART_BLEND
-        n_nf  = len(NEUTRAL_F)
-        n_nb  = len(NEUTRAL_B)
-        f_end = [
-            current_f[i] * (1 - blend) +
-            NEUTRAL_F[i] * blend
-            if i < n_nf else current_f[i]
-            for i in range(n_f)]
-        b_end = [
-            current_b[i] * (1 - blend) +
-            NEUTRAL_B[i] * blend
-            if i < n_nb else current_b[i]
-            for i in range(n_f)]
+        blends = STOP_BLEND_PER_FORMANT
+        f_end = []
+        b_end = []
+        for i in range(n_f):
+            b = blends[i] \
+                if i < len(blends) else 0.0
+            if i == 0 and b > 0:
+                tgt = NEUTRAL_F[0] \
+                      if 0 < len(NEUTRAL_F) \
+                      else current_f[0]
+                f_end.append(
+                    current_f[0] * (1 - b)
+                    + tgt * b)
+            else:
+                f_end.append(current_f[i])
+            b_end.append(current_b[i])
         return f_end, b_end
 
     if next_ph == 'L':
+        blends = L_BLEND_PER_FORMANT
         f_end = list(current_f)
         b_end = list(current_b)
-        if n_f >= 2:
-            f_end[1] = (
-                current_f[1] *
-                (1 - L_COART_BLEND) +
-                L_COART_F2_TARGET *
-                L_COART_BLEND)
+        for i in range(n_f):
+            b = blends[i] \
+                if i < len(blends) else 0.0
+            if b > 0:
+                if i == 0:
+                    tgt = NEUTRAL_F[0] \
+                          if 0 < len(NEUTRAL_F) \
+                          else current_f[0]
+                elif i == 1:
+                    tgt = 1000.0
+                else:
+                    tgt = current_f[i]
+                f_end[i] = (
+                    current_f[i] * (1 - b)
+                    + tgt * b)
         return f_end, b_end
 
     return None, None
@@ -374,9 +300,8 @@ def _build_trajectories_v14(
         phoneme_specs, sr=SR):
     """
     v14 trajectory builder.
-    FIX 12B: F_end modified for vowels
-    before closing consonants.
-    Delegates to v13 _build_trajectories.
+    Per-formant coarticulation blend.
+    F2 identity preserved for nasals/stops.
     """
     n_specs = len(phoneme_specs)
     patched = []
@@ -392,8 +317,6 @@ def _build_trajectories_v14(
                 ph in (VOWEL_PHONEMES |
                        DIPHTHONG_PHONEMES)):
 
-            # get_b(ph) returns a list.
-            # Do NOT pass index to get_b.
             current_f = list(
                 s.get('F_tgt', get_f(ph)))
             raw_b = get_b(ph)
@@ -410,7 +333,8 @@ def _build_trajectories_v14(
                 current_f, current_b)
             if f_end is not None:
                 s['F_end'] = f_end
-                s['B_end'] = b_end
+                # B_end: leave unchanged
+                # (bandwidth shift is minor)
 
         patched.append(s)
 
@@ -419,32 +343,17 @@ def _build_trajectories_v14(
 
 
 # ============================================================
-# FIX 12C: NASAL MURMUR ONSET (REVISED)
-# Low gain additive murmur.
-# Does NOT alter F_tgt.
-# Does NOT blend toward nasal resonance.
-# Adds nasal COLOR to the vowel tail.
+# FIX 12C: NASAL MURMUR (unchanged)
 # ============================================================
 
 def _apply_nasal_anticipation(
         out, specs, sr=SR):
     """
-    FIX 12C: For vowels before M/N/NG,
-    blend a low-gain nasal murmur into
-    the final NASAL_ANTICIPATION_MS of
-    the vowel body.
-
-    The murmur is the existing output
-    re-filtered through nasal resonators,
-    then added at NASAL_ANTICIPATION_GAIN.
-    The oral vowel signal is unchanged.
+    Additive nasal murmur in vowel tail
+    before M/N/NG.
+    Gain = 0.07 — colors without darkening.
+    The oral vowel signal is NOT modified.
     The murmur is purely additive.
-
-    NASAL_ANTICIPATION_GAIN = 0.07 means
-    the murmur is 7% the peak amplitude
-    of the existing signal in that zone.
-    Audible as nasal coloring, not as
-    a formant shift.
     """
     n_total = len(out)
     n_ant   = int(
@@ -468,7 +377,6 @@ def _apply_nasal_anticipation(
                         n_s // 3)
             n_on  = min(trans_n(ph, sr),
                         n_s // 3)
-
             vowel_end    = pos + n_s - n_off
             murmur_start = max(
                 pos + n_on,
@@ -507,8 +415,7 @@ def _apply_nasal_anticipation(
                 murmur = (murmur / peak *
                     NASAL_ANTICIPATION_GAIN)
 
-            env = np.linspace(
-                0.0, 1.0, n_m)
+            env = np.linspace(0.0, 1.0, n_m)
             out[murmur_start:murmur_end] \
                 = f32(
                     out[murmur_start:
@@ -522,6 +429,45 @@ def _apply_nasal_anticipation(
 
 
 # ============================================================
+# OLA STRETCH
+# ============================================================
+
+def _ola_stretch(sig, factor,
+                  win_ms=25, sr=SR):
+    sig     = np.array(sig, dtype=np.float64)
+    n_in    = len(sig)
+    win_n   = int(win_ms / 1000.0 * sr)
+    if win_n % 2 != 0:
+        win_n += 1
+    hop_in  = win_n // 4
+    hop_out = int(hop_in * factor)
+    if hop_out == 0:
+        hop_out = 1
+    n_frames = max(1,
+        (n_in - win_n) // hop_in + 1)
+    n_out = hop_out * (n_frames - 1) + win_n
+    out   = np.zeros(n_out, dtype=np.float64)
+    norm  = np.zeros(n_out, dtype=np.float64)
+    window = np.hanning(win_n)
+    for i in range(n_frames):
+        i0 = i * hop_in
+        i1 = i0 + win_n
+        if i1 > n_in:
+            frame = np.zeros(win_n)
+            av = n_in - i0
+            if av > 0:
+                frame[:av] = sig[i0:i0 + av]
+        else:
+            frame = sig[i0:i1]
+        o0 = i * hop_out
+        o1 = o0 + win_n
+        out[o0:o1]  += frame * window
+        norm[o0:o1] += window
+    norm = np.where(norm < 1e-8, 1.0, norm)
+    return f32(out / norm)
+
+
+# ============================================================
 # PHRASE SYNTHESIS v14
 # ============================================================
 
@@ -532,12 +478,6 @@ def synth_phrase(words_phonemes,
                   sr=SR,
                   arc_type=ARC_NORMAL,
                   add_breath=True):
-    """
-    v14 synth_phrase.
-    All three FIX 12 components active
-    with revised parameters.
-    All v13 fixes preserved.
-    """
     word_emphasis       = {}
     flat_words_phonemes = []
     for entry in words_phonemes:
@@ -556,8 +496,7 @@ def synth_phrase(words_phonemes,
         dil=dil)
 
     if not prosody:
-        return f32(np.zeros(
-            int(0.1 * sr)))
+        return f32(np.zeros(int(0.1 * sr)))
 
     n_items = len(prosody)
     specs   = []
@@ -570,8 +509,7 @@ def synth_phrase(words_phonemes,
         oq_        = item['oq']
         bw_m       = item['bw_mult']
         amp_       = item['amp']
-        rest_ms    = item.get(
-            'rest_ms', 0.0)
+        rest_ms    = item.get('rest_ms', 0.0)
         word_final = item.get(
             'word_final', False)
         word_      = item.get('word', '')
@@ -579,14 +517,12 @@ def synth_phrase(words_phonemes,
                       if i < n_items - 1
                       else None)
 
-        # Word-final fricative cap (v13).
         FRICS = {'S', 'Z', 'SH', 'ZH',
                  'F', 'V', 'TH', 'DH'}
         if word_final and ph in FRICS:
             dur_ms = min(
                 dur_ms, FINAL_FRIC_MAX_MS)
 
-        # Per-word emphasis (v13 FIX 11).
         if word_ in word_emphasis:
             emph    = word_emphasis[word_]
             pitch_ *= float(
@@ -596,8 +532,7 @@ def synth_phrase(words_phonemes,
             amp_   *= float(
                 emph.get('amp_boost', 1.0))
 
-        # FIX 12A: compress vowel before
-        # closing consonant.
+        # FIX 12A
         dur_ms = _coart_compress_dur(
             dur_ms, ph, next_ph)
 
@@ -611,13 +546,11 @@ def synth_phrase(words_phonemes,
             sr=sr)
         specs.append(spec)
 
-    # FIX 12B: trajectories with
-    # closure approach F_end.
+    # FIX 12B
     F_full, B_full, _ = \
         _build_trajectories_v14(
             specs, sr=sr)
-    n_total = sum(
-        s['n_s'] for s in specs)
+    n_total = sum(s['n_s'] for s in specs)
 
     tract_src, bypass_segs, buzz_segs = \
         _build_source_and_bypass(
@@ -629,16 +562,13 @@ def synth_phrase(words_phonemes,
 
     for pos, byp in bypass_segs:
         e = min(pos + len(byp), n_total)
-        n = e - pos
-        out[pos:e] += byp[:n]
+        out[pos:e] += byp[:e - pos]
 
     for pos, buz in buzz_segs:
         e = min(pos + len(buz), n_total)
-        n = e - pos
-        out[pos:e] += buz[:n]
+        out[pos:e] += buz[:e - pos]
 
-    # Nasal antiformants — unchanged
-    # from v9–v13.
+    # Nasal antiformants — unchanged.
     T = 1.0 / sr
     NASAL_AF = {
         'M':  (1000, 300),
@@ -659,8 +589,7 @@ def synth_phrase(words_phonemes,
                     -2 * np.pi * abw * T)
                 a1 = (2 * np.exp(
                     -np.pi * abw * T) *
-                    np.cos(2 * np.pi *
-                           af * T))
+                    np.cos(2 * np.pi * af * T))
                 b0 = 1.0 - a1 - a2
                 y  = (b0 * float(seg[i]) +
                       a1 * y1 + a2 * y2)
@@ -676,12 +605,10 @@ def synth_phrase(words_phonemes,
                     pos + n_s] = 0.0
         pos += n_s
 
-    # FIX 12C: additive nasal murmur
-    # in vowel tail before M/N/NG.
+    # FIX 12C
     out = _apply_nasal_anticipation(
         out, specs, sr=sr)
 
-    # Amplitude envelope (v13 FIX 10).
     amp_env = np.ones(n_total, dtype=DTYPE)
     pos = 0
     for item, spec in zip(prosody, specs):
@@ -689,7 +616,6 @@ def synth_phrase(words_phonemes,
         amp_env[pos:pos + n_s] *= item['amp']
         pos += n_s
 
-    # Edge envelope (v13 FIX 10).
     atk = int(PHRASE_ATK_MS / 1000.0 * sr)
     rel = int(PHRASE_REL_MS / 1000.0 * sr)
     edge_env = f32(np.ones(n_total))
@@ -733,7 +659,7 @@ def synth_phrase(words_phonemes,
 
 
 # ============================================================
-# CONVENIENCE WRAPPERS
+# CONVENIENCE
 # ============================================================
 
 def save(name, sig, room=True,
@@ -741,17 +667,15 @@ def save(name, sig, room=True,
     sig = f32(sig)
     if room:
         sig = apply_room(
-            sig, rt60=rt60,
-            dr=dr, sr=sr)
+            sig, rt60=rt60, dr=dr, sr=sr)
     write_wav(
-        f"output_play/{name}.wav",
-        sig, sr)
+        f"output_play/{name}.wav", sig, sr)
     dur = len(sig) / sr
     print(f"    {name}.wav  ({dur:.2f}s)")
 
 
 # ============================================================
-# MAIN — self test
+# MAIN
 # ============================================================
 
 if __name__ == "__main__":
@@ -759,26 +683,25 @@ if __name__ == "__main__":
     os.makedirs("output_play", exist_ok=True)
 
     print()
-    print("VOICE PHYSICS v14 — rev2")
-    print("'i am here' fix")
+    print("VOICE PHYSICS v14 — rev3")
+    print("per-formant blend: F2 preserved")
     print()
-    print("  REVISED PARAMETERS:")
-    print(f"  COART_DUR_COMPRESS:     "
-          f"{COART_DUR_COMPRESS}  (was 0.82)")
-    print(f"  NASAL_COART_BLEND:      "
-          f"{NASAL_COART_BLEND}  (was 0.40)")
-    print(f"  NASAL_ANTICIPATION_GAIN:"
-          f" {NASAL_ANTICIPATION_GAIN}  (was 0.12)")
+    print("  NASAL_BLEND_PER_FORMANT:",
+          NASAL_BLEND_PER_FORMANT)
+    print("  F2 blend = 0.00 — AE identity kept")
+    print("  F1 blend = 0.12 — jaw closure only")
     print()
-    print("  F_end target for nasals:")
-    print("  M → bilabial approach "
-          "[550, 900, 2200, 3300]")
-    print("  N → alveolar approach "
-          "[500, 1200, 2200, 3300]")
-    print("  NG→ velar approach    "
-          "[480, 1000, 2200, 3300]")
-    print("  NOT nasal resonance   "
-          "[250, 1000, ...]")
+    print("  AE before M:")
+    ae_f = VOWEL_F['AE'][0]
+    f1_blend = NASAL_BLEND_PER_FORMANT[0]
+    f2_blend = NASAL_BLEND_PER_FORMANT[1]
+    f1_tgt   = NASAL_CLOSURE_F1['M']
+    f1_result = ae_f[0]*(1-f1_blend) + f1_tgt*f1_blend
+    f2_result = ae_f[1]*(1-f2_blend) + ae_f[1]*f2_blend
+    print(f"    F1: {ae_f[0]} → {f1_result:.0f}Hz "
+          f"(target {f1_tgt}Hz)")
+    print(f"    F2: {ae_f[1]} → {f2_result:.0f}Hz "
+          f"(unchanged — AE identity)")
     print()
     print("=" * 52)
     print()
@@ -795,68 +718,25 @@ if __name__ == "__main__":
         punctuation='.',
         pitch_base=PITCH,
         arc_type=ARC_NORMAL)
-    save("v14r2_i_am_here",
+    save("v14r3_i_am_here",
          seg, rt60=1.4, dr=0.52)
 
-    print()
-    print("  'I am here' slow 3.5×")
-    import numpy as np as _np
-
-    def _ola(sig, factor, win_ms=25,
-              sr=SR):
-        sig   = _np.array(
-            sig, dtype=_np.float64)
-        n_in  = len(sig)
-        win_n = int(win_ms / 1000.0 * sr)
-        if win_n % 2 != 0:
-            win_n += 1
-        hop_in  = win_n // 4
-        hop_out = int(hop_in * factor)
-        if hop_out == 0:
-            hop_out = 1
-        n_frames = max(1,
-            (n_in - win_n) // hop_in + 1)
-        n_out = (hop_out * (n_frames - 1)
-                 + win_n)
-        out  = _np.zeros(
-            n_out, dtype=_np.float64)
-        norm = _np.zeros(
-            n_out, dtype=_np.float64)
-        window = _np.hanning(win_n)
-        for i in range(n_frames):
-            i0 = i * hop_in
-            i1 = i0 + win_n
-            if i1 > n_in:
-                frame = _np.zeros(win_n)
-                av = n_in - i0
-                if av > 0:
-                    frame[:av] = sig[
-                        i0:i0 + av]
-            else:
-                frame = sig[i0:i1]
-            o0 = i * hop_out
-            o1 = o0 + win_n
-            out[o0:o1]  += frame * window
-            norm[o0:o1] += window
-        norm = _np.where(
-            norm < 1e-8, 1.0, norm)
-        return f32(out / norm)
-
-    seg2 = synth_phrase(
-        [('I',    ['AY']),
-         ('am',   ['AE', 'M']),
-         ('here', ['H',  'IY', 'R'])],
-        punctuation='.',
-        pitch_base=PITCH,
-        add_breath=False)
-    seg2 = _ola(seg2, factor=3.5)
-    save("v14r2_i_am_here_slow",
-         seg2, rt60=1.4, dr=0.52)
+    seg_slow = _ola_stretch(
+        synth_phrase(
+            [('I',    ['AY']),
+             ('am',   ['AE', 'M']),
+             ('here', ['H',  'IY', 'R'])],
+            punctuation='.',
+            add_breath=False),
+        factor=3.5)
+    save("v14r3_i_am_here_slow",
+         seg_slow, rt60=1.4, dr=0.52)
 
     print()
-    print("  Nasal isolation: am / him / sun")
+    print("  Isolation: am / ham / him / sun")
     for word, phones in [
         ('am',   ['AE', 'M']),
+        ('ham',  ['HH', 'AE', 'M']),
         ('him',  ['HH', 'IH', 'M']),
         ('sun',  ['S',  'AH', 'N']),
         ('ring', ['R',  'IH', 'NG']),
@@ -865,20 +745,20 @@ if __name__ == "__main__":
             [(word, phones)],
             punctuation='.',
             add_breath=False)
-        save(f"v14r2_{word}",
+        save(f"v14r3_{word}",
              seg, rt60=0.8, dr=0.65)
 
-        seg_s = synth_phrase(
-            [(word, phones)],
-            punctuation='.',
-            add_breath=False)
-        seg_s = _ola(seg_s, factor=4.0)
-        save(f"v14r2_{word}_slow",
+        seg_s = _ola_stretch(
+            synth_phrase(
+                [(word, phones)],
+                punctuation='.',
+                add_breath=False),
+            factor=4.0)
+        save(f"v14r3_{word}_slow",
              seg_s, rt60=0.6, dr=0.72)
 
     print()
-    print("  Baseline: the voice was"
-          " already here")
+    print("  Baseline: the voice was already here")
     seg = synth_phrase(
         [('the',     ['DH', 'AH']),
          ('voice',   ['V',  'OY', 'S']),
@@ -888,30 +768,26 @@ if __name__ == "__main__":
          ('here',    ['H',  'IY', 'R'])],
         punctuation='.',
         arc_type=ARC_NORMAL)
-    save("v14r2_the_voice_was_already_here",
+    save("v14r3_the_voice_was_already_here",
          seg, rt60=1.5, dr=0.50)
 
     print()
+    print("=" * 52)
+    print()
     print("  PLAY:")
-    print("  afplay output_play/"
-          "v14r2_i_am_here.wav")
-    print("  afplay output_play/"
-          "v14r2_i_am_here_slow.wav")
-    print("  afplay output_play/"
-          "v14r2_am_slow.wav")
+    print("  afplay output_play/v14r3_i_am_here.wav")
+    print("  afplay output_play/v14r3_i_am_here_slow.wav")
+    print("  afplay output_play/v14r3_am.wav")
+    print("  afplay output_play/v14r3_am_slow.wav")
+    print("  afplay output_play/v14r3_ham.wav")
     print()
     print("  IF STILL HEARING 'um':")
-    print("  Lower NASAL_COART_BLEND")
-    print("    current:", NASAL_COART_BLEND,
-          "→ try 0.10")
-    print("  Lower NASAL_ANTICIPATION_GAIN")
-    print("    current:",
-          NASAL_ANTICIPATION_GAIN,
-          "→ try 0.04")
-    print()
-    print("  IF NASAL QUALITY IS GONE:")
-    print("  Raise NASAL_ANTICIPATION_GAIN")
-    print("    current:",
-          NASAL_ANTICIPATION_GAIN,
-          "→ try 0.10")
+    print("    → The problem is NOT coarticulation.")
+    print("    → Disable FIX 12 entirely to confirm.")
+    print("    → Set COART_DUR_COMPRESS = 1.0")
+    print("      and NASAL_ANTICIPATION_GAIN = 0.0")
+    print("    → If still 'um': bug is in v13 or")
+    print("      the AE transcription itself.")
+    print("    → Check 'am' is ['AE','M'],")
+    print("      not ['AH','M'].")
     print()
