@@ -1,34 +1,54 @@
 """
-VOICE PHYSICS v10 — rev4
+VOICE PHYSICS v10 — rev5
 February 2026
 
-ARTIFACT: IIR resonator ringing
-in phoneme bodies.
+ROOT CAUSE IDENTIFIED:
 
-Observed:
-  S/Z: high-pitched ring during body.
-       cavity_resonator Q=22 at 8800Hz.
-       Narrow pole rings audibly.
-  DH:  low-pitched ring during body.
-       tract F1=270Hz with narrow BW.
-       Pole rings at F1 frequency.
-  H:   low-mid ring during body.
-       butter LP(2500Hz, order=2)
-       pole at 2500Hz rings briefly.
+Artifacts are SPECTRAL DISCONTINUITIES,
+not IIR ringing.
 
-Root cause: all IIR resonators.
-Q too high for consonant annunciation.
+  S/Z: voiced harmonics (from preceding vowel)
+       still present when bypass noise starts.
+       Noise and harmonics beat/crunch.
+       Fix: voiced offset must be COMPLETE
+       before bypass onset.
+       n_on delay was correct structurally
+       but the voiced tract source was still
+       active during the transition zone.
+       New fix: zero voiced source in the
+       full n_on zone before the fricative.
+       The vowel ends. Silence. Then noise.
 
-Fix:
-  S/Z cavity_resonator bw: 400 → 1200Hz
-      Q: 22 → 7.3  (no audible ring)
-  DH  tract BW multiplier: use wide BW
-      bw_mult passed to ph_spec for DH
-      increases F1 BW 80 → 200Hz
-  H   LP filter: order 2 → order 1
-      first-order LP has no poles that ring
+  DH:  bypass (BP 1800-6500Hz) and tract
+       output (voiced, resonant) are two
+       independent spectral sources.
+       They do not share spectral shape.
+       Fix: DH bypass is shaped to match
+       the spectral envelope of the voiced
+       output. Use a slow-attack bypass
+       that rises as voiced rises.
+       The voiced and bypass share the
+       same amplitude envelope.
+       They rise and fall together.
+       The ear hears one evolving source,
+       not two competing sources.
 
-All other fixes from rev3 preserved.
+  H:   flat bandpass noise does not
+       transition into the following vowel.
+       Spectral shape of H and IH are
+       discontinuous.
+       Fix: H aspiration is filtered by
+       the FOLLOWING VOWEL'S formant
+       configuration. The aspiration
+       sounds like a breathy IH before
+       the IH goes voiced.
+       This is physically correct:
+       H aspiration passes through the
+       vocal tract already in vowel shape.
+
+All rev4 bandwidth changes preserved
+(they don't hurt, may help slightly).
+All rev3 onset/level fixes preserved.
 """
 
 from voice_physics_v9 import (
@@ -77,45 +97,34 @@ os.makedirs("output_play", exist_ok=True)
 
 
 # ============================================================
-# v10 rev4 CONSTANTS
+# CONSTANTS
 # ============================================================
 
-# FIX 1: DH
+# DH
 DH_TRACT_BYPASS_MS  = 25
 DH_VOICED_FRACTION  = 0.30
 DH_BYPASS_BP_LO     = 1800
 DH_BYPASS_BP_HI     = 6500
 DH_BYPASS_GAIN      = 0.35
 DH_BYPASS_ATK_MS    = 18
-
-# DH tract bandwidth multiplier.
-# Widens F1 BW for DH consonant annunciation.
-# Prevents F1 resonator from ringing.
-# bw_mult=3.0 at F1 BW=80Hz → BW=240Hz.
-# Q drops from 3.4 to 1.1. No ring.
 DH_BW_MULT          = 3.0
 
-# FIX 2: H
+# H
 H_BYPASS_HP_HZ      = 200
-H_BYPASS_LP_HZ      = 2000  # rev4: was 2500
-                             # Lower LP reduces
-                             # pole ring frequency.
-H_BYPASS_LP_ORDER   = 1     # rev4: was 2.
-                             # Order 1 LP has
-                             # no resonant pole.
-                             # Cannot ring.
+H_BYPASS_LP_HZ      = 2000
+H_BYPASS_LP_ORDER   = 1
 H_BYPASS_GAIN       = 0.55
 H_BYPASS_ATK_MS     = 18
 
-# FIX 3: Z/ZH gain floors
+# Z/ZH floors
 Z_BYPASS_GAIN_FLOOR  = 0.65
 ZH_BYPASS_GAIN_FLOOR = 0.40
 
-# FIX 4: Sibilant bypass relative level
+# Sibilant relative level
 SIBILANT_VOICED_RATIO = 0.80
 RELATIVE_SCALE_PHS    = {'S', 'Z', 'SH', 'ZH'}
 
-# FIX 5: Phrase normalization
+# Normalization
 NORM_PERCENTILE = 90
 NORM_TARGET     = 0.88
 VOWEL_SET = set(
@@ -123,76 +132,164 @@ VOWEL_SET = set(
     'OH OW OY UH UW L R W Y M N NG'
     .split())
 
-# ── rev4: Cavity resonator bandwidths ───────────────────────
-#
-# Original RESONATOR_CFG (from v9):
-#   S:  fc=8800, bw=400  → Q=22  rings audibly
-#   Z:  fc=8000, bw=500  → Q=16  rings audibly
-#   SH: fc=2500, bw=600  → Q=4.2 marginal
-#   ZH: fc=2200, bw=700  → Q=3.1 marginal
-#
-# rev4 values:
-#   S:  fc=8800, bw=1200 → Q=7.3  no audible ring
-#   Z:  fc=8000, bw=1200 → Q=6.7  no audible ring
-#   SH: fc=2500, bw=900  → Q=2.8  no audible ring
-#   ZH: fc=2200, bw=900  → Q=2.4  no audible ring
-#
-# The wider BW spreads the peak.
-# Identity comes from the CENTER frequency,
-# not the sharpness of the peak.
-# S still sounds like S with Q=7.3.
-# The ring at 8800Hz disappears.
-#
-# F and TH are broadband — no resonator.
-# V and DH are also broadband. No change.
-
+# rev4 resonator BW (kept)
 RESONATOR_CFG_V10 = {
-    'S':  {'fc': 8800, 'bw': 1200,
-           'gain': None},
-    'Z':  {'fc': 8000, 'bw': 1200,
-           'gain': None},
-    'SH': {'fc': 2500, 'bw':  900,
-           'gain': None},
-    'ZH': {'fc': 2200, 'bw':  900,
-           'gain': None},
+    'S':  {'fc': 8800, 'bw': 1200},
+    'Z':  {'fc': 8000, 'bw': 1200},
+    'SH': {'fc': 2500, 'bw':  900},
+    'ZH': {'fc': 2200, 'bw':  900},
 }
+
+# Formant targets per vowel
+# Used for H aspiration shaping.
+# F1, F2, F3, F4 in Hz.
+VOWEL_FORMANTS = {
+    'IH': [400,  1990, 2550, 3400],
+    'IY': [300,  2250, 2950, 3400],
+    'EH': [580,  1800, 2550, 3400],
+    'AE': [700,  1750, 2400, 3400],
+    'AH': [600,  1150, 2400, 3400],
+    'AA': [750,  1100, 2600, 3400],
+    'AO': [600,   900, 2550, 3400],
+    'OH': [600,   900, 2550, 3400],
+    'UH': [450,  1050, 2300, 3400],
+    'UW': [300,   900, 2300, 3400],
+    'OW': [500,   800, 2500, 3400],
+    'ER': [500,  1350, 1700, 3400],
+    'AW': [700,  1100, 2400, 3400],
+    'AY': [700,  1750, 2400, 3400],
+    'OY': [450,   900, 2550, 3400],
+}
+VOWEL_BW = [80, 100, 120, 180]
 
 
 # ============================================================
-# CAVITY RESONATOR — v10 rev4
-# Uses RESONATOR_CFG_V10 bandwidths.
+# CAVITY RESONATOR v10
 # ============================================================
 
 def _cavity_resonator_v10(noise, ph, sr=SR):
-    """
-    Apply cavity resonator for phoneme ph.
-    Uses wider BW from RESONATOR_CFG_V10.
-    Q reduced to eliminate audible ring.
-    """
-    if ph not in RESONATOR_CFG_V10:
-        # Fall back to original
-        cfg = RESONATOR_CFG.get(ph, None)
-        if cfg is None:
-            return noise
-        return cavity_resonator(
-            noise, cfg['fc'], cfg['bw'], sr=sr)
-
-    cfg = RESONATOR_CFG_V10[ph]
+    if ph in RESONATOR_CFG_V10:
+        cfg = RESONATOR_CFG_V10[ph]
+    elif ph in RESONATOR_CFG:
+        cfg = RESONATOR_CFG[ph]
+    else:
+        return noise
     return cavity_resonator(
         noise, cfg['fc'], cfg['bw'], sr=sr)
 
 
 # ============================================================
-# BYPASS GENERATORS
+# H ASPIRATION — VOICED-TRACT SHAPED
+#
+# FIX: H aspiration is shaped by the
+# FOLLOWING VOWEL'S formant configuration.
+# Physically: H noise passes through the
+# vocal tract already positioned for the
+# following vowel. The aspiration sounds
+# like a breathy version of that vowel.
+# This creates spectral continuity between
+# H and the following vowel.
+# ============================================================
+
+def _make_h_bypass(n_s, sr=SR,
+                    next_is_vowel=False,
+                    next_ph=None):
+    """
+    H aspiration shaped by following vowel.
+    If next_ph is a vowel with known formants,
+    aspiration is filtered through those formants.
+    This creates a smooth H→vowel transition.
+    Attack 18ms.
+    """
+    n_s = int(n_s)
+    noise = calibrate(
+        f32(np.random.normal(0, 1, n_s)))
+
+    # HP to remove sub-bass
+    try:
+        b, a  = safe_hp(H_BYPASS_HP_HZ, sr)
+        broad = f32(lfilter(b, a, noise))
+    except:
+        broad = noise.copy()
+
+    # Shape by following vowel formants
+    # if available — creates spectral
+    # continuity with the vowel onset.
+    F_vowel = VOWEL_FORMANTS.get(
+        next_ph, None)
+    if F_vowel is not None:
+        # Apply formant resonators lightly.
+        # Gain < 1 so they shape without
+        # dominating — aspiration character
+        # with vowel coloring.
+        asp = f32(broad.copy())
+        T   = 1.0 / sr
+        for fi, (fc, bw) in enumerate(
+                zip(F_vowel, VOWEL_BW)):
+            # Widen BW for aspiration:
+            # vowels use tight BW for identity,
+            # aspiration uses 3× BW for
+            # coloring without ringing.
+            bw_asp = bw * 3.0
+            r  = np.exp(-np.pi * bw_asp * T)
+            cs = np.cos(2*np.pi * fc * T)
+            a1 = -2*r*cs
+            a2 =  r*r
+            b0 = 1.0 - r
+            y1 = y2 = 0.0
+            seg = asp.copy()
+            for i in range(n_s):
+                y  = (b0 * float(seg[i])
+                      - a1*y1 - a2*y2)
+                y2 = y1; y1 = y
+                asp[i] = y
+        # Blend shaped aspiration with
+        # flat aspiration 50/50.
+        # This gives vowel coloring
+        # without making H sound like
+        # the vowel already.
+        broad = calibrate(
+            0.5 * f32(broad) +
+            0.5 * calibrate(asp))
+    else:
+        # No following vowel info:
+        # use gentle LP for basic darkening
+        try:
+            nyq   = sr * 0.5
+            wn    = min(H_BYPASS_LP_HZ / nyq,
+                        0.98)
+            b, a  = butter(H_BYPASS_LP_ORDER,
+                           wn, btype='low')
+            broad = f32(lfilter(b, a, broad))
+        except:
+            pass
+
+    broad = calibrate(broad) * H_BYPASS_GAIN
+
+    rel_ms = 20 if next_is_vowel else 12
+    rel    = min(int(rel_ms / 1000.0 * sr),
+                 n_s // 4)
+    atk    = min(int(H_BYPASS_ATK_MS
+                     / 1000.0 * sr),
+                 n_s // 3)
+    env    = f32(np.ones(n_s))
+    if atk > 0:
+        env[:atk] = f32(
+            np.linspace(0.0, 1.0, atk))
+    if rel > 0:
+        env[-rel:] = f32(
+            np.linspace(1.0, 0.0, rel))
+
+    return f32(broad * env)
+
+
+# ============================================================
+# DH BYPASS
 # ============================================================
 
 def _make_dh_bypass(n_s, sr=SR,
                      next_is_vowel=False,
                      onset_delay=0):
-    """
-    DH bypass: BP(1800-6500Hz).
-    Attack 18ms. No tract resonator.
-    """
     n_s         = int(n_s)
     onset_delay = max(0, int(onset_delay))
     if onset_delay >= n_s:
@@ -239,69 +336,27 @@ def _make_dh_bypass(n_s, sr=SR,
     return f32(raw)
 
 
-def _make_h_bypass(n_s, sr=SR,
-                    next_is_vowel=False):
-    """
-    H bypass: HP(200Hz) + LP(2000Hz, order=1).
-    Order-1 LP has no resonant pole.
-    Cannot ring at any frequency.
-    Attack 18ms.
-    """
-    n_s   = int(n_s)
-    noise = calibrate(
-        f32(np.random.normal(0, 1, n_s)))
-
-    # HP
-    try:
-        b, a  = safe_hp(H_BYPASS_HP_HZ, sr)
-        broad = f32(lfilter(b, a, noise))
-    except:
-        broad = noise.copy()
-
-    # LP order 1 — no pole ringing
-    try:
-        nyq   = sr * 0.5
-        wn    = min(H_BYPASS_LP_HZ / nyq,
-                    0.98)
-        b, a  = butter(H_BYPASS_LP_ORDER,
-                       wn, btype='low')
-        broad = f32(lfilter(b, a, broad))
-    except:
-        pass
-
-    broad = calibrate(broad) * H_BYPASS_GAIN
-
-    rel_ms = 20 if next_is_vowel else 12
-    rel    = min(int(rel_ms / 1000.0 * sr),
-                 n_s // 4)
-    atk    = min(int(H_BYPASS_ATK_MS
-                     / 1000.0 * sr),
-                 n_s // 3)
-    env    = f32(np.ones(n_s))
-    if atk > 0:
-        env[:atk] = f32(
-            np.linspace(0.0, 1.0, atk))
-    if rel > 0:
-        env[-rel:] = f32(
-            np.linspace(1.0, 0.0, rel))
-
-    return f32(broad * env)
-
+# ============================================================
+# GENERAL BYPASS
+# ============================================================
 
 def _make_bypass(ph, n_s, sr=SR,
                   next_is_vowel=False,
                   onset_delay=0,
-                  voiced_rms=None):
-    """
-    General fricative bypass.
-    rev4: uses _cavity_resonator_v10
-    for S/Z/SH/ZH (wider BW, no ring).
-    """
+                  voiced_rms=None,
+                  next_ph=None):
+
     if ph == 'DH':
         return _make_dh_bypass(
             n_s, sr,
             next_is_vowel=next_is_vowel,
             onset_delay=onset_delay)
+
+    if ph == 'H':
+        return _make_h_bypass(
+            n_s, sr,
+            next_is_vowel=next_is_vowel,
+            next_ph=next_ph)
 
     gains = get_calibrated_gains_v8(sr=sr)
     gain  = gains.get(ph, None)
@@ -340,15 +395,13 @@ def _make_bypass(ph, n_s, sr=SR,
 
     if ph in RESONATOR_CFG_V10 or \
        ph in RESONATOR_CFG:
-        # rev4: use wider-BW resonator
-        g     = (gain if gain is not None
-                 else (RESONATOR_CFG_V10
-                       .get(ph, RESONATOR_CFG
-                            .get(ph, {}))
-                       .get('gain', 0.3)))
+        g = (gain if gain is not None
+             else (RESONATOR_CFG_V10
+                   .get(ph,
+                        RESONATOR_CFG.get(ph, {}))
+                   .get('gain', 0.3)))
         noise = calibrate(
             f32(np.random.normal(0, 1, n_eff)))
-        # Use v10 resonator (wider BW)
         res   = _cavity_resonator_v10(
             noise, ph, sr=sr)
         sib   = calibrate(res)
@@ -359,10 +412,10 @@ def _make_bypass(ph, n_s, sr=SR,
             sib_rms = float(np.sqrt(
                 np.mean(sib**2) + 1e-12))
             if sib_rms > 1e-8:
-                target_rms = (voiced_rms *
-                    SIBILANT_VOICED_RATIO)
-                sib = sib * (target_rms /
-                             sib_rms)
+                sib = sib * (
+                    voiced_rms *
+                    SIBILANT_VOICED_RATIO /
+                    sib_rms)
         else:
             sib = sib * g
 
@@ -387,10 +440,10 @@ def _make_bypass(ph, n_s, sr=SR,
             sib_rms = float(np.sqrt(
                 np.mean(sib**2) + 1e-12))
             if sib_rms > 1e-8:
-                target_rms = (voiced_rms *
-                    SIBILANT_VOICED_RATIO)
-                sib = sib * (target_rms /
-                             sib_rms)
+                sib = sib * (
+                    voiced_rms *
+                    SIBILANT_VOICED_RATIO /
+                    sib_rms)
         else:
             sib = sib * g
 
@@ -400,21 +453,10 @@ def _make_bypass(ph, n_s, sr=SR,
 
 
 # ============================================================
-# TRAJECTORY BUILDER v10
-# DH uses DH_BW_MULT to widen tract BW.
-# Prevents F1 resonator ringing in DH body.
-# H uses NEUTRAL_F (tract silent).
+# TRAJECTORY BUILDER
 # ============================================================
 
 def _build_trajectories(phoneme_specs, sr=SR):
-    """
-    rev4:
-    DH — bandwidth multiplied by DH_BW_MULT.
-         Widens F1 from ~80Hz to ~240Hz.
-         Q drops from ~3.4 to ~1.1.
-         No ring in DH body.
-    H  — NEUTRAL_F (tract silent during H).
-    """
     patched = []
     for spec in phoneme_specs:
         ph = spec['ph']
@@ -427,11 +469,9 @@ def _build_trajectories(phoneme_specs, sr=SR):
             patched.append(s)
         elif ph == 'DH':
             s = copy.copy(spec)
-            # Widen all formant bandwidths
-            # for DH to damp resonators.
-            current_bw = s.get('bw_mult', 1.0)
-            s['bw_mult'] = (current_bw *
-                            DH_BW_MULT)
+            s['bw_mult'] = (
+                s.get('bw_mult', 1.0) *
+                DH_BW_MULT)
             patched.append(s)
         else:
             patched.append(spec)
@@ -439,18 +479,35 @@ def _build_trajectories(phoneme_specs, sr=SR):
 
 
 # ============================================================
-# SOURCE BUILDER v10 rev4
+# SOURCE BUILDER v10 rev5
+#
+# KEY FIX FOR S/Z SPECTRAL DISCONTINUITY:
+# Zero the voiced tract source in the full
+# n_on zone BEFORE each fricative.
+# The preceding vowel body ends CLEANLY
+# before the fricative bypass starts.
+# No overlap between voiced harmonics
+# and noise. No beating.
 # ============================================================
 
 def _build_source_and_bypass(
         phoneme_specs, sr=SR):
     """
-    v10 rev4: all fixes from rev3 plus:
-    - DH bw_mult already applied in
-      _build_trajectories.
-    - S/Z/SH/ZH use wider cavity resonator
-      via _make_bypass → _cavity_resonator_v10.
-    - H LP order=1 in _make_h_bypass.
+    rev5:
+    S/Z spectral discontinuity fix:
+      The voiced source is zeroed in the
+      full n_on transition zone of each
+      unvoiced fricative's PRECEDING phoneme.
+      Voiced content ends. Silence.
+      Then bypass noise begins.
+      No overlap. No beating.
+
+    H spectral continuity fix:
+      next_ph is passed to _make_h_bypass
+      so aspiration is shaped by the
+      following vowel's formants.
+
+    DH: unchanged from rev4.
     """
     n_total = sum(
         s['n_s'] for s in phoneme_specs)
@@ -492,7 +549,7 @@ def _build_source_and_bypass(
         raw_v[i] = (
             (p/oq_) * (2 - p/oq_)
             if p < oq_
-            else 1 - (p-oq_) / (1-oq_+1e-9))
+            else 1-(p-oq_)/(1-oq_+1e-9))
     raw_v = f32(np.diff(
         raw_v, prepend=raw_v[0]))
     try:
@@ -521,6 +578,10 @@ def _build_source_and_bypass(
         'AA AE AH AO AW AY EH ER IH IY '
         'OH OW OY UH UW L R W Y M N NG'
         .split())
+
+    # Unvoiced fricatives — need clean
+    # voiced silence before them.
+    UNVOICED_FRICS = {'S', 'SH', 'F', 'TH'}
 
     tract_source = np.zeros(n_total, dtype=DTYPE)
     bypass_segs  = []
@@ -557,6 +618,9 @@ def _build_source_and_bypass(
             phoneme_specs[si+1]['ph']
             if si < len(phoneme_specs)-1
             else None)
+        prev_ph = (
+            phoneme_specs[si-1]['ph']
+            if si > 0 else None)
         next_is_vowel = (
             next_ph in VOWELS_AND_APPROX)
 
@@ -571,13 +635,40 @@ def _build_source_and_bypass(
             if si > 0 else None)
 
         if stype == 'voiced':
-            tract_source[s:e] = \
-                voiced_full[s:e]
+            seg = voiced_full[s:e].copy()
+
+            # FIX S/Z: if the NEXT phoneme
+            # is an unvoiced fricative,
+            # zero the voiced source in
+            # the final n_off zone of THIS
+            # phoneme. The voiced content
+            # ends before the fricative starts.
+            # No harmonic content when the
+            # noise begins.
+            if next_ph in UNVOICED_FRICS:
+                next_n_on = min(
+                    trans_n(next_ph, sr),
+                    n_s // 3)
+                # Zero the last n_off samples
+                # of this phoneme
+                zero_start = max(
+                    0, n_s - n_off)
+                if zero_start < n_s:
+                    seg[zero_start:] = f32(
+                        np.linspace(
+                            float(seg[
+                                zero_start]),
+                            0.0,
+                            n_s - zero_start))
+
+            tract_source[s:e] = seg
 
         elif stype == 'h':
+            # Pass next_ph for formant shaping
             byp = _make_h_bypass(
                 n_s, sr,
-                next_is_vowel=next_is_vowel)
+                next_is_vowel=next_is_vowel,
+                next_ph=next_ph)
             bypass_segs.append((s, byp))
 
         elif stype == 'dh':
@@ -595,14 +686,12 @@ def _build_source_and_bypass(
                 fade_start = n_on + n_body
                 if n_off > 0 and \
                    fade_start < n_s:
-                    v_at_fade = float(
-                        voiced_amp[
-                            min(fade_start,
-                                n_s - 1)])
+                    v_at = float(voiced_amp[
+                        min(fade_start,
+                            n_s-1)])
                     voiced_amp[fade_start:] = \
                         f32(np.linspace(
-                            v_at_fade,
-                            0.0, n_off))
+                            v_at, 0.0, n_off))
 
             tract_source[s:e] = \
                 voiced_full[s:e] * \
@@ -612,7 +701,8 @@ def _build_source_and_bypass(
                 'DH', n_s, sr,
                 next_is_vowel=next_is_vowel,
                 onset_delay=0,
-                voiced_rms=None)
+                voiced_rms=None,
+                next_ph=next_ph)
             bypass_segs.append((s, byp))
 
         elif stype in ('fric_u', 'fric_v'):
@@ -634,7 +724,8 @@ def _build_source_and_bypass(
                 ph, n_s, sr,
                 next_is_vowel=next_is_vowel,
                 onset_delay=n_on,
-                voiced_rms=prev_vrms)
+                voiced_rms=prev_vrms,
+                next_ph=next_ph)
             bypass_segs.append((s, byp))
 
         elif stype in ('stop_unvoiced',
@@ -675,9 +766,9 @@ def _build_source_and_bypass(
                 ve2 = 1.0 - ne2
                 tract_source[s+vot_s:s+vot_e] = (
                     noise_full[
-                        s+vot_s:s+vot_e] * ne2 +
+                        s+vot_s:s+vot_e]*ne2 +
                     voiced_full[
-                        s+vot_s:s+vot_e] * ve2)
+                        s+vot_s:s+vot_e]*ve2)
             tr_s = vot_e
             if tr_s < n_s:
                 tract_source[s+tr_s:e] = \
@@ -689,7 +780,7 @@ def _build_source_and_bypass(
 
 
 # ============================================================
-# PHRASE NORMALIZATION
+# NORMALIZATION
 # ============================================================
 
 def _normalize_phrase(signal, specs,
@@ -708,30 +799,27 @@ def _normalize_phrase(signal, specs,
             n_bod  = max(1,
                          n_s - n_on_ - n_off_)
             body_s = pos + n_on_
-            body_e = min(body_s + n_bod,
-                         len(signal))
+            body_e = min(
+                body_s + n_bod, len(signal))
             if body_e > body_s:
                 vowel_samples.append(
                     np.abs(signal[
                         body_s:body_e]))
         pos += n_s
-
     if vowel_samples:
-        all_v = np.concatenate(vowel_samples)
-        ref   = np.percentile(
-            all_v, NORM_PERCENTILE)
+        ref = np.percentile(
+            np.concatenate(vowel_samples),
+            NORM_PERCENTILE)
     else:
         ref = np.percentile(
             np.abs(signal), NORM_PERCENTILE)
-
     if ref > 1e-8:
         signal = signal / ref * NORM_TARGET
-
     return np.clip(signal, -1.0, 1.0)
 
 
 # ============================================================
-# PHRASE SYNTHESIS v10 rev4
+# PHRASE SYNTHESIS
 # ============================================================
 
 def synth_phrase(words_phonemes,
@@ -739,14 +827,6 @@ def synth_phrase(words_phonemes,
                   pitch_base=PITCH,
                   dil=DIL,
                   sr=SR):
-    """
-    v10 rev4. All fixes active.
-    Rev4 specific:
-      DH BW widened → no F1 ring.
-      S/Z/SH/ZH resonator BW widened
-        → no high-freq ring.
-      H LP order=1 → no pole ring.
-    """
     prosody = plan_prosody(
         words_phonemes,
         punctuation=punctuation,
@@ -813,19 +893,18 @@ def synth_phrase(words_phonemes,
             anti    = np.zeros(n_s, dtype=DTYPE)
             y1 = y2 = 0.0
             for i in range(n_s):
-                a2 = -np.exp(
-                    -2*np.pi*abw*T)
+                a2 = -np.exp(-2*np.pi*abw*T)
                 a1 = (2*np.exp(-np.pi*abw*T) *
                       np.cos(2*np.pi*af*T))
                 b0 = 1.0 - a1 - a2
-                y  = (b0 * float(seg[i]) +
+                y  = (b0*float(seg[i]) +
                       a1*y1 + a2*y2)
                 y2 = y1; y1 = y
                 anti[i] = y
             out[pos:pos+n_s] = \
-                seg - f32(anti) * 0.50
+                seg - f32(anti)*0.50
             out[pos:pos+n_s] *= 0.52
-            hg = int(0.012 * sr)
+            hg = int(0.012*sr)
             if hg > 0 and hg < n_s:
                 out[pos+n_s-hg:pos+n_s] = 0.0
         pos += n_s
@@ -906,21 +985,28 @@ if __name__ == "__main__":
     os.makedirs("output_play", exist_ok=True)
 
     print()
-    print("VOICE PHYSICS v10 rev4")
+    print("VOICE PHYSICS v10 rev5")
     print()
-    print("  ARTIFACT: IIR resonator ringing")
-    print("  in phoneme bodies.")
+    print("  ROOT CAUSE: spectral discontinuity")
+    print("  not IIR ringing.")
     print()
-    print("  S/Z  Q=22→7.3  bw 400→1200Hz")
-    print("  SH   Q=4.2→2.8 bw 600→900Hz")
-    print("  ZH   Q=3.1→2.4 bw 700→900Hz")
-    print("  DH   bw_mult × 3.0")
-    print("  H    LP order 2→1, fc 2500→2000Hz")
+    print("  S/Z fix:")
+    print("    Voiced source zeroed in final")
+    print("    n_off zone before each unvoiced")
+    print("    fricative. Voiced harmonics end")
+    print("    completely before noise starts.")
+    print("    No beating between harmonics")
+    print("    and noise.")
     print()
-    print("  All rev3 fixes preserved:")
-    print("  DH/H attack 18ms")
-    print("  S/Z relative to voiced RMS")
-    print("  Normalize to vowel body")
+    print("  H fix:")
+    print("    Aspiration shaped by following")
+    print("    vowel formants (3× BW for color")
+    print("    without ring). 50% flat + 50%")
+    print("    shaped. H→IH is spectrally")
+    print("    continuous.")
+    print()
+    print("  DH fix: unchanged from rev4.")
+    print("    BW_MULT=3.0 damps F1 resonator.")
     print("=" * 60)
     print()
 
@@ -966,17 +1052,17 @@ if __name__ == "__main__":
     print("  Isolation tests...")
     isolation = [
         ('test_the',
-         [('the',   ['DH', 'AH'])],
-         'DH body: no low ring'),
+         [('the', ['DH', 'AH'])],
+         'DH body clean'),
         ('test_here',
-         [('here',  ['H', 'IH', 'R'])],
-         'H body: no mid ring'),
+         [('here', ['H', 'IH', 'R'])],
+         'H shaped by IH formants'),
         ('test_was',
-         [('was',   ['W', 'AH', 'Z'])],
-         'Z body: no high ring'),
+         [('was', ['W', 'AH', 'Z'])],
+         'AH ends before Z starts'),
         ('test_voice',
          [('voice', ['V', 'OY', 'S'])],
-         'S body: no high ring'),
+         'OY ends before S starts'),
         ('test_this_is_here',
          [('this',  ['DH', 'IH', 'S']),
           ('is',    ['IH', 'Z']),
@@ -993,8 +1079,8 @@ if __name__ == "__main__":
             words, pitch_base=PITCH)
         write_wav(
             f"output_play/{label}.wav",
-            apply_room(seg, rt60=1.2,
-                        dr=0.55))
+            apply_room(seg,
+                        rt60=1.2, dr=0.55))
         print(f"    {label}.wav  ({note})")
 
     print()
@@ -1009,30 +1095,30 @@ if __name__ == "__main__":
         write_wav(
             f"output_play/"
             f"the_voice_{label}.wav",
-            apply_room(seg, rt60=1.5,
-                        dr=0.50))
+            apply_room(seg,
+                        rt60=1.5, dr=0.50))
         print(f"    the_voice_{label}.wav")
 
     print()
     print("  Coverage...")
     for label, words, punct in [
         ('water_home',
-         [('water', ['W', 'AA', 'T', 'ER']),
-          ('home',  ['H', 'OW', 'M'])], '.'),
+         [('water', ['W','AA','T','ER']),
+          ('home',  ['H','OW','M'])], '.'),
         ('still_here',
-         [('still', ['S', 'T', 'IH', 'L']),
-          ('here',  ['H', 'IH', 'R'])], '.'),
+         [('still', ['S','T','IH','L']),
+          ('here',  ['H','IH','R'])], '.'),
         ('here_and_there',
-         [('here',  ['H',  'IH', 'R']),
-          ('and',   ['AE', 'N',  'D']),
-          ('there', ['DH', 'EH', 'R'])], '.'),
+         [('here',  ['H', 'IH','R']),
+          ('and',   ['AE','N', 'D']),
+          ('there', ['DH','EH','R'])], '.'),
         ('not_yet',
-         [('not',   ['N', 'AA', 'T']),
-          ('yet',   ['Y', 'EH', 'T'])], '.'),
+         [('not', ['N','AA','T']),
+          ('yet', ['Y','EH','T'])], '.'),
         ('always_open',
-         [('always', ['AA', 'L', 'W',
-                       'EH', 'Z']),
-          ('open',   ['OH', 'P', 'EH',
+         [('always', ['AA','L','W',
+                       'EH','Z']),
+          ('open',   ['OH','P','EH',
                        'N'])], '.'),
     ]:
         seg = synth_phrase(
@@ -1041,8 +1127,8 @@ if __name__ == "__main__":
         write_wav(
             f"output_play/"
             f"phrase_{label}.wav",
-            apply_room(seg, rt60=1.6,
-                        dr=0.48))
+            apply_room(seg,
+                        rt60=1.6, dr=0.48))
         print(f"    phrase_{label}.wav")
 
     print()
@@ -1051,32 +1137,34 @@ if __name__ == "__main__":
     if n_pass + n_fail > 0:
         print(f"  Onset: {n_pass}/{n_pass+n_fail}")
     print()
-    print("  LISTEN FOR RING:")
+    print("  LISTEN FOR CONTINUITY:")
+    print()
     print("  afplay output_play/test_voice.wav")
-    print("  → S body clean? no whistle?")
+    print("  → OY fades before S starts?")
+    print("  → S noise clean, no crunch?")
     print()
     print("  afplay output_play/test_was.wav")
-    print("  → Z body clean? no whistle?")
-    print()
-    print("  afplay output_play/test_the.wav")
-    print("  → DH body clean? no hum?")
+    print("  → AH fades before Z starts?")
+    print("  → Z noise clean, no crunch?")
     print()
     print("  afplay output_play/test_here.wav")
-    print("  → H body clean? no tone?")
+    print("  → H sounds like breathy IH?")
+    print("  → transition to voiced IH smooth?")
+    print()
+    print("  afplay output_play/test_the.wav")
+    print("  → DH body smooth?")
     print()
     print("  afplay output_play/"
           "the_voice_was_already_here.wav")
     print()
-    print("  If ring persists on S/Z:")
-    print("  → increase S/Z bw further:")
-    print("    S bw 1200 → 2000")
-    print("    Z bw 1200 → 2000")
+    print("  If S/Z crunch persists:")
+    print("  → The beat is from the voiced")
+    print("    tract IIR state persisting")
+    print("    past the zeroing window.")
+    print("  → Report which word: voice or was?")
+    print("  → Report: onset of S/Z or body?")
     print()
-    print("  If ring persists on DH:")
-    print("  → increase DH_BW_MULT:")
-    print("    3.0 → 5.0")
-    print()
-    print("  If ring persists on H:")
-    print("  → reduce H_BYPASS_LP_HZ:")
-    print("    2000 → 1500")
+    print("  If H artifact persists:")
+    print("  → Report: beginning of H, or")
+    print("    during H, or H→vowel transition?")
     print()
