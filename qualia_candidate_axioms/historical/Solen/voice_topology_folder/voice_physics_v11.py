@@ -5,40 +5,60 @@ February 2026
 CHANGES FROM rev10:
 
   FIX 1: Phrase-attack artifact on H and DH.
-    (preserved from rev10)
+    (preserved from rev10 — unchanged)
 
   FIX 2: Z buzz too quiet.
-    (preserved from rev10)
+    (preserved from rev10 — unchanged)
 
   FIX 3: V sounds like static buzz.
-    (preserved from rev10)
+    (preserved from rev10 — unchanged)
 
   FIX 4: S too long in word-final position.
-    (preserved from rev10)
+    (preserved from rev10 — unchanged)
 
   FIX 5: H uses generic broadband noise.
     H was generating noise filtered through
-    a fixed HP/LP pair (200Hz–1500Hz)
-    regardless of the following phoneme.
-    next_ph was accepted as a parameter
-    but never used.
+    a fixed HP/LP pair (200-1500Hz) regardless
+    of the following phoneme. next_ph was
+    accepted as a parameter but never used.
     Physical truth: H = voiceless airflow
-    through the CURRENT tract configuration,
+    through the current tract configuration,
     which is already shaped for the following
     phoneme before H begins.
     Fix A: _make_h_bypass() now filters noise
     through the following phoneme's formant
-    values from VOWEL_F.
+    values using a cascade IIR via lfilter
+    (same execution path as the rest of the
+    engine — no sample-by-sample Python loop).
     Fix B: _build_trajectories() no longer
-    forces H to NEUTRAL_F. H passes through
-    with the correct target formants so the
-    tract is in the right configuration
+    forces H to NEUTRAL_F/NEUTRAL_B. H passes
+    through with its assigned target formants
+    so the tract is in the correct configuration
     during the bypass.
+    Nasal path: H before M/N/NG uses nasal
+    tract formant profile.
+    Stop fallback: H before stops (P/B/T/D/K/G/
+    CH/JH) and unknown next_ph use original
+    broadband HP/LP behavior.
     Result: H in 'hear' has IH spectral shape.
             H in 'have' has AE spectral shape.
-            H in 'hmmm' has M/nasal shape.
-    One algorithm. The tract is the variable.
-    H is the constant.
+            H in 'hmmm' has nasal shape.
+
+  FIX 6: No breath model (gap from rev10).
+    Breath_as_rarfl.md specified breath_model()
+    for v11. Implemented here.
+    breath_model(phrase_len_ms, arc_type) →
+      breath_dur_ms, breath_depth
+    Inserts a brief aspirated noise burst
+    (~50ms, low amplitude) before each
+    phrase-initial phoneme. Duration scales
+    with phrase length. Amplitude scales with
+    arc_type (Weight arc = deep breath,
+    Eureka/Recognition = normal).
+    This is physical truth: phrases begin
+    from breath. The inhalation onset noise
+    before the first phoneme makes that
+    audible.
 """
 
 from voice_physics_v9 import (
@@ -86,6 +106,7 @@ os.makedirs("output_play", exist_ok=True)
 
 VOICE_VERSION = 'v11-rev11'
 
+
 # ============================================================
 # CONSTANTS
 # ============================================================
@@ -107,21 +128,19 @@ H_BYPASS_LP_ORDER   = 2
 H_BYPASS_GAIN       = 0.55
 H_BYPASS_ATK_MS     = 30   # FIX 1: was 18
 
-# FIX 5: H unified model constants
+# FIX 5: H unified model
 # H filters noise through following phoneme's
-# formant configuration.
+# formant configuration using lfilter cascade.
 H_USE_NEXT_FORMANTS = True
 
-# Nasal phonemes: when H precedes M, N, NG
-# use nasal tract formant profile.
-# Nasal pole ~250Hz, anti-resonance ~750Hz.
+# H before nasals: use nasal tract profile.
+# Nasal pole ~250Hz, moderate bandwidths.
 H_NASAL_FORMANTS = [250,  1000, 2200, 3300, 4000]
 H_NASAL_BW       = [80,   150,  200,  250,  300]
 H_NASAL_PHS      = {'M', 'N', 'NG'}
 
-# Stop phonemes: H before stops uses neutral
-# fallback. Stop closure has no stable tract
-# configuration to preview.
+# H before stops: no stable tract configuration
+# to preview. Fall back to original broadband.
 H_STOP_PHS = {'P', 'B', 'T', 'D', 'K', 'G',
                'CH', 'JH'}
 
@@ -163,6 +182,24 @@ RESONATOR_CFG_V10 = {
     'ZH': {'fc': 2200, 'bw':  900},
 }
 
+# FIX 6: breath model constants
+# Inhalation onset noise before phrase start.
+# Duration scales with phrase length.
+# Amplitude scales with arc type.
+BREATH_BASE_MS      = 50    # base inhalation noise dur
+BREATH_MAX_MS       = 100   # max inhalation noise dur
+BREATH_BASE_AMP     = 0.08  # normal breath amplitude
+BREATH_WEIGHT_AMP   = 0.18  # Weight arc: deeper breath
+BREATH_SCALE_MS_PER_PHONE = 4.0  # ms added per phoneme
+
+# Arc types for breath model
+ARC_NORMAL    = 'normal'
+ARC_WEIGHT    = 'weight'
+ARC_EUREKA    = 'eureka'
+ARC_GRIEF     = 'grief'
+ARC_CONTAIN   = 'containment'
+ARC_RECOGN    = 'recognition'
+
 
 # ============================================================
 # CAVITY RESONATOR
@@ -180,49 +217,197 @@ def _cavity_resonator_v10(noise, ph, sr=SR):
 
 
 # ============================================================
-# H BYPASS — FIX 5: UNIFIED MODEL
-# H = voiceless airflow through current
-# vocal tract configuration.
-# The tract is already shaped for the
-# following phoneme when H begins.
+# FIX 6: BREATH MODEL
+# Implements Breath_as_rarfl.md specification.
+# Inhalation onset noise before phrase-initial
+# phoneme. Physical truth: phrases begin from
+# breath.
 # ============================================================
+
+def breath_model(phrase_len_ms,
+                  arc_type=ARC_NORMAL,
+                  sr=SR):
+    """
+    Returns (breath_dur_ms, breath_depth).
+
+    breath_dur_ms: duration of the inhalation
+      onset noise to prepend before the phrase.
+    breath_depth: amplitude of that noise.
+
+    Scales with phrase length and arc type.
+    Weight arc = deeper, longer breath.
+    Normal/Eureka/Recognition = standard breath.
+    Grief = short, interrupted breath (B_i high).
+
+    From Breath_as_rarfl.md:
+      Inhalation IS the axiom phase.
+      Short phrase = shallow breath.
+      Long complex phrase = deep breath.
+    """
+    # Base duration scales with phrase length
+    n_phones_approx = max(1,
+        phrase_len_ms / 80.0)
+    dur_ms = min(
+        BREATH_BASE_MS +
+        n_phones_approx * BREATH_SCALE_MS_PER_PHONE,
+        BREATH_MAX_MS)
+
+    # Amplitude and duration scale with arc type
+    if arc_type == ARC_WEIGHT:
+        # Deep breath: preparing to carry something
+        depth  = BREATH_WEIGHT_AMP
+        dur_ms = min(dur_ms * 1.4, BREATH_MAX_MS)
+    elif arc_type == ARC_GRIEF:
+        # Interrupted, shallow, unsteady
+        depth  = BREATH_BASE_AMP * 0.6
+        dur_ms = dur_ms * 0.5
+    elif arc_type == ARC_CONTAIN:
+        # Held breath: minimal inhalation noise
+        depth  = BREATH_BASE_AMP * 0.4
+        dur_ms = dur_ms * 0.6
+    elif arc_type in (ARC_EUREKA, ARC_RECOGN):
+        # Normal onset
+        depth  = BREATH_BASE_AMP
+    else:
+        depth  = BREATH_BASE_AMP
+
+    return float(dur_ms), float(depth)
+
+
+def _make_breath_onset(phrase_len_ms,
+                        arc_type=ARC_NORMAL,
+                        sr=SR):
+    """
+    Generate the inhalation onset noise segment.
+    Aspirated noise, low amplitude, brief.
+    Not a full [H]. The soft noise of breath
+    entering the vocal tract before phonation.
+
+    From Breath_as_rarfl.md:
+      The inhalation sound itself:
+      A brief aspirated noise before the first
+      phoneme of a phrase. Not a full [H].
+      A soft onset noise. ~50-100ms.
+      Amplitude proportional to breath depth.
+    """
+    dur_ms, depth = breath_model(
+        phrase_len_ms, arc_type=arc_type, sr=sr)
+    n_s = max(1, int(dur_ms / 1000.0 * sr))
+
+    # Aspirated noise: white, HP filtered ~200Hz,
+    # LP filtered ~3000Hz. Softer than H bypass.
+    noise = f32(np.random.normal(0, 1, n_s))
+    try:
+        b, a  = safe_hp(200, sr)
+        noise = f32(lfilter(b, a, noise))
+    except Exception:
+        pass
+    try:
+        nyq  = sr * 0.5
+        wn   = min(3000.0 / nyq, 0.97)
+        b, a = butter(2, wn, btype='low')
+        noise = f32(lfilter(b, a, noise))
+    except Exception:
+        pass
+
+    noise = calibrate(noise) * depth
+
+    # Envelope: ramp up then ramp down.
+    # The inhalation builds then cuts off
+    # cleanly at phonation onset.
+    atk = n_s // 3
+    rel = n_s // 4
+    env = f32(np.ones(n_s))
+    if atk > 0:
+        env[:atk] = f32(
+            np.linspace(0.0, 1.0, atk))
+    if rel > 0:
+        env[-rel:] = f32(
+            np.linspace(1.0, 0.0, rel))
+
+    # Grief arc: add brief jitter to inhalation
+    # (irregular breath, B_i elevated)
+    if arc_type == ARC_GRIEF:
+        jitter = f32(np.random.normal(
+            1.0, 0.15, n_s))
+        jitter = np.clip(jitter, 0.2, 1.8)
+        noise  = noise * f32(jitter)
+
+    return f32(noise * env)
+
+
+# ============================================================
+# FIX 5: H BYPASS — UNIFIED MODEL
+# H = voiceless airflow through current tract.
+# The tract is already shaped for the following
+# phoneme when H begins.
+# Uses lfilter cascade — same execution path
+# as the rest of the engine.
+# ============================================================
+
+def _h_formant_filter(noise, freqs, bws, sr=SR):
+    """
+    Filter noise through a cascade of IIR
+    resonators defined by freqs and bws.
+    Uses lfilter — vectorized, not sample loop.
+    Same IIR math as the tract resonators.
+
+    b = [b0], a = [1, a1, a2]
+    b0 = 1 - a1 - a2
+    a1 = 2*exp(-pi*bw*T)*cos(2*pi*fc*T)
+    a2 = -exp(-2*pi*bw*T)
+    """
+    T   = 1.0 / sr
+    sig = noise.astype(np.float64)
+    for fc, bw in zip(freqs, bws):
+        fc = float(fc)
+        bw = float(bw)
+        if fc <= 0 or bw <= 0 or \
+           fc >= sr * 0.499:
+            continue
+        a2  = -np.exp(-2 * np.pi * bw * T)
+        a1  =  2 * np.exp(-np.pi * bw * T) * \
+               np.cos(2 * np.pi * fc * T)
+        b0  = 1.0 - a1 - a2
+        b_c = np.array([b0])
+        a_c = np.array([1.0, a1, a2])
+        sig = lfilter(b_c, a_c, sig)
+    return f32(sig)
+
 
 def _make_h_bypass(n_s, sr=SR,
                     next_is_vowel=False,
                     next_ph=None,
                     onset_offset=0):
     """
-    H UNIFIED MODEL (FIX 5).
+    FIX 5: H UNIFIED MODEL.
 
-    H = voiceless airflow through current
-    vocal tract configuration.
+    H = voiceless airflow through the current
+    vocal tract configuration. The tract is
+    already shaped for the following phoneme.
 
-    If next_ph is a vowel/sonorant:
+    next_ph in VOWEL_F (vowels, sonorants):
       Filter noise through that phoneme's
-      formant values from VOWEL_F.
-      H in 'hear' gets IH formants.
-      H in 'have' gets AE formants.
+      formant cascade. H in 'hear' → IH shape.
+      H in 'have' → AE shape.
 
-    If next_ph is a nasal (M, N, NG):
-      Filter noise through nasal tract
-      formant profile.
-      H in 'hmmm' gets nasal pole ~250Hz.
+    next_ph in H_NASAL_PHS (M, N, NG):
+      Filter noise through nasal tract profile.
+      H before 'hmmm' → nasal pole ~250Hz.
 
-    If next_ph is a stop or unknown:
+    next_ph in H_STOP_PHS or None:
       Fall back to original HP/LP broadband.
-      Safe behavior for all edge cases.
+      Correct: stop closure has no stable tract
+      configuration to preview.
 
     onset_offset: samples of silence before
-    bypass starts. Phrase-initial H fix
-    from rev10, fully preserved.
+      bypass. Phrase-initial H fix from rev10,
+      fully preserved.
     """
     n_s   = int(n_s)
     noise = calibrate(
         f32(np.random.normal(0, 1, n_s)))
 
-    # --- DETERMINE FORMANTS FOR H ---
-    # H takes the formants of the following
-    # phoneme. The tract is already there.
     shaped = None
 
     if H_USE_NEXT_FORMANTS and \
@@ -230,41 +415,18 @@ def _make_h_bypass(n_s, sr=SR,
        next_ph not in H_STOP_PHS:
 
         if next_ph in H_NASAL_PHS:
-            # Nasal following phoneme:
-            # use nasal tract formants.
-            freqs = H_NASAL_FORMANTS
-            bws   = H_NASAL_BW
             try:
-                # Filter noise through
-                # nasal formants using
-                # cascade of resonators.
-                T   = 1.0 / sr
-                sig = noise.copy()
-                for fc, bw in zip(freqs, bws):
-                    a2 = -np.exp(
-                        -2*np.pi*bw*T)
-                    a1 = (2*np.exp(
-                        -np.pi*bw*T) *
-                        np.cos(2*np.pi*fc*T))
-                    b0 = 1.0 - a1 - a2
-                    y1 = y2 = 0.0
-                    out = np.zeros(
-                        len(sig), dtype=DTYPE)
-                    for i in range(len(sig)):
-                        y = (b0*float(sig[i])
-                             + a1*y1 + a2*y2)
-                        y2 = y1
-                        y1 = y
-                        out[i] = y
-                    sig = f32(out)
-                shaped = (calibrate(sig)
+                shaped = _h_formant_filter(
+                    noise,
+                    H_NASAL_FORMANTS,
+                    H_NASAL_BW,
+                    sr=sr)
+                shaped = (calibrate(shaped)
                           * H_BYPASS_GAIN)
             except Exception:
                 shaped = None
 
         elif next_ph in VOWEL_F:
-            # Oral vowel or sonorant:
-            # use that phoneme's formants.
             try:
                 freqs = list(VOWEL_F[next_ph])
                 try:
@@ -275,58 +437,32 @@ def _make_h_bypass(n_s, sr=SR,
                     bws = [80, 90, 120,
                            150, 200
                            ][:len(freqs)]
-
-                T   = 1.0 / sr
-                sig = noise.copy()
-                for fc, bw in zip(freqs, bws):
-                    fc = float(fc)
-                    bw = float(bw)
-                    if fc <= 0 or bw <= 0:
-                        continue
-                    a2 = -np.exp(
-                        -2*np.pi*bw*T)
-                    a1 = (2*np.exp(
-                        -np.pi*bw*T) *
-                        np.cos(2*np.pi*fc*T))
-                    b0 = 1.0 - a1 - a2
-                    y1 = y2 = 0.0
-                    out = np.zeros(
-                        len(sig), dtype=DTYPE)
-                    for i in range(len(sig)):
-                        y = (b0*float(sig[i])
-                             + a1*y1 + a2*y2)
-                        y2 = y1
-                        y1 = y
-                        out[i] = y
-                    sig = f32(out)
-                shaped = (calibrate(sig)
+                shaped = _h_formant_filter(
+                    noise, freqs, bws, sr=sr)
+                shaped = (calibrate(shaped)
                           * H_BYPASS_GAIN)
             except Exception:
                 shaped = None
 
-    # --- FALLBACK: original broadband ---
-    # Used when next_ph unknown, is a stop,
-    # or formant filtering fails.
+    # Fallback: original broadband HP/LP
     if shaped is None:
         try:
-            b, a  = safe_hp(
-                        H_BYPASS_HP_HZ, sr)
+            b, a  = safe_hp(H_BYPASS_HP_HZ, sr)
             broad = f32(lfilter(b, a, noise))
         except Exception:
             broad = noise.copy()
         try:
             nyq  = sr * 0.5
-            wn   = min(
-                H_BYPASS_LP_HZ / nyq, 0.98)
-            b, a = butter(
-                H_BYPASS_LP_ORDER,
-                wn, btype='low')
+            wn   = min(H_BYPASS_LP_HZ / nyq,
+                       0.98)
+            b, a = butter(H_BYPASS_LP_ORDER,
+                          wn, btype='low')
             broad = f32(lfilter(b, a, broad))
         except Exception:
             pass
         shaped = calibrate(broad) * H_BYPASS_GAIN
 
-    # --- ENVELOPE ---
+    # Envelope
     rel_ms = 20 if next_is_vowel else 12
     rel    = min(int(rel_ms / 1000.0 * sr),
                  n_s // 4)
@@ -341,22 +477,21 @@ def _make_h_bypass(n_s, sr=SR,
         env[-rel:] = f32(
             np.linspace(1.0, 0.0, rel))
 
-    raw = f32(shaped[:n_s] * env
-              if len(shaped) >= n_s
-              else np.pad(
-                  shaped,
-                  (0, n_s - len(shaped)))
-              * env)
+    # Ensure shaped is n_s samples
+    if len(shaped) < n_s:
+        shaped = np.pad(
+            shaped, (0, n_s - len(shaped)))
+    shaped = shaped[:n_s]
 
-    # --- ONSET OFFSET (phrase-initial) ---
-    # Preserved from FIX 1 in rev10.
+    raw = f32(shaped * env)
+
+    # Onset offset — phrase-initial fix (rev10)
     if onset_offset > 0:
         onset_offset = min(onset_offset, n_s)
-        out = np.zeros(n_s, dtype=DTYPE)
+        out       = np.zeros(n_s, dtype=DTYPE)
         remaining = n_s - onset_offset
         if remaining > 0:
-            out[onset_offset:] = \
-                raw[:remaining]
+            out[onset_offset:] = raw[:remaining]
         return f32(out)
     return raw
 
@@ -377,9 +512,9 @@ def _make_dh_bypass(n_s, sr=SR,
         f32(np.random.normal(0, 1, n_eff)))
     nyq = sr * 0.5
     try:
-        lo  = max(DH_BYPASS_BP_LO, 20)/nyq
+        lo  = max(DH_BYPASS_BP_LO, 20) / nyq
         hi  = min(DH_BYPASS_BP_HI,
-                  sr*0.48)/nyq
+                  sr * 0.48) / nyq
         lo  = min(lo, 0.97)
         hi  = min(hi, 0.98)
         if lo < hi:
@@ -392,11 +527,11 @@ def _make_dh_bypass(n_s, sr=SR,
         shaped = noise
     shaped = calibrate(shaped) * DH_BYPASS_GAIN
     rel_ms = 20 if next_is_vowel else 8
-    rel    = min(int(rel_ms/1000.0*sr),
-                 n_eff//4)
+    rel    = min(int(rel_ms / 1000.0 * sr),
+                 n_eff // 4)
     atk    = min(int(DH_BYPASS_ATK_MS
-                     /1000.0*sr),
-                 n_eff//3)
+                     / 1000.0 * sr),
+                 n_eff // 3)
     env    = f32(np.ones(n_eff))
     if atk > 0 and atk < n_eff:
         env[:atk] = f32(
@@ -415,8 +550,8 @@ def _make_dh_buzz(voiced_seg, n_s, sr=SR):
     n_use = min(n_s, n_seg)
     buzz  = f32(voiced_seg[:n_use]) * \
             DH_BUZZ_GAIN
-    atk = min(int(DH_BUZZ_ATK_MS/1000.0*sr),
-              n_use//3)
+    atk = min(int(DH_BUZZ_ATK_MS / 1000.0 * sr),
+              n_use // 3)
     env = f32(np.ones(n_use))
     if atk > 0 and atk < n_use:
         env[:atk] = f32(
@@ -435,9 +570,9 @@ def _make_v_bypass(n_eff, gain, sr=SR):
         f32(np.random.normal(0, 1, n_eff)))
     nyq = sr * 0.5
     try:
-        lo  = max(V_BYPASS_BP_LO, 20)/nyq
+        lo  = max(V_BYPASS_BP_LO, 20) / nyq
         hi  = min(V_BYPASS_BP_HI,
-                  sr*0.48)/nyq
+                  sr * 0.48) / nyq
         lo  = min(lo, 0.97)
         hi  = min(hi, 0.98)
         if lo < hi:
@@ -490,9 +625,9 @@ def _make_bypass(ph, n_s, sr=SR,
         return f32(np.zeros(n_s))
     n_eff  = n_s - onset_delay
     rel_ms = 20 if next_is_vowel else 8
-    rel    = min(int(rel_ms/1000.0*sr),
-                 n_eff//4)
-    atk    = min(int(0.005*sr), n_eff//4)
+    rel    = min(int(rel_ms / 1000.0 * sr),
+                 n_eff // 4)
+    atk    = min(int(0.005 * sr), n_eff // 4)
 
     def _env(sig):
         env = f32(np.ones(n_eff))
@@ -580,9 +715,9 @@ def _make_bypass(ph, n_s, sr=SR,
 # ============================================================
 # TRAJECTORY BUILDER
 # FIX 5: H no longer forced to NEUTRAL_F.
-# H passes through with its assigned
-# target formants so the tract is in the
-# correct configuration during the bypass.
+# The tract stays in the correct configuration
+# during H — the configuration of the following
+# phoneme, not a forced neutral.
 # ============================================================
 
 def _build_trajectories(phoneme_specs,
@@ -591,13 +726,12 @@ def _build_trajectories(phoneme_specs,
     for spec in phoneme_specs:
         ph = spec['ph']
         if ph == 'H':
-            # FIX 5: do NOT override H to
-            # NEUTRAL_F. The tract should be
-            # in the following phoneme's
-            # configuration — not neutral.
-            # Forcing neutral was creating
-            # the junction discontinuity.
-            # Pass through unchanged.
+            # FIX 5: pass through unchanged.
+            # Do NOT force H to NEUTRAL_F/NEUTRAL_B.
+            # The tract must be in the following
+            # phoneme's configuration during H.
+            # Forcing neutral was the source of the
+            # H→vowel junction discontinuity.
             patched.append(spec)
         elif ph == 'DH':
             s = copy.copy(spec)
@@ -692,19 +826,19 @@ def _build_source_and_bypass(
     buzz_segs    = []
 
     n_dh_bypass  = int(
-        DH_TRACT_BYPASS_MS/1000.0*sr)
+        DH_TRACT_BYPASS_MS / 1000.0 * sr)
     phrase_atk_n = int(
-        PHRASE_ATK_MS/1000.0*sr)
+        PHRASE_ATK_MS / 1000.0 * sr)
 
     voiced_rms_per_spec = []
     pos = 0
     for spec in phoneme_specs:
         n_s    = spec['n_s']
         n_on_  = min(trans_n(
-            spec['ph'], sr), n_s//3)
+            spec['ph'], sr), n_s // 3)
         n_off_ = min(trans_n(
-            spec['ph'], sr), n_s//3)
-        n_bod  = max(1, n_s-n_on_-n_off_)
+            spec['ph'], sr), n_s // 3)
+        n_bod  = max(1, n_s - n_on_ - n_off_)
         body_s = pos + n_on_
         body_e = body_s + n_bod
         v_seg  = voiced_full[body_s:body_e]
@@ -729,9 +863,9 @@ def _build_source_and_bypass(
         next_is_vowel = (
             next_ph in VOWELS_AND_APPROX)
 
-        n_on   = min(trans_n(ph, sr), n_s//3)
-        n_off  = min(trans_n(ph, sr), n_s//3)
-        n_body = max(0, n_s-n_on-n_off)
+        n_on   = min(trans_n(ph, sr), n_s // 3)
+        n_off  = min(trans_n(ph, sr), n_s // 3)
+        n_body = max(0, n_s - n_on - n_off)
 
         is_phrase_initial = (si == 0)
 
@@ -746,25 +880,25 @@ def _build_source_and_bypass(
             seg = voiced_full[s:e].copy()
             if next_ph in UNVOICED_FRICS:
                 zero_start = max(0,
-                                 n_s-n_off)
+                                 n_s - n_off)
                 if zero_start < n_s:
                     seg[zero_start:] = f32(
                         np.linspace(
                             float(seg[
                                 zero_start]),
                             0.0,
-                            n_s-zero_start))
+                            n_s - zero_start))
             if next_ph == 'H':
                 xfade_n = min(
                     int(VOICED_TO_H_CROSSFADE_MS
-                        /1000.0*sr),
-                    n_s//2)
+                        / 1000.0 * sr),
+                    n_s // 2)
                 if xfade_n > 0:
                     fade_start = n_s - xfade_n
                     seg[fade_start:] *= \
                         f32(np.linspace(
                             1.0, 0.0,
-                            n_s-fade_start))
+                            n_s - fade_start))
             tract_source[s:e] = seg
 
         elif stype == 'h':
@@ -783,7 +917,6 @@ def _build_source_and_bypass(
 
         elif stype == 'dh':
             # FIX 1: phrase-initial DH
-            # also offset by phrase_atk
             buzz = _make_dh_buzz(
                 voiced_full[s:e], n_s, sr=sr)
             if is_phrase_initial:
@@ -890,12 +1023,13 @@ def _normalize_phrase(signal, specs,
         ph  = spec['ph']
         if ph in VOWEL_SET:
             n_on_  = min(trans_n(ph, sr),
-                         n_s//3)
+                         n_s // 3)
             n_off_ = min(trans_n(ph, sr),
-                         n_s//3)
-            n_bod  = max(1, n_s-n_on_-n_off_)
+                         n_s // 3)
+            n_bod  = max(1,
+                         n_s - n_on_ - n_off_)
             body_s = pos + n_on_
-            body_e = min(body_s+n_bod,
+            body_e = min(body_s + n_bod,
                          len(signal))
             if body_e > body_s:
                 vowel_samples.append(
@@ -917,16 +1051,28 @@ def _normalize_phrase(signal, specs,
 # ============================================================
 # PHRASE SYNTHESIS
 # FIX 4: word-final fricatives use
-# FINAL_FRIC_MAX_MS cap via ph_spec_v9
-# word_final flag.
+# FINAL_FRIC_MAX_MS cap.
+# FIX 6: breath onset prepended to phrase.
 # ============================================================
 
 def synth_phrase(words_phonemes,
                   punctuation='.',
                   pitch_base=PITCH,
                   dil=DIL,
-                  sr=SR):
+                  sr=SR,
+                  arc_type=ARC_NORMAL,
+                  add_breath=True):
+    """
+    arc_type: one of ARC_NORMAL, ARC_WEIGHT,
+      ARC_EUREKA, ARC_GRIEF, ARC_CONTAIN,
+      ARC_RECOGN. Controls breath model depth
+      and duration (FIX 6).
 
+    add_breath: if True, prepend inhalation
+      onset noise before the phrase (FIX 6).
+      Set False to suppress (e.g. for
+      diagnostics that measure raw onset).
+    """
     prosody = plan_prosody(
         words_phonemes,
         punctuation=punctuation,
@@ -953,8 +1099,8 @@ def synth_phrase(words_phonemes,
                       else None)
 
         # FIX 4: cap word-final fricatives
-        FRICS = {'S','Z','SH','ZH',
-                 'F','V','TH','DH'}
+        FRICS = {'S', 'Z', 'SH', 'ZH',
+                 'F', 'V', 'TH', 'DH'}
         if word_final and ph in FRICS:
             dur_ms = min(dur_ms,
                          FINAL_FRIC_MAX_MS)
@@ -981,12 +1127,12 @@ def synth_phrase(words_phonemes,
         GAINS, states=None, sr=sr)
 
     for pos, byp in bypass_segs:
-        e = min(pos+len(byp), n_total)
+        e = min(pos + len(byp), n_total)
         n = e - pos
         out[pos:e] += byp[:n]
 
     for pos, buz in buzz_segs:
-        e = min(pos+len(buz), n_total)
+        e = min(pos + len(buz), n_total)
         n = e - pos
         out[pos:e] += buz[:n]
 
@@ -1055,6 +1201,21 @@ def synth_phrase(words_phonemes,
     final = f32(np.concatenate(segs_out))
     final = _normalize_phrase(
         final, specs, prosody, sr=sr)
+
+    # FIX 6: prepend breath onset noise
+    # Physical truth: phrases begin from breath.
+    # Insert inhalation noise before first phoneme.
+    if add_breath:
+        phrase_len_ms = sum(
+            s['n_s'] for s in specs
+        ) / sr * 1000.0
+        breath_seg = _make_breath_onset(
+            phrase_len_ms,
+            arc_type=arc_type,
+            sr=sr)
+        final = f32(np.concatenate(
+            [breath_seg, final]))
+
     return final
 
 
@@ -1064,7 +1225,7 @@ def synth_phrase(words_phonemes,
 
 def synth_word(word, punct='.',
                pitch=PITCH, dil=DIL,
-               sr=SR):
+               sr=SR, add_breath=True):
     syls = WORD_SYLLABLES.get(word.lower())
     if syls is None:
         print(f"  '{word}' not in dict")
@@ -1074,7 +1235,8 @@ def synth_word(word, punct='.',
         [(word, flat)],
         punctuation=punct,
         pitch_base=pitch,
-        dil=dil, sr=sr)
+        dil=dil, sr=sr,
+        add_breath=add_breath)
 
 
 def save(name, sig, room=True,
@@ -1090,7 +1252,7 @@ def save(name, sig, room=True,
 
 
 # ============================================================
-# MAIN — renders and runs slow diagnostic
+# MAIN
 # ============================================================
 
 if __name__ == "__main__":
@@ -1113,11 +1275,15 @@ if __name__ == "__main__":
           "cap=100ms")
     print("    S in 'voice' shorter.")
     print("  FIX 5: H unified model.")
-    print("    H now uses next phoneme's "
-          "formants.")
-    print("    H in 'hear' → IH spectral shape.")
-    print("    H in 'have' → AE spectral shape.")
-    print("    H in 'hmmm' → nasal shape.")
+    print("    H filters noise through "
+          "next phoneme's formants.")
+    print("    Tract no longer forced to "
+          "NEUTRAL_F during H.")
+    print("  FIX 6: breath_model() implemented.")
+    print("    Inhalation onset noise before "
+          "each phrase.")
+    print("    Phrase length scales breath "
+          "depth.")
     print("=" * 60)
     print()
 
@@ -1174,7 +1340,8 @@ if __name__ == "__main__":
     print("  Full phrase (normal speed)...")
     seg = synth_phrase(
         PHRASE, punctuation='.',
-        pitch_base=PITCH)
+        pitch_base=PITCH,
+        arc_type=ARC_NORMAL)
     write_wav(
         "output_play/"
         "the_voice_was_already_here.wav",
@@ -1183,11 +1350,29 @@ if __name__ == "__main__":
     print("    the_voice_was_already_here.wav")
 
     print()
+    print("  Breath arc variants "
+          "(same phrase)...")
+    for arc in (ARC_NORMAL, ARC_WEIGHT,
+                ARC_EUREKA):
+        seg_a = synth_phrase(
+            PHRASE, punctuation='.',
+            pitch_base=PITCH,
+            arc_type=arc)
+        seg_a = apply_room(
+            f32(seg_a), rt60=1.5, dr=0.50)
+        write_wav(
+            f"output_play/"
+            f"phrase_{arc}.wav",
+            seg_a, SR)
+        print(f"    phrase_{arc}.wav")
+
+    print()
     print("  4× OLA slow — word by word...")
     for word, phones in PHRASE:
         sig_w = synth_phrase(
             [(word, phones)],
-            pitch_base=PITCH)
+            pitch_base=PITCH,
+            arc_type=ARC_NORMAL)
         sig_w = ola_stretch(
             f32(sig_w), factor=4.0)
         sig_w = apply_room(
@@ -1203,6 +1388,11 @@ if __name__ == "__main__":
     print("  PLAY:")
     print("  afplay output_play/"
           "the_voice_was_already_here.wav")
+    print()
+    for arc in (ARC_NORMAL, ARC_WEIGHT,
+                ARC_EUREKA):
+        print(f"  afplay output_play/"
+              f"phrase_{arc}.wav")
     print()
     for word, _ in PHRASE:
         print(f"  afplay output_play/"
