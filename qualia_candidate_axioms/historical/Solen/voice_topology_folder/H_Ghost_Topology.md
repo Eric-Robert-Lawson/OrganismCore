@@ -386,6 +386,109 @@ No constriction × open    = H (canonical)
                              before voice commits)
 ```
 
+---
+
+### THE FRICATIVE AS COMPRESSED STOP + H
+
+The digraph spellings record a deeper layer
+of the same topology:
+
+  ph → f
+  th → θ (TH/DH)
+  ch/kh → x or tʃ
+
+These are not spelling conventions.
+They are fossil transcriptions.
+They record what the production
+actually was before it compressed.
+
+Greek φ (phi) was not a fricative.
+It was an aspirated bilabial stop:
+  P = bilabial closure
+  H = aspiration at release
+
+The sequence P + H, produced quickly,
+with the H merging into the following
+vowel's onset, collapsed into F —
+the labiodental fricative —
+because the bilabial closure never
+fully built. The air leaked through
+the lip-teeth contact. The H aspiration
+shaped into continuous frication.
+
+The spelling ph preserved the H
+that was already there.
+The production changed.
+The ghost was absorbed.
+The orthography kept the record.
+
+The same event, three times:
+
+  ph → f:  P × H = bilabial stop
+             + aspiration = labiodental fric.
+             F2 locus of F (~1100 Hz) sits
+             between bilabial (~720 Hz) and
+             alveolar (~1800 Hz) —
+             exactly where a bilabial stop
+             releasing through H aspiration
+             would deposit its energy.
+
+  th → θ:  T × H = alveolar stop
+             + aspiration = dental fricative.
+             TH locus (~1600 Hz) sits
+             between alveolar (~1800 Hz)
+             and dental release position —
+             the stop aspiration becoming
+             continuous frication at the
+             teeth rather than the ridge.
+
+  ch/kh → x: K × H = velar stop
+             + aspiration = velar fricative.
+             In languages that kept the
+             distinction: Bach, loch.
+             In English: absorbed into K
+             or shifted further.
+
+Every fricative in this class
+is a Stop × H trajectory
+that compressed into a single gesture.
+
+The H ghost was present.
+It drove the change.
+It was absorbed into the fricative.
+The locus is its fossil.
+
+**What this means for the topology:**
+
+The consonant table should be read
+not just as a synchronic map
+(what each consonant is now)
+but as a trajectory space
+(what each consonant was, and how
+it arrived at its current form).
+
+Fricatives are in the topology
+as single gestures.
+But their loci betray their history:
+they are the endpoint of a
+Stop × H arc that completed.
+
+The ghost was always there.
+In some phonemes, it is still
+separable (VOT after stops).
+In others, it has fully merged
+(the fricative itself IS the ghost
+of the stop that preceded it).
+
+H is not just between phonemes.
+H is inside some phonemes —
+compressed into the gesture,
+audible only as the locus
+and the frication texture
+it left behind.
+
+---
+
 H (canonical) and voiced H are
 the two endpoints of the entire
 consonant topology.
@@ -928,6 +1031,42 @@ This generalizes the v11 H fix:
   Tonnetz engine were always one system.
   Now the connection is named.
 
+**locus_transitions.md / voice_physics_v17:**
+  v17 established LOCUS_F2_BASE —
+  the F2 locus for each place of
+  articulation. These values were
+  derived from acoustic phonetics
+  tables.
+
+  The f ↔ ph observation provides
+  a deeper account of why those values
+  are what they are.
+
+  The F2 locus of F (~1100 Hz) is not
+  an arbitrary measurement.
+  It is the compressed fossil of a
+  P × H trajectory — the bilabial
+  stop releasing through H aspiration,
+  landing between bilabial (~720 Hz)
+  and alveolar (~1800 Hz) because
+  that is where the lip-teeth contact
+  deposits energy when the closure is
+  incomplete.
+
+  The F2 locus of TH/DH (~1600 Hz)
+  is the alveolar stop releasing
+  through H aspiration across the
+  teeth rather than the ridge.
+
+  The F2 locus table is a
+  compressed record of the H-ghost
+  trajectories that produced each
+  place of articulation.
+
+  This is not a change to v17.
+  It is the physical account of
+  why v17's constants are correct.
+
 ---
 
 ## PART X: WHAT IS STILL OPEN
@@ -988,6 +1127,60 @@ This generalizes the v11 H fix:
   the underlying harmonic topology.
   Needs investigation.
 
+**Q7: Fricatives as compressed Stop × H.**
+  If every fricative is a compressed
+  stop-plus-ghost trajectory, should
+  the engine model them that way?
+
+  Current model: fricative = single
+  noise burst with downstream cavity
+  filter. Acoustically correct.
+
+  Alternative: fricative = P/T/K/etc
+  closure (very brief, below threshold
+  for audible burst) + H aspiration
+  (the frication IS the H ghost of
+  the stop that didn't fully build).
+
+  This would change the source model
+  for F, V, TH, DH from pure noise
+  to a compressed stop-onset + noise.
+  The stop closure phase: 5-10ms,
+  no burst, tract at bilabial/dental/
+  alveolar position. Then the
+  frication: the H ghost at that
+  position.
+
+  Predicted effect: fricatives would
+  have a slight onset sharpening —
+  a brief formant movement toward
+  the stop locus before settling into
+  the frication noise — that makes
+  place of articulation more salient.
+  The TH would depart from a
+  slightly more alveolar position
+  before landing at the dental
+  frication. The F would depart from
+  a slightly bilabial position before
+  the labiodental noise begins.
+
+  This is not a fix for a current error.
+  The fricatives sound correct.
+  It is an investigation: does adding
+  the ghost back into the fricative
+  make the voice more real, or does it
+  add complexity without audible gain?
+
+  Test: synthesize F in isolation with
+  and without the compressed onset.
+  Check whether the 5ms stop-position
+  onset is audible at normal speed.
+  At slow speed it should be clear.
+  If audible at normal speed:
+  implement in v18.
+  If not: the compression is complete
+  and the current model is correct.
+
 ---
 
 ## SUMMARY
@@ -1014,13 +1207,19 @@ the voice at or returning to
 its baseline state.
 
 The syllable cycle:
-  H → onset → nucleus �� coda → H
+  H → onset → nucleus → coda → H
 
 The consonant topology:
   Articulation × Glottis state.
   H = no articulation × open glottis.
   Voiced H = no articulation × voiced.
   All other consonants = H + a constriction.
+
+Fricatives as compressed Stop × H:
+  ph → f:  P × H, bilabial fossil
+  th → θ:  T × H, alveolar fossil
+  ch → x:  K × H, velar fossil
+  The locus is the ghost that was absorbed.
 
 The ghost is the return to origin
 at the end of each beat.
@@ -1102,4 +1301,24 @@ Hierarchy:
     artifact connections.
     Arc type descriptions deepened
     with Tonnetz framing.
-````{"repoID":0,"ref":"","type":"repo-instructions","url":"/Eric-Robert-Lawson/OrganismCore/blob/refs/heads/main/.github/copilot-instructions.md"}
+
+  v3 — February 2026
+    Part III extended: fricatives as
+    compressed Stop × H trajectories.
+    The digraph spellings (ph, th, ch)
+    as fossil records of the H ghost
+    that drove sound changes and was
+    absorbed into the resulting fricative.
+    F2 loci as compressed ghost fossils.
+    Part IX extended: connection to
+    locus_transitions.md and v17 —
+    LOCUS_F2_BASE values explained as
+    records of historical P/T/K × H
+    trajectories.
+    Q7 added: whether fricatives should
+    be synthesized as compressed
+    stop-plus-ghost rather than single
+    noise bursts. Test proposed.
+    Summary updated: fricative fossil
+    line added.
+    Revision history updated.
