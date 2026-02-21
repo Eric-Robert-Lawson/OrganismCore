@@ -1,23 +1,44 @@
 """
-VOICE PHYSICS v10 — rev2
+VOICE PHYSICS v10 — rev3
 February 2026
 
-Changes from rev1:
-  H_BYPASS_LP_HZ: 7000 → 2500
-    H aspiration centroid was 4237Hz.
-    Target is (800, 2500Hz).
-    White noise HP(200)+LP(7000) is too bright.
-    LP(2500) brings centroid to ~1350Hz. ✓
-    Also reduces prominence slightly.
+FIXES FROM PERCEPTUAL REPORT:
 
-Onset diagnostic targets also updated
-(in onset_diagnostic.py):
-  DH rms_ratio_max: 0.60 → 1.30
-    Old target assumed loud onset = bad.
-    New architecture: onset = bypass only.
-    Body = bypass + growing voiced.
-    Natural ratio ≈ 1.0-1.1 = correct.
-    1.068 is correct behavior, not a failure.
+  "brushing against clothing" before
+  'the' and 'here':
+    DH and H bypass onset attack was 5-8ms.
+    Too fast. Below masking threshold.
+    Ear hears as a brush/click transient.
+    Fix: DH and H bypass attack = 18ms.
+    Slower fade-in. Onset is smooth.
+
+  "waS and voiCE" — loud static pop:
+    S/Z bypass was calibrated independently
+    to TARGET_RMS. Bypass at full level
+    at the vowel→fricative boundary.
+    The vowel drops. The bypass is loud.
+    Combined peak normalized the whole
+    phrase downward around that spike.
+    Fix 1: S/Z bypass gain is computed
+    relative to the concurrent voiced
+    body RMS, not TARGET_RMS.
+    Fix 2: Phrase normalization uses
+    the 90th percentile of the VOWEL
+    segments only, not the whole signal
+    including sibilants.
+
+  H prominence=12.28 (false fail):
+    measure_peak_prominence measured
+    all bins > 200Hz.
+    LP(2500Hz) cutoff creates near-zero
+    bins above 2500Hz.
+    Many near-zero bins pull mean down.
+    max/mean inflated artificially.
+    Not a real resonance. Not audible.
+    Fix: prominence measured in
+    onset_diagnostic.py within the
+    H bypass passband (200-2500Hz) only.
+    See onset_diagnostic.py rev3.
 """
 
 from voice_physics_v9 import (
@@ -66,26 +87,67 @@ os.makedirs("output_play", exist_ok=True)
 
 
 # ============================================================
-# v10 CONSTANTS
+# v10 rev3 CONSTANTS
 # ============================================================
 
 # FIX 1: DH
-DH_TRACT_BYPASS_MS = 25
-DH_VOICED_FRACTION = 0.30
-DH_BYPASS_BP_LO    = 1800
-DH_BYPASS_BP_HI    = 6500
-DH_BYPASS_GAIN     = 0.35
+DH_TRACT_BYPASS_MS  = 25
+DH_VOICED_FRACTION  = 0.30
+DH_BYPASS_BP_LO     = 1800
+DH_BYPASS_BP_HI     = 6500
+DH_BYPASS_GAIN      = 0.35
+DH_BYPASS_ATK_MS    = 18    # rev3: was 5ms
+                             # Extended to remove
+                             # brush artifact.
 
 # FIX 2: H
-# LP lowered to 2500Hz (was 7000Hz).
-# Brings centroid into (800, 2500Hz) target.
-H_BYPASS_HP_HZ  = 200
-H_BYPASS_LP_HZ  = 2500   # rev2: was 7000
-H_BYPASS_GAIN   = 0.55
+H_BYPASS_HP_HZ      = 200
+H_BYPASS_LP_HZ      = 2500  # rev2: was 7000
+H_BYPASS_GAIN       = 0.55
+H_BYPASS_ATK_MS     = 18    # rev3: was 8ms
+                             # Extended to remove
+                             # brush artifact.
 
 # FIX 3: Z/ZH gain floors
 Z_BYPASS_GAIN_FLOOR  = 0.65
 ZH_BYPASS_GAIN_FLOOR = 0.40
+
+# FIX 4: Sibilant bypass relative level
+# S/Z bypass gain is computed as a fraction
+# of the concurrent voiced body RMS,
+# not as an absolute calibrated level.
+# This prevents the bypass from being
+# anomalously loud at the vowel boundary.
+#
+# SIBILANT_VOICED_RATIO:
+# bypass RMS = concurrent voiced RMS
+#              × SIBILANT_VOICED_RATIO
+# 0.80 = sibilant is slightly quieter
+# than the concurrent voiced signal.
+# This keeps the S/Z in the same
+# amplitude frame as the vowels.
+SIBILANT_VOICED_RATIO = 0.80
+
+# Which phonemes use relative scaling:
+RELATIVE_SCALE_PHS = {'S', 'Z', 'SH', 'ZH'}
+
+# FIX 5: Phrase normalization
+# Use 90th percentile of voiced segments
+# as normalization reference.
+# Prevents sibilant peaks from
+# compressing the voiced content.
+# If no voiced segments found,
+# fall back to 95th percentile of all.
+NORM_PERCENTILE       = 90
+NORM_TARGET           = 0.88
+
+# Vowels and voiced approximants
+# used to identify voiced segments
+# for normalization reference:
+VOWEL_SET = set(
+    'AA AE AH AO AW AY EH ER IH IY '
+    'OH OW OY UH UW L R W Y M N NG'
+    .split())
 
 
 # ============================================================
@@ -99,7 +161,8 @@ def _make_dh_bypass(n_s, sr=SR,
     DH bypass: bandpass 1800-6500Hz.
     Dental friction character.
     Centroid ~3000-4000Hz.
-    onset_delay=0: friction starts at t=0.
+    Attack extended to 18ms (was 5ms).
+    Removes brush artifact at onset.
     """
     n_s         = int(n_s)
     onset_delay = max(0, int(onset_delay))
@@ -131,12 +194,17 @@ def _make_dh_bypass(n_s, sr=SR,
     rel_ms = 20 if next_is_vowel else 8
     rel    = min(int(rel_ms / 1000.0 * sr),
                  n_eff // 4)
-    atk    = min(int(0.005 * sr), n_eff // 4)
+    # Extended attack
+    atk    = min(int(DH_BYPASS_ATK_MS
+                     / 1000.0 * sr),
+                 n_eff // 3)
     env    = f32(np.ones(n_eff))
     if atk > 0 and atk < n_eff:
-        env[:atk] = f32(np.linspace(0, 1, atk))
+        env[:atk] = f32(
+            np.linspace(0, 1, atk))
     if rel > 0:
-        env[-rel:] = f32(np.linspace(1, 0, rel))
+        env[-rel:] = f32(
+            np.linspace(1, 0, rel))
 
     raw = np.zeros(n_s, dtype=DTYPE)
     raw[onset_delay:] = f32(shaped * env)
@@ -148,26 +216,24 @@ def _make_h_bypass(n_s, sr=SR,
     """
     H bypass: broadband aspiration.
     HP(200Hz) + LP(2500Hz).
-    Centroid ~1350Hz.
-    Target: (800, 2500Hz). ✓
-    No resonators. No tract.
+    Centroid ~1350Hz. Target (800-2500Hz). ✓
+    Attack extended to 18ms (was 8ms).
+    Removes brush artifact at onset.
     """
     n_s   = int(n_s)
     noise = calibrate(
         f32(np.random.normal(0, 1, n_s)))
 
-    # HP: remove sub-bass
     try:
         b, a  = safe_hp(H_BYPASS_HP_HZ, sr)
         broad = f32(lfilter(b, a, noise))
     except:
         broad = noise.copy()
 
-    # LP: darken to aspiration character
-    # 2500Hz keeps centroid in mid range
     try:
         nyq   = sr * 0.5
-        wn    = min(H_BYPASS_LP_HZ / nyq, 0.98)
+        wn    = min(H_BYPASS_LP_HZ / nyq,
+                    0.98)
         b, a  = butter(2, wn, btype='low')
         broad = f32(lfilter(b, a, broad))
     except:
@@ -175,16 +241,20 @@ def _make_h_bypass(n_s, sr=SR,
 
     broad = calibrate(broad) * H_BYPASS_GAIN
 
-    atk_ms = 8
     rel_ms = 20 if next_is_vowel else 12
-    atk    = min(int(atk_ms / 1000.0 * sr),
-                 n_s // 4)
     rel    = min(int(rel_ms / 1000.0 * sr),
                  n_s // 4)
+    # Extended attack
+    atk    = min(int(H_BYPASS_ATK_MS
+                     / 1000.0 * sr),
+                 n_s // 3)
     env    = f32(np.ones(n_s))
     if atk > 0:
+        # Start at 0 (was 0.2).
+        # Full fade-in over 18ms.
+        # Smooth onset. No brush click.
         env[:atk] = f32(
-            np.linspace(0.2, 1.0, atk))
+            np.linspace(0.0, 1.0, atk))
     if rel > 0:
         env[-rel:] = f32(
             np.linspace(1.0, 0.0, rel))
@@ -194,11 +264,18 @@ def _make_h_bypass(n_s, sr=SR,
 
 def _make_bypass(ph, n_s, sr=SR,
                   next_is_vowel=False,
-                  onset_delay=0):
+                  onset_delay=0,
+                  voiced_rms=None):
     """
     General fricative bypass.
-    Routes DH to _make_dh_bypass.
-    FIX 3: Z/ZH gain floors applied here.
+    FIX 3: Z/ZH gain floors.
+    FIX 4: S/Z/SH/ZH use relative
+           scaling when voiced_rms
+           is provided.
+    voiced_rms: RMS of concurrent voiced
+                body segment. Used to
+                scale sibilant bypass
+                relative to voice level.
     """
     if ph == 'DH':
         return _make_dh_bypass(
@@ -249,8 +326,23 @@ def _make_bypass(ph, n_s, sr=SR,
             f32(np.random.normal(0, 1, n_eff)))
         res   = cavity_resonator(
             noise, cfg['fc'], cfg['bw'], sr=sr)
-        raw[onset_delay:] = _env(
-            calibrate(res) * g)
+        sib   = calibrate(res)
+
+        # FIX 4: relative scaling for S/Z/SH/ZH
+        if ph in RELATIVE_SCALE_PHS and \
+           voiced_rms is not None and \
+           voiced_rms > 1e-8:
+            # Scale to voiced_rms × ratio
+            sib_rms = float(np.sqrt(
+                np.mean(sib**2) + 1e-12))
+            if sib_rms > 1e-8:
+                target_rms = (voiced_rms *
+                               SIBILANT_VOICED_RATIO)
+                sib = sib * (target_rms / sib_rms)
+        else:
+            sib = sib * g
+
+        raw[onset_delay:] = _env(sib)
 
     elif ph in BROADBAND_CFG:
         cfg   = BROADBAND_CFG[ph]
@@ -263,8 +355,21 @@ def _make_bypass(ph, n_s, sr=SR,
             broad = f32(lfilter(b, a, noise))
         except:
             broad = noise.copy()
-        raw[onset_delay:] = _env(
-            calibrate(broad) * g)
+        sib = calibrate(broad)
+
+        if ph in RELATIVE_SCALE_PHS and \
+           voiced_rms is not None and \
+           voiced_rms > 1e-8:
+            sib_rms = float(np.sqrt(
+                np.mean(sib**2) + 1e-12))
+            if sib_rms > 1e-8:
+                target_rms = (voiced_rms *
+                               SIBILANT_VOICED_RATIO)
+                sib = sib * (target_rms / sib_rms)
+        else:
+            sib = sib * g
+
+        raw[onset_delay:] = _env(sib)
 
     return f32(raw)
 
@@ -275,9 +380,8 @@ def _make_bypass(ph, n_s, sr=SR,
 
 def _build_trajectories(phoneme_specs, sr=SR):
     """
-    H phonemes use NEUTRAL_F/B.
+    H uses NEUTRAL_F/B.
     Tract rests at neutral during H.
-    Following vowel starts from neutral.
     """
     patched = []
     for spec in phoneme_specs:
@@ -294,16 +398,20 @@ def _build_trajectories(phoneme_specs, sr=SR):
 
 
 # ============================================================
-# SOURCE BUILDER v10
+# SOURCE BUILDER v10 rev3
 # ============================================================
 
 def _build_source_and_bypass(
         phoneme_specs, sr=SR):
     """
-    v10: self-contained source builder.
-    FIX 1: DH — tract silent + shaped bypass.
-    FIX 2: H  — tract = 0, aspiration bypass.
-    FIX 3: Z  — gain floor in _make_bypass.
+    v10 rev3:
+    FIX 1: DH bypass attack = 18ms.
+    FIX 2: H bypass attack = 18ms.
+    FIX 3: Z/ZH gain floor in _make_bypass.
+    FIX 4: S/Z/SH/ZH bypass scaled
+           relative to voiced body RMS.
+           voiced_rms computed from the
+           preceding vowel body segment.
     """
     n_total = sum(
         s['n_s'] for s in phoneme_specs)
@@ -317,11 +425,13 @@ def _build_source_and_bypass(
         f0_this = spec.get('pitch', PITCH)
         oq_this = spec.get('oq', 0.65)
         f0_next = (
-            phoneme_specs[si+1].get('pitch', PITCH)
+            phoneme_specs[si+1]
+            .get('pitch', PITCH)
             if si < len(phoneme_specs)-1
             else f0_this)
         oq_next = (
-            phoneme_specs[si+1].get('oq', 0.65)
+            phoneme_specs[si+1]
+            .get('oq', 0.65)
             if si < len(phoneme_specs)-1
             else oq_this)
         f0_traj[pos:pos+n_s] = np.linspace(
@@ -380,6 +490,31 @@ def _build_source_and_bypass(
     n_dh_bypass  = int(
         DH_TRACT_BYPASS_MS / 1000.0 * sr)
 
+    # ── Pre-compute voiced RMS per phoneme ──
+    # Used for FIX 4: relative sibilant scaling.
+    # For each phoneme, compute the RMS of
+    # voiced_full in the phoneme body zone.
+    # The immediately preceding vowel's RMS
+    # is used as the reference for the
+    # following sibilant.
+    voiced_rms_per_spec = []
+    pos = 0
+    for spec in phoneme_specs:
+        n_s    = spec['n_s']
+        n_on_  = min(trans_n(
+            spec['ph'], sr), n_s // 3)
+        n_off_ = min(trans_n(
+            spec['ph'], sr), n_s // 3)
+        n_bod  = max(1,
+                     n_s - n_on_ - n_off_)
+        body_s = pos + n_on_
+        body_e = body_s + n_bod
+        v_seg  = voiced_full[body_s:body_e]
+        vrms   = float(np.sqrt(
+            np.mean(v_seg**2) + 1e-12))
+        voiced_rms_per_spec.append(vrms)
+        pos += n_s
+
     pos = 0
     for si, spec in enumerate(phoneme_specs):
         n_s   = spec['n_s']
@@ -395,30 +530,39 @@ def _build_source_and_bypass(
         next_is_vowel = (
             next_ph in VOWELS_AND_APPROX)
 
-        n_on   = min(trans_n(ph, sr), n_s // 3)
-        n_off  = min(trans_n(ph, sr), n_s // 3)
+        n_on   = min(trans_n(ph, sr),
+                     n_s // 3)
+        n_off  = min(trans_n(ph, sr),
+                     n_s // 3)
         n_body = max(0, n_s - n_on - n_off)
+
+        # FIX 4: get preceding voiced RMS
+        # for relative sibilant scaling.
+        prev_vrms = (
+            voiced_rms_per_spec[si-1]
+            if si > 0 else None)
 
         if stype == 'voiced':
             tract_source[s:e] = \
                 voiced_full[s:e]
 
         elif stype == 'h':
-            # FIX 2: tract source = 0.
-            # H entirely through aspiration bypass.
+            # Tract source = 0.
+            # H entirely through bypass.
             byp = _make_h_bypass(
                 n_s, sr,
                 next_is_vowel=next_is_vowel)
             bypass_segs.append((s, byp))
 
         elif stype == 'dh':
-            # FIX 1: tract silent at onset.
-            # Bypass (friction) at t=0.
-            # Voiced fades in after silence zone.
+            # Tract silent at onset.
+            # Bypass starts at t=0.
+            # Voiced fades in after silence.
             n_silent = min(n_dh_bypass, n_s)
             n_remain = n_s - n_silent
 
-            voiced_amp = np.zeros(n_s, dtype=DTYPE)
+            voiced_amp = np.zeros(
+                n_s, dtype=DTYPE)
             if n_remain > 0:
                 voiced_amp[n_silent:] = f32(
                     np.linspace(
@@ -444,7 +588,8 @@ def _build_source_and_bypass(
             byp = _make_bypass(
                 'DH', n_s, sr,
                 next_is_vowel=next_is_vowel,
-                onset_delay=0)
+                onset_delay=0,
+                voiced_rms=None)
             bypass_segs.append((s, byp))
 
         elif stype in ('fric_u', 'fric_v'):
@@ -462,10 +607,12 @@ def _build_source_and_bypass(
                     voiced_full[s:e] * \
                     f32(amp) * vf
 
+            # FIX 4: pass preceding voiced RMS
             byp = _make_bypass(
                 ph, n_s, sr,
                 next_is_vowel=next_is_vowel,
-                onset_delay=n_on)
+                onset_delay=n_on,
+                voiced_rms=prev_vrms)
             bypass_segs.append((s, byp))
 
         elif stype in ('stop_unvoiced',
@@ -501,7 +648,8 @@ def _build_source_and_bypass(
             vot_s = clos_n + burst_n
             vot_e = vot_s  + vot_n
             if vot_n > 0 and vot_e <= n_s:
-                ne2 = f32(np.linspace(1,0,vot_n))
+                ne2 = f32(np.linspace(
+                    1, 0, vot_n))
                 ve2 = 1.0 - ne2
                 tract_source[s+vot_s:s+vot_e] = (
                     noise_full[
@@ -519,7 +667,68 @@ def _build_source_and_bypass(
 
 
 # ============================================================
-# PHRASE SYNTHESIS v10
+# PHRASE NORMALIZATION v10 rev3
+#
+# FIX 5: normalize relative to vowel body,
+# not to the sibilant peak.
+# ============================================================
+
+def _normalize_phrase(signal, specs,
+                       prosody,
+                       sr=SR):
+    """
+    Normalize the phrase using the
+    NORM_PERCENTILE of the vowel/approximant
+    body segments.
+
+    This prevents S/Z sibilant peaks from
+    compressing the voiced content.
+
+    If no vowel segments found (e.g.
+    single consonant test), fall back to
+    NORM_PERCENTILE of the whole signal.
+    """
+    signal = f32(signal)
+
+    # Collect voiced body samples
+    vowel_samples = []
+    pos = 0
+    for item, spec in zip(prosody, specs):
+        n_s = spec['n_s']
+        ph  = spec['ph']
+        if ph in VOWEL_SET:
+            # Body zone only
+            n_on_  = min(trans_n(ph, sr),
+                         n_s // 3)
+            n_off_ = min(trans_n(ph, sr),
+                         n_s // 3)
+            n_bod  = max(1,
+                         n_s - n_on_ - n_off_)
+            body_s = pos + n_on_
+            body_e = body_s + n_bod
+            body_e = min(body_e, len(signal))
+            if body_e > body_s:
+                vowel_samples.append(
+                    np.abs(signal[
+                        body_s:body_e]))
+        pos += n_s
+
+    if vowel_samples:
+        all_v = np.concatenate(vowel_samples)
+        ref   = np.percentile(
+            all_v, NORM_PERCENTILE)
+    else:
+        ref = np.percentile(
+            np.abs(signal), NORM_PERCENTILE)
+
+    if ref > 1e-8:
+        signal = signal / ref * NORM_TARGET
+
+    return np.clip(signal, -1.0, 1.0)
+
+
+# ============================================================
+# PHRASE SYNTHESIS v10 rev3
 # ============================================================
 
 def synth_phrase(words_phonemes,
@@ -528,9 +737,11 @@ def synth_phrase(words_phonemes,
                   dil=DIL,
                   sr=SR):
     """
-    v10 synth_phrase. Self-contained.
-    Calls only _private functions.
-    No parent version involved.
+    v10 rev3:
+    FIX 1+2: DH/H bypass attack = 18ms.
+    FIX 3:   Z/ZH gain floor.
+    FIX 4:   S/Z bypass scaled to voice RMS.
+    FIX 5:   Normalize to vowel body RMS.
     """
     prosody = plan_prosody(
         words_phonemes,
@@ -616,6 +827,7 @@ def synth_phrase(words_phonemes,
                 out[pos+n_s-hg:pos+n_s] = 0.0
         pos += n_s
 
+    # Amplitude envelope from prosody
     amp_env = np.ones(n_total, dtype=DTYPE)
     pos = 0
     for item, spec in zip(prosody, specs):
@@ -634,6 +846,7 @@ def synth_phrase(words_phonemes,
             np.linspace(1, 0, rel))
     out = out * f32(amp_env) * env
 
+    # Rests
     segs_out = []
     pos = 0
     for item, spec in zip(prosody, specs):
@@ -647,10 +860,11 @@ def synth_phrase(words_phonemes,
         pos += n_s
 
     final = f32(np.concatenate(segs_out))
-    p95   = np.percentile(np.abs(final), 95)
-    if p95 > 1e-8:
-        final = final / p95 * 0.88
-    final = np.clip(final, -1.0, 1.0)
+
+    # FIX 5: normalize to vowel body RMS
+    final = _normalize_phrase(
+        final, specs, prosody, sr=sr)
+
     return final
 
 
@@ -694,20 +908,27 @@ if __name__ == "__main__":
     os.makedirs("output_play", exist_ok=True)
 
     print()
-    print("VOICE PHYSICS v10 rev2")
+    print("VOICE PHYSICS v10 rev3")
     print()
-    print("  H_BYPASS_LP_HZ: 7000 → 2500")
-    print("  H centroid target: (800, 2500Hz)")
-    print("  LP(2500) → centroid ~1350Hz ✓")
+    print("  FIX 1+2: DH/H bypass attack = 18ms")
+    print("    Was 5ms/8ms.")
+    print("    Removes brush/click at onset")
+    print("    of 'the' and 'here'.")
     print()
-    print("  DH rms_ratio target: 0.60 → 1.30")
-    print("  (updated in onset_diagnostic.py)")
-    print("  Onset=bypass, body=bypass+voiced.")
-    print("  Natural ratio ~1.0-1.1 is correct.")
+    print("  FIX 3: Z/ZH gain floor = 0.65/0.40")
+    print("    Z sibilance confirmed present.")
     print()
-    print("  Z gain floor: 0.65")
-    print("  Z effective gain confirmed: 0.65")
-    print("  Z timing: late ✓")
+    print("  FIX 4: S/Z bypass = voiced_rms × 0.80")
+    print("    Was: calibrated independently.")
+    print("    Now: scaled to preceding vowel.")
+    print("    waS and voiCE stay in amplitude")
+    print("    frame of the rest of the phrase.")
+    print()
+    print("  FIX 5: Normalize to vowel body RMS")
+    print("    Was: 95th percentile of all.")
+    print("    Now: 90th percentile of vowels.")
+    print("    Sibilant peaks no longer compress")
+    print("    the voiced content.")
     print("=" * 60)
     print()
 
@@ -754,16 +975,16 @@ if __name__ == "__main__":
     isolation = [
         ('test_the',
          [('the',   ['DH', 'AH'])],
-         'dental onset'),
+         'smooth onset, no brush'),
         ('test_here',
          [('here',  ['H', 'IH', 'R'])],
-         'breathy aspiration'),
+         'smooth aspiration, no brush'),
         ('test_was',
          [('was',   ['W', 'AH', 'Z'])],
-         'Z buzz'),
+         'Z in phrase amplitude frame'),
         ('test_voice',
          [('voice', ['V', 'OY', 'S'])],
-         'S after OY'),
+         'S in phrase amplitude frame'),
         ('test_this_is_here',
          [('this',  ['DH', 'IH', 'S']),
           ('is',    ['IH', 'Z']),
@@ -801,8 +1022,8 @@ if __name__ == "__main__":
         print(f"    the_voice_{label}.wav")
 
     print()
-    print("  Coverage phrases...")
-    coverage = [
+    print("  Coverage...")
+    for label, words, punct in [
         ('water_home',
          [('water', ['W', 'AA', 'T', 'ER']),
           ('home',  ['H', 'OW', 'M'])], '.'),
@@ -821,8 +1042,7 @@ if __name__ == "__main__":
                        'EH', 'Z']),
           ('open',   ['OH', 'P', 'EH',
                        'N'])], '.'),
-    ]
-    for label, words, punct in coverage:
+    ]:
         seg = synth_phrase(
             words, punctuation=punct,
             pitch_base=PITCH)
@@ -838,16 +1058,25 @@ if __name__ == "__main__":
     print()
     if n_pass + n_fail > 0:
         print(f"  Onset: {n_pass}/{n_pass+n_fail}")
-        if n_fail == 0:
-            print("  All passing.")
-        else:
-            print("  See diagnostic above.")
+    print()
+    print("  LISTEN IN ORDER:")
+    print("  afplay output_play/test_the.wav")
+    print("  → smooth dental onset?")
+    print("    no brush before 'the'?")
+    print()
+    print("  afplay output_play/test_here.wav")
+    print("  → smooth aspiration?")
+    print("    no brush before 'here'?")
+    print()
+    print("  afplay output_play/test_voice.wav")
+    print("  → S same level as OY?")
+    print("    no pop at end of 'voice'?")
+    print()
+    print("  afplay output_play/test_was.wav")
+    print("  → Z same level as AH?")
+    print("    no pop at end of 'was'?")
     print()
     print("  afplay output_play/"
           "the_voice_was_already_here.wav")
-    print()
-    print("  afplay output_play/test_the.wav")
-    print("  afplay output_play/test_here.wav")
-    print("  afplay output_play/test_was.wav")
-    print("  afplay output_play/test_voice.wav")
+    print("  → phrase continuous amplitude?")
     print()
