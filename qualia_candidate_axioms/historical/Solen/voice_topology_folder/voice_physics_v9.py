@@ -53,6 +53,17 @@ FIX 4: BYPASS ONSET DELAY FOR TRANSITIONS
   The sibilance arrives with the
   consonant, not before it.
 
+DATA CORRECTIONS (Feb 2026 audit):
+  plan_prosody: caller's explicit phonemes
+    now take priority over WORD_SYLLABLES.
+    Silent override that caused 'am'→'um'
+    is removed.
+  VOWELS_AND_APPROX: EY added.
+    Was missing — affected bypass logic
+    for any phoneme preceding EY.
+  __main__ phrases: IH→IY in 'here',
+    AO+L in 'already', throughout.
+
 Import chain:
   v9 → v8 → v7 → v6 → v5 → v4 → v3
 """
@@ -106,44 +117,17 @@ os.makedirs("output_play", exist_ok=True)
 # ============================================================
 
 DH_VOICED_FRACTION = 0.30
-# Was 0.70. Dental friction is identity.
-# Voicing confirms it is DH not TH.
-# But voicing must not dominate.
-
-DH_MAX_MS = 75
-# DH in function words is brief.
-# "the", "this", "that" —
-# the DH is a quick dental gesture.
-# 75ms is already generous at any tempo.
+DH_MAX_MS          = 75
 
 
 # ============================================================
 # FIX 2: H PURE ASPIRATION MODEL
 # ============================================================
 
-H_MAX_MS         = 75
-# H is a transitional glide.
-# It has no body to stretch.
-# 75ms is enough at any tempo.
-
-H_NOISE_FRACTION = 0.30
-# Fraction of H that is pure turbulence
-# (the aspirated onset).
-# Was 0.12. Raised so the breathy
-# character is clearly heard.
-
-# H modal voiced fraction:
+H_MAX_MS          = 75
+H_NOISE_FRACTION  = 0.30
 H_VOICED_FRACTION = 0.0
-# ZERO. H is never modal voiced.
-# The periodicity of the following vowel
-# begins at the vowel onset, not during H.
-# H = aspiration only.
-
 H_ASPIRATION_GAIN = 0.55
-# Amplitude of aspiration noise
-# relative to calibrated level.
-# Enough to be heard as breathy.
-# Not so loud it sounds like SH.
 
 
 # ============================================================
@@ -156,56 +140,43 @@ FINAL_FRIC_MAX_MS = {
     'F':  100, 'V':  100,
     'TH': 110, 'DH':  75,
 }
-# These are the caps for phonemes
-# that immediately precede a syntactic rest
-# (i.e. are word-final).
-# Internal sibilants keep the
-# existing FRIC_MAX_MS caps.
 
 
 # ============================================================
 # FIX 4: BYPASS ONSET DELAY
-#
-# Bypass was starting at t=0.
-# Tract was still at preceding vowel.
-# Vowel + sibilance = smear.
-#
-# Delay bypass by n_on // 2 samples.
-# This aligns bypass onset with
-# the midpoint of the tract transition.
-# The sibilance arrives WITH the
-# consonant articulation, not before it.
 # ============================================================
 
-# Phonemes that get onset delay
 BYPASS_ONSET_DELAY_PHS = {
     'S', 'Z', 'SH', 'ZH', 'F', 'V',
     'TH', 'DH',
 }
 
 
+# ============================================================
+# VOWELS AND APPROXIMANTS SET
+# Used by bypass logic to determine
+# whether the next phoneme is a vowel.
+# FIX: EY added — was missing.
+# ============================================================
+
+VOWELS_AND_APPROX = set(
+    'AA AE AH AO AW AY EH ER EY IH IY '
+    'OH OW OY UH UW L R W Y M N NG'.split()
+)
+
+
 def make_bypass_v9(ph, n_s, sr=SR,
                     next_is_vowel=False,
                     onset_delay=0):
-    """
-    v9 bypass generator.
-    Adds onset_delay: bypass starts
-    onset_delay samples into the phoneme.
-    The leading samples are zero.
-    Bypass reaches full level at
-    5ms after onset_delay.
-    """
     gains = get_calibrated_gains_v8(sr=sr)
     gain  = gains.get(ph, None)
 
-    n_s        = int(n_s)
+    n_s         = int(n_s)
     onset_delay = max(0, int(onset_delay))
     if onset_delay >= n_s:
         return f32(np.zeros(n_s))
 
-    # Effective segment length after delay
-    n_eff = n_s - onset_delay
-
+    n_eff   = n_s - onset_delay
     rel_ms  = 20 if next_is_vowel else 8
     rel     = min(int(rel_ms/1000.0*sr),
                   n_eff // 4)
@@ -254,29 +225,39 @@ def make_bypass_v9(ph, n_s, sr=SR,
 
 # ============================================================
 # PLAN PROSODY v9
-# Adds: DH cap, H cap, word-final fric cap.
+# FIX: caller's explicit phonemes take
+# priority over WORD_SYLLABLES.
 # ============================================================
 
 def plan_prosody(words_phonemes,
                   punctuation='.',
                   pitch_base=PITCH,
                   dil=DIL):
-    """
-    v9 prosody planner.
-    Adds DH_MAX_MS, H_MAX_MS caps.
-    Word-final sibilants capped at
-    FINAL_FRIC_MAX_MS values.
-    """
     flat = []
     for wi, (word, phonemes) in \
             enumerate(words_phonemes):
-        syl_map  = WORD_SYLLABLES.get(
-            word.lower(), [phonemes])
-        stress_p = STRESS_DICT.get(
-            word.lower(),
-            [1]*len(syl_map))
+
+        # FIX: if caller supplied phonemes,
+        # use them. Only fall back to
+        # WORD_SYLLABLES when phonemes is empty.
+        if phonemes:
+            syl_map  = [list(phonemes)]
+            stress_p = STRESS_DICT.get(
+                word.lower(), [1])
+            if not stress_p:
+                stress_p = [1]
+            stress_p = [stress_p[0]] * \
+                        len(syl_map)
+        else:
+            syl_map  = WORD_SYLLABLES.get(
+                word.lower(), [phonemes])
+            stress_p = STRESS_DICT.get(
+                word.lower(),
+                [1] * len(syl_map))
+
         while len(stress_p) < len(syl_map):
             stress_p.append(0)
+
         for si, syl in enumerate(syl_map):
             sv = (stress_p[si]
                   if si < len(stress_p)
@@ -299,7 +280,7 @@ def plan_prosody(words_phonemes,
         punctuation,
         BOUNDARY_TONE['default'])
 
-    # Identify word-final phoneme indices
+    # Word-final phoneme indices
     last_ph_of_word = {}
     for i, item in enumerate(flat):
         last_ph_of_word[
@@ -307,38 +288,33 @@ def plan_prosody(words_phonemes,
     word_final_indices = set(
         last_ph_of_word.values())
 
-    # First pass: durations with all caps
+    # First pass: durations
     for i, item in enumerate(flat):
-        ph  = item['ph']
-        sv  = item['stress']
-        d   = PHON_DUR_BASE.get(ph, 80)
-        d  *= DUR_SCALE.get(sv, 1.0)
-        d  *= dil
+        ph = item['ph']
+        sv = item['stress']
+        d  = PHON_DUR_BASE.get(ph, 80)
+        d *= DUR_SCALE.get(sv, 1.0)
+        d *= dil
 
-        is_word_final = (i in word_final_indices)
+        is_word_final = (i in
+                          word_final_indices)
         item['word_final'] = is_word_final
 
-        # FIX 2: H cap
         if ph == 'H':
             d = min(d, H_MAX_MS)
-        # FIX 1: DH cap
         elif ph == 'DH':
             d = min(d, DH_MAX_MS)
-        # FIX 3: word-final fric cap
         elif ph in FINAL_FRIC_MAX_MS \
                 and is_word_final:
             d = min(d, FINAL_FRIC_MAX_MS[ph])
-        # Standard fric cap (internal)
         elif ph in FRIC_MAX_MS:
             d = min(d, FRIC_MAX_MS[ph])
-        # Vowel caps
         elif ph in DIPHTHONG_PHONEMES:
             d = min(d, DIPHTHONG_MAX_MS.get(
                 sv, 360))
         elif ph in VOWEL_PHONEMES:
             d = min(d, VOWEL_MAX_MS.get(
                 sv, 300))
-        # Approximant / nasal caps
         elif ph in APPROX_MAX_MS:
             d = min(d, APPROX_MAX_MS[ph])
 
@@ -356,8 +332,8 @@ def plan_prosody(words_phonemes,
                 max(total_dur, 1.0)
 
         f0_global  = contour_fn(t_mid)
-        f0_local   = {2:1.08, 1:1.03}.get(
-            sv, 1.0)
+        f0_local   = {2:1.08,
+                       1:1.03}.get(sv, 1.0)
         f0_boundary = 1.0
         if t_mid > 0.80:
             bt_p = (t_mid - 0.80) / 0.20
@@ -379,7 +355,7 @@ def plan_prosody(words_phonemes,
             sv, 0.65)
         bw_stress = {2:0.75, 1:0.90,
                       0:1.10}.get(sv, 1.0)
-        bw_pos    = 1.0
+        bw_pos = 1.0
         if t_mid > 0.85:
             bw_pos = 1.0 + \
                 2.0*(t_mid-0.85)/0.15
@@ -390,8 +366,10 @@ def plan_prosody(words_phonemes,
     n_words = len(words_phonemes)
     for wi in range(n_words-1):
         last_idx = last_ph_of_word[wi]
-        w_this   = words_phonemes[wi][0].lower()
-        w_next   = words_phonemes[wi+1][0].lower()
+        w_this   = words_phonemes[wi][0]\
+                   .lower()
+        w_next   = words_phonemes[wi+1][0]\
+                   .lower()
         bond_key = (w_this, w_next)
         bond     = SYNTACTIC_BONDS.get(
             bond_key,
@@ -412,23 +390,13 @@ def plan_prosody(words_phonemes,
 
 # ============================================================
 # SOURCE BUILDER v9
-# FIX 1: DH voiced fraction 0.30
-# FIX 2: H = pure aspiration
-# FIX 4: bypass onset delay
 # ============================================================
 
 def build_source_and_bypass(
         phoneme_specs, sr=SR):
-    """
-    v9 source builder.
-    FIX 1: DH voiced fraction = 0.30.
-    FIX 2: H = pure aspiration, 0 modal voice.
-    FIX 4: bypass onset delayed by n_on//2.
-    """
     n_total = sum(
         s['n_s'] for s in phoneme_specs)
 
-    # F0 and oq trajectories
     f0_traj = np.zeros(n_total, dtype=DTYPE)
     oq_traj = np.zeros(n_total, dtype=DTYPE)
     pos = 0
@@ -450,7 +418,6 @@ def build_source_and_bypass(
             oq_this, oq_next, n_s)
         pos += n_s
 
-    # Rosenberg pulse voiced source
     T     = 1.0/sr
     raw_v = np.zeros(n_total, dtype=DTYPE)
     p     = 0.0
@@ -486,7 +453,6 @@ def build_source_and_bypass(
     raw_v       = raw_v + asp_src
     voiced_full = calibrate(raw_v)
 
-    # Aspiration noise source (for H)
     asp_noise = calibrate(
         f32(np.random.normal(0, 1, n_total)))
     try:
@@ -499,10 +465,6 @@ def build_source_and_bypass(
 
     noise_full = calibrate(
         f32(np.random.normal(0, 1, n_total)))
-
-    VOWELS_AND_APPROX = set(
-        'AA AE AH AO AW AY EH ER IH IY '
-        'OH OW OY UH UW L R W Y M N NG'.split())
 
     tract_source = np.zeros(
         n_total, dtype=DTYPE)
@@ -519,14 +481,17 @@ def build_source_and_bypass(
         next_ph = (phoneme_specs[si+1]['ph']
                    if si < len(phoneme_specs)-1
                    else None)
+        # FIX: use module-level
+        # VOWELS_AND_APPROX which includes EY
         next_is_vowel = (
             next_ph in VOWELS_AND_APPROX)
         is_word_final = spec.get(
             'word_final', False)
 
-        # Transition zone (for bypass delay)
-        n_on  = min(trans_n(ph, sr), n_s // 3)
-        n_off = min(trans_n(ph, sr), n_s // 3)
+        n_on   = min(trans_n(ph, sr),
+                     n_s // 3)
+        n_off  = min(trans_n(ph, sr),
+                     n_s // 3)
         n_body = n_s - n_on - n_off
 
         if stype == 'voiced':
@@ -534,48 +499,33 @@ def build_source_and_bypass(
                 voiced_full[s:e]
 
         elif stype == 'h':
-            # FIX 2: H = pure aspiration
-            # No modal voicing.
-            # Aspiration noise for full duration,
-            # shaped by following vowel formants
-            # via the tract.
-            n_asp = int(n_s * H_NOISE_FRACTION)
-            n_asp = max(n_asp, min(
-                int(0.025*sr), n_s))
-
-            # Full aspiration envelope
+            n_asp = max(
+                int(n_s * H_NOISE_FRACTION),
+                min(int(0.025*sr), n_s))
             asp_env = np.ones(n_s, dtype=DTYPE)
-            # Fade in over first 8ms
             n_fi = min(int(0.008*sr), n_s//4)
             if n_fi > 0:
                 asp_env[:n_fi] = np.linspace(
                     0.3, 1.0, n_fi)
-            # Fade out over last 12ms
             n_fo = min(int(0.012*sr), n_s//4)
             if n_fo > 0:
                 asp_env[-n_fo:] = np.linspace(
                     1.0, 0.0, n_fo)
-
-            # Pure aspiration: no modal voice
             tract_source[s:e] = (
                 asp_noise[s:e] *
                 f32(asp_env) *
                 H_ASPIRATION_GAIN)
 
         elif stype == 'dh':
-            # FIX 1: DH voiced fraction 0.30
-            # Fade voicing over n_off zone
             vf  = DH_VOICED_FRACTION
             amp = np.ones(n_s, dtype=DTYPE)
             if n_off > 0 and n_body > 0:
                 amp[n_body + n_on:] = f32(
-                    np.linspace(1.0, 0.0,
-                                 n_off))
+                    np.linspace(
+                        1.0, 0.0, n_off))
             tract_source[s:e] = \
                 voiced_full[s:e] * \
                 f32(amp) * vf
-
-            # FIX 4: bypass onset delay
             onset_delay = n_on // 2
             byp = make_bypass_v9(
                 'DH', n_s, sr,
@@ -595,11 +545,6 @@ def build_source_and_bypass(
                 tract_source[s:e] = \
                     voiced_full[s:e] * \
                     f32(amp) * vf
-
-            # FIX 4: bypass onset delay
-            # Delay = half the transition time.
-            # Bypass starts when tract is
-            # 50% of the way to fricative position.
             onset_delay = n_on // 2
             byp = make_bypass_v9(
                 ph, n_s, sr,
@@ -630,9 +575,10 @@ def build_source_and_bypass(
                     burst = noise_full[
                         s+bs:s+be].copy()
                     try:
-                        b, a = safe_hp(bhp, sr)
-                        burst = f32(
-                            lfilter(b, a, burst))
+                        b, a = safe_hp(
+                            bhp, sr)
+                        burst = f32(lfilter(
+                            b, a, burst))
                     except:
                         pass
                     benv = f32(np.exp(
@@ -665,9 +611,6 @@ def build_source_and_bypass(
 
 # ============================================================
 # PH SPEC v9
-# Passes word_final flag into spec
-# so trajectory builder and source
-# builder can use it.
 # ============================================================
 
 def ph_spec_v9(ph, dur_ms,
@@ -677,11 +620,6 @@ def ph_spec_v9(ph, dur_ms,
                 rest_ms=0.0,
                 word_final=False,
                 sr=SR):
-    """
-    v9 phoneme spec.
-    Adds word_final flag for
-    bypass onset and duration decisions.
-    """
     spec = ph_spec_v7(
         ph, dur_ms,
         pitch=pitch, oq=oq,
@@ -702,13 +640,6 @@ def synth_phrase(words_phonemes,
                   pitch_base=PITCH,
                   dil=DIL,
                   sr=SR):
-    """
-    v9: All fixes active.
-      FIX 1: DH voiced fraction 0.30.
-      FIX 2: H = pure aspiration.
-      FIX 3: Word-final sibilant cap 120ms.
-      FIX 4: Bypass onset delayed by n_on//2.
-    """
     prosody = plan_prosody(
         words_phonemes,
         punctuation=punctuation,
@@ -723,11 +654,13 @@ def synth_phrase(words_phonemes,
     for i, item in enumerate(prosody):
         ph         = item['ph']
         dur_ms     = item['dur_ms']
-        pitch_     = pitch_base * item['f0_mult']
+        pitch_     = pitch_base * \
+                     item['f0_mult']
         oq_        = item['oq']
         bw_m       = item['bw_mult']
         amp_       = item['amp']
-        rest_ms    = item.get('rest_ms', 0.0)
+        rest_ms    = item.get(
+            'rest_ms', 0.0)
         word_final = item.get(
             'word_final', False)
         next_ph    = (prosody[i+1]['ph']
@@ -745,10 +678,12 @@ def synth_phrase(words_phonemes,
 
     F_full, B_full, _ = \
         build_trajectories(specs, sr=sr)
-    n_total = sum(s['n_s'] for s in specs)
+    n_total = sum(
+        s['n_s'] for s in specs)
 
     tract_src, bypass_segs = \
-        build_source_and_bypass(specs, sr=sr)
+        build_source_and_bypass(
+            specs, sr=sr)
 
     out, _ = tract(
         tract_src, F_full, B_full,
@@ -759,7 +694,6 @@ def synth_phrase(words_phonemes,
         n = e - pos
         out[pos:e] += byp[:n]
 
-    # Nasal antiformants
     T = 1.0/sr
     NASAL_AF = {
         'M':  (1000, 300),
@@ -780,7 +714,7 @@ def synth_phrase(words_phonemes,
                 a2 = -np.exp(
                     -2*np.pi*abw*T)
                 a1 =  2*np.exp(
-                    -np.pi*abw*T)*\
+                    -np.pi*abw*T) * \
                     np.cos(2*np.pi*af*T)
                 b0 = 1.0-a1-a2
                 y  = b0*float(seg[i]) + \
@@ -827,7 +761,8 @@ def synth_phrase(words_phonemes,
         pos += n_s
 
     final = f32(np.concatenate(segs_out))
-    p95   = np.percentile(np.abs(final), 95)
+    p95   = np.percentile(
+        np.abs(final), 95)
     if p95 > 1e-8:
         final = final / p95 * 0.88
     final = np.clip(final, -1.0, 1.0)
@@ -876,42 +811,37 @@ if __name__ == "__main__":
     print()
     print("  FIX 1: DH voiced fraction 0.70→0.30")
     print("         DH max 75ms.")
-    print("         Dental friction is identity.")
-    print("         Voicing is secondary.")
-    print()
     print("  FIX 2: H = pure aspiration")
     print("         Zero modal voicing during H.")
     print("         H max 75ms.")
-    print("         Breathiness is identity.")
-    print()
     print("  FIX 3: Word-final sibilant cap 120ms")
-    print("         S/Z before rest: max 120ms.")
-    print("         Sibilant ends. Rest begins.")
-    print("         No trailing hiss.")
+    print("  FIX 4: Bypass onset delay n_on//2")
     print()
-    print("  FIX 4: Bypass onset delay")
-    print("         Bypass starts at n_on//2.")
-    print("         Tract halfway to fricative")
-    print("         before sibilance begins.")
-    print("         No vowel+hiss smear.")
-    print("="*60)
+    print("  DATA FIXES:")
+    print("  plan_prosody: caller phonemes")
+    print("    take priority over WORD_SYLLABLES")
+    print("  VOWELS_AND_APPROX: EY added")
+    print("  __main__: IH→IY in 'here',")
+    print("    AO+L in 'already'")
+    print("=" * 60)
     print()
 
-    # Calibrate gains
     print("  Calibrating gains...")
     recalibrate_gains_v8(sr=SR)
     print()
 
-    # Primary diagnostic phrase
-    print("  Primary phrase...")
+    # ── primary phrase ─────────────────
+    # FIX: IY in 'here', AO+L in 'already'
     PHRASE = [
         ('the',     ['DH', 'AH']),
         ('voice',   ['V',  'OY', 'S']),
         ('was',     ['W',  'AH', 'Z']),
-        ('already', ['AA', 'L',  'R',
+        ('already', ['AO', 'L',  'R',
                       'EH', 'D', 'IY']),
-        ('here',    ['H',  'IH', 'R']),
+        ('here',    ['H',  'IY', 'R']),  # FIX
     ]
+
+    print("  Primary phrase...")
     seg = synth_phrase(
         PHRASE, punctuation='.',
         pitch_base=PITCH)
@@ -921,12 +851,10 @@ if __name__ == "__main__":
         apply_room(seg, rt60=1.5, dr=0.50))
     print("    the_voice_was_already_here.wav")
 
-    # Targeted isolation tests
-    # These test exactly the four reported problems.
+    # ── isolation tests ────────────────
     print()
     print("  Isolation tests...")
 
-    # Test 1: "the" — should not have "ea" prefix
     seg = synth_phrase(
         [('the', ['DH', 'AH'])],
         pitch_base=PITCH)
@@ -934,21 +862,18 @@ if __name__ == "__main__":
         "output_play/test_the.wav",
         apply_room(seg, rt60=1.2, dr=0.55))
     print("    test_the.wav")
-    print("    → should be: clean 'the'")
-    print("      NOT: 'ea-the'")
+    print("    → clean 'the', no 'ea' prefix")
 
-    # Test 2: "here" — no CH prefix
+    # FIX: IY not IH
     seg = synth_phrase(
-        [('here', ['H', 'IH', 'R'])],
+        [('here', ['H', 'IY', 'R'])],
         pitch_base=PITCH)
     write_wav(
         "output_play/test_here.wav",
         apply_room(seg, rt60=1.2, dr=0.55))
     print("    test_here.wav")
-    print("    → should be: breathy 'here'")
-    print("      NOT: 'CH-here'")
+    print("    → breathy 'here', no CH prefix")
 
-    # Test 3: "was" — Z ends cleanly
     seg = synth_phrase(
         [('was', ['W', 'AH', 'Z'])],
         pitch_base=PITCH)
@@ -956,10 +881,8 @@ if __name__ == "__main__":
         "output_play/test_was.wav",
         apply_room(seg, rt60=1.2, dr=0.55))
     print("    test_was.wav")
-    print("    → Z should end at the vowel boundary")
-    print("      NOT: dragged out separately")
+    print("    → Z ends at vowel boundary")
 
-    # Test 4: "voice" — S ends cleanly
     seg = synth_phrase(
         [('voice', ['V', 'OY', 'S'])],
         pitch_base=PITCH)
@@ -967,10 +890,9 @@ if __name__ == "__main__":
         "output_play/test_voice.wav",
         apply_room(seg, rt60=1.2, dr=0.55))
     print("    test_voice.wav")
-    print("    → S should follow OY naturally")
-    print("      NOT: announced or separated")
+    print("    → S follows OY naturally")
 
-    # Full phrase variants
+    # ── sentence types ─────────────────
     print()
     print("  Sentence types...")
     for punct, label in [
@@ -981,34 +903,46 @@ if __name__ == "__main__":
             PHRASE, punctuation=punct,
             pitch_base=PITCH)
         write_wav(
-            f"output_play/the_voice_{label}.wav",
+            f"output_play/"
+            f"the_voice_{label}.wav",
             apply_room(
                 seg, rt60=1.5, dr=0.50))
         print(f"    the_voice_{label}.wav")
 
-    # Additional phrases covering DH and H
+    # ── additional phrases ───────────���─
+    # FIX: IY in 'here' throughout
     print()
     print("  DH and H phrase tests...")
     for label, words, punct in [
         ('this_is_here',
          [('this', ['DH', 'IH', 'S']),
           ('is',   ['IH', 'Z']),
-          ('here', ['H',  'IH', 'R'])], '.'),
+          ('here', ['H',  'IY', 'R'])],   # FIX
+         '.'),
         ('that_was_always',
          [('that',   ['DH', 'AE', 'T']),
           ('was',    ['W',  'AH', 'Z']),
-          ('always', ['AA', 'L',  'W',
-                       'EH', 'Z'])], '.'),
+          ('always', ['AO', 'L',  'W',
+                       'EY', 'Z'])],       # FIX: AO, EY
+         '.'),
         ('here_and_there',
-         [('here',  ['H',  'IH', 'R']),
+         [('here',  ['H',  'IY', 'R']),   # FIX
           ('and',   ['AE', 'N',  'D']),
-          ('there', ['DH', 'EH', 'R'])], '.'),
+          ('there', ['DH', 'EH', 'R'])],
+         '.'),
         ('still_here',
          [('still', ['S', 'T', 'IH', 'L']),
-          ('here',  ['H', 'IH', 'R'])], '.'),
+          ('here',  ['H', 'IY', 'R'])],   # FIX
+         '.'),
         ('water_home',
          [('water', ['W', 'AA', 'T', 'ER']),
-          ('home',  ['H', 'OW', 'M'])], '.'),
+          ('home',  ['H', 'OW', 'M'])],
+         '.'),
+        ('i_am_here',
+         [('i',    ['AY']),
+          ('am',   ['AE', 'M']),
+          ('here', ['H',  'IY', 'R'])],   # FIX
+         '.'),
     ]:
         seg = synth_phrase(
             words, punctuation=punct,
@@ -1020,7 +954,7 @@ if __name__ == "__main__":
         print(f"    phrase_{label}.wav")
 
     print()
-    print("="*60)
+    print("=" * 60)
     print()
     print("  START HERE:")
     print("  afplay output_play/"
@@ -1032,24 +966,7 @@ if __name__ == "__main__":
     print("  afplay output_play/test_was.wav")
     print("  afplay output_play/test_voice.wav")
     print()
-    print("  WHAT TO LISTEN FOR:")
-    print()
-    print("  test_the.wav:")
-    print("    Starts immediately with dental.")
-    print("    No vowel before the DH.")
-    print()
-    print("  test_here.wav:")
-    print("    Breathy onset directly into IH.")
-    print("    Like a whispered 'here'.")
-    print("    No affricate prefix.")
-    print()
-    print("  test_was.wav:")
-    print("    W→AH→Z as one continuous word.")
-    print("    Z ends where the vowel ends.")
-    print("    Not separately announced.")
-    print()
-    print("  test_voice.wav:")
-    print("    V→OY→S as one continuous word.")
-    print("    S follows OY naturally.")
-    print("    Not announced as a separate event.")
+    print("  NEW:")
+    print("  afplay output_play/"
+          "phrase_i_am_here.wav")
     print()
