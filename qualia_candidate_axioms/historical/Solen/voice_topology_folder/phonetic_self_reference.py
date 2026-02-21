@@ -1875,3 +1875,39 @@ if __name__ == "__main__":
         sr=ENGINE_SR)
     results = psr.run_all(
         synth_fn, verbose=True)
+
+
+
+# ============================================================
+# BACKWARD COMPATIBILITY
+#
+# voice_physics_v4 (and any earlier version
+# in the import chain) imports check_phoneme
+# from this module.
+#
+# v2 renamed it to check_phoneme_l1 to
+# clarify which level it belongs to.
+#
+# This alias restores the old name so the
+# v4 → v5 → v6 → v7 → v8 → ... → v17
+# import chain does not break.
+#
+# Do not remove.
+# Do not change check_phoneme_l1.
+# ============================================================
+
+def check_phoneme(ph, seg, sr=SR,
+                   verbose=True):
+    """
+    Backward-compatible alias for
+    check_phoneme_l1().
+
+    Used by voice_physics_v4 and the
+    full import chain below it.
+    Level 1 acoustic identity check only.
+
+    For the full three-level check,
+    use PhoneticSelfRef.run_all().
+    """
+    return check_phoneme_l1(
+        ph, seg, sr=sr, verbose=verbose)
