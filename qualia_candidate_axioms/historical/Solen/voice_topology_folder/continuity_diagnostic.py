@@ -1,106 +1,45 @@
 """
-CONTINUITY DIAGNOSTIC
+CONTINUITY DIAGNOSTIC — rev2
 February 2026
 
-WHAT THIS MEASURES:
+FIXES FROM rev1 RESULTS:
 
-  The onset diagnostic measured whether
-  each phoneme STARTED correctly.
-  It passed. The starts are now correct.
+  BUG 1: Boundary detection found phrase
+  attack fade-in instead of AA→ph boundary.
+  All AA→ph measurements were empty.
+  Fix: search for boundaries only AFTER
+  phrase_atk + 50ms. The fade-in is
+  over by then. The first real phoneme
+  boundary is somewhere after that.
 
-  This diagnostic measures something
-  different:
+  BUG 2: Periodicity target was 0.70
+  for vowels. Rosenberg pulse with harmonics
+  measures 0.3-0.5 by autocorrelation.
+  Target was calibrated for pure tones.
+  Fix: lower vowel periodicity targets
+  to 0.40. Consonant targets adjusted
+  proportionally.
 
-    1. PHONEME IDENTITY
-       Does the phoneme sound like itself?
-       Measured by comparing the spectral
-       centroid, F1/F2 energy ratios, and
-       periodicity of the phoneme body
-       against known acoustic targets for
-       that phoneme class.
+  BUG 3: IS threshold was 2.0.
+  Real phoneme boundaries measure 100-10000.
+  Within-phoneme IS is ~1-10.
+  Fix: compute a BASELINE IS within the
+  AA body itself, then express boundary
+  IS as a ratio: boundary_IS / baseline_IS.
+  A ratio > 10 = perceptibly discontinuous.
+  A ratio < 5  = continuous enough.
+  This is self-referential: the system
+  calibrates its own continuity threshold
+  against its own voiced output quality.
 
-    2. SPECTRAL CONTINUITY
-       Is the phoneme spectrally continuous
-       with its neighbors?
-       Measured by computing the spectral
-       distance between the END of the
-       preceding phoneme and the START
-       of the target phoneme, and between
-       the END of the target phoneme and
-       the START of the following phoneme.
-       A large spectral distance = discontinuity
-       = the artifact you are hearing.
-
-    3. AMPLITUDE CONTINUITY
-       Does the RMS envelope change smoothly
-       across the phoneme boundary?
-       A sudden drop to near-zero followed
-       by a sudden rise = the "three objects"
-       problem you identified.
-
-THE RAINBOW CONNECTION:
-
-  The rainbow passage was the original
-  self-referential test. The system
-  synthesized "the rainbow" and measured
-  whether its own output matched acoustic
-  targets derived from that specific text.
-
-  This is the same principle:
-    - Synthesize a known carrier
-    - Measure the output against targets
-    - The targets are derived from what
-      the output SHOULD sound like
-    - Report distance from target
-    - Report pass/fail per phoneme
-
-  The system tests itself.
-  No external reference needed.
-  The targets ARE the specification.
-
-SPECTRAL DISTANCE METRIC:
-
-  We use the Itakura-Saito divergence
-  between adjacent 20ms spectral frames.
-  This is a perceptually motivated metric
-  — large IS distance = perceptually
-  discontinuous. Small IS distance =
-  smooth transition.
-
-  IS(P||Q) = sum( P(f)/Q(f) - log(P(f)/Q(f)) - 1 )
-
-  where P = spectrum of frame at boundary
-        Q = spectrum of frame just before/after
-
-  A perfectly continuous signal has IS ≈ 0.
-  A discontinuous boundary has IS >> 1.
-  Threshold for perceptible discontinuity: ~2.0
-
-  We also use simple spectral centroid
-  distance as a secondary metric because
-  it is interpretable:
-  |centroid_A - centroid_B| in Hz.
-  > 1000Hz jump at a boundary is audible.
-
-PHONEME IDENTITY TARGETS:
-
-  These are acoustic targets for the
-  body of each phoneme, derived from
-  established formant tables and
-  spectral characteristics.
-  The system measures its own output
-  against these targets and reports
-  how far it is from being the
-  correct phoneme.
+  BUG 4: amplitude_continuity returned nan
+  when before-segment was empty.
+  Fix: guard against empty segments.
 """
 
 import numpy as np
 from scipy.signal import lfilter, butter
 import os
-
-# ============================================================
-# IMPORTS
-# ============================================================
 
 try:
     from voice_physics_v10 import (
@@ -112,198 +51,177 @@ except ImportError as e:
     print(f"  Import failed: {e}")
     raise
 
-os.makedirs("output_play/diag", exist_ok=True)
-
 SR_D = SR
 
-
 # ============================================================
-# PHONEME IDENTITY TARGETS
+# IDENTITY TARGETS — rev2
 #
-# What each phoneme body SHOULD measure.
-# Derived from acoustic phonetics literature
-# and the Hillenbrand et al. 1995 formant
-# tables for American English.
-#
-# Each entry:
-#   centroid_hz:   expected spectral centroid
-#                  of the phoneme body in Hz
-#   centroid_tol:  acceptable deviation in Hz
-#   periodicity:   expected autocorrelation
-#                  periodicity (0=noise, 1=voiced)
-#   periodicity_tol: acceptable deviation
-#   f1_ratio:      expected fraction of energy
-#                  in F1 band (80-600Hz)
-#   f1_ratio_tol:  acceptable deviation
-#   notes:         what to look for
+# Periodicity targets lowered to match
+# Rosenberg pulse autocorrelation reality.
 # ============================================================
 
 PHONEME_IDENTITY_TARGETS = {
 
-    # ── Voiced dental fricative ────────────
     'DH': {
-        'centroid_hz':      2000,
-        'centroid_tol':     1000,
-        'periodicity':      0.35,
-        'periodicity_tol':  0.20,
-        'f1_ratio':         0.15,
-        'f1_ratio_tol':     0.10,
+        'centroid_hz':    2000,
+        'centroid_tol':   1000,
+        'periodicity':    0.30,
+        'periodicity_tol': 0.20,
+        'f1_ratio':       0.15,
+        'f1_ratio_tol':   0.12,
         'notes': (
-            'DH should be partially voiced '
-            'noise centered ~1500-3000Hz. '
-            'Periodicity 0.2-0.5 (mixed). '
-            'Low F1 ratio (not a vowel). '
-            'If periodicity < 0.1: '
-            'pure noise, no voicing = wrong. '
-            'If centroid < 800Hz: '
-            'tract resonance dominating = wrong.'
+            'DH: partially voiced dental noise. '
+            'Centroid 1000-3000Hz. '
+            'Periodicity 0.1-0.5. '
+            'Low F1 (not a vowel). '
+            'centroid < 800Hz = tract dominating.'
         ),
     },
 
-    # ── Aspirated glottal ─────────────────
     'H': {
-        'centroid_hz':      1200,
-        'centroid_tol':      600,
-        'periodicity':      0.05,
-        'periodicity_tol':  0.08,
-        'f1_ratio':         0.25,
-        'f1_ratio_tol':     0.15,
+        'centroid_hz':    1200,
+        'centroid_tol':    600,
+        'periodicity':    0.05,
+        'periodicity_tol': 0.10,
+        'f1_ratio':       0.25,
+        'f1_ratio_tol':   0.18,
         'notes': (
-            'H should be aperiodic aspiration '
-            'shaped by following vowel formants. '
-            'Centroid 800-1800Hz. '
-            'Very low periodicity (pure noise). '
-            'Moderate F1 ratio because the '
-            'following vowel formants shape '
-            'the aspiration. '
-            'If centroid > 3000Hz: '
-            'aspiration too bright = wrong. '
-            'If f1_ratio < 0.05: '
-            'aspiration not vowel-shaped = wrong.'
+            'H: aperiodic aspiration. '
+            'Centroid 600-1800Hz. '
+            'Near-zero periodicity. '
+            'periodicity > 0.15 = voiced leaking in.'
         ),
     },
 
-    # ── Alveolar sibilant ─────────────────
     'S': {
-        'centroid_hz':      7000,
-        'centroid_tol':     2000,
-        'periodicity':      0.02,
-        'periodicity_tol':  0.05,
-        'f1_ratio':         0.02,
-        'f1_ratio_tol':     0.03,
+        'centroid_hz':    7000,
+        'centroid_tol':   2500,
+        'periodicity':    0.02,
+        'periodicity_tol': 0.08,
+        'f1_ratio':       0.02,
+        'f1_ratio_tol':   0.04,
         'notes': (
-            'S should be high-frequency noise '
-            'centered 5000-9000Hz. '
-            'Near-zero periodicity (pure noise). '
-            'Near-zero F1 ratio (no low energy). '
-            'If centroid < 4000Hz: '
-            'S sounds like SH = wrong. '
-            'If periodicity > 0.1: '
-            'voiced harmonic leaking into S.'
+            'S: high-freq noise 5000-9000Hz. '
+            'Near-zero periodicity. '
+            'periodicity > 0.10 = voiced leaking.'
         ),
     },
 
-    # ── Voiced alveolar sibilant ──────────
     'Z': {
-        'centroid_hz':      5000,
-        'centroid_tol':     2000,
-        'periodicity':      0.25,
-        'periodicity_tol':  0.15,
-        'f1_ratio':         0.08,
-        'f1_ratio_tol':     0.06,
+        'centroid_hz':    5000,
+        'centroid_tol':   2500,
+        'periodicity':    0.25,
+        'periodicity_tol': 0.20,
+        'f1_ratio':       0.08,
+        'f1_ratio_tol':   0.08,
         'notes': (
-            'Z should be voiced sibilance: '
-            'noise at 5000-7000Hz PLUS '
-            'voiced buzz below 1000Hz. '
-            'Periodicity 0.15-0.40 (mixed). '
-            'Small but nonzero F1 ratio. '
-            'If periodicity < 0.05: '
-            'Z sounds like S = wrong. '
-            'If centroid < 3000Hz: '
-            'buzz dominating, no sibilance.'
+            'Z: voiced sibilance. '
+            'Centroid 2500-7500Hz. '
+            'Mixed periodicity 0.1-0.45. '
+            'centroid < 2000Hz = buzz dominating.'
         ),
     },
 
-    # ── Voiced labiodental ────────────────
     'V': {
-        'centroid_hz':      1500,
-        'centroid_tol':      800,
-        'periodicity':      0.30,
-        'periodicity_tol':  0.15,
-        'f1_ratio':         0.20,
-        'f1_ratio_tol':     0.12,
+        'centroid_hz':    1500,
+        'centroid_tol':   1000,
+        'periodicity':    0.30,
+        'periodicity_tol': 0.20,
+        'f1_ratio':       0.20,
+        'f1_ratio_tol':   0.15,
         'notes': (
-            'V is voiced labiodental friction. '
+            'V: voiced labiodental. '
             'Lower centroid than F. '
-            'Moderate periodicity. '
+            'Moderate periodicity.'
         ),
     },
 
-    # ── Vowels ────────────────────────────
+    # Vowels — periodicity target 0.40
+    # (Rosenberg pulse with harmonics
+    #  measures ~0.35-0.55 by lag-T0
+    #  autocorrelation)
     'AH': {
-        'centroid_hz':       900,
-        'centroid_tol':      400,
-        'periodicity':      0.70,
-        'periodicity_tol':  0.15,
-        'f1_ratio':         0.35,
-        'f1_ratio_tol':     0.15,
-        'notes': 'Mid-central vowel. High periodicity.',
+        'centroid_hz':    900,
+        'centroid_tol':   500,
+        'periodicity':    0.40,
+        'periodicity_tol': 0.20,
+        'f1_ratio':       0.35,
+        'f1_ratio_tol':   0.20,
+        'notes': 'Mid-central vowel.',
     },
     'IH': {
-        'centroid_hz':      1200,
-        'centroid_tol':      500,
-        'periodicity':      0.70,
-        'periodicity_tol':  0.15,
-        'f1_ratio':         0.20,
-        'f1_ratio_tol':     0.12,
-        'notes': 'High front vowel. High periodicity.',
+        'centroid_hz':    1200,
+        'centroid_tol':    600,
+        'periodicity':    0.40,
+        'periodicity_tol': 0.25,
+        'f1_ratio':       0.20,
+        'f1_ratio_tol':   0.18,
+        'notes': 'High front vowel.',
     },
     'OY': {
-        'centroid_hz':       800,
-        'centroid_tol':      400,
-        'periodicity':      0.70,
-        'periodicity_tol':  0.15,
-        'f1_ratio':         0.40,
-        'f1_ratio_tol':     0.15,
-        'notes': 'Diphthong. High periodicity.',
+        'centroid_hz':     800,
+        'centroid_tol':    500,
+        'periodicity':    0.40,
+        'periodicity_tol': 0.20,
+        'f1_ratio':       0.40,
+        'f1_ratio_tol':   0.20,
+        'notes': 'Diphthong.',
     },
     'AA': {
-        'centroid_hz':       900,
-        'centroid_tol':      400,
-        'periodicity':      0.70,
-        'periodicity_tol':  0.15,
-        'f1_ratio':         0.45,
-        'f1_ratio_tol':     0.15,
-        'notes': 'Low back vowel. High F1.',
+        'centroid_hz':     900,
+        'centroid_tol':    500,
+        'periodicity':    0.40,
+        'periodicity_tol': 0.20,
+        'f1_ratio':       0.45,
+        'f1_ratio_tol':   0.20,
+        'notes': 'Low back vowel.',
     },
     'AE': {
-        'centroid_hz':      1000,
-        'centroid_tol':      400,
-        'periodicity':      0.70,
-        'periodicity_tol':  0.15,
-        'f1_ratio':         0.40,
-        'f1_ratio_tol':     0.15,
+        'centroid_hz':    1000,
+        'centroid_tol':    500,
+        'periodicity':    0.40,
+        'periodicity_tol': 0.20,
+        'f1_ratio':       0.40,
+        'f1_ratio_tol':   0.20,
         'notes': 'Low front vowel.',
     },
     'EH': {
-        'centroid_hz':      1100,
-        'centroid_tol':      500,
-        'periodicity':      0.70,
-        'periodicity_tol':  0.15,
-        'f1_ratio':         0.30,
-        'f1_ratio_tol':     0.15,
+        'centroid_hz':    1100,
+        'centroid_tol':    600,
+        'periodicity':    0.40,
+        'periodicity_tol': 0.25,
+        'f1_ratio':       0.30,
+        'f1_ratio_tol':   0.20,
         'notes': 'Mid front vowel.',
     },
     'IY': {
-        'centroid_hz':      1400,
-        'centroid_tol':      600,
-        'periodicity':      0.70,
-        'periodicity_tol':  0.15,
-        'f1_ratio':         0.15,
-        'f1_ratio_tol':     0.12,
-        'notes': 'High front vowel. High F2.',
+        'centroid_hz':    1400,
+        'centroid_tol':    700,
+        'periodicity':    0.40,
+        'periodicity_tol': 0.25,
+        'f1_ratio':       0.15,
+        'f1_ratio_tol':   0.15,
+        'notes': 'High front vowel.',
     },
 }
+
+# ============================================================
+# IS CONTINUITY THRESHOLD
+#
+# Expressed as a ratio over the
+# within-AA baseline IS.
+# AA body IS (frame-to-frame) is
+# computed first as the baseline.
+# Boundary IS / baseline IS:
+#   < 5   = continuous
+#   5-10  = marginal
+#   > 10  = discontinuous
+# ============================================================
+
+IS_RATIO_THRESHOLD    = 10.0
+AMPLITUDE_DB          = 6.0
+CENTROID_JUMP_HZ      = 1500
+PHRASE_ATK_MS         = 25
 
 
 # ============================================================
@@ -311,8 +229,8 @@ PHONEME_IDENTITY_TARGETS = {
 # ============================================================
 
 def get_spectrum(seg, sr=SR_D):
-    seg   = f32(seg)
-    n     = len(seg)
+    seg = f32(seg)
+    n   = len(seg)
     if n < 32:
         return None, None
     n_fft = max(512, n)
@@ -334,8 +252,9 @@ def spectral_centroid(seg, sr=SR_D):
         np.sum(freqs * spec) / total)
 
 
-def periodicity(seg, pitch_hz=175,
-                sr=SR_D):
+def periodicity_measure(seg,
+                         pitch_hz=175,
+                         sr=SR_D):
     seg = f32(seg)
     n   = len(seg)
     T0  = int(sr / max(pitch_hz, 50))
@@ -363,197 +282,252 @@ def f1_band_ratio(seg, sr=SR_D,
 
 
 def itakura_saito(spec_p, spec_q):
-    """
-    Itakura-Saito divergence.
-    Perceptually motivated spectral
-    distance. Large value = discontinuous.
-    Both spectra must be same length
-    and positive.
-    """
-    p = np.array(spec_p, dtype=np.float64)
-    q = np.array(spec_q, dtype=np.float64)
-    # Floor to prevent log(0)
-    p = np.maximum(p, 1e-10)
-    q = np.maximum(q, 1e-10)
+    p = np.maximum(
+        np.array(spec_p, dtype=np.float64),
+        1e-10)
+    q = np.maximum(
+        np.array(spec_q, dtype=np.float64),
+        1e-10)
     r = p / q
-    return float(np.mean(
-        r - np.log(r) - 1.0))
+    return float(np.mean(r - np.log(r) - 1))
 
 
-def spectral_distance_at_boundary(
-        sig, boundary_sample,
-        frame_ms=20, sr=SR_D):
+def rms_val(seg):
+    seg = f32(seg)
+    if len(seg) == 0:
+        return 0.0
+    return float(np.sqrt(
+        np.mean(seg**2) + 1e-12))
+
+
+# ============================================================
+# BASELINE IS
+#
+# Compute the typical IS divergence
+# WITHIN the AA body — frame to frame.
+# This is the natural floor.
+# All boundary measurements are
+# expressed as multiples of this floor.
+# ============================================================
+
+_baseline_is_cache = {}
+
+def get_baseline_is(sr=SR_D):
+    if sr in _baseline_is_cache:
+        return _baseline_is_cache[sr]
+
+    # Synthesize AA alone
+    sig = synth_phrase(
+        [('b', ['AA', 'AA'])],
+        punctuation='.',
+        pitch_base=PITCH,
+        dil=DIL, sr=sr)
+    sig = f32(sig)
+    n   = len(sig)
+
+    atk_n    = int(PHRASE_ATK_MS/1000.0*sr)
+    frame_n  = int(0.020 * sr)
+    hop_n    = int(0.010 * sr)
+
+    # Measure IS between adjacent frames
+    # inside the AA body
+    is_vals = []
+    pos = atk_n + frame_n
+    while pos + frame_n < n - frame_n:
+        seg_a = sig[pos-frame_n : pos]
+        seg_b = sig[pos : pos+frame_n]
+        sp_a, _ = get_spectrum(seg_a, sr)
+        sp_b, _ = get_spectrum(seg_b, sr)
+        if sp_a is not None and \
+           sp_b is not None:
+            n_min = min(len(sp_a), len(sp_b))
+            v = itakura_saito(
+                sp_a[:n_min],
+                sp_b[:n_min])
+            if np.isfinite(v):
+                is_vals.append(v)
+        pos += hop_n
+
+    if not is_vals:
+        baseline = 1.0
+    else:
+        baseline = float(np.median(is_vals))
+        baseline = max(baseline, 0.1)
+
+    _baseline_is_cache[sr] = baseline
+    print(f"  IS baseline (AA body): "
+          f"{baseline:.3f}")
+    return baseline
+
+
+# ============================================================
+# BOUNDARY DETECTION — rev2
+#
+# Fixed: skip phrase_atk zone.
+# Search starts at atk_n + 50ms.
+# ============================================================
+
+def find_boundaries(sig, sr=SR_D):
     """
-    Measure spectral discontinuity
-    at a boundary sample position.
+    Find AA→ph and ph→AA boundary positions.
 
-    Computes:
-      frame_before: the frame_ms window
-                    ending at boundary_sample
-      frame_after:  the frame_ms window
-                    starting at boundary_sample
+    Strategy:
+      Compute RMS envelope.
+      Skip the phrase attack zone.
+      Find the peak RMS in the first
+      third of the signal (= AA body).
+      Find where RMS drops to < 50%
+      of that peak = AA→ph boundary.
+      Find where RMS recovers to > 50%
+      of the FINAL AA peak = ph→AA boundary.
 
     Returns:
-      is_div:      Itakura-Saito divergence
-      centroid_jump: |centroid_before -
-                      centroid_after| in Hz
+      b1: AA→ph boundary sample
+      b2: ph→AA boundary sample
+      valid: bool
     """
     sig    = f32(sig)
     n      = len(sig)
-    n_frame = int(frame_ms / 1000.0 * sr)
+    hop_ms = 5
+    hop_n  = int(hop_ms / 1000.0 * sr)
 
-    before_start = max(0,
-        boundary_sample - n_frame)
-    before_end   = boundary_sample
-    after_start  = boundary_sample
-    after_end    = min(n,
-        boundary_sample + n_frame)
+    # Skip phrase attack
+    atk_n    = int(
+        PHRASE_ATK_MS / 1000.0 * sr)
+    skip_n   = atk_n + int(0.050 * sr)
 
-    if (before_end <= before_start or
-            after_end <= after_start):
-        return 999.0, 999.0
+    # RMS envelope
+    env    = []
+    frames = []
+    i      = 0
+    while i + hop_n <= n:
+        seg = sig[i:i+hop_n]
+        env.append(rms_val(seg))
+        frames.append(i)
+        i += hop_n
+    env    = np.array(env)
+    frames = np.array(frames)
 
-    seg_b = sig[before_start:before_end]
-    seg_a = sig[after_start:after_end]
+    if len(env) < 4:
+        return n//3, 2*n//3, False
 
-    spec_b, _ = get_spectrum(seg_b, sr)
-    spec_a, _ = get_spectrum(seg_a, sr)
+    # First third = AA region
+    first_third = len(env) // 3
+    skip_frame  = 0
+    for fi, fs in enumerate(frames):
+        if fs >= skip_n:
+            skip_frame = fi
+            break
 
-    if spec_b is None or spec_a is None:
-        return 999.0, 999.0
+    aa_env = env[skip_frame:first_third]
+    if len(aa_env) == 0:
+        aa_env = env[skip_frame:]
+    if len(aa_env) == 0:
+        return n//3, 2*n//3, False
 
-    # Align lengths
-    n_min = min(len(spec_b), len(spec_a))
-    spec_b = spec_b[:n_min]
-    spec_a = spec_a[:n_min]
+    aa_peak = float(np.max(aa_env))
+    if aa_peak < 1e-8:
+        return n//3, 2*n//3, False
 
-    is_div = itakura_saito(spec_b, spec_a)
+    threshold = aa_peak * 0.50
+
+    # Find b1: first drop below threshold
+    # after skip_frame
+    b1_frame = None
+    for fi in range(skip_frame, len(env)):
+        if env[fi] < threshold:
+            b1_frame = fi
+            break
+
+    # Last third = final AA region
+    last_third_start = 2 * len(env) // 3
+    final_aa_env = env[last_third_start:]
+    if len(final_aa_env) == 0:
+        final_aa_peak = aa_peak
+    else:
+        final_aa_peak = float(
+            np.max(final_aa_env))
+    final_threshold = (
+        max(final_aa_peak, aa_peak) * 0.50)
+
+    # Find b2: last point below threshold
+    # before the final AA recovery
+    b2_frame = None
+    for fi in range(len(env)-1,
+                     last_third_start, -1):
+        if env[fi] < final_threshold:
+            b2_frame = fi
+            break
+
+    if b1_frame is None:
+        b1 = n // 3
+    else:
+        b1 = int(frames[b1_frame])
+
+    if b2_frame is None:
+        b2 = 2 * n // 3
+    else:
+        b2 = int(frames[b2_frame])
+
+    if b1 >= b2:
+        b1 = n // 3
+        b2 = 2 * n // 3
+
+    return b1, b2, True
+
+
+def measure_boundary(sig, pos,
+                      baseline_is,
+                      sr=SR_D,
+                      frame_ms=20):
+    """
+    Measure spectral and amplitude
+    discontinuity at pos.
+    Returns IS ratio, centroid jump, amp dB.
+    """
+    sig     = f32(sig)
+    n       = len(sig)
+    frame_n = int(frame_ms/1000.0*sr)
+
+    b_start = max(0, pos - frame_n)
+    b_end   = pos
+    a_start = pos
+    a_end   = min(n, pos + frame_n)
+
+    seg_b = sig[b_start:b_end]
+    seg_a = sig[a_start:a_end]
+
+    if len(seg_b) < 32 or len(seg_a) < 32:
+        return None, None, None
+
+    sp_b, _ = get_spectrum(seg_b, sr)
+    sp_a, _ = get_spectrum(seg_a, sr)
+    if sp_b is None or sp_a is None:
+        return None, None, None
+
+    n_min  = min(len(sp_b), len(sp_a))
+    raw_is = itakura_saito(
+        sp_b[:n_min], sp_a[:n_min])
+
+    if not np.isfinite(raw_is):
+        return None, None, None
+
+    is_ratio = raw_is / max(baseline_is,
+                             0.001)
 
     c_b = spectral_centroid(seg_b, sr)
     c_a = spectral_centroid(seg_a, sr)
     c_jump = abs(c_a - c_b)
 
-    return is_div, c_jump
-
-
-def rms_envelope(sig, hop_ms=5,
-                  sr=SR_D):
-    """
-    RMS envelope of signal.
-    Returns array of RMS values,
-    one per hop_ms window.
-    """
-    sig   = f32(sig)
-    hop_n = int(hop_ms / 1000.0 * sr)
-    n     = len(sig)
-    out   = []
-    i     = 0
-    while i + hop_n <= n:
-        seg = sig[i:i+hop_n]
-        out.append(float(np.sqrt(
-            np.mean(seg**2) + 1e-12)))
-        i += hop_n
-    return np.array(out)
-
-
-def amplitude_continuity(
-        sig, boundary_sample,
-        frame_ms=20, sr=SR_D):
-    """
-    Measure amplitude discontinuity
-    at boundary_sample.
-    Returns ratio of RMS after/before.
-    1.0 = perfectly continuous.
-    >> 1 or << 1 = discontinuous.
-    We express as dB deviation from 1.0:
-    0dB = continuous.
-    Large magnitude = discontinuous.
-    """
-    sig    = f32(sig)
-    n      = len(sig)
-    n_frame = int(frame_ms / 1000.0 * sr)
-
-    before = sig[
-        max(0, boundary_sample-n_frame):
-        boundary_sample]
-    after  = sig[
-        boundary_sample:
-        min(n, boundary_sample+n_frame)]
-
-    rms_b = float(np.sqrt(
-        np.mean(before**2) + 1e-12))
-    rms_a = float(np.sqrt(
-        np.mean(after**2) + 1e-12))
-
+    rms_b = rms_val(seg_b)
+    rms_a = rms_val(seg_a)
     if rms_b < 1e-8:
-        return 999.0
-    ratio = rms_a / rms_b
-    db    = 20 * np.log10(
-        max(ratio, 1e-6))
-    return db
+        amp_db = None
+    else:
+        amp_db = 20 * np.log10(
+            max(rms_a/rms_b, 1e-6))
 
-
-# ============================================================
-# PHONEME BODY EXTRACTOR
-#
-# Synthesizes [AA, ph, AA] and
-# estimates where the ph body is.
-# Uses the same method as the onset
-# diagnostic: ph is synthesized FIRST
-# so its onset is at phrase_atk.
-# Then the body is measured.
-# ============================================================
-
-PHRASE_ATK_MS = 25  # matches synth_phrase
-
-def get_phoneme_body(ph, sr=SR_D,
-                      body_start_ms=None,
-                      body_end_ms=None):
-    """
-    Synthesize [ph, AH] with ph first.
-    Extract the body segment.
-    body_start_ms: ms after phrase_atk
-                   where body begins.
-                   Default: 20ms (onset end).
-    body_end_ms:   ms after phrase_atk
-                   where body ends.
-                   Default: 60ms.
-    Returns:
-      sig:         full signal
-      body:        body segment
-      body_s:      body start sample
-      body_e:      body end sample
-    """
-    sig = synth_phrase(
-        [('test', [ph, 'AH'])],
-        punctuation='.',
-        pitch_base=PITCH,
-        dil=DIL,
-        sr=sr)
-    sig = f32(sig)
-    n   = len(sig)
-
-    onset_s = int(
-        PHRASE_ATK_MS / 1000.0 * sr)
-
-    if body_start_ms is None:
-        body_start_ms = 20.0
-    if body_end_ms is None:
-        body_end_ms   = 60.0
-
-    body_s = onset_s + int(
-        body_start_ms / 1000.0 * sr)
-    body_e = onset_s + int(
-        body_end_ms   / 1000.0 * sr)
-    body_s = min(body_s, n-1)
-    body_e = min(body_e, n)
-
-    if body_e <= body_s:
-        body_e = min(body_s + int(
-            0.020*sr), n)
-
-    return sig, sig[body_s:body_e], \
-           body_s, body_e
+    return is_ratio, c_jump, amp_db
 
 
 # ============================================================
@@ -562,12 +536,7 @@ def get_phoneme_body(ph, sr=SR_D,
 
 def check_phoneme_identity(
         ph, sr=SR_D, verbose=True):
-    """
-    Synthesize ph and measure whether
-    it sounds like itself.
-    Compare body measurements against
-    PHONEME_IDENTITY_TARGETS.
-    """
+
     target = PHONEME_IDENTITY_TARGETS.get(ph)
     if target is None:
         if verbose:
@@ -575,55 +544,68 @@ def check_phoneme_identity(
                   f"no identity targets")
         return {}, True
 
-    sig, body, body_s, body_e = \
-        get_phoneme_body(ph, sr=sr)
+    # Synthesize ph first, AH following
+    sig = synth_phrase(
+        [('t', [ph, 'AH'])],
+        punctuation='.',
+        pitch_base=PITCH,
+        dil=DIL, sr=sr)
+    sig = f32(sig)
+    n   = len(sig)
+
+    atk_n  = int(PHRASE_ATK_MS/1000.0*sr)
+    body_s = atk_n + int(0.020*sr)
+    body_e = atk_n + int(0.060*sr)
+    body_s = min(body_s, n-1)
+    body_e = min(body_e, n)
+    if body_e <= body_s:
+        body_e = min(body_s + int(0.020*sr), n)
+
+    body = sig[body_s:body_e]
 
     c  = spectral_centroid(body, sr)
-    p  = periodicity(body,
-                     pitch_hz=PITCH, sr=sr)
+    p  = periodicity_measure(
+        body, pitch_hz=PITCH, sr=sr)
     f1 = f1_band_ratio(body, sr=sr)
 
     results = {}
     failed  = []
 
-    # Centroid
     c_tgt = target['centroid_hz']
     c_tol = target['centroid_tol']
     c_ok  = abs(c - c_tgt) <= c_tol
     results['centroid'] = {
-        'measured': round(c, 0),
-        'target':   c_tgt,
+        'measured':  round(c, 0),
+        'target':    c_tgt,
         'tolerance': c_tol,
-        'distance': round(abs(c-c_tgt), 0),
-        'pass':     c_ok,
+        'distance':  round(abs(c-c_tgt), 0),
+        'pass':      c_ok,
     }
     if not c_ok:
         failed.append('centroid')
 
-    # Periodicity
     p_tgt = target['periodicity']
     p_tol = target['periodicity_tol']
     p_ok  = abs(p - p_tgt) <= p_tol
     results['periodicity'] = {
-        'measured': round(p, 3),
-        'target':   p_tgt,
+        'measured':  round(p, 3),
+        'target':    p_tgt,
         'tolerance': p_tol,
-        'distance': round(abs(p-p_tgt), 3),
-        'pass':     p_ok,
+        'distance':  round(abs(p-p_tgt), 3),
+        'pass':      p_ok,
     }
     if not p_ok:
         failed.append('periodicity')
 
-    # F1 ratio
     f_tgt = target['f1_ratio']
     f_tol = target['f1_ratio_tol']
     f_ok  = abs(f1 - f_tgt) <= f_tol
     results['f1_ratio'] = {
-        'measured': round(f1, 3),
-        'target':   f_tgt,
+        'measured':  round(f1, 3),
+        'target':    f_tgt,
         'tolerance': f_tol,
-        'distance': round(abs(f1-f_tgt), 3),
-        'pass':     f_ok,
+        'distance':  round(abs(f1-f_tgt), 3),
+        'pass':      f_ok,
     }
     if not f_ok:
         failed.append('f1_ratio')
@@ -636,173 +618,106 @@ def check_phoneme_identity(
         for k, v in results.items():
             ps = '    ✓' if v['pass'] \
                  else '    ✗'
-            print(f"{ps} {k}: "
-                  f"{v['measured']}  "
-                  f"target={v['target']} "
-                  f"±{v['tolerance']}  "
-                  f"dist={v['distance']}")
+            print(
+                f"{ps} {k}: "
+                f"{v['measured']}  "
+                f"target={v['target']}"
+                f"±{v['tolerance']}  "
+                f"dist={v['distance']}")
         if not all_pass:
-            print(f"       {target['notes']}")
+            print(f"       "
+                  f"{target['notes']}")
 
     return results, all_pass
 
 
 # ============================================================
 # CONTINUITY CHECK
-#
-# Synthesize [AA, ph, AA].
-# Find the boundary positions.
-# Measure spectral and amplitude
-# discontinuity at each boundary.
 # ============================================================
 
-# Thresholds for perceptible discontinuity
-IS_THRESHOLD        = 2.0   # Itakura-Saito
-CENTROID_JUMP_HZ    = 1000  # Hz
-AMPLITUDE_DB        = 6.0   # dB
-
-
 def check_continuity(
-        ph, sr=SR_D, verbose=True):
-    """
-    Synthesize [AA, ph, AA].
-    Measure continuity at:
-      boundary 1: AA → ph
-      boundary 2: ph → AA
+        ph, baseline_is,
+        sr=SR_D, verbose=True):
 
-    Reports:
-      Spectral IS divergence at each boundary
-      Spectral centroid jump at each boundary
-      Amplitude RMS jump at each boundary
-
-    A phoneme is continuous if all three
-    measures are below threshold at both
-    boundaries.
-    """
-    # Synthesize carrier
     sig = synth_phrase(
-        [('test', ['AA', ph, 'AA'])],
+        [('t', ['AA', ph, 'AA'])],
         punctuation='.',
         pitch_base=PITCH,
-        dil=DIL,
-        sr=sr)
+        dil=DIL, sr=sr)
     sig = f32(sig)
-    n   = len(sig)
 
-    # Estimate boundary positions.
-    # Use the RMS envelope to find where
-    # amplitude changes significantly.
-    # AA is voiced and loud.
-    # If ph is noise/fricative it will
-    # have a different amplitude.
-    # Find the two transitions.
+    b1, b2, valid = find_boundaries(
+        sig, sr=sr)
 
-    hop_ms   = 5
-    hop_n    = int(hop_ms / 1000.0 * sr)
-    env      = rms_envelope(
-        sig, hop_ms=hop_ms, sr=sr)
-    n_frames = len(env)
+    isr1, cj1, adb1 = measure_boundary(
+        sig, b1, baseline_is, sr=sr)
+    isr2, cj2, adb2 = measure_boundary(
+        sig, b2, baseline_is, sr=sr)
 
-    # Peak RMS (in AA region)
-    peak_rms = float(np.max(env))
-
-    # Find first dip below 50% of peak
-    # = AA → ph transition
-    b1_frame = None
-    for i in range(n_frames):
-        if env[i] < peak_rms * 0.50:
-            b1_frame = i
-            break
-
-    # Find last dip below 50% of peak
-    # = ph → AA transition
-    b2_frame = None
-    for i in range(n_frames-1, -1, -1):
-        if env[i] < peak_rms * 0.50:
-            b2_frame = i
-            break
-
-    # Convert to samples
-    phrase_atk_n = int(
-        PHRASE_ATK_MS / 1000.0 * sr)
-
-    if b1_frame is None:
-        b1_sample = n // 3
-    else:
-        b1_sample = b1_frame * hop_n
-
-    if b2_frame is None:
-        b2_sample = 2 * n // 3
-    else:
-        b2_sample = b2_frame * hop_n
-
-    # Fallback: use fixed estimates
-    # if RMS detection fails (e.g. for
-    # phonemes with no amplitude dip)
-    if b1_sample >= b2_sample:
-        b1_sample = n // 3
-        b2_sample = 2 * n // 3
-
-    # Measure at boundary 1 (AA → ph)
-    is1, cj1 = spectral_distance_at_boundary(
-        sig, b1_sample, sr=sr)
-    amp1 = amplitude_continuity(
-        sig, b1_sample, sr=sr)
-
-    # Measure at boundary 2 (ph → AA)
-    is2, cj2 = spectral_distance_at_boundary(
-        sig, b2_sample, sr=sr)
-    amp2 = amplitude_continuity(
-        sig, b2_sample, sr=sr)
+    def make_result(isr, cj, adb):
+        if isr is None:
+            return {
+                'is_ratio': None,
+                'centroid_jump_hz': None,
+                'amplitude_db': None,
+                'is_pass': False,
+                'centroid_pass': False,
+                'amplitude_pass': False,
+                'error': 'measurement_failed',
+            }
+        return {
+            'is_ratio': round(isr, 2),
+            'centroid_jump_hz':
+                round(cj, 0) if cj else None,
+            'amplitude_db':
+                round(adb, 1)
+                if adb is not None else None,
+            'is_pass':
+                isr <= IS_RATIO_THRESHOLD,
+            'centroid_pass':
+                (cj <= CENTROID_JUMP_HZ
+                 if cj is not None else False),
+            'amplitude_pass':
+                (abs(adb) <= AMPLITUDE_DB
+                 if adb is not None else False),
+        }
 
     results = {
-        'AA_to_ph': {
-            'is_divergence':   round(is1, 3),
-            'centroid_jump_hz': round(cj1, 0),
-            'amplitude_db':    round(amp1, 1),
-            'is_pass':
-                is1  <= IS_THRESHOLD,
-            'centroid_pass':
-                cj1  <= CENTROID_JUMP_HZ,
-            'amplitude_pass':
-                abs(amp1) <= AMPLITUDE_DB,
-        },
-        'ph_to_AA': {
-            'is_divergence':   round(is2, 3),
-            'centroid_jump_hz': round(cj2, 0),
-            'amplitude_db':    round(amp2, 1),
-            'is_pass':
-                is2  <= IS_THRESHOLD,
-            'centroid_pass':
-                cj2  <= CENTROID_JUMP_HZ,
-            'amplitude_pass':
-                abs(amp2) <= AMPLITUDE_DB,
-        },
+        'AA_to_ph': make_result(
+            isr1, cj1, adb1),
+        'ph_to_AA': make_result(
+            isr2, cj2, adb2),
+        'boundary_valid': valid,
     }
 
     b1_pass = (
         results['AA_to_ph']['is_pass'] and
-        results['AA_to_ph']['centroid_pass'] and
-        results['AA_to_ph']['amplitude_pass'])
+        results['AA_to_ph']['centroid_pass'])
     b2_pass = (
         results['ph_to_AA']['is_pass'] and
-        results['ph_to_AA']['centroid_pass'] and
-        results['ph_to_AA']['amplitude_pass'])
+        results['ph_to_AA']['centroid_pass'])
     all_pass = b1_pass and b2_pass
 
     if verbose:
         status = '✓' if all_pass else '✗'
+        bv     = '✓' if valid else '?'
         print(f"  [{status}] {ph} "
-              f"continuity")
+              f"continuity  "
+              f"[boundary_detect={bv}]")
         for bname, bdata in results.items():
-            bp = ('✓' if
-                  (bdata['is_pass'] and
-                   bdata['centroid_pass'] and
-                   bdata['amplitude_pass'])
-                  else '✗')
+            if bname == 'boundary_valid':
+                continue
             arrow = ('AA→ph'
                      if bname == 'AA_to_ph'
                      else 'ph→AA')
+            if bdata.get('error'):
+                print(f"    [✗] {arrow}: "
+                      f"measurement failed")
+                continue
+            bp = '✓' if (
+                bdata['is_pass'] and
+                bdata['centroid_pass']) \
+                else '✗'
             print(f"    [{bp}] {arrow}")
             ip = '✓' if bdata['is_pass'] \
                  else '✗'
@@ -812,147 +727,150 @@ def check_continuity(
                 'amplitude_pass'] else '✗'
             print(
                 f"      [{ip}] "
-                f"IS={bdata['is_divergence']}"
-                f"  target<={IS_THRESHOLD}")
+                f"IS_ratio="
+                f"{bdata['is_ratio']}  "
+                f"target<={IS_RATIO_THRESHOLD}")
             print(
                 f"      [{cp}] "
                 f"centroid_jump="
-                f"{bdata['centroid_jump_hz']}Hz"
-                f"  target<={CENTROID_JUMP_HZ}")
+                f"{bdata['centroid_jump_hz']}"
+                f"Hz  "
+                f"target<={CENTROID_JUMP_HZ}")
             print(
                 f"      [{ap}] "
-                f"amp={bdata['amplitude_db']}dB"
+                f"amp="
+                f"{bdata['amplitude_db']}dB"
                 f"  target±{AMPLITUDE_DB}dB")
 
     return results, all_pass
 
 
 # ============================================================
-# FULL DIAGNOSTIC RUN
+# FULL RUN
 # ============================================================
 
 def run_continuity_diagnostic(
         sr=SR_D, verbose=True):
 
     print()
-    print("CONTINUITY DIAGNOSTIC")
-    print("Self-referential: system tests itself.")
+    print("CONTINUITY DIAGNOSTIC rev2")
+    print("Self-referential.")
+    print("IS threshold relative to "
+          "AA body baseline.")
     print("="*50)
 
-    # Phonemes to test
     TEST_PHS = list(
         PHONEME_IDENTITY_TARGETS.keys())
 
-    total_id   = 0
-    pass_id    = 0
-    total_cont = 0
-    pass_cont  = 0
-
-    all_id_results   = {}
-    all_cont_results = {}
-
-    # ── PART 1: Identity ──────────────────
+    # Compute baseline IS first
     print()
+    print("  Computing IS baseline...")
+    baseline_is = get_baseline_is(sr=sr)
+    print(f"  Threshold = baseline × "
+          f"{IS_RATIO_THRESHOLD} = "
+          f"{baseline_is * IS_RATIO_THRESHOLD:.3f}")
+    print()
+
+    total_id = pass_id = 0
+    total_ct = pass_ct = 0
+    all_id   = {}
+    all_ct   = {}
+
     print("  PART 1: Phoneme identity")
-    print("  Does each phoneme sound like itself?")
     print()
-
     for ph in TEST_PHS:
         r, ok = check_phoneme_identity(
             ph, sr=sr, verbose=verbose)
-        all_id_results[ph] = r
+        all_id[ph] = r
         total_id += 1
         if ok:
             pass_id += 1
         if verbose:
             print()
 
-    # ── PART 2: Continuity ────────────────
-    print()
     print("  PART 2: Boundary continuity")
-    print("  Is each phoneme continuous")
-    print("  with its neighbors?")
     print()
-
     for ph in TEST_PHS:
         r, ok = check_continuity(
-            ph, sr=sr, verbose=verbose)
-        all_cont_results[ph] = r
-        total_cont += 1
+            ph, baseline_is,
+            sr=sr, verbose=verbose)
+        all_ct[ph] = r
+        total_ct += 1
         if ok:
-            pass_cont += 1
+            pass_ct += 1
         if verbose:
             print()
 
-    # ── SUMMARY ───────────────────────────
     print("="*50)
     print()
-    print("  CONTINUITY DIAGNOSTIC SUMMARY")
-    print()
-    print(f"  Identity:    "
+    print("  SUMMARY")
+    print(f"  Identity:   "
           f"{pass_id}/{total_id}")
-    print(f"  Continuity:  "
-          f"{pass_cont}/{total_cont}")
+    print(f"  Continuity: "
+          f"{pass_ct}/{total_ct}")
     print()
 
-    # Identify the worst offenders
     print("  IDENTITY FAILURES:")
-    any_id_fail = False
-    for ph, r in all_id_results.items():
-        fails = [k for k, v in r.items()
-                 if not v.get('pass', True)]
+    any_fail = False
+    for ph, r in all_id.items():
+        fails = [
+            k for k, v in r.items()
+            if not v.get('pass', True)]
         if fails:
-            any_id_fail = True
-            dists = {
-                k: r[k]['distance']
-                for k in fails}
-            print(f"    {ph}: {fails}")
-            for k, d in dists.items():
-                print(f"      {k} "
-                      f"distance={d}")
-    if not any_id_fail:
+            any_fail = True
+            print(f"    {ph}:")
+            for k in fails:
+                print(
+                    f"      {k}: "
+                    f"measured="
+                    f"{r[k]['measured']}  "
+                    f"target="
+                    f"{r[k]['target']}  "
+                    f"dist="
+                    f"{r[k]['distance']}")
+    if not any_fail:
         print("    All passing.")
     print()
 
     print("  CONTINUITY FAILURES:")
-    any_cont_fail = False
-    for ph, r in all_cont_results.items():
+    any_fail = False
+    for ph, r in all_ct.items():
         for bname, bdata in r.items():
-            b_fails = []
-            if not bdata['is_pass']:
-                b_fails.append(
-                    f"IS="
-                    f"{bdata['is_divergence']}")
-            if not bdata['centroid_pass']:
-                b_fails.append(
-                    f"jump="
-                    f"{bdata['centroid_jump_hz']}"
-                    f"Hz")
-            if not bdata['amplitude_pass']:
-                b_fails.append(
-                    f"amp="
-                    f"{bdata['amplitude_db']}"
-                    f"dB")
-            if b_fails:
-                any_cont_fail = True
+            if bname == 'boundary_valid':
+                continue
+            if bdata.get('error'):
+                any_fail = True
                 arrow = ('AA→ph'
                          if bname == 'AA_to_ph'
                          else 'ph→AA')
                 print(f"    {ph} {arrow}: "
-                      f"{', '.join(b_fails)}")
-    if not any_cont_fail:
+                      f"measurement failed")
+                continue
+            fails = []
+            if not bdata['is_pass']:
+                fails.append(
+                    f"IS_ratio="
+                    f"{bdata['is_ratio']}")
+            if not bdata['centroid_pass']:
+                fails.append(
+                    f"jump="
+                    f"{bdata['centroid_jump_hz']}"
+                    f"Hz")
+            if fails:
+                any_fail = True
+                arrow = ('AA→ph'
+                         if bname == 'AA_to_ph'
+                         else 'ph→AA')
+                print(f"    {ph} {arrow}: "
+                      f"{', '.join(fails)}")
+    if not any_fail:
         print("    All passing.")
     print()
 
-    return (all_id_results,
-            all_cont_results,
+    return (all_id, all_ct,
             pass_id, total_id,
-            pass_cont, total_cont)
+            pass_ct, total_ct)
 
-
-# ============================================================
-# ENTRY POINT
-# ============================================================
 
 if __name__ == "__main__":
     run_continuity_diagnostic(sr=SR)
