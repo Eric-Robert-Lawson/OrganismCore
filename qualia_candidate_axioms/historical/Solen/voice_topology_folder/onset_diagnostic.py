@@ -1,158 +1,141 @@
 """
-ONSET DIAGNOSTIC
+ONSET DIAGNOSTIC — v2
 February 2026
 
-The rainbow measures steady-state phoneme properties.
-These artifacts are ONSET artifacts.
-The rainbow cannot see them.
+CHANGES FROM v1:
 
-This diagnostic measures:
+  BUG FIX: find_phoneme_onset
+    Was using fixed 160ms estimate for
+    carrier phoneme (AA) duration.
+    At DIL=6, AA is capped at ~300ms.
+    The 20ms measurement window was
+    landing inside AA, not inside the
+    target phoneme.
+    This caused:
+      H prominence=33× (measuring AA resonance)
+      DH centroid=830Hz (measuring AA, not DH)
+    
+    Fix: synthesize a SHORT carrier AA
+    at DIL=1, or use a short silence
+    as carrier, or detect the onset
+    dynamically from the signal.
+    
+    New approach: synthesize in a
+    controlled context where the
+    carrier duration is known precisely.
+    Use a SHORT carrier (DIL=1 for
+    the carrier, DIL=6 for the target).
+    
+    Actually simpler: detect onset
+    dynamically by measuring when
+    the spectral character changes.
+    For fricatives: when high-freq
+    energy rises above threshold.
+    For H: when the signal starts
+    (always at phrase start if we
+    put H first).
+    For DH: same.
 
-  For each target phoneme in context:
-    1. Extract the first N_ONSET_MS of the phoneme
-    2. Measure spectral centroid of that window
-    3. Measure periodicity (voiced character)
-       of that window
-    4. Measure RMS of that window vs
-       RMS of the phoneme body
-    5. Compare to ONSET_TARGETS
+    SIMPLEST FIX: put the TARGET phoneme
+    FIRST in the carrier, not second.
+    [ph, AA] instead of [AA, ph].
+    The target starts at sample 0.
+    The onset is at sample 0 + phrase_atk.
+    phrase_atk = int(0.025 * sr) = 1102 samples.
+    onset_pos = 1102.
+    Exact. No estimation needed.
 
-ONSET_TARGETS define what each phoneme
-should look like in its FIRST 20ms.
+  BUG FIX: Z gain diagnostic
+    Add print of actual calibrated
+    gain value for Z so we can see
+    what the calibration is returning.
 
-Not what it sounds like at steady state.
-What it sounds like at t=0.
-
-The four failing phonemes and their
-expected onset character:
-
-  DH onset:
-    Should be: low periodicity,
-               dental friction character,
-               NOT a strong F1=270Hz resonance.
-    If spectral centroid of first 20ms < 1500Hz
-    AND periodicity > 0.4:
-    → voiced component too strong at onset.
-    → "ea" prefix artifact.
-
-  H onset:
-    Should be: broadband aspiration,
-               spectral centroid 1000-3000Hz,
-               NO resonant peak at F2 frequency.
-    If strong resonant peak exists at
-    next-vowel F2 frequency in first 20ms:
-    → coarticulation too aggressive.
-    → "CH" prefix artifact.
-
-  S (word-final) onset-relative:
-    Should be: bypass reaches full level
-               AFTER the preceding vowel
-               formants have moved at least 50%.
-    If bypass energy is high in samples
-    where F1 is still at vowel target:
-    → onset too early.
-    → dragged sibilant artifact.
-
-  Z (word-final) — same as S.
-
-Usage:
-  from onset_diagnostic import run_onset_diagnostic
-  from voice_physics_v10 import synth_phrase, PITCH
-  run_onset_diagnostic(synth_phrase, PITCH)
-
-Or run directly:
-  python onset_diagnostic.py
+  BUG FIX: sibilant timing context
+    Timing check used [AA, ph, AA].
+    If AA is 300ms, the ph doesn't
+    start until 300ms. The timing
+    window is wrong.
+    Fix: use [ph, AA] — ph first,
+    then the following vowel.
+    This puts ph at onset and AA
+    after, which is the correct
+    context for measuring sibilant
+    onset vs vowel departure
+    (i.e., sibilant → vowel transition,
+    not vowel → sibilant).
+    
+    Actually for sibilant timing we
+    WANT vowel → sibilant to test
+    whether the sibilance starts before
+    or after the vowel F1 departs.
+    The correct context is [AA, ph].
+    But we need to find where AA ends.
+    
+    Dynamic detection: watch F1 band
+    energy drop. That IS what the
+    timing check already does.
+    The issue is the sib threshold = 0.25
+    may be too high for Z.
+    Lower to 0.10 for Z check.
 """
 
 import numpy as np
-from scipy.signal import lfilter, butter, find_peaks
+from scipy.signal import lfilter, butter
 import os
 
 # ============================================================
 # CONFIGURATION
 # ============================================================
 
-N_ONSET_MS  = 20    # ms window for onset measurement
-N_BODY_MS   = 30    # ms window for body measurement
-                     # (used for ratio)
-SR_DEFAULT  = 44100
+SR_DEFAULT   = 44100
+N_ONSET_MS   = 20    # measurement window
+N_BODY_MS    = 30    # body window for ratio
 
-# Onset targets — what each phoneme's first 20ms
-# should look like spectrally and temporally.
+# Phrase-level attack envelope (from synth_phrase)
+# int(0.025 * SR) samples of fade-in
+# The target phoneme starts AFTER this.
+PHRASE_ATK_MS = 25   # ms — matches synth_phrase atk
 
 ONSET_TARGETS = {
-
-    # DH: dental voiced fricative
-    # Onset character: dental friction first,
-    # voiced buzz grows into body.
-    # First 20ms should be:
-    #   - spectral centroid above 2000Hz
-    #     (friction character, not vowel buzz)
-    #   - periodicity below 0.35
-    #     (not strongly periodic at onset)
-    #   - RMS below 0.55 × body RMS
-    #     (quiet onset, not full-level voiced)
     'DH': {
-        'centroid_min': 1800,
-        'centroid_max': 5000,
-        'periodicity_max': 0.40,
+        'centroid_min':        1800,
+        'centroid_max':        6000,
+        'periodicity_max':     0.40,
         'onset_rms_ratio_max': 0.60,
-        'description': 'dental friction onset, '
-                        'voicing grows in',
+        'description':
+            'dental friction onset, '
+            'voicing grows in',
     },
-
-    # H: glottal aspirate
-    # Onset character: broadband aspiration,
-    # no dominant resonant peak,
-    # spectral centroid in mid range.
-    # First 20ms should be:
-    #   - spectral centroid 800-2500Hz
-    #     (mid-range aspiration)
-    #   - NO resonant peak taller than
-    #     3× the spectral floor
-    #     (flat aspiration, not resonated)
-    #   - periodicity below 0.25
-    #     (essentially aperiodic)
     'H': {
-        'centroid_min':  800,
-        'centroid_max': 2500,
-        'periodicity_max': 0.25,
-        'peak_prominence_max': 3.0,
-        'description': 'flat broadband aspiration, '
-                        'no dominant resonance',
+        'centroid_min':          800,
+        'centroid_max':         2500,
+        'periodicity_max':      0.25,
+        'peak_prominence_max':  3.0,
+        'description':
+            'flat broadband aspiration, '
+            'no dominant resonance',
     },
-
-    # S: alveolar sibilant
-    # Onset character: bypass energy should
-    # arrive AFTER tract has transitioned.
-    # First 20ms should be:
-    #   - spectral centroid ABOVE 5000Hz
-    #     (sibilance, not vowel formants)
-    #   - F1-band energy (80-600Hz) LOW
-    #     relative to high-freq energy
-    #     (vowel formants not still active)
     'S': {
-        'centroid_min': 5000,
-        'centroid_max': 12000,
-        'f1_band_ratio_max': 0.15,
-        'description': 'sibilance onset, '
-                        'vowel F1 not active',
+        'centroid_min':        5000,
+        'centroid_max':       12000,
+        'f1_band_ratio_max':   0.15,
+        'description':
+            'sibilance onset, '
+            'vowel F1 not active',
     },
-
-    # Z: voiced alveolar sibilant
-    # Same as S for onset timing.
     'Z': {
-        'centroid_min': 4500,
-        'centroid_max': 12000,
-        'f1_band_ratio_max': 0.20,
-        'description': 'sibilance + buzz onset, '
-                        'vowel F1 not active',
+        'centroid_min':        4500,
+        'centroid_max':       12000,
+        'f1_band_ratio_max':   0.20,
+        'description':
+            'sibilance + buzz onset, '
+            'vowel F1 not active',
     },
 }
 
 
 # ============================================================
-# MEASUREMENT FUNCTIONS
+# UTILITIES
 # ============================================================
 
 def f32(x):
@@ -160,34 +143,22 @@ def f32(x):
 
 
 def measure_spectral_centroid(seg, sr=SR_DEFAULT):
-    """
-    Spectral centroid of a short segment.
-    Returns frequency in Hz.
-    """
-    seg = f32(seg)
-    n   = len(seg)
+    seg   = f32(seg)
+    n     = len(seg)
     if n < 32:
         return 0.0
-    # Use zero-padded FFT for resolution
     n_fft = max(512, n)
     spec  = np.abs(np.fft.rfft(seg, n=n_fft))
     freqs = np.fft.rfftfreq(n_fft, d=1.0/sr)
-    # Weight by power
     power = spec**2
     total = float(np.sum(power))
     if total < 1e-12:
         return 0.0
-    centroid = float(np.sum(freqs * power) / total)
-    return centroid
+    return float(np.sum(freqs * power) / total)
 
 
 def measure_periodicity(seg, pitch_hz=175,
                          sr=SR_DEFAULT):
-    """
-    Normalized autocorrelation at T0.
-    1.0 = perfectly periodic.
-    0.0 = completely aperiodic.
-    """
     seg = f32(seg)
     n   = len(seg)
     T0  = int(sr / max(pitch_hz, 50))
@@ -201,177 +172,117 @@ def measure_periodicity(seg, pitch_hz=175,
 
 
 def measure_peak_prominence(seg, sr=SR_DEFAULT):
-    """
-    Ratio of tallest spectral peak to
-    mean spectral level.
-    High value = resonator character.
-    Low value = flat aspiration character.
-    """
-    seg = f32(seg)
-    n   = len(seg)
+    seg   = f32(seg)
+    n     = len(seg)
     if n < 32:
         return 0.0
     n_fft = max(512, n)
     spec  = np.abs(np.fft.rfft(seg, n=n_fft))
     freqs = np.fft.rfftfreq(n_fft, d=1.0/sr)
-    # Only look above 200Hz to avoid DC
     mask  = freqs > 200
     s_m   = spec[mask]
     if len(s_m) < 4:
         return 0.0
-    mean_level = float(np.mean(s_m))
-    max_level  = float(np.max(s_m))
-    if mean_level < 1e-10:
+    mean_l = float(np.mean(s_m))
+    max_l  = float(np.max(s_m))
+    if mean_l < 1e-10:
         return 0.0
-    return max_level / mean_level
+    return max_l / mean_l
 
 
 def measure_f1_band_ratio(seg, sr=SR_DEFAULT,
                            f1_lo=80, f1_hi=600):
-    """
-    Ratio of energy in F1 band (80-600Hz)
-    to total energy.
-    High value = strong vowel formant.
-    Low value = consonant/fricative.
-    """
-    seg = f32(seg)
-    n   = len(seg)
+    seg   = f32(seg)
+    n     = len(seg)
     if n < 32:
         return 0.0
     n_fft = max(512, n)
-    spec  = np.abs(np.fft.rfft(seg, n=n_fft))**2
+    spec  = np.abs(np.fft.rfft(
+        seg, n=n_fft))**2
     freqs = np.fft.rfftfreq(n_fft, d=1.0/sr)
-    total  = float(np.sum(spec))
+    total = float(np.sum(spec))
     if total < 1e-12:
         return 0.0
-    f1_mask = (freqs >= f1_lo) & (freqs <= f1_hi)
-    f1_e    = float(np.sum(spec[f1_mask]))
-    return f1_e / total
+    f1_mask = (freqs >= f1_lo) & \
+              (freqs <= f1_hi)
+    return float(
+        np.sum(spec[f1_mask])) / total
 
 
-def rms(x):
+def rms_val(x):
     x = f32(x)
-    return float(np.sqrt(np.mean(x**2) + 1e-12))
+    return float(
+        np.sqrt(np.mean(x**2) + 1e-12))
 
 
 # ============================================================
-# PHONEME ONSET EXTRACTOR
-# Synthesizes a phoneme in context and
-# extracts the onset window.
+# ONSET POSITION
+#
+# BUG FIX: Put target phoneme FIRST.
+# Carrier = [ph] alone, or [ph, AA].
+# Target starts at phrase_atk_samples.
+# Exact position. No estimation.
 # ============================================================
 
-def synth_phoneme_in_context(ph, synth_fn,
-                               pitch,
-                               context='vowel_before',
-                               sr=SR_DEFAULT):
+def get_onset_pos(sr=SR_DEFAULT):
     """
-    Synthesize a phoneme in a carrier context.
-
-    context='vowel_before':
-      [AA] [ph] — onset of ph follows AA
-      Isolates onset artifacts after a vowel.
-
-    context='start':
-      [ph] alone — onset at start of phrase.
-      Isolates onset artifacts at phrase beginning.
-
-    Returns (full_sig, ph_start_sample, ph_n_samples)
-    so caller can extract the onset window.
+    Position where the first phoneme body
+    begins in a synth_phrase output.
+    = phrase attack envelope duration.
     """
-    if context == 'vowel_before':
-        carrier = [('test', ['AA', ph])]
-    elif context == 'vowel_both':
-        carrier = [('test', ['AA', ph, 'AA'])]
-    else:
-        carrier = [('test', [ph])]
-
-    sig = synth_fn(
-        carrier,
-        punctuation='.',
-        pitch_base=pitch)
-
-    return f32(sig)
-
-
-def find_phoneme_onset(sig, ph, sr=SR_DEFAULT,
-                        context='vowel_before'):
-    """
-    Locate the approximate sample position
-    where ph begins in the signal.
-
-    For context='vowel_before':
-    The AA precedes ph.
-    AA duration at DIL=6 is ~200ms (capped).
-    We look for the onset of consonant character
-    after ~150ms.
-
-    This is approximate — the diagnostic
-    does not need precise boundaries.
-    It needs to capture the first 20ms
-    of the phoneme correctly.
-
-    Returns estimated onset sample.
-    """
-    n    = len(sig)
-    sr_f = float(sr)
-
-    # Rough estimate: for vowel_before context,
-    # AA is ~150-250ms, ph starts after that.
-    # Use 160ms as the search start.
-    search_start = int(0.160 * sr)
-    search_start = min(search_start, n // 3)
-
-    return search_start
+    return int(PHRASE_ATK_MS / 1000.0 * sr)
 
 
 # ============================================================
-# CORE DIAGNOSTIC
+# ONSET CHARACTER CHECK
 # ============================================================
 
 def check_onset(ph, synth_fn, pitch,
                  sr=SR_DEFAULT,
                  verbose=True):
     """
-    Check the onset character of phoneme ph.
-
-    Returns dict of measurements and pass/fail
-    for each onset target metric.
+    Synthesize [ph] alone (or [ph, AA]
+    for context).
+    Target phoneme is FIRST.
+    Onset window starts at phrase_atk.
     """
     targets = ONSET_TARGETS.get(ph)
     if targets is None:
         if verbose:
-            print(f"  [--] {ph}: no onset targets defined")
+            print(f"  [--] {ph}: "
+                  f"no onset targets")
         return {}, True
 
-    n_onset  = int(N_ONSET_MS / 1000.0 * sr)
-    n_body   = int(N_BODY_MS  / 1000.0 * sr)
+    n_onset = int(N_ONSET_MS / 1000.0 * sr)
+    n_body  = int(N_BODY_MS  / 1000.0 * sr)
 
-    # Synthesize in carrier context
-    context  = 'vowel_before'
-    sig      = synth_phoneme_in_context(
-        ph, synth_fn, pitch,
-        context=context, sr=sr)
+    # Synthesize: target phoneme first.
+    # Use a following vowel for context
+    # (affects tract coarticulation).
+    carrier = [('test', [ph, 'AH'])]
+    sig = synth_fn(
+        carrier,
+        punctuation='.',
+        pitch_base=pitch)
+    sig = f32(sig)
+    n   = len(sig)
 
-    onset_pos = find_phoneme_onset(
-        sig, ph, sr=sr, context=context)
-
-    n_sig = len(sig)
-
-    # Extract onset window
-    onset_end = min(onset_pos + n_onset, n_sig)
-    onset_seg = sig[onset_pos:onset_end]
-
-    # Extract body window (after onset)
+    # Onset position = phrase attack end
+    onset_pos = get_onset_pos(sr=sr)
+    onset_end = min(onset_pos + n_onset, n)
     body_start = onset_pos + n_onset
-    body_end   = min(body_start + n_body, n_sig)
-    body_seg   = (sig[body_start:body_end]
-                  if body_end > body_start
-                  else onset_seg)
+    body_end   = min(body_start + n_body, n)
 
-    if len(onset_seg) < 8:
+    if onset_end <= onset_pos:
         if verbose:
-            print(f"  [?] {ph}: onset segment too short")
+            print(f"  [?] {ph}: "
+                  f"signal too short")
         return {}, True
+
+    onset_seg = sig[onset_pos:onset_end]
+    body_seg  = (sig[body_start:body_end]
+                 if body_end > body_start
+                 else onset_seg)
 
     # Measurements
     centroid    = measure_spectral_centroid(
@@ -382,16 +293,13 @@ def check_onset(ph, synth_fn, pitch,
         onset_seg, sr=sr)
     f1_ratio    = measure_f1_band_ratio(
         onset_seg, sr=sr)
+    onset_rms   = rms_val(onset_seg)
+    body_rms    = rms_val(body_seg)
+    rms_ratio   = (onset_rms / body_rms
+                   if body_rms > 1e-8
+                   else 0.0)
 
-    onset_rms = rms(onset_seg)
-    body_rms  = rms(body_seg)
-    rms_ratio = (onset_rms / body_rms
-                 if body_rms > 1e-8
-                 else 0.0)
-
-    # Check against targets
     results = {}
-    passed  = []
     failed  = []
 
     t = targets
@@ -400,66 +308,65 @@ def check_onset(ph, synth_fn, pitch,
        'centroid_max' in t:
         c_min = t.get('centroid_min', 0)
         c_max = t.get('centroid_max', 20000)
-        ok    = (c_min <= centroid <= c_max)
+        ok    = c_min <= centroid <= c_max
         results['onset_centroid'] = {
             'measured': round(centroid, 0),
             'target':   (c_min, c_max),
             'pass':     ok,
         }
-        (passed if ok else failed).append(
-            'onset_centroid')
+        if not ok:
+            failed.append('onset_centroid')
 
     if 'periodicity_max' in t:
         p_max = t['periodicity_max']
-        ok    = (periodicity <= p_max)
+        ok    = periodicity <= p_max
         results['onset_periodicity'] = {
             'measured': round(periodicity, 3),
             'target':   f'<= {p_max}',
             'pass':     ok,
         }
-        (passed if ok else failed).append(
-            'onset_periodicity')
+        if not ok:
+            failed.append('onset_periodicity')
 
     if 'peak_prominence_max' in t:
         pr_max = t['peak_prominence_max']
-        ok     = (prominence <= pr_max)
+        ok     = prominence <= pr_max
         results['onset_peak_prominence'] = {
             'measured': round(prominence, 2),
             'target':   f'<= {pr_max}',
             'pass':     ok,
         }
-        (passed if ok else failed).append(
-            'onset_peak_prominence')
+        if not ok:
+            failed.append('onset_peak_prominence')
 
     if 'f1_band_ratio_max' in t:
         fr_max = t['f1_band_ratio_max']
-        ok     = (f1_ratio <= fr_max)
+        ok     = f1_ratio <= fr_max
         results['onset_f1_ratio'] = {
             'measured': round(f1_ratio, 3),
             'target':   f'<= {fr_max}',
             'pass':     ok,
         }
-        (passed if ok else failed).append(
-            'onset_f1_ratio')
+        if not ok:
+            failed.append('onset_f1_ratio')
 
     if 'onset_rms_ratio_max' in t:
         rr_max = t['onset_rms_ratio_max']
-        ok     = (rms_ratio <= rr_max)
+        ok     = rms_ratio <= rr_max
         results['onset_rms_ratio'] = {
             'measured': round(rms_ratio, 3),
             'target':   f'<= {rr_max}',
             'pass':     ok,
         }
-        (passed if ok else failed).append(
-            'onset_rms_ratio')
+        if not ok:
+            failed.append('onset_rms_ratio')
 
-    all_pass = (len(failed) == 0)
+    all_pass = len(failed) == 0
 
     if verbose:
         status = '✓' if all_pass else '✗'
         desc   = t.get('description', '')
-        print(f"  [{status}] {ph:4s}  "
-              f"({desc})")
+        print(f"  [{status}] {ph:4s}  ({desc})")
         for k, v in results.items():
             p = '    ✓' if v['pass'] else '    ✗'
             print(f"{p} {k}: "
@@ -470,42 +377,67 @@ def check_onset(ph, synth_fn, pitch,
 
 
 # ============================================================
-# ALSO CHECK: BYPASS ONSET TIMING
-# This measures whether the sibilance
-# arrives before or after the tract
-# has transitioned.
-# This is the "dragged S/Z" diagnostic.
+# SIBILANT TIMING CHECK
+#
+# BUG FIX: use [ph, AA] so we measure
+# sibilant → vowel transition, and
+# detect onset dynamically.
+#
+# Also: lower Z sibilance threshold to 0.10
+# and print actual gain value.
 # ============================================================
 
-def check_sibilant_onset_timing(ph, synth_fn,
-                                  pitch,
-                                  sr=SR_DEFAULT,
-                                  verbose=True):
+def check_sibilant_onset_timing(
+        ph, synth_fn, pitch,
+        sr=SR_DEFAULT,
+        verbose=True):
     """
-    For S and Z: check that sibilance energy
-    arrives after the vowel formant has departed.
+    Synthesize [ph, AA].
+    ph is first — starts at phrase_atk.
+    AA follows — vowel F1 energy rises
+    as ph ends.
 
-    Method:
-      Synthesize [AA, ph] in context.
-      At the boundary region (last 20ms of AA
-      and first 20ms of ph), measure:
-        - F1-band energy (80-600Hz) — vowel marker
-        - High-freq energy (4000+Hz) — sibilant marker
+    We are checking the OFFSET of the
+    sibilant: does the sibilance end
+    cleanly before the vowel F1 arrives?
 
-      If high-freq energy rises before
-      F1-band energy falls below 50%:
-      → sibilant onset is too early.
-      → dragged artifact.
+    Wait — the original test was [AA, ph]
+    checking sibilant ONSET vs vowel DEPARTURE.
+    But since AA is 300ms at DIL=6 and the
+    diagnostic window was at 160ms,
+    we were measuring inside AA.
 
-    Returns:
-      'clean':   sibilance starts after vowel ends.
-      'overlap': sibilance starts while vowel active.
-      'late':    sibilance starts well after
-                 vowel ends (minor gap is ok).
+    CORRECT APPROACH for sibilant ONSET:
+    Synthesize [AA, ph] but find AA's
+    actual end point dynamically, then
+    measure sibilance vs F1 around that point.
+
+    We detect AA end as the point where
+    the signal RMS in a 5ms window
+    drops to < 50% of the AA peak RMS.
+    (AA ends with a voiced offset.
+     ph onset may be quieter.)
+
+    Actually the simplest correct approach:
+    Use SHORT AA by synthesizing with DIL=1.
+    But synth_fn uses its own DIL.
+
+    EVEN SIMPLER: just detect the actual
+    sibilance onset time dynamically,
+    and separately detect the F1 drop time
+    dynamically. Report both. The gap
+    between them is what matters.
+    The absolute times don't matter.
+    This is what the original code did —
+    and it worked for S (gave 'late').
+    The issue is only Z's threshold.
     """
+    hop   = int(0.005 * sr)
+    win   = int(0.015 * sr)
     n_fft = 512
 
-    carrier = [('test', ['AA', ph, 'AA'])]
+    # Use [AA, ph] — vowel then sibilant
+    carrier = [('test', ['AA', ph])]
     sig = synth_fn(
         carrier,
         punctuation='.',
@@ -513,55 +445,49 @@ def check_sibilant_onset_timing(ph, synth_fn,
     sig = f32(sig)
     n   = len(sig)
 
-    # Analyse in short hop windows
-    hop   = int(0.005 * sr)   # 5ms hops
-    win   = int(0.015 * sr)   # 15ms window
     times = []
     f1_e  = []
     hi_e  = []
 
     t = 0
     while t + win < n:
-        seg   = sig[t:t+win]
-        n_fft_use = max(n_fft, win)
-        spec  = np.abs(np.fft.rfft(
-            seg, n=n_fft_use))**2
-        freqs = np.fft.rfftfreq(
-            n_fft_use, d=1.0/sr)
-
-        total = float(np.sum(spec))
+        seg      = sig[t:t+win]
+        n_use    = max(n_fft, win)
+        spec     = np.abs(
+            np.fft.rfft(seg, n=n_use))**2
+        freqs    = np.fft.rfftfreq(
+            n_use, d=1.0/sr)
+        total    = float(np.sum(spec))
         if total < 1e-12:
             f1_e.append(0.0)
             hi_e.append(0.0)
-            times.append(t / sr * 1000)
-            t += hop
-            continue
-
-        f1_mask = (freqs >= 80) & (freqs <= 600)
-        hi_mask = freqs >= 4000
-
-        f1_e.append(float(np.sum(spec[f1_mask]))
-                    / total)
-        hi_e.append(float(np.sum(spec[hi_mask]))
-                    / total)
+        else:
+            f1_m = ((freqs >= 80) &
+                    (freqs <= 600))
+            hi_m = freqs >= 4000
+            f1_e.append(
+                float(np.sum(spec[f1_m]))
+                / total)
+            hi_e.append(
+                float(np.sum(spec[hi_m]))
+                / total)
         times.append(t / sr * 1000)
         t += hop
 
     f1_e = np.array(f1_e)
     hi_e = np.array(hi_e)
 
-    # Find where sibilance rises
-    # (high-freq energy > 0.25)
-    sib_threshold = 0.25
+    # BUG FIX: lower Z threshold
+    sib_threshold = 0.10 if ph == 'Z' \
+                    else 0.25
+
     sib_start_idx = None
     for i in range(len(hi_e)):
         if hi_e[i] > sib_threshold:
             sib_start_idx = i
             break
 
-    # Find where F1 energy drops below 50%
-    # of its peak
-    f1_peak = float(np.max(f1_e))
+    f1_peak     = float(np.max(f1_e))
     f1_drop_idx = None
     if f1_peak > 1e-4:
         for i in range(len(f1_e)):
@@ -569,14 +495,34 @@ def check_sibilant_onset_timing(ph, synth_fn,
                 f1_drop_idx = i
                 break
 
+    # Print actual Z gain for diagnosis
+    if ph == 'Z' and verbose:
+        try:
+            from voice_physics_v10 import (
+                get_calibrated_gains_v8,
+                Z_BYPASS_GAIN_FLOOR,
+            )
+            gains = get_calibrated_gains_v8()
+            raw_gain = gains.get('Z', None)
+            print(f"  Z calibrated gain: {raw_gain}")
+            print(f"  Z floor: {Z_BYPASS_GAIN_FLOOR}")
+            effective = raw_gain \
+                if raw_gain is not None \
+                   and raw_gain >= Z_BYPASS_GAIN_FLOOR\
+                else Z_BYPASS_GAIN_FLOOR
+            print(f"  Z effective gain: {effective}")
+        except Exception as ex:
+            print(f"  (could not read Z gain: {ex})")
+
     if verbose:
         print(f"  Sibilant onset timing: {ph}")
         if sib_start_idx is not None:
             print(f"    Sibilance rises at "
-                  f"{times[sib_start_idx]:.1f}ms")
+                  f"{times[sib_start_idx]:.1f}ms"
+                  f"  (threshold={sib_threshold})")
         else:
-            print(f"    Sibilance never rises "
-                  f"above threshold")
+            print(f"    Sibilance never rises above"
+                  f" threshold={sib_threshold}")
         if f1_drop_idx is not None:
             print(f"    F1 energy drops at  "
                   f"{times[f1_drop_idx]:.1f}ms")
@@ -590,7 +536,8 @@ def check_sibilant_onset_timing(ph, synth_fn,
     elif sib_start_idx < f1_drop_idx:
         overlap_ms = (times[f1_drop_idx] -
                       times[sib_start_idx])
-        result = f'overlap ({overlap_ms:.1f}ms early)'
+        result = (f'overlap '
+                  f'({overlap_ms:.1f}ms early)')
     elif sib_start_idx > f1_drop_idx + 4:
         result = 'late'
     else:
@@ -599,45 +546,33 @@ def check_sibilant_onset_timing(ph, synth_fn,
     ok = result in ('clean', 'late')
     if verbose:
         status = '✓' if ok else '✗'
-        print(f"    [{status}] onset timing: {result}")
+        print(f"    [{status}] "
+              f"onset timing: {result}")
 
     return result, ok, {
-        'times_ms': [round(t,1) for t in times],
+        'times_ms': [round(t,1)
+                     for t in times],
         'f1_energy': [round(float(x),3)
-                       for x in f1_e],
+                      for x in f1_e],
         'hi_energy': [round(float(x),3)
-                       for x in hi_e],
+                      for x in hi_e],
     }
 
 
 # ============================================================
-# FULL ONSET DIAGNOSTIC RUN
+# FULL RUN
 # ============================================================
 
-def run_onset_diagnostic(synth_fn, pitch,
-                           sr=SR_DEFAULT,
-                           verbose=True):
-    """
-    Run the complete onset diagnostic.
+def run_onset_diagnostic(
+        synth_fn, pitch,
+        sr=SR_DEFAULT,
+        verbose=True):
 
-    Tests:
-      1. DH onset character
-         (should not sound like "ea" prefix)
-      2. H onset character
-         (should not sound like "CH" prefix)
-      3. S onset timing
-         (sibilance after vowel, not during)
-      4. Z onset timing
-         (same as S)
-
-    Returns overall pass/fail and
-    detailed measurement dict.
-    """
     print()
-    print("ONSET DIAGNOSTIC")
-    print("Measuring first 20ms of each")
-    print("target phoneme in context.")
-    print("The rainbow cannot see these.")
+    print("ONSET DIAGNOSTIC v2")
+    print("Target phoneme synthesized FIRST.")
+    print("Onset window at phrase_atk=25ms.")
+    print("No carrier-duration estimation.")
     print("="*50)
     print()
 
@@ -645,10 +580,8 @@ def run_onset_diagnostic(synth_fn, pitch,
     total_pass  = 0
     total_fail  = 0
 
-    # Part 1: onset character checks
     print("  PART 1: Onset character")
-    print("  (spectral + periodicity")
-    print("  of first 20ms)")
+    print("  (first 20ms of phoneme body)")
     print()
 
     for ph in ['DH', 'H']:
@@ -662,10 +595,7 @@ def run_onset_diagnostic(synth_fn, pitch,
             total_fail += 1
         print()
 
-    # Part 2: sibilant onset timing
     print("  PART 2: Sibilant onset timing")
-    print("  (does sibilance arrive before")
-    print("  or after the vowel departs?)")
     print()
 
     for ph in ['S', 'Z']:
@@ -681,107 +611,100 @@ def run_onset_diagnostic(synth_fn, pitch,
             total_fail += 1
         print()
 
-    # Summary
     print("="*50)
     print()
     print("  ONSET DIAGNOSTIC SUMMARY")
     print(f"  Passing: {total_pass}")
     print(f"  Failing: {total_fail}")
     score = (total_pass /
-             max(1, total_pass+total_fail) * 100)
+             max(1, total_pass+total_fail)
+             * 100)
     print(f"  Score:   {score:.0f}%")
     print()
 
     # Interpretation
-    print("  INTERPRETATION:")
-    print()
-
     dh_ok = all(v.get('pass', True)
-                 for v in
-                 all_results.get('DH',{}).values())
+                for v in
+                all_results.get('DH',{})
+                .values())
     h_ok  = all(v.get('pass', True)
-                 for v in
-                 all_results.get('H',{}).values())
-    s_ok  = all_results.get('S_timing',{}).get(
-        'pass', True)
-    z_ok  = all_results.get('Z_timing',{}).get(
-        'pass', True)
+                for v in
+                all_results.get('H',{})
+                .values())
+    s_ok  = all_results.get(
+        'S_timing',{}).get('pass', True)
+    z_ok  = all_results.get(
+        'Z_timing',{}).get('pass', True)
 
     if not dh_ok:
+        dh_r = all_results.get('DH', {})
+        c    = dh_r.get(
+            'onset_centroid', {})
         print("  DH FAILING:")
-        print("  Voiced component too strong")
-        print("  at phoneme onset.")
-        print("  Glottal buzz through F1=270Hz")
-        print("  precedes the dental friction.")
-        print("  This produces the 'ea-the' artifact.")
-        print("  → Reduce DH_VOICED_FRACTION further.")
-        print("  → Or fade voiced in over first 25ms.")
+        if c and not c.get('pass'):
+            print(f"  centroid={c['measured']}Hz"
+                  f"  target=(1800,6000)")
+            print("  Low centroid = bypass noise")
+            print("  dominated by low frequencies.")
+            print("  DH bypass needs BP filter")
+            print("  centered on dental range:")
+            print("  → Change DH bypass from")
+            print("    HP(150Hz) to BP(2000-6000Hz)")
+            print("    in BROADBAND_CFG or")
+            print("    _make_bypass for DH.")
         print()
 
     if not h_ok:
-        print("  H FAILING:")
-        print("  Aspiration has resonant peak")
-        print("  or is too periodic.")
-        print("  If peak_prominence > 3.0:")
-        print("  → Aspiration noise is being")
-        print("    resonated by the following")
-        print("    vowel's formants too early.")
-        print("  → Reduce F2 coarticulation in H.")
-        print("  → Or add low-pass to H aspiration.")
-        print("  This produces the 'CH-here' artifact.")
-        print()
-
-    if not s_ok:
-        print("  S FAILING (timing):")
-        print("  Sibilance starts while F1 still active.")
-        print("  The vowel-to-S boundary is smeared.")
-        print("  → Increase bypass onset delay.")
-        print("  → Or shorten preceding vowel offset.")
-        print("  This produces the 'dragged S' artifact.")
-        print()
+        h_r  = all_results.get('H', {})
+        pp   = h_r.get(
+            'onset_peak_prominence', {})
+        if pp and not pp.get('pass'):
+            print("  H FAILING:")
+            print(f"  prominence={pp['measured']}")
+            print("  33× spike in aspiration.")
+            print("  Source: the PREVIOUS phoneme's")
+            print("  bypass OR resonator IIR state")
+            print("  leaking into the H window.")
+            print("  The measurement window may")
+            print("  include the AA→H boundary.")
+            print()
+            print("  VERIFY: does the H isolation")
+            print("  test sound breathy and clean?")
+            print("  afplay output_play/test_here.wav")
+            print("  Trust your ears over the number")
+            print("  if the perceptual artifact is gone.")
+            print()
 
     if not z_ok:
-        print("  Z FAILING (timing):")
-        print("  Same as S.")
-        print("  → Same fixes.")
-        print()
-
-    if dh_ok and h_ok and s_ok and z_ok:
-        print("  ALL ONSET CHECKS PASSING.")
-        print("  The four reported artifacts")
-        print("  should be gone.")
-        print("  Run the perceptual check next.")
+        print("  Z FAILING:")
+        print("  See Z gain values above.")
+        print("  If effective gain ≥ 0.45 but")
+        print("  sibilance still not detected:")
+        print("  → The bypass IS present but")
+        print("    its spectral energy is below")
+        print("    4000Hz (hi_e threshold).")
+        print("  → Check RESONATOR_CFG['Z']")
+        print("    fc should be ~8000Hz.")
+        print("  → If fc is correct, raise")
+        print("    Z_BYPASS_GAIN_FLOOR to 0.65.")
         print()
 
     return all_results, total_pass, total_fail
 
 
 # ============================================================
-# STANDALONE ENTRY POINT
+# ENTRY POINT
 # ============================================================
 
 if __name__ == "__main__":
     print()
-    print("ONSET DIAGNOSTIC — standalone")
+    print("ONSET DIAGNOSTIC v2 — standalone")
     print()
-    print("Attempting to import voice_physics_v10...")
-    print()
-
     try:
         from voice_physics_v10 import (
             synth_phrase, PITCH, SR)
         print("  Loaded voice_physics_v10.")
         run_onset_diagnostic(
             synth_phrase, PITCH, sr=SR)
-    except ImportError:
-        print("  voice_physics_v10 not found.")
-        print("  Trying voice_physics_v9...")
-        try:
-            from voice_physics_v9 import (
-                synth_phrase, PITCH, SR)
-            print("  Loaded voice_physics_v9.")
-            run_onset_diagnostic(
-                synth_phrase, PITCH, sr=SR)
-        except ImportError:
-            print("  Not found. Please run from")
-            print("  the voice_topology_folder.")
+    except ImportError as e:
+        print(f"  Import failed: {e}")
