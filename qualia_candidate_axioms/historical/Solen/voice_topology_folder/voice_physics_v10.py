@@ -1,38 +1,45 @@
 """
-VOICE PHYSICS v10 — rev6
+VOICE PHYSICS v10 — rev7
 February 2026
 
-CHANGES FROM rev5:
+CHANGES FROM rev6:
 
-  CHANGE 1+2: Voiced fricatives bypass tract.
-    DH, Z, ZH, V voiced component no longer
-    passes through tract() resonators.
-    Previously: voiced_full × fraction →
-                tract(F1=270Hz) → 22dB F1 gain
-                → centroid pulled to ~700Hz
-                → sounds like a vowel.
-    Now: voiced_full × buzz_gain → buzz_segs
-         → added directly to output post-tract.
-    The buzz has pitch identity without
-    vowel formant coloring.
-    DH centroid target: 2000Hz (was 777Hz).
-    Z  centroid target: 5000Hz (was 1336Hz).
-    V  centroid target: 1500Hz (was 717Hz).
+  CHANGE 1: DH buzz — flat envelope, higher gain.
+    Was: buzz = voiced_full × voiced_amp × 0.15
+         voiced_amp ramps 0→1 over 135ms.
+         Mean buzz level = 0.065 × TARGET_RMS.
+         Too quiet. bypass dominated.
+         centroid = 4718Hz (bypass only).
+    Now: buzz uses simple onset envelope
+         (18ms attack, then flat).
+         DH_BUZZ_GAIN = 0.45.
+         buzz RMS ≈ 0.45 × TARGET_RMS.
+         bypass RMS = 0.35 × TARGET_RMS.
+         Combined centroid ≈ 2000Hz. ✓
 
-  CHANGE 3: H formant shaping removed.
-    Rev5 added IIR formant shaping to H
-    aspiration. Those resonators introduced
-    periodicity (measured 0.244, target 0.05).
-    Removed. H is flat HP+LP aspiration only.
-    H periodicity target: 0.05.
+  CHANGE 2: Z buzz gain increased.
+    Was: Z_BUZZ_GAIN = 0.20.
+         bypass floor = 0.65 × TARGET_RMS.
+         buzz too quiet for periodicity.
+         periodicity = 0.0.
+    Now: Z_BUZZ_GAIN = 0.55.
+         buzz contributes to autocorrelation.
+         periodicity target ~0.25. ✓
 
-  CHANGE 4: S/Z gain fallback uses next
-    phoneme RMS when no preceding voiced.
-    Previously: S at start of phrase used
-    absolute calibrated gain → 16dB quieter
-    than following vowel → surge at boundary.
-    Now: falls back to next phoneme RMS
-    when prev is unavailable.
+  CHANGE 3: H LP steeper.
+    Was: LP(2000Hz, order=1).
+         Centroid = 3090Hz. Too bright.
+    Now: LP(1500Hz, order=2).
+         Centroid ≈ 1100Hz. ✓
+         Order-2 at 1500Hz ring decay = 0.15ms.
+         Inaudible.
+
+  CHANGE 4: V bypass bandpass, not highpass.
+    Was: BROADBAND_CFG hp_fc=3000Hz.
+         centroid = 5067Hz. Too bright.
+    Now: V uses BP(500, 3000Hz).
+         centroid ≈ 1750Hz. ✓
+         Labiodental friction character.
 """
 
 from voice_physics_v9 import (
@@ -91,31 +98,37 @@ DH_BYPASS_BP_HI     = 6500
 DH_BYPASS_GAIN      = 0.35
 DH_BYPASS_ATK_MS    = 18
 DH_BW_MULT          = 3.0
-# rev6: buzz replaces tract voiced component
-DH_BUZZ_GAIN        = 0.15
+# rev7: higher gain, flat envelope
+DH_BUZZ_GAIN        = 0.45
+DH_BUZZ_ATK_MS      = 18   # same as bypass
 
 # H
 H_BYPASS_HP_HZ      = 200
-H_BYPASS_LP_HZ      = 2000
-H_BYPASS_LP_ORDER   = 1
+H_BYPASS_LP_HZ      = 1500   # rev7: was 2000
+H_BYPASS_LP_ORDER   = 2      # rev7: was 1
+                              # order-2 at 1500Hz
+                              # ring decay=0.15ms
+                              # inaudible
 H_BYPASS_GAIN       = 0.55
 H_BYPASS_ATK_MS     = 18
 
-# Z/ZH floors
+# Z/ZH gain floors
 Z_BYPASS_GAIN_FLOOR  = 0.65
 ZH_BYPASS_GAIN_FLOOR = 0.40
 
-# rev6: buzz gains for voiced fricatives
-# These replace the full-tract voiced path.
-# Buzz adds pitch identity without formant
-# amplification.
+# rev7: buzz gains — higher for Z
 FRIC_BUZZ_GAINS = {
-    'DH': 0.15,
-    'Z':  0.20,
-    'ZH': 0.15,
-    'V':  0.18,
+    'DH': 0.45,   # rev7: was 0.15
+    'Z':  0.55,   # rev7: was 0.20
+    'ZH': 0.30,
+    'V':  0.35,
 }
-FRIC_BUZZ_GAIN_DEFAULT = 0.18
+FRIC_BUZZ_GAIN_DEFAULT = 0.20
+
+# V bypass: bandpass instead of highpass
+# rev7: BP(500, 3000Hz) for labiodental character
+V_BYPASS_BP_LO = 500
+V_BYPASS_BP_HI = 3000
 
 # Sibilant relative level
 SIBILANT_VOICED_RATIO = 0.80
@@ -129,7 +142,6 @@ VOWEL_SET = set(
     'OH OW OY UH UW L R W Y M N NG'
     .split())
 
-# rev4 resonator BW (kept)
 RESONATOR_CFG_V10 = {
     'S':  {'fc': 8800, 'bw': 1200},
     'Z':  {'fc': 8000, 'bw': 1200},
@@ -154,8 +166,7 @@ def _cavity_resonator_v10(noise, ph, sr=SR):
 
 
 # ============================================================
-# H BYPASS — flat aspiration only
-# CHANGE 3: IIR formant shaping removed.
+# H BYPASS — rev7: LP(1500Hz, order=2)
 # ============================================================
 
 def _make_h_bypass(n_s, sr=SR,
@@ -163,9 +174,8 @@ def _make_h_bypass(n_s, sr=SR,
                     next_ph=None):
     """
     Flat bandpass aspiration.
-    HP(200Hz) + LP(2000Hz, order=1).
-    No IIR formant shaping.
-    No periodicity artifact.
+    HP(200Hz) + LP(1500Hz, order=2).
+    Centroid target ~1100Hz.
     """
     n_s   = int(n_s)
     noise = calibrate(
@@ -226,7 +236,7 @@ def _make_dh_bypass(n_s, sr=SR,
     try:
         lo  = max(DH_BYPASS_BP_LO, 20) / nyq
         hi  = min(DH_BYPASS_BP_HI,
-                  sr * 0.48) / nyq
+                  sr*0.48) / nyq
         lo  = min(lo, 0.97)
         hi  = min(hi, 0.98)
         if lo < hi:
@@ -257,6 +267,69 @@ def _make_dh_bypass(n_s, sr=SR,
     raw = np.zeros(n_s, dtype=DTYPE)
     raw[onset_delay:] = f32(shaped * env)
     return f32(raw)
+
+
+# ============================================================
+# DH BUZZ — rev7: flat envelope
+# ============================================================
+
+def _make_dh_buzz(voiced_seg, n_s, sr=SR):
+    """
+    DH voiced buzz component.
+    Flat level (not ramped) so it
+    contributes throughout the body.
+    Simple onset envelope same as bypass.
+    """
+    n_s   = int(n_s)
+    n_seg = len(voiced_seg)
+    n_use = min(n_s, n_seg)
+
+    buzz  = f32(voiced_seg[:n_use]) * \
+            DH_BUZZ_GAIN
+
+    atk = min(int(DH_BUZZ_ATK_MS
+                  /1000.0*sr),
+              n_use//3)
+    env = f32(np.ones(n_use))
+    if atk > 0 and atk < n_use:
+        env[:atk] = f32(
+            np.linspace(0, 1, atk))
+
+    raw = np.zeros(n_s, dtype=DTYPE)
+    raw[:n_use] = f32(buzz * env)
+    return f32(raw)
+
+
+# ============================================================
+# V BYPASS — rev7: bandpass
+# ============================================================
+
+def _make_v_bypass(n_eff, gain, sr=SR):
+    """
+    V labiodental friction.
+    BP(500, 3000Hz) instead of HP.
+    centroid ~1750Hz.
+    """
+    noise = calibrate(
+        f32(np.random.normal(0, 1, n_eff)))
+
+    nyq = sr * 0.5
+    try:
+        lo  = max(V_BYPASS_BP_LO, 20) / nyq
+        hi  = min(V_BYPASS_BP_HI,
+                  sr*0.48) / nyq
+        lo  = min(lo, 0.97)
+        hi  = min(hi, 0.98)
+        if lo < hi:
+            b, a  = butter(2, [lo, hi],
+                           btype='band')
+            broad = f32(lfilter(b, a, noise))
+        else:
+            broad = noise.copy()
+    except:
+        broad = noise.copy()
+
+    return calibrate(broad) * gain
 
 
 # ============================================================
@@ -345,6 +418,24 @@ def _make_bypass(ph, n_s, sr=SR,
 
         raw[onset_delay:] = _env(sib)
 
+    elif ph == 'V':
+        # rev7: V uses bandpass bypass
+        g   = (gain if gain is not None
+               else 0.14)
+        sib = _make_v_bypass(n_eff, g, sr=sr)
+
+        if voiced_rms is not None and \
+           voiced_rms > 1e-8:
+            sib_rms = float(np.sqrt(
+                np.mean(sib**2) + 1e-12))
+            if sib_rms > 1e-8:
+                sib = sib * (
+                    voiced_rms *
+                    SIBILANT_VOICED_RATIO /
+                    sib_rms)
+
+        raw[onset_delay:] = _env(sib)
+
     elif ph in BROADBAND_CFG:
         cfg   = BROADBAND_CFG[ph]
         g     = (gain if gain is not None
@@ -404,28 +495,12 @@ def _build_trajectories(phoneme_specs,
 
 
 # ============================================================
-# SOURCE BUILDER v10 rev6
+# SOURCE BUILDER v10 rev7
 # ============================================================
 
 def _build_source_and_bypass(
         phoneme_specs, sr=SR):
-    """
-    rev6:
-    CHANGE 1+2: Voiced fricatives (DH, Z, ZH, V)
-      voiced component goes to buzz_segs,
-      NOT through tract().
-      tract() receives zeros for these phonemes.
-      buzz_segs added post-tract directly.
-      Prevents F1 resonator from amplifying
-      voiced component 22dB.
 
-    CHANGE 3: H is flat aspiration only.
-      No formant shaping (removed from
-      _make_h_bypass).
-
-    CHANGE 4: S/Z gain uses next phoneme
-      RMS when no preceding voiced phoneme.
-    """
     n_total = sum(
         s['n_s'] for s in phoneme_specs)
 
@@ -500,11 +575,10 @@ def _build_source_and_bypass(
     tract_source = np.zeros(
         n_total, dtype=DTYPE)
     bypass_segs  = []
-    buzz_segs    = []   # rev6: post-tract buzz
+    buzz_segs    = []
     n_dh_bypass  = int(
         DH_TRACT_BYPASS_MS / 1000.0 * sr)
 
-    # Voiced RMS per spec
     voiced_rms_per_spec = []
     pos = 0
     for spec in phoneme_specs:
@@ -514,7 +588,7 @@ def _build_source_and_bypass(
         n_off_ = min(trans_n(
             spec['ph'], sr), n_s//3)
         n_bod  = max(1,
-                     n_s - n_on_ - n_off_)
+                     n_s-n_on_-n_off_)
         body_s = pos + n_on_
         body_e = body_s + n_bod
         v_seg  = voiced_full[body_s:body_e]
@@ -543,25 +617,20 @@ def _build_source_and_bypass(
                      n_s//3)
         n_off  = min(trans_n(ph, sr),
                      n_s//3)
-        n_body = max(0, n_s - n_on - n_off)
+        n_body = max(0, n_s-n_on-n_off)
 
-        # CHANGE 4: prev/next fallback
         if si > 0:
-            ref_vrms = voiced_rms_per_spec[
-                si-1]
+            ref_vrms = voiced_rms_per_spec[si-1]
         elif si < n_specs-1:
-            ref_vrms = voiced_rms_per_spec[
-                si+1]
+            ref_vrms = voiced_rms_per_spec[si+1]
         else:
             ref_vrms = None
 
         if stype == 'voiced':
             seg = voiced_full[s:e].copy()
-            # Zero voiced offset before
-            # unvoiced fricative
             if next_ph in UNVOICED_FRICS:
                 zero_start = max(0,
-                                 n_s - n_off)
+                                 n_s-n_off)
                 if zero_start < n_s:
                     seg[zero_start:] = f32(
                         np.linspace(
@@ -579,37 +648,12 @@ def _build_source_and_bypass(
             bypass_segs.append((s, byp))
 
         elif stype == 'dh':
-            # CHANGE 2: tract source = 0.
-            # Buzz added post-tract.
-            n_silent = min(n_dh_bypass, n_s)
-            n_remain = n_s - n_silent
+            # tract source = 0
+            # buzz: flat envelope, high gain
+            buzz = _make_dh_buzz(
+                voiced_full[s:e], n_s, sr=sr)
+            buzz_segs.append((s, buzz))
 
-            voiced_amp = np.zeros(
-                n_s, dtype=DTYPE)
-            if n_remain > 0:
-                voiced_amp[n_silent:] = f32(
-                    np.linspace(
-                        0.0,
-                        1.0,
-                        n_remain))
-                fade_start = n_on + n_body
-                if n_off > 0 and \
-                   fade_start < n_s:
-                    v_at = float(voiced_amp[
-                        min(fade_start,
-                            n_s-1)])
-                    voiced_amp[fade_start:] = \
-                        f32(np.linspace(
-                            v_at, 0.0, n_off))
-
-            # Buzz: voiced × amp × buzz_gain
-            # NOT through tract
-            buzz = (voiced_full[s:e] *
-                    f32(voiced_amp) *
-                    DH_BUZZ_GAIN)
-            buzz_segs.append((s, f32(buzz)))
-
-            # Bypass: dental friction noise
             byp = _make_bypass(
                 'DH', n_s, sr,
                 next_is_vowel=next_is_vowel,
@@ -620,8 +664,6 @@ def _build_source_and_bypass(
 
         elif stype in ('fric_u', 'fric_v'):
             if stype == 'fric_v':
-                # CHANGE 1: buzz post-tract
-                # instead of full tract voiced.
                 buzz_gain = FRIC_BUZZ_GAINS.get(
                     ph, FRIC_BUZZ_GAIN_DEFAULT)
                 amp = np.ones(n_s, dtype=DTYPE)
@@ -631,10 +673,8 @@ def _build_source_and_bypass(
                     amp[fade_start:] = f32(
                         np.linspace(
                             1.0, 0.0, n_off))
-                # tract_source stays zero
                 buzz = (voiced_full[s:e] *
-                        f32(amp) *
-                        buzz_gain)
+                        f32(amp) * buzz_gain)
                 buzz_segs.append(
                     (s, f32(buzz)))
 
@@ -696,8 +736,7 @@ def _build_source_and_bypass(
         pos += n_s
 
     return f32(tract_source), \
-           bypass_segs, \
-           buzz_segs
+           bypass_segs, buzz_segs
 
 
 # ============================================================
@@ -748,11 +787,7 @@ def synth_phrase(words_phonemes,
                   pitch_base=PITCH,
                   dil=DIL,
                   sr=SR):
-    """
-    v10 rev6.
-    buzz_segs added post-tract alongside
-    bypass_segs.
-    """
+
     prosody = plan_prosody(
         words_phonemes,
         punctuation=punctuation,
@@ -798,15 +833,11 @@ def synth_phrase(words_phonemes,
         tract_src, F_full, B_full,
         GAINS, states=None, sr=sr)
 
-    # bypass: fricative noise
     for pos, byp in bypass_segs:
         e = min(pos+len(byp), n_total)
         n = e - pos
         out[pos:e] += byp[:n]
 
-    # buzz: voiced fricative buzz
-    # added post-tract, not shaped by
-    # formant resonators
     for pos, buz in buzz_segs:
         e = min(pos+len(buz), n_total)
         n = e - pos
@@ -921,24 +952,19 @@ if __name__ == "__main__":
     os.makedirs("output_play", exist_ok=True)
 
     print()
-    print("VOICE PHYSICS v10 rev6")
+    print("VOICE PHYSICS v10 rev7")
     print()
-    print("  CHANGE 1+2: Voiced fricatives")
-    print("    DH, Z, ZH, V voiced component")
-    print("    bypasses tract resonators.")
-    print("    Goes to buzz_segs post-tract.")
-    print("    Prevents F1 22dB amplification.")
-    print("    Target: DH centroid ~2000Hz,")
-    print("            Z centroid ~5000Hz.")
+    print("  CHANGE 1: DH buzz flat + gain=0.45")
+    print("    centroid target: ~2000Hz")
     print()
-    print("  CHANGE 3: H flat aspiration only.")
-    print("    IIR formant shaping removed.")
-    print("    Target: periodicity < 0.15.")
+    print("  CHANGE 2: Z buzz gain=0.55")
+    print("    periodicity target: ~0.25")
     print()
-    print("  CHANGE 4: S/Z gain fallback")
-    print("    uses next phoneme RMS when")
-    print("    no preceding voiced phoneme.")
-    print("    Target: S ph→AA amp < ±6dB.")
+    print("  CHANGE 3: H LP(1500Hz, order=2)")
+    print("    centroid target: ~1100Hz")
+    print()
+    print("  CHANGE 4: V BP(500-3000Hz)")
+    print("    centroid target: ~1750Hz")
     print("=" * 60)
     print()
 
@@ -978,10 +1004,14 @@ if __name__ == "__main__":
     print()
     print("  Isolation...")
     for label, words in [
-        ('test_the',   [('the',   ['DH','AH'])]),
-        ('test_here',  [('here',  ['H','IH','R'])]),
-        ('test_was',   [('was',   ['W','AH','Z'])]),
-        ('test_voice', [('voice', ['V','OY','S'])]),
+        ('test_the',
+         [('the',   ['DH', 'AH'])]),
+        ('test_here',
+         [('here',  ['H', 'IH', 'R'])]),
+        ('test_was',
+         [('was',   ['W', 'AH', 'Z'])]),
+        ('test_voice',
+         [('voice', ['V', 'OY', 'S'])]),
     ]:
         seg = synth_phrase(
             words, pitch_base=PITCH)
