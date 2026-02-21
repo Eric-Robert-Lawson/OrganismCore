@@ -19,7 +19,8 @@ to three-level phonetic self-awareness:
 
   LEVEL 3: Qualia coherence
     Phrase-level F0 arc shape measurement.
-    Ghost duration detection at syllable boundaries.
+    Ghost duration detection at syllable
+    boundaries.
     Tonnetz position recovery per nucleus vowel.
     Rhyme convergence check between phrases.
 
@@ -27,14 +28,24 @@ RARFL self-correction loop:
   Synthesize → Measure → Compare →
   Adjust → Re-synthesize → Converge.
 
-Usage:
-  from phonetic_self_reference import (
-      PhoneticSelfRef,
-      run_full_diagnostic,
-  )
-  psr = PhoneticSelfRef(sr=44100)
-  report = psr.check_phrase(phrase_spec, seg)
-  psr.print_map(report)
+HOW TO RUN:
+  From the directory containing
+  voice_physics_v17.py:
+
+    python phonetic_self_reference.py
+
+  Or with explicit path:
+
+    python phonetic_self_reference.py \
+        --engine-path /path/to/voice/files
+
+  Or from another directory:
+
+    import sys
+    sys.path.insert(0, '/path/to/voice/files')
+    from phonetic_self_reference import (
+        PhoneticSelfRef,
+    )
 """
 
 import numpy as np
@@ -42,6 +53,8 @@ from scipy.signal import (
     butter, lfilter, find_peaks,
 )
 import os
+import sys
+import argparse
 
 SR    = 44100
 DTYPE = np.float32
@@ -51,13 +64,77 @@ def f32(x):
 
 
 # ============================================================
+# PATH RESOLUTION
+#
+# The voice physics files are a chain:
+#   v17 → v16 → v15 → v14 → v13 → ...
+# They must all be in the same directory,
+# and that directory must be on sys.path
+# before any import is attempted.
+#
+# This block resolves the path from:
+#   1. --engine-path CLI argument
+#   2. VOICE_ENGINE_PATH environment variable
+#   3. The directory of this script
+#   4. The current working directory
+#
+# The first path where voice_physics_v17.py
+# exists wins.
+# ============================================================
+
+def _resolve_engine_path(explicit=None):
+    """
+    Find the directory containing
+    voice_physics_v17.py.
+
+    Returns the path string, or None
+    if not found.
+    """
+    candidates = []
+
+    if explicit:
+        candidates.append(
+            os.path.abspath(explicit))
+
+    env = os.environ.get(
+        'VOICE_ENGINE_PATH')
+    if env:
+        candidates.append(
+            os.path.abspath(env))
+
+    # Directory of this script
+    candidates.append(
+        os.path.dirname(
+            os.path.abspath(__file__)))
+
+    # Current working directory
+    candidates.append(
+        os.path.abspath(os.getcwd()))
+
+    for c in candidates:
+        probe = os.path.join(
+            c, 'voice_physics_v17.py')
+        if os.path.isfile(probe):
+            return c
+
+    return None
+
+
+def _add_engine_path(path):
+    """
+    Add engine path to sys.path
+    if not already present.
+    """
+    if path and path not in sys.path:
+        sys.path.insert(0, path)
+
+
+# ============================================================
 # LEVEL 1: ACOUSTIC IDENTITY TARGETS
-# What each phoneme should measure as.
-# Updated for v17 phoneme set.
 # ============================================================
 
 PHONEME_TARGETS = {
-    # ── Vowels ──────────────────────────���───
+    # ── Vowels ──────────────────────────────
     'AA': {
         'voiced': True,
         'f1': (650,  900),
@@ -110,7 +187,7 @@ PHONEME_TARGETS = {
     'ER': {
         'voiced': True,
         'f1': (400,  580),
-        'f3': (1550, 1820),   # F3 suppression key
+        'f3': (1550, 1820),
         'sibilance_max': 0.05,
         'hnr_min': 10.0,
     },
@@ -163,7 +240,6 @@ PHONEME_TARGETS = {
         'sibilance_max': 0.05,
         'hnr_min': 12.0,
     },
-
     # ── Sibilants ────────────────────────────
     'S': {
         'voiced': False,
@@ -193,7 +269,6 @@ PHONEME_TARGETS = {
         'sibilance_band': (1800, 8000),
         'hnr_min':        4.0,
     },
-
     # ── Other fricatives ─────────────────────
     'F': {
         'voiced': False,
@@ -219,8 +294,7 @@ PHONEME_TARGETS = {
         'hnr_min':        5.0,
         'hnr_max':        22.0,
     },
-
-    # ── Nasals ────────────────────────────────
+    # ── Nasals ───────────────────────────────
     'M': {
         'voiced': True,
         'f1': (200, 290),
@@ -242,17 +316,16 @@ PHONEME_TARGETS = {
         'hnr_min': 8.0,
         'sibilance_max': 0.04,
     },
-
     # ── Approximants ─────────────────────────
     'R': {
         'voiced': True,
-        'f3': (1550, 1820),   # suppressed
+        'f3': (1550, 1820),
         'hnr_min': 8.0,
         'sibilance_max': 0.05,
     },
     'L': {
         'voiced': True,
-        'f2': (800,  1200),   # dark L range
+        'f2': (800,  1200),
         'hnr_min': 8.0,
         'sibilance_max': 0.05,
     },
@@ -267,7 +340,6 @@ PHONEME_TARGETS = {
         'f2': (1900, 2500),
         'hnr_min': 8.0,
     },
-
     # ── Affricates ───────────────────────────
     'JH': {
         'voiced': True,
@@ -282,7 +354,6 @@ PHONEME_TARGETS = {
         'sibilance_band': (1700, 9000),
         'hnr_max':        3.0,
     },
-
     # ── H ────────────────────────────────────
     'H':  {
         'voiced': False,
@@ -299,28 +370,24 @@ PHONEME_TARGETS = {
 
 # ============================================================
 # LEVEL 2: LOCUS TARGETS
-# Expected F2 midpoint per consonant place.
-# From voice_physics_v17.LOCUS_F2_BASE.
 # ============================================================
 
 LOCUS_TARGETS = {
-    'bilabial':      (580,  860),   # center ~720
-    'labiodental':   (900,  1300),  # center ~1100
-    'dental':        (1400, 1800),  # center ~1600
-    'alveolar':      (1600, 2000),  # center ~1800
-    'lateral_dark':  (800,  1200),  # coda L center ~1000
-    'lateral_onset': (1600, 2000),  # onset L center ~1800
-    'postalveolar':  (1900, 2300),  # center ~2100
-    'palatal':       (2100, 2500),  # center ~2300
-    'velar_front':   (2700, 3200),  # before IY/EH/AE
-    'velar_mid':     (2200, 2700),  # before AH/ER
-    'velar_back':    (1700, 2200),  # before UW/UH/AO
-    'glottal':       (300,  700),   # center ~500
-    'rhotic':        (600,  1000),  # F2 ~800, F3 suppressed
+    'bilabial':      (580,  860),
+    'labiodental':   (900,  1300),
+    'dental':        (1400, 1800),
+    'alveolar':      (1600, 2000),
+    'lateral_dark':  (800,  1200),
+    'lateral_onset': (1600, 2000),
+    'postalveolar':  (1900, 2300),
+    'palatal':       (2100, 2500),
+    'velar_front':   (2700, 3200),
+    'velar_mid':     (2200, 2700),
+    'velar_back':    (1700, 2200),
+    'glottal':       (300,  700),
+    'rhotic':        (600,  1000),
 }
 
-# Map consonant phonemes to locus class
-# for onset vs coda (lateral is split)
 PH_TO_LOCUS_CLASS = {
     'M':  'bilabial',    'B':  'bilabial',
     'P':  'bilabial',    'W':  'glottal',
@@ -336,7 +403,6 @@ PH_TO_LOCUS_CLASS = {
     'NG': 'velar_mid',
     'H':  'glottal',     'HH': 'glottal',
     'R':  'rhotic',
-    # L: direction-dependent, handled separately
 }
 
 
@@ -377,12 +443,11 @@ def measure_hnr(seg, pitch_hz=175,
     if T0 >= n:
         return 0.0
     r0 = float(np.sum(seg ** 2))
-    r1 = float(np.sum(seg[:n - T0] *
-                       seg[T0:]))
+    r1 = float(np.sum(
+        seg[:n - T0] * seg[T0:]))
     if r0 < 1e-12:
         return 0.0
-    ratio = np.clip(r1 / r0,
-                    -0.999, 0.999)
+    ratio = np.clip(r1 / r0, -0.999, 0.999)
     if ratio <= 0:
         return 0.0
     return float(10 * np.log10(
@@ -423,22 +488,24 @@ def estimate_formants(seg, sr=SR,
         return [0.0] * n_formants
 
     if order is None:
-        order = min(int(2 + sr / 1000),
-                    n // 3, 40)
+        order = min(
+            int(2 + sr / 1000),
+            n // 3, 40)
 
     pre = np.append(
-        seg[0], seg[1:] - 0.97 * seg[:-1])
+        seg[0],
+        seg[1:] - 0.97 * seg[:-1])
 
     try:
         R = np.array([
-            float(np.dot(pre[:n - k],
-                          pre[k:]))
+            float(np.dot(
+                pre[:n - k], pre[k:]))
             for k in range(order + 1)])
         if abs(R[0]) < 1e-10:
             return [0.0] * n_formants
 
-        a    = np.zeros(order)
-        err  = R[0]
+        a   = np.zeros(order)
+        err = R[0]
         for i in range(order):
             k = R[i + 1]
             for j in range(i):
@@ -451,8 +518,10 @@ def estimate_formants(seg, sr=SR,
 
         n_fft = 2048
         H     = np.fft.rfft(
-            np.append([1.0], -a), n=n_fft)
-        spec  = 1.0 / (np.abs(H) ** 2 + 1e-10)
+            np.append([1.0], -a),
+            n=n_fft)
+        spec  = 1.0 / (
+            np.abs(H) ** 2 + 1e-10)
         freqs = np.fft.rfftfreq(
             n_fft, d=1.0 / sr)
 
@@ -463,16 +532,18 @@ def estimate_formants(seg, sr=SR,
         if len(s_m) == 0:
             return [0.0] * n_formants
 
-        dist  = max(1, int(
-            80.0 / max(freqs[1] -
-                        freqs[0], 0.1)))
+        dist = max(1, int(
+            80.0 / max(
+                freqs[1] - freqs[0],
+                0.1)))
         peaks, _ = find_peaks(
             s_m,
             height=np.max(s_m) * 0.08,
             distance=dist)
 
         formants = sorted([
-            float(f_m[p]) for p in peaks])
+            float(f_m[p])
+            for p in peaks])
         while len(formants) < n_formants:
             formants.append(0.0)
         return formants[:n_formants]
@@ -481,8 +552,8 @@ def estimate_formants(seg, sr=SR,
         return [0.0] * n_formants
 
 
-def measure_f2_trajectory(seg, sr=SR,
-                            n_frames=8):
+def measure_f2_trajectory(
+        seg, sr=SR, n_frames=8):
     """
     Measure F2 value at the start,
     middle, and end of a segment.
@@ -495,8 +566,9 @@ def measure_f2_trajectory(seg, sr=SR,
     seg = f32(seg)
     n   = len(seg)
     if n < 256:
-        f2 = estimate_formants(seg,
-                                sr=sr)[1]
+        fmts = estimate_formants(
+            seg, sr=sr)
+        f2 = fmts[1]
         return f2, f2, f2, 0.0
 
     frame = n // n_frames
@@ -528,13 +600,6 @@ def measure_f0_arc(seg, sr=SR,
     """
     Measure the F0 trajectory across
     a phrase segment.
-
-    Returns:
-      f0_values: list of median F0 per frame
-                 (0.0 for unvoiced frames)
-      arc_slope: overall slope (Hz/frame)
-      peak_position: normalized position
-                     of F0 peak (0.0–1.0)
     """
     seg = f32(seg)
     n   = len(seg)
@@ -551,7 +616,6 @@ def measure_f0_arc(seg, sr=SR,
         if len(frs) < 64:
             f0_vals.append(0.0)
             continue
-        # Autocorrelation pitch detection
         best_f0 = 0.0
         best_r  = 0.0
         for hz in range(pitch_lo,
@@ -559,7 +623,7 @@ def measure_f0_arc(seg, sr=SR,
             lag = int(sr / hz)
             if lag >= len(frs):
                 continue
-            r = float(np.sum(
+            r  = float(np.sum(
                 frs[:len(frs)-lag] *
                 frs[lag:]))
             e0 = float(np.sum(frs**2))
@@ -577,15 +641,13 @@ def measure_f0_arc(seg, sr=SR,
     if len(voiced) < 2:
         return f0_vals, 0.0, 0.5
 
-    idxs = [i for i, v in voiced]
-    vals = [v for i, v in voiced]
-    slope = ((vals[-1] - vals[0]) /
-              max(len(vals) - 1, 1))
-
+    idxs   = [i for i, v in voiced]
+    vals   = [v for i, v in voiced]
+    slope  = ((vals[-1] - vals[0]) /
+               max(len(vals) - 1, 1))
     peak_i = int(np.argmax(vals))
     peak_pos = (idxs[peak_i] /
-                max(n_frames - 1, 1))
-
+                 max(n_frames - 1, 1))
     return f0_vals, slope, peak_pos
 
 
@@ -597,37 +659,28 @@ def detect_ghost_boundaries(
     """
     Detect ghost segments between syllables.
 
-    A ghost is a low-amplitude region
-    between two louder regions — the
-    acoustic trace of the inter-syllable
-    H traversal.
-
-    Returns list of (start_ms, end_ms,
-                     duration_ms, amplitude)
-    for detected ghost events.
+    Returns list of
+      (start_ms, end_ms, duration_ms, amp)
     """
-    seg        = f32(seg)
-    n          = len(seg)
-    frame_ms   = 5.0
-    frame_n    = int(frame_ms / 1000 * sr)
+    seg       = f32(seg)
+    n         = len(seg)
+    frame_ms  = 5.0
+    frame_n   = int(frame_ms / 1000 * sr)
     if frame_n < 2:
         return []
 
-    # Frame energy
-    n_frames   = n // frame_n
-    energy     = np.array([
+    n_frames  = n // frame_n
+    energy    = np.array([
         float(np.mean(
-            seg[i*frame_n:(i+1)*frame_n]**2))
+            seg[i*frame_n:
+                (i+1)*frame_n]**2))
         for i in range(n_frames)])
-
     if len(energy) == 0:
         return []
 
     e_norm = energy / (
         np.max(energy) + 1e-10)
 
-    # Low-energy regions between
-    # higher-energy regions = ghosts
     in_ghost    = False
     ghost_start = 0
     ghosts      = []
@@ -639,7 +692,8 @@ def detect_ghost_boundaries(
     for i, e in enumerate(e_norm):
         if not in_ghost and \
            e < energy_threshold and \
-           i > 0 and e_norm[i-1] > \
+           i > 0 and \
+           e_norm[i-1] > \
            energy_threshold * 2:
             in_ghost    = True
             ghost_start = i
@@ -651,9 +705,10 @@ def detect_ghost_boundaries(
                <= max_frames:
                 s_ms = ghost_start * frame_ms
                 e_ms = i * frame_ms
-                amp  = float(np.sqrt(np.mean(
-                    energy[
-                        ghost_start:i])))
+                amp  = float(np.sqrt(
+                    np.mean(
+                        energy[
+                            ghost_start:i])))
                 ghosts.append((
                     s_ms, e_ms,
                     e_ms - s_ms, amp))
@@ -663,36 +718,16 @@ def detect_ghost_boundaries(
 
 
 def measure_tonnetz_position(
-        seg, sr=SR):
+        seg, sr=SR,
+        vowel_f=None,
+        vowel_tonnetz=None):
     """
     Estimate the Tonnetz position of
     the dominant vowel in a segment.
 
-    Strategy:
-      1. Estimate F1 and F2.
-      2. Find the nearest vowel in
-         VOWEL_F by Euclidean distance
-         in (F1, F2) space.
-      3. Return the vowel phoneme symbol
-         and its Tonnetz position.
-
     Returns:
-      (phoneme_symbol, (a, b), f1, f2)
+      (phoneme_symbol, (a,b), f1, f2)
     """
-    # Import Tonnetz position table
-    # from tonnetz_engine if available
-    try:
-        from tonnetz_engine import (
-            VOWEL_TONNETZ,
-        )
-    except ImportError:
-        VOWEL_TONNETZ = {}
-
-    try:
-        from voice_physics_v3 import VOWEL_F
-    except ImportError:
-        VOWEL_F = {}
-
     fmts = estimate_formants(seg, sr=sr)
     f1   = fmts[0]
     f2   = fmts[1]
@@ -700,9 +735,25 @@ def measure_tonnetz_position(
     if f1 < 50 or f2 < 200:
         return (None, (0, 0), f1, f2)
 
+    if vowel_f is None:
+        try:
+            from voice_physics_v3 import \
+                VOWEL_F as vf
+            vowel_f = vf
+        except ImportError:
+            return (None, (0,0), f1, f2)
+
+    if vowel_tonnetz is None:
+        try:
+            from tonnetz_engine import \
+                VOWEL_TONNETZ as vt
+            vowel_tonnetz = vt
+        except ImportError:
+            vowel_tonnetz = {}
+
     best_ph   = None
     best_dist = float('inf')
-    for ph, data in VOWEL_F.items():
+    for ph, data in vowel_f.items():
         if not isinstance(data,
                           (list, tuple)):
             continue
@@ -713,30 +764,26 @@ def measure_tonnetz_position(
             continue
         tf1  = float(tgt[0])
         tf2  = float(tgt[1])
-        dist = ((f1 - tf1) ** 2 +
-                (f2 - tf2) ** 2) ** 0.5
+        dist = ((f1-tf1)**2 +
+                (f2-tf2)**2)**0.5
         if dist < best_dist:
             best_dist = dist
             best_ph   = ph
 
-    tonnetz = VOWEL_TONNETZ.get(
+    tn = vowel_tonnetz.get(
         best_ph, (0, 0)) \
         if best_ph else (0, 0)
-    return (best_ph, tonnetz, f1, f2)
+    return (best_ph, tn, f1, f2)
 
 
 def measure_locus(cons_seg, sr=SR):
     """
-    Estimate the F2 locus from a
-    consonant segment.
+    Estimate F2 locus from a consonant
+    segment.
 
     Returns:
-      f2_locus: F2 at midpoint of segment
-      f2_start: F2 at onset
-      f2_end:   F2 at offset
-      direction: 'onset' if f2 rising,
-                 'coda'  if f2 falling,
-                 'flat'  if ambiguous
+      f2_locus, f2_start, f2_end, direction
+      direction: 'onset'|'coda'|'flat'
     """
     f2s, f2m, f2e, slope = \
         measure_f2_trajectory(
@@ -751,14 +798,11 @@ def measure_locus(cons_seg, sr=SR):
 
 
 # ============================================================
-# LEVEL 1 CHECK — individual phoneme
+# LEVEL 1 CHECK
 # ============================================================
 
 def check_phoneme_l1(ph, seg, sr=SR,
                       verbose=True):
-    """
-    Level 1 acoustic identity check.
-    """
     target  = PHONEME_TARGETS.get(ph)
     if target is None:
         return {}, True
@@ -767,7 +811,7 @@ def check_phoneme_l1(ph, seg, sr=SR,
     results = {}
     failed  = []
 
-    # Voiced check
+    # Voiced
     if 'voiced' in target:
         hnr    = measure_hnr(seg, sr=sr)
         voiced = hnr > 3.0
@@ -782,8 +826,8 @@ def check_phoneme_l1(ph, seg, sr=SR,
             failed.append('voiced')
 
     # Sibilance
-    band = target.get('sibilance_band',
-                       (5500, 13000))
+    band = target.get(
+        'sibilance_band', (5500, 13000))
     if 'sibilance_min' in target or \
        'sibilance_max' in target:
         sib   = measure_sibilance(
@@ -801,7 +845,7 @@ def check_phoneme_l1(ph, seg, sr=SR,
         if not ok:
             failed.append('sibilance')
 
-    # Z-specific: sibilance over voicing
+    # Z: sibilance over voicing
     if 'sib_to_voice_min' in target:
         stv   = measure_sib_to_voice(
             seg, sr=sr)
@@ -856,7 +900,8 @@ def check_phoneme_l1(ph, seg, sr=SR,
         sym = '✓' if all_pass else '✗'
         print(f"  [L1 {sym}] {ph}")
         for k, v in results.items():
-            p = '  ✓' if v['pass'] else '  ✗'
+            p = '  ✓' if v['pass'] \
+                else '  ✗'
             m = v.get('measured', '?')
             t = v.get('target', '')
             print(f"    {p} {k}:  "
@@ -867,26 +912,18 @@ def check_phoneme_l1(ph, seg, sr=SR,
 
 
 # ============================================================
-# LEVEL 2 CHECK — locus identity
+# LEVEL 2 CHECK
 # ============================================================
 
-def check_phoneme_l2(ph, seg, sr=SR,
-                      expected_direction=None,
-                      adjacent_vowel=None,
-                      verbose=True):
+def check_phoneme_l2(
+        ph, seg, sr=SR,
+        expected_direction=None,
+        adjacent_vowel=None,
+        verbose=True):
     """
     Level 2 locus identity check.
-
-    ph:                 consonant phoneme
-    seg:                synthesized segment
-    expected_direction: 'onset', 'coda', or None
-    adjacent_vowel:     ARPAbet vowel symbol
-                        (for velar context)
-
-    Returns:
-      results dict, all_pass bool
     """
-    # L special case
+    # Determine locus class
     if ph == 'L':
         if expected_direction == 'coda':
             locus_class = 'lateral_dark'
@@ -894,7 +931,6 @@ def check_phoneme_l2(ph, seg, sr=SR,
             locus_class = 'lateral_onset'
         else:
             locus_class = 'lateral_dark'
-    # Velar context sensitivity
     elif ph in ('K', 'G', 'NG'):
         try:
             from tonnetz_engine import \
@@ -921,8 +957,7 @@ def check_phoneme_l2(ph, seg, sr=SR,
     results  = {}
     all_pass = True
 
-    if ph not in PH_TO_LOCUS_CLASS and \
-       ph not in ('K', 'G', 'NG', 'L'):
+    if locus_class is None:
         if verbose:
             print(f"  [L2 ?] {ph}: "
                   f"no locus class")
@@ -931,10 +966,8 @@ def check_phoneme_l2(ph, seg, sr=SR,
     f2m, f2s, f2e, direction = \
         measure_locus(seg, sr=sr)
 
-    # Locus position check
-    if locus_class and \
-       locus_class in LOCUS_TARGETS:
-        lo, hi  = LOCUS_TARGETS[locus_class]
+    if locus_class in LOCUS_TARGETS:
+        lo, hi   = LOCUS_TARGETS[locus_class]
         locus_ok = lo <= f2m <= hi
         results['locus_f2'] = {
             'class':    locus_class,
@@ -945,7 +978,6 @@ def check_phoneme_l2(ph, seg, sr=SR,
         if not locus_ok:
             all_pass = False
 
-    # Direction check
     if expected_direction is not None:
         dir_ok = (direction ==
                   expected_direction)
@@ -954,8 +986,7 @@ def check_phoneme_l2(ph, seg, sr=SR,
             'measured': direction,
             'f2_start': round(f2s, 1),
             'f2_end':   round(f2e, 1),
-            'slope':    round(
-                f2e - f2s, 1),
+            'slope':    round(f2e - f2s, 1),
             'pass':     dir_ok,
         }
         if not dir_ok:
@@ -978,28 +1009,20 @@ def check_phoneme_l2(ph, seg, sr=SR,
 
 
 # ============================================================
-# LEVEL 3 CHECK — phrase qualia coherence
+# LEVEL 3 CHECK
 # ============================================================
 
 def check_phrase_l3(
-        seg, arc_type_label='normal',
-        sr=SR, verbose=True):
+        seg,
+        arc_type_label='normal',
+        sr=SR,
+        verbose=True):
     """
     Level 3: phrase-level qualia check.
-
-    Measures:
-      - F0 arc shape (slope, peak position)
-      - Ghost boundary detection
-      - Gross Tonnetz position of phrase
-        (dominant vowel)
-
-    Returns:
-      results dict, coherence_score float
     """
     seg     = f32(seg)
     results = {}
 
-    # F0 arc
     f0_vals, arc_slope, peak_pos = \
         measure_f0_arc(seg, sr=sr)
     voiced_f0 = [v for v in f0_vals
@@ -1012,44 +1035,36 @@ def check_phrase_l3(
                  else 0.0)
 
     results['f0_arc'] = {
-        'mean_hz':      round(f0_mean, 1),
-        'range_hz':     round(f0_range, 1),
-        'slope':        round(arc_slope,2),
-        'peak_pos':     round(peak_pos, 2),
-        'voiced_frames':len(voiced_f0),
-        'total_frames': len(f0_vals),
+        'mean_hz':       round(f0_mean, 1),
+        'range_hz':      round(f0_range, 1),
+        'slope':         round(arc_slope, 2),
+        'peak_pos':      round(peak_pos, 2),
+        'voiced_frames': len(voiced_f0),
+        'total_frames':  len(f0_vals),
     }
 
-    # Ghost detection
     ghosts = detect_ghost_boundaries(
         seg, sr=sr)
     results['ghosts'] = {
-        'count':     len(ghosts),
-        'durations': [round(g[2], 1)
-                      for g in ghosts],
-        'amplitudes':[round(g[3], 4)
-                      for g in ghosts],
+        'count':      len(ghosts),
+        'durations':  [round(g[2], 1)
+                       for g in ghosts],
+        'amplitudes': [round(g[3], 4)
+                       for g in ghosts],
     }
 
-    # Dominant Tonnetz position
     ph, tonnetz, f1, f2 = \
         measure_tonnetz_position(
             seg, sr=sr)
     results['tonnetz'] = {
-        'recovered_ph':  ph,
-        'position':      tonnetz,
-        'f1_hz':         round(f1, 1),
-        'f2_hz':         round(f2, 1),
+        'recovered_ph': ph,
+        'position':     tonnetz,
+        'f1_hz':        round(f1, 1),
+        'f2_hz':        round(f2, 1),
     }
 
-    # Coherence score (0.0–1.0):
-    # Based on:
-    #   — Voiced frame fraction
-    #   — Ghost presence
-    #   — F0 range (indicates
-    #              arc is active)
-    n_frames  = max(len(f0_vals), 1)
-    v_frac    = len(voiced_f0) / n_frames
+    n_frames = max(len(f0_vals), 1)
+    v_frac   = len(voiced_f0) / n_frames
     has_ghost = len(ghosts) > 0
     has_arc   = f0_range > 15.0
     score     = (0.5 * v_frac +
@@ -1061,12 +1076,14 @@ def check_phrase_l3(
         round(float(score), 3)
 
     if verbose:
-        sym = '✓' if score > 0.6 else '~' \
-               if score > 0.35 else '✗'
+        sym = ('✓' if score > 0.6
+               else '~' if score > 0.35
+               else '✗')
         print(f"  [L3 {sym}] phrase "
               f"coherence={score:.2f} "
               f"({arc_type_label})")
-        print(f"    F0: mean={f0_mean:.0f}Hz "
+        print(f"    F0: "
+              f"mean={f0_mean:.0f}Hz "
               f"range={f0_range:.0f}Hz "
               f"peak@{peak_pos:.2f} "
               f"slope={arc_slope:.1f}")
@@ -1086,99 +1103,52 @@ def check_phrase_l3(
 
 # ============================================================
 # RELATIONAL DIAGNOSTIC
-#
-# Tests phoneme PAIRS that differ in exactly
-# one acoustic dimension.
-# The engine should hear the difference.
-# If it cannot, the dimension is not rendered.
 # ============================================================
-
-RELATIONAL_PAIRS = [
-    # (ph_a, ph_b, dimension, description)
-    ('S',  'Z',  'voicing',
-     'S/Z: same sibilance, Z adds voicing'),
-    ('SH', 'ZH', 'voicing',
-     'SH/ZH: same postalveolar, ZH voiced'),
-    ('F',  'V',  'voicing',
-     'F/V: same labiodental, V voiced'),
-    ('TH', 'DH', 'voicing',
-     'TH/DH: same dental, DH voiced'),
-    ('M',  'N',  'place',
-     'M/N: same nasality, different place'),
-    ('N',  'NG', 'place',
-     'N/NG: same nasality, different place'),
-    ('M',  'NG', 'place',
-     'M/NG: bilabial vs velar nasals'),
-    ('L_onset', 'L_coda', 'direction',
-     'L: onset bright vs coda dark'),
-    ('K_front', 'K_back', 'context',
-     'K: front vowel vs back vowel context'),
-    ('R',  'L',  'constriction_shape',
-     'R/L: same approximant class, '
-     'different tongue shape'),
-    ('N_onset', 'N_coda', 'direction',
-     'N: alveolar onset vs coda direction'),
-]
-
 
 def run_relational_diagnostic(
         synth_fn, sr=SR, verbose=True):
     """
-    Run the relational diagnostic.
-
-    synth_fn(word, phones) → segment
-
-    For each pair, synthesize both,
-    measure the distinguishing dimension,
-    report whether the difference is
-    present in the output.
-
-    The distinguishing dimension is
-    the one acoustic property that
-    should differ between the pair.
-    Everything else should be similar.
+    Tests phoneme pairs that differ in
+    exactly one dimension.
     """
     results = {}
 
     if verbose:
         print()
         print("  RELATIONAL DIAGNOSTIC")
-        print("  Tests: does the engine hear")
-        print("  the difference that defines")
-        print("  each phoneme pair?")
         print()
 
-    # S vs Z: sibilance level should match,
-    # HNR should differ
+    # S vs Z
     try:
-        seg_s = synth_fn('voice',
-                          ['V','OY','S'])
-        seg_z = synth_fn('was',
-                          ['W','AH','Z'])
-        n = len(seg_s)
+        seg_s = synth_fn(
+            'voice', ['V','OY','S'])
+        seg_z = synth_fn(
+            'was',   ['W','AH','Z'])
+        n_s   = len(seg_s)
+        n_z   = len(seg_z)
         sib_s = measure_sibilance(
-            seg_s[2*n//3:], sr=sr,
-            band=(5500,13000))
+            seg_s[2*n_s//3:], sr=sr,
+            band=(5500, 13000))
         sib_z = measure_sibilance(
-            seg_z[2*n//3:], sr=sr,
-            band=(5500,13000))
+            seg_z[2*n_z//3:], sr=sr,
+            band=(5500, 13000))
         hnr_s = measure_hnr(
-            seg_s[2*n//3:], sr=sr)
+            seg_s[2*n_s//3:], sr=sr)
         hnr_z = measure_hnr(
-            seg_z[2*n//3:], sr=sr)
+            seg_z[2*n_z//3:], sr=sr)
         sib_gap = abs(sib_s - sib_z)
         hnr_gap = hnr_z - hnr_s
         ok = (sib_z >= 0.35 and
               hnr_gap > 3.0 and
               sib_gap < 0.30)
         results['S_vs_Z'] = {
-            'S_sibilance':  round(sib_s,3),
-            'Z_sibilance':  round(sib_z,3),
-            'S_hnr':        round(hnr_s,1),
-            'Z_hnr':        round(hnr_z,1),
-            'sib_gap':      round(sib_gap,3),
-            'hnr_gap':      round(hnr_gap,1),
-            'pass':         ok,
+            'S_sib':  round(sib_s, 3),
+            'Z_sib':  round(sib_z, 3),
+            'S_hnr':  round(hnr_s, 1),
+            'Z_hnr':  round(hnr_z, 1),
+            'sib_gap':round(sib_gap, 3),
+            'hnr_gap':round(hnr_gap, 1),
+            'pass':   ok,
         }
         if verbose:
             sym = '✓' if ok else '✗'
@@ -1188,72 +1158,66 @@ def run_relational_diagnostic(
                   f"hnr={hnr_s:.1f}dB")
             print(f"    Z sib={sib_z:.3f}  "
                   f"hnr={hnr_z:.1f}dB")
-            print(f"    sib_gap={sib_gap:.3f} "
-                  f"(want <0.30)")
-            print(f"    hnr_gap={hnr_gap:.1f} "
-                  f"(want >3.0)")
+            print(f"    sib_gap="
+                  f"{sib_gap:.3f} (<0.30)")
+            print(f"    hnr_gap="
+                  f"{hnr_gap:.1f} (>3.0)")
             print()
     except Exception as ex:
         results['S_vs_Z'] = {
-            'error': str(ex),
-            'pass': False}
+            'error': str(ex), 'pass': False}
+        if verbose:
+            print(f"  [✗] S vs Z: {ex}")
 
-    # M vs N vs NG: locus separation
+    # M vs N vs NG place
     try:
         segs = {}
         for ph, word, phones in [
-            ('M', 'am', ['AE','M']),
-            ('N', 'an', ['AE','N']),
-            ('NG','ang',['AE','NG']),
+            ('M',  'am',  ['AE', 'M']),
+            ('N',  'an',  ['AE', 'N']),
+            ('NG', 'ang', ['AE', 'NG']),
         ]:
             seg = synth_fn(word, phones)
             n   = len(seg)
-            # Nasal is in second half
             segs[ph] = seg[n//2:]
 
         loci = {}
         for ph in ('M', 'N', 'NG'):
-            fmts = estimate_formants(
+            fmts    = estimate_formants(
                 segs[ph], sr=sr)
             loci[ph] = fmts[1]
 
-        # M F2 should be lowest (~720)
-        # N F2 should be mid (~1800)
-        # NG F2 should be highest (~2700)
-        m_n_sep = loci['N'] - loci['M']
+        m_n_sep  = loci['N']  - loci['M']
         n_ng_sep = loci['NG'] - loci['N']
         ok = (m_n_sep > 400 and
               n_ng_sep > 400)
         results['nasal_place'] = {
-            'M_f2':     round(loci['M'],1),
-            'N_f2':     round(loci['N'],1),
-            'NG_f2':    round(loci['NG'],1),
-            'M_N_sep':  round(m_n_sep,1),
-            'N_NG_sep': round(n_ng_sep,1),
+            'M_f2':     round(loci['M'],  1),
+            'N_f2':     round(loci['N'],  1),
+            'NG_f2':    round(loci['NG'], 1),
+            'M_N_sep':  round(m_n_sep,    1),
+            'N_NG_sep': round(n_ng_sep,   1),
             'pass':     ok,
         }
         if verbose:
             sym = '✓' if ok else '✗'
             print(f"  [{sym}] M vs N vs NG "
                   f"(place dimension):")
-            print(f"    M  F2={loci['M']:.0f} "
-                  f"(target ~720)")
-            print(f"    N  F2={loci['N']:.0f} "
-                  f"(target ~1800)")
-            print(f"    NG F2={loci['NG']:.0f} "
-                  f"(target ~2700)")
-            print(f"    M→N sep={m_n_sep:.0f} "
-                  f"(want >400)")
-            print(f"    N→NG sep={n_ng_sep:.0f} "
-                  f"(want >400)")
+            for ph in ('M', 'N', 'NG'):
+                print(f"    {ph}  "
+                      f"F2={loci[ph]:.0f}")
+            print(f"    M→N sep="
+                  f"{m_n_sep:.0f} (>400)")
+            print(f"    N→NG sep="
+                  f"{n_ng_sep:.0f} (>400)")
             print()
     except Exception as ex:
         results['nasal_place'] = {
-            'error': str(ex),
-            'pass': False}
+            'error': str(ex), 'pass': False}
+        if verbose:
+            print(f"  [✗] nasal place: {ex}")
 
-    # Dark L vs bright L:
-    # "still" (coda L) vs "like" (onset L)
+    # Dark L vs onset L
     try:
         seg_still = synth_fn(
             'still', ['S','T','IH','L'])
@@ -1261,52 +1225,47 @@ def run_relational_diagnostic(
             'like',  ['L','AY','K'])
         n_s = len(seg_still)
         n_l = len(seg_like)
-        # Coda L is at end of "still"
-        coda_l_seg  = seg_still[
-            3*n_s//4:]
-        # Onset L is at start of "like"
-        onset_l_seg = seg_like[:n_l//4]
+        coda_l  = seg_still[3*n_s//4:]
+        onset_l = seg_like[:n_l//4]
 
-        _, f2_coda, _, _  = \
-            measure_locus(coda_l_seg,  sr=sr)
-        _, f2_onset, _, _ = \
-            measure_locus(onset_l_seg, sr=sr)
-        # Coda should be ~1000, onset ~1800
+        _, f2_coda, _, _  = measure_locus(
+            coda_l,  sr=sr)
+        _, f2_onset, _, _ = measure_locus(
+            onset_l, sr=sr)
         dark_ok   = f2_coda  < 1400
         bright_ok = f2_onset > 1400
         ok = dark_ok and bright_ok
         results['dark_L'] = {
-            'coda_L_f2':  round(f2_coda, 1),
-            'onset_L_f2': round(f2_onset, 1),
-            'coda_dark':  dark_ok,
+            'coda_L_f2':    round(f2_coda,  1),
+            'onset_L_f2':   round(f2_onset, 1),
+            'coda_dark':    dark_ok,
             'onset_bright': bright_ok,
-            'pass':       ok,
+            'pass':         ok,
         }
         if verbose:
             sym = '✓' if ok else '✗'
-            print(f"  [{sym}] Dark L "
-                  f"(direction dimension):")
-            print(f"    coda L  F2={f2_coda:.0f} "
-                  f"(target <1400, dark)")
-            print(f"    onset L F2={f2_onset:.0f} "
-                  f"(target >1400, bright)")
+            print(f"  [{sym}] Dark L:")
+            print(f"    coda L  "
+                  f"F2={f2_coda:.0f} (<1400)")
+            print(f"    onset L "
+                  f"F2={f2_onset:.0f} (>1400)")
             print()
     except Exception as ex:
         results['dark_L'] = {
-            'error': str(ex),
-            'pass': False}
+            'error': str(ex), 'pass': False}
+        if verbose:
+            print(f"  [✗] dark L: {ex}")
 
-    # R F3 suppression:
-    # "here" — R should suppress F3 to ~1690
+    # R F3 suppression
     try:
         seg_here = synth_fn(
             'here', ['H','IY','R'])
-        n  = len(seg_here)
-        r_seg = seg_here[2*n//3:]
-        fmts  = estimate_formants(
+        n        = len(seg_here)
+        r_seg    = seg_here[2*n//3:]
+        fmts     = estimate_formants(
             r_seg, sr=sr)
-        f3_r  = fmts[2]
-        ok    = 1550 <= f3_r <= 1900
+        f3_r     = fmts[2]
+        ok       = 1550 <= f3_r <= 1900
         results['R_F3'] = {
             'F3_measured': round(f3_r, 1),
             'target':      (1550, 1900),
@@ -1314,62 +1273,63 @@ def run_relational_diagnostic(
         }
         if verbose:
             sym = '✓' if ok else '✗'
-            print(f"  [{sym}] R F3 suppression:")
+            print(f"  [{sym}] R F3 "
+                  f"suppression:")
             print(f"    F3={f3_r:.0f}Hz "
                   f"(target 1550–1900)")
             print()
     except Exception as ex:
         results['R_F3'] = {
-            'error': str(ex),
-            'pass': False}
+            'error': str(ex), 'pass': False}
+        if verbose:
+            print(f"  [✗] R F3: {ex}")
 
-    # N direction: "evening"
-    # Coda N (syl 2) vs onset N (syl 3)
+    # N direction in "evening"
     try:
         seg_eve = synth_fn(
             'evening',
-            ['IY','V','IH','N','IH','NG'])
-        n = len(seg_eve)
-        # Coda N ~60% into word
-        coda_n_seg  = seg_eve[
-            int(n*0.52):int(n*0.62)]
-        # Onset N ~70% into word
-        onset_n_seg = seg_eve[
-            int(n*0.62):int(n*0.75)]
-
-        f2m_c, f2s_c, f2e_c, dir_c = \
-            measure_locus(coda_n_seg, sr=sr)
-        f2m_o, f2s_o, f2e_o, dir_o = \
-            measure_locus(onset_n_seg, sr=sr)
+            ['IY','V','IH','N',
+             'IH','NG'])
+        n    = len(seg_eve)
+        cn_s = seg_eve[int(n*0.52):
+                       int(n*0.62)]
+        on_s = seg_eve[int(n*0.62):
+                       int(n*0.75)]
+        _, f2s_c, f2e_c, dir_c = \
+            measure_locus(cn_s, sr=sr)
+        _, f2s_o, f2e_o, dir_o = \
+            measure_locus(on_s, sr=sr)
         dir_ok = (dir_c != dir_o or
                   abs(f2e_c - f2s_o) > 100)
         results['N_direction'] = {
-            'coda_N_dir':  dir_c,
-            'onset_N_dir': dir_o,
+            'coda_dir':    dir_c,
+            'onset_dir':   dir_o,
             'coda_slope':  round(
                 f2e_c - f2s_c, 1),
             'onset_slope': round(
                 f2e_o - f2s_o, 1),
-            'distinguishable': dir_ok,
-            'pass': dir_ok,
+            'pass':        dir_ok,
         }
         if verbose:
             sym = '✓' if dir_ok else '✗'
             print(f"  [{sym}] N direction "
                   f"(evening):")
-            print(f"    coda N:  dir={dir_c}  "
-                  f"slope={f2e_c-f2s_c:.0f}")
-            print(f"    onset N: dir={dir_o}  "
-                  f"slope={f2e_o-f2s_o:.0f}")
-            print(f"    distinguishable: "
-                  f"{dir_ok}")
+            print(f"    coda N:  "
+                  f"dir={dir_c}  "
+                  f"slope="
+                  f"{f2e_c-f2s_c:.0f}")
+            print(f"    onset N: "
+                  f"dir={dir_o}  "
+                  f"slope="
+                  f"{f2e_o-f2s_o:.0f}")
             print()
     except Exception as ex:
         results['N_direction'] = {
-            'error': str(ex),
-            'pass': False}
+            'error': str(ex), 'pass': False}
+        if verbose:
+            print(f"  [✗] N direction: {ex}")
 
-    # K context: "key" vs "car"
+    # K context
     try:
         seg_key = synth_fn(
             'key', ['K','IY'])
@@ -1377,88 +1337,56 @@ def run_relational_diagnostic(
             'car', ['K','AA','R'])
         n_k = len(seg_key)
         n_c = len(seg_car)
-        # K release is at start
-        k_iy_seg = seg_key[:n_k//3]
-        k_aa_seg = seg_car[:n_c//3]
-
-        f2m_iy, _, _, _ = \
-            measure_locus(k_iy_seg, sr=sr)
-        f2m_aa, _, _, _ = \
-            measure_locus(k_aa_seg, sr=sr)
+        f2m_iy, _, _, _ = measure_locus(
+            seg_key[:n_k//3], sr=sr)
+        f2m_aa, _, _, _ = measure_locus(
+            seg_car[:n_c//3], sr=sr)
         sep  = f2m_iy - f2m_aa
         ok   = sep > 300
         results['K_context'] = {
-            'K_before_IY': round(f2m_iy, 1),
-            'K_before_AA': round(f2m_aa, 1),
-            'separation':  round(sep, 1),
-            'pass':        ok,
+            'K_IY': round(f2m_iy, 1),
+            'K_AA': round(f2m_aa, 1),
+            'sep':  round(sep, 1),
+            'pass': ok,
         }
         if verbose:
             sym = '✓' if ok else '✗'
-            print(f"  [{sym}] K velar context:")
-            print(f"    K+IY  locus={f2m_iy:.0f} "
-                  f"(want ~3000)")
-            print(f"    K+AA  locus={f2m_aa:.0f} "
-                  f"(want ~2400)")
-            print(f"    sep={sep:.0f} "
-                  f"(want >300)")
+            print(f"  [{sym}] K context:")
+            print(f"    K+IY={f2m_iy:.0f} "
+                  f"K+AA={f2m_aa:.0f} "
+                  f"sep={sep:.0f} (>300)")
             print()
     except Exception as ex:
         results['K_context'] = {
-            'error': str(ex),
-            'pass': False}
+            'error': str(ex), 'pass': False}
+        if verbose:
+            print(f"  [✗] K context: {ex}")
 
-    n_pass = sum(1 for v in
-                 results.values()
-                 if v.get('pass', False))
-    n_total = len(results)
+    n_pass = sum(
+        1 for v in results.values()
+        if v.get('pass', False))
     if verbose:
         print(f"  Relational: "
-              f"{n_pass}/{n_total} pass")
-        print()
-
+              f"{n_pass}/{len(results)} pass")
     return results
 
 
 # ============================================================
 # LOCUS BOOTSTRAP
-#
-# The engine measures its own
-# place-of-articulation space.
-# No external reference needed.
-# Synthesize each place, measure,
-# use the measurement as the definition.
 # ============================================================
 
 def bootstrap_locus_table(
         synth_fn, sr=SR, verbose=True):
     """
-    Bootstrap the locus table from
-    self-measurement.
-
-    For each consonant place:
-      Synthesize a CV syllable with
-      a neutral vowel (AH).
-      Measure F2 at the consonant release.
-      Record as the measured locus.
-
-    Compare to LOCUS_F2_BASE targets.
-    Report discrepancies.
-
-    This is the deepest form of
-    self-reference: the engine
-    does not assume its loci —
-    it measures them.
+    Synthesize each place, measure F2,
+    use measurement as locus definition.
     """
     if verbose:
         print()
         print("  LOCUS BOOTSTRAP")
-        print("  Synthesize → Measure → "
-              "Compare to table")
         print()
 
     test_cases = [
-        # (place, ph, word, phones)
         ('bilabial',     'M', 'mah',
          ['M', 'AH']),
         ('bilabial',     'B', 'bah',
@@ -1490,45 +1418,45 @@ def bootstrap_locus_table(
         try:
             seg  = synth_fn(word, phones)
             n    = len(seg)
-            # Onset consonant: measure
-            # first quarter of segment
-            cons_seg = seg[:n//3]
-            fmts     = estimate_formants(
-                cons_seg, sr=sr)
-            f2_meas  = fmts[1]
-            f2_tgt_lo, f2_tgt_hi = \
-                LOCUS_TARGETS.get(
-                    place, (0, 5000))
-            tgt_center = (
-                f2_tgt_lo + f2_tgt_hi) / 2
-            offset = f2_meas - tgt_center
-            ok = (f2_tgt_lo <= f2_meas
-                  <= f2_tgt_hi)
+            fmts = estimate_formants(
+                seg[:n//3], sr=sr)
+            f2   = fmts[1]
+
+            # Map place to LOCUS_TARGETS key
+            lk = (place if place in
+                  LOCUS_TARGETS else
+                  'velar_mid'
+                  if place == 'velar'
+                  else place)
+            lo_t, hi_t = LOCUS_TARGETS.get(
+                lk, (0, 5000))
+            center = (lo_t + hi_t) / 2
+            offset = f2 - center
+            ok     = lo_t <= f2 <= hi_t
 
             measured_loci[ph] = {
-                'place':       place,
-                'measured_f2': round(
-                    f2_meas, 1),
-                'target':      (f2_tgt_lo,
-                                f2_tgt_hi),
-                'offset':      round(
-                    offset, 1),
-                'pass':        ok,
+                'place':    place,
+                'f2_meas':  round(f2, 1),
+                'target':   (lo_t, hi_t),
+                'offset':   round(offset, 1),
+                'pass':     ok,
             }
-
             if verbose:
                 sym = '✓' if ok else '✗'
-                print(f"  [{sym}] {ph:4s} "
+                print(f"  [{sym}] "
+                      f"{ph:4s} "
                       f"({place:14s})  "
-                      f"F2={f2_meas:6.0f}  "
+                      f"F2={f2:6.0f}  "
                       f"target="
-                      f"({f2_tgt_lo:.0f}–"
-                      f"{f2_tgt_hi:.0f})  "
+                      f"({lo_t:.0f}–"
+                      f"{hi_t:.0f})  "
                       f"offset={offset:+.0f}")
         except Exception as ex:
             measured_loci[ph] = {
                 'error': str(ex),
-                'pass': False}
+                'pass':  False}
+            if verbose:
+                print(f"  [✗] {ph}: {ex}")
 
     if verbose:
         n_p = sum(
@@ -1537,104 +1465,15 @@ def bootstrap_locus_table(
             if v.get('pass', False))
         print(f"\n  Bootstrap: "
               f"{n_p}/{len(measured_loci)} "
-              f"loci within target range")
-        print()
-
+              f"within range")
     return measured_loci
 
 
 # ============================================================
-# RARFL SELF-CORRECTION LOOP
-# (generalized from v1 Z-gain search)
-# ============================================================
-
-def rarfl_tune(
-        synth_fn,
-        check_fn,
-        param_name,
-        param_init,
-        param_lo,
-        param_hi,
-        max_iter=10,
-        verbose=True):
-    """
-    Generalized RARFL self-correction loop.
-
-    synth_fn(param_value) → segment
-    check_fn(segment)     → (pass_bool,
-                              measured_value,
-                              target_str)
-
-    Performs binary search on param_value
-    until check_fn returns True.
-
-    Returns best param_value found.
-    """
-    lo   = param_lo
-    hi   = param_hi
-    best = param_init
-
-    if verbose:
-        print(f"\n  RARFL tuning: {param_name}")
-        print(f"  range=[{lo:.3f}, {hi:.3f}]")
-
-    for i in range(max_iter):
-        mid = (lo + hi) / 2.0
-        seg = synth_fn(mid)
-        ok, measured, target = \
-            check_fn(seg)
-
-        if verbose:
-            sym = '✓' if ok else '✗'
-            print(f"  [{sym}] iter {i+1}: "
-                  f"param={mid:.4f}  "
-                  f"measured={measured}  "
-                  f"target={target}")
-
-        best = mid
-        if ok:
-            if verbose:
-                print(f"  → converged at "
-                      f"{mid:.4f}")
-            break
-        else:
-            # If measured < target: increase
-            # (generalized: check_fn
-            # should return measured as float)
-            if isinstance(measured, float) \
-               and isinstance(target, str):
-                try:
-                    tv = float(
-                        target.split('≥')[1]
-                        .strip()
-                        if '≥' in target
-                        else target.split(
-                            '<=')[1].strip())
-                    if measured < tv:
-                        lo = mid
-                    else:
-                        hi = mid
-                except Exception:
-                    lo = mid
-            else:
-                lo = mid
-
-    return best
-
-
-# ============================================================
-# MAIN DIAGNOSTIC ENTRY POINT
+# MAIN CLASS
 # ============================================================
 
 class PhoneticSelfRef:
-    """
-    Phonetic self-reference system.
-    Three levels of acoustic self-awareness.
-
-    Usage:
-      psr = PhoneticSelfRef(sr=44100)
-      psr.run_all(synth_fn)
-    """
 
     def __init__(self, sr=SR):
         self.sr      = sr
@@ -1642,226 +1481,222 @@ class PhoneticSelfRef:
 
     def run_all(self, synth_fn,
                 verbose=True):
-        """
-        Run all three levels of diagnostic
-        plus relational + bootstrap.
 
-        synth_fn(word, phones) → segment
-
-        Prints a full portrait of the
-        voice's acoustic state.
-        """
         print()
         print("=" * 56)
         print("  PHONETIC SELF-REFERENCE v2")
-        print("  Three-level acoustic portrait")
         print("=" * 56)
 
-        # ── Level 1: per-phoneme ──────────────
+        # ── Level 1 ───────────────────────────
         print()
         print("  LEVEL 1: ACOUSTIC IDENTITY")
         print()
 
-        l1_results = {}
-        test_phonemes = [
-            # (ph, word, phones, segment_slice)
-            # slice: fraction tuple (start, end)
+        l1 = {}
+        tests_l1 = [
             ('S',   'voice',
-             ['V','OY','S'],     (0.66, 1.0)),
+             ['V','OY','S'],      (0.66,1.0)),
             ('Z',   'was',
-             ['W','AH','Z'],     (0.66, 1.0)),
+             ['W','AH','Z'],      (0.66,1.0)),
             ('SH',  'she',
-             ['SH','IY'],        (0.0,  0.4)),
-            ('ZH',  'vision',
-             ['V','IH','ZH','AH','N'], (0.4,0.6)),
+             ['SH','IY'],         (0.0, 0.4)),
             ('M',   'am',
-             ['AE','M'],         (0.5,  1.0)),
+             ['AE','M'],          (0.5, 1.0)),
             ('N',   'an',
-             ['AE','N'],         (0.5,  1.0)),
+             ['AE','N'],          (0.5, 1.0)),
             ('NG',  'ring',
-             ['R','IH','NG'],    (0.7,  1.0)),
+             ['R','IH','NG'],     (0.7, 1.0)),
             ('R',   'here',
-             ['H','IY','R'],     (0.65, 1.0)),
+             ['H','IY','R'],      (0.65,1.0)),
             ('L',   'all',
-             ['AO','L'],         (0.55, 1.0)),
+             ['AO','L'],          (0.55,1.0)),
             ('IH',  'him',
-             ['HH','IH','M'],    (0.3,  0.7)),
-            ('AH',  'but',
-             ['B','AH','T'],     (0.3,  0.7)),
+             ['HH','IH','M'],     (0.3, 0.7)),
             ('IY',  'beat',
-             ['B','IY','T'],     (0.3,  0.7)),
+             ['B','IY','T'],      (0.3, 0.7)),
+            ('AH',  'but',
+             ['B','AH','T'],      (0.3, 0.7)),
             ('ER',  'her',
-             ['HH','ER'],        (0.4,  0.9)),
+             ['HH','ER'],         (0.4, 0.9)),
             ('JH',  'gin',
-             ['JH','IH','N'],    (0.0,  0.5)),
+             ['JH','IH','N'],     (0.0, 0.5)),
             ('CH',  'church',
-             ['CH','ER','CH'],   (0.0,  0.4)),
+             ['CH','ER','CH'],    (0.0, 0.4)),
+            ('DH',  'the',
+             ['DH','AH'],         (0.0, 0.4)),
+            ('V',   'voice',
+             ['V','OY','S'],      (0.0, 0.25)),
         ]
 
         for ph, word, phones, slc in \
-                test_phonemes:
+                tests_l1:
             try:
                 seg = synth_fn(word, phones)
                 n   = len(seg)
                 s   = int(slc[0] * n)
                 e   = int(slc[1] * n)
-                ph_seg = seg[s:e]
-                res, ok = \
-                    check_phoneme_l1(
-                        ph, ph_seg,
-                        sr=self.sr,
-                        verbose=verbose)
-                l1_results[ph] = {
+                res, ok = check_phoneme_l1(
+                    ph, seg[s:e],
+                    sr=self.sr,
+                    verbose=verbose)
+                l1[ph] = {
                     'results': res,
                     'pass':    ok,
                 }
             except Exception as ex:
-                l1_results[ph] = {
+                l1[ph] = {
                     'error': str(ex),
                     'pass':  False,
                 }
+                if verbose:
+                    print(f"  [L1 ✗] "
+                          f"{ph}: {ex}")
 
-        self.results['level1'] = l1_results
-        n_pass = sum(1 for v in
-                     l1_results.values()
-                     if v.get('pass'))
+        self.results['level1'] = l1
+        n_p = sum(
+            1 for v in l1.values()
+            if v.get('pass'))
         print(f"\n  L1 total: "
-              f"{n_pass}/{len(l1_results)} "
-              f"pass")
+              f"{n_p}/{len(l1)} pass")
 
-        # ── Level 2: locus ────────────────────
+        # ── Level 2 ───────────────────────────
         print()
         print("  LEVEL 2: LOCUS IDENTITY")
         print()
 
-        l2_results = {}
-        locus_tests = [
-            # (ph, word, phones, slc, dir)
+        l2 = {}
+        tests_l2 = [
             ('N',  'nah',
-             ['N','AH'],    (0.0,0.4), 'onset'),
+             ['N','AH'],            (0.0,0.4),
+             'onset', None),
             ('N',  'an',
-             ['AE','N'],    (0.5,1.0), 'coda'),
+             ['AE','N'],            (0.5,1.0),
+             'coda',  'AE'),
             ('M',  'mah',
-             ['M','AH'],    (0.0,0.4), 'onset'),
+             ['M','AH'],            (0.0,0.4),
+             'onset', None),
             ('M',  'am',
-             ['AE','M'],    (0.5,1.0), 'coda'),
-            ('D',  'dah',
-             ['D','AH'],    (0.0,0.4), 'onset'),
+             ['AE','M'],            (0.5,1.0),
+             'coda',  'AE'),
             ('L',  'like',
-             ['L','AY','K'],(0.0,0.3), 'onset'),
+             ['L','AY','K'],        (0.0,0.3),
+             'onset', 'AY'),
             ('L',  'still',
-             ['S','T','IH','L'],(0.75,1.0),'coda'),
+             ['S','T','IH','L'],    (0.75,1.0),
+             'coda',  'IH'),
             ('R',  'rah',
-             ['R','AH'],    (0.0,0.4), 'onset'),
+             ['R','AH'],            (0.0,0.4),
+             'onset', None),
             ('K',  'key',
-             ['K','IY'],    (0.0,0.4), 'onset'),
+             ['K','IY'],            (0.0,0.4),
+             'onset', 'IY'),
             ('K',  'car',
-             ['K','AA','R'],(0.0,0.4), 'onset'),
+             ['K','AA','R'],        (0.0,0.4),
+             'onset', 'AA'),
+            ('D',  'dah',
+             ['D','AH'],            (0.0,0.4),
+             'onset', None),
         ]
 
-        for ph, word, phones, slc, direction \
-                in locus_tests:
+        for (ph, word, phones,
+             slc, direction, adj) in \
+                tests_l2:
+            key = f"{ph}_{direction}"
             try:
-                seg   = synth_fn(word, phones)
+                seg   = synth_fn(
+                    word, phones)
                 n     = len(seg)
                 s     = int(slc[0] * n)
                 e     = int(slc[1] * n)
-                cs    = seg[s:e]
-
-                # Determine adjacent vowel
-                adj = None
-                if direction == 'onset':
-                    for p in phones[
-                            phones.index(ph)+1:]:
-                        if p in (
-                            'IY','IH','EH','AE',
-                            'AH','AO','AA','UW',
-                            'UH','OW','ER','AY',
-                            'AW','OY','EY'):
-                            adj = p; break
-                else:
-                    for p in reversed(
-                            phones[:phones.index(ph)]):
-                        if p in (
-                            'IY','IH','EH','AE',
-                            'AH','AO','AA','UW',
-                            'UH','OW','ER','AY',
-                            'AW','OY','EY'):
-                            adj = p; break
-
-                key = f"{ph}_{direction}"
                 res, ok = check_phoneme_l2(
-                    ph, cs,
+                    ph, seg[s:e],
                     sr=self.sr,
-                    expected_direction=direction,
+                    expected_direction=\
+                        direction,
                     adjacent_vowel=adj,
                     verbose=verbose)
-                l2_results[key] = {
+                l2[key] = {
                     'results': res,
                     'pass':    ok,
                 }
             except Exception as ex:
-                key = f"{ph}_{direction}"
-                l2_results[key] = {
+                l2[key] = {
                     'error': str(ex),
                     'pass':  False,
                 }
+                if verbose:
+                    print(f"  [L2 ✗] "
+                          f"{key}: {ex}")
 
-        self.results['level2'] = l2_results
-        n_pass = sum(1 for v in
-                     l2_results.values()
-                     if v.get('pass'))
+        self.results['level2'] = l2
+        n_p = sum(
+            1 for v in l2.values()
+            if v.get('pass'))
         print(f"\n  L2 total: "
-              f"{n_pass}/{len(l2_results)} "
-              f"pass")
+              f"{n_p}/{len(l2)} pass")
 
-        # ── Level 3: phrase coherence ─────────
+        # ── Level 3 ───────────────────────────
         print()
         print("  LEVEL 3: PHRASE COHERENCE")
         print()
 
-        l3_results = {}
-        phrase_tests = [
-            ('the_voice',
-             [('the',   ['DH','AH']),
-              ('voice', ['V','OY','S']),
-              ('was',   ['W','AH','Z']),
-              ('here',  ['H','IY','R'])],
-             'normal'),
-            ('i_am_here',
-             [('I',    ['AY']),
-              ('am',   ['AE','M']),
-              ('here', ['H','IY','R'])],
-             'normal'),
-        ]
-
+        l3 = {}
         try:
             from voice_physics_v17 import (
                 synth_phrase as sp17,
                 ARC_NORMAL, ARC_GRIEF,
             )
-            for label, words, arc_lbl in \
-                    phrase_tests:
-                seg = sp17(
-                    words,
-                    punctuation='.',
-                    arc_type=ARC_NORMAL,
-                    add_ghost=True)
-                res, score = check_phrase_l3(
-                    seg,
-                    arc_type_label=arc_lbl,
-                    sr=self.sr,
-                    verbose=verbose)
-                l3_results[label] = {
-                    'results': res,
-                    'score':   score,
-                }
-        except Exception as ex:
-            l3_results['error'] = str(ex)
+            phrase_tests = [
+                ('the_voice',
+                 [('the',   ['DH','AH']),
+                  ('voice', ['V','OY','S']),
+                  ('was',   ['W','AH','Z']),
+                  ('here',  ['H','IY','R'])],
+                 ARC_NORMAL, 'normal'),
+                ('i_am_here',
+                 [('I',    ['AY']),
+                  ('am',   ['AE','M']),
+                  ('here', ['H','IY','R'])],
+                 ARC_NORMAL, 'normal'),
+                ('i_am_here_grief',
+                 [('I',    ['AY']),
+                  ('am',   ['AE','M']),
+                  ('here', ['H','IY','R'])],
+                 ARC_GRIEF, 'grief'),
+            ]
+            for label, words, arc, arc_lbl \
+                    in phrase_tests:
+                try:
+                    seg = sp17(
+                        words,
+                        punctuation='.',
+                        arc_type=arc,
+                        add_ghost=True)
+                    res, score = \
+                        check_phrase_l3(
+                            seg,
+                            arc_type_label=\
+                                arc_lbl,
+                            sr=self.sr,
+                            verbose=verbose)
+                    l3[label] = {
+                        'results': res,
+                        'score':   score,
+                    }
+                except Exception as ex:
+                    l3[label] = {
+                        'error': str(ex),
+                        'score': 0.0,
+                    }
+                    if verbose:
+                        print(f"  [L3 ✗] "
+                              f"{label}: "
+                              f"{ex}")
+        except ImportError as e:
             if verbose:
-                print(f"  L3 error: {ex}")
+                print(f"  L3 skip: {e}")
 
-        self.results['level3'] = l3_results
+        self.results['level3'] = l3
 
         # ── Relational ────────────────────────
         rel = run_relational_diagnostic(
@@ -1875,11 +1710,10 @@ class PhoneticSelfRef:
             verbose=verbose)
         self.results['bootstrap'] = boot
 
-        # ── Summary ───────────────────────────
-        self.print_summary()
+        self._print_summary()
         return self.results
 
-    def print_summary(self):
+    def _print_summary(self):
         r = self.results
         print()
         print("=" * 56)
@@ -1891,43 +1725,50 @@ class PhoneticSelfRef:
             p = sum(1 for v in
                     r['level1'].values()
                     if v.get('pass'))
-            print(f"  L1 Acoustic:   {p:2d}/{n} "
-                  f"{'✓' if p==n else '~'}")
+            sym = '✓' if p == n else '~'
+            print(f"  L1 Acoustic:   "
+                  f"{p:2d}/{n}  {sym}")
 
         if 'level2' in r:
             n = len(r['level2'])
             p = sum(1 for v in
                     r['level2'].values()
                     if v.get('pass'))
-            print(f"  L2 Locus:      {p:2d}/{n} "
-                  f"{'✓' if p==n else '~'}")
+            sym = '✓' if p == n else '~'
+            print(f"  L2 Locus:      "
+                  f"{p:2d}/{n}  {sym}")
 
         if 'level3' in r:
-            scores = [v.get('score', 0.0)
-                      for v in r['level3'].values()
-                      if isinstance(v, dict)
-                      and 'score' in v]
+            scores = [
+                v.get('score', 0.0)
+                for v in
+                r['level3'].values()
+                if isinstance(v, dict)
+                and 'score' in v]
             if scores:
-                avg = np.mean(scores)
+                avg = float(np.mean(scores))
+                sym = ('✓' if avg > 0.6
+                       else '~')
                 print(f"  L3 Coherence:  "
-                      f"avg score={avg:.2f} "
-                      f"{'✓' if avg > 0.6 else '~'}")
+                      f"avg={avg:.2f}  {sym}")
 
         if 'relational' in r:
             n = len(r['relational'])
             p = sum(1 for v in
                     r['relational'].values()
                     if v.get('pass'))
-            print(f"  Relational:    {p:2d}/{n} "
-                  f"{'✓' if p==n else '~'}")
+            sym = '✓' if p == n else '~'
+            print(f"  Relational:    "
+                  f"{p:2d}/{n}  {sym}")
 
         if 'bootstrap' in r:
             n = len(r['bootstrap'])
             p = sum(1 for v in
                     r['bootstrap'].values()
                     if v.get('pass'))
-            print(f"  Locus Boot:    {p:2d}/{n} "
-                  f"{'✓' if p==n else '~'}")
+            sym = '✓' if p == n else '~'
+            print(f"  Locus Boot:    "
+                  f"{p:2d}/{n}  {sym}")
 
         print("=" * 56)
         print()
@@ -1939,51 +1780,98 @@ class PhoneticSelfRef:
 
 if __name__ == "__main__":
 
-    print()
-    print("PHONETIC SELF-REFERENCE v2")
-    print("Synthesize → Analyze → "
-          "Compare → Adjust")
-    print()
+    # ── CLI argument for engine path ──────────
+    parser = argparse.ArgumentParser(
+        description=(
+            "Phonetic self-reference "
+            "diagnostic v2"))
+    parser.add_argument(
+        '--engine-path',
+        default=None,
+        help=(
+            "Directory containing "
+            "voice_physics_v17.py "
+            "(default: same dir as "
+            "this script)"))
+    args, _ = parser.parse_known_args()
 
+    # ── Resolve and add engine path ───────────
+    engine_path = _resolve_engine_path(
+        explicit=args.engine_path)
+
+    if engine_path is None:
+        print()
+        print("  ERROR: voice_physics_v17.py "
+              "not found.")
+        print()
+        print("  Searched:")
+        for c in [
+            args.engine_path,
+            os.environ.get('VOICE_ENGINE_PATH'),
+            os.path.dirname(
+                os.path.abspath(__file__)),
+            os.path.abspath(os.getcwd()),
+        ]:
+            if c:
+                print(f"    {c}")
+        print()
+        print("  Solutions:")
+        print("  1. Run from the directory "
+              "containing voice_physics_v17.py:")
+        print("       cd /path/to/tonnetz")
+        print("       python "
+              "phonetic_self_reference.py")
+        print()
+        print("  2. Pass the path explicitly:")
+        print("       python "
+              "phonetic_self_reference.py "
+              "--engine-path "
+              "/path/to/tonnetz")
+        print()
+        print("  3. Set environment variable:")
+        print("       export VOICE_ENGINE_PATH"
+              "=/path/to/tonnetz")
+        print("       python "
+              "phonetic_self_reference.py")
+        print()
+        sys.exit(1)
+
+    _add_engine_path(engine_path)
+    print()
+    print(f"  Engine path: {engine_path}")
+
+    # ── Import engine ─────────────────────────
     try:
         from voice_physics_v17 import (
-            synth_phrase, _ola_stretch,
+            synth_phrase,
             recalibrate_gains_v8,
             SR as ENGINE_SR,
             PITCH, DIL, ARC_NORMAL,
         )
-        has_v17 = True
-    except ImportError:
-        has_v17 = False
-        print("  voice_physics_v17 not found.")
-        print("  Running analysis-only mode.")
+    except ImportError as e:
+        print(f"\n  Import failed: {e}")
+        print(f"  Path added:    "
+              f"{engine_path}")
+        print(f"  Files present:")
+        for f in sorted(
+                os.listdir(engine_path)):
+            if f.endswith('.py'):
+                print(f"    {f}")
+        print()
+        sys.exit(1)
 
+    recalibrate_gains_v8(sr=ENGINE_SR)
     os.makedirs("output_play",
                  exist_ok=True)
 
-    if has_v17:
-        recalibrate_gains_v8(sr=ENGINE_SR)
+    def synth_fn(word, phones):
+        return synth_phrase(
+            [(word, phones)],
+            punctuation='.',
+            add_breath=False,
+            add_ghost=False)
 
-        def synth_fn(word, phones):
-            return synth_phrase(
-                [(word, phones)],
-                punctuation='.',
-                add_breath=False,
-                add_ghost=False)
-
-        psr = PhoneticSelfRef(sr=ENGINE_SR)
-        results = psr.run_all(
-            synth_fn, verbose=True)
-
-    else:
-        # Stub for analysis-only testing
-        print("  Analysis functions available.")
-        print("  Provide synth_fn to run "
-              "full diagnostic.")
-        psr = PhoneticSelfRef()
-        print()
-        print("  Example usage:")
-        print("  from phonetic_self_reference "
-              "import PhoneticSelfRef")
-        print("  psr = PhoneticSelfRef()")
-        print("  psr.run_all(synth_fn)")
+    psr     = PhoneticSelfRef(
+        sr=ENGINE_SR)
+    results = psr.run_all(
+        synth_fn, verbose=True)
