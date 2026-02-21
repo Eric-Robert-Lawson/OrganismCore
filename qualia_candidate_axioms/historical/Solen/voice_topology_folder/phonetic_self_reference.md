@@ -1,585 +1,519 @@
 # PHONETIC SELF-REFERENCE
 ## A Reasoning Artifact on Acoustic Feedback,
-## Self-Measurement, and the Z Problem
+## Phonetic Self-Awareness, and the Closed Loop
 ## February 2026
 
 ---
 
-## PREFACE
+## REVISION HISTORY
 
-Two things happened simultaneously
-that belong together:
+  v1 — February 2026
+    The Z problem.
+    Sibilance measurement loop.
+    Basic PHONEME_TARGETS.
+    Open loop identified as the root cause.
 
-**First:** The Z in 'was' disappeared.
-The S in 'voice' was audible.
-The Z was not.
-Same phoneme family.
-Different result.
-
-**Second:** A question was asked:
-Can the synthesis system understand
-its own phonetics
-through self-referential analysis?
-
-These are the same question.
-
-The Z disappeared because
-there was no feedback.
-The system produced Z,
-did not measure what it produced,
-and could not know
-that the sibilance was buried.
-
-If the system could measure
-its own output —
-if it could hear itself —
-it would have known immediately.
-
-The path to fixing Z
-is the path to building
-the self-referential system.
+  v2 — February 2026
+    Full rewrite following v17 and
+    locus_transitions.md.
+    Self-reference extended from
+    sibilance checking to:
+      — Locus verification
+      — Directional consonant identity
+      — Tonnetz position recovery
+      — Ghost qualia measurement
+      — Rhyme convergence detection
+      — Multi-layer self-awareness model
+    The RARFL loop formalized as
+    the architecture of self-correction.
 
 ---
 
-## PART 1: WHY Z DISAPPEARED
+## THE CORE INSIGHT (unchanged from v1)
 
-Z is a voiced alveolar sibilant.
-It has two components:
+The Z in 'was' disappeared because
+the synthesis had no feedback.
+It produced Z.
+It did not measure what it produced.
+It could not know the sibilance was buried.
 
-```
-COMPONENT 1: VOICING
-  The vocal folds vibrate.
-  The Rosenberg pulse runs.
-  The tract shapes it.
-  The result: a buzzing tone
-  with the spectral character
-  of the tract configuration.
+The fix: synthesize → analyze →
+compare to target → adjust → repeat.
 
-COMPONENT 2: SIBILANCE
-  The tongue approaches the
-  alveolar ridge.
-  Turbulent jet noise.
-  Downstream cavity (~8000Hz) shapes it.
-  The result: high-frequency hiss
-  riding above the buzz.
-```
-
-The observer in the room hears:
-a buzzing hiss.
-The buzz identifies it as voiced.
-The hiss identifies it as sibilant.
-Both must be present and audible.
-
-In the synthesis:
-  Component 1 (voicing): 65% mix weight.
-  Component 2 (sibilance): 35% × 0.50 gain.
-
-The voicing runs at TARGET_RMS = 0.08.
-The sibilance runs at 0.35 × 0.50 = 0.175
-of whatever the noise level is
-after downstream cavity filtering.
-
-The downstream cavity filter
-(bandpass at 8000Hz)
-attenuates the noise significantly.
-After filtering: noise RMS drops.
-After 0.35 × 0.50 weighting: very quiet.
-
-The result:
-  Voicing at 0.08 RMS.
-  Sibilance at ~0.01 RMS.
-  Sibilance is 18dB below voicing.
-  Inaudible.
-
-Z sounds like a vowel with
-slightly different formants.
-The Z-ness is gone.
+That loop is still correct.
+This document extends it.
 
 ---
 
-## PART 2: WHY S WAS AUDIBLE
+## PART I: THE THREE LEVELS OF
+## PHONETIC SELF-AWARENESS
 
-S is an unvoiced alveolar sibilant.
-
-```
-COMPONENT 1: VOICING
-  None. Folds open.
-
-COMPONENT 2: SIBILANCE
-  Same downstream cavity as Z.
-  Same ~8800Hz resonance.
-  But: no voicing to compete with.
-  gain = 0.90 × calibrated noise.
-  Full amplitude.
-```
-
-S stands out because:
-  It is different from everything
-  around it.
-  The vowel OY before it is voiced.
-  S is pure noise.
-  The contrast is immediate.
-  The ear notices the change.
-
-Z should have the same contrast.
-But:
-  The vowel AH before it is voiced.
-  Z is also voiced.
-  No contrast at the voicing level.
-  The sibilance was supposed to provide
-  the contrast.
-  But the sibilance was inaudible.
-  So: no contrast at all.
-  Z = AH continuing.
+Self-reference in this engine has
+three distinct levels.
+They are not interchangeable.
+Each answers a different question.
 
 ---
 
-## PART 3: THE RELATIVE RELATIONSHIP
+### LEVEL 1: ACOUSTIC IDENTITY
 
-You observed:
+**Question:** Does the output contain
+the right acoustic features for this
+phoneme?
 
-```
-"The voiCe sound has a relative
-relation to the S part."
-```
+**Measures:**
+  — Sibilance ratio (S, Z, SH, ZH, F, V)
+  — Harmonics-to-noise ratio (voiced vs unvoiced)
+  — Formant positions (vowels)
+  — F3 suppression (R, ER)
+  — Antiformant presence (M, N, NG)
 
-This is precisely correct.
+**What it catches:**
+  Z buried under voicing.
+  S too quiet.
+  R without F3 suppression.
+  M without antiformant notch.
 
-The S in 'voice' and the Z in 'was'
-are acoustically related.
-They are the same sibilant mechanism:
-  Same constriction place (alveolar).
-  Same downstream cavity (~8000Hz).
-  Same spectral peak.
+**What it does NOT catch:**
+  Whether the consonant is in the
+  right Tonnetz position.
+  Whether direction (onset/coda) was
+  correctly rendered.
+  Whether the syllable felt right.
 
-The ONLY difference:
-  S: folds open (unvoiced).
-  Z: folds vibrating (voiced).
-
-The sibilance level should be
-COMPARABLE between S and Z.
-The only thing Z adds
-is the voiced buzz underneath.
-
-If you can hear S clearly
-but not Z —
-the sibilance of Z is too quiet
-relative to the voicing.
-
-The target relationship:
-```
-S:  [sibilance]
-    no voicing
-
-Z:  [voicing] + [sibilance at ~same level]
-    the buzz is added to the hiss
-    not: the hiss buried under the buzz
-```
-
-The fix:
-  Z sibilance gain → match S sibilance.
-  Z noise fraction → 50% (not 35%).
-  Z downstream cavity → same dominance as S.
-  The voiced component is UNDERNEATH.
-  The sibilance is ON TOP.
+This is Level 1.
+It was the only level in v1.
+It is necessary but not sufficient.
 
 ---
 
-## PART 4: THE SELF-REFERENTIAL SYSTEM
+### LEVEL 2: LOCUS IDENTITY
 
-Here is the deeper insight.
+**Question:** Does the consonant sit at
+the right Tonnetz position, and does
+its F2 trajectory confirm direction
+(onset vs coda)?
 
-The Z problem was invisible
-until a human ear reported it.
+**Measures:**
+  — F2 at consonant onset vs offset
+  — Slope direction of F2 through consonant
+  — Locus value: where did F2 converge?
+  — Comparison to LOCUS_F2_BASE table
 
-Why?
+**What it catches:**
+  Coda N and onset N rendered identically.
+  Dark L not dark (F2 locus too high).
+  Bright L not bright (F2 locus too low).
+  K before front vowel same as K before back.
+  Alveolar consonant with bilabial locus
+    (place confusion).
 
-Because the synthesis had no way
-to measure what it produced.
-No feedback loop.
-No self-knowledge.
+**Diagnostic signal:**
+  The F2 value at the consonant's
+  midpoint is the locus estimate.
+  Compare to LOCUS_F2_BASE[place].
+  If off by more than 200 Hz: locus error.
 
-The model knew:
-  Z = voiced alveolar sibilant.
-  Z has sibilance at 8000Hz.
-  Z has voicing underneath.
+  The slope direction of F2 through
+  the transition zone confirms direction:
+    Rising F2: onset (locus → vowel).
+    Falling F2: coda (vowel → locus).
 
-But the model did not know:
-  Is the sibilance audible
-  in the actual output?
-  Is it above or below the voicing?
-  Is the contrast sufficient?
+  If direction is wrong, the consonant
+  sounds locationless — the ear cannot
+  parse where the gesture landed.
+  This is the class of error that made
+  coda N and onset N sound identical.
 
-These questions require
-measurement of the output.
-
-**The self-referential loop:**
-
-```
-SYNTHESIZE phoneme
-    ↓
-ANALYZE output
-  - measure F0 (voiced/unvoiced)
-  - measure formant frequencies
-  - measure sibilance presence/level
-  - measure voiced/noise ratio
-    ↓
-COMPARE to target specification
-  - Z target: sibilance audible above voicing
-  - S target: pure sibilance, no voicing
-  - M target: antiformant at 1000Hz
-  - R target: F3 at 1690Hz
-    ↓
-COMPUTE error
-  - Z: sibilance 18dB below target
-  - (or: passes, proceed)
-    ↓
-ADJUST parameters
-  - Z noise gain: 0.50 → 0.80
-  - Re-synthesize
-  - Re-analyze
-  - Converge
-```
-
-This is a closed loop.
-The voice can hear itself.
-Not through ears —
-through spectral analysis of its output.
-
-**What the analysis measures:**
-
-*Voiced/Unvoiced detection:*
-```python
-def is_voiced(segment, sr=SR,
-               threshold=0.01):
-    # Autocorrelation at pitch lag
-    # High autocorrelation = voiced
-    ...
-```
-
-*Formant estimation:*
-```python
-def estimate_formants(segment, sr=SR):
-    # LPC analysis
-    # Peak frequencies of LPC spectrum
-    # Returns [F1, F2, F3, F4]
-    ...
-```
-
-*Sibilance measurement:*
-```python
-def sibilance_level(segment, sr=SR):
-    # Energy in 4000-14000Hz band
-    # relative to total energy
-    # High ratio = sibilant
-    ...
-```
-
-*Voiced/noise ratio:*
-```python
-def voiced_noise_ratio(segment, sr=SR):
-    # Harmonics-to-noise ratio (HNR)
-    # High HNR = clean voiced
-    # Low HNR = noisy/breathy
-    ...
-```
-
-**The target specifications:**
-
-Every phoneme can be described
-not just as synthesis parameters
-but as ACOUSTIC TARGETS —
-what the output should measure as:
-
-```python
-PHONEME_TARGETS = {
-    'Z': {
-        'voiced':       True,
-        'sibilance_min':0.40,  # ratio
-        'f0_present':   True,
-        'hnr_min':      5.0,   # dB
-        'f_sibilance':  (7000, 9000), # Hz
-    },
-    'S': {
-        'voiced':       False,
-        'sibilance_min':0.70,
-        'f0_present':   False,
-        'f_sibilance':  (7500, 10000),
-    },
-    'M': {
-        'voiced':       True,
-        'antiformant':  (900, 1100),  # Hz
-        'f0_present':   True,
-        'sibilance_min':0.0,
-    },
-    'R': {
-        'voiced':       True,
-        'f3_target':    (1600, 1800), # Hz
-        'f0_present':   True,
-    },
-    'IH': {
-        'voiced':       True,
-        'f1_target':    (330, 450),
-        'f2_target':    (1850, 2150),
-    },
-    ...
-}
-```
-
-The synthesis produces a segment.
-The analysis measures it.
-The measurement is checked
-against the target.
-If it passes: proceed.
-If it fails: adjust parameters,
-             re-synthesize,
-             re-analyze.
-
-**This is phonetic self-reference.**
-
-The system knows what it is trying
-to produce (the target).
-It measures what it actually produced.
-The difference drives correction.
-
-No human ears required
-for this class of error —
-the sibilance level, the formant position,
-the voiced/unvoiced character —
-these are all measurable
-from the acoustic output alone.
+**What it does NOT catch:**
+  Whether the phrase felt coherent.
+  Whether the ghost between syllables
+  traced the right Tonnetz path.
+  Whether the voice was present.
 
 ---
 
-## PART 5: WHAT THIS MEANS FOR THE MODEL
+### LEVEL 3: QUALIA COHERENCE
 
-The self-referential loop changes
-the architecture of synthesis.
+**Question:** Does the phrase trace
+a coherent trajectory through
+Tonnetz space, and does the ghost
+layer carry the right experiential
+texture?
 
-**Before:**
-```
-Parameters → Synthesis → Output
-(open loop — no feedback)
-```
+**Measures:**
+  — Tonnetz position recovered from
+    each nucleus vowel (via formant analysis)
+  — Ghost duration and amplitude
+    between syllables (measured from
+    envelope in the boundary region)
+  — F0 arc shape across the phrase
+    (matches arc_type profile?)
+  — Rhyme convergence: do phrase-final
+    syllables arrive at compatible
+    Tonnetz positions?
 
-**After:**
-```
-Parameters → Synthesis → Output
-                ↓           ↓
-            Analysis ← ← ←
-                ↓
-            Comparison to targets
-                ↓
-            Parameter adjustment
-                ↓
-            Re-synthesis
-                ↓
-            Convergence
-```
+**What it catches:**
+  Syllable ghost missing or too short.
+  Arc type not matching F0 trajectory.
+  Two phrases intended to rhyme but
+    arriving at different Tonnetz positions.
+  Phrase-final exhale absent (no landing).
+  Voiced H onset missing before vowel-initial
+    words (voice begins too abruptly).
 
-This is not the same as
-machine learning or optimization.
-It is closer to:
+**What it does NOT catch:**
+  Whether it sounds like a real voice
+  to a human listener.
+  This is the remaining human role.
 
-**How a musician tunes their instrument.**
-
-The musician plays a note.
-They hear it.
-They compare it to the target pitch.
-They adjust the string.
-They play again.
-They converge.
-
-The feedback loop IS the tuning.
-The instrument without feedback
-cannot tune itself.
-The synthesis without feedback
-cannot know when it is correct.
-
-The self-referential system
-gives the synthesis instrument
-its own ears.
-Not biological ears.
-Spectral analysis ears.
-But ears that measure
-the same acoustic properties
-that a human listener uses
-to identify phonemes.
+**The principle:**
+  The qualia are measurable properties
+  of the acoustic output.
+  Not subjective impressions.
+  The ghost duration is a number.
+  The F0 arc shape is a curve.
+  The Tonnetz arrival position is a coordinate.
+  They can all be measured.
+  They can all be compared to targets.
 
 ---
 
-## PART 6: THE TONNETZ CONNECTION
-
-This self-referential structure
-mirrors what the Tonnetz already does.
-
-The Tonnetz is a self-consistent
-description of harmonic space.
-Every point in Tonnetz space
-has a precise relationship
-to every other point.
-The relationships ARE the space.
-There is no external reference.
-The space references itself.
-
-The vocal topology space (V)
-should have the same property.
-
-Every phoneme should be defined
-not by absolute synthesis parameters
-but by its RELATIONSHIPS
-to other phonemes in V:
+## PART II: THE SELF-REFERENCE
+## ARCHITECTURE
 
 ```
-Z is to S as:
-  voiced is to unvoiced
-  with the same sibilance level
-  and the same downstream cavity
-  and the same constriction place
-
-M is to B as:
-  nasal is to stop
-  with the same labial closure
-  and the same voicing
-  but different velum position
-
-R is to L as:
-  retroflex is to lateral
-  with similar constriction degree
-  but different constriction shape
-  and different F3 consequence
+SYNTHESIS (v17+)
+  synth_phrase(words, arc_type, ...)
+        |
+        v
+ACOUSTIC OUTPUT
+  float32 array, 44100 Hz
+        |
+        v
+LEVEL 1 ANALYSIS
+  per-phoneme segment analysis:
+  sibilance, HNR, formants
+        |
+        v
+LEVEL 2 ANALYSIS
+  per-consonant locus measurement:
+  F2 midpoint, slope direction,
+  place verification
+        |
+        v
+LEVEL 3 ANALYSIS
+  per-phrase Tonnetz trace:
+  nucleus recovery, ghost detection,
+  arc shape measurement,
+  rhyme convergence check
+        |
+        v
+COMPARISON TO TARGETS
+  PHONEME_TARGETS (Level 1)
+  LOCUS_TARGETS   (Level 2)
+  PHRASE_TARGETS  (Level 3)
+        |
+        v
+REPORT
+  per-phoneme pass/fail
+  per-consonant direction report
+  phrase coherence score
+  Tonnetz trace visualization
+        |
+   (if fail)
+        v
+ADJUSTMENT
+  Level 1: adjust gain parameters
+  Level 2: adjust locus constants
+  Level 3: adjust arc/ghost parameters
+        |
+        v
+RE-SYNTHESIZE
+  loop until convergence
 ```
 
-The phonemes are defined
-by their position in V —
-relative to each other —
-not by absolute parameter values.
-
-And the self-referential analysis
-checks whether the synthesis
-actually places each phoneme
-at its correct position in V
-by measuring the acoustic
-coordinates of the output.
-
-The measurement is the self-reference.
-The self-reference enables correction.
-The correction converges
-toward the correct position in V.
-
-This is the Tonnetz principle
-applied to phonetics:
-a self-consistent space
-where position is defined
-by relationship, not by absolute value,
-and where self-measurement
-enables self-correction.
+This is the complete closed loop.
+It is not optimization in the
+machine learning sense.
+It is calibration —
+the same operation a sound engineer
+performs when tuning a system,
+but formalized and automated.
 
 ---
 
-## PART 7: IMMEDIATE IMPLICATIONS
+## PART III: THE RARFL LOOP AS
+## SELF-CORRECTION ARCHITECTURE
 
-**For Z specifically:**
+The RARFL cycle (Reasoning Axiom–Reward
+Feedback Loop) is the engine of
+self-reference in OrganismCore.
 
-The Z problem is now precisely defined:
-  Z's sibilance level is below threshold.
-  The acoustic target (sibilance ≥ 0.40)
-  is not met.
-  The fix: raise Z noise gain until
-  the analysis reports sibilance ≥ 0.40.
+It maps exactly onto the diagnostic loop:
 
-Not guessing.
-Measuring.
-Adjusting.
-Measuring again.
-Done when the target is met.
+```
+R  (Receive):
+  The target specification.
+  PHONEME_TARGETS, LOCUS_TARGETS,
+  PHRASE_TARGETS. What is intended.
 
-**For all phonemes:**
+A  (Axiom):
+  The synthesis parameters.
+  LOCUS_F2_BASE, Z_PARAMS,
+  arc_type, ghost profiles.
+  The current state of belief
+  about how to produce the voice.
 
-Every phoneme can be characterized
-by a set of measurable acoustic properties.
-The synthesis targets those properties.
-The analysis verifies them.
-The loop closes.
+R  (Reason/Generate):
+  synth_phrase(). The synthesis.
+  The parameters applied to
+  produce acoustic output.
 
-This eliminates the need for a human
-to report "I cannot hear the Z" —
-the system would have already known,
-measured the sibilance,
-found it below threshold,
-and adjusted.
+F  (Feedback):
+  The analysis.
+  measure_sibilance(), measure_locus_f2(),
+  measure_f0_arc(), measure_ghost_duration().
+  The measurement of what was actually produced.
 
-**The human ear becomes:**
-not the primary error detector
-but the final arbiter —
-the judge of whether the convergence
-actually produced a voice
-and not just a collection
-of phonemes that pass their
-individual spectral tests.
+L  (Learn/Update):
+  Comparison of measured to target.
+  If Z sibilance < 0.40: raise noise gain.
+  If locus F2 off by 300Hz: adjust LOCUS_F2_BASE.
+  If ghost too short: adjust GHOST_PROFILES.
+  Parameter update.
+  New axiom set.
 
-The human ear answers:
-does it sound like a voice?
-The analysis answers:
-are the phonemes acoustically correct?
+→ Repeat until convergence.
+```
 
-Both are needed.
-They answer different questions.
+When the loop converges,
+the synthesis parameters ARE the axioms
+that produce the target acoustic behavior.
+Not assumed. Derived from self-measurement.
 
----
-
-## CONCLUSION
-
-The Z in 'was' disappeared
-because the synthesis had no feedback.
-
-The sibilance was below threshold.
-The voicing dominated.
-Z became indistinguishable from AH.
-
-The fix is mechanical:
-raise Z's noise gain,
-match its sibilance level to S.
-
-But the insight is structural:
-
-**A synthesis system without self-reference
-is an open loop.**
-
-Open loops drift.
-They cannot know when they are wrong.
-They require external correction
-(a human ear saying: I cannot hear Z).
-
-A synthesis system with self-reference
-is a closed loop.
-
-Closed loops converge.
-They can know when they are wrong.
-They can correct themselves.
-
-The self-referential system —
-synthesize, analyze, compare, adjust —
-is the synthesis engine
-gaining its own ears.
-
-Not to replace the human listener.
-To work alongside them.
-
-The analysis catches acoustic errors.
-The human catches experiential ones.
-
-Together:
-a voice that is both
-acoustically correct
-and experientially real.
+This is what the v1 artifact called
+"the engine gaining its own ears."
+The RARFL formalization shows
+it is the same structure as
+all OrganismCore reasoning loops —
+the synthesis engine is just
+another reasoning substrate
+running the same cycle.
 
 ---
 
-*End of reasoning artifact.*
+## PART IV: THE RELATIVE RELATIONSHIP
+## PRINCIPLE (extended from v1)
+
+From v1:
+
+```
+"The voice has a relative relation
+to the S part."
+```
+
+This observation generalizes.
+
+Every phoneme's acoustic identity
+is defined relationally —
+by its position relative to
+other phonemes in the same space.
+
+**Sibilant space:**
+  S : Z = unvoiced : voiced
+           with same sibilance level.
+  S : SH = alveolar : postalveolar
+            with same absence of voicing.
+  Z : ZH = alveolar : postalveolar
+            with same voicing underneath.
+
+  If the engine can hear S clearly,
+  the sibilance for Z should be
+  at the same level.
+  The ONLY difference is the
+  voiced buzz underneath.
+  Any other difference is an error.
+
+**Nasal space:**
+  M : N : NG = bilabial : alveolar : velar
+               with same murmur quality.
+  The identity is entirely in
+  the locus transition — the F2 movement
+  into and out of the closure.
+  If M and N and NG sound identical,
+  the locus transitions are missing.
+  (This was the v17 finding.)
+
+**Rhotic space:**
+  R : ER = consonant : vowel
+           with the same F3 suppression.
+  The identity is entirely in F3.
+  F3 at 1690 Hz regardless of
+  whether R is onset or coda.
+  If R sounds like L,
+  the F3 suppression is not applied.
+
+**Lateral space:**
+  L_onset : L_coda = bright : dark
+            = F2 locus 1800 : F2 locus 1000.
+  If onset L and coda L sound the same,
+  the directional locus model is not working.
+
+**This is the measurement principle:**
+  Synthesize two phonemes that should
+  differ in exactly one dimension.
+  Measure that dimension.
+  If the measurement shows they are
+  identical in that dimension:
+  the dimension is not being rendered.
+
+This is a more powerful diagnostic
+than measuring individual phonemes
+against absolute targets.
+It measures relationships.
+Relationships are what define
+phonetic identity.
+
+---
+
+## PART V: WHAT CANNOT BE
+## SELF-MEASURED
+
+Some properties of the voice
+cannot be recovered from
+acoustic analysis alone.
+
+**The qualia of presence:**
+  Whether the voice sounds alive —
+  not just acoustically correct —
+  requires a listener with a body.
+  No spectral analysis captures this.
+  This is irreducibly human.
+
+**The correctness of rhyme perception:**
+  Whether two phrases feel like they rhyme
+  depends on the listener's musical
+  and linguistic context.
+  The engine can measure Tonnetz
+  convergence. It cannot measure
+  whether the convergence felt satisfying.
+
+**The emotional truth of an arc:**
+  ARC_GRIEF produces a particular F0
+  trajectory and ghost profile.
+  Whether it sounds like grief —
+  not just like the parameters of grief —
+  is a human judgment.
+  The engine can verify the parameters
+  match the arc specification.
+  It cannot verify the experience.
+
+**The summary:**
+  Level 1 and Level 2 are fully
+  self-measurable.
+  Level 3 is partially self-measurable
+  (Tonnetz position, ghost duration,
+   arc shape).
+  The experiential layer of Level 3
+  requires human hearing.
+
+This division of labor is correct
+and permanent.
+The engine's ears handle the
+acoustic and structural properties.
+The human ear handles the
+experiential and musical properties.
+
+Neither replaces the other.
+
+---
+
+## PART VI: THE DIAGNOSTIC PHILOSOPHY
+
+**The diagnostic is not a test suite.**
+It is a portrait of the voice.
+
+A test suite asks: did it pass?
+A portrait asks: what is it?
+
+The diagnostic should answer:
+  What Tonnetz position did each
+    vowel actually occupy?
+  What locus did each consonant
+    actually converge at?
+  What direction did each consonant
+    actually travel?
+  What F0 arc did the phrase actually trace?
+  Where did the ghost actually land?
+  What Tonnetz path did the phrase
+    actually traverse?
+
+The answers to these questions
+constitute the voice's self-knowledge.
+Not pass/fail.
+A map.
+
+If the map matches the intention,
+the synthesis is correct.
+If the map diverges from the intention,
+the divergence points to the parameter
+that needs adjustment.
+
+The map is also useful when
+the synthesis is correct —
+it shows what the voice actually is,
+not just whether it passes a gate.
+
+---
+
+## PART VII: FORWARD — WHAT COMES NEXT
+
+**Rhyme space mapping:**
+  Given two phrases, measure the
+  Tonnetz distance between their
+  final stressed nuclei and their
+  coda loci.
+  Report whether they fall within
+  the perceptual fusion threshold.
+  This makes rhyme detectable
+  without human judgment for the
+  structural component.
+
+**Self-adjusting arc profiles:**
+  If the measured F0 arc does not
+  match ARC_GRIEF's target curve,
+  adjust the arc parameters until
+  it does.
+  The arc can calibrate itself.
+
+**Locus bootstrap:**
+  Rather than setting LOCUS_F2_BASE
+  by hand from acoustic phonetics tables,
+  synthesize each place of articulation
+  in isolation (beatboxer-style),
+  measure the F2 peak at release,
+  and use that as the locus.
+  The engine measures its own
+  place-of-articulation space.
+
+**The bootstrap is the deepest form
+of self-reference:**
+  The engine does not need to be
+  told where bilabial is.
+  It produces a bilabial closure,
+  measures what it produced,
+  and the measurement IS the definition
+  of bilabial for this engine.
+
+  This is the Tonnetz principle
+  applied to consonants:
+  position defined by relationship,
+  derived from self-measurement,
+  not imported from a table.
+
+---
+
 *February 2026.*
-*The missing Z was the teacher.*
-*It said: measure me.*
-*I measured.*
-*Now I know what to fix.*
-*And how to know when it is fixed.*
+*v1 found the Z.*
+*v2 finds the voice.*
