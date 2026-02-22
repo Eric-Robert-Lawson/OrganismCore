@@ -52,6 +52,9 @@ MORPHOLOGICAL NOTE:
 
 CHANGE LOG:
   v1 — initial parameters
+  v2 — fix: synth_gefrunon E_next=None→UU_F
+       TypeError: NoneType has no len()
+       in synth_E_short F_next branch.
 """
 
 import numpy as np
@@ -70,17 +73,13 @@ os.makedirs("output_play", exist_ok=True)
 # ============================================================
 
 # J — palatal approximant [j]
-# OE 'g' before front vowel.
-# Glide — no closure, rapid F2 transition.
-# F2 starts very high, sweeps into [e].
 J_F_START = [250.0, 2500.0, 3000.0, 3500.0]
-J_F_END   = [370.0, 2100.0, 2800.0, 3300.0]  # → [e]
+J_F_END   = [370.0, 2100.0, 2800.0, 3300.0]
 J_B       = [ 80.0,  150.0,  200.0,  280.0]
 J_GAINS   = [ 12.0,    8.0,    1.5,    0.5]
 J_DUR_MS  = 50.0
 
 # E — short close-mid front [e]
-# Same as GĀR-DENA
 E_F      = [370.0, 2100.0, 2800.0, 3300.0]
 E_B      = [ 80.0,  120.0,  170.0,  240.0]
 E_GAINS  = [ 18.0,    9.0,    1.5,    0.5]
@@ -89,27 +88,20 @@ E_COART_ON  = 0.12
 E_COART_OFF = 0.12
 
 # F — voiceless labiodental fricative [f]
-# Lower lip to upper teeth.
-# Centroid higher than [θ]: smaller constriction
-# at labiodental vs dental place.
 F_DUR_MS   = 70.0
 F_NOISE_CF = 5500.0
 F_NOISE_BW = 3000.0
 F_GAIN     = 0.30
 
 # UU — long close back rounded [uː]
-# Same place as [u], 2.5× duration.
-# Slightly more peripheral than short [u]:
-# F1 slightly lower, F2 slightly lower.
 UU_F      = [280.0,  650.0, 2200.0, 3100.0]
 UU_B      = [ 80.0,  100.0,  200.0,  280.0]
 UU_GAINS  = [ 16.0,   12.0,    1.0,    0.3]
-UU_DUR_MS = 150.0   # phonemically long
+UU_DUR_MS = 150.0
 UU_COART_ON  = 0.08
 UU_COART_OFF = 0.08
 
 # N — voiced alveolar nasal [n]
-# Same as all previous instances
 N_F       = [250.0, 1800.0, 2600.0, 3300.0]
 N_B       = [100.0,  200.0,  300.0,  350.0]
 N_GAINS   = [  8.0,    2.0,    0.5,    0.2]
@@ -118,7 +110,6 @@ N_ANTI_F  = 800.0
 N_ANTI_BW = 200.0
 
 # O — short close-mid back rounded [o]
-# Same as ÞĒOD-CYNINGA
 O_F      = [500.0,  800.0, 2400.0, 3200.0]
 O_B      = [100.0,  120.0,  200.0,  280.0]
 O_GAINS  = [ 18.0,   10.0,    1.2,    0.4]
@@ -329,12 +320,9 @@ def synth_J(F_next=None,
     """
     Palatal approximant [j].
     OE 'g' before front vowel.
-    A glide — formants sweep rapidly
-    from palatal position into the
-    following vowel. No closure.
-    F2 starts very high (~2500 Hz)
-    and transitions toward [e] F2
-    (~2100 Hz) over 50 ms.
+    Glide — formants sweep from palatal
+    position into following vowel.
+    No closure.
     """
     dur_ms = J_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
@@ -378,13 +366,16 @@ def synth_E_short(F_prev, F_next,
     src    = f32(src * env)
     n_on   = int(E_COART_ON  * n_s)
     n_off  = int(E_COART_OFF * n_s)
+    # F_next defaults to E_F if not provided
+    f_next = F_next if F_next is not None \
+             else E_F
     result = np.zeros(n_s, dtype=DTYPE)
     for fi in range(len(E_F)):
         f_s   = (float(F_prev[fi])
                  if fi < len(F_prev)
                  else float(E_F[fi]))
-        f_e   = (float(F_next[fi])
-                 if fi < len(F_next)
+        f_e   = (float(f_next[fi])
+                 if fi < len(f_next)
                  else float(E_F[fi]))
         f_b   = float(E_F[fi])
         f_arr = np.full(n_s, f_b, dtype=DTYPE)
@@ -421,8 +412,7 @@ def synth_F(F_next=None, dil=DIL, sr=SR):
     """
     Voiceless labiodental fricative [f].
     Lower lip to upper teeth.
-    Frication centroid ~5500 Hz —
-    higher than dental [θ] (~4000 Hz).
+    Centroid ~5500 Hz — higher than [θ].
     No voicing.
     """
     dur_ms = F_DUR_MS * dil
@@ -456,11 +446,9 @@ def synth_UU_long(F_prev, F_next,
                    dil=DIL, sr=SR):
     """
     Long close back rounded [uː].
-    Same place as short [u].
     Duration 150 ms — phonemically long.
-    Slightly more peripheral than [u]:
-    F1 280 Hz (vs 300), F2 650 Hz (vs 700).
-    The length is the primary cue.
+    F1=280, F2=650 — slightly more
+    peripheral than short [u] (300/700).
     """
     dur_ms = UU_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
@@ -479,13 +467,17 @@ def synth_UU_long(F_prev, F_next,
     src    = f32(src * env)
     n_on   = int(UU_COART_ON  * n_s)
     n_off  = int(UU_COART_OFF * n_s)
+    f_prev = F_prev if F_prev is not None \
+             else UU_F
+    f_next = F_next if F_next is not None \
+             else UU_F
     result = np.zeros(n_s, dtype=DTYPE)
     for fi in range(len(UU_F)):
-        f_s   = (float(F_prev[fi])
-                 if fi < len(F_prev)
+        f_s   = (float(f_prev[fi])
+                 if fi < len(f_prev)
                  else float(UU_F[fi]))
-        f_e   = (float(F_next[fi])
-                 if fi < len(F_next)
+        f_e   = (float(f_next[fi])
+                 if fi < len(f_next)
                  else float(UU_F[fi]))
         f_b   = float(UU_F[fi])
         f_arr = np.full(n_s, f_b, dtype=DTYPE)
@@ -548,7 +540,8 @@ def synth_N(F_prev, F_next,
 def synth_N_final(F_prev=None,
                    pitch_hz=PITCH_HZ,
                    dil=DIL, sr=SR):
-    """Word-final [n] — longer decay."""
+    """Word-final [n] — longer decay
+    into silence."""
     dur_ms = N_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     T      = 1.0 / sr
@@ -558,7 +551,7 @@ def synth_N_final(F_prev=None,
     n_dec  = min(int(0.040 * sr), n_s // 2)
     env    = np.ones(n_s, dtype=DTYPE)
     if n_tr < n_s:
-        env[:n_tr]  = np.linspace(
+        env[:n_tr] = np.linspace(
             0.3, 1.0, n_tr)
     if n_dec < n_s:
         env[-n_dec:] = np.linspace(
@@ -595,13 +588,17 @@ def synth_O_short(F_prev, F_next,
     src    = f32(src * env)
     n_on   = int(O_COART_ON  * n_s)
     n_off  = int(O_COART_OFF * n_s)
+    f_prev = F_prev if F_prev is not None \
+             else O_F
+    f_next = F_next if F_next is not None \
+             else O_F
     result = np.zeros(n_s, dtype=DTYPE)
     for fi in range(len(O_F)):
-        f_s   = (float(F_prev[fi])
-                 if fi < len(F_prev)
+        f_s   = (float(f_prev[fi])
+                 if fi < len(f_prev)
                  else float(O_F[fi]))
-        f_e   = (float(F_next[fi])
-                 if fi < len(F_next)
+        f_e   = (float(f_next[fi])
+                 if fi < len(f_next)
                  else float(O_F[fi]))
         f_b   = float(O_F[fi])
         f_arr = np.full(n_s, f_b, dtype=DTYPE)
@@ -673,7 +670,8 @@ def synth_gefrunon(pitch_hz=PITCH_HZ,
         F_next=E_F,
         pitch_hz=pitch_hz, dil=dil, sr=sr)
     e_seg  = synth_E_short(
-        F_prev=J_F_START, F_next=None,
+        F_prev=J_F_START,
+        F_next=UU_F,        # toward long [uː]
         pitch_hz=pitch_hz, dil=dil, sr=sr)
     f_seg  = synth_F(
         F_next=UU_F, dil=dil, sr=sr)
@@ -708,7 +706,7 @@ def synth_gefrunon(pitch_hz=PITCH_HZ,
 
 if __name__ == "__main__":
     print()
-    print("GEFRŪNON RECONSTRUCTION v1")
+    print("GEFRŪNON RECONSTRUCTION v2")
     print("Old English [jefrуːnon]")
     print("Beowulf line 2, word 3")
     print()
