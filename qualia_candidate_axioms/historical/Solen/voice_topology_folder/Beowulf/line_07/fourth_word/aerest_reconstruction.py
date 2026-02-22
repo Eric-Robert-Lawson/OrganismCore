@@ -16,35 +16,12 @@ PHONEME STRUCTURE:
 NEW PHONEMES: none.
 Pure assembly. Five phonemes. All verified.
 
-NOTES:
-  [æː]→[r]: long vowel into trill.
-    Pre-rhotic context.
-    Real speech: slight shortening
-    of preceding vowel (pre-rhotic
-    shortening). Not modelled
-    explicitly. Noted as limitation.
-
-  [s]→[t]: word-final alveolar cluster.
-    Both voiceless. Same place.
-    Fricative releases into stop closure.
-    Smooth transition — no place change.
-    [s] duration may be slightly reduced
-    in cluster — not modelled.
-
-  [æː] here is the same phoneme
-  as MǢGÞUM. Long open front.
-  F1 ~750 Hz, F2 ~1750 Hz.
-  Duration 110 ms.
-
-CONTEXT:
-  syþðan ǣrest wearð —
-  since first it came to be.
-  The absolute temporal origin
-  of the Beowulf narrative.
-  Three words. Since. First. Became.
-
 CHANGE LOG:
-  v1 — initial parameters
+  v1 — R_TRILL_DEPTH 0.55 — FAILED D3
+       voicing 0.4320 < 0.50
+  v2 — R_TRILL_DEPTH 0.55 → 0.40
+  v2 — added performance output
+       pitch 110 Hz, dil 2.5, rt60 2.0
 """
 
 import numpy as np
@@ -59,10 +36,9 @@ os.makedirs("output_play", exist_ok=True)
 
 
 # ============================================================
-# PARAMETERS — all from verified inventory
+# PARAMETERS
 # ============================================================
 
-# AEY — long open front unrounded [æː]
 AEY_F     = [750.0, 1750.0, 2600.0, 3300.0]
 AEY_B     = [120.0,  150.0,  200.0,  280.0]
 AEY_GAINS = [ 16.0,    8.0,    1.5,    0.5]
@@ -70,15 +46,13 @@ AEY_DUR_MS      = 110.0
 AEY_COART_ON    = 0.10
 AEY_COART_OFF   = 0.10
 
-# R — alveolar trill [r]
 R_F           = [300.0,  900.0, 2000.0, 3200.0]
 R_B           = [100.0,  150.0,  250.0,  300.0]
 R_GAINS       = [ 14.0,    7.0,    2.0,    0.5]
 R_DUR_MS      = 65.0
 R_TRILL_RATE  = 28.0
-R_TRILL_DEPTH = 0.55
+R_TRILL_DEPTH = 0.40   # v1: 0.55 — FAILED
 
-# E — short close-mid front [e]
 E_F     = [450.0, 1900.0, 2600.0, 3300.0]
 E_B     = [100.0,  130.0,  200.0,  280.0]
 E_GAINS = [ 16.0,    8.0,    1.5,    0.5]
@@ -86,13 +60,11 @@ E_DUR_MS     = 55.0
 E_COART_ON   = 0.12
 E_COART_OFF  = 0.12
 
-# S — voiceless alveolar fricative [s]
 S_DUR_MS   = 65.0
 S_NOISE_CF = 7500.0
 S_NOISE_BW = 4000.0
 S_GAIN     = 0.55
 
-# T — voiceless alveolar stop [t]
 T_DUR_MS     = 65.0
 T_BURST_F    = 3500.0
 T_BURST_BW   = 1500.0
@@ -101,8 +73,10 @@ T_VOT_MS     = 8.0
 T_BURST_GAIN = 0.55
 T_VOT_GAIN   = 0.15
 
-PITCH_HZ = 145.0
-DIL      = 1.0
+PITCH_HZ      = 145.0
+PITCH_PERF    = 110.0
+DIL           = 1.0
+DIL_PERF      = 2.5
 
 
 # ============================================================
@@ -225,13 +199,12 @@ def apply_formants(src, freqs, bws, gains,
 
 
 # ============================================================
-# PHONEME SYNTHESIZERS — pure assembly
+# PHONEME SYNTHESIZERS
 # ============================================================
 
 def synth_AEY(F_prev=None, F_next=None,
                pitch_hz=PITCH_HZ,
                dil=DIL, sr=SR):
-    """Long open front unrounded [æː]. Verified MǢGÞUM."""
     dur_ms = AEY_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     T      = 1.0 / sr
@@ -295,7 +268,10 @@ def synth_AEY(F_prev=None, F_next=None,
 def synth_R(F_prev=None, F_next=None,
              pitch_hz=PITCH_HZ,
              dil=DIL, sr=SR):
-    """Alveolar trill [r]. Verified GĀR-DENA."""
+    """
+    Alveolar trill [r].
+    v2: R_TRILL_DEPTH 0.55 → 0.40
+    """
     dur_ms = R_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     T      = 1.0 / sr
@@ -327,7 +303,6 @@ def synth_R(F_prev=None, F_next=None,
 def synth_E(F_prev=None, F_next=None,
              pitch_hz=PITCH_HZ,
              dil=DIL, sr=SR):
-    """Short close-mid front [e]. Verified GĀR-DENA."""
     dur_ms = E_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     T      = 1.0 / sr
@@ -390,7 +365,6 @@ def synth_E(F_prev=None, F_next=None,
 
 def synth_S(F_prev=None, F_next=None,
              dil=DIL, sr=SR):
-    """Voiceless alveolar fricative [s]. Verified ÆÞELINGAS."""
     dur_ms = S_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     noise  = np.random.randn(n_s).astype(float)
@@ -419,7 +393,6 @@ def synth_S(F_prev=None, F_next=None,
 def synth_T(F_prev=None, F_next=None,
              pitch_hz=PITCH_HZ,
              dil=DIL, sr=SR):
-    """Voiceless alveolar stop [t]. Verified HWÆT."""
     dur_ms    = T_DUR_MS * dil
     n_s       = max(4, int(
         dur_ms / 1000.0 * sr))
@@ -444,8 +417,7 @@ def synth_T(F_prev=None, F_next=None,
     burst     = f32(burst * env_bu)
     noise_v   = np.random.randn(
         n_vot).astype(float)
-    b_vp, a_vp = safe_bp(
-        500.0, 8000.0, sr)
+    b_vp, a_vp = safe_bp(500.0, 8000.0, sr)
     vot       = f32(lfilter(
         b_vp, a_vp, noise_v)
                     * T_VOT_GAIN)
@@ -529,12 +501,14 @@ def synth_aerest(pitch_hz=PITCH_HZ,
 
 if __name__ == "__main__":
     print()
-    print("ǢREST RECONSTRUCTION v1")
+    print("ǢREST RECONSTRUCTION v2")
     print("Old English [æːrest]")
     print("Beowulf line 7, word 4")
-    print("Zero new phonemes — pure assembly")
+    print("v2: R_TRILL_DEPTH 0.55 → 0.40")
+    print("    + performance output added")
     print()
 
+    # diagnostic
     w_dry = synth_aerest(
         pitch_hz=145.0, dil=1.0,
         add_room=False)
@@ -557,18 +531,21 @@ if __name__ == "__main__":
         "output_play/aerest_slow.wav",
         w_slow, SR)
     print("  aerest_slow.wav")
+
+    # performance — scop register
+    w_perf = synth_aerest(
+        pitch_hz=PITCH_PERF,
+        dil=DIL_PERF,
+        add_room=True)
+    write_wav(
+        "output_play/aerest_perf.wav",
+        w_perf, SR)
+    print(f"  aerest_perf.wav"
+          f"  ({len(w_perf)/SR*1000:.0f} ms)"
+          f"  [110 Hz, dil 2.5, hall]")
     print()
-    print("  afplay output_play/"
-          "aerest_dry.wav")
-    print("  afplay output_play/"
-          "aerest_slow.wav")
-    print("  afplay output_play/"
-          "aerest_hall.wav")
-    print()
-    print("  Line 7 progress:")
-    print("  egsode  ✓")
-    print("  eorlas  ✓")
-    print("  syþðan  ✓")
-    print("  ǣrest   — pending verification")
-    print("  wearð   — remaining")
+    print("  afplay output_play/aerest_dry.wav")
+    print("  afplay output_play/aerest_hall.wav")
+    print("  afplay output_play/aerest_slow.wav")
+    print("  afplay output_play/aerest_perf.wav")
     print()
