@@ -4,64 +4,32 @@ Old English: þreatum
 Meaning: troops, bands (dative plural)
 IPA: [θreɑtum]
 Beowulf: Line 5, Word 4 (overall word 21)
+Line 5 final word.
 February 2026
 
 PHONEME STRUCTURE:
   Þ   [θ]   voiceless dental fric.     — verified ÞĒOD-CYNINGA
   R   [r]   alveolar trill             — verified GĀR-DENA
   EA  [eɑ]  short front-back diph.    — verified SCEAÞENA
-  T   [t]   voiceless alveolar stop   — verified HWÆT
-  U   [u]   short close back rounded  — verified GĒAR-DAGUM
-  M   [m]   voiced bilabial nasal     — verified GĒAR-DAGUM
+  T   [t]   voiceless alveolar stop    — verified HWÆT
+  U   [u]   short close back rounded   — verified GĒAR-DAGUM
+  M   [m]   voiced bilabial nasal      — verified GĒAR-DAGUM
 
-NEW PHONEMES: none. Pure assembly.
+NEW PHONEMES: none.
+Pure assembly — sixth verified word
+with zero new phonemes.
 
-NOTES:
-  [θ] word-initial here — onset from
-  silence. Same parameters as medial
-  [θ] instances.
-
-  [r] post-fricative — [θr] cluster.
-  Trill onset directly after dental
-  fricative. No vowel between them.
-  The [r] begins with tongue tip
-  already near alveolar ridge from
-  the [θ] dental contact — close
-  articulatory transition.
-
-  [eɑ] in consonant cluster context:
-  [r]→[eɑ]→[t]. The diphthong is
-  sandwiched between the trill and
-  the stop. Onset coarticulation from
-  [r] — F2 onset may be slightly
-  higher than isolated [eɑ] due to
-  [r] lowering effect on F1.
-  Offset coarticulation toward [t] —
-  closure building through final
-  portion of diphthong.
-
-  [t] post-diphthong — voiceless stop
-  after voiced vowel. Clean closure.
-  Short aspiration burst.
-
-  [um] syllable — unstressed dative
-  plural suffix. [u] is short and
-  reduced in unstressed position.
-  [m] word-final — closure held,
-  minimal release.
-
-ETYMOLOGICAL NOTE:
-  þrēat → ModE 'threat'
-  Semantic path:
-    pressing crowd / troop →
-    pressing danger →
-    menace / threat
-  The force meaning was always
-  present. The word pressed.
+ETYMOLOGY:
+  þrēat — troop, band, pressing crowd.
+  Dative plural þreatum.
+  ModE 'threat' descends from this.
+  Semantic shift: pressing crowd →
+  pressing danger → menace.
+  The force was always in the word.
 
 LINE 5 COMPLETE after this word:
   Scyld Scefing sceaþena þreatum
-  [ʃyld  ʃeviŋɡ  ʃeɑθenɑ  θreɑtum]
+  Scyld Scefing [terrorised enemy] troops
 
 CHANGE LOG:
   v1 — initial parameters
@@ -89,12 +57,14 @@ TH_NOISE_BW = 3000.0
 TH_GAIN     = 0.18
 
 # R — alveolar trill [r]
-R_DUR_MS   = 70.0
-R_F        = [120.0, 1700.0, 2600.0, 3300.0]
-R_B        = [100.0,  150.0,  200.0,  280.0]
-R_GAINS    = [ 10.0,    6.0,    1.5,    0.5]
-R_TRILL_RATE = 28.0   # Hz — trill pulses
-R_TRILL_DEPTH= 0.55   # AM depth
+R_F      = [250.0, 1100.0, 2200.0, 3200.0]
+R_B      = [120.0,  180.0,  250.0,  300.0]
+R_GAINS  = [ 14.0,    7.0,    2.0,    0.5]
+R_DUR_MS = 70.0
+R_TRILL_RATE = 28.0   # Hz — trill modulation
+R_TRILL_DEPTH= 0.55
+R_COART_ON   = 0.15
+R_COART_OFF  = 0.15
 
 # EA — short front-back diphthong [eɑ]
 EA_DUR_MS  = 80.0
@@ -110,21 +80,25 @@ T_DUR_MS   = 65.0
 T_BURST_F  = 4000.0
 T_BURST_BW = 2000.0
 T_BURST_MS = 12.0
-T_ASP_MS   = 20.0
+T_ASP_MS   = 35.0
+T_ASP_CF   = 4500.0
+T_ASP_BW   = 3000.0
 
 # U — short close back rounded [u]
-U_F      = [320.0,  800.0, 2400.0, 3100.0]
-U_B      = [ 80.0,  120.0,  200.0,  280.0]
-U_GAINS  = [ 16.0,    6.0,    1.0,    0.4]
-U_DUR_MS = 45.0
+U_F      = [300.0,  800.0, 2300.0, 3100.0]
+U_B      = [ 80.0,  120.0,  200.0,  260.0]
+U_GAINS  = [ 16.0,    8.0,    1.5,    0.5]
+U_DUR_MS = 55.0
 U_COART_ON  = 0.12
 U_COART_OFF = 0.12
 
 # M — voiced bilabial nasal [m]
-M_F      = [280.0, 1000.0, 2200.0, 3000.0]
-M_B      = [100.0,  300.0,  400.0,  400.0]
-M_GAINS  = [  8.0,    1.5,    0.4,    0.2]
+M_F      = [250.0, 1000.0, 2500.0, 3200.0]
+M_B      = [100.0,  200.0,  300.0,  350.0]
+M_GAINS  = [  8.0,    2.0,    0.5,    0.2]
 M_DUR_MS = 65.0
+M_ANTI_F = 1000.0
+M_ANTI_BW= 200.0
 
 PITCH_HZ = 145.0
 DIL      = 1.0
@@ -324,20 +298,20 @@ def synth_R(F_prev=None, F_next=None,
              dil=DIL, sr=SR):
     """
     Alveolar trill [r].
-    Rosenberg pulse source with
-    AM trill modulation at ~28 Hz.
-    Trill depth 0.55 — periodic
-    constrictions of tongue tip
-    against alveolar ridge.
-    Post-fricative position here —
-    [θr] cluster onset.
+    Rosenberg pulse with amplitude
+    modulation at trill rate ~28 Hz.
+    Each modulation cycle = one tap
+    of tongue tip against alveolar
+    ridge. 2–3 taps at 28 Hz in 70 ms.
+    Formants: low F1, low F2 ~1100 Hz
+    characteristic of trill/rhotic.
     """
     dur_ms = R_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     T      = 1.0 / sr
     src    = rosenberg_pulse(n_s, pitch_hz,
                               oq=0.65, sr=sr)
-    # Trill AM envelope
+    # Trill modulation envelope
     t_arr  = np.arange(n_s) * T
     trill  = (1.0 - R_TRILL_DEPTH
               + R_TRILL_DEPTH
@@ -345,21 +319,60 @@ def synth_R(F_prev=None, F_next=None,
                   2 * np.pi
                   * R_TRILL_RATE
                   * t_arr)))
-    # Onset ramp from [θ] transition
-    n_atk  = min(int(0.008 * sr), n_s // 4)
-    n_rel  = min(int(0.012 * sr), n_s // 4)
+    # Global onset/offset
+    n_on   = min(int(0.010 * sr), n_s // 4)
+    n_off  = min(int(0.010 * sr), n_s // 4)
     env    = np.ones(n_s, dtype=DTYPE)
-    if n_atk < n_s:
-        env[:n_atk] = np.linspace(
-            0.2, 1.0, n_atk)
-    if n_rel < n_s:
-        env[-n_rel:] = np.linspace(
-            1.0, 0.4, n_rel)
-    src    = f32(src * trill.astype(DTYPE)
+    if n_on < n_s:
+        env[:n_on]  = np.linspace(
+            0.2, 1.0, n_on)
+    if n_off < n_s:
+        env[-n_off:] = np.linspace(
+            1.0, 0.2, n_off)
+    src    = f32(src
+                 * trill.astype(DTYPE)
                  * env)
-    result = apply_formants(
-        src, R_F, R_B, R_GAINS, sr=sr)
-    mx     = np.max(np.abs(result))
+    # Coarticulation
+    n_con  = int(R_COART_ON  * n_s)
+    n_coff = int(R_COART_OFF * n_s)
+    f_prev = F_prev if F_prev is not None \
+             else R_F
+    f_next = F_next if F_next is not None \
+             else R_F
+    result = np.zeros(n_s, dtype=DTYPE)
+    for fi in range(len(R_F)):
+        f_s   = (float(f_prev[fi])
+                 if fi < len(f_prev)
+                 else float(R_F[fi]))
+        f_e   = (float(f_next[fi])
+                 if fi < len(f_next)
+                 else float(R_F[fi]))
+        f_b   = float(R_F[fi])
+        f_arr = np.full(n_s, f_b, dtype=DTYPE)
+        if n_con > 0:
+            f_arr[:n_con] = np.linspace(
+                f_s, f_b, n_con)
+        if n_coff > 0:
+            f_arr[-n_coff:] = np.linspace(
+                f_b, f_e, n_coff)
+        bw  = float(R_B[fi])
+        g   = float(R_GAINS[fi])
+        y1 = y2 = 0.0
+        out = np.zeros(n_s, dtype=DTYPE)
+        for i in range(n_s):
+            fc  = max(20.0, min(
+                sr * 0.48, float(f_arr[i])))
+            a2_ = -np.exp(-2*np.pi*bw*T)
+            a1_ =  2*np.exp(-np.pi*bw*T) \
+                   * np.cos(2*np.pi*fc*T)
+            b0_ = 1.0 - a1_ - a2_
+            yy  = (b0_ * float(src[i])
+                   + a1_ * y1 + a2_ * y2)
+            y2  = y1
+            y1  = yy
+            out[i] = yy
+        result += out * g
+    mx = np.max(np.abs(result))
     if mx > 1e-8:
         result = f32(result / mx * 0.62)
     return f32(result)
@@ -383,9 +396,9 @@ def synth_EA(F_prev=None, F_next=None,
         env[-n_rel:] = np.linspace(
             1.0, 0.6, n_rel)
     src    = f32(src * env)
-    i_on   = int(EA_TRANS_ON  * n_s)
-    i_off  = int(EA_TRANS_OFF * n_s)
-    n_tr   = max(1, i_off - i_on)
+    i_ton  = int(EA_TRANS_ON  * n_s)
+    i_toff = int(EA_TRANS_OFF * n_s)
+    n_trans= max(1, i_toff - i_ton)
     result = np.zeros(n_s, dtype=DTYPE)
     for fi in range(len(EA_F_ON)):
         f_on  = float(EA_F_ON[fi])
@@ -394,14 +407,14 @@ def synth_EA(F_prev=None, F_next=None,
         g     = float(EA_GAINS[fi])
         f_arr = np.full(n_s, f_on,
                          dtype=DTYPE)
-        if i_on > 0:
-            f_arr[:i_on] = f_on
-        if i_off <= n_s:
-            f_arr[i_on:i_off] = \
+        if i_ton > 0:
+            f_arr[:i_ton] = f_on
+        if i_toff <= n_s:
+            f_arr[i_ton:i_toff] = \
                 np.linspace(f_on, f_off,
-                             n_tr)
-        if i_off < n_s:
-            f_arr[i_off:] = f_off
+                             n_trans)
+        if i_toff < n_s:
+            f_arr[i_toff:] = f_off
         y1 = y2 = 0.0
         out = np.zeros(n_s, dtype=DTYPE)
         for i in range(n_s):
@@ -433,33 +446,35 @@ def synth_T(F_prev=None, F_next=None,
     n_asp   = max(2, int(T_ASP_MS
                          / 1000.0 * sr))
     n_clos  = max(2, n_s - n_burst - n_asp)
-    # Silent closure
+    # Closure — silence
     closure = np.zeros(n_clos, dtype=DTYPE)
     # Burst
-    noise   = np.random.randn(
+    noise_b = np.random.randn(
         n_burst).astype(float)
     b_bp, a_bp = safe_bp(
         T_BURST_F - T_BURST_BW / 2,
         T_BURST_F + T_BURST_BW / 2, SR)
-    burst   = f32(lfilter(
-        b_bp, a_bp, noise) * 0.65)
+    burst   = f32(lfilter(b_bp, a_bp,
+                           noise_b) * 0.70)
     env_b   = np.linspace(
-        1.0, 0.2, n_burst).astype(DTYPE)
+        1.0, 0.3, n_burst).astype(DTYPE)
     burst   = f32(burst * env_b)
     # Aspiration
     noise_a = np.random.randn(
         n_asp).astype(float)
-    b_lp, a_lp = safe_lp(4000.0, SR)
-    asp     = f32(lfilter(
-        b_lp, a_lp, noise_a) * 0.25)
+    b_ap, a_ap = safe_bp(
+        T_ASP_CF - T_ASP_BW / 2,
+        T_ASP_CF + T_ASP_BW / 2, SR)
+    asp     = f32(lfilter(b_ap, a_ap,
+                           noise_a) * 0.35)
     env_a   = np.linspace(
-        0.8, 0.0, n_asp).astype(DTYPE)
+        0.6, 0.0, n_asp).astype(DTYPE)
     asp     = f32(asp * env_a)
     seg     = np.concatenate([
         closure, burst, asp])
     mx      = np.max(np.abs(seg))
     if mx > 1e-8:
-        seg = f32(seg / mx * 0.60)
+        seg = f32(seg / mx * 0.65)
     return f32(seg)
 
 
@@ -472,7 +487,7 @@ def synth_U(F_prev=None, F_next=None,
     src    = rosenberg_pulse(n_s, pitch_hz,
                               oq=0.65, sr=sr)
     n_atk  = min(int(0.010 * sr), n_s // 4)
-    n_rel  = min(int(0.010 * sr), n_s // 4)
+    n_rel  = min(int(0.015 * sr), n_s // 4)
     env    = np.ones(n_s, dtype=DTYPE)
     if n_atk < n_s:
         env[:n_atk] = np.linspace(
@@ -496,8 +511,7 @@ def synth_U(F_prev=None, F_next=None,
                  if fi < len(f_next)
                  else float(U_F[fi]))
         f_b   = float(U_F[fi])
-        f_arr = np.full(n_s, f_b,
-                         dtype=DTYPE)
+        f_arr = np.full(n_s, f_b, dtype=DTYPE)
         if n_on > 0:
             f_arr[:n_on] = np.linspace(
                 f_s, f_b, n_on)
@@ -510,8 +524,7 @@ def synth_U(F_prev=None, F_next=None,
         out = np.zeros(n_s, dtype=DTYPE)
         for i in range(n_s):
             fc  = max(20.0, min(
-                sr * 0.48,
-                float(f_arr[i])))
+                sr * 0.48, float(f_arr[i])))
             a2_ = -np.exp(-2*np.pi*bw*T)
             a1_ =  2*np.exp(-np.pi*bw*T) \
                    * np.cos(2*np.pi*fc*T)
@@ -524,19 +537,13 @@ def synth_U(F_prev=None, F_next=None,
         result += out * g
     mx = np.max(np.abs(result))
     if mx > 1e-8:
-        result = f32(result / mx * 0.60)
+        result = f32(result / mx * 0.65)
     return f32(result)
 
 
 def synth_M(F_prev=None, F_next=None,
              pitch_hz=PITCH_HZ,
              dil=DIL, sr=SR):
-    """
-    Voiced bilabial nasal [m].
-    Word-final here — lips close,
-    held, minimal release.
-    Decay toward silence.
-    """
     dur_ms = M_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     src    = rosenberg_pulse(n_s, pitch_hz,
@@ -551,7 +558,10 @@ def synth_M(F_prev=None, F_next=None,
     src    = f32(src * env)
     result = apply_formants(
         src, M_F, M_B, M_GAINS, sr=sr)
-    mx     = np.max(np.abs(result))
+    result = iir_notch(
+        result, fc=M_ANTI_F,
+        bw=M_ANTI_BW, sr=sr)
+    mx = np.max(np.abs(result))
     if mx > 1e-8:
         result = f32(result / mx * 0.50)
     return f32(result)
@@ -632,7 +642,7 @@ if __name__ == "__main__":
     print("ÞREATUM RECONSTRUCTION v1")
     print("Old English [θreɑtum]")
     print("Beowulf line 5, word 4")
-    print("LINE 5 FINAL WORD")
+    print("Line 5 final word.")
     print()
 
     w_dry = synth_threatum(
@@ -666,6 +676,7 @@ if __name__ == "__main__":
         w_perf, SR)
     print(f"  threatum_performance.wav"
           f"  ({len(w_perf)/SR*1000:.0f} ms)")
+
     print()
     print("  afplay output_play/"
           "threatum_dry.wav")
@@ -677,7 +688,4 @@ if __name__ == "__main__":
     print("  LINE 5 COMPLETE:")
     print("  Scyld Scefing"
           " sceaþena þreatum")
-    print()
-    print("  [ʃyld ʃeviŋɡ"
-          " ʃeɑθenɑ θreɑtum]")
     print()
