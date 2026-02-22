@@ -6,39 +6,21 @@ IPA: [ɡeːɑrdɑɡum]
 Beowulf: Line 1, Word 5
 February 2026
 
-PHONEME STRUCTURE:
-  G1  [ɡ]   voiced velar stop, before [eː]
-  Ē   [eː]  long close-mid front vowel
-  A1  [ɑ]   short open back vowel
-  R   [r]   alveolar trill, short
-  D   [d]   voiced alveolar stop
-  A2  [ɑ]   short open back vowel
-  G2  [ɡ]   voiced velar stop, before [u]
-  U   [u]   short close back rounded vowel — NEW
-  M   [m]   voiced bilabial nasal — NEW
-
-NEW PHONEMES:
-  [u]: F1 ~300 Hz (high, rounded)
-       F2 ~700 Hz (back + rounded — lowest F2)
-       Lips rounded throughout.
-       Short duration, unstressed syllable.
-
-  [m]: Bilabial closure — both lips together.
-       Same murmur quality as [n].
-       Antiformant shifts lower: ~1000 Hz
-       (longer oral cavity vs alveolar [n]).
-       Word-final — releases into silence.
-
-REUSED PHONEMES (parameters from prior words):
-  G: GĀR-DENA G — same base, adjusted
-     coarticulation for [eː] and [u] contexts.
-  Ē: WĒ long [eː] — identical parameters.
-  A: GĀR-DENA final [ɑ] — identical.
-  R: GĀR-DENA trill — identical.
-  D: GĀR-DENA [d] — identical.
-
 CHANGE LOG:
   v1 — initial parameters
+  v2 — M nasal fix:
+    M_GAINS[1] 2.0→12.0
+    M_B[1] 250→350 Hz
+    Root cause: [m] murmur was a single
+    spike at 129 Hz (Rosenberg fundamental).
+    Second resonator at 1000 Hz had gain 2.0
+    — too weak to produce murmur energy above
+    400 Hz. Real [m] has broad energy
+    200–800 Hz from nasal tract resonance.
+    Widening M_B[1] and raising M_GAINS[1]
+    fills the murmur region so the 1000 Hz
+    antiformant is a dip within the spectrum
+    rather than a cliff at the edge of it.
 """
 
 import numpy as np
@@ -53,20 +35,15 @@ os.makedirs("output_play", exist_ok=True)
 
 
 # ============================================================
-# PARAMETERS — v1
+# PARAMETERS — v2
 # ============================================================
 
-# G1 — voiced velar stop before [eː]
-# Same burst CF as GĀR-DENA G (~1500 Hz)
-# Release trajectory moves toward EE_F
 G1_F          = [250.0, 2200.0, 3000.0, 3500.0]
 G1_B          = [200.0,  250.0,  300.0,  350.0]
 G1_CLOSURE_MS = 50.0
 G1_BURST_MS   = 12.0
 G1_BURST_CF   = 1500.0
 
-# Ē — long close-mid front vowel [eː]
-# Identical to WĒ reconstruction
 EE_F      = [390.0, 2100.0, 2800.0, 3300.0]
 EE_B      = [ 80.0,  120.0,  160.0,  220.0]
 EE_GAINS  = [ 20.0,    8.0,    1.5,    0.5]
@@ -74,8 +51,6 @@ EE_DUR_MS = 160.0
 EE_COART_ON  = 0.10
 EE_COART_OFF = 0.10
 
-# A — short open back vowel [ɑ]
-# Same as GĀR-DENA A parameters
 A_F      = [840.0, 1150.0, 2500.0, 3300.0]
 A_B      = [180.0,  120.0,  200.0,  280.0]
 A_GAINS  = [ 16.0,    5.0,    1.2,    0.4]
@@ -83,8 +58,6 @@ A_DUR_MS = 65.0
 A_COART_ON  = 0.12
 A_COART_OFF = 0.12
 
-# R — alveolar trill [r]
-# Same as GĀR-DENA R
 R_F          = [450.0, 1350.0, 1690.0, 3200.0]
 R_B          = [100.0,  150.0,  200.0,  280.0]
 R_GAINS      = [ 15.0,    4.0,    2.0,    0.5]
@@ -92,29 +65,18 @@ R_CLOSURE_MS = 35.0
 R_OPEN_MS    = 20.0
 R_N_CLOSURES = 2
 
-# D — voiced alveolar stop [d]
-# Same as GĀR-DENA D
 D_F          = [250.0, 1800.0, 2600.0, 3400.0]
 D_B          = [200.0,  220.0,  280.0,  320.0]
 D_CLOSURE_MS = 45.0
 D_BURST_MS   = 10.0
 D_BURST_CF   = 3500.0
 
-# G2 — voiced velar stop before [u]
-# Before back rounded vowel:
-# burst CF shifts slightly lower (~1200 Hz)
-# due to back vowel context lowering F2 locus
 G2_F          = [250.0, 1000.0, 2600.0, 3200.0]
 G2_B          = [200.0,  220.0,  280.0,  330.0]
 G2_CLOSURE_MS = 50.0
 G2_BURST_MS   = 12.0
 G2_BURST_CF   = 1200.0
 
-# U — short close back rounded vowel [u]
-# F1 very low: close jaw height + rounding
-# F2 very low: back tongue + lip rounding
-# This is the lowest F2 of any vowel
-# Contrast: [ɪ] F2=1800, [ɑ] F2=1150, [u] F2=700
 U_F      = [300.0,  700.0, 2200.0, 3100.0]
 U_B      = [ 80.0,  100.0,  200.0,  280.0]
 U_GAINS  = [ 16.0,   12.0,    1.0,    0.3]
@@ -122,17 +84,12 @@ U_DUR_MS = 60.0
 U_COART_ON  = 0.15
 U_COART_OFF = 0.15
 
-# M — voiced bilabial nasal [m]
-# Bilabial closure: lips together
-# Oral cavity longer than [n] —
-# antiformant shifts lower to ~1000 Hz
-# Murmur: similar to [n] but darker
-# Word-final: releases into silence
+# FIX v2: M_GAINS[1] 2.0→12.0, M_B[1] 250→350
 M_F       = [250.0, 1000.0, 2200.0, 3000.0]
-M_B       = [120.0,  250.0,  350.0,  400.0]
-M_GAINS   = [  8.0,    2.0,    0.5,    0.2]
+M_B       = [120.0,  350.0,  350.0,  400.0]
+M_GAINS   = [  8.0,   12.0,    1.0,    0.2]
 M_DUR_MS  = 60.0
-M_ANTI_F  = 1000.0   # bilabial: lower than [n]
+M_ANTI_F  = 1000.0
 M_ANTI_BW = 200.0
 
 PITCH_HZ = 145.0
@@ -337,10 +294,6 @@ def synth_G(F_next, burst_cf,
              G_F, G_B,
              pitch_hz=PITCH_HZ,
              dil=DIL, sr=SR):
-    """Generic voiced velar stop synthesizer.
-    Used for both G1 (before [eː]) and
-    G2 (before [u]) with different parameters.
-    """
     n_cl  = max(4, int(
         closure_ms * dil / 1000.0 * sr))
     n_bst = max(4, int(
@@ -587,14 +540,6 @@ def synth_D(F_prev, F_next,
 def synth_U_short(F_prev, F_next,
                    pitch_hz=PITCH_HZ,
                    dil=DIL, sr=SR):
-    """
-    Short close back rounded vowel [u].
-    F1 very low (~300 Hz): close height.
-    F2 very low (~700 Hz): back + rounded.
-    Lip rounding is the defining feature —
-    it pulls F2 down from ~1000 Hz (back
-    unrounded [ɯ]) to ~700 Hz.
-    """
     dur_ms = U_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     T      = 1.0 / sr
@@ -658,13 +603,6 @@ def synth_U_short(F_prev, F_next,
 def synth_M_final(F_prev=None,
                    pitch_hz=PITCH_HZ,
                    dil=DIL, sr=SR):
-    """
-    Word-final voiced bilabial nasal [m].
-    Bilabial closure: both lips together.
-    Antiformant at 1000 Hz (lower than [n]
-    at 800 Hz — longer oral cavity).
-    Releases into silence.
-    """
     dur_ms = M_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     T      = 1.0 / sr
@@ -719,10 +657,6 @@ def apply_simple_room(sig, rt60=2.0,
     return f32(mix)
 
 
-# ============================================================
-# FULL WORD
-# ============================================================
-
 def synth_gear_dagum(pitch_hz=PITCH_HZ,
                       dil=DIL,
                       add_room=False,
@@ -762,7 +696,6 @@ def synth_gear_dagum(pitch_hz=PITCH_HZ,
     m_seg  = synth_M_final(
         F_prev=U_F,
         pitch_hz=pitch_hz, dil=dil, sr=sr)
-
     word = np.concatenate([
         g1_seg, ee_seg, a1_seg, r_seg,
         d_seg, a2_seg, g2_seg, u_seg, m_seg])
@@ -776,13 +709,9 @@ def synth_gear_dagum(pitch_hz=PITCH_HZ,
     return f32(word)
 
 
-# ============================================================
-# MAIN
-# ============================================================
-
 if __name__ == "__main__":
     print()
-    print("GĒAR-DAGUM RECONSTRUCTION v1")
+    print("GĒAR-DAGUM RECONSTRUCTION v2")
     print("Old English [ɡeːɑrdɑɡum]")
     print("Beowulf line 1, word 5")
     print()
@@ -821,17 +750,14 @@ if __name__ == "__main__":
           f"  ({len(gd_perf)/SR*1000:.0f} ms)")
 
     u_iso = synth_U_short(
-        F_prev=G2_F, F_next=M_F,
-        pitch_hz=145.0, dil=1.0, sr=SR)
+        G2_F, M_F, 145.0, 1.0, SR)
     write_wav(
         "output_play/gear_dagum_u_isolated.wav",
         ola_stretch(u_iso, 4.0), SR)
     print("  gear_dagum_u_isolated.wav"
           "  (U vowel 4x slow)")
 
-    m_iso = synth_M_final(
-        F_prev=U_F,
-        pitch_hz=145.0, dil=1.0, sr=SR)
+    m_iso = synth_M_final(U_F, 145.0, 1.0, SR)
     write_wav(
         "output_play/gear_dagum_m_isolated.wav",
         ola_stretch(m_iso, 4.0), SR)
