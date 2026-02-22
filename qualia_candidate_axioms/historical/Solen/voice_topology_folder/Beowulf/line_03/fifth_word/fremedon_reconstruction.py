@@ -2,9 +2,11 @@
 FREMEDON RECONSTRUCTION
 Old English: fremedon
 Meaning: performed, did, carried out
-         (3rd pl. past tense of fremman)
+         3rd person plural past tense
+         of fremman (to perform, do)
 IPA: [fremedon]
 Beowulf: Line 3, Word 5 (overall word 13)
+         Final word of line 3.
 February 2026
 
 PHONEME STRUCTURE:
@@ -17,35 +19,39 @@ PHONEME STRUCTURE:
   O   [o]   short close-mid back        — verified ÞĒOD-CYNINGA
   N   [n]   voiced alveolar nasal       — verified
 
-ZERO NEW PHONEMES.
-Pure assembly from verified inventory.
-Proof of framework.
+NEW PHONEMES: none.
+Pure assembly. All eight segments
+from verified inventory.
 
-ONSET CLUSTER [fr]:
-  [f] releases into [r] directly.
-  No vowel between.
-  [f] offset coarticulates toward
-  [r] formant targets before frication
-  ends. Voiced [r] onset begins as
-  [f] frication fades.
-  Handled via F_next parameter on
-  synth_F pointing to R_F targets.
+ASSEMBLY NOTE:
+  [fr] onset cluster:
+  [f] offset coarticulates toward [r].
+  Voicing onset of [r] overlaps with
+  final ms of [f] frication.
+  [f] formant trajectory targets R_F
+  in final 15% of segment.
+
+  This word is the framework proof:
+  if FREMEDON passes clean, the synthesis
+  engine can produce any arbitrary OE
+  word from the existing inventory.
 
 MORPHOLOGICAL NOTE:
-  fremman — class I weak verb
-  to perform, do, carry out,
-  promote, further, support.
-  fremedon — 3rd plural past indicative
-  they performed, they did.
-  Subject: þā æþelingas — those princes.
+  fremman — Class I weak verb.
+  To perform, do, carry out, further,
+  promote, benefit.
+  fremedon — past tense plural:
+  they performed.
+  Subject: æþelingas (the princes).
+  Object: ellen (courage/deeds of courage).
   Full clause: hu ðā æþelingas
-               ellen fremedon
+               ellen fremedon —
   how those princes performed
-  acts of courage.
-  Modern English cognate: none direct.
-  Related to 'frame' through
-  Proto-Germanic *framjan —
-  to further, promote, carry forward.
+  deeds of courage.
+  The verb closes the clause that
+  has been building since line 3
+  word 1 (hu). Six words. One thought.
+  The entire syntax resolves here.
 
 CHANGE LOG:
   v1 — initial parameters
@@ -67,63 +73,62 @@ os.makedirs("output_play", exist_ok=True)
 # ============================================================
 
 # F — voiceless labiodental fricative [f]
-F_NOISE_CF  = 7200.0
-F_NOISE_BW  = 5000.0
-F_GAIN      = 0.30
-F_DUR_MS    = 65.0   # word-initial, before [r]
+F_DUR_MS   = 70.0
+F_NOISE_CF = 6500.0
+F_NOISE_BW = 3000.0
+F_GAIN     = 0.30
 
 # R — alveolar trill [r]
-# Rosenberg pulse through trill modulation.
-# Amplitude modulation at trill rate
-# ~25 Hz — tongue tip contacts/releases
-# alveolar ridge ~4–6 times per trill.
-R_F         = [400.0, 1100.0, 2200.0, 3100.0]
-R_B         = [120.0,  150.0,  200.0,  280.0]
-R_GAINS     = [ 14.0,    7.0,    2.0,    0.5]
-R_DUR_MS    = 70.0
-R_TRILL_HZ  = 25.0   # trill modulation rate
-R_TRILL_MOD = 0.55   # modulation depth
-              # 0 = no modulation (approximant)
-              # 1 = full on/off (strong trill)
+# Verified GĀR-DENA.
+# Here: post-fricative position [fr].
+# Voicing onset overlaps final ms of [f].
+R_F      = [400.0, 1100.0, 2200.0, 3100.0]
+R_B      = [120.0,  150.0,  200.0,  280.0]
+R_GAINS  = [ 14.0,    7.0,    2.0,    0.6]
+R_DUR_MS = 70.0
+R_TRILL_RATE = 28.0   # interruptions/sec
+R_TRILL_DEPTH= 0.55
+R_COART_ON   = 0.15
+R_COART_OFF  = 0.15
 
 # E — short close-mid front [e]
-E_F         = [370.0, 2100.0, 2800.0, 3300.0]
-E_B         = [ 80.0,  120.0,  170.0,  240.0]
-E_GAINS     = [ 18.0,    9.0,    1.5,    0.5]
-E_DUR_MS    = 60.0
+E_F      = [370.0, 2100.0, 2800.0, 3300.0]
+E_B      = [ 80.0,  120.0,  170.0,  240.0]
+E_GAINS  = [ 18.0,    9.0,    1.5,    0.5]
+E_DUR_MS = 60.0
 E_COART_ON  = 0.12
 E_COART_OFF = 0.12
 
 # M — voiced bilabial nasal [m]
-M_F         = [250.0, 1000.0, 2200.0, 3200.0]
-M_B         = [100.0,  300.0,  400.0,  500.0]
-M_GAINS     = [  8.0,    1.5,    0.4,    0.1]
-M_DUR_MS    = 65.0
-M_ANTI_F    = 750.0
-M_ANTI_BW   = 200.0
+M_F      = [250.0, 1000.0, 2200.0, 3200.0]
+M_B      = [100.0,  200.0,  300.0,  350.0]
+M_GAINS  = [  8.0,    2.0,    0.5,    0.2]
+M_DUR_MS = 65.0
+M_ANTI_F = 1000.0
+M_ANTI_BW= 200.0
 
 # D — voiced alveolar stop [d]
-D_DUR_MS    = 70.0
-D_BURST_F   = 3500.0
-D_BURST_BW  = 1500.0
-D_BURST_MS  = 10.0
-D_VOT_MS    = 6.0
+D_DUR_MS  = 70.0
+D_BURST_F = 1800.0
+D_BURST_BW= 600.0
+D_BURST_MS= 10.0
+D_VOT_MS  = 6.0
 
-# O — short close-mid back rounded [o]
-O_F         = [400.0,  800.0, 2300.0, 3200.0]
-O_B         = [100.0,  120.0,  200.0,  280.0]
-O_GAINS     = [ 16.0,    5.0,    1.0,    0.3]
-O_DUR_MS    = 65.0
+# O — short close-mid back [o]
+O_F      = [430.0,  700.0, 2400.0, 3200.0]
+O_B      = [ 90.0,  120.0,  200.0,  280.0]
+O_GAINS  = [ 18.0,    7.0,    1.2,    0.4]
+O_DUR_MS = 65.0
 O_COART_ON  = 0.12
 O_COART_OFF = 0.12
 
 # N — voiced alveolar nasal [n]
-N_F         = [250.0, 1800.0, 2600.0, 3300.0]
-N_B         = [100.0,  200.0,  300.0,  350.0]
-N_GAINS     = [  8.0,    2.0,    0.5,    0.2]
-N_DUR_MS    = 65.0
-N_ANTI_F    = 800.0
-N_ANTI_BW   = 200.0
+N_F      = [250.0, 1800.0, 2600.0, 3300.0]
+N_B      = [100.0,  200.0,  300.0,  350.0]
+N_GAINS  = [  8.0,    2.0,    0.5,    0.2]
+N_DUR_MS = 65.0
+N_ANTI_F = 800.0
+N_ANTI_BW= 200.0
 
 PITCH_HZ = 145.0
 DIL      = 1.0
@@ -257,10 +262,10 @@ def iir_notch(sig, fc, bw=200.0, sr=SR):
     wc = 2 * np.pi * fc * T
     r  = float(np.clip(
         1.0 - np.pi * bw * T, 0.1, 0.999))
-    b1   = -2.0 * np.cos(wc)
-    b2   =  1.0
-    a1   = -2.0 * r * np.cos(wc)
-    a2   =  r * r
+    b1 = -2.0 * np.cos(wc)
+    b2 =  1.0
+    a1 = -2.0 * r * np.cos(wc)
+    a2 =  r * r
     gain_dc = abs((1 + b1 + b2)
                   / (1 + a1 + a2 + 1e-12))
     if gain_dc > 1e-6:
@@ -294,9 +299,8 @@ def iir_notch(sig, fc, bw=200.0, sr=SR):
 def synth_F(F_next=None, dil=DIL, sr=SR):
     """
     Voiceless labiodental fricative [f].
-    Word-initial, before [r].
-    F_next points to R_F for coarticulation
-    — frication fades toward trill formants.
+    Word-initial here — [fr] cluster.
+    Offset coarticulates toward R_F.
     """
     dur_ms = F_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
@@ -306,19 +310,22 @@ def synth_F(F_next=None, dil=DIL, sr=SR):
         min(F_NOISE_CF + F_NOISE_BW / 2,
             sr * 0.48), sr)
     fric   = lfilter(b, a, noise)
+    # Secondary lower band
+    b2, a2 = safe_bp(1000.0, 4000.0, sr)
+    fric  += lfilter(b2, a2, noise) * 0.25
     n_atk  = min(int(0.010 * sr), n_s // 4)
-    n_dec  = min(int(0.020 * sr), n_s // 3)
+    n_dec  = min(int(0.015 * sr), n_s // 4)
     env    = np.ones(n_s, dtype=float)
     if n_atk < n_s:
         env[:n_atk] = np.linspace(
             0.0, 1.0, n_atk)
     if n_dec < n_s:
         env[-n_dec:] = np.linspace(
-            1.0, 0.0, n_dec)
+            1.0, 0.3, n_dec)
     fric   = f32(fric * env * F_GAIN)
     mx     = np.max(np.abs(fric))
     if mx > 1e-8:
-        fric = f32(fric / mx * 0.42)
+        fric = f32(fric / mx * 0.45)
     return f32(fric)
 
 
@@ -327,12 +334,10 @@ def synth_R(F_prev=None, F_next=None,
              dil=DIL, sr=SR):
     """
     Alveolar trill [r].
-    Rosenberg pulse through formants
-    with amplitude modulation at
-    trill rate ~25 Hz simulating
-    tongue tip contact/release cycles.
-    Post-fricative position — voiced
-    onset after [f] offset.
+    Amplitude-modulated voiced source.
+    Trill rate ~28 Hz.
+    Post-fricative here — gradual
+    voicing onset from [f].
     """
     dur_ms = R_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
@@ -340,28 +345,28 @@ def synth_R(F_prev=None, F_next=None,
     src    = rosenberg_pulse(n_s, pitch_hz,
                               oq=0.65, sr=sr)
     # Trill amplitude modulation
-    # Simulates tongue tip occlusion cycles
     t_arr  = np.arange(n_s) * T
-    mod    = (1.0 - R_TRILL_MOD
-              + R_TRILL_MOD
-              * (0.5 + 0.5 * np.cos(
-                  2 * np.pi * R_TRILL_HZ
-                  * t_arr))).astype(DTYPE)
-    src    = f32(src * mod)
-    # Onset envelope — voiced after [f]
-    n_atk  = min(int(0.015 * sr), n_s // 4)
-    n_rel  = min(int(0.020 * sr), n_s // 4)
-    env    = np.ones(n_s, dtype=DTYPE)
-    if n_atk < n_s:
-        env[:n_atk] = np.linspace(
-            0.2, 1.0, n_atk)
-    if n_rel < n_s:
-        env[-n_rel:] = np.linspace(
-            1.0, 0.4, n_rel)
+    trill  = (1.0
+              - R_TRILL_DEPTH
+              * 0.5
+              * (1 - np.cos(
+                  2 * np.pi
+                  * R_TRILL_RATE * t_arr))
+              ).astype(DTYPE)
+    # Post-fricative voicing onset ramp
+    n_voi  = min(int(0.020 * sr), n_s // 3)
+    voi    = np.ones(n_s, dtype=DTYPE)
+    if n_voi < n_s:
+        voi[:n_voi] = np.linspace(
+            0.1, 1.0, n_voi)
+    env    = trill * voi
+    n_off  = min(int(0.015 * sr), n_s // 4)
+    if n_off < n_s:
+        env[-n_off:] *= np.linspace(
+            1.0, 0.4, n_off)
     src    = f32(src * env)
-    # Formant trajectory
-    n_on   = int(0.15 * n_s)
-    n_off  = int(0.15 * n_s)
+    n_on   = int(R_COART_ON  * n_s)
+    n_off2 = int(R_COART_OFF * n_s)
     f_prev = F_prev if F_prev is not None \
              else R_F
     f_next = F_next if F_next is not None \
@@ -379,9 +384,9 @@ def synth_R(F_prev=None, F_next=None,
         if n_on > 0:
             f_arr[:n_on] = np.linspace(
                 f_s, f_b, n_on)
-        if n_off > 0:
-            f_arr[-n_off:] = np.linspace(
-                f_b, f_e, n_off)
+        if n_off2 > 0:
+            f_arr[-n_off2:] = np.linspace(
+                f_b, f_e, n_off2)
         bw  = float(R_B[fi])
         g   = float(R_GAINS[fi])
         y1 = y2 = 0.0
@@ -498,48 +503,42 @@ def synth_D(F_prev=None, F_next=None,
              pitch_hz=PITCH_HZ,
              dil=DIL, sr=SR):
     dur_ms    = D_DUR_MS * dil
-    n_s       = max(4, int(
-        dur_ms / 1000.0 * sr))
-    n_burst   = max(2, int(
-        D_BURST_MS / 1000.0 * sr))
-    n_vot     = max(2, int(
-        D_VOT_MS / 1000.0 * sr))
-    n_closure = max(2,
-        n_s - n_burst - n_vot)
+    n_s       = max(4, int(dur_ms / 1000.0 * sr))
+    n_burst   = max(2, int(D_BURST_MS
+                           / 1000.0 * sr))
+    n_vot     = max(2, int(D_VOT_MS
+                           / 1000.0 * sr))
+    n_closure = max(2, n_s - n_burst - n_vot)
     T         = 1.0 / sr
-    # Closure — voiced murmur
+    # Voiced closure murmur
     src_c  = rosenberg_pulse(
-        n_closure, pitch_hz,
-        oq=0.65, sr=sr)
+        n_closure, pitch_hz, oq=0.65, sr=sr)
     env_c  = np.linspace(
-        0.1, 0.3, n_closure
-        ).astype(DTYPE)
+        0.1, 0.3, n_closure).astype(DTYPE)
     b_lp, a_lp = safe_lp(300.0, sr)
-    murmur = f32(
-        lfilter(b_lp, a_lp,
-                src_c.astype(float))
-        * env_c * 0.3)
-    # Burst — alveolar
-    noise  = np.random.randn(
-        n_burst).astype(float)
+    murmur = f32(lfilter(b_lp, a_lp,
+                          src_c.astype(float))
+                 * env_c * 0.3)
+    # Alveolar burst
+    noise  = np.random.randn(n_burst
+                              ).astype(float)
     b_bp, a_bp = safe_bp(
         D_BURST_F - D_BURST_BW / 2,
         D_BURST_F + D_BURST_BW / 2, sr)
-    burst  = f32(
-        lfilter(b_bp, a_bp, noise) * 0.55)
-    # VOT — voiced transition
+    burst  = f32(lfilter(b_bp, a_bp, noise)
+                 * 0.55)
+    # VOT — short voiced transition
     src_v  = rosenberg_pulse(
-        n_vot, pitch_hz,
-        oq=0.65, sr=sr)
-    f_next_v = (F_next if F_next is not None
-                else O_F)
+        n_vot, pitch_hz, oq=0.65, sr=sr)
+    f_nxt  = (F_next if F_next is not None
+              else O_F)
     vot    = apply_formants(
-        src_v, f_next_v,
+        src_v, f_nxt,
         [100.0, 150.0, 200.0, 280.0],
         [14.0, 7.0, 1.2, 0.4], sr=sr)
     vot    = f32(vot * 0.5)
-    seg    = np.concatenate(
-        [murmur, burst, vot])
+    seg    = np.concatenate([murmur,
+                              burst, vot])
     mx     = np.max(np.abs(seg))
     if mx > 1e-8:
         seg = f32(seg / mx * 0.65)
@@ -612,6 +611,7 @@ def synth_O_short(F_prev=None, F_next=None,
 def synth_N_final(F_prev=None,
                    pitch_hz=PITCH_HZ,
                    dil=DIL, sr=SR):
+    """Word-final nasal — longer decay."""
     dur_ms = N_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     src    = rosenberg_pulse(n_s, pitch_hz,
@@ -620,7 +620,7 @@ def synth_N_final(F_prev=None,
     n_dec  = min(int(0.040 * sr), n_s // 3)
     env    = np.ones(n_s, dtype=DTYPE)
     if n_tr < n_s:
-        env[:n_tr]  = np.linspace(
+        env[:n_tr] = np.linspace(
             0.3, 1.0, n_tr)
     if n_dec < n_s:
         env[-n_dec:] = np.linspace(
@@ -717,6 +717,7 @@ if __name__ == "__main__":
     print("FREMEDON RECONSTRUCTION v1")
     print("Old English [fremedon]")
     print("Beowulf line 3, word 5")
+    print("Final word of line 3.")
     print()
 
     w_dry = synth_fremedon(
@@ -751,21 +752,17 @@ if __name__ == "__main__":
     print(f"  fremedon_performance.wav"
           f"  ({len(w_perf)/SR*1000:.0f} ms)")
 
-    r_seg = synth_R(R_F, E_F, 145.0, 1.0, SR)
-    write_wav(
-        "output_play/fremedon_r_isolated.wav",
-        ola_stretch(r_seg / (
-            np.max(np.abs(r_seg))+1e-8)
-            * 0.75, 4.0), SR)
-    print("  fremedon_r_isolated.wav  (4x slow)")
-
     print()
-    print("  afplay output_play/"
-          "fremedon_r_isolated.wav")
     print("  afplay output_play/"
           "fremedon_dry.wav")
     print("  afplay output_play/"
           "fremedon_slow.wav")
     print("  afplay output_play/"
           "fremedon_hall.wav")
+    print("  afplay output_play/"
+          "fremedon_performance.wav")
+    print()
+    print("  LINE 3 COMPLETE:")
+    print("  hu ðā æþelingas"
+          " ellen fremedon")
     print()
