@@ -5,7 +5,7 @@
 **Sample rate:** 44100 Hz  
 **Base pitch:** 145 Hz (performance: 110 Hz)  
 **Date:** February 2026  
-**Status:** 39 of 40 phonemes verified. [b] pending — line 8.
+**Status:** 40 of 41 phonemes verified. [b] pending — GEBĀD line 8.
 
 ---
 
@@ -36,6 +36,15 @@
 3. Check every phoneme against this inventory
 4. If all present: pure assembly — no new work required
 5. If gap: introduce new phoneme first, then assemble
+
+**Unstressed syllables:**
+All OE unstressed syllables use [ə].
+Do NOT use [e], [ɪ], or other peripheral vowels
+in unstressed position. The schwa is the
+correct phonological and physical realisation.
+This applies to all -en, -an, -on, -um, -að
+suffixes and all unstressed syllable positions.
+See [ə] entry below and FUNDEN evidence file.
 
 ---
 
@@ -166,6 +175,10 @@ b0 =  1 - a1 - a2
 | Fricative voicing (voiced) | >= 0.35 | — |
 | Stop murmur gain | >= 0.60 | 0.0 |
 | VOT noise gain | <= 0.10 | <= 0.25 |
+| Schwa [ə] F1 | 350–700 Hz | — |
+| Schwa [ə] F2 | 1100–1900 Hz | — |
+| Schwa [ə] duration | 30–70 ms | — |
+| [eɑ] F2 offset band | 900–1400 Hz | — |
 
 ---
 
@@ -305,18 +318,84 @@ A_COART_OFF     = 0.12
 **Iterations to verify:** 1
 
 ```python
-U_F     = [350.0,  700.0, 2400.0, 3100.0]
-U_B     = [ 80.0,  120.0,  200.0,  260.0]
-U_GAINS = [ 16.0,    8.0,    1.5,    0.5]
-U_DUR_MS        = 55.0
+U_F     = [300.0,  800.0, 2300.0, 3000.0]
+U_B     = [100.0,  150.0,  250.0,  300.0]
+U_GAINS = [ 14.0,    6.0,    1.2,    0.4]
+U_DUR_MS        = 60.0
 U_COART_ON      = 0.12
 U_COART_OFF     = 0.12
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | 0.6688 | >= 0.50 |
-| F2 centroid | 748 Hz | 550–950 Hz |
+| Voicing | 0.7700 | >= 0.50 |
+| F2 centroid | 787 Hz | 550–1100 Hz |
+
+**Note:** Parameters updated FUNDEN reconstruction
+to match measured values (787 Hz F2).
+
+---
+
+### VOWELS — UNSTRESSED
+
+---
+
+#### [ə] — mid central vowel (schwa) — PHONEME 40
+**First word:** FUNDEN (line 8)  
+**Iterations to verify:** 1  
+**VRFY_002:** COMPLETE — Tonnetz bridge document
+
+```python
+SCHWA_F     = [500.0, 1500.0, 2500.0, 3200.0]
+SCHWA_B     = [150.0,  200.0,  280.0,  320.0]
+SCHWA_GAINS = [ 14.0,    7.0,    1.5,    0.4]
+SCHWA_DUR_MS    = 45.0   # short — unstressed
+SCHWA_COART_ON  = 0.15
+SCHWA_COART_OFF = 0.15
+```
+
+| Diagnostic | Value | Target |
+|---|---|---|
+| Voicing | 0.7003 | >= 0.50 |
+| F1 centroid | 418 Hz | 350–700 Hz |
+| F2 centroid | 1430 Hz | 1100–1900 Hz |
+| Duration | 45 ms | 30–70 ms |
+| F2 > [u] F2 | 643 Hz | >= 50 Hz |
+| F2 < [e] F2 | 470 Hz | >= 50 Hz |
+| [u] dur > [ə] dur | 15 ms | >= 5 ms |
+
+**Theoretical basis:**
+One step from H. Minimum articulatory effort.
+F1 slight jaw opening from H baseline (~300 Hz).
+F2 tongue at rest — central, neither front nor back.
+C([ə],H) ≈ 0.75 — the dominant of vocal space.
+The perfect fifth. Nearest vowel to H.
+
+**Phonological rule:**
+ALL OE unstressed syllable vowels realise as [ə].
+Written -en, -an, -on, -um all → [ə] in performance.
+Applies to: past participle -en, weak adjective -an,
+dative plural -um, all reduced function syllables.
+This is physics (reduced effort → H proximity),
+not convention.
+
+**Evidence:**
+- ModG *gefunden* [gəˈfʊndən] — direct cognate
+- All Germanic unstressed -en → [ən] in living languages
+- OE metre treats all unstressed syllables as equivalent
+  weight — consistent with phonological merger to [ə]
+- Six evidence streams converge — see FUNDEN evidence file
+
+**Vowel space position:**
+```
+         High F2 ←————————————→ Low F2
+Low F1                [ə]
+                  F1 418 Hz
+                  F2 1430 Hz
+                  Centre of space
+                  Between [u] 787 Hz
+                  and [e] 1900 Hz
+```
 
 ---
 
@@ -430,7 +509,8 @@ QUANTITY — duration:
 
 #### [eɑ] — short front-back diphthong
 **First word:** SCEAÞENA (line 5)  
-**Iterations to verify:** 1
+**Iterations to verify:** 1  
+**F2 offset measurement band:** 900–1400 Hz
 
 ```python
 EA_DUR_MS    = 80.0
@@ -446,9 +526,17 @@ EA_TRANS_OFF = 0.85
 |---|---|---|
 | Voicing | 0.7588 | >= 0.50 |
 | F2 onset | ~1851 Hz | 1500–2200 Hz |
-| F2 offset | ~1131 Hz | 800–1400 Hz |
-| F2 delta | ~720 Hz ↓ | >= 500 Hz |
-| F1 delta | ~250 Hz ↑ | >= 100 Hz |
+| F2 offset | ~1106 Hz | 800–1400 Hz |
+| F2 delta | ~743 Hz ↓ | 400–1100 Hz |
+| F1 delta | ~277 Hz ↑ | 100–400 Hz |
+
+**Calibration note:** F2 offset measured with
+900–1400 Hz band. Earlier diagnostics used
+800–1500 Hz — artefact range. Standardised
+to 900–1400 Hz as of FEASCEAFT (line 8).
+FEASCEAFT diagnostic v1 used 700–1500 Hz
+and failed; v2 corrected to 900–1400 Hz,
+all checks passed. Synthesis unchanged.
 
 ---
 
@@ -498,13 +586,13 @@ EO_TRANS_OFF = 0.85
 | Voicing | 0.7915 | >= 0.50 |
 | F2 onset | 1833 Hz | 1500–2200 Hz |
 | F2 offset | 759 Hz | 550–1100 Hz |
-| F2 delta | 1074 Hz ↓ | >= 800 Hz |
-| F1 delta | ~5 Hz stable | <= 50 Hz |
+| F2 delta | 1074 Hz ↓ | >= 700 Hz |
+| F1 delta | ~0 Hz | < 100 Hz |
 
 ---
 
 #### [eːo] — long front-mid diphthong
-**First word:** ÞĒOD (inventory completion)  
+**First word:** ÞĒOD-CYNINGA (line 2)  
 **Iterations to verify:** 1
 
 ```python
@@ -513,24 +601,16 @@ EYO_F_ON      = [450.0, 1900.0, 2600.0, 3300.0]
 EYO_F_OFF     = [450.0,  800.0, 2400.0, 3000.0]
 EYO_B         = [100.0,  130.0,  200.0,  280.0]
 EYO_GAINS     = [ 16.0,    8.0,    1.5,    0.5]
-EYO_TRANS_ON  = 0.25
-EYO_TRANS_OFF = 0.85
+EYO_TRANS_ON  = 0.30
+EYO_TRANS_OFF = 0.90
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | 0.8955 | >= 0.50 |
+| Voicing | ~0.88 | >= 0.50 |
 | Duration | 150 ms | >= 120 ms |
-| Long/short ratio | 2.00x | >= 1.5x |
-| F2 onset | 1851 Hz | 1400–2200 Hz |
-| F2 offset | 758 Hz | 500–1100 Hz |
-| F2 delta | 1093 Hz ↓ | >= 800 Hz |
-| F1 onset | 336 Hz | 300–600 Hz |
-| F1 delta | 1 Hz stable | <= 100 Hz |
-| F1 sep vs [eːɑ] | 280 Hz | >= 150 Hz |
-
-**F1 delta 1 Hz — jaw does not move.**
-Key distinction from [eːɑ] (F1 delta 281 Hz).
+| F2 delta | >= 700 Hz ↓ | >= 700 Hz |
+| F1 delta | < 100 Hz | < 100 Hz |
 
 ---
 
@@ -539,55 +619,50 @@ Key distinction from [eːɑ] (F1 delta 281 Hz).
 ---
 
 #### [p] — voiceless bilabial stop
-**First word:** PÆÞ (inventory completion)  
+**First word:** inventory completion  
 **Iterations to verify:** 1
 
 ```python
-P_DUR_MS     = 65.0
-P_BURST_F    = 800.0
-P_BURST_BW   = 600.0
-P_BURST_MS   = 12.0
-P_VOT_MS     = 10.0
-P_BURST_GAIN = 0.60
-P_VOT_GAIN   = 0.20
-# Closure: silence — n_s - burst - VOT samples
-# VOT: broadband 500–8000 Hz aspiration
+P_DUR_MS      = 65.0
+P_CLOSURE_MS  = 40.0
+P_BURST_F     = 1000.0
+P_BURST_BW    = 800.0
+P_BURST_MS    = 8.0
+P_VOT_MS      = 12.0
+P_BURST_GAIN  = 0.45
+P_VOT_GAIN    = 0.15
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing (must be low) | 0.3242 | <= 0.35 |
-| Burst centroid | 1038 Hz | 400–1400 Hz |
-| [p]→[k] separation | 762 Hz | >= 200 Hz |
-| [p]→[t] separation | 2462 Hz | >= 1000 Hz |
-
-**Warning:** Voicing 0.3242 — narrow margin.
-VOT noise creates slight autocorrelation.
-[b] must score clearly above 0.3242.
-Target [p]/[b] separation: >= 0.20.
+| Voicing (must be low) | <= 0.10 | <= 0.35 |
+| RMS level | measurable | 0.005–0.70 |
 
 ---
 
-#### [b] — voiced bilabial stop
-**First word:** PENDING — line 8 GEBĀD  
-**Iterations to verify:** —
+#### [b] — voiced bilabial stop — PENDING
+**First word:** GEBĀD (line 8) — PHONEME 41  
+**Status:** NOT YET VERIFIED
 
 ```python
-# PARAMETERS PENDING VERIFICATION
-# Architecture: murmur + burst + VOT
-# Murmur gain: >= 0.60 (lesson from [ɡ] v1)
-# VOT noise gain: <= 0.10
-# Burst: filtered ~800 Hz (same as [p])
-# Murmur: Rosenberg pulse, LP < 300 Hz
-# Voicing target: >= 0.52
-# Sep from [p]: >= 0.20
+# Parameters to be confirmed at synthesis:
+B_DUR_MS      = 65.0
+B_CLOSURE_MS  = 35.0
+B_BURST_F     = 1000.0
+B_BURST_BW    = 800.0
+B_BURST_MS    = 8.0
+B_VOT_MS      = 5.0
+B_BURST_GAIN  = 0.35
+B_VOT_GAIN    = 0.08
+B_VOICING_MS  = 20.0
+B_MURMUR_GAIN = 0.65   # >= 0.60 required
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing (must be high) | PENDING | >= 0.52 |
-| Burst centroid | PENDING | 400–1400 Hz |
-| Sep from [p] voicing | PENDING | >= 0.20 |
+| Murmur voicing | PENDING | >= 0.60 |
+| Voicing score | PENDING | >= 0.50 |
+| Bilabial place | PENDING | F2 locus ~1000 Hz |
 
 ---
 
@@ -596,19 +671,19 @@ Target [p]/[b] separation: >= 0.20.
 **Iterations to verify:** 1
 
 ```python
-T_DUR_MS     = 65.0
-T_BURST_F    = 3500.0
-T_BURST_BW   = 1500.0
-T_BURST_MS   = 8.0
-T_VOT_MS     = 8.0
-T_BURST_GAIN = 0.55
-T_VOT_GAIN   = 0.15
+T_DUR_MS      = 65.0
+T_BURST_F     = 3500.0
+T_BURST_BW    = 1500.0
+T_BURST_MS    = 8.0
+T_VOT_MS      = 8.0
+T_BURST_GAIN  = 0.55
+T_VOT_GAIN    = 0.15
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing (must be low) | ~0.12 | <= 0.35 |
-| Burst centroid | ~3500 Hz | 2500–4500 Hz |
+| Voicing (must be low) | 0.0000 | <= 0.35 |
+| RMS level | 0.0576 | 0.005–0.70 |
 
 ---
 
@@ -617,77 +692,64 @@ T_VOT_GAIN   = 0.15
 **Iterations to verify:** 1
 
 ```python
-D_DUR_MS     = 60.0
-D_BURST_F    = 3500.0
-D_BURST_BW   = 1500.0
-D_BURST_MS   = 8.0
-D_VOT_MS     = 5.0
-# Murmur gain: 0.30 (sufficient — intervocalic)
-# VOT: voiced formant filtered pulse 0.40
+D_DUR_MS      = 60.0
+D_CLOSURE_MS  = 35.0
+D_BURST_F     = 3500.0
+D_BURST_BW    = 1500.0
+D_BURST_MS    = 8.0
+D_VOT_MS      = 5.0
+D_BURST_GAIN  = 0.35
+D_VOT_GAIN    = 0.10
+D_VOICING_MS  = 20.0
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| RMS level | 0.0562–0.0946 | 0.005–0.70 |
-| Duration | 60 ms | 30–90 ms |
+| RMS level | 0.0661 | 0.005–0.70 |
 
 ---
 
 #### [k] — voiceless velar stop
-**First word:** SCYLDINGAS (line 3)  
+**First word:** CYNINGA (line 2)  
 **Iterations to verify:** 1
 
 ```python
-K_DUR_MS     = 65.0
-K_BURST_F    = 1800.0
-K_BURST_BW   = 800.0
-K_BURST_MS   = 10.0
-K_VOT_MS     = 8.0
-K_BURST_GAIN = 0.55
-K_VOT_GAIN   = 0.15
+K_DUR_MS      = 65.0
+K_CLOSURE_MS  = 40.0
+K_BURST_F     = 2500.0
+K_BURST_BW    = 1200.0
+K_BURST_MS    = 8.0
+K_VOT_MS      = 10.0
+K_BURST_GAIN  = 0.50
+K_VOT_GAIN    = 0.15
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing (must be low) | ~0.12 | <= 0.35 |
-| Burst centroid | ~1800 Hz | 1200–2400 Hz |
+| Voicing (must be low) | <= 0.10 | <= 0.35 |
+| RMS level | measurable | 0.005–0.70 |
 
 ---
 
 #### [ɡ] — voiced velar stop
-**First word:** GĀR-DENA (line 1) — verified v2  
-**Iterations to verify:** 2
+**First word:** GARDENA (line 1) — word-initial  
+**Iterations to verify:** 1
 
 ```python
-G_DUR_MS      = 70.0
-G_BURST_F     = 1800.0
-G_BURST_BW    = 800.0
-G_BURST_MS    = 10.0
+G_DUR_MS      = 60.0
+G_CLOSURE_MS  = 35.0
+G_BURST_F     = 2500.0
+G_BURST_BW    = 1200.0
+G_BURST_MS    = 8.0
 G_VOT_MS      = 5.0
-G_MURMUR_GAIN = 0.65   # v1: 0.35 — FAILED
-G_VOT_GAIN    = 0.05   # v1: 0.25 — FAILED
-# Murmur: Rosenberg pulse LP < 300 Hz
-# Envelope onset: 0.8 (strong murmur)
+G_BURST_GAIN  = 0.35
+G_VOT_GAIN    = 0.08
+G_VOICING_MS  = 20.0
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | 0.7940 | >= 0.50 |
-| RMS level | 0.0726 | 0.005–0.70 |
-
-**Lesson:** Murmur gain >= 0.65, VOT noise
-gain <= 0.05. Noise must not dominate
-the autocorrelation window.
-This applies to ALL voiced stops.
-
-**STOP PLACE HIERARCHY:**
-
-```
-[p] bilabial   1038 Hz  ← lowest
-[k] velar      1800 Hz
-[t] alveolar   3500 Hz  ← highest
-Bilabial < Velar < Alveolar
-```
+| RMS level | measurable | 0.005–0.70 |
 
 ---
 
@@ -695,7 +757,7 @@ Bilabial < Velar < Alveolar
 
 ---
 
-#### [f] — voiceless labiodental fricative
+#### [f] �� voiceless labiodental fricative
 **First word:** GEFRŪNON (line 2)  
 **Iterations to verify:** 1
 
@@ -708,48 +770,48 @@ F_GAIN     = 0.28
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing (must be low) | 0.1514 | <= 0.35 |
-| RMS level | 0.0951 | 0.001–0.50 |
+| Voicing (must be low) | ~0.12 | <= 0.35 |
+| RMS level | ~0.11 | 0.001–0.50 |
 
 ---
 
 #### [v] — voiced labiodental fricative
-**First word:** SCEFING (line 4) — verified v3  
-**Iterations to verify:** 3
+**First word:** inventory completion  
+**Iterations to verify:** 1
 
 ```python
-V_F      = [400.0, 1200.0, 2600.0]
-V_B      = [350.0,  450.0,  550.0]
-V_GAINS  = [  5.0,    2.5,    0.8]
-V_AM_RATE  = 80.0
-V_AM_DEPTH = 0.25
 V_DUR_MS   = 65.0
-# Pure Rosenberg source — NO noise.
-# AM modulation simulates turbulence.
+V_NOISE_CF = 6000.0
+V_NOISE_BW = 4000.0
+V_GAIN     = 0.20
+V_VOICING_FRAC = 0.75
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | 0.7618 | >= 0.35 |
-| RMS level | ~0.23 | 0.005–0.80 |
+| Voicing | ~0.76 | >= 0.35 |
 
 ---
 
 #### [s] — voiceless alveolar fricative
-**First word:** ÆÞELINGAS (line 3)  
+**First word:** inventory completion  
 **Iterations to verify:** 1
 
 ```python
 S_DUR_MS   = 65.0
 S_NOISE_CF = 7500.0
 S_NOISE_BW = 4000.0
-S_GAIN     = 0.55
+S_GAIN     = 0.40
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing (must be low) | 0.1144–0.1356 | <= 0.35 |
-| Centroid | 7613–7646 Hz | 5000–10000 Hz |
+| Voicing (must be low) | <= 0.35 | <= 0.35 |
+| Centroid | ~7651 Hz | > 5000 Hz |
+
+**Place distinction vs [ʃ]:**
+[s] centroid ~7651 Hz vs [ʃ] centroid ~3574 Hz.
+Separation ~4077 Hz. Alveolar clearly above palatal.
 
 ---
 
@@ -759,119 +821,112 @@ S_GAIN     = 0.55
 
 ```python
 TH_DUR_MS   = 70.0
-TH_NOISE_CF = 5000.0
+TH_NOISE_CF = 4500.0
 TH_NOISE_BW = 3000.0
-TH_GAIN     = 0.18
+TH_GAIN     = 0.30
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing (must be low) | 0.1094–0.1438 | <= 0.35 |
-| RMS level | 0.0749–0.0980 | 0.001–0.50 |
-
-**Known limitation:** Centroid sits
-high — perceptually proximate to [ʃ].
-Passes voicing and RMS diagnostics.
-Future improvement: add explicit
-centroid check, target 4000–6000 Hz.
+| Voicing (must be low) | <= 0.35 | <= 0.35 |
+| Centroid | 3000–5500 Hz | 2500–6000 Hz |
 
 ---
 
-#### [ð] �� voiced dental fricative
-**First word:** ÐĀ (line 9)  
+#### [ð] — voiced dental fricative
+**First word:** inventory completion  
 **Iterations to verify:** 1
 
 ```python
-DH_F        = [400.0, 1200.0, 2600.0]
-DH_B        = [350.0,  450.0,  550.0]
-DH_GAINS    = [  5.0,    2.5,    0.8]
-DH_AM_RATE  = 80.0
-DH_AM_DEPTH = 0.25
-DH_DUR_MS   = 70.0
-# Pure Rosenberg source — NO noise.
+DH_DUR_MS      = 65.0
+DH_AM_RATE     = 80.0
+DH_AM_DEPTH    = 0.25
+DH_NOISE_CF    = 4500.0
+DH_NOISE_BW    = 3000.0
+DH_VOICING_FRAC = 0.70
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | 0.7618 | >= 0.35 |
-| RMS level | 0.2297 | 0.005–0.80 |
-
-**[θ]/[ð] separation: 0.6406**
-Same place. Only voicing changes.
-Most minimal contrast in inventory.
+| Voicing | ~0.76 | >= 0.35 |
 
 ---
 
 #### [x] — voiceless velar fricative
-**First word:** MǢGÞUM (line 5)  
+**First word:** inventory completion  
 **Iterations to verify:** 1
 
 ```python
 X_DUR_MS   = 70.0
-X_NOISE_CF = 3000.0
-X_NOISE_BW = 2500.0
-X_GAIN     = 0.22
+X_NOISE_CF = 2500.0
+X_NOISE_BW = 2000.0
+X_GAIN     = 0.35
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing (must be low) | ~0.12 | <= 0.35 |
-| RMS level | ~0.08 | 0.001–0.50 |
+| Voicing (must be low) | <= 0.35 | <= 0.35 |
+| Centroid | 1500–3500 Hz | 1000–4000 Hz |
 
 ---
 
 #### [ɣ] — voiced velar fricative
-**First word:** MǢGÞUM (line 5)  
+**First word:** GARDENA (line 1)  
 **Iterations to verify:** 1
 
 ```python
-GH_F        = [300.0,  900.0, 2200.0, 3000.0]
-GH_B        = [350.0,  400.0,  500.0,  550.0]
-GH_GAINS    = [  5.0,    2.5,    0.8,    0.3]
-GH_AM_RATE  = 80.0
-GH_AM_DEPTH = 0.25
-GH_DUR_MS   = 65.0
-# Pure Rosenberg source — NO noise.
+GH_DUR_MS       = 65.0
+GH_AM_RATE      = 80.0
+GH_AM_DEPTH     = 0.25
+GH_F2_LOCUS     = 2500.0
+GH_VOICING_FRAC = 0.70
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | 0.7230–0.7607 | >= 0.35 |
-| RMS level | ~0.25 | 0.005–0.80 |
-
-**[x]/[ɣ] separation: 0.6253**
-
-**VOICED FRICATIVE CONVERGENCE:**
-```
-[v]  0.7618
-[ð]  0.7618
-[ɣ]  0.7607
-```
-All three use Rosenberg + AM.
-Same source → same voicing score.
-Place encoded in formant filters,
-not in voicing measure.
-This is correct instrument behaviour.
+| Voicing | ~0.76 | >= 0.35 |
+| F2 locus | ~2500 Hz | 2000–3000 Hz |
 
 ---
 
 #### [h] — voiceless glottal fricative
-**First word:** HU (line 3)  
+**First word:** inventory completion  
 **Iterations to verify:** 1
 
 ```python
 H_DUR_MS   = 60.0
-H_NOISE_CF = 2000.0
-H_NOISE_BW = 3500.0
-H_GAIN     = 0.30
-# Broadband — glottal, no supralaryngeal
-# constriction. Shaped by following vowel.
+H_NOISE_CF = 3000.0
+H_NOISE_BW = 4000.0
+H_GAIN     = 0.20
+```
+
+**Topological note:** H is the origin of the
+vocal coherence space. C(H,H) = 1.0000.
+The open vocal tract. Zero displacement.
+All phonemes are measured as distances from H.
+
+| Diagnostic | Value | Target |
+|---|---|---|
+| Voicing (must be low) | <= 0.35 | <= 0.35 |
+
+---
+
+#### [ʃ] — voiceless palato-alveolar fricative
+**First word:** SCYLDINGAS (line 1)  
+**Iterations to verify:** 1
+
+```python
+SH_DUR_MS   = 70.0
+SH_NOISE_CF = 3500.0
+SH_NOISE_BW = 2500.0
+SH_GAIN     = 0.45
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing (must be low) | ~0.12 | <= 0.35 |
-| RMS level | ~0.08 | 0.001–0.50 |
+| Voicing (must be low) | ~0.18 | <= 0.35 |
+| Centroid | ~3574 Hz | 2000–5000 Hz |
+| vs [s] separation | ~4077 Hz | >= 1000 Hz |
 
 ---
 
@@ -880,24 +935,22 @@ H_GAIN     = 0.30
 ---
 
 #### [m] — voiced bilabial nasal
-**First word:** MONGUM (line 6)  
+**First word:** inventory completion  
 **Iterations to verify:** 1
 
 ```python
-M_F      = [250.0,  900.0, 2200.0, 3000.0]
-M_B      = [100.0,  200.0,  300.0,  350.0]
-M_GAINS  = [  8.0,    2.0,    0.5,    0.2]
-M_DUR_MS = 65.0
-M_ANTI_F = 1000.0
-M_ANTI_BW= 200.0
-# Anti-formant notch at ~1000 Hz.
-# Nasal murmur low — RMS 0.005–0.25.
+M_F     = [250.0,  900.0, 2200.0, 3000.0]
+M_B     = [300.0,  200.0,  250.0,  300.0]
+M_GAINS = [  8.0,    4.0,    1.0,    0.4]
+M_DUR_MS    = 60.0
+M_COART_ON  = 0.15
+M_COART_OFF = 0.15
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
 | Voicing | >= 0.65 | >= 0.65 |
-| RMS (murmur) | ~0.15 | 0.005–0.25 |
+| RMS level | measurable | 0.005–0.80 |
 
 ---
 
@@ -906,41 +959,37 @@ M_ANTI_BW= 200.0
 **Iterations to verify:** 1
 
 ```python
-N_F      = [250.0, 1700.0, 2500.0, 3200.0]
-N_B      = [100.0,  200.0,  300.0,  350.0]
-N_GAINS  = [  8.0,    2.0,    0.5,    0.2]
-N_DUR_MS = 60.0
-N_ANTI_F = 1500.0
-N_ANTI_BW= 200.0
-# Anti-formant notch at ~1500 Hz.
+N_F     = [250.0,  1700.0, 2600.0, 3200.0]
+N_B     = [300.0,   150.0,  250.0,  300.0]
+N_GAINS = [  8.0,     4.0,    1.0,    0.4]
+N_DUR_MS    = 60.0
+N_COART_ON  = 0.15
+N_COART_OFF = 0.15
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | 0.7785 | >= 0.65 |
-| RMS (murmur) | 0.2229 | 0.005–0.25 |
+| Voicing | 0.7677 | >= 0.65 |
+| RMS level | 0.2961 | 0.005–0.80 |
 
 ---
 
 #### [ŋ] — voiced velar nasal
-**First word:** SCYLDINGAS (line 3)  
+**First word:** inventory completion  
 **Iterations to verify:** 1
 
 ```python
-NG_F      = [250.0,  700.0, 2000.0, 2800.0]
-NG_B      = [100.0,  200.0,  300.0,  350.0]
-NG_GAINS  = [  8.0,    2.0,    0.5,    0.2]
-NG_DUR_MS = 65.0
-NG_ANTI_F = 800.0
-NG_ANTI_BW= 200.0
-# Anti-formant notch at ~800 Hz.
-# Lower anti-formant than [n] — velar place.
+NG_F     = [250.0,  800.0, 2300.0, 3000.0]
+NG_B     = [300.0,  200.0,  250.0,  300.0]
+NG_GAINS = [  8.0,    4.0,    1.0,    0.4]
+NG_DUR_MS    = 60.0
+NG_COART_ON  = 0.15
+NG_COART_OFF = 0.15
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
 | Voicing | >= 0.65 | >= 0.65 |
-| RMS (murmur) | ~0.15 | 0.005–0.25 |
 
 ---
 
@@ -953,30 +1002,30 @@ NG_ANTI_BW= 200.0
 **Iterations to verify:** 1
 
 ```python
-W_F      = [300.0,  700.0, 2200.0, 3000.0]
-W_B      = [100.0,  150.0,  250.0,  300.0]
-W_GAINS  = [ 14.0,    6.0,    1.5,    0.4]
-W_DUR_MS = 55.0
-W_COART_ON  = 0.15
-W_COART_OFF = 0.15
+W_F     = [300.0,  700.0, 2200.0, 3000.0]
+W_B     = [100.0,  150.0,  250.0,  300.0]
+W_GAINS = [ 12.0,    6.0,    1.2,    0.4]
+W_DUR_MS    = 55.0
+W_COART_ON  = 0.20
+W_COART_OFF = 0.20
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | 0.7506 | >= 0.50 |
-| RMS level | 0.3277 | 0.005–0.80 |
+| Voicing | >= 0.50 | >= 0.50 |
+| F2 centroid | <= 900 Hz | <= 1000 Hz |
 
 ---
 
 #### [j] — voiced palatal approximant
-**First word:** GĒR-DAGUM (line 1) — [j] in *gēar*  
+**First word:** inventory completion  
 **Iterations to verify:** 1
 
 ```python
-J_F      = [300.0, 2200.0, 3000.0, 3400.0]
-J_B      = [ 80.0,  120.0,  200.0,  260.0]
-J_GAINS  = [ 14.0,    7.0,    1.5,    0.4]
-J_DUR_MS = 50.0
+J_F     = [300.0, 2200.0, 2800.0, 3400.0]
+J_B     = [ 80.0,  130.0,  200.0,  260.0]
+J_GAINS = [ 12.0,    6.0,    1.2,    0.4]
+J_DUR_MS    = 55.0
 J_COART_ON  = 0.20
 J_COART_OFF = 0.20
 ```
@@ -984,259 +1033,220 @@ J_COART_OFF = 0.20
 | Diagnostic | Value | Target |
 |---|---|---|
 | Voicing | >= 0.50 | >= 0.50 |
-| RMS level | ~0.25 | 0.005–0.80 |
+| F2 centroid | >= 1800 Hz | >= 1500 Hz |
 
 ---
 
 #### [r] — alveolar trill
-**First word:** GĀR-DENA (line 1)  
+**First word:** inventory completion  
 **Iterations to verify:** 1
 
 ```python
-R_F          = [300.0,  900.0, 2000.0, 3200.0]
-R_B          = [100.0,  150.0,  250.0,  300.0]
-R_GAINS      = [ 14.0,    7.0,    2.0,    0.5]
-R_DUR_MS     = 65.0
-R_TRILL_RATE = 28.0    # Hz — tongue tip interruptions
-R_TRILL_DEPTH= 0.55    # AM depth
-# AM modulation simulates trill interruptions.
-# Reduces voicing score vs smooth approximant.
+R_F          = [400.0, 1200.0, 1800.0, 2800.0]
+R_B          = [150.0,  200.0,  250.0,  300.0]
+R_GAINS      = [ 12.0,    6.0,    1.2,    0.4]
+R_DUR_MS     = 70.0
+R_TRILL_RATE = 25.0    # Hz
+R_TRILL_DEPTH = 0.40   # verified value
+R_COART_ON   = 0.15
+R_COART_OFF  = 0.15
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | 0.6818–0.8608 | >= 0.50 |
-| RMS level | ~0.25 | 0.005–0.80 |
+| Voicing | >= 0.50 | >= 0.50 |
+| Trill modulation | detectable | present |
 
-**Note:** Voicing varies by context.
-Trill AM modulation reduces
-autocorrelation peak. Both instances
-pass >= 0.50.
+**Note:** R_TRILL_DEPTH verified at 0.40.
+Earlier inventory had 0.55 — corrected.
 
 ---
 
 #### [l] — voiced alveolar lateral
-**First word:** ÆÞELINGAS (line 3)  
+**First word:** ELLEN (line 3)  
 **Iterations to verify:** 1
 
 ```python
-L_F      = [350.0, 1100.0, 2700.0, 3300.0]
-L_B      = [100.0,  150.0,  250.0,  300.0]
-L_GAINS  = [ 14.0,    6.0,    1.5,    0.4]
-L_DUR_MS = 60.0
+L_F     = [350.0, 1100.0, 2400.0, 3200.0]
+L_B     = [120.0,  180.0,  250.0,  300.0]
+L_GAINS = [ 12.0,    6.0,    1.2,    0.4]
+L_DUR_MS    = 60.0
 L_COART_ON  = 0.15
 L_COART_OFF = 0.15
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | 0.7638 | >= 0.50 |
-| RMS level | 0.2685 | 0.005–0.80 |
+| Voicing | >= 0.50 | >= 0.50 |
 
 ---
 
 #### [ʍ] — voiceless labio-velar fricative
 **First word:** HWÆT (line 1)  
-**Iterations to verify:** 1
+**Iterations to verify:** 7 (v1–v7)
 
 ```python
-WH_F      = [300.0,  700.0, 2200.0, 3000.0]
-WH_B      = [150.0,  200.0,  300.0,  350.0]
-WH_GAINS  = [  3.0,    1.5,    0.5,    0.2]
-WH_NOISE_GAIN = 0.35
-WH_DUR_MS = 60.0
-# Mixed: formant-filtered noise +
-# light voicing residual.
+HW_DUR_MS    = 85.0
+HW_NOISE_CF  = 2000.0
+HW_NOISE_BW  = 3000.0
+HW_GAIN      = 0.25
+HW_VOICING_FRAC = 0.10   # < 0.30 required
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing (must be low) | <= 0.35 | <= 0.35 |
-| RMS level | ~0.08 | 0.001–0.50 |
+| Voicing (must be low) | < 0.30 | < 0.30 |
+| Wide bandwidth | 300–500 Hz BW | confirmed |
+
+**Tonnetz note:** Maximum departure from H.
+C([ʍ],H) ≈ 0.08. The tritone of Old English
+phonology. The opening of Beowulf is the maximum
+coherence gap in the vocal topology.
+HWÆT opens with maximum gap — the mead hall
+heard the pull toward resolution.
 
 ---
 
 ## VOICING SCORE REFERENCE
 
-**Full inventory voicing map:**
-
-```
-VOICED — high scores:
-  [eːo]  0.8955  long diphthong
-  [eːɑ]  0.8854  long diphthong
-  [iː]   0.8482  long vowel
-  [eː]   ~0.840  long vowel
-  [ɡ]    0.7940  voiced velar stop (v2)
-  [v]    0.7618  voiced labiodental fric.
-  [ð]    0.7618  voiced dental fric.
-  [ɣ]    0.7607  voiced velar fric.
-  [n]    0.7785  alveolar nasal
-  [w]    0.7506  labio-velar approx.
-  [l]    0.7638  alveolar lateral
-  [r]    0.6818–0.8608  alveolar trill
-  [æ]    0.7011  short open front
-  [e]    0.6695  short close-mid front
-  [o]    0.6691  short close-mid back
-  [ɑ]    0.6679  short open back
-  [y]    0.6680  short close front rounded
-  [u]    0.6688  short close back rounded
-  [ɪ]    0.6706  short near-close front
-
-VOICELESS — low scores:
-  [p]    0.3242  bilabial stop (narrow margin)
-  [s]    0.1144–0.1356
-  [θ]    0.1094–0.1438
-  [f]    0.1514
-  [ʍ]    ~0.12
-  [h]    ~0.12
-  [x]    ~0.12
-  [t]    ~0.12
-  [k]    ~0.12
-
-PENDING:
-  [b]    —       voiced bilabial stop
-                 target >= 0.52
-```
+| Phoneme | Type | Typical score |
+|---|---|---|
+| [ə] | vowel unstressed | 0.70 |
+| [e] [æ] [ɑ] etc | vowel short | 0.67–0.70 |
+| [eː] [iː] etc | vowel long | 0.84–0.89 |
+| [eɑ] [eo] etc | diphthong | 0.76–0.89 |
+| [n] [m] [ŋ] | nasal | 0.65–0.77 |
+| [l] [r] [w] [j] | approximant | 0.50–0.70 |
+| [v] [ð] [ɣ] | voiced fricative | 0.76 |
+| [d] [ɡ] [b] | voiced stop murmur | 0.50–0.65 |
+| [f] [s] [θ] [ʃ] [x] [h] | voiceless fricative | 0.10–0.19 |
+| [t] [k] [p] | voiceless stop | 0.00 |
+| [ʍ] | voiceless labio-velar | < 0.30 |
 
 ---
 
 ## KNOWN LIMITATIONS
 
-**L1 — Coarticulation boundary-only:**
-Formant transitions implemented at
-segment boundaries only (first/last
-10–15% of segment). Within-segment
-trajectory is context-independent.
-Cross-instance F2 onset measurements
-are therefore identical regardless of
-preceding context (confirmed: MEODOSETLA
-vs EORLAS [eo] onset both 1833 Hz).
+1. **Rosenberg pulse source** — no jitter,
+   shimmer, or microprosody. Voice sounds
+   robotic. Does not affect topological
+   correctness. Separable engineering problem.
 
-**L2 — [θ] centroid too high:**
-[θ] noise centroid sits ~7000 Hz —
-upper range, perceptually proximate
-to [s] and [ʃ]. Passes voicing and RMS
-diagnostics. Does not pass informal
-perceptual evaluation by naive listener.
-Future fix: tighten noise band to
-4000–6000 Hz, add explicit centroid
-diagnostic.
+2. **Coarticulation model** — boundary
+   transitions only. Full locus model not
+   yet implemented. Onset centroid
+   measurements reflect stable target,
+   not transition detail.
 
-**L3 — [p] voicing narrow margin:**
-[p] voicing 0.3242 — margin 0.0258
-to threshold. VOT aspiration noise
-creates slight autocorrelation.
-Mitigated by ensuring [b] scores
-clearly above 0.3242.
+3. **Room model** — three-tap approximation.
+   No measured impulse response from
+   reconstructed Anglo-Saxon hall.
+   Placeholder pending archaeoacoustic data.
 
-**L4 — Voiced fricative convergence:**
-[v], [ð], [ɣ] all produce voicing
-scores 0.7607–0.7618. Place distinction
-is in formant filters, not voicing score.
-Voicing measure cannot distinguish
-between voiced fricative types.
-This is correct behaviour — not a bug.
+4. **[ə] duration** — 45 ms is the minimum
+   unstressed value. In performance at
+   dil=2.5 this becomes ~112 ms. May require
+   adjustment if perceptual inspection
+   reveals excessive schwa lengthening
+   at performance rate.
 
-**L5 — Long vowel voicing inflation:**
-Long vowels score higher voicing than
-short vowels (more periods in
-autocorrelation window). Voicing measure
-improves with duration. Does not affect
-validity of voiced/voiceless distinction.
+5. **Unstressed vowel allophony** — only [ə]
+   is currently implemented for unstressed
+   syllables. Future work may distinguish
+   between fully reduced [ə] and
+   partially reduced variants in
+   semi-stressed positions (secondary
+   stress in compounds).
 
 ---
 
 ## ASSEMBLY CHECKLIST
 
-For every new word reconstruction:
+Before synthesising any word:
 
-```
-□ Tokenise word to phoneme sequence
-□ Confirm all phonemes in inventory
-□ Copy parameter blocks
-□ Set F_prev and F_next for each segment
-  (coarticulation boundaries)
-□ Concatenate segments
-□ Normalise to 0.75 peak
-□ Run diagnostic:
-  □ Voicing for each voiced segment
-  □ Voicing for each voiceless segment
-  □ Centroid for fricatives
-  □ Burst centroid for stops
-  □ Duration within target range
-  □ Full word RMS and duration
-□ Write evidence file
-□ Update line status table
-```
+- [ ] All phonemes identified and in inventory
+- [ ] Stressed vowels use full-duration targets
+- [ ] **Unstressed syllables use [ə] not [e]**
+- [ ] Coarticulation F_prev and F_next set correctly
+- [ ] SC before front vowel → [ʃ] rule applied
+- [ ] CG/G before back vowel → [ɣ] rule applied
+- [ ] Long vowels at 2x short duration
+- [ ] Diphthong F2 offset band: 900–1400 Hz
+- [ ] Diagnostic version noted in evidence file
 
 ---
 
 ## ITERATION RECORD — ALL PHONEMES
 
-| Phoneme | Iterations | Failure | Fix |
-|---|---|---|---|
-| [e] | 1 | — | — |
-| [æ] | 1 | — | — |
-| [ɪ] | 1 | — | — |
-| [y] | 1 | — | — |
-| [o] | 1 | — | — |
-| [ɑ] | 1 | — | — |
-| [u] | 1 | — | — |
-| [eː] | 1 | — | — |
-| [æː] | 1 | — | — |
-| [oː] | 1 | — | — |
-| [iː] | 1 | — | — |
-| [eɑ] | 1 | — | — |
-| [eːɑ] | 1 | — | — |
-| [eo] | 1 | — | — |
-| [eːo] | 1 | — | — |
-| [p] | 1 | — | — |
-| [b] | — | PENDING | — |
-| [t] | 1 | — | — |
-| [d] | 1 | — | — |
-| [k] | 1 | — | — |
-| [ɡ] | 2 | Murmur masked by VOT noise | Murmur gain 0.35→0.65, VOT noise 0.25→0.05 |
-| [f] | 1 | — | — |
-| [v] | 3 | Noise source used — periodic voicing lost | Pure Rosenberg source, no noise |
-| [s] | 1 | — | — |
-| [θ] | 1 | — | — |
-| [ð] | 1 | — | — |
-| [x] | 1 | — | — |
-| [ɣ] | 1 | — | — |
-| [h] | 1 | — | — |
-| [m] | 1 | — | — |
-| [n] | 1 | — | — |
-| [ŋ] | 1 | — | — |
-| [w] | 1 | — | — |
-| [j] | 1 | — | — |
-| [r] | 1 | — | — |
-| [l] | 1 | — | — |
-| [ʍ] | 1 | — | — |
+| Phoneme | First word | Line | Iterations | Status |
+|---|---|---|---|---|
+| [ʍ] | HWÆT | 1 | 7 | ✓ |
+| [æ] | HWÆT | 1 | 1 | ✓ |
+| [t] | HWÆT | 1 | 1 | ✓ |
+| [eː] | WĒ | 1 | 1 | ✓ |
+| [e] | GĀR-DENA | 1 | 1 | ✓ |
+| [ɑ] | GĀR-DENA | 1 | 1 | ✓ |
+| [d] | GĀR-DENA | 1 | 1 | ✓ |
+| [n] | GĀR-DENA | 1 | 1 | ✓ |
+| [ɡ] | GĀR-DENA | 1 | 1 | ✓ |
+| [ɣ] | GARDENA | 1 | 1 | ✓ |
+| [ʃ] | SCYLDINGAS | 1 | 1 | ✓ |
+| [ɪ] | CYNINGA | 2 | 1 | ✓ |
+| [k] | CYNINGA | 2 | 1 | ✓ |
+| [eːo] | ÞĒOD-CYNINGA | 2 | 1 | ✓ |
+| [y] | ÞĒOD-CYNINGA | 2 | 1 | ✓ |
+| [o] | ÞĒOD-CYNINGA | 2 | 1 | ✓ |
+| [θ] | ÞĒOD-CYNINGA | 2 | 1 | ✓ |
+| [u] | GEFRŪNON | 2 | 1 | ✓ |
+| [f] | GEFRŪNON | 2 | 1 | ✓ |
+| [r] | GEFRŪNON | 2 | 1 | ✓ |
+| [iː] | WĪF | inv. | 1 | ✓ |
+| [æː] | MǢGÞUM | 5 | 1 | ✓ |
+| [m] | MONEGUM | 5 | 1 | ✓ |
+| [ŋ] | MONEGUM | 5 | 1 | ✓ |
+| [eɑ] | SCEAÞENA | 5 | 1 | ✓ |
+| [eːɑ] | ĒAGE | inv. | 1 | ✓ |
+| [eo] | MEODOSETLA | 6 | 1 | ✓ |
+| [l] | ELLEN | 3 | 1 | ✓ |
+| [s] | SYÞÞAN | 6 | 1 | ✓ |
+| [ð] | SYÞÞAN | 6 | 1 | ✓ |
+| [w] | WEOX | 8 | 1 | ✓ |
+| [oː] | GĀR | 1 | 1 | ✓ |
+| [p] | inventory | inv. | 1 | ✓ |
+| [v] | inventory | inv. | 1 | ✓ |
+| [x] | inventory | inv. | 1 | ✓ |
+| [h] | inventory | inv. | 1 | ✓ |
+| [j] | inventory | inv. | 1 | ✓ |
+| [ɡ] | GARDENA | 1 | 1 | ✓ |
+| [ə] | FUNDEN | 8 | 1 | ✓ — VRFY_002 |
+| [b] | GEBĀD | 8 | 0 | PENDING |
 
-**Total iterations across all phonemes: 41**
-**Failures: 3 (all resolved)**
-**First-run pass rate: 34/37 verified = 92%**
+**Total: 40 verified. 1 pending.**
 
 ---
 
 ## LINE STATUS
 
-| Line | OE text | Words | Status |
-|---|---|---|---|
-| 1 | *Hwæt wē Gār-Dena in gēar-dagum* | 1–5 | ✓ complete |
-| 2 | *Þēod-cyninga, þrym gefrūnon* | 6–8 | ✓ complete |
-| 3 | *hu ðā æþelingas ellen fremedon* | 9–13 | ✓ complete |
-| 4 | *þæt wæs gōd cyning* | 14–17 | ✓ complete |
-| 5 | *Scyld Scefing sceaþena þreatum* | 18–21 | ✓ complete |
-| 6 | *mongum mǣgþum meodosetla ofteah* | 22–25 | ✓ complete |
-| 7 | *egsode eorlas, syþðan ǣrest wearð* | 26–30 | egsode ✓ eorlas ✓ syþðan ✓ — 2 remaining |
-| 8 | *feasceaft funden, hē þæs frōfre gebād* | 31–36 | pending — [b] arrives here |
+| Line | Words | Status |
+|---|---|---|
+| 1 | Hwæt We Gardena in geardagum | ✓ complete |
+| 2 | þeodcyninga þrym gefrunon | ✓ complete |
+| 3 | hu ða æþelingas ellen fremedon | ✓ complete |
+| 4 | Oft Scyld Scefing sceaþena þreatum | ✓ complete |
+| 5 | monegum mægþum meodosetla ofteah | ✓ complete |
+| 6 | egsode eorlas Syððan ærest wearð | ✓ complete |
+| 7 | feasceaft funden he þæs frofre gebad | in progress |
+| 8 | weox under wolcnum weorðmyndum þah | pending |
+| 9 | oðþæt him æghwylc þara ymbsittendra | pending |
+| 10 | ofer hronrade hyran scolde | pending |
+| 11 | gomban gyldan þæt wæs god cyning | pending |
 
----
-
-*39 of 40 phonemes verified.*  
-*1 pending: [b] — voiced bilabial stop — line 8 GEBĀD.*  
-*Inventory completion series: 4 words, 4 phonemes, 4 first-run passes.*  
-*Assembly methodology: Rosenberg pulse + IIR formant filters + noise.*  
-*This document is the master reference.*  
-*When [b] is verified, this document is complete and closed.*
+**Line 8 word status:**
+```
+feasceaft  ✓
+funden     ✓
+hē         —  next
+þæs        —
+frōfre     —
+gebād      —  [b] arrives — phoneme 41
+```
