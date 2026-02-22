@@ -1,27 +1,12 @@
 """
-ǢREST DIAGNOSTIC v1
+ǢREST DIAGNOSTIC v2
 Old English: ǣrest [æːrest]
 Beowulf line 7, word 4
 Zero new phonemes — pure assembly
 February 2026
 
-DIAGNOSTICS:
-  D1  AEY long vowel [æː]
-  D2  AEY duration — long vowel
-  D3  R trill [r]
-  D4  E vowel [e]
-  D5  S fricative [s]
-  D6  T stop [t]
-  D7  ST cluster — alveolar sequence
-  D8  Full word
-  D9  Perceptual
-
-KEY CHECKS:
-  D2: duration >= 90 ms — long vowel
-  D7: both S and T voiceless
-      same place — alveolar sequence
-      S centroid in fricative range
-      T burst in stop range
+v2: R_TRILL_DEPTH 0.55 → 0.40
+    performance output added
 """
 
 import numpy as np
@@ -133,10 +118,10 @@ def check(label, value, lo, hi,
 def run_diagnostics():
     print()
     print("=" * 60)
-    print("ǢREST DIAGNOSTIC v1")
+    print("ǢREST DIAGNOSTIC v2")
     print("Old English [æːrest]")
     print("Beowulf line 7, word 4")
-    print("Zero new phonemes — pure assembly")
+    print("v2: R_TRILL_DEPTH 0.55 → 0.40")
     print("=" * 60)
     print()
 
@@ -146,7 +131,8 @@ def run_diagnostics():
             synth_AEY, synth_R, synth_E,
             synth_S, synth_T,
             apply_simple_room,
-            AEY_F, R_F, E_F)
+            AEY_F, R_F, E_F,
+            PITCH_PERF, DIL_PERF)
         print("  aerest_reconstruction.py: OK")
     except ImportError as e:
         print(f"  IMPORT FAILED: {e}")
@@ -155,7 +141,7 @@ def run_diagnostics():
 
     all_pass = True
 
-    # ── D1 AEY BASIC ──────────────────────
+    # ── D1 AEY ────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 1 — AEY LONG VOWEL [æː]")
     print()
@@ -180,13 +166,10 @@ def run_diagnostics():
 
     # ── D2 AEY DURATION ───────────────────
     print("─" * 60)
-    print("DIAGNOSTIC 2 — [æː] DURATION"
-          " — long vowel")
+    print("DIAGNOSTIC 2 — [æː] DURATION")
     print()
     dur_aey = n_aey / SR * 1000.0
     print(f"  Duration: {dur_aey:.0f} ms")
-    print(f"  Long vowel target: >= 90 ms")
-    print()
     p1 = check(
         f'duration ({dur_aey:.0f} ms)',
         dur_aey, 90.0, 150.0,
@@ -199,12 +182,17 @@ def run_diagnostics():
     # ── D3 R ──────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 3 — R TRILL [r]")
+    print("  v2: TRILL_DEPTH 0.55 → 0.40")
     print()
     r_seg  = synth_R(AEY_F, E_F,
                       145.0, 1.0, SR)
+    voic_r = measure_voicing(r_seg)
+    print(f"  v1 voicing: 0.4320  FAILED")
+    print(f"  v2 voicing: {voic_r:.4f}"
+          f"  {'— expect PASS' if voic_r >= 0.50 else '— still below threshold'}")
+    print()
     p1 = check('voicing',
-               measure_voicing(r_seg),
-               0.50, 1.0)
+               voic_r, 0.50, 1.0)
     p2 = check('RMS level', rms(r_seg),
                0.005, 0.80)
     d3 = p1 and p2
@@ -270,33 +258,18 @@ def run_diagnostics():
     print(f"  {'PASSED' if d6 else 'FAILED'}")
     print()
 
-    # ── D7 ST CLUSTER ──────��──────────────
+    # ── D7 ST CLUSTER ─────────────────────
     print("─" * 60)
-    print("DIAGNOSTIC 7 — [st] CLUSTER"
-          " — alveolar sequence")
-    print()
-    print("  Both voiceless. Same place.")
-    print("  Fricative → stop.")
-    print("  Smooth transition — no place change.")
+    print("DIAGNOSTIC 7 — [st] CLUSTER")
     print()
     voic_s = measure_voicing(s_seg)
     voic_t = measure_voicing(t_seg)
-    print(f"  [s] voicing: {voic_s:.4f}")
-    print(f"  [t] voicing: {voic_t:.4f}")
-    print(f"  [s] centroid: {cent_s:.0f} Hz"
-          f"  (fricative)")
-    t_burst = measure_band_centroid(
-        t_seg, 1000.0, 6000.0)
-    print(f"  [t] centroid: {t_burst:.0f} Hz"
-          f"  (stop burst)")
-    print()
     p1 = check('[s] voiceless',
                voic_s, 0.0, 0.35)
     p2 = check('[t] voiceless',
                voic_t, 0.0, 0.35)
     p3 = check(
-        f'[s] fricative centroid'
-        f' ({cent_s:.0f} Hz)',
+        f'[s] centroid ({cent_s:.0f} Hz)',
         cent_s, 5000.0, 10000.0,
         unit=' Hz', fmt='.1f')
     d7 = p1 and p2 and p3
@@ -310,7 +283,11 @@ def run_diagnostics():
     print()
     w_dry  = synth_aerest(145.0, 1.0, False)
     w_hall = synth_aerest(145.0, 1.0, True)
-    dur_ms = len(w_dry) / SR * 1000.0
+    w_slow = ola_stretch(w_dry, 4.0)
+    w_perf = synth_aerest(
+        PITCH_PERF, DIL_PERF, True)
+    dur_ms      = len(w_dry)  / SR * 1000.0
+    dur_perf_ms = len(w_perf) / SR * 1000.0
     p1 = check('RMS level', rms(w_dry),
                0.010, 0.90)
     p2 = check(
@@ -318,7 +295,10 @@ def run_diagnostics():
         dur_ms, 300.0, 480.0,
         unit=' ms', fmt='.1f')
     print(f"  {len(w_dry)} samples"
-          f" ({dur_ms:.0f} ms)")
+          f" ({dur_ms:.0f} ms) — diagnostic")
+    print(f"  {len(w_perf)} samples"
+          f" ({dur_perf_ms:.0f} ms)"
+          f" — performance")
     write_wav(
         "output_play/diag_aerest_full.wav",
         w_dry)
@@ -327,33 +307,45 @@ def run_diagnostics():
         w_hall)
     write_wav(
         "output_play/diag_aerest_slow.wav",
-        ola_stretch(w_dry, 4.0))
+        w_slow)
+    write_wav(
+        "output_play/diag_aerest_perf.wav",
+        w_perf)
     d8 = p1 and p2
     all_pass &= d8
     print(f"  {'PASSED' if d8 else 'FAILED'}")
     print()
 
-    # ── D9 PERCEPTUAL ─────────────────────
+    # ── D9 PERCEPTUAL ─────────��───────────
     print("─" * 60)
     print("DIAGNOSTIC 9 — PERCEPTUAL")
     print()
+    print("  Diagnostic versions:")
     for fn in [
+        "diag_aerest_full.wav",
         "diag_aerest_slow.wav",
         "diag_aerest_hall.wav",
     ]:
         print(f"  afplay output_play/{fn}")
     print()
+    print("  Performance version:")
+    print("  afplay output_play/"
+          "diag_aerest_perf.wav")
+    print(f"  [{PITCH_PERF} Hz,"
+          f" dil {DIL_PERF},"
+          f" hall RT60=2.0s]")
+    print()
     print("  LISTEN FOR:")
     print("  AEY — long open front")
-    print("    held — noticeably longer")
-    print("    than short [æ] in HWÆT")
+    print("    held — longer than short [æ]")
     print("  R   — trill")
+    print("    v2: slightly smoother")
+    print("    than v1 but still trill")
     print("  E   — short front vowel")
     print("  S   — voiceless fricative")
-    print("  T   — stop — word closes")
-    print("  Full: AEY·R·E·S·T")
-    print("  ModE 'first' — not same word")
-    print("  but same meaning position:")
+    print("  T   — stop close")
+    print("  Performance: slower, deeper,")
+    print("    hall reverb — scop register")
     print("  syþðan ǣrest wearð —")
     print("  since first it came to be")
     print()
@@ -365,7 +357,7 @@ def run_diagnostics():
     rows = [
         ("D1  AEY long vowel",      d1),
         ("D2  AEY duration",        d2),
-        ("D3  R trill",             d3),
+        ("D3  R trill (v2)",        d3),
         ("D4  E vowel",             d4),
         ("D5  S fricative",         d5),
         ("D6  T stop",              d6),
@@ -383,6 +375,16 @@ def run_diagnostics():
         print("  ǢREST [æːrest] verified.")
         print("  Zero new phonemes.")
         print("  39 phonemes verified.")
+        print()
+        print("  Output files:")
+        print("  diag_aerest_full.wav"
+              "  — dry 145 Hz")
+        print("  diag_aerest_hall.wav"
+              "  — hall 145 Hz")
+        print("  diag_aerest_slow.wav"
+              "  — 4x slow")
+        print("  diag_aerest_perf.wav"
+              "  — 110 Hz dil 2.5 hall")
         print()
         print("  Line 7 status:")
         print("  egsode  ✓")
