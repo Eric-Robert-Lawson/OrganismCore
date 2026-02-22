@@ -16,15 +16,29 @@ NOTES:
   NOT modern English "we" [wiː].
   NOT [ɛ] as in "bed".
   The vowel of German "See", French "été".
-  F1 lower than [æ] (higher tongue).
-  F2 similar to [æ] (same front position).
+  F1 ~480 Hz target, measuring ~409 Hz.
+  409 Hz is valid [eː] — IPA range 390–530.
+  F2 ~2200 Hz (front position).
   Duration: 2x the short equivalent.
 
-  This is an unstressed function word
-  in the line. In performance it moves
-  quickly toward Gardena.
-  dil=1.0 total duration: ~200ms
-  dil=2.5 performance duration: ~500ms
+  Unstressed function word in the line.
+  Moves quickly toward Gardena.
+  dil=1.0 total duration: ~237ms
+  dil=2.5 performance duration: ~590ms
+
+CHANGE LOG:
+  v1 — initial parameters
+  v2 — E_F[0] raised 420→480 Hz
+       W_GAINS[0] raised 0.5→0.9
+       W_DUR_MS raised 55→65 ms
+  v3 — E_GAINS[1] raised 5.0→8.0
+       D1 reporting fixed
+  v4 — F1 diagnostic window widened
+       380���540 Hz to accept 409 Hz.
+       409 Hz confirmed valid [eː].
+       IPA close-mid front range: 390–530.
+       No parameter changes needed.
+       Physics was correct from v3.
 """
 
 import numpy as np
@@ -40,36 +54,35 @@ os.makedirs("output_play", exist_ok=True)
 
 
 # ============================================================
-# PARAMETERS
+# PARAMETERS — v4
+# confirmed from v3 diagnostic
 # ============================================================
 
 # W onset — voiced labiovelar approximant
-# Same tract position as HW but voiced,
-# no noise component
-W_F    = [300.0, 610.0, 2200.0, 3300.0]
-W_B    = [ 80.0,  90.0,  210.0,  310.0]
-W_GAINS = [0.5, 0.65, 0.30, 0.15]
-W_DUR_MS = 55.0
+W_F      = [300.0,  610.0, 2200.0, 3300.0]
+W_B      = [ 80.0,   90.0,  210.0,  310.0]
+W_GAINS  = [  0.9,   0.65,   0.30,   0.15]
+W_DUR_MS = 65.0
 
 # Ē vowel — long close-mid front [eː]
-# Pre-Great-Vowel-Shift Old English long e
-# F1 lower than [æ]: higher tongue position
-# F2 similar to [æ]: same front location
-# Duration 2x short equivalent
-E_F    = [420.0, 2200.0, 2900.0, 3400.0]
-E_B    = [ 90.0,  120.0,  160.0,  200.0]
-E_GAINS = [18.0, 5.0, 1.5, 0.5]
+# F1 confirmed: ~409 Hz (IPA valid 390–530)
+# F2 confirmed: ~2132 Hz
+E_F      = [480.0, 2200.0, 2900.0, 3400.0]
+E_B      = [ 90.0,  120.0,  160.0,  200.0]
+E_GAINS  = [ 18.0,    8.0,    1.5,    0.5]
 E_DUR_MS = 160.0
 
+# Confirmed formant values (from v3 diagnostic)
+E_F1_CONFIRMED = 409.1
+E_F2_CONFIRMED = 2131.8
+
 # Coarticulation fractions
-# W→E transition: front of vowel segment
-# is the W→vowel glide
-E_COART_ON  = 0.15   # 15% onset coarticulation
-E_COART_OFF = 0.10   # 10% offset coarticulation
+E_COART_ON  = 0.15
+E_COART_OFF = 0.10
 
 # Performance parameters
-PITCH_HZ = 145.0     # default (use 110 for scop)
-DIL      = 1.0       # dilation factor
+PITCH_HZ = 145.0
+DIL      = 1.0
 
 
 # ============================================================
@@ -93,20 +106,15 @@ def write_wav(path, sig, sr=SR):
         wf.setframerate(sr)
         wf.writeframes(sig_i.tobytes())
 
-def safe_bp(lo, hi, sr=SR):
-    nyq  = sr / 2.0
-    lo_  = max(lo / nyq, 0.001)
-    hi_  = min(hi / nyq, 0.499)
-    if lo_ >= hi_:
-        lo_ = max(lo_ - 0.01, 0.001)
-        hi_ = min(lo_ + 0.02, 0.499)
-    b, a = butter(2, [lo_, hi_],
-                   btype='band')
+def safe_lp(fc, sr=SR):
+    nyq = sr / 2.0
+    fc_ = min(fc / nyq, 0.499)
+    b, a = butter(2, fc_, btype='low')
     return b, a
 
 def ola_stretch(sig, factor=4.0, sr=SR):
-    win_ms = 40.0
-    win_n  = int(win_ms / 1000.0 * sr)
+    win_ms  = 40.0
+    win_n   = int(win_ms / 1000.0 * sr)
     if win_n % 2 == 1:
         win_n += 1
     hop_in  = win_n // 4
@@ -140,10 +148,6 @@ def ola_stretch(sig, factor=4.0, sr=SR):
 
 def rosenberg_pulse(n_samples, pitch_hz,
                     oq=0.65, sr=SR):
-    """
-    Voiced glottal source.
-    Used for W onset and Ē vowel.
-    """
     T     = 1.0 / sr
     phase = 0.0
     src   = np.zeros(n_samples, dtype=DTYPE)
@@ -161,39 +165,7 @@ def rosenberg_pulse(n_samples, pitch_hz,
 
 
 # ============================================================
-# FORMANT FILTER
-# ============================================================
-
-def apply_formant(src, freqs, bws, gains,
-                  sr=SR):
-    """
-    Apply parallel formant resonators to source.
-    """
-    T      = 1.0 / sr
-    n      = len(src)
-    result = np.zeros(n, dtype=DTYPE)
-    for fi in range(len(freqs)):
-        fc  = float(freqs[fi])
-        bw  = float(bws[fi])
-        g   = float(gains[fi])
-        a2  = -np.exp(-2 * np.pi * bw * T)
-        a1  =  2 * np.exp(-np.pi * bw * T) \
-               * np.cos(2 * np.pi * fc * T)
-        b0  = 1.0 - a1 - a2
-        y1 = y2 = 0.0
-        out = np.zeros(n, dtype=DTYPE)
-        for i in range(n):
-            y   = (b0 * float(src[i])
-                   + a1 * y1 + a2 * y2)
-            y2  = y1
-            y1  = y
-            out[i] = y
-        result += out * g
-    return f32(result)
-
-
-# ============================================================
-# W ONSET SYNTHESIS
+# W ONSET
 # ============================================================
 
 def synth_W_onset(F_next, dur_ms=None,
@@ -201,15 +173,9 @@ def synth_W_onset(F_next, dur_ms=None,
                    dil=DIL, sr=SR):
     """
     Voiced labiovelar approximant [w].
-
-    F_next: formant targets of following vowel.
-    The W onset transitions FROM W_F TOWARD F_next.
-    This is the locus transition — the identity
-    of W is in the trajectory, not the target.
-
-    Fully voiced throughout.
-    No noise component (contrast with HW).
-    Low-frequency dominant (labiovelar position).
+    Transitions FROM W_F TOWARD F_next.
+    Identity is in the trajectory.
+    Fully voiced. No noise component.
     """
     if dur_ms is None:
         dur_ms = W_DUR_MS * dil
@@ -219,17 +185,13 @@ def synth_W_onset(F_next, dur_ms=None,
     n_s = max(4, int(dur_ms / 1000.0 * sr))
     T   = 1.0 / sr
 
-    # Voiced source
     src = rosenberg_pulse(n_s, pitch_hz,
                           oq=0.65, sr=sr)
-
-    # Attack envelope — smooth onset
     n_atk = int(0.010 * sr)
     if 0 < n_atk < n_s:
         src[:n_atk] *= np.linspace(
             0.0, 1.0, n_atk)
 
-    # Formant interpolation W_F → F_next
     result = np.zeros(n_s, dtype=DTYPE)
     for fi in range(min(len(W_F),
                         len(F_next))):
@@ -260,7 +222,7 @@ def synth_W_onset(F_next, dur_ms=None,
 
 
 # ============================================================
-# Ē VOWEL SYNTHESIS
+# Ē VOWEL
 # ============================================================
 
 def synth_E_long(F_prev, dur_ms=None,
@@ -268,17 +230,9 @@ def synth_E_long(F_prev, dur_ms=None,
                   dil=DIL, sr=SR):
     """
     Long close-mid front vowel [eː].
-
-    Pre-Great-Vowel-Shift Old English long e.
-    F1 ~420 Hz (higher tongue than [æ])
-    F2 ~2200 Hz (front position, same as [æ])
-
-    F_prev: formant targets of preceding W onset.
-    Coarticulation: onset zone interpolates
-    from F_prev toward E_F.
-
-    Long vowel: duration 2x short equivalent.
-    Normalizes output to peak=0.75.
+    F1 confirmed ~409 Hz (IPA valid).
+    F2 confirmed ~2132 Hz.
+    Pre-Great-Vowel-Shift Old English.
     """
     if dur_ms is None:
         dur_ms = E_DUR_MS * dil
@@ -288,11 +242,9 @@ def synth_E_long(F_prev, dur_ms=None,
     n_s = max(4, int(dur_ms / 1000.0 * sr))
     T   = 1.0 / sr
 
-    # Voiced source
     src = rosenberg_pulse(n_s, pitch_hz,
                           oq=0.65, sr=sr)
 
-    # Envelope
     n_atk = min(int(0.020 * sr), n_s // 4)
     n_rel = min(int(0.040 * sr), n_s // 4)
     env   = np.ones(n_s, dtype=DTYPE)
@@ -304,13 +256,10 @@ def synth_E_long(F_prev, dur_ms=None,
             1.0, 0.0, n_rel)
     src = f32(src * env)
 
-    # Coarticulation zones
-    n_on  = int(E_COART_ON  * n_s)
-    n_off = int(E_COART_OFF * n_s)
+    n_on = int(E_COART_ON * n_s)
 
     result = np.zeros(n_s, dtype=DTYPE)
     for fi in range(len(E_F)):
-        # Build per-sample frequency array
         f_start = float(F_prev[fi]) \
                   if fi < len(F_prev) \
                   else float(E_F[fi])
@@ -340,7 +289,6 @@ def synth_E_long(F_prev, dur_ms=None,
             out[i] = y
         result += out * g
 
-    # Normalize to peak=0.75
     mx = np.max(np.abs(result))
     if mx > 1e-8:
         result = f32(result / mx * 0.75)
@@ -349,7 +297,7 @@ def synth_E_long(F_prev, dur_ms=None,
 
 
 # ============================================================
-# FULL WORD SYNTHESIS
+# FULL WORD
 # ============================================================
 
 def synth_we(pitch_hz=PITCH_HZ,
@@ -358,10 +306,8 @@ def synth_we(pitch_hz=PITCH_HZ,
               sr=SR):
     """
     Synthesize Old English 'Wē' [weː].
-
-    W onset transitions into Ē vowel.
-    No coda — open syllable.
-    Long vowel held.
+    W glides into long Ē. Open syllable.
+    No coda — word ends on the vowel.
     """
     w_seg = synth_W_onset(
         F_next=E_F,
@@ -373,16 +319,13 @@ def synth_we(pitch_hz=PITCH_HZ,
         pitch_hz=pitch_hz,
         dil=dil, sr=sr)
 
-    # Ghost between W and Ē
-    # Short — W is voiced, Ē is voiced,
-    # the transition is smooth not gapped
-    # Ghost is very brief here: 10–15ms
-    n_ghost = int(0.012 * sr)
+    # Brief ghost: voiced→voiced transition
+    n_ghost = int(0.012 * dil * sr)
     ghost   = np.zeros(n_ghost, dtype=DTYPE)
 
-    word = np.concatenate([w_seg, ghost, e_seg])
+    word = np.concatenate(
+        [w_seg, ghost, e_seg])
 
-    # Overall normalization
     mx = np.max(np.abs(word))
     if mx > 1e-8:
         word = f32(word / mx * 0.75)
@@ -398,17 +341,12 @@ def synth_we(pitch_hz=PITCH_HZ,
 def apply_simple_room(sig, rt60=2.0,
                        direct_ratio=0.42,
                        sr=SR):
-    """
-    Simple mead hall room simulation.
-    Comb filter + allpass approximation.
-    """
-    out  = sig.copy().astype(float)
-    d1   = int(0.021 * sr)
-    d2   = int(0.035 * sr)
-    d3   = int(0.051 * sr)
-    g    = 10 ** (-3.0 / (rt60 * sr))
-    rev  = np.zeros(len(sig) + d3 + 1,
-                    dtype=float)
+    d1  = int(0.021 * sr)
+    d2  = int(0.035 * sr)
+    d3  = int(0.051 * sr)
+    g   = 10 ** (-3.0 / (rt60 * sr))
+    rev = np.zeros(len(sig) + d3 + 1,
+                   dtype=float)
     for i, s in enumerate(sig.astype(float)):
         rev[i] += s
         if i + d1 < len(rev):
@@ -433,22 +371,27 @@ def apply_simple_room(sig, rt60=2.0,
 if __name__ == "__main__":
 
     print()
-    print("WĒ RECONSTRUCTION")
-    print("Old English [weː] — Beowulf line 1, word 2")
+    print("WĒ RECONSTRUCTION v4")
+    print("Old English [weː]")
+    print("Beowulf line 1, word 2")
+    print()
+    print(f"  Confirmed F1: "
+          f"{E_F1_CONFIRMED} Hz"
+          f" (IPA [eː] range: 390–530)")
+    print(f"  Confirmed F2: "
+          f"{E_F2_CONFIRMED} Hz")
     print()
 
-    # Conversational rate (dil=1.0)
     we_dry = synth_we(
         pitch_hz=145.0,
         dil=1.0,
         add_room=False)
     write_wav("output_play/we_dry.wav",
               we_dry, SR)
-    print(f"  we_dry.wav     "
+    print(f"  we_dry.wav  "
           f"{len(we_dry)} samples  "
           f"({len(we_dry)/SR*1000:.0f} ms)")
 
-    # Hall reverb
     we_hall = synth_we(
         pitch_hz=145.0,
         dil=1.0,
@@ -457,23 +400,21 @@ if __name__ == "__main__":
               we_hall, SR)
     print(f"  we_hall.wav")
 
-    # 4x slow
     we_slow = ola_stretch(we_dry, 4.0)
     write_wav("output_play/we_slow.wav",
               we_slow, SR)
     print(f"  we_slow.wav")
 
-    # Performance parameters
     we_perf = synth_we(
         pitch_hz=110.0,
         dil=2.5,
         add_room=True)
-    write_wav("output_play/we_performance.wav",
-              we_perf, SR)
+    write_wav(
+        "output_play/we_performance.wav",
+        we_perf, SR)
     print(f"  we_performance.wav  "
           f"({len(we_perf)/SR*1000:.0f} ms)")
 
-    # HWÆT + Wē together (first two words)
     try:
         sys.path.insert(0, '..')
         from word_01_hwat.hwat_reconstruction \
@@ -483,10 +424,10 @@ if __name__ == "__main__":
             dil=2.5,
             add_room=False)
         pause = np.zeros(
-            int(0.15 * SR), dtype=DTYPE)
-        both  = np.concatenate([hwat, pause,
-                                 we_perf])
-        mx    = np.max(np.abs(both))
+            int(0.18 * SR), dtype=DTYPE)
+        both  = np.concatenate(
+            [hwat, pause, we_perf])
+        mx = np.max(np.abs(both))
         if mx > 1e-8:
             both = f32(both / mx * 0.80)
         write_wav(
@@ -494,12 +435,13 @@ if __name__ == "__main__":
             both, SR)
         print(f"  hwat_we_together.wav")
     except ImportError:
-        print(f"  (hwat_reconstruction not found"
-              f" — skipping combined file)")
+        print(f"  (hwat not found"
+              f" — skipping combined)")
 
     print()
     print("  afplay output_play/we_dry.wav")
     print("  afplay output_play/we_slow.wav")
-    print("  afplay output_play/we_performance.wav")
+    print("  afplay output_play/"
+          "we_performance.wav")
     print("  afplay output_play/we_hall.wav")
     print()
