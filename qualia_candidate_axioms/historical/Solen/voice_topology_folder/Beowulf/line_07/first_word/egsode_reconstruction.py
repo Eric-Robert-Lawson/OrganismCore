@@ -17,36 +17,24 @@ PHONEME STRUCTURE:
 NEW PHONEMES: none.
 Pure assembly.
 
-NOTE ON [ɡs] CLUSTER:
-  Voiced velar stop into voiceless
-  alveolar fricative. Voicing
-  offset at [ɡ] burst, silence
-  at [s] onset. The devoicing
-  is abrupt — [ɡ] is fully voiced,
-  [s] is fully voiceless.
-  No partial voicing at boundary.
+v1 FAILURE:
+  D4 [ɡs] transition failed.
+  [ɡ] voicing 0.0008 — effectively zero.
+  Burst + noise VOT dominated the
+  autocorrelation window.
+  Murmur too weak — not detected.
 
-NOTE ON WORD STRUCTURE:
-  e-gso-de — three syllables.
-  Stress on first syllable: EG-so-de.
-  The [ɡs] cluster bridges syllable 1
-  and syllable 2.
-
-ETYMOLOGY:
-  egesa — terror, dread (noun)
-  egsian — to terrify (verb)
-  egsode — terrified (past tense)
-  ModE 'eerie' distantly related
-  via ON 'agr'.
-  Also related to 'ugly' —
-  that which causes dread.
-  Scyld egsode eorlas —
-  Scyld terrified warriors.
-  Psychological domination —
-  not just military defeat.
+v2 FIX:
+  Increased murmur gain 0.35 → 0.65.
+  Increased murmur duration fraction.
+  Reduced VOT noise gain 0.25 → 0.05.
+  Extended closure fraction of total
+  duration — more samples in murmur
+  phase for autocorrelation to find.
 
 CHANGE LOG:
-  v1 — initial parameters
+  v1 — initial parameters — D4 FAIL
+  v2 — murmur gain up, VOT noise down
 """
 
 import numpy as np
@@ -73,11 +61,14 @@ E_COART_ON  = 0.12
 E_COART_OFF = 0.12
 
 # G — voiced velar stop [ɡ]
-G_DUR_MS   = 65.0
-G_BURST_F  = 1800.0
-G_BURST_BW = 800.0
-G_BURST_MS = 10.0
-G_VOT_MS   = 8.0
+# v2: murmur gain raised, VOT noise reduced
+G_DUR_MS      = 70.0
+G_BURST_F     = 1800.0
+G_BURST_BW    = 800.0
+G_BURST_MS    = 10.0
+G_VOT_MS      = 5.0
+G_MURMUR_GAIN = 0.65   # v1: 0.35 — too weak
+G_VOT_GAIN    = 0.05   # v1: 0.25 — too loud
 
 # S — voiceless alveolar fricative [s]
 S_DUR_MS   = 65.0
@@ -224,45 +215,6 @@ def apply_formants(src, freqs, bws, gains,
 
 
 # ============================================================
-# IIR NOTCH
-# ============================================================
-
-def iir_notch(sig, fc, bw=200.0, sr=SR):
-    T  = 1.0 / sr
-    wc = 2 * np.pi * fc * T
-    r  = float(np.clip(
-        1.0 - np.pi * bw * T, 0.1, 0.999))
-    b1 = -2.0 * np.cos(wc)
-    b2 =  1.0
-    a1 = -2.0 * r * np.cos(wc)
-    a2 =  r * r
-    gain_dc = abs((1 + b1 + b2)
-                  / (1 + a1 + a2 + 1e-12))
-    if gain_dc > 1e-6:
-        b1_n = b1 / gain_dc
-        b2_n = b2 / gain_dc
-    else:
-        b1_n = b1
-        b2_n = b2
-    b0  = 1.0
-    n   = len(sig)
-    out = np.zeros(n, dtype=DTYPE)
-    x   = sig.astype(float)
-    y1 = y2 = x1 = x2 = 0.0
-    for i in range(n):
-        xi     = x[i]
-        yi     = (b0 * xi + b1_n * x1
-                  + b2_n * x2
-                  - a1 * y1 - a2 * y2)
-        x2     = x1
-        x1     = xi
-        y2     = y1
-        y1     = yi
-        out[i] = yi
-    return f32(out)
-
-
-# ============================================================
 # PHONEME SYNTHESIZERS
 # ============================================================
 
@@ -333,13 +285,14 @@ def synth_G(F_prev=None, F_next=None,
              pitch_hz=PITCH_HZ,
              dil=DIL, sr=SR):
     """
-    Voiced velar stop [ɡ].
-    Post-vowel position — [e]→[ɡ].
-    Voiced closure — murmur during
-    closure phase. Burst at release.
-    VOT into following [s] — but [s]
-    is voiceless so VOT transitions
-    to noise rather than voiced onset.
+    Voiced velar stop [ɡ] v2.
+    v1 failure: murmur too weak,
+    autocorrelation found noise not
+    pitch. Murmur gain raised to 0.65,
+    VOT noise reduced to 0.05.
+    Closure fraction extended to ensure
+    enough periodic samples for
+    autocorrelation window.
     """
     dur_ms    = G_DUR_MS * dil
     n_s       = max(4, int(
@@ -355,12 +308,12 @@ def synth_G(F_prev=None, F_next=None,
         n_closure, pitch_hz,
         oq=0.65, sr=sr)
     env_c  = np.linspace(
-        0.4, 0.1, n_closure).astype(DTYPE)
+        0.8, 0.4, n_closure).astype(DTYPE)
     b_lp, a_lp = safe_lp(300.0, sr)
     murmur = f32(lfilter(
         b_lp, a_lp,
         src_c.astype(float))
-                 * env_c * 0.35)
+                 * env_c * G_MURMUR_GAIN)
     noise  = np.random.randn(
         n_burst).astype(float)
     b_bp, a_bp = safe_bp(
@@ -371,13 +324,13 @@ def synth_G(F_prev=None, F_next=None,
     env_bu = np.linspace(
         1.0, 0.2, n_burst).astype(DTYPE)
     burst  = f32(burst * env_bu)
-    # VOT — into [s] — noise onset
     noise_v = np.random.randn(
         n_vot).astype(float)
     b_vp, a_vp = safe_bp(
         3000.0, 8000.0, sr)
     vot    = f32(lfilter(
-        b_vp, a_vp, noise_v) * 0.25)
+        b_vp, a_vp, noise_v)
+                 * G_VOT_GAIN)
     env_vo = np.linspace(
         0.3, 0.0, n_vot).astype(DTYPE)
     vot    = f32(vot * env_vo)
@@ -385,7 +338,7 @@ def synth_G(F_prev=None, F_next=None,
         murmur, burst, vot])
     mx     = np.max(np.abs(seg))
     if mx > 1e-8:
-        seg = f32(seg / mx * 0.55)
+        seg = f32(seg / mx * 0.58)
     return f32(seg)
 
 
@@ -602,7 +555,7 @@ def synth_egsode(pitch_hz=PITCH_HZ,
 
 if __name__ == "__main__":
     print()
-    print("EGSODE RECONSTRUCTION v1")
+    print("EGSODE RECONSTRUCTION v2")
     print("Old English [eɡsode]")
     print("Beowulf line 7, word 1")
     print()
@@ -630,22 +583,11 @@ if __name__ == "__main__":
         w_slow, SR)
     print("  egsode_slow.wav")
 
-    w_perf = synth_egsode(
-        pitch_hz=110.0, dil=2.5,
-        add_room=True)
-    write_wav(
-        "output_play/egsode_performance.wav",
-        w_perf, SR)
-    print(f"  egsode_performance.wav"
-          f"  ({len(w_perf)/SR*1000:.0f} ms)")
-
     print()
     print("  afplay output_play/"
           "egsode_dry.wav")
     print("  afplay output_play/"
           "egsode_slow.wav")
-    print("  afplay output_play/"
-          "egsode_hall.wav")
     print()
     print("  Line 7 in progress:")
     print("  egsode eorlas,"
