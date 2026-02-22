@@ -36,7 +36,7 @@ Physics. Measurement. Verification.
 
 The framework has three layers:
 
-**Layer 0: Initial Principles First Basis: **
+**Layer 0: Initial Principles First Basis:**
   Tonnetz Seed Manifold
   Onboarding documents required (ask if you need for) from voice_topology_folder
 
