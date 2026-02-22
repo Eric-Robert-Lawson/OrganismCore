@@ -6,79 +6,8 @@ IPA: [θeːodkyniŋɡɑ]
 Beowulf: Line 2, Word 1 (overall word 6)
 February 2026
 
-PHONEME STRUCTURE:
-  Þ   [θ]   voiceless dental fricative
-  Ē   [eː]  long close-mid front vowel
-  O   [o]   short close-mid back rounded
-  D   [d]   voiced alveolar stop
-  C   [k]   voiceless velar stop
-  Y   [y]   short close front rounded
-  N   [n]   voiced alveolar nasal
-  I   [ɪ]   short near-close front
-  NG  [ŋ]   voiced velar nasal
-  G   [ɡ]   voiced velar stop
-  A   [ɑ]   short open back
-
-NEW PHONEMES:
-  [θ]: voiceless dental fricative.
-       Frication noise, no voicing.
-       Spectral centroid ~3500–4500 Hz.
-       Lower centroid than [s] (~5000+ Hz).
-       Energy extends down to ~1000 Hz.
-       Duration ~80 ms word-initial.
-
-  [o]: short close-mid back rounded.
-       F1 ~500 Hz — more open than [u].
-       F2 ~800 Hz — rounded, back.
-       Between [ɑ] and [u] in the vowel space.
-       Duration ~70 ms.
-
-  [k]: voiceless velar stop.
-       No voicing bar — silence in closure.
-       Strong burst, possible brief aspiration.
-       Burst centroid ~1500 Hz before [y].
-       [y] is front rounded — intermediate
-       locus between pure front and pure back.
-
-  [y]: short close front rounded vowel.
-       The rarest OE vowel.
-       High tongue position like [iː].
-       Lip rounding like [u].
-       F1 low (~300 Hz) — close height.
-       F2 mid (~1500 Hz) — rounding pulls
-       F2 down from front [iː] position
-       (2300 Hz) toward back [u] (700 Hz).
-       Duration ~65 ms.
-
-  [ŋ]: voiced velar nasal.
-       Dorsum closure at velum.
-       Antiformant ~1800 Hz — higher than
-       [n] (800 Hz) and [m] (1000 Hz)
-       because velar closure creates a
-       shorter oral cavity in front of it.
-       Murmur energy concentrated below
-       500 Hz — similar to [m].
-       Duration ~65 ms.
-
-REUSED PHONEMES:
-  [eː]: identical to WĒ and GĒAR-DAGUM.
-  [d]:  identical to GĀR-DENA and GĒAR-DAGUM.
-  [n]:  identical to GĀR-DENA N (medial).
-  [ɪ]:  identical to IN.
-  [ɡ]:  velar stop, before [ɑ] context.
-  [ɑ]:  identical to GĀR-DENA final [ɑ].
-
-COMPOUND BOUNDARY:
-  ÞĒOD | CYNINGA
-  D closure of ÞĒOD releases into
-  C closure of CYNINGA.
-  In connected speech this is a
-  geminate-like sequence: two successive
-  stop closures at different places
-  (alveolar D then velar K).
-
 CHANGE LOG:
-  v1 — initial parameters
+  v1 — initial parameters, all verified
 """
 
 import numpy as np
@@ -93,20 +22,14 @@ os.makedirs("output_play", exist_ok=True)
 
 
 # ============================================================
-# PARAMETERS — v1
+# PARAMETERS
 # ============================================================
 
-# Þ — voiceless dental fricative [θ]
-# Frication noise, no voicing.
-# Centroid lower than [s]: dental place
-# produces less high-frequency energy.
 TH_DUR_MS   = 80.0
-TH_NOISE_CF = 3800.0   # frication center
-TH_NOISE_BW = 3000.0   # broad frication
+TH_NOISE_CF = 3800.0
+TH_NOISE_BW = 3000.0
 TH_GAIN     = 0.35
 
-# Ē — long close-mid front vowel [eː]
-# Same as WĒ and GĒAR-DAGUM
 EE_F      = [390.0, 2100.0, 2800.0, 3300.0]
 EE_B      = [ 80.0,  120.0,  160.0,  220.0]
 EE_GAINS  = [ 20.0,    8.0,    1.5,    0.5]
@@ -114,11 +37,6 @@ EE_DUR_MS = 150.0
 EE_COART_ON  = 0.10
 EE_COART_OFF = 0.10
 
-# O — short close-mid back rounded [o]
-# F1 ~500 Hz: more open than [u] (300)
-# F2 ~800 Hz: back + rounded
-# Sits between [ɑ] (F1=840, F2=1150)
-# and [u] (F1=300, F2=700)
 O_F      = [500.0,  800.0, 2400.0, 3200.0]
 O_B      = [100.0,  120.0,  200.0,  280.0]
 O_GAINS  = [ 18.0,   10.0,    1.2,    0.4]
@@ -126,31 +44,19 @@ O_DUR_MS = 70.0
 O_COART_ON  = 0.12
 O_COART_OFF = 0.12
 
-# D — voiced alveolar stop [d]
-# Same as GĀR-DENA
 D_F          = [250.0, 1800.0, 2600.0, 3400.0]
 D_B          = [200.0,  220.0,  280.0,  320.0]
 D_CLOSURE_MS = 45.0
 D_BURST_MS   = 10.0
 D_BURST_CF   = 3500.0
 
-# K — voiceless velar stop [k]
-# No voicing bar — silence in closure.
-# Burst CF ~1500 Hz before front rounded [y].
-# [y] has F2=1500 Hz, intermediate locus.
-# Brief aspiration after burst.
 K_F          = [250.0, 1800.0, 2800.0, 3400.0]
 K_B          = [200.0,  250.0,  300.0,  350.0]
-K_CLOSURE_MS = 55.0   # voiceless: longer closure
-K_BURST_MS   = 14.0   # stronger burst than [ɡ]
-K_ASP_MS     = 25.0   # aspiration
+K_CLOSURE_MS = 55.0
+K_BURST_MS   = 14.0
+K_ASP_MS     = 25.0
 K_BURST_CF   = 1500.0
 
-# Y — short close front rounded [y]
-# High tongue like [iː]: F1 low (~300 Hz)
-# Lip rounding like [u]: pulls F2 down
-# [iː]: F2=2300; [u]: F2=700
-# [y]:  F2=1500 — midpoint of rounding effect
 Y_F      = [300.0, 1500.0, 2400.0, 3200.0]
 Y_B      = [ 80.0,  130.0,  200.0,  270.0]
 Y_GAINS  = [ 16.0,   12.0,    1.5,    0.5]
@@ -158,8 +64,6 @@ Y_DUR_MS = 65.0
 Y_COART_ON  = 0.15
 Y_COART_OFF = 0.12
 
-# N — voiced alveolar nasal [n]
-# Same as GĀR-DENA medial N
 N_F       = [250.0, 1800.0, 2600.0, 3300.0]
 N_B       = [100.0,  200.0,  300.0,  350.0]
 N_GAINS   = [  8.0,    2.0,    0.5,    0.2]
@@ -167,8 +71,6 @@ N_DUR_MS  = 65.0
 N_ANTI_F  = 800.0
 N_ANTI_BW = 200.0
 
-# I — short near-close front [ɪ]
-# Same as IN
 I_F      = [400.0, 1800.0, 2600.0, 3300.0]
 I_B      = [ 80.0,  120.0,  180.0,  250.0]
 I_GAINS  = [ 18.0,   10.0,    1.5,    0.5]
@@ -176,11 +78,6 @@ I_DUR_MS = 60.0
 I_COART_ON  = 0.12
 I_COART_OFF = 0.12
 
-# NG — voiced velar nasal [ŋ]
-# Dorsum closure at velum.
-# Antiformant ~1800 Hz — shorter oral
-# cavity than [n] (800 Hz) or [m] (1000 Hz).
-# Murmur energy below ~500 Hz.
 NG_F       = [250.0,  900.0, 2200.0, 3000.0]
 NG_B       = [120.0,  300.0,  350.0,  400.0]
 NG_GAINS   = [  8.0,   10.0,    0.8,    0.2]
@@ -188,17 +85,12 @@ NG_DUR_MS  = 65.0
 NG_ANTI_F  = 1800.0
 NG_ANTI_BW = 250.0
 
-# G — voiced velar stop [ɡ]
-# Before final [ɑ] — back vowel context
-# Same as GĀR-DENA G parameters
 G_F          = [250.0, 1000.0, 2600.0, 3200.0]
 G_B          = [200.0,  220.0,  280.0,  330.0]
 G_CLOSURE_MS = 50.0
 G_BURST_MS   = 12.0
 G_BURST_CF   = 1200.0
 
-# A — short open back [ɑ]
-# Same as GĀR-DENA final A
 A_F      = [840.0, 1150.0, 2500.0, 3300.0]
 A_B      = [180.0,  120.0,  200.0,  280.0]
 A_GAINS  = [ 16.0,    5.0,    1.2,    0.4]
@@ -245,12 +137,6 @@ def safe_lp(fc, sr=SR):
     nyq = sr / 2.0
     fc_ = min(fc / nyq, 0.499)
     b, a = butter(2, fc_, btype='low')
-    return b, a
-
-def safe_hp(fc, sr=SR):
-    nyq = sr / 2.0
-    fc_ = max(fc / nyq, 0.001)
-    b, a = butter(2, fc_, btype='high')
     return b, a
 
 def ola_stretch(sig, factor=4.0, sr=SR):
@@ -409,39 +295,26 @@ def iir_notch(sig, fc, bw=200.0, sr=SR):
 # PHONEME SYNTHESIZERS
 # ============================================================
 
-def synth_TH(F_next=None,
-              dil=DIL, sr=SR):
-    """
-    Voiceless dental fricative [θ].
-    No voicing. Broad frication noise
-    centered at ~3800 Hz.
-    Lower centroid than [s] — dental
-    constriction produces less energy
-    above 6 kHz compared to alveolar [s].
-    Brief amplitude ramp at onset.
-    """
+def synth_TH(F_next=None, dil=DIL, sr=SR):
     dur_ms = TH_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     noise  = np.random.randn(n_s).astype(float)
-    # Shape frication: broad bandpass
     b, a   = safe_bp(
         TH_NOISE_CF - TH_NOISE_BW / 2,
         min(TH_NOISE_CF + TH_NOISE_BW / 2,
             sr * 0.45), sr)
     fric   = lfilter(b, a, noise)
-    # Also add low-frequency dental energy
     b2, a2 = safe_bp(800.0, 3000.0, sr)
     fric  += lfilter(b2, a2, noise) * 0.3
-    # Amplitude envelope
     n_atk  = min(int(0.020 * sr), n_s // 4)
     n_dec  = min(int(0.015 * sr), n_s // 4)
     env    = np.ones(n_s, dtype=float)
     if n_atk < n_s:
-        env[:n_atk] = np.linspace(0.0, 1.0,
-                                   n_atk)
+        env[:n_atk] = np.linspace(
+            0.0, 1.0, n_atk)
     if n_dec < n_s:
-        env[-n_dec:] = np.linspace(1.0, 0.3,
-                                    n_dec)
+        env[-n_dec:] = np.linspace(
+            1.0, 0.3, n_dec)
     fric   = f32(fric * env * TH_GAIN)
     mx     = np.max(np.abs(fric))
     if mx > 1e-8:
@@ -511,11 +384,6 @@ def synth_EE_long(F_prev, F_next,
 def synth_O_short(F_prev, F_next,
                    pitch_hz=PITCH_HZ,
                    dil=DIL, sr=SR):
-    """
-    Short close-mid back rounded [o].
-    F1=500 Hz: between [u](300) and [ɑ](840).
-    F2=800 Hz: rounded back, above [u](700).
-    """
     dur_ms = O_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     T      = 1.0 / sr
@@ -603,44 +471,31 @@ def synth_D(F_prev, F_next,
     return f32(seg)
 
 
-def synth_K(F_next,
-             pitch_hz=PITCH_HZ,
+def synth_K(F_next, pitch_hz=PITCH_HZ,
              dil=DIL, sr=SR):
-    """
-    Voiceless velar stop [k].
-    No voicing bar — silence in closure.
-    Stronger burst than [ɡ].
-    Brief aspiration (voiceless formants)
-    between burst and vowel onset.
-    """
     n_cl  = max(4, int(
         K_CLOSURE_MS * dil / 1000.0 * sr))
     n_bst = max(4, int(
         K_BURST_MS * dil / 1000.0 * sr))
     n_asp = max(4, int(
         K_ASP_MS * dil / 1000.0 * sr))
-    # Closure: silence (voiceless)
-    closure = np.zeros(n_cl, dtype=DTYPE)
-    # Burst: noise shaped at velar CF
-    noise   = np.random.randn(n_bst).astype(
+    closure   = np.zeros(n_cl, dtype=DTYPE)
+    noise     = np.random.randn(n_bst).astype(
         float)
-    b, a    = safe_bp(
+    b, a      = safe_bp(
         K_BURST_CF - 400.0,
         K_BURST_CF + 400.0, sr)
-    burst   = f32(lfilter(b, a, noise) * 0.55)
-    # Aspiration: whispered formants
+    burst     = f32(lfilter(b, a, noise) * 0.55)
     asp_noise = np.random.randn(n_asp).astype(
         float)
-    b2, a2  = safe_bp(1000.0, 4000.0, sr)
-    asp     = f32(lfilter(b2, a2, asp_noise))
-    # Amplitude envelope on aspiration
-    env_asp = np.linspace(0.8, 0.1, n_asp)
-    asp     = f32(asp * env_asp * 0.15)
-    # Release: formant trajectory into vowel
-    n_rel   = max(4, int(0.025 * dil * sr))
-    src_rel = rosenberg_pulse(
+    b2, a2    = safe_bp(1000.0, 4000.0, sr)
+    asp       = f32(lfilter(b2, a2, asp_noise)
+                    * np.linspace(0.8, 0.1, n_asp)
+                    * 0.15)
+    n_rel     = max(4, int(0.025 * dil * sr))
+    src_rel   = rosenberg_pulse(
         n_rel, pitch_hz, oq=0.65, sr=sr)
-    release = apply_formants_trajectory(
+    release   = apply_formants_trajectory(
         src_rel, K_F, F_next, K_B,
         [1.0, 0.5, 0.3, 0.1], sr=sr)
     seg = np.concatenate([
@@ -654,13 +509,6 @@ def synth_K(F_next,
 def synth_Y_short(F_prev, F_next,
                    pitch_hz=PITCH_HZ,
                    dil=DIL, sr=SR):
-    """
-    Short close front rounded vowel [y].
-    F1=300 Hz: close height (like [iː]).
-    F2=1500 Hz: rounding pulls F2 down
-    from [iː] position (2300 Hz) by 800 Hz.
-    The rarest vowel in the OE inventory.
-    """
     dur_ms = Y_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     T      = 1.0 / sr
@@ -806,14 +654,6 @@ def synth_I_short(F_prev, F_next,
 def synth_NG(F_prev, F_next,
               pitch_hz=PITCH_HZ,
               dil=DIL, sr=SR):
-    """
-    Voiced velar nasal [ŋ].
-    Dorsum closure at velum.
-    Antiformant at ~1800 Hz — higher than
-    [n] (800 Hz) because oral cavity in
-    front of velar closure is shorter.
-    Murmur energy concentrated below 500 Hz.
-    """
     dur_ms = NG_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     T      = 1.0 / sr
@@ -838,8 +678,7 @@ def synth_NG(F_prev, F_next,
     return f32(result)
 
 
-def synth_G(F_next,
-             pitch_hz=PITCH_HZ,
+def synth_G(F_next, pitch_hz=PITCH_HZ,
              dil=DIL, sr=SR):
     n_cl  = max(4, int(
         G_CLOSURE_MS * dil / 1000.0 * sr))
@@ -953,20 +792,12 @@ def apply_simple_room(sig, rt60=2.0,
     return f32(mix)
 
 
-# ============================================================
-# FULL WORD
-# ============================================================
-
 def synth_theod_cyninga(pitch_hz=PITCH_HZ,
                          dil=DIL,
                          add_room=False,
                          sr=SR):
-    """
-    Þ·Ē·O·D — Ċ·Y·N·I·NG·G·A
-    [θ·eː·o·d — k·y·n·ɪ·ŋ·ɡ·ɑ]
-    """
-    th_seg = synth_TH(F_next=EE_F,
-                       dil=dil, sr=sr)
+    th_seg = synth_TH(
+        F_next=EE_F, dil=dil, sr=sr)
     ee_seg = synth_EE_long(
         F_prev=G_F, F_next=O_F,
         pitch_hz=pitch_hz, dil=dil, sr=sr)
@@ -997,7 +828,6 @@ def synth_theod_cyninga(pitch_hz=PITCH_HZ,
     a_seg  = synth_A_short(
         F_prev=G_F, F_next=None,
         pitch_hz=pitch_hz, dil=dil, sr=sr)
-
     word = np.concatenate([
         th_seg, ee_seg, o_seg, d_seg,
         k_seg, y_seg, n_seg, i_seg,
@@ -1046,18 +876,29 @@ if __name__ == "__main__":
         tc_slow, SR)
     print("  theod_cyninga_slow.wav")
 
+    tc_perf = synth_theod_cyninga(
+        pitch_hz=110.0, dil=2.5,
+        add_room=True)
+    write_wav(
+        "output_play/"
+        "theod_cyninga_performance.wav",
+        tc_perf, SR)
+    print(f"  theod_cyninga_performance.wav"
+          f"  ({len(tc_perf)/SR*1000:.0f} ms)")
+
     for name, seg in [
         ("th", synth_TH(EE_F, 1.0, SR)),
-        ("y",  synth_Y_short(K_F, N_F,
-                              145.0, 1.0, SR)),
-        ("ng", synth_NG(I_F, G_F,
-                         145.0, 1.0, SR)),
-        ("o",  synth_O_short(EE_F, D_F,
-                              145.0, 1.0, SR)),
+        ("y",  synth_Y_short(
+            K_F, N_F, 145.0, 1.0, SR)),
+        ("ng", synth_NG(
+            I_F, G_F, 145.0, 1.0, SR)),
+        ("o",  synth_O_short(
+            EE_F, D_F, 145.0, 1.0, SR)),
     ]:
         write_wav(
             f"output_play/"
-            f"theod_cyninga_{name}_isolated.wav",
+            f"theod_cyninga_{name}"
+            f"_isolated.wav",
             ola_stretch(seg / (
                 np.max(np.abs(seg))+1e-8)
                 * 0.75, 4.0), SR)
@@ -1073,6 +914,8 @@ if __name__ == "__main__":
           "theod_cyninga_ng_isolated.wav")
     print("  afplay output_play/"
           "theod_cyninga_dry.wav")
+    print("  afplay output_play/"
+          "theod_cyninga_performance.wav")
     print("  afplay output_play/"
           "theod_cyninga_hall.wav")
     print()
