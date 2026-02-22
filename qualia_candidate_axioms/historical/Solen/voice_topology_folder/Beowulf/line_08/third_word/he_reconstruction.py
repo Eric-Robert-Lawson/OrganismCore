@@ -1,4 +1,3 @@
-```python
 """
 HĒ RECONSTRUCTION
 Old English: hē
@@ -449,4 +448,3 @@ if __name__ == "__main__":
     print("  feasceaft funden, hē —")
     print("  found wretched, he —")
     print()
-```
