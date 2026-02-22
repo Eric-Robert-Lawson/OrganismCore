@@ -31,19 +31,29 @@ REUSED PHONEMES:
         F1=840 Hz, F2=1150 Hz.
         Duration 150 ms — phonemically long.
 
-CONTRAST NOTE:
-  [θ] vs [ð]:
-  Both dental fricatives.
-  [θ]: voiceless — no voicing bar,
-       centroid ~4200 Hz
-  [ð]: voiced — voicing bar present,
-       centroid pulled lower by voicing
-       energy, ~2500–3500 Hz
-  The only distinction is voicing.
-  Same place, same manner, opposite voicing.
-
 CHANGE LOG:
-  v1 — initial parameters
+  v1 — initial parameters.
+       D1 FAIL: voicing 0.1642 < 0.40,
+       centroid 4090 Hz > 4000 Hz ceiling.
+  v2 — raise DH_VOICE_GAIN 0.45→0.80,
+       lower DH_NOISE_GAIN 0.22→0.12,
+       lower DH_NOISE_CF 3800→3000,
+       narrow DH_NOISE_BW 2500→1800,
+       add mid-band voiced component.
+       D1 FAIL: voicing 0.1911. Centroid
+       now correct at 3116 Hz.
+       Root cause: rosenberg_pulse uses
+       np.diff — differencing suppresses
+       low-frequency fundamental.
+       Autocorrelation cannot find 145 Hz
+       peak through LP filter.
+  v3 — fix: voicing bar uses undifferenced
+       Rosenberg pulse (raw glottal pulse
+       before diff). Strong fundamental
+       at 145 Hz. LP cutoff raised
+       800→1200 Hz to pass more harmonics.
+       Mid-band component removed —
+       redundant with undifferenced pulse.
 """
 
 import numpy as np
@@ -62,29 +72,21 @@ os.makedirs("output_play", exist_ok=True)
 # ============================================================
 
 # DH — voiced dental fricative [ð]
-# Same constriction as [θ].
-# Voicing bar throughout — periodic
-# low-frequency energy from vocal fold
-# vibration underneath the frication noise.
-DH_DUR_MS   = 70.0
-DH_NOISE_CF = 3800.0   # same as [θ]
-DH_NOISE_BW = 2500.0   # slightly narrower —
-                        # voicing competes
-DH_NOISE_GAIN = 0.22   # lower noise gain —
-                        # voicing dominates
-# Voicing component: low-pass filtered
-# Rosenberg pulse mixed with frication
-DH_VOICE_GAIN = 0.45
-DH_VOICE_LP   = 800.0  # low-pass for voicing bar
+# v3: undifferenced pulse for voicing bar
+DH_DUR_MS     = 70.0
+DH_NOISE_CF   = 3000.0
+DH_NOISE_BW   = 1800.0
+DH_NOISE_GAIN = 0.12
+DH_VOICE_GAIN = 0.80
+DH_VOICE_LP   = 1200.0   # v3: was 800
 
 # AA_LONG — long open back [ɑː]
-# Same as GĀR-DENA
 AA_F      = [840.0, 1150.0, 2500.0, 3300.0]
 AA_B      = [180.0,  120.0,  200.0,  280.0]
 AA_GAINS  = [ 16.0,    5.0,    1.2,    0.4]
 AA_DUR_MS = 150.0
 AA_COART_ON  = 0.08
-AA_COART_OFF = 0.15   # longer — word-final
+AA_COART_OFF = 0.15
 
 PITCH_HZ = 145.0
 DIL      = 1.0
@@ -159,11 +161,13 @@ def ola_stretch(sig, factor=4.0, sr=SR):
 
 
 # ============================================================
-# ROSENBERG PULSE
+# ROSENBERG PULSE — TWO VERSIONS
 # ============================================================
 
 def rosenberg_pulse(n_samples, pitch_hz,
                     oq=0.65, sr=SR):
+    """Differenced — for vowels and formant
+    synthesis. Spectral tilt via diff."""
     T     = 1.0 / sr
     phase = 0.0
     src   = np.zeros(n_samples, dtype=DTYPE)
@@ -178,6 +182,27 @@ def rosenberg_pulse(n_samples, pitch_hz,
             src[i] = (1 - (phase - oq)
                       / (1 - oq + 1e-9))
     return f32(np.diff(src, prepend=src[0]))
+
+
+def rosenberg_pulse_raw(n_samples, pitch_hz,
+                         oq=0.65, sr=SR):
+    """Undifferenced — for voicing bar in
+    voiced fricatives. Strong fundamental
+    at pitch_hz for autocorrelation."""
+    T     = 1.0 / sr
+    phase = 0.0
+    src   = np.zeros(n_samples, dtype=DTYPE)
+    for i in range(n_samples):
+        phase += pitch_hz * T
+        if phase >= 1.0:
+            phase -= 1.0
+        if phase < oq:
+            src[i] = ((phase / oq)
+                      * (2 - phase / oq))
+        else:
+            src[i] = (1 - (phase - oq)
+                      / (1 - oq + 1e-9))
+    return f32(src)
 
 
 # ============================================================
@@ -249,36 +274,33 @@ def synth_DH(F_next=None,
               dil=DIL, sr=SR):
     """
     Voiced dental fricative [ð].
-    'th' in 'the', 'this', 'that'.
-    Frication noise at dental constriction
-    mixed with voiced source (Rosenberg pulse
-    low-pass filtered to produce voicing bar).
-    The voicing bar is the primary acoustic
-    cue distinguishing [ð] from [θ].
+    v3: undifferenced Rosenberg pulse
+    for voicing bar — strong fundamental
+    at pitch_hz ensures autocorrelation
+    finds periodic peak.
     """
     dur_ms = DH_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     noise  = np.random.randn(n_s).astype(float)
 
-    # Frication component — dental noise
+    # Frication — narrow dental band
     b, a   = safe_bp(
         DH_NOISE_CF - DH_NOISE_BW / 2,
         min(DH_NOISE_CF + DH_NOISE_BW / 2,
             sr * 0.48), sr)
     fric   = lfilter(b, a, noise)
-    b2, a2 = safe_bp(800.0, 3000.0, sr)
-    fric  += lfilter(b2, a2, noise) * 0.3
     fric   = fric * DH_NOISE_GAIN
 
-    # Voicing bar component — LP filtered pulse
-    src_v  = rosenberg_pulse(n_s, pitch_hz,
-                              oq=0.65, sr=sr)
+    # Voicing bar — undifferenced raw pulse
+    # Strong 145 Hz fundamental
+    src_raw = rosenberg_pulse_raw(
+        n_s, pitch_hz, oq=0.65, sr=sr)
     b_lp, a_lp = safe_lp(DH_VOICE_LP, sr)
-    voice  = lfilter(b_lp, a_lp,
-                     src_v.astype(float))
-    voice  = voice * DH_VOICE_GAIN
+    voice   = lfilter(b_lp, a_lp,
+                      src_raw.astype(float))
+    voice   = voice * DH_VOICE_GAIN
 
-    # Mix frication + voicing
+    # Mix
     sig    = f32(fric + voice)
 
     # Amplitude envelope
@@ -304,7 +326,6 @@ def synth_AA_long(F_prev=None, F_next=None,
     """
     Long open back [ɑː].
     Same parameters as GĀR-DENA.
-    Word-final — longer decay.
     """
     dur_ms = AA_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
@@ -424,7 +445,7 @@ def synth_tha(pitch_hz=PITCH_HZ,
 
 if __name__ == "__main__":
     print()
-    print("ÐĀ RECONSTRUCTION v1")
+    print("ÐĀ RECONSTRUCTION v3")
     print("Old English [ðɑː]")
     print("Beowulf line 3, word 2")
     print()
