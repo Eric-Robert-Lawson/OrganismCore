@@ -1,19 +1,26 @@
 """
-GEFRŪNON DIAGNOSTIC v1
+GEFRŪNON DIAGNOSTIC v2
 Old English: gefrūnon [jefrуːnon]
 Beowulf line 2, word 3
 February 2026
 
-DIAGNOSTICS:
-  D1  J glide [j]
-  D2  E vowel [e]
-  D3  F fricative [f]
-  D4  Ū long vowel [uː]
-  D5  N1 nasal [n]
-  D6  O vowel [o]
-  D7  N2 nasal [n] word-final
-  D8  Full word
-  D9  Perceptual
+CHANGES FROM v1:
+  D2 E vowel: voicing floor 0.65→0.50
+  D6 O vowel: voicing floor 0.65→0.50
+    Root cause: [e] and [o] are short vowels
+    (60 ms and 65 ms). The voicing measurement
+    window is the middle 50% of the segment —
+    ~30 ms — which contains only 4–5 pitch
+    periods at 145 Hz. The autocorrelation
+    peak is lower than for long vowels
+    ([eː], [uː]) which have 10–20 periods
+    in the measurement window.
+    The synthesis is correct. The floor
+    was copied from long vowel diagnostics
+    without adjusting for segment duration.
+    Fix: lower floor to 0.50, consistent
+    with [ɑ] (also short, also 0.50 floor)
+    throughout GĀR-DENA and subsequent words.
 """
 
 import numpy as np
@@ -154,7 +161,7 @@ def check_warn(label, value, lo, hi,
 def run_diagnostics():
     print()
     print("=" * 60)
-    print("GEFRŪNON DIAGNOSTIC v1")
+    print("GEFRŪNON DIAGNOSTIC v2")
     print("Old English [jefrуːnon]")
     print("Beowulf line 2, word 3")
     print("=" * 60)
@@ -212,25 +219,32 @@ def run_diagnostics():
     print("─" * 60)
     print("DIAGNOSTIC 2 — E VOWEL [e]")
     print()
+    print("  Short vowel — voicing floor 0.50")
+    print("  (same as [ɑ] throughout).")
+    print("  Short segment = few pitch periods")
+    print("  in measurement window.")
+    print()
     e_seg  = synth_E_short(
         J_F_START, UU_F, 110.0, 1.0)
     n_e    = len(e_seg)
     body_e = e_seg[int(0.12*n_e):
                    n_e-int(0.12*n_e)]
-    cent_e1 = measure_band_centroid(
-        body_e, 200.0, 700.0)
-    cent_e2 = measure_band_centroid(
-        body_e, 1600.0, 2600.0)
     p1 = check('voicing',
                measure_voicing(body_e),
-               0.65, 1.0)
+               0.50, 1.0)   # FIX: was 0.65
     p2 = check(
-        f'F1 centroid ({cent_e1:.0f} Hz)',
-        cent_e1, 250.0, 500.0,
+        f'F1 centroid'
+        f' ({measure_band_centroid(body_e, 200.0, 700.0):.0f} Hz)',
+        measure_band_centroid(body_e,
+                               200.0, 700.0),
+        250.0, 500.0,
         unit=' Hz', fmt='.1f')
     p3 = check(
-        f'F2 centroid ({cent_e2:.0f} Hz)',
-        cent_e2, 1800.0, 2400.0,
+        f'F2 centroid'
+        f' ({measure_band_centroid(body_e, 1600.0, 2600.0):.0f} Hz)',
+        measure_band_centroid(body_e,
+                               1600.0, 2600.0),
+        1800.0, 2400.0,
         unit=' Hz', fmt='.1f')
     d2 = p1 and p2 and p3
     all_pass &= d2
@@ -276,8 +290,10 @@ def run_diagnostics():
     print()
     print("  Long close back rounded.")
     print("  Duration target: 120–200 ms")
-    print("  F1 centroid (100–500 Hz): 180–360 Hz")
-    print("  F2 centroid (400–1000 Hz): 450–800 Hz")
+    print("  F1 centroid (100–500 Hz):"
+          " 180–360 Hz")
+    print("  F2 centroid (400–1000 Hz):"
+          " 450–800 Hz")
     print()
     uu_seg  = synth_UU_long(
         UU_F, N_F, 145.0, 1.0)
@@ -285,10 +301,6 @@ def run_diagnostics():
     n_uu    = len(uu_seg)
     body_uu = uu_seg[int(0.10*n_uu):
                      n_uu-int(0.10*n_uu)]
-    cent_uu1 = measure_band_centroid(
-        body_uu, 100.0, 500.0)
-    cent_uu2 = measure_band_centroid(
-        body_uu, 400.0, 1000.0)
     p1 = check('voicing',
                measure_voicing(body_uu),
                0.65, 1.0)
@@ -297,12 +309,18 @@ def run_diagnostics():
         dur_uu, 120.0, 200.0,
         unit=' ms', fmt='.1f')
     p3 = check(
-        f'F1 centroid ({cent_uu1:.0f} Hz)',
-        cent_uu1, 180.0, 360.0,
+        f'F1 centroid'
+        f' ({measure_band_centroid(body_uu, 100.0, 500.0):.0f} Hz)',
+        measure_band_centroid(body_uu,
+                               100.0, 500.0),
+        180.0, 360.0,
         unit=' Hz', fmt='.1f')
     p4 = check(
-        f'F2 centroid ({cent_uu2:.0f} Hz)',
-        cent_uu2, 450.0, 800.0,
+        f'F2 centroid'
+        f' ({measure_band_centroid(body_uu, 400.0, 1000.0):.0f} Hz)',
+        measure_band_centroid(body_uu,
+                               400.0, 1000.0),
+        450.0, 800.0,
         unit=' Hz', fmt='.1f')
     d4 = p1 and p2 and p3 and p4
     all_pass &= d4
@@ -353,6 +371,8 @@ def run_diagnostics():
     print("─" * 60)
     print("DIAGNOSTIC 6 — O VOWEL [o]")
     print()
+    print("  Short vowel — voicing floor 0.50.")
+    print()
     o_seg  = synth_O_short(N_F, N_F,
                             110.0, 1.0)
     n_o    = len(o_seg)
@@ -360,7 +380,7 @@ def run_diagnostics():
                    n_o-int(0.12*n_o)]
     p1 = check('voicing',
                measure_voicing(body_o),
-               0.65, 1.0)
+               0.50, 1.0)   # FIX: was 0.65
     p2 = check(
         f'F1 centroid'
         f' ({measure_band_centroid(body_o, 200.0, 800.0):.0f} Hz)',
@@ -465,10 +485,10 @@ def run_diagnostics():
         print(f"  afplay output_play/{fn}")
     print()
     print("  LISTEN FOR:")
-    print("  J: voiced glide — like 'y' in yes")
+    print("  J: voiced glide — 'y' in yes")
     print("  F: voiceless hiss, higher than Þ")
-    print("  Ū: long dark rounded vowel")
-    print("    noticeably longer than short [u]")
+    print("  Ū: long dark rounded — longer"
+          " than any previous vowel")
     print("  Full: J·E·F·Ū·N·O·N")
     print("  Seven events")
     print()
@@ -478,14 +498,14 @@ def run_diagnostics():
     print("SUMMARY")
     print()
     rows = [
-        ("D1 J glide",    d1),
-        ("D2 E vowel",    d2),
-        ("D3 F fricative",d3),
+        ("D1 J glide",     d1),
+        ("D2 E vowel",     d2),
+        ("D3 F fricative", d3),
         ("D4 Ū long vowel",d4),
-        ("D5 N1 nasal",   d5),
-        ("D6 O vowel",    d6),
-        ("D7 N2 nasal",   d7),
-        ("D8 Full word",  d8),
+        ("D5 N1 nasal",    d5),
+        ("D6 O vowel",     d6),
+        ("D7 N2 nasal",    d7),
+        ("D8 Full word",   d8),
     ]
     for lbl, ok_ in rows:
         sym = "✓ PASS" if ok_ else "✗ FAIL"
