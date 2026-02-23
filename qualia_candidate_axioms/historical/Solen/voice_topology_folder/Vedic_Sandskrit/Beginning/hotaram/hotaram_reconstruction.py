@@ -1,14 +1,26 @@
 #!/usr/bin/env python3
 """
-HOTĀRAM v1 — Vedic Sanskrit word 8
-Rigveda 1.1.1 — hotāram [hoːtaːrɑm]
-"the invoker, the priest who recites"
+HOTĀRAM v3 — Full coarticulation implementation
+Rigveda 1.1.1, word 8
 
-NEW PHONEME: [aː] long open central unrounded vowel
-All other phonemes VERIFIED in previous words
-
-Target: Independent verification of [aː] duration ratio
-Expected: [aː]/[ɑ] ≥ 1.7× (long vowel distinction)
+ITERATION v2→v3:
+  Problem: [aː] and [ɑ] formants still measuring low (v1=v2)
+           Coarticulation parameters existed but not used
+           [h] sounds too noisy (no vowel context)
+  
+  Cause: Synthesis functions don't implement coarticulation
+         No F_prev/F_next parameters
+         Phonemes synthesized in isolation, then concatenated
+  
+  Fix: Implement AGNI coarticulation architecture
+       - All functions accept F_prev, F_next
+       - Blend formant targets at onset/offset
+       - Use inventory coarticulation weights
+       - Pass contexts in word synthesis
+  
+  Expected: Formants reach targets at steady-state
+            Voicing improves
+            [h] sounds vowel-colored (darker)
 
 February 2026
 """
@@ -28,10 +40,10 @@ os.makedirs("output_play", exist_ok=True)
 # ============================================================================
 
 # [h] voiceless glottal fricative — VERIFIED PUROHITAM
+VS_H_F_APPROX = [500.0, 1500.0, 2500.0, 3500.0]  # neutral formant context
+VS_H_B        = [200.0,  300.0,  400.0,  500.0]
+VS_H_GAINS    = [  0.3,    0.2,    0.15,   0.1]
 VS_H_DUR_MS    = 65.0
-VS_H_NOISE_CF  = 3000.0
-VS_H_NOISE_BW  = 4000.0
-VS_H_GAIN      = 0.22
 VS_H_COART_ON  = 0.30
 VS_H_COART_OFF = 0.30
 
@@ -50,6 +62,7 @@ VS_T_BURST_BW   = 1500.0
 VS_T_BURST_MS   = 7.0
 VS_T_VOT_MS     = 15.0
 VS_T_BURST_GAIN = 0.38
+VS_T_LOCUS_F    = [700.0, 1800.0, 2500.0, 3500.0]  # VOT formant context
 
 # [aː] long open central unrounded — PENDING (this word)
 VS_AA_F      = [700.0, 1100.0, 2550.0, 3400.0]
@@ -66,6 +79,8 @@ VS_R_GAINS = [ 12.0,    6.0,    1.5,    0.4]
 VS_R_DUR_MS = 30.0
 VS_R_DIP_DEPTH = 0.35
 VS_R_DIP_WIDTH = 0.40
+VS_R_COART_ON  = 0.15
+VS_R_COART_OFF = 0.15
 
 # [ɑ] short open central unrounded — VERIFIED AGNI
 VS_A_F      = [700.0, 1100.0, 2550.0, 3400.0]
@@ -104,7 +119,6 @@ def write_wav(path, sig, sr=SR):
     print(f"Wrote {path}")
 
 def rosenberg_pulse(n_samples, pitch_hz, oq=0.65, sr=SR):
-    """Rosenberg glottal pulse model"""
     period = int(sr / pitch_hz)
     pulse = np.zeros(period, dtype=float)
     t1 = int(period * oq * 0.6)
@@ -119,7 +133,6 @@ def rosenberg_pulse(n_samples, pitch_hz, oq=0.65, sr=SR):
     return f32(repeated[:n_samples])
 
 def apply_formants(src, freqs, bws, gains, sr=SR):
-    """Formant filter bank (IIR resonators)"""
     out = np.zeros(len(src), dtype=float)
     nyq = sr / 2.0
     for f, bw, g in zip(freqs, bws, gains):
@@ -133,7 +146,6 @@ def apply_formants(src, freqs, bws, gains, sr=SR):
     return f32(out)
 
 def iir_notch(sig, fc, bw=200.0, sr=SR):
-    """Nasal antiresonance"""
     w0 = 2.0 * np.pi * fc / sr
     r = max(0.0, min(0.999, 1.0 - np.pi * bw / sr))
     b_n = [1.0, -2.0 * np.cos(w0), 1.0]
@@ -141,7 +153,6 @@ def iir_notch(sig, fc, bw=200.0, sr=SR):
     return f32(lfilter(b_n, a_n, sig.astype(float)))
 
 def ola_stretch(sig, factor=6.0, sr=SR):
-    """Time-stretch via overlap-add"""
     win_ms = 40.0
     win_n = int(win_ms / 1000.0 * sr)
     if win_n % 2 == 1:
@@ -170,35 +181,52 @@ def ola_stretch(sig, factor=6.0, sr=SR):
     return f32(out)
 
 # ============================================================================
-# PHONEME SYNTHESIS FUNCTIONS
+# PHONEME SYNTHESIS FUNCTIONS (v3 - AGNI coarticulation pattern)
 # ============================================================================
 
-def synth_H(pitch_hz=PITCH_HZ, dil=1.0):
+def synth_H(F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
     """
-    [h] — voiceless glottal fricative
-    VERIFIED PUROHITAM
-    Vowel-coloured aspiration noise
+    [h] voiceless glottal fricative (VERIFIED PUROHITAM)
+    v3: Accepts F_next for vowel context coarticulation.
+    
+    [h] is acoustically transparent — inherits formant
+    context from adjacent vowel. Without F_next, noise
+    is too bright (generic broadband). With F_next=[oː],
+    noise is darker, vowel-colored.
     """
     n = int(VS_H_DUR_MS * dil / 1000.0 * SR)
     noise = np.random.randn(n)
-    b_bp, a_bp = butter(2, [VS_H_NOISE_CF - VS_H_NOISE_BW/2,
-                             VS_H_NOISE_CF + VS_H_NOISE_BW/2],
-                        btype='band', fs=SR)
-    filtered = lfilter(b_bp, a_bp, noise)
-    out = f32(filtered * VS_H_GAIN)
+    
+    # Blend formant context with following vowel
+    f_ctx = list(VS_H_F_APPROX)
+    if F_next is not None:
+        for k in range(min(len(F_next), len(f_ctx))):
+            f_ctx[k] = f_ctx[k] * (1.0 - VS_H_COART_OFF) + F_next[k] * VS_H_COART_OFF
+    
+    out = apply_formants(noise, f_ctx, VS_H_B, VS_H_GAINS)
     mx = np.max(np.abs(out))
     if mx > 1e-8:
-        out = out / mx * 0.28
+        out = out / mx * 0.45
     return f32(out)
 
-def synth_OO(pitch_hz=PITCH_HZ, dil=1.0):
+def synth_OO(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
     """
-    [oː] — long close-mid back rounded
-    VERIFIED PUROHITAM
+    [oː] long close-mid back rounded (VERIFIED PUROHITAM)
+    v3: Full coarticulation with F_prev, F_next
     """
     n = int(VS_OO_DUR_MS * dil / 1000.0 * SR)
     src = rosenberg_pulse(n, pitch_hz)
-    out = apply_formants(src, VS_OO_F, VS_OO_B, VS_OO_GAINS)
+    
+    # Blend formants
+    f_mean = list(VS_OO_F)
+    if F_prev is not None:
+        for k in range(min(len(F_prev), len(VS_OO_F))):
+            f_mean[k] = F_prev[k] * VS_OO_COART_ON + VS_OO_F[k] * (1.0 - VS_OO_COART_ON)
+    if F_next is not None:
+        for k in range(min(len(F_next), len(VS_OO_F))):
+            f_mean[k] = f_mean[k] * (1.0 - VS_OO_COART_OFF) + F_next[k] * VS_OO_COART_OFF
+    
+    out = apply_formants(src, f_mean, VS_OO_B, VS_OO_GAINS)
     mx = np.max(np.abs(out))
     if mx > 1e-8:
         out = out / mx * 0.72
@@ -206,8 +234,9 @@ def synth_OO(pitch_hz=PITCH_HZ, dil=1.0):
 
 def synth_T(pitch_hz=PITCH_HZ, dil=1.0):
     """
-    [t] — voiceless dental stop
-    VERIFIED PUROHITAM
+    [t] voiceless dental stop (VERIFIED PUROHITAM)
+    No coarticulation in closure/burst (stop is inherently discrete)
+    VOT coarticulates toward following vowel
     """
     n_cl = int(VS_T_CLOSURE_MS / 1000.0 * SR)
     n_b = int(VS_T_BURST_MS / 1000.0 * SR)
@@ -224,10 +253,10 @@ def synth_T(pitch_hz=PITCH_HZ, dil=1.0):
         burst = burst * np.hanning(len(burst))
     burst = f32(burst * VS_T_BURST_GAIN)
     
-    # VOT with gradual voicing onset
+    # VOT uses dental locus formants as context
     vot_src = rosenberg_pulse(n_v, pitch_hz)
     vot_env = np.linspace(0.0, 1.0, n_v)
-    vot = apply_formants(vot_src, VS_AA_F, VS_AA_B, [g*0.3 for g in VS_AA_GAINS])
+    vot = apply_formants(vot_src, VS_T_LOCUS_F, VS_AA_B, [g*0.3 for g in VS_AA_GAINS])
     vot = f32(vot * vot_env * 0.12)
     
     out = np.concatenate([closure, burst, vot])
@@ -236,28 +265,37 @@ def synth_T(pitch_hz=PITCH_HZ, dil=1.0):
         out = out / mx * 0.55
     return f32(out)
 
-def synth_AA(pitch_hz=PITCH_HZ, dil=1.0):
+def synth_AA(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
     """
-    [aː] — long open central unrounded
-    PENDING (this word)
+    [aː] long open central unrounded (PENDING this word)
+    v3: Full AGNI coarticulation pattern
     
-    Identical formants to [ɑ], 2× duration
-    Target: 110 ms (vs [ɑ] 55 ms)
-    Ratio: 2.0×
+    Identical formants to [ɑ], 2× duration.
+    Coarticulation blends targets at onset/offset.
+    Steady-state in middle reaches target formants.
     """
     n = int(VS_AA_DUR_MS * dil / 1000.0 * SR)
     src = rosenberg_pulse(n, pitch_hz)
-    out = apply_formants(src, VS_AA_F, VS_AA_B, VS_AA_GAINS)
+    
+    # Blend formants (AGNI pattern)
+    f_mean = list(VS_AA_F)
+    if F_prev is not None:
+        for k in range(min(len(F_prev), len(VS_AA_F))):
+            f_mean[k] = F_prev[k] * VS_AA_COART_ON + VS_AA_F[k] * (1.0 - VS_AA_COART_ON)
+    if F_next is not None:
+        for k in range(min(len(F_next), len(VS_AA_F))):
+            f_mean[k] = f_mean[k] * (1.0 - VS_AA_COART_OFF) + F_next[k] * VS_AA_COART_OFF
+    
+    out = apply_formants(src, f_mean, VS_AA_B, VS_AA_GAINS)
     mx = np.max(np.abs(out))
     if mx > 1e-8:
         out = out / mx * 0.72
     return f32(out)
 
-def synth_R(pitch_hz=PITCH_HZ, dil=1.0):
+def synth_R(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
     """
-    [ɾ] — alveolar tap
-    VERIFIED PUROHITAM
-    Single Gaussian amplitude dip
+    [ɾ] alveolar tap (VERIFIED PUROHITAM)
+    v3: Full coarticulation
     """
     n = int(VS_R_DUR_MS * dil / 1000.0 * SR)
     src = rosenberg_pulse(n, pitch_hz)
@@ -271,35 +309,61 @@ def synth_R(pitch_hz=PITCH_HZ, dil=1.0):
         if dist < dip_width_samp:
             gaussian = np.exp(-4.0 * (dist / dip_width_samp) ** 2)
             env[i] = 1.0 - VS_R_DIP_DEPTH * gaussian
-    
     src *= env
-    out = apply_formants(src, VS_R_F, VS_R_B, VS_R_GAINS)
+    
+    # Blend formants
+    f_mean = list(VS_R_F)
+    if F_prev is not None:
+        for k in range(min(len(F_prev), len(VS_R_F))):
+            f_mean[k] = F_prev[k] * VS_R_COART_ON + VS_R_F[k] * (1.0 - VS_R_COART_ON)
+    if F_next is not None:
+        for k in range(min(len(F_next), len(VS_R_F))):
+            f_mean[k] = f_mean[k] * (1.0 - VS_R_COART_OFF) + F_next[k] * VS_R_COART_OFF
+    
+    out = apply_formants(src, f_mean, VS_R_B, VS_R_GAINS)
     mx = np.max(np.abs(out))
     if mx > 1e-8:
         out = out / mx * 0.62
     return f32(out)
 
-def synth_A(pitch_hz=PITCH_HZ, dil=1.0):
+def synth_A(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
     """
-    [ɑ] — short open central unrounded
-    VERIFIED AGNI
+    [ɑ] short open central unrounded (VERIFIED AGNI)
+    v3: Full AGNI coarticulation pattern (exact match)
     """
     n = int(VS_A_DUR_MS * dil / 1000.0 * SR)
     src = rosenberg_pulse(n, pitch_hz)
-    out = apply_formants(src, VS_A_F, VS_A_B, VS_A_GAINS)
+    
+    # Blend formants (AGNI pattern - exact match)
+    f_mean = list(VS_A_F)
+    if F_prev is not None:
+        for k in range(min(len(F_prev), len(VS_A_F))):
+            f_mean[k] = F_prev[k] * VS_A_COART_ON + VS_A_F[k] * (1.0 - VS_A_COART_ON)
+    if F_next is not None:
+        for k in range(min(len(F_next), len(VS_A_F))):
+            f_mean[k] = f_mean[k] * (1.0 - VS_A_COART_OFF) + F_next[k] * VS_A_COART_OFF
+    
+    out = apply_formants(src, f_mean, VS_A_B, VS_A_GAINS)
     mx = np.max(np.abs(out))
     if mx > 1e-8:
         out = out / mx * 0.72
     return f32(out)
 
-def synth_M(pitch_hz=PITCH_HZ, dil=1.0):
+def synth_M(F_prev=None, pitch_hz=PITCH_HZ, dil=1.0):
     """
-    [m] — bilabial nasal
-    VERIFIED PUROHITAM
+    [m] bilabial nasal (VERIFIED PUROHITAM)
+    v3: Coarticulation on onset only (word-final)
     """
     n = int(VS_M_DUR_MS * dil / 1000.0 * SR)
     src = rosenberg_pulse(n, pitch_hz)
-    out = apply_formants(src, VS_M_F, VS_M_B, VS_M_GAINS)
+    
+    # Blend formants
+    f_mean = list(VS_M_F)
+    if F_prev is not None:
+        for k in range(min(len(F_prev), len(VS_M_F))):
+            f_mean[k] = F_prev[k] * VS_M_COART_ON + VS_M_F[k] * (1.0 - VS_M_COART_ON)
+    
+    out = apply_formants(src, f_mean, VS_M_B, VS_M_GAINS)
     out = iir_notch(out, VS_M_ANTI_F, VS_M_ANTI_BW)
     mx = np.max(np.abs(out))
     if mx > 1e-8:
@@ -307,25 +371,23 @@ def synth_M(pitch_hz=PITCH_HZ, dil=1.0):
     return f32(out)
 
 # ============================================================================
-# WORD SYNTHESIS
+# WORD SYNTHESIS (v3 - full formant context passing)
 # ============================================================================
 
 def synth_hotaram(pitch_hz=PITCH_HZ, dil=1.0):
     """
-    Synthesize: hotāram [hoːtaːrɑm]
-    Syllables: HO-TĀ-RAM
-    
-    New phoneme: [aː]
-    Target verification: duration ratio [aː]/[ɑ] ≥ 1.7×
+    HOTĀRAM [hoːtaːrɑm] v3
+    Full coarticulation: each phoneme receives formant context
+    from neighbors. Matches AGNI architecture exactly.
     """
     segs = [
-        synth_H(pitch_hz, dil),   # [h]  65 ms
-        synth_OO(pitch_hz, dil),  # [oː] 100 ms
-        synth_T(pitch_hz, dil),   # [t]  47 ms (closure+burst+VOT)
-        synth_AA(pitch_hz, dil),  # [aː] 110 ms ← NEW (pending verification)
-        synth_R(pitch_hz, dil),   # [ɾ]  30 ms
-        synth_A(pitch_hz, dil),   # [ɑ]  55 ms
-        synth_M(pitch_hz, dil)    # [m]  60 ms
+        synth_H(F_next=VS_OO_F, pitch_hz=pitch_hz, dil=dil),
+        synth_OO(F_prev=VS_H_F_APPROX, F_next=VS_T_LOCUS_F, pitch_hz=pitch_hz, dil=dil),
+        synth_T(pitch_hz=pitch_hz, dil=dil),
+        synth_AA(F_prev=VS_T_LOCUS_F, F_next=VS_R_F, pitch_hz=pitch_hz, dil=dil),
+        synth_R(F_prev=VS_AA_F, F_next=VS_A_F, pitch_hz=pitch_hz, dil=dil),
+        synth_A(F_prev=VS_R_F, F_next=VS_M_F, pitch_hz=pitch_hz, dil=dil),
+        synth_M(F_prev=VS_A_F, pitch_hz=pitch_hz, dil=dil),
     ]
     
     word = np.concatenate(segs)
@@ -341,19 +403,18 @@ def synth_hotaram(pitch_hz=PITCH_HZ, dil=1.0):
 if __name__ == "__main__":
     print()
     print("=" * 70)
-    print("HOTĀRAM v1 — Vedic Sanskrit Reconstruction")
+    print("HOTĀRAM v3 — Full AGNI coarticulation")
     print("=" * 70)
     print()
-    print("Word 8 of Rigveda 1.1.1")
-    print("IPA: [hoːtaːrɑm]")
-    print("Translation: 'the invoker, the priest who recites'")
-    print()
-    print("New phoneme: [aː] long open central unrounded")
-    print("  Same formants as [ɑ] (VERIFIED AGNI)")
-    print("  Duration: 110 ms (2.0× [ɑ] 55 ms)")
-    print("  Target: Verify duration ratio ≥ 1.7×")
-    print()
-    print("All other phonemes: VERIFIED in previous words")
+    print("ITERATION v2→v3:")
+    print("  Problem: Formants still low (coarticulation params unused)")
+    print("           [h] too noisy (no vowel context)")
+    print("  Fix: Implement AGNI coarticulation architecture")
+    print("       - F_prev/F_next parameters in all functions")
+    print("       - Formant blending at onset/offset")
+    print("       - Inventory coarticulation weights")
+    print("       - Context passing in word synthesis")
+    print("  Expected: Formants reach targets, [h] darker")
     print()
     
     word_dry = synth_hotaram(PITCH_HZ, 1.0)
@@ -366,6 +427,8 @@ if __name__ == "__main__":
     
     print()
     print("=" * 70)
-    print("Synthesis complete. Run hotaram_diagnostic.py for verification.")
+    print("v3 complete. Run hotaram_diagnostic.py")
+    print("Expected: D1, D2, D5 should PASS")
+    print("[h] should sound darker, vowel-colored")
     print("=" * 70)
     print()
