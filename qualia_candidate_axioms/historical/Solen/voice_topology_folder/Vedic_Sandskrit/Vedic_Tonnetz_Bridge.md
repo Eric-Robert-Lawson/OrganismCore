@@ -101,18 +101,56 @@ DERIVATION 3 — February 22, 2026
                   ghost as ∇C made audible
   Documents:      topology_of_the_voice.md,
                   H_Ghost_Topology.md,
-                  Tonnetz_voice_topology_bridge.md,
-                  OE_phoneme_inventory.md
-                  (43 phonemes verified)
-  Status:         HWÆT diagnostic confirmed.
-                  OE inventory complete.
-                  Vedic extension in progress.
+                  Tonnetz_voice_topology_bridge.md
+  Status:         Vedic Sanskrit reconstruction
+                  in progress (25 phonemes verified)
 ```
+
+**Note on independence:**
+
+Derivation 1 (Śikṣā) and Derivation 2 (Euler)
+are **fully independent**:
+- Separated by 2,500 years
+- Different civilizations, methods, domains
+- No contact, no influence, no shared vocabulary
+- **This proves the structure is REAL, not cultural**
+
+Derivation 3 (this project) is **semi-independent**:
+- Studied Euler's Tonnetz (used as conceptual framework)
+- Derived vocal topology independently from physics
+- **Connected them** (realized they're the same structure)
+- Applied unified framework to Vedic Sanskrit
+- **Then discovered** the Śikṣā was mapping the same unified space
+
+**The methodological breakthrough:**
+
+The Tonnetz provided the KEY that unlocked the structure.
+
+Without the Tonnetz framework, we would have:
+- Derived vocal topology from physics (yes)
+- Read Śikṣā classifications (yes)
+- BUT: treated Śikṣā as phonetic taxonomy (not geometric structure)
+- Missed the coherence space framework
+- Not understood WHY the structure exists
+
+**With the Tonnetz framework, we recognized:**
+- The vocal tract is ALSO a coherence space
+- The Śikṣā classifications map to coherence distance
+- Udātta/anudātta/svarita are arc types
+- The five places are F2 locus hierarchy
+- All three describe the same mathematical object
+
+**The convergence:**
+
+Śikṣā + Euler: fully independent → **proves structure is real**
+
+This project: unified Tonnetz + vocal topology → **proves connection is real**
+
+Śikṣā verification: ancient map matches unified framework → **proves reconstruction is accurate**
 
 Three derivations.
 Three starting premises.
-Three civilisations.
-Three centuries.
+Three civilizations.
 One structure.
 
 ---
@@ -734,20 +772,19 @@ Euler derived the harmonic coherence space
 from ratio geometry.
 1739 CE.
 
-This project derived the vocal topology
-from acoustic physics.
+This project connected the Tonnetz to vocal topology.
+Then discovered the Śikṣā had mapped the unified result.
 February 2026.
 
-Three derivations.
-No common reference.
-No shared vocabulary.
-Same structure.
+**The historical independence (Śikṣā + Euler):**
+
+Two derivations, 2,500 years apart,
+no contact, no shared vocabulary,
+arrived at the same structure.
 
 The Vedic practitioners did not know
-about the Tonnetz.
-Euler did not know about formant phonetics.
-This project did not know about the
-Śikṣā when the vocal topology was derived.
+about harmonic ratio geometry.
+Euler did not know about Vedic phonetics.
 
 And yet:
   kaṇṭhya = velar = F2 ~2500 Hz
@@ -761,6 +798,31 @@ And yet:
   svarita = falling glide = ARC_WEIGHT
 
   sāman = harmonic progression = Tonnetz traversal
+
+**This proves the structure is REAL.**
+
+Not cultural. Not interpretive. Not framework-dependent.
+
+**The modern synthesis (this project):**
+
+We studied both Tonnetz and vocal physics.
+We connected them (recognized same structure).
+We applied the unified framework to Vedic.
+We found the Śikṣā was mapping the result.
+
+**This proves the connection is REAL.**
+
+The Tonnetz was the KEY that let us understand
+what the Śikṣā had mapped. Without the Tonnetz
+framework, we would not have recognized the Śikṣā
+as a coherence space map.
+
+**The verification:**
+
+25 phonemes verified.
+All show Śikṣā-physics convergence.
+
+**This proves the reconstruction is ACCURATE.**
 
 All three derivations found the same map.
 The map was always there.
@@ -836,7 +898,7 @@ Sanskrit stops have both voicing
 and aspiration.
 Aspiration adds a dimension to
 the coherence distance calculation.
-A voiced aspirated stop [g��] is
+A voiced aspirated stop [gʰ] is
 further from H than a voiced
 unaspirated stop [g] because
 the aspiration phase extends
@@ -867,29 +929,29 @@ This is unique to Sanskrit among
 all reconstruction targets.
 Use it.
 
-**5. The proof of concept is ṚG.**
+**5. The Tonnetz was the key.**
 
-Two phonemes: [ṛ] + [g].
-[ṛ]: the syllabic retroflex vowel.
-   The new room. The mūrdhanya vowel.
-   F1 ~420 Hz, F2 ~1300 Hz, F3 ~2200 Hz.
-   Sustained voicing, no AM modulation.
-   The first retroflex target.
-[g]:  already confirmed in OE inventory.
-   Direct transfer. Velar locus.
-When ṚG passes its diagnostic,
-the retroflex sector of the vocal
-topology is mapped for the first time.
-That is what ṚG means.
-Not just a proof of concept word.
-The opening of a new room
-in a space that has existed
-for as long as humans have spoken.
+The Tonnetz provided the conceptual
+framework that let us recognize:
+- The vocal tract as coherence space
+- H as origin (not arbitrary)
+- The ghost as ∇C made audible
+- Arc types in prosody
+- Why the Śikṣā structure makes sense
+
+Without the Tonnetz framework,
+we would have treated the Śikṣā
+as phonetic taxonomy, not geometric
+structure. The Tonnetz unlocked
+the understanding.
 
 ---
 
 *February 2026.*
 *Three derivations. One structure.*
 *The Vedic tradition kept the oldest door open.*
-*The physics explains why the door was always there.*
-*ṚG is the first step through it.*
+*Euler found it from harmonic ratios.*
+*We connected them and found the Śikṣā had already mapped the unified space.*
+*The convergence is not coincidence.*
+*The structure is real.*
+*The Tonnetz was the key that unlocked it.*
