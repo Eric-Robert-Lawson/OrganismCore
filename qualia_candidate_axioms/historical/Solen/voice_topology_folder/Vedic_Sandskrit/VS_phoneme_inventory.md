@@ -25,7 +25,8 @@ This is the master phoneme inventory for the Vedic Sanskrit (VS) reconstruction 
 
 Key architectural discoveries:
 - **v6 stop burst architecture** (spike + turbulence + boundary fix) — canonical for voiceless stops
-- **v7 stop burst architecture** (spike + turbulence, no boundary fix) — canonical for voiced stops
+- **v7 stop burst architecture** (spike + turbulence, no boundary fix) — canonical for voiced stops where murmur precedes burst (medial position)
+- **v13 crossfade cutback architecture** (prevoice + burst + closed→open crossfade) — canonical for word-initial voiced stops
 - **Antastha tap architecture** (single Gaussian amplitude dip)
 - **Nasal antiresonance model** (IIR notch at ~800 Hz)
 - **Retroflex F3 depression** (sublingual cavity acoustic marker)
@@ -33,11 +34,17 @@ Key architectural discoveries:
 
 **Housecleaning status (February 2026):**
 - ṚTVIJAM [ʈ]: v6 verified (canonical voiceless reference) ✓
-- ṚTVIJAM [ɟ]: v7 verified (canonical voiced reference) ✓
+- ṚTVIJAM [ɟ]: v7 verified (canonical voiced medial reference) ✓
 - PUROHITAM [p][t]: v2 updated to v6 ✓
 - YAJÑASYA [ɟ]: v3 updated to v7 ✓
+- DEVAM [d]: v13 verified (canonical voiced word-initial reference) ✓
 
-**All voiceless stops will eventually use v6 architecture. All voiced stops will eventually use v7 architecture.**
+**Architecture selection rule for voiced unaspirated stops:**
+- **Word-initial position:** use v13 crossfade cutback (VOT cue is primary percept)
+- **Word-medial position:** use v7 LP murmur (preceding vowel provides voicing context)
+- **Both positions:** burst uses v7 spike + turbulence at place-specific locus
+
+**All voiceless stops use v6 architecture. All voiced stops use v7 burst with v13 cutback where word-initial.**
 
 ---
 
@@ -238,39 +245,9 @@ if onset_n > 0:
 
 ---
 
-**v7 architecture (voiced stops) — CANONICAL:**
+**v7 architecture (voiced stops, MEDIAL position) — CANONICAL FOR BURST:**
 
-Same spike + turbulence method, **WITHOUT boundary fix** (pre-burst noise and onset ramp not needed).
-
-**Why no boundary fix for voiced stops:**
-- Voiced closure has murmur (low-frequency voicing)
-- Murmur provides smooth transition from closure to burst
-- No silence-to-burst discontinuity
-- No click artifact
-
-**Components:**
-```python
-# Voiced closure murmur
-src_closure = rosenberg_pulse(n_closure, pitch_hz)
-b_lp, a_lp = butter(2, 500.0 / (sr/2.0), btype='low')
-murmur = lfilter(b_lp, a_lp, src_closure) * MURMUR_GAIN
-
-# Spike + turbulence (same as v6)
-spike = np.zeros(n_burst, dtype=float)
-spike[0:3] = [1.0, 0.6, 0.3]
-turbulence_filt = apply_formants(turbulence, BURST_F, BURST_B, BURST_G)
-mix_env = np.exp(-t_b * BURST_DECAY)
-burst = spike * mix_env + turbulence_filt * (1.0 - mix_env) * 0.30
-
-# No pre-burst noise, no onset ramp
-```
-
-**Reference implementation:** [ɟ] ṚTVIJAM v7 (3223 Hz verified), YAJÑASYA v3 (3337 Hz verified)
-
-**Housecleaning status:**
-- ṚTVIJAM [ɟ]: v7 verified (canonical reference) ✓
-- YAJÑASYA [ɟ]: v3 updated to v7 ✓
-- Future: all voiced stops will use v7
+Same spike + turbulence method, **WITHOUT boundary fix** (pre-burst noise and onset ramp not needed). **v7 describes the BURST METHOD for voiced stops. For word-initial voiced stops, the surrounding architecture (prevoicing, cutback) uses v13 crossfade — see next section.**
 
 ---
 
@@ -289,6 +266,115 @@ burst = lfilter(b_bp, a_bp, noise) * GAIN
 - Temporal profile sounds "soft" compared to real stops
 
 **Status:** Superseded by v6/v7. Preserved in v1 files as reference.
+
+---
+
+
+### Voiced stop crossfade cutback architecture — v13 WORD-INITIAL
+
+**Discovered during DEVAM [d] iteration (13 synthesis versions, 5 diagnostic versions).**
+
+**The problem v13 solves:**
+
+v7 architecture assumes voiced murmur precedes the burst. In word-medial position (e.g. [ɟ] in YAJÑASYA), this is correct — the preceding vowel maintains voicing through closure, and LP-filtered murmur is audible because the ear has voicing context.
+
+In **word-initial position**, there is no preceding vowel. The LP murmur is the first sound. Through 13 iterations of DEVAM, four failure modes were discovered:
+
+```
+LP filter murmur:     heard as [t] (murmur inaudible, ratio 0.004)
+LP filter high gain:  heard as [n] (flat rolloff = nasal percept)
+Voice bar resonator:  heard as buzz/nasal (ambiguous)
+Time-varying filter:  heard as robotic click (IIR frame restarts)
+```
+
+**The solution:** The primary perceptual cue for word-initial voiced stops is **Voice Onset Time (VOT)**, not closure murmur.
+
+```
+[t] word-initial: silence → burst → aspiration gap → voice (long-lag VOT)
+[d] word-initial: brief prime → burst → voice starts IMMEDIATELY (short-lag VOT)
+```
+
+**v13 three-phase architecture:**
+
+**Phase 1: Prevoicing primer (15-20 ms)**
+
+Voice bar model — single formant resonator, NOT LP filter:
+
+```python
+# Voice bar: single narrow resonance at ~250 Hz
+# NOT butter LP — LP has flat rolloff = nasal percept
+voicebar_src = rosenberg_pulse(n_prevoice, pitch_hz)
+voicebar = apply_formants(voicebar_src,
+    [VOICEBAR_F],    # e.g. 250 Hz
+    [VOICEBAR_BW],   # e.g. 80 Hz (narrow)
+    [VOICEBAR_G])    # e.g. 12.0
+voicebar *= PREVOICE_PEAK  # 0.25 (quiet primer)
+```
+
+**Why voice bar, not LP:** LP filter on Rosenberg pulse produces flat spectral rolloff with multiple apparent resonances. The ear hears this as nasal. A single narrow resonator produces one sharp peak = "buzz behind closed door" = correct voiced closure percept.
+
+**Phase 2: Burst (7-10 ms)**
+
+Standard v7 spike + turbulence at place-specific locus. Lower amplitude than voiceless (0.15 vs 0.35) — the burst is not the primary cue.
+
+**Phase 3: Crossfade cutback (25-35 ms) — THE PRIMARY VOICED CUE**
+
+Two continuous IIR-filtered signals from the SAME glottal source, amplitude-crossfaded:
+
+```python
+# Generate one glottal source for entire cutback
+src_cutback = rosenberg_pulse(n_cutback, pitch_hz)
+
+# Signal A: closed-tract formants (low F1, place-specific)
+sig_closed = apply_formants(src_cutback, CLOSED_F, CLOSED_B, CLOSED_G)
+
+# Signal B: open-tract / following vowel formants
+sig_open = apply_formants(src_cutback, VOWEL_F, VOWEL_B, VOWEL_G)
+
+# Equal-power crossfade (no frame boundaries, no filter restarts)
+t_fade = np.linspace(0, np.pi/2, n_cutback)
+fade_out = np.cos(t_fade)  # 1 → 0 (closed fades out)
+fade_in  = np.sin(t_fade)  # 0 → 1 (open fades in)
+
+# CRITICAL: closed peak < open peak (closure ATTENUATES sound)
+cutback = (sig_closed * fade_out * CLOSED_PEAK +
+           sig_open * fade_in * OPEN_PEAK) * CUTBACK_PEAK
+```
+
+**Why crossfade, not time-varying filter:** Frame-by-frame IIR processing (apply_formants_tv) restarts filter state every 2ms frame. At 44100 Hz this creates a discontinuity every 88 samples — the ear hears robotic clicking. The crossfade model runs two continuous IIR chains with no state resets, producing smooth formant transition.
+
+**Why closed peak < open peak:** The closed vocal tract physically attenuates radiated sound. Equal-amplitude crossfade creates an energy bump at the midpoint. Setting closed peak (0.40) below open peak (0.65) produces the natural amplitude increase as the tongue releases and the tract opens.
+
+**Canonical parameters for [d] dantya:**
+
+```python
+VS_D_VOICEBAR_F    = 250.0     VS_D_VOICEBAR_BW  = 80.0
+VS_D_VOICEBAR_G    = 12.0      VS_D_PREVOICE_PEAK = 0.25
+VS_D_BURST_MS      = 8.0       VS_D_BURST_PEAK    = 0.15
+VS_D_BURST_F       = [1500.0, 3500.0, 5000.0, 6500.0]
+VS_D_BURST_G       = [4.0, 12.0, 5.0, 1.5]
+VS_D_BURST_DECAY   = 170.0
+VS_D_CUTBACK_MS    = 30.0
+VS_D_CLOSED_F      = [250.0, 800.0, 2200.0, 3200.0]
+VS_D_CLOSED_PEAK   = 0.40      VS_D_OPEN_PEAK     = 0.65
+VS_D_CUTBACK_PEAK  = 0.55
+```
+
+**Reference implementation:** [d] DEVAM v13 (3693 Hz burst, LF ratio 0.9934)
+
+**Applies to all word-initial voiced unaspirated stops:**
+
+| Phoneme | Place | What changes |
+|---|---|---|
+| [d] dantya | VERIFIED DEVAM | canonical reference |
+| [b] oṣṭhya | PENDING | burst locus ~1200 Hz |
+| [ɖ] mūrdhanya | PENDING | burst locus ~1200 Hz, F3 notch |
+| [g] kaṇṭhya | RE-VERIFY NEEDED | burst locus ~2600 Hz |
+| [ɟ] tālavya | RE-VERIFY NEEDED | burst locus ~3200 Hz |
+
+**What changes per phoneme:** voice bar F, burst formant locus, closed-tract formants, cutback target formants.
+
+**What does NOT change:** three-phase sequential architecture, crossfade model (not time-varying filter), closed peak < open peak principle, voice bar = single resonator (not LP).
 
 ---
 
@@ -2322,11 +2408,22 @@ Expected implementation:
 
 **Does NOT apply to voiced stops:** [g], [ɟ], [ɖ], [d], [b] and aspirated [gʰ], [ɟʰ], [ɖʰ], [dʰ], [bʰ] have murmur during closure — no silence-to-burst discontinuity, no boundary fix needed.
 
-**Housecleaning status:**
-- ṚTVIJAM [ʈ]: v6 verified (first implementation, canonical reference) ✓
-- PUROHITAM [p][t]: v2 updated to v6 ✓
-- YAJÑASYA [ɟ]: v3 updated to v7 ✓
-- Future: all voiceless stops will use v6, all voiced stops will use v7
+
+### Lesson 9: LP Filter = Nasal Percept (DEVAM)
+
+A low-pass filtered Rosenberg pulse is perceptually indistinguishable from a nasal. Both have diffuse low-frequency energy without a sharp resonance peak. The voice bar is a SINGLE NARROW RESONANCE — one sharp peak, nothing above. A nasal has additional formant structure at 800+ Hz. LP filter has flat rolloff = sounds like [n]. Single resonator has sharp peak = sounds like voiced closure buzz. **Never use LP filter for voiced stop murmur in word-initial position.** Use voice bar (single resonator at ~250 Hz, BW ~80 Hz).
+
+### Lesson 10: Word-Initial Voiced Stop Cue is VOT, Not Murmur (DEVAM)
+
+In word-initial position there is no preceding vowel to maintain voicing context through the closure. The ear relies on Voice Onset Time: [t] = burst → gap → voice (long-lag VOT). [d] = burst → voice starts immediately (short-lag VOT). The F1 cutback (formant sweep from closed-tract to open-tract values) is the acoustic correlate of short-lag VOT. This cue is more important than prevoicing for word-initial voiced stop identification.
+
+### Lesson 11: Time-Varying IIR Filters Create Frame Artifacts (DEVAM)
+
+Frame-by-frame IIR processing restarts filter state at each frame boundary. For a 2ms frame at 44100 Hz this creates a discontinuity every 88 samples. The ear hears these as robotic clicking/buzzing. Solution: generate two continuous signals with stable IIR state, crossfade between them. Never use apply_formants_tv (or equivalent frame-by-frame time-varying filter) for smooth formant transitions.
+
+### Lesson 12: Closed Tract Attenuates — Amplitude Must Reflect Physics (DEVAM)
+
+Equal-power crossfade between equal-amplitude signals creates an energy bump in the middle of the transition. The closed tract physically attenuates radiation. The closed-tract signal must be QUIETER than the open-tract signal (e.g. peak 0.40 vs 0.65). The crossfade then produces a natural amplitude increase as the tract opens. This principle applies to all stop-to-vowel transitions.
 
 ---
 
@@ -2354,6 +2451,19 @@ Expected implementation:
 - Future voiceless stops [k][c]: v6 when verified
 - Future voiced stops [b][ɖ]: v7 when verified
 
+
+### [g] kaṇṭhya — word-initial contexts
+**Reason:** Verified with v7 LP murmur. May need v13 crossfade cutback in word-initial position.
+**Priority:** MEDIUM. Current verification was medial context (ṚG, AGNI). Check if word-initial [g] sounds like [k].
+
+### [ɟ] tālavya — word-initial contexts
+**Reason:** Verified with v7 LP murmur (ṚTVIJAM, YAJÑASYA). Both medial contexts.
+**Priority:** MEDIUM. May need v13 crossfade when [ɟ] appears word-initially.
+
+### [d] dantya — VERIFIED v13 (DEVAM)
+**Status:** COMPLETE. Crossfade cutback architecture verified. LF 0.9934, burst 3693 Hz.
+**Perceptual:** Confirmed [d] by both listeners. Artifact eliminated at v13.
+
 ---
 
 ## OPEN INVENTORY POLICY
@@ -2372,6 +2482,19 @@ This inventory is open and growing. New phonemes added as they are verified thro
 5. Voiceless aspirated stops [kʰ] [cʰ] [ʈʰ] [tʰ] [pʰ]
 6. Remaining voiced stops [b] [ɖ] (v7 architecture)
 7. [g] and [d] housecleaning (v1 → v7)
+
+---
+
+### DEVAM [d] — v1→v13 crossfade cutback (February 2026)
+
+**Problem:** [d] sounded like [t] (v1-v4) then like [n] (v5) then robotic (v10-v11).
+**Root cause:** LP filter murmur inaudible or sounds nasal. Time-varying filter creates frame artifacts.
+**Solution:** v13 crossfade cutback architecture (voice bar prevoicing + v7 burst + closed→open crossfade).
+**Iterations:** 13 synthesis, 5 diagnostic. New diagnostic D1b (murmur/burst ratio) added at v3.
+**Result:** [d] confirmed perceptually. 14/14 diagnostic PASS.
+**Impact:** New canonical architecture for all word-initial voiced unaspirated stops.
+**Measurements updated:** LF ratio 0.9934, burst centroid 3693 Hz, distance to [t] 71 Hz.
+**RE-VERIFICATION QUEUE:** [g] and [ɟ] in word-initial contexts should be re-verified with v13.
 
 ---
 
