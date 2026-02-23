@@ -1094,8 +1094,8 @@ When a new phoneme is encountered:
 | Word | IPA | Status | New phonemes |
 |---|---|---|---|
 | ṚG | [ɻ̩g] | ✓ VERIFIED | [ɻ̩] |
-| AGNI | [ɑgni] | IN PROGRESS | [ɑ][n][i] |
-| ĪḶE | [iːɭe] | PENDING | [iː][ɭ] |
+| AGNI | [ɑgni] | ✓ VERIFIED | [ɑ][n][i] |
+| ĪḶE | [iːɭe] | IN PROGRESS | [iː][ɭ] |
 | PUROHITAM | [puroːhitɑm] | PENDING | [p][oː][h] |
 | YAJÑASYA | [jɑdʒɲɑsjɑ] | PENDING | [dʒ][ɲ] |
 | DEVAM | [devɑm] | PENDING | [dʰ]→[d][e] |
