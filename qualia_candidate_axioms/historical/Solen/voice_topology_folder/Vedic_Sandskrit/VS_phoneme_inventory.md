@@ -276,16 +276,19 @@ burst = spike * mix_env + turbulence_filt * (1.0 - mix_env) * 0.30
 
 **Canonical implementations:**
 - [ʈ] voiceless retroflex: v6 (ṚTVIJAM)
-- [ɟ] voiced palatal: v7 (ṚTVIJAM, YAJÑASYA)
+- [ɟ] voiced palatal: v7 (ṚTVIJAM)
 
 **Phonemes updated to v6/v7:**
-- [ʈ] VERIFIED ṚTVIJAM (v6)
-- [ɟ] VERIFIED ṚTVIJAM v7 (v7)
-- [ɟ] PENDING YAJÑASYA v3 update (v7)
+- [ʈ] VERIFIED ṚTVIJAM (v6) ✓
+- [ɟ] VERIFIED ṚTVIJAM v7 (v7) ✓
 
 **Phonemes needing update:**
 - [t] PUROHITAM (voiceless - needs v6)
 - [p] PUROHITAM (voiceless - needs v6)
+- [ɟ] YAJÑASYA (source file - needs v7)
+
+**Phonemes using old method (not urgent):**
+- [g], [d], [dʰ] (voiced - murmur masks boundary)
 
 ### Aspirated stop architecture
 Three-phase model for voiced aspirated stops:
@@ -532,7 +535,7 @@ Aspirated stops: murmur phase 40–60 ms (voiced)
 
 ```
 Place      Śikṣā      Burst CF  Status
-mūrdhanya  retroflex   1194 Hz  VERIFIED [ʈ] ṚTVIJAM  ← NEW
+mūrdhanya  retroflex   1194 Hz  VERIFIED [ʈ] ṚTVIJAM
 oṣṭhya     labial      1204 Hz  VERIFIED [p] PUROHITAM
 ─────────────────────────────────────────
 LOW-BURST REGION (800-1600 Hz)
@@ -590,7 +593,7 @@ STATUS:
 
 ---
 
-### VOWELS — SHORT
+### VOWELS — SHORT (4 VERIFIED)
 
 #### [a] — short open central unrounded — अ
 **Śikṣā:** kaṇṭhya (guttural)
@@ -615,6 +618,99 @@ Verified values:
 - Duration: 55 ms
 
 ---
+
+#### [i] — short close front unrounded — इ
+**Śikṣā:** tālavya (palatal)
+**Status:** VERIFIED — AGNI
+**Date verified:** February 2026
+**Diagnostic:** agni_diagnostic.py v1
+
+```
+VS_I_F      = [280.0, 2200.0, 2900.0, 3400.0]
+VS_I_B      = [ 80.0,  130.0,  180.0,  250.0]
+VS_I_GAINS  = [ 12.0,    8.0,    1.5,    0.5]
+VS_I_DUR_MS = 50.0
+VS_I_COART_ON  = 0.12
+VS_I_COART_OFF = 0.12
+```
+
+Verified values:
+- F2 centroid: 2124 Hz (target 2000–2400)
+- Voicing: confirmed >= 0.50
+- Duration: 50 ms
+
+---
+
+#### [u] — short close back rounded — उ
+**Śikṣā:** oṣṭhya (labial)
+**Status:** VERIFIED — PUROHITAM
+**Date verified:** February 2026
+**Diagnostic:** purohitam_diagnostic.py v1
+
+```
+VS_U_F      = [300.0,  750.0, 2300.0, 3100.0]
+VS_U_B      = [ 90.0,  120.0,  200.0,  260.0]
+VS_U_GAINS  = [ 14.0,    8.0,    1.5,    0.5]
+VS_U_DUR_MS = 50.0
+VS_U_COART_ON  = 0.12
+VS_U_COART_OFF = 0.12
+```
+
+Verified values:
+- F2 centroid: 742 Hz (target 600–950)
+- Voicing: 0.5035
+
+---
+
+#### [ɻ̩] — syllabic retroflex approximant — ऋ
+**Śikṣā:** mūrdhanya (retroflex/cerebral)
+**Status:** VERIFIED — ṚG
+**Date verified:** February 2026
+**Diagnostic:** rg_diagnostic.py v1
+
+```
+VS_RV_F      = [420.0, 1300.0, 2200.0, 3100.0]
+VS_RV_B      = [150.0,  200.0,  280.0,  300.0]
+VS_RV_GAINS  = [ 14.0,    7.0,    1.5,    0.4]
+VS_RV_DUR_MS      = 60.0
+VS_RV_COART_ON    = 0.15
+VS_RV_COART_OFF   = 0.15
+VS_RV_F3_NOTCH    = 2200.0
+VS_RV_F3_NOTCH_BW = 300.0
+```
+
+Verified values:
+- F1 centroid: 385 Hz (target 350–500)
+- F2 centroid: 1212 Hz (target 1100–1500)
+- F3 centroid: 2355 Hz (target < 2500)
+- F3 depression: 345 Hz (target >= 200)
+- Voicing: 0.6013 (target >= 0.50)
+- Duration: 60 ms
+
+---
+
+#### [ɻ̩ː] — long syllabic retroflex — ॠ
+**Śikṣā:** mūrdhanya
+**Status:** PENDING
+
+Same formant targets as [ɻ̩].
+Duration >= 1.7× [ɻ̩] (60 ms → ~102 ms).
+Rare in the Rigveda.
+
+---
+
+#### [ḷ] — syllabic lateral approximant — ऌ
+**Śikṣā:** dantya (dental)
+**Status:** PENDING
+
+Synthesised as vowel with lateral
+approximant formant targets.
+Very rare. Appears in specific
+grammatical forms only.
+
+---
+
+### VOWELS — LONG MONOPHTHONGS (4 VERIFIED)
 
 #### [aː] — long open central unrounded — आ
 **Śikṣā:** kaṇṭhya
@@ -650,28 +746,6 @@ Verified values:
 
 ---
 
-#### [i] — short close front unrounded — इ
-**Śikṣā:** tālavya (palatal)
-**Status:** VERIFIED — AGNI
-**Date verified:** February 2026
-**Diagnostic:** agni_diagnostic.py v1
-
-```
-VS_I_F      = [280.0, 2200.0, 2900.0, 3400.0]
-VS_I_B      = [ 80.0,  130.0,  180.0,  250.0]
-VS_I_GAINS  = [ 12.0,    8.0,    1.5,    0.5]
-VS_I_DUR_MS = 50.0
-VS_I_COART_ON  = 0.12
-VS_I_COART_OFF = 0.12
-```
-
-Verified values:
-- F2 centroid: 2124 Hz (target 2000–2400)
-- Voicing: confirmed >= 0.50
-- Duration: 50 ms
-
----
-
 #### [iː] — long close front unrounded — ई
 **Śikṣā:** tālavya
 **Status:** VERIFIED — ĪḶE
@@ -693,90 +767,6 @@ Verified values:
 - Duration: 100 ms
 
 ---
-
-#### [u] — short close back rounded — उ
-**Śikṣā:** oṣṭhya (labial)
-**Status:** VERIFIED — PUROHITAM
-**Date verified:** February 2026
-**Diagnostic:** purohitam_diagnostic.py v1
-
-```
-VS_U_F      = [300.0,  750.0, 2300.0, 3100.0]
-VS_U_B      = [ 90.0,  120.0,  200.0,  260.0]
-VS_U_GAINS  = [ 14.0,    8.0,    1.5,    0.5]
-VS_U_DUR_MS = 50.0
-VS_U_COART_ON  = 0.12
-VS_U_COART_OFF = 0.12
-```
-
-Verified values:
-- F2 centroid: 742 Hz (target 600–950)
-- Voicing: 0.5035
-
----
-
-#### [uː] — long close back rounded — ऊ
-**Śikṣā:** oṣṭhya
-**Status:** PENDING
-
-```
-VS_UU_F      = [300.0,  750.0, 2300.0, 3100.0]
-VS_UU_B      = [ 90.0,  120.0,  200.0,  260.0]
-VS_UU_GAINS  = [ 14.0,    8.0,    1.5,    0.5]
-VS_UU_DUR_MS = 100.0
-VS_UU_COART_ON  = 0.10
-VS_UU_COART_OFF = 0.10
-```
-
----
-
-#### [ɻ̩] — syllabic retroflex approximant — ऋ
-**Śikṣā:** mūrdhanya (retroflex/cerebral)
-**Status:** VERIFIED — ṚG
-**Date verified:** February 2026
-**Diagnostic:** rg_diagnostic.py v1
-
-```
-VS_RV_F      = [420.0, 1300.0, 2200.0, 3100.0]
-VS_RV_B      = [150.0,  200.0,  280.0,  300.0]
-VS_RV_GAINS  = [ 14.0,    7.0,    1.5,    0.4]
-VS_RV_DUR_MS      = 60.0
-VS_RV_COART_ON    = 0.15
-VS_RV_COART_OFF   = 0.15
-```
-
-Verified values:
-- F1 centroid: 385 Hz (target 350–500)
-- F2 centroid: 1212 Hz (target 1100–1500)
-- F3 centroid: 2355 Hz (target < 2500)
-- F3 depression: 345 Hz (target >= 200)
-- Voicing: 0.6013 (target >= 0.50)
-- Duration: 60 ms
-
----
-
-#### [ɻ̩ː] — long syllabic retroflex — ॠ
-**Śikṣā:** mūrdhanya
-**Status:** PENDING
-
-Same formant targets as [ɻ̩].
-Duration >= 1.7× [ɻ̩] (60 ms → ~102 ms).
-Rare in the Rigveda.
-
----
-
-#### [ḷ] — syllabic lateral approximant — ऌ
-**Śikṣā:** dantya (dental)
-**Status:** PENDING
-
-Synthesised as vowel with lateral
-approximant formant targets.
-Very rare. Appears in specific
-grammatical forms only.
-
----
-
-### VOWELS — LONG MONOPHTHONGS
 
 #### [eː] — long close-mid front — ए
 **Śikṣā:** tālavya
@@ -825,7 +815,22 @@ Sanskrit [o] is always long.
 
 ---
 
-### VOWELS — DIPHTHONGS
+#### [uː] — long close back rounded — ऊ
+**Śikṣā:** oṣṭhya
+**Status:** PENDING
+
+```
+VS_UU_F      = [300.0,  750.0, 2300.0, 3100.0]
+VS_UU_B      = [ 90.0,  120.0,  200.0,  260.0]
+VS_UU_GAINS  = [ 14.0,    8.0,    1.5,    0.5]
+VS_UU_DUR_MS = 100.0
+VS_UU_COART_ON  = 0.10
+VS_UU_COART_OFF = 0.10
+```
+
+---
+
+### VOWELS — DIPHTHONGS (0 VERIFIED)
 
 #### [ai] — diphthong — ऐ
 **Śikṣā:** tālavya
@@ -845,7 +850,7 @@ Duration: ~120 ms total.
 
 ---
 
-### CONSONANTS — STOPS
+### CONSONANTS — STOPS (7 VERIFIED)
 ### THE FIVE-ROW SYSTEM
 
 ```
@@ -859,7 +864,7 @@ Row 4: Voiced aspirated gʰ    ɟʰ    ɖʰ    dʰ    bʰ
 Row 5: Nasal            ŋ     ɲ     ɳ     n     m
 
 BURST CENTROID HIERARCHY (VS-internal verified):
-  mūrdhanya [ʈ]:  1194 Hz  (ṚTVIJAM) ← NEW
+  mūrdhanya [ʈ]:  1194 Hz  (ṚTVIJAM)
   oṣṭhya    [p]:  1204 Hz  (PUROHITAM)
   ──────────────────────────────────────
   LOW-BURST REGION (800-1600 Hz)
@@ -875,34 +880,21 @@ FIVE-PLACE HIERARCHY COMPLETE:
 mūrdhanya < oṣṭhya < kaṇṭhya < tālavya < dantya
 1194 < 1204 < 2594 < 3223 < 3764 Hz
 
-Dental column COMPLETE — all 5 rows verified:
-[t] [tʰ-PENDING] [d] [dʰ] [n]
+Dental column COMPLETE — all 5 rows:
+[t*] [tʰ-PENDING] [d] [dʰ] [n]
+* = needs v6 update
 
 Dental burst ordering:
 [dʰ] 3462 < [d] 3563 < [t] 3764 Hz
-Aspiration and voicing lower burst centroid.
 ```
 
 ---
 
-#### VELAR ROW — kaṇṭhya
+#### VELAR ROW — kaṇṭhya (1/5 VERIFIED)
 
 ##### [k] — voiceless velar stop — क
 **Śikṣā:** kaṇṭhya
 **Status:** PENDING (will use v6 architecture)
-
-```
-VS_K_CLOSURE_MS = 35.0
-VS_K_BURST_MS   = 10.0
-VS_K_VOT_MS     = 25.0
-
-# v6 spike + turbulence
-VS_K_BURST_F     = [500.0, 2500.0, 3000.0, 3500.0]
-VS_K_BURST_B     = [250.0,  350.0,  450.0,  500.0]
-VS_K_BURST_G     = [  8.0,   12.0,    3.0,    1.0]
-VS_K_BURST_DECAY = 150.0
-VS_K_BURST_GAIN  = 0.20
-```
 
 ---
 
@@ -937,9 +929,8 @@ Verified values:
 - Verified burst mean across ṚG + AGNI: 2594 Hz
 
 **Note:** Uses bandpass noise burst.
-Will update to v7 (spike + turbulence)
-when [g] reappears. Not urgent (voiced
-stop, murmur masks boundary).
+Will update to v7 when [g] reappears.
+Not urgent (voiced, murmur masks boundary).
 
 ---
 
@@ -947,26 +938,15 @@ stop, murmur masks boundary).
 **Śikṣā:** kaṇṭhya
 **Status:** PENDING
 
-Aspiration model applies (see [dʰ] canonical).
-
 ---
 
 ##### [ŋ] — voiced velar nasal — ङ
 **Śikṣā:** kaṇṭhya
 **Status:** PENDING
 
-```
-VS_NG_F       = [280.0, 2200.0, 2800.0, 3200.0]
-VS_NG_B       = [120.0,  300.0,  400.0,  400.0]
-VS_NG_GAINS   = [  8.0,    2.0,    0.4,    0.2]
-VS_NG_DUR_MS  = 60.0
-VS_NG_ANTI_F  = 2000.0
-VS_NG_ANTI_BW = 300.0
-```
-
 ---
 
-#### PALATAL ROW — tālavya
+#### PALATAL ROW — tālavya (2/5 VERIFIED)
 
 ##### [c] — voiceless palatal stop — च
 **Śikṣā:** tālavya
@@ -1022,8 +1002,6 @@ Verified values:
 **Śikṣā:** tālavya
 **Status:** PENDING
 
-Aspiration model applies (see [dʰ] canonical).
-
 ---
 
 ##### [ɲ] — voiced palatal nasal — ञ
@@ -1051,7 +1029,7 @@ Verified values:
 
 ---
 
-#### RETROFLEX ROW — mūrdhanya
+#### RETROFLEX ROW — mūrdhanya (1/5 VERIFIED)
 
 All retroflex phonemes share
 the mūrdhanya diagnostic signature:
@@ -1094,13 +1072,12 @@ Verified values:
 - Burst centroid: 1194 Hz (target 800–1600)
 - F3 centroid: 2276 Hz (target < 2500)
 - F3 depression: 424 Hz (target >= 200)
-- Perceptual: "rik-vee-jahm" (sounds like "k" to English speakers) ✓
+- Perceptual: "rik-vee-jahm" ✓
 
 **KEY INSIGHTS:**
-- Burst 1194 Hz < [p] 1204 Hz (original prediction [ʈ] ≤ [p] CORRECT)
+- Burst 1194 Hz < [p] 1204 Hz (original prediction CORRECT)
 - Both occupy LOW-BURST REGION (800-1600 Hz)
-- Distinction is F3 DEPRESSION (424 Hz), not burst centroid
-- Sublingual cavity places [ʈ] at or below [p]
+- Distinction is F3 DEPRESSION (424 Hz), not burst
 - Five-place burst hierarchy complete
 
 **CANONICAL v6 ARCHITECTURE:**
@@ -1124,28 +1101,15 @@ This is the reference implementation for all voiceless stops.
 **Śikṣā:** mūrdhanya
 **Status:** PENDING
 
-Aspiration model applies (see [dʰ] canonical).
-
 ---
 
 ##### [ɳ] — voiced retroflex nasal — ण
 **Śikṣā:** mūrdhanya
 **Status:** PENDING
 
-```
-VS_NN_F        = [250.0, 1400.0, 2200.0, 3000.0]
-VS_NN_B        = [100.0,  200.0,  280.0,  300.0]
-VS_NN_GAINS    = [  8.0,    4.0,    1.2,    0.4]
-VS_NN_DUR_MS   = 65.0
-VS_NN_ANTI_F   = 1000.0
-VS_NN_ANTI_BW  = 250.0
-VS_NN_F3_NOTCH    = 2200.0
-VS_NN_F3_NOTCH_BW = 300.0
-```
-
 ---
 
-#### DENTAL ROW — dantya
+#### DENTAL ROW — dantya (4/5 VERIFIED)
 
 ##### [t] — voiceless dental stop — त
 **Śikṣā:** dantya
@@ -1261,7 +1225,7 @@ Verified values:
 
 ---
 
-#### LABIAL ROW — oṣṭhya
+#### LABIAL ROW — oṣṭhya (2/5 VERIFIED)
 
 ##### [p] — voiceless bilabial stop — प
 **Śikṣā:** oṣṭhya
@@ -1303,11 +1267,9 @@ Verified values (old):
 **Śikṣā:** oṣṭhya
 **Status:** PENDING
 
-Aspiration model applies (see [dʰ] canonical).
-
 ---
 
-##### [m] — voiced bilabial nasal — म
+##### [m] ��� voiced bilabial nasal — म
 **Śikṣā:** oṣṭhya
 **Status:** VERIFIED — PUROHITAM
 **Date verified:** February 2026
@@ -1331,7 +1293,7 @@ Verified values:
 
 ---
 
-### CONSONANTS — SIBILANTS
+### CONSONANTS — SIBILANTS (1 VERIFIED)
 
 Three-way sibilant hierarchy — all VS-internal:
 
@@ -1367,31 +1329,15 @@ Verified values:
 **Śikṣā:** tālavya
 **Status:** PENDING
 
-```
-VS_SH_NOISE_CF = 4500.0
-VS_SH_NOISE_BW = 2500.0
-VS_SH_GAIN     = 0.22
-VS_SH_DUR_MS   = 80.0
-```
-
 ---
 
 #### [ʂ] — voiceless retroflex sibilant — ष
 **Śikṣā:** mūrdhanya
 **Status:** PENDING
 
-```
-VS_SS_NOISE_CF    = 2800.0
-VS_SS_NOISE_BW    = 2000.0
-VS_SS_GAIN        = 0.22
-VS_SS_DUR_MS      = 85.0
-VS_SS_F3_NOTCH    = 2200.0
-VS_SS_F3_NOTCH_BW = 300.0
-```
-
 ---
 
-### CONSONANTS — SONORANTS
+### CONSONANTS — SONORANTS (5 VERIFIED)
 
 #### [ɾ] — alveolar tap — र
 **Śikṣā:** antastha (semivowel)
@@ -1446,20 +1392,15 @@ Verified values:
 - F3 centroid: 2413 Hz (target 1800–2499)
 - F3 depression: 287 Hz (target >= 200)
 
+Two simultaneous constraints:
+  mūrdhanya: F3 depression 287 Hz
+  lateral: F2 reduced below [ɻ̩] F2
+
 ---
 
 #### [l] — voiced dental lateral — ल
 **Śikṣā:** dantya
 **Status:** PENDING
-
-```
-VS_L_F       = [350.0, 1100.0, 2700.0, 3300.0]
-VS_L_B       = [150.0,  300.0,  350.0,  380.0]
-VS_L_GAINS   = [ 10.0,    4.0,    1.5,    0.5]
-VS_L_DUR_MS  = 65.0
-VS_L_COART_ON  = 0.15
-VS_L_COART_OFF = 0.15
-```
 
 ---
 
@@ -1528,7 +1469,7 @@ Verified values:
 
 ---
 
-### SPECIAL PHONOLOGICAL ELEMENTS
+### SPECIAL PHONOLOGICAL ELEMENTS (0 VERIFIED)
 
 #### Anusvāra — nasalisation — ं
 **Status:** PENDING
@@ -1546,22 +1487,41 @@ Verified values:
 
 | Class | Śikṣā | Verified | Pending | Total |
 |---|---|---|---|---|
-| Vowels short | various | [a][i][u][ɻ̩] | [ḷ] | 4/5 |
-| Vowels long | various | [aː][iː][eː][oː] | [uː][ɻ̩ː] | 4/6 |
-| Diphthongs | various | — | [ai][au] | 0/2 |
-| Velar stops | kaṇṭhya | [g] | [k][kʰ][gʰ][ŋ] | 1/5 |
-| Palatal stops | tālavya | [ɟ][ɲ] | [c][cʰ][ɟʰ] | 2/5 |
-| Retroflex stops | mūrdhanya | **[ʈ]** | [ʈʰ][ɖ][ɖʰ][ɳ] | **1/5** |
-| Dental stops | dantya | [d][dʰ][n] [t*] | [tʰ] | 3+1/5 |
-| Labial stops | oṣṭhya | [m] [p*] | [pʰ][b][bʰ] | 1+1/5 |
-| Sibilants | various | [s] | [ɕ][ʂ] | 1/3 |
-| Sonorants | various | [ɾ][ɭ][j][v][h] | [l] | 5/6 |
-| Special | — | — | anusvāra/visarga | 0/2 |
-| **Total** | | **26** | **~24** | **~50** |
+| Vowels short | various | 4 | 1 | 5 |
+| Vowels long | various | 4 | 2 | 6 |
+| Diphthongs | various | 0 | 2 | 2 |
+| Velar stops | kaṇṭhya | 1 | 4 | 5 |
+| Palatal stops | tālavya | 2 | 3 | 5 |
+| Retroflex stops | mūrdhanya | 1 | 4 | 5 |
+| Dental stops | dantya | 4 | 1 | 5 |
+| Labial stops | oṣṭhya | 2 | 3 | 5 |
+| Sibilants | various | 1 | 2 | 3 |
+| Sonorants | various | 5 | 1 | 6 |
+| Special | — | 0 | 2 | 2 |
+| **Total** | | **24** | **25** | **49** |
 
-* = needs v6 update (PUROHITAM v2)
+### All 24 verified phonemes
 
-### All 26 verified phonemes
+```
+VOWELS (8):
+  [a] [aː] [i] [iː] [u] [eː] [oː] [ɻ̩]
+
+STOPS (7):
+  [g] [ɟ] [ʈ] [t] [p] [d] [dʰ]
+
+NASALS (3):
+  [n] [m] [ɲ]
+
+SONORANTS (5):
+  [ɾ] [ɭ] [j] [v] [h]
+
+SIBILANTS (1):
+  [s]
+
+TOTAL: 24 phonemes verified
+```
+
+### Verified phonemes by word
 
 ```
 Word            Phonemes verified
@@ -1569,13 +1529,13 @@ Word            Phonemes verified
 AGNI            [a]  [n]  [i]
 ĪḶE             [iː] [ɭ]  [eː]
 PUROHITAM       [p*] [u]  [ɾ]  [oː]  [h]  [t*]  [m]
-YAJÑASYA        [j]  [ɟ]  [ɲ]  [s]
+YAJÑASYA        [j]  [ɟ*] [ɲ]  [s]
 DEVAM           [d]  [v]
-RATNADHĀTAMAM   [dʰ]
+ṚTVIJAM         [ʈ]
 HOTĀRAM         [aː]
-ṚTVIJAM         [ʈ]  ← NEW
+RATNADHĀTAMAM   [dʰ]
 
-* = needs v2 update to v6
+* = needs architecture update (PUROHITAM v2, YAJÑASYA v3)
 ```
 
 ---
@@ -1609,7 +1569,7 @@ Vowel triangle — fully anchored:
 Retroflex sector (3 phonemes):
   [ɻ̩]:  F3 2355 Hz (depression 345 Hz)  VERIFIED ṚG
   [ɭ]:  F3 2413 Hz (depression 287 Hz)  VERIFIED ĪḶE
-  [ʈ]:  F3 2276 Hz (depression 424 Hz)  VERIFIED ṚTVIJAM ← NEW
+  [ʈ]:  F3 2276 Hz (depression 424 Hz)  VERIFIED ṚTVIJAM
 
 Long vowel pairs:
   [a]  55ms  / [aː]  110ms = 2.00× ✓ VERIFIED
@@ -1638,7 +1598,7 @@ Three-nasal ordering confirmed:
 
 ```
 Place      Śikṣā      Burst CF  Status
-mūrdhanya  retroflex   1194 Hz  VERIFIED [ʈ] ṚTVIJAM ← NEW
+mūrdhanya  retroflex   1194 Hz  VERIFIED [ʈ] ṚTVIJAM
 oṣṭhya     labial      1204 Hz  VERIFIED [p] PUROHITAM
 ───────────────────────────────────────────────────────
 LOW-BURST REGION (800-1600 Hz)
@@ -1671,15 +1631,15 @@ Phoneme  Architecture   Dip count  F2      Status
 [ɾ]      tap (dip)       2         1897 Hz  VERIFIED PUROHITAM
 [j]      approximant     0         2028 Hz  VERIFIED YAJÑASYA
 [v]      approximant     0         1396 Hz  VERIFIED DEVAM
+[ɭ]      retroflex lat.  0         1158 Hz  VERIFIED ĪḶE
 [l]      lateral        pending    ~1100 Hz  PENDING
-[ɭ]      retroflex lat. pending    1158 Hz  VERIFIED ĪḶE
 ```
 
 ---
 
 ## ASPIRATION MODEL — CANONICAL IMPLEMENTATION
 
-**[dʰ] RATNADHĀTAMAM is the reference.**
+**[dʰ] RATNADHĀTAMAM is the reference for all 10 aspirated stops.**
 
 ---
 
@@ -1701,17 +1661,6 @@ Phoneme  Architecture   Dip count  F2      Status
 
 ### Lesson 8: The Click Was At The Boundary (ṚTVIJAM)
 
-**6 iterations changed burst synthesis method.**
-**None fixed the click.**
-**The click was at the silence-to-burst BOUNDARY.**
-
-**The fix:**
-- Pre-burst noise (3ms, amplitude 0.002)
-- Onset ramp (1ms linear)
-- Keep spike + turbulence physics
-
-**Applies to ALL voiceless stops.**
-
 ---
 
 ## OPEN INVENTORY POLICY
@@ -1729,6 +1678,77 @@ No phoneme is VERIFIED until:
 
 ---
 
+## NEW PHONEME INTRODUCTION WORKFLOW
+
+When a new phoneme is encountered:
+
+```
+1. CLASSIFY
+   Assign Śikṣā class.
+   Map to articulatory position.
+   Predict formant targets from
+   Śikṣā classification and physics.
+   Check against existing VS hierarchy.
+
+2. ESTIMATE
+   Write initial parameter block
+   with PENDING status.
+   Add to this inventory.
+   
+   **VOICELESS STOPS:**
+   Use v6 architecture (spike + turbulence + boundary fix).
+   Do NOT use bandpass noise.
+   
+   **VOICED STOPS:**
+   Use v7 architecture (spike + turbulence, no boundary fix).
+
+3. SYNTHESISE
+   Implement in word reconstruction file.
+   Produce isolated output and
+   in-word context.
+
+4. DIAGNOSE
+   Write diagnostic for the new phoneme.
+   Include all standard checks.
+   Use calibrated measurement methodology:
+     — 40ms voicing frames
+     — 15% VOT edge trim
+     — Correct F2 measurement bands
+     — Post-formant H1-H2 thresholds
+     — Sanity checks on verified phonemes
+
+5. ITERATE
+   If diagnostic fails:
+     FIX THE RULER FIRST.
+     Check measurement bands.
+     Check frame sizes.
+     Check edge trim.
+     Verify diagnostic against verified phonemes.
+     THEN adjust synthesis if needed.
+
+6. CONFIRM
+   When diagnostic passes:
+     Run perceptual check.
+     Listen. Does it sound correct?
+     
+   **FOR STOPS:**
+   Check specifically for click artifacts.
+   If click present, boundary fix may need adjustment.
+
+7. VERIFY
+   When both diagnostic and ear pass:
+     Update status: PENDING → VERIFIED
+     Record verified parameter values.
+     Update inventory tables.
+
+8. DOCUMENT
+   Write evidence.md for the word.
+   The evidence file is the
+   permanent record of verification.
+```
+
+---
+
 ## LINE STATUS
 
 | Word | IPA | Status | Phonemes verified |
@@ -1737,21 +1757,23 @@ No phoneme is VERIFIED until:
 | AGNI | [ɑgni] | ✓ VERIFIED | [a] [n] [i] |
 | ĪḶE | [iːɭeː] | ✓ VERIFIED | [iː] [ɭ] [eː] |
 | PUROHITAM | [puroːhitɑm] | ✓ VERIFIED (needs v2) | [p*] [u] [ɾ] [oː] [h] [t*] [m] |
-| YAJÑASYA | [jɑɟɲɑsjɑ] | ✓ VERIFIED (needs v3) | [j] [ɟ] [ɲ] [s] |
+| YAJÑASYA | [jɑɟɲɑsjɑ] | ✓ VERIFIED (needs v3) | [j] [ɟ*] [ɲ] [s] |
 | DEVAM | [devɑm] | ✓ VERIFIED | [d] [v] |
-| **ṚTVIJAM** | **[ɻ̩tviɟɑm]** | **✓ VERIFIED** | **[ʈ] ← NEW** |
+| **ṚTVIJAM** | **[ɻ̩tviɟɑm]** | **✓ VERIFIED** | **[ʈ]** |
 | HOTĀRAM | [hoːtaːrɑm] | ✓ VERIFIED | [aː] |
 | RATNADHĀTAMAM | [rɑtnɑdʰaːtɑmɑm] | ✓ VERIFIED | [dʰ] |
 
-**Current status:** 26 phonemes verified
+**Current status:** 24 phonemes verified
 **Pending updates:** PUROHITAM v2, YAJÑASYA v3
 
 ---
 
 *February 2026.*
-*26 phonemes verified.*
+*24 phonemes verified.*
 *The retroflex stop [ʈ] complete.*
 *Five-place burst hierarchy complete.*
+*The vowel triangle anchored.*
+*The retroflex sector mapped (3 phonemes).*
 *The map is accurate.*
 *The territory matches.*
 *Proceed to housecleaning.*
