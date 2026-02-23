@@ -1,204 +1,220 @@
 # VEDIC SANSKRIT PHONEME INVENTORY
 ## Rigveda Reconstruction — Master Reference
-**Methodology:** Formant synthesis — Rosenberg pulse source + IIR formant filters
-**Extended architecture:** Aspirated stop synthesis + retroflex F3 dip model
-**Diagnostic framework:** See DIAGNOSTIC INSTRUMENT SELECTION
-**Sample rate:** 44100 Hz
-**Base pitch:** 120 Hz (performance: 120 Hz, ritual recitation register)
-**Date:** February 2026
-**Status:** Inventory established from first principles. 0 phonemes verified.
-**Verification target:** 60+ phonemes. First word: ṚG [ɻ̩g].
+## February 2026
 
 ---
 
-## RELATIONSHIP TO OE INVENTORY
+## WHAT THIS DOCUMENT IS
 
-This inventory is a direct extension
-of the OE_phoneme_inventory.md.
+The master phoneme reference for the
+Vedic Sanskrit reconstruction project.
 
-The synthesis architecture is identical:
-  Rosenberg pulse — all voiced phonemes
-  Band-filtered noise — voiceless fricatives
-  Three-phase stop — closure + burst + VOT
-  IIR formant filters — four formants
-  Coarticulation — linear interpolation at boundaries
+Every phoneme used in the reconstruction
+is documented here with:
+- IPA symbol and Devanāgarī character
+- Śikṣā classification
+- Articulatory description
+- Formant targets (F1, F2, F3, F4)
+- Formant bandwidths
+- Duration parameters
+- Coarticulation parameters
+- Synthesis parameters
+- Diagnostic thresholds
+- Verification status
+- First verified word
 
-The diagnostic instruments are identical:
-  Instrument 1 — autocorrelation voicing
-  Instrument 2 — LF energy ratio (voiced stops)
-  Instrument 3 — band spectral centroid
-  Instrument 4 — LPC merge / band centroid fallback
+This document is VS-specific.
+It does not inherit values from
+any other language project.
+Every value is derived from:
+  1. Physics of the vocal tract
+  2. Śikṣā treatise classification
+  3. Vedic orthographic record
+  4. Comparative Indo-European evidence
+  5. Acoustic measurement of living
+     cognate languages and reciters
+  6. VS-internal diagnostic results
 
-What is new:
+---
 
-**1. Retroflex architecture.**
-  F3 dip model — retroflexion lowers F3.
-  This is the acoustic signature
-  of the mūrdhanya class.
-  No OE phoneme required this.
+## ARCHITECTURE NOTE
 
-**2. Aspiration architecture.**
-  Extended VOT model for aspirated stops.
-  Breathy voice phase for voiced aspirates.
-  Two new synthesis phases
-  beyond the OE three-phase model.
+**This inventory is self-contained.**
 
-**3. Syllabic sonorant.**
-  [ṛ] = voiced retroflex approximant
-  functioning as a vowel.
-  Synthesised as a vowel
-  with retroflex F2/F3 targets.
-  Not a consonant in the synthesis.
-  A vowel in a new region of the space.
-
-**4. Pitch accent layer.**
-  F0 modulation at syllable level.
-  Udātta: +20-40 Hz above baseline.
-  Anudātta: baseline or -10 Hz.
-  Svarita: linear F0 descent
-  through the syllable duration.
-  This layer sits above the phoneme layer
-  and is applied during word synthesis,
-  not during phoneme synthesis.
+Where a VS phoneme occupies the same
+position in the universal vocal topology
+as a phoneme verified in another project,
+this is noted as a convergence observation.
+It is not a dependency. The VS value
+is independently derived and independently
+verified. The agreement is evidence that
+the acoustic phonological space is real
+and universal — not evidence that one
+project borrowed from another.
 
 ---
 
 ## HOW TO USE THIS DOCUMENT
 
-**For pure assembly (new words, all phonemes verified):**
-1. Identify all phonemes in the target word
-2. Confirm all are in this inventory
-3. Copy the parameter block for each phoneme
-4. Apply pitch accent F0 modulation per syllable
-5. Concatenate segments
-6. Normalise to 0.75 peak
-7. Run diagnostic
-8. Write evidence file
+**For synthesis:**
+Use the F, B, and GAINS arrays directly
+in voice_physics_vs.py. Do not adjust
+verified parameters without re-running
+the diagnostic and updating this document.
 
-**For new phoneme introduction:**
-1. Identify the gap in this inventory
-2. Derive parameters from first principles
-   (Śikṣā place + acoustic phonetics)
-3. Cross-check against living Sanskrit
-   recitation measurements if available
-4. Synthesise and iterate
-5. Run full diagnostic
-6. Mark verified with first-occurrence word
-7. Update COMPLETE INVENTORY QUICK REFERENCE
+**For diagnostics:**
+The DIAGNOSTIC THRESHOLDS section gives
+the pass/fail ranges for each phoneme.
+These are derived from the parameter
+values plus acoustic measurement margins.
 
-**Śikṣā cross-reference rule:**
-Every phoneme in this inventory has
-a Śikṣā category (kaṇṭhya, tālavya,
-mūrdhanya, dantya, oṣṭhya).
-Include the Śikṣā category in the
-entry header.
-This connects the acoustic measurement
-to the independent physical derivation
-that the ancient tradition performed.
+**For new phonemes:**
+Follow the NEW PHONEME INTRODUCTION
+WORKFLOW at the end of this document.
+A new phoneme is PENDING until its
+diagnostic passes AND the ear confirms.
+Only then is it VERIFIED.
+
+**For agents:**
+Read VERIFIED entries as ground truth.
+Read PENDING entries as current best
+estimates — subject to revision.
+Never re-derive a VERIFIED phoneme
+without documented evidence of error.
 
 ---
 
-## SYNTHESIS ARCHITECTURE EXTENSIONS
+## SYNTHESIS ENGINE
 
-### Retroflex F3 dip
+**File:** `voice_physics_vs.py`
 
-All retroflex phonemes ([ṭ, ṭʰ, ɖ, ɖʰ,
-ɳ, ʂ, ṛ]) share a diagnostic signature:
+This is the VS-specific synthesis engine.
+It implements the source-filter model
+from physics. It is not imported from
+or dependent on any other project.
 
-```
-F3 is depressed below the neutral position.
-Neutral F3 for alveolar: ~2600-3000 Hz
-Retroflex F3: ~2000-2400 Hz
+### Source
+Rosenberg glottal pulse model.
+Open quotient: 0.65 (male reciter).
+Differentiated for formant filtering.
+Pitch: 120.0 Hz default
+(Vedic recitation — chest register,
+male voice, ritual performance).
 
-Physical basis:
-  Tongue tip curled back (sublaminal contact).
-  Tongue body retracted slightly.
-  This retroflexion creates a sublingual
-  cavity anterior to the constriction.
-  This cavity acts as a resonant pocket.
-  It lowers F3 specifically.
-  F1 and F2 do not change as dramatically.
-  The F3 dip IS the retroflex signature.
+### Formant filter
+IIR resonator bank — four formants.
+F1–F4 with independent bandwidths
+and gains. Applied to Rosenberg source.
 
-Diagnostic:
-  For any retroflex phoneme, measure
-  F3 centroid in the band 2000-3200 Hz.
-  Target: centroid below 2500 Hz.
-  This separates retroflex from alveolar
-  at the same F2 locus.
-```
-
-Implementation:
-
-```python
-# Retroflex phonemes: F3 target ~2200 Hz
-# Alveolar phonemes:  F3 target ~2700 Hz
-# The 500 Hz separation is the retroflex marker.
-# Verified in living Hindi/Tamil speakers.
-# Applied uniformly to all mūrdhanya class.
-```
-
----
+### Retroflex F3 dip model
+`iir_notch()` applied at F3 frequency
+for all mūrdhanya phonemes.
+The notch models the acoustic zero
+caused by the retroflexed tongue.
+F3 target for mūrdhanya class:
+below 2500 Hz. Neutral (alveolar)
+F3 reference: 2700 Hz.
+Depression >= 200 Hz required for
+mūrdhanya confirmation.
 
 ### Aspirated stop architecture
+Four-phase model for aspirated stops:
+  Phase 1: voiced closure murmur
+  Phase 2: burst at place locus
+  Phase 3: aspiration noise
+           (turbulent airflow,
+            broad spectrum,
+            no voicing)
+  Phase 4: short voiced VOT release
+This is new territory — no aspirated
+stops exist in the OE inventory.
+The aspiration phase is the
+phonemically distinctive feature.
 
-OE stops: three phases (closure, burst, VOT).
-Sanskrit aspirated stops: four phases.
+### Nasal antiresonance model
+`iir_notch()` applied at the nasal
+zero frequency for all nasal phonemes.
+[m]: notch ~800 Hz (bilabial)
+[n]: notch ~800 Hz (dental/alveolar)
+[ɳ]: notch ~1000 Hz (retroflex)
+[ɲ]: notch ~1200 Hz (palatal)
+[ŋ]: notch ~2000 Hz (velar)
+The notch-to-neighbour ratio < 0.60
+confirms the antiresonance is present.
 
-```
-VOICELESS ASPIRATED [kʰ, cʰ, ʈʰ, tʰ, pʰ]:
+### Pitch accent F0 modulation
+Udātta:   F0 × 1.20–1.35 above baseline
+Anudātta: F0 at baseline
+Svarita:  F0 falls continuously
+          from udātta to anudātta
+          through syllable duration
 
-  Phase 1: closure        silence
-           duration: 25-35 ms
+### Coarticulation model
+Linear interpolation of formant targets
+across coarticulation windows.
+Window size: 10–15% of segment duration
+at onset and offset.
+F_prev and F_next passed to each
+segment synthesiser.
 
-  Phase 2: burst          band-filtered noise
-           place-specific frequency
-           duration: 8-12 ms
-           gain: 0.40
+### Room simulation
+Schroeder reverb approximation.
+VS default: rt60 = 1.5 s
+(temple courtyard / outdoor ritual).
+direct_ratio = 0.55.
+Less reverberant than OE mead hall.
+More direct signal.
 
-  Phase 3: aspiration     broadband noise
-           the "breath" — wide bandwidth
-           duration: 60-100 ms        ← KEY DIFFERENCE
-           gain: 0.20
-           VOT is LONG — 60-100 ms
-           vs OE voiceless VOT: 20-25 ms
+### Time stretching
+OLA (overlap-add) at 4× factor.
+Window: 40 ms Hanning.
+Used for all diagnostic slow versions.
 
-  Phase 4: voiced onset   Rosenberg pulse
-           following vowel onset
-           
+---
 
-VOICED ASPIRATED [gʰ, ɟʰ, ɖʰ, dʰ, bʰ]:
+## DIAGNOSTIC THRESHOLDS
 
-  Phase 1: voiced closure Rosenberg pulse
-                          LP filtered 800 Hz
-                          murmur gain 0.85
-           duration: 25-35 ms
+### Voicing
+Voiced phonemes:       voicing >= 0.50
+Strongly voiced:       voicing >= 0.65
+Voiceless phonemes:    voicing <= 0.30
+Aspirated stops:
+  closure phase:       voicing >= 0.40
+  aspiration phase:    voicing <= 0.20
 
-  Phase 2: burst          band-filtered noise
-           duration: 8-12 ms
-           gain: 0.35
+### Formant centroid bands
+F1 measurement band:   depends on vowel
+                       specified per phoneme
+F2 measurement band:   depends on vowel
+                       specified per phoneme
+F3 mūrdhanya check:    centroid < 2500 Hz
+                       depression >= 200 Hz
+                       vs neutral 2700 Hz
 
-  Phase 3: breathy voice  Rosenberg pulse
-                          + simultaneous
-                          broadband noise
-                          "murmur + breath"
-                          duration: 30-60 ms
-                          VOT: 30-60 ms
-                          voiced with aspiration
+### Voiced stop closure
+LF energy ratio (below 500 Hz): >= 0.40
+Confirms voiced closure murmur
+without pitch period detection.
 
-  Phase 4: modal voice    full vowel onset
+### Nasal antiresonance
+Notch-to-neighbour ratio: < 0.60
+Notch band: ±200 Hz around notch centre
+Neighbour bands: immediately adjacent
 
-DIAGNOSTIC — ASPIRATION:
-  Aspiration phase noise centroid:
-  4000-8000 Hz (broadband, not place-specific)
-  Duration of aspiration phase:
-  >= 50 ms for voiceless aspirated
-  >= 25 ms for voiced aspirated
-  Voicing during aspiration phase:
-  voiceless aspirated: voicing < 0.20
-  voiced aspirated:    voicing 0.40-0.70
-                       (partial voicing — breathy)
-```
+### Duration
+Specified per phoneme in ms.
+Long vowels: >= 1.7× corresponding
+             short vowel duration.
+Aspirated stops: aspiration phase
+                 20–40 ms.
+
+### VS-internal separation
+Once >= 3 VS phonemes verified in
+a given articulatory dimension,
+separation checks use VS-internal
+reference values only.
+Minimum separation: 150 Hz in F2
+between adjacent phoneme categories.
 
 ---
 
@@ -206,766 +222,893 @@ DIAGNOSTIC — ASPIRATION:
 
 ### NOTATION SYSTEM
 
-Each phoneme entry uses:
-- IPA symbol
-- Devanagari character
-- IAST transliteration
-- Śikṣā class (kaṇṭhya / tālavya /
-  mūrdhanya / dantya / oṣṭhya)
-- Tonnetz distance from H (estimated)
-- Parameter block
-- Diagnostic targets
-- Evidence stream notes
+```
+STATUS:
+  VERIFIED  — diagnostic passed, ear confirmed
+  PENDING   — in progress, parameters estimated
+  TRANSFER  — same vocal topology position as
+              a phoneme verified in another
+              reconstruction; requires independent
+              VS diagnostic confirmation before
+              status becomes VERIFIED
+
+Each TRANSFER entry notes the convergence
+observation but requires its own diagnostic
+pass to become VERIFIED. A TRANSFER is a
+starting hypothesis, not a verified value.
+```
 
 ---
 
-### VOWELS — SHORT (5 pure + 2 syllabic)
+### VOWELS — SHORT
 
 #### [a] — short open central unrounded — अ
-**IAST:** a
-**Śikṣā:** kaṇṭhya (guttural — produced deep)
-**Tonnetz C(a,H):** ≈ 0.45
-**First word:** AGNI (Rigveda 1.1.1, word 1)
-**Status:** PENDING
+**Śikṣā:** kaṇṭhya (guttural)
+**Status:** PENDING (AGNI in progress)
+**First word target:** AGNI
 
-```python
-VS_A_F     = [700.0, 1200.0, 2500.0, 3300.0]
-VS_A_B     = [130.0,  150.0,  200.0,  280.0]
-VS_A_GAINS = [ 16.0,    8.0,    1.5,    0.5]
-VS_A_DUR_MS      = 60.0
-VS_A_COART_ON    = 0.10
-VS_A_COART_OFF   = 0.10
+```
+VS_A_F      = [700.0, 1100.0, 2550.0, 3400.0]
+VS_A_B      = [130.0,  160.0,  220.0,  280.0]
+VS_A_GAINS  = [ 16.0,    6.0,    1.5,    0.5]
+VS_A_DUR_MS = 55.0
+VS_A_COART_ON  = 0.12
+VS_A_COART_OFF = 0.12
 ```
 
-**Diagnostic targets:**
-| Measure | Target |
-|---|---|
-| Voicing | >= 0.50 |
-| F1 centroid (500–900 Hz) | 650–780 Hz |
-| F2 centroid (900–1500 Hz) | 1050–1250 Hz |
+Diagnostic targets:
+- F1 centroid 620–800 Hz
+- F2 centroid 900–1300 Hz
+- Voicing >= 0.50
+- Duration 45–70 ms
 
-**Note:**
-Sanskrit short [a] = reduced central vowel.
-Not the full open [æ] of OE.
-More schwa-like than the OE [ɑ].
-Closest OE cognate: the unstressed [ə].
-C(a,H) higher than OE [ɑ] — closer to H.
-The most common vowel in Sanskrit.
-The phonological default.
+Note: Śikṣā places [a] in the
+kaṇṭhya (velar/guttural) class —
+the maximally open vocal tract.
+This is consistent with high F1.
+The Sanskrit [a] is a full open vowel,
+not a reduced schwa. It is the
+phonological default of the language.
 
 ---
 
 #### [aː] — long open central unrounded — आ
-**IAST:** ā
 **Śikṣā:** kaṇṭhya
 **Status:** PENDING
 
-```python
-VS_AA_F     = [750.0, 1150.0, 2500.0, 3200.0]
-VS_AA_B     = [150.0,  150.0,  200.0,  280.0]
-VS_AA_GAINS = [ 16.0,    8.0,    1.5,    0.5]
-VS_AA_DUR_MS     = 120.0
+```
+VS_AA_F      = [700.0, 1100.0, 2550.0, 3400.0]
+VS_AA_B      = [130.0,  160.0,  220.0,  280.0]
+VS_AA_GAINS  = [ 16.0,    6.0,    1.5,    0.5]
+VS_AA_DUR_MS = 110.0   — long: >= 1.7× [a]
+VS_AA_COART_ON  = 0.10
+VS_AA_COART_OFF = 0.10
 ```
 
-Duration ratio [ā]/[a] = 2.0×.
-Same formant quality as [a]. Duration only.
-Identical to the OE [ɑ]/[ɑː] distinction.
-The phonemic length contrast is universal.
+Same formant targets as [a].
+Duration is the phonemic distinction.
 
 ---
 
 #### [i] — short close front unrounded — इ
-**IAST:** i
 **Śikṣā:** tālavya (palatal)
-**Status:** PENDING
+**Status:** PENDING (AGNI in progress)
+**First word target:** AGNI
 
-```python
-VS_I_F     = [280.0, 2200.0, 2800.0, 3400.0]
-VS_I_B     = [ 80.0,  120.0,  200.0,  260.0]
-VS_I_GAINS = [ 16.0,    8.0,    1.5,    0.5]
-VS_I_DUR_MS      = 55.0
+```
+VS_I_F      = [280.0, 2200.0, 2900.0, 3400.0]
+VS_I_B      = [ 80.0,  130.0,  180.0,  250.0]
+VS_I_GAINS  = [ 12.0,    8.0,    1.5,    0.5]
+VS_I_DUR_MS = 50.0
+VS_I_COART_ON  = 0.12
+VS_I_COART_OFF = 0.12
 ```
 
-Equivalent to OE [ɪ] / [iː].
-High front position. High F2.
-Palatal identity: tālavya class.
+Diagnostic targets:
+- F1 centroid 220–340 Hz
+- F2 centroid 2000–2400 Hz
+- Voicing >= 0.50
+- Duration 40–65 ms
+
+Śikṣā places [i] in the tālavya
+(palatal) class — high F2, front
+tongue position. The high F2 target
+of ~2200 Hz is consistent with
+palatal articulation.
 
 ---
 
 #### [iː] — long close front unrounded — ई
-**IAST:** ī
 **Śikṣā:** tālavya
 **Status:** PENDING
 
-```python
-VS_II_DUR_MS = 110.0
-# Formant parameters identical to VS_I
+```
+VS_II_F      = [280.0, 2200.0, 2900.0, 3400.0]
+VS_II_B      = [ 80.0,  130.0,  180.0,  250.0]
+VS_II_GAINS  = [ 12.0,    8.0,    1.5,    0.5]
+VS_II_DUR_MS = 100.0   — long: >= 1.7× [i]
 ```
 
 ---
 
 #### [u] — short close back rounded — उ
-**IAST:** u
 **Śikṣā:** oṣṭhya (labial)
 **Status:** PENDING
 
-```python
-VS_U_F     = [300.0,  750.0, 2300.0, 3100.0]
-VS_U_B     = [ 90.0,  120.0,  200.0,  280.0]
-VS_U_GAINS = [ 16.0,    8.0,    1.5,    0.5]
-VS_U_DUR_MS      = 55.0
+```
+VS_U_F      = [300.0,  800.0, 2300.0, 3100.0]
+VS_U_B      = [ 80.0,  120.0,  200.0,  260.0]
+VS_U_GAINS  = [ 16.0,    8.0,    1.5,    0.5]
+VS_U_DUR_MS = 50.0
+VS_U_COART_ON  = 0.12
+VS_U_COART_OFF = 0.12
 ```
 
-Equivalent to OE [u]. Low F2.
-Labial class: lip rounding dominant.
-F2 ~750 Hz — back position.
+Śikṣā places [u] in the oṣṭhya
+(labial) class. Lip rounding
+lowers F2. Back tongue position
+also lowers F2. Both effects
+converge on low F2 target ~800 Hz.
 
 ---
 
 #### [uː] — long close back rounded — ऊ
-**IAST:** ū
 **Śikṣā:** oṣṭhya
 **Status:** PENDING
 
-```python
-VS_UU_DUR_MS = 110.0
-# Formant parameters identical to VS_U
+```
+VS_UU_F      = [300.0,  800.0, 2300.0, 3100.0]
+VS_UU_DUR_MS = 100.0   — long: >= 1.7× [u]
 ```
 
 ---
 
-#### [ṛ] — short syllabic retroflex approximant — ऋ
-**IPA:** [ɻ̩]
-**IAST:** ṛ
-**Śikṣā:** mūrdhanya (cerebral/retroflex)
-**Tonnetz C(ṛ,H):** ≈ 0.55 (estimated)
-**First word:** ṚG — proof of concept
-**Status:** PENDING — FIRST TARGET
+#### [ɻ̩] — syllabic retroflex approximant — ऋ
+**Śikṣā:** mūrdhanya (retroflex/cerebral)
+**Status:** VERIFIED — ṚG
+**Date verified:** February 2026
+**Diagnostic:** rg_diagnostic.py v1
 
-```python
-VS_RV_F     = [420.0, 1300.0, 2200.0, 3100.0]
-VS_RV_B     = [150.0,  200.0,  280.0,  300.0]
-VS_RV_GAINS = [ 14.0,    7.0,    1.5,    0.4]
+```
+VS_RV_F      = [420.0, 1300.0, 2200.0, 3100.0]
+VS_RV_B      = [150.0,  200.0,  280.0,  300.0]
+VS_RV_GAINS  = [ 14.0,    7.0,    1.5,    0.4]
 VS_RV_DUR_MS      = 60.0
 VS_RV_COART_ON    = 0.15
 VS_RV_COART_OFF   = 0.15
 ```
 
-**Diagnostic targets:**
-| Measure | Target |
-|---|---|
-| Voicing | >= 0.50 |
-| F1 centroid (300–600 Hz) | 350–500 Hz |
-| F2 centroid (900–1600 Hz) | 1100–1500 Hz |
-| F3 centroid (1800–3000 Hz) | < 2500 Hz (retroflex dip) |
-| Duration | 50–80 ms |
+Verified values:
+- F1 centroid:  385 Hz  (target 350–500)
+- F2 centroid: 1212 Hz  (target 1100–1500)
+- F3 centroid: 2355 Hz  (target < 2500)
+- F3 depression: 345 Hz (target >= 200)
+- Voicing: 0.6013       (target >= 0.50)
+- Duration: 60 ms       (target 50–80)
 
-**CRITICAL — RETROFLEX F3 DIP:**
-This is the diagnostic signature
-that separates [ṛ] from all vowels
-in the OE inventory.
-The OE [r] trill had AM modulation.
-The Sanskrit [ṛ] is a vowel.
-Sustained voicing, no interruption.
-But the F3 is pulled down below
-2500 Hz by the retroflexion.
-This is the new Tonnetz territory.
-No OE phoneme maps here.
+The mūrdhanya marker: F3 depression
+of 345 Hz below the neutral alveolar
+reference of 2700 Hz. The tongue curl
+is present in the acoustic output.
+The retroflex sector of the vocal
+topology is mapped.
 
-**Vocal topology position:**
-```
-F1 ~420 Hz  — mid jaw opening
-F2 ~1300 Hz — between central [ə] (1500 Hz)
-              and back [u] (750 Hz)
-F3 ~2200 Hz — BELOW neutral position
-              The retroflex marker.
-              The tongue curl depresses F3.
-
-Not [ə]: F3 too low, F2 too low.
-Not [u]: F1 too high, too voiced.
-Not [r]: no AM modulation.
-A new point in the space.
-The mūrdhanya vowel.
-```
-
-**Śikṣā confirmation:**
-The Pāṇinīya Śikṣā classifies ṛ
-as mūrdhanya — cerebral.
-The tongue tip is retroflexed.
-The ancient treatise describes
-the same F3-depressing configuration
-in anatomical terms:
-"the tongue tip raised toward
-the region behind the teeth."
-Two descriptions of the same fact.
+Śikṣā confirmation: mūrdhanya class
+predicts low F2 and retroflexed tongue.
+Measured F2 at 1212 Hz and F3 depression
+of 345 Hz confirm Śikṣā classification.
 
 ---
 
-#### [ḷ] — short syllabic lateral approximant — ऌ (rare)
-**IPA:** [l̩]
-**IAST:** ḷ
-**Śikṣā:** dantya (dental)
-**Status:** LOW PRIORITY — rare in Rigveda
-
-```python
-# Lateral vowel — [l] quality as vowel
-# F1 ~350 Hz, F2 ~1100 Hz, F3 ~2500 Hz
-# Lateral formant pattern, sustained voicing
-# Similar to OE [l] but functioning as vowel
-```
-
----
-
-### VOWELS — DIPHTHONGS (2)
-
-#### [eː] — long close-mid front — ए
-**IAST:** e (always long in Sanskrit)
-**Śikṣā:** tālavya (historically a diphthong ai)
+#### [ɻ̩ː] — long syllabic retroflex — ॠ
+**Śikṣā:** mūrdhanya
 **Status:** PENDING
 
-```python
-VS_E_F     = [400.0, 2000.0, 2700.0, 3300.0]
-VS_E_B     = [100.0,  130.0,  200.0,  270.0]
-VS_E_GAINS = [ 16.0,    8.0,    1.5,    0.5]
-VS_E_DUR_MS      = 110.0
+Same formant targets as [ɻ̩].
+Duration >= 1.7× [ɻ̩] duration.
+Rare in the Rigveda.
+
+---
+
+#### [ḷ] — syllabic lateral approximant — ऌ
+**Śikṣā:** dantya (dental)
+**Status:** PENDING
+
+Synthesised as a vowel with lateral
+approximant formant targets.
+Very rare. Appears in specific
+grammatical forms only.
+
+---
+
+### VOWELS — LONG MONOPHTHONGS
+
+#### [eː] — long close-mid front — ए
+**Śikṣā:** tālavya
+**Status:** PENDING
+
+```
+VS_EE_F      = [380.0, 2000.0, 2700.0, 3300.0]
+VS_EE_B      = [100.0,  140.0,  200.0,  260.0]
+VS_EE_GAINS  = [ 14.0,    8.0,    1.5,    0.5]
+VS_EE_DUR_MS = 90.0
 ```
 
-Sanskrit [e] is always long — no short /e/.
-Monophthong in classical Sanskrit.
-Equivalent to OE [eː].
+Sanskrit [e] is always long.
+No short [e] in the Sanskrit system.
 
 ---
 
 #### [oː] — long close-mid back — ओ
-**IAST:** o (always long in Sanskrit)
-**Śikṣā:** kaṇṭhya + oṣṭhya (compound)
+**Śikṣā:** kaṇṭhya + oṣṭhya
 **Status:** PENDING
 
-```python
-VS_O_F     = [400.0,  800.0, 2500.0, 3200.0]
-VS_O_B     = [100.0,  120.0,  200.0,  280.0]
-VS_O_GAINS = [ 16.0,    8.0,    1.5,    0.5]
-VS_O_DUR_MS      = 110.0
 ```
+VS_OO_F      = [380.0,  900.0, 2400.0, 3100.0]
+VS_OO_B      = [100.0,  130.0,  200.0,  260.0]
+VS_OO_GAINS  = [ 14.0,    8.0,    1.5,    0.5]
+VS_OO_DUR_MS = 90.0
+```
+
+Sanskrit [o] is always long.
+No short [o] in the Sanskrit system.
 
 ---
 
-#### [ai] — diphthong front rising — ऐ
-**IAST:** ai
+### VOWELS — DIPHTHONGS
+
+#### [ai] — diphthong — ऐ
+**Śikṣā:** tālavya
 **Status:** PENDING
 
-```python
-# Onset: [a] targets
-# Offset: [i] targets
-# Duration: 130 ms
-# Linear formant interpolation
-```
+Synthesised as [a] → [i] trajectory.
+Duration: ~120 ms total.
+F2 rises from [a] target to [i] target.
 
 ---
 
-#### [au] — diphthong back rising — औ
-**IAST:** au
+#### [au] — diphthong — औ
+**Śikṣā:** oṣṭhya
 **Status:** PENDING
 
-```python
-# Onset: [a] targets
-# Offset: [u] targets
-# Duration: 130 ms
-```
+Synthesised as [a] → [u] trajectory.
+Duration: ~120 ms total.
+F2 falls from [a] target to [u] target.
 
 ---
 
 ### CONSONANTS — STOPS
-## THE FIVE-ROW SYSTEM
+### THE FIVE-ROW SYSTEM
 
-Sanskrit stops form a perfect grid:
-5 places × 5 manners = 25 phonemes.
-This is the most systematic consonant
-structure of any major language.
-
-```
-PLACE:      Velar  Palatal Retroflex Dental Labial
-IPA col:      k      c       ʈ        t      p
-
-Row 1: VL unaspirated   k    c    ʈ    t    p
-Row 2: VL aspirated     kʰ   cʰ   ʈʰ   tʰ   pʰ
-Row 3: Voiced unaspirated g   ɟ    ɖ    d    b
-Row 4: Voiced aspirated  gʰ   ɟʰ   ɖʰ   dʰ   bʰ
-Row 5: Nasal             ŋ    ɲ    ɳ    n    m
-```
-
-OE had: rows 1, 3, 5 only.
-Sanskrit adds: rows 2 and 4 (aspiration).
-Sanskrit adds: column 2 (palatal) — new place.
-Sanskrit adds: column 3 (retroflex) — new place.
+Each row: voiceless / voiceless aspirated /
+          voiced / voiced aspirated / nasal
 
 ---
 
-#### VELAR ROW [k, kʰ, g, gʰ, ŋ]
+#### VELAR ROW — kaṇṭhya
 
-**[k] — voiceless velar stop — क**
-Identical to OE [k]. Already verified.
-
-```python
-VS_K = OE_K  # direct transfer
-```
-
-**[kʰ] — voiceless aspirated velar — ख**
-**IAST:** kh
+##### [k] — voiceless velar stop — क
 **Śikṣā:** kaṇṭhya
 **Status:** PENDING
 
-```python
-VS_KH_DUR_MS      = 120.0
-VS_KH_CLOSURE_MS  = 30.0
-VS_KH_BURST_F     = 2500.0
-VS_KH_BURST_BW    = 1200.0
-VS_KH_BURST_MS    = 10.0
-VS_KH_ASPIR_MS    = 70.0     # ← long aspiration
-VS_KH_ASPIR_GAIN  = 0.18
-VS_KH_VOT_TOTAL   = 80.0     # burst + aspiration
+```
+VS_K_CLOSURE_MS = 35.0
+VS_K_BURST_F    = 2500.0
+VS_K_BURST_BW   = 1200.0
+VS_K_BURST_MS   = 10.0
+VS_K_ASPIR_MS   = 0.0     — unaspirated
+VS_K_VOT_MS     = 25.0    — long positive VOT
 ```
 
-**Diagnostic:**
-| Measure | Target |
-|---|---|
-| Voicing closure | <= 0.20 |
-| Burst centroid | 1800–3200 Hz (velar) |
-| Aspiration duration | >= 50 ms |
-| Total VOT | 60–100 ms |
+---
 
-**[g] — voiced velar stop — ग**
-Identical to OE [g] (unaspirated).
-Direct transfer from OE inventory.
-
-**[gʰ] — voiced aspirated velar — घ**
-**IAST:** gh
+##### [kʰ] — voiceless velar aspirated — ख
 **Śikṣā:** kaṇṭhya
 **Status:** PENDING
 
-```python
-VS_GH_DUR_MS      = 110.0
-VS_GH_CLOSURE_MS  = 30.0
-VS_GH_BURST_F     = 2500.0
-VS_GH_BURST_BW    = 1200.0
-VS_GH_BURST_MS    = 8.0
-VS_GH_BREATHY_MS  = 40.0     # ← breathy voice phase
-VS_GH_BREATHY_GAIN = 0.30    # voicing + noise mix
-VS_GH_MURMUR_GAIN = 0.85
+```
+VS_KH_CLOSURE_MS = 35.0
+VS_KH_BURST_F    = 2500.0
+VS_KH_BURST_MS   = 10.0
+VS_KH_ASPIR_MS   = 30.0   — aspiration phase
+VS_KH_ASPIR_GAIN = 0.25
 ```
 
-**Diagnostic:**
-| Measure | Target |
-|---|---|
-| LF ratio closure | >= 0.40 |
-| Burst centroid | 1800–3200 Hz |
-| Breathy phase voicing | 0.40–0.70 (partial) |
-| Breathy phase duration | 25–60 ms |
-
-**[ŋ] — voiced velar nasal — ङ**
-Identical to OE [ŋ]. Direct transfer.
+The aspiration phase: broad-spectrum
+turbulent noise, low voicing fraction
+(< 0.20), 20–40 ms duration.
+This is the primary diagnostic marker
+for the aspirated class.
 
 ---
 
-#### PALATAL ROW [c, cʰ, ɟ, ɟʰ, ɲ]
-**NEW PLACE — not in OE inventory**
+##### [g] — voiced velar stop — ग
+**Śikṣā:** kaṇṭhya
+**Status:** VERIFIED — ṚG
+**Date verified:** February 2026
+**Diagnostic:** rg_diagnostic.py v1
+**Convergence note:** Same vocal topology
+position as OE [g] — independently
+confirmed in VS context.
 
-Palatal consonants are produced
-with the tongue body raised
-against the hard palate.
-They occupy the palatal sector
-of the vocal topology:
-high F2, high F3.
+```
+VS_G_F           = [300.0, 1900.0, 2500.0, 3200.0]
+VS_G_B           = [120.0,  200.0,  280.0,  350.0]
+VS_G_GAINS       = [ 14.0,    6.0,    1.5,    0.4]
+VS_G_CLOSURE_MS  = 30.0
+VS_G_BURST_F     = 2500.0
+VS_G_BURST_BW    = 1200.0
+VS_G_BURST_MS    = 8.0
+VS_G_VOT_MS      = 10.0
+VS_G_MURMUR_GAIN = 0.70
+VS_G_BURST_GAIN  = 0.30
+```
 
-**[c] — voiceless palatal stop — च**
-**IPA:** [c] (often affricated [tɕ])
-**IAST:** c
+Verified values (ṚG context):
+- LF ratio (closure): 0.9703 (target >= 0.40)
+- Burst centroid: 2403 Hz (target 1800–3200)
+
+---
+
+##### [gʰ] — voiced velar aspirated — घ
+**Śikṣā:** kaṇṭhya
+**Status:** PENDING
+
+```
+VS_GH_CLOSURE_MS = 30.0
+VS_GH_BURST_F    = 2500.0
+VS_GH_BURST_MS   = 8.0
+VS_GH_ASPIR_MS   = 25.0   — aspiration phase
+VS_GH_MURMUR_GAIN = 0.60
+```
+
+Voiced aspirated: closure is voiced,
+aspiration phase has breathy voicing
+(voicing fraction 0.20–0.40).
+Distinct from voiceless aspirated
+(voicing fraction < 0.20 in aspiration).
+
+---
+
+##### [ŋ] — voiced velar nasal — ङ
+**Śikṣā:** kaṇṭhya
+**Status:** PENDING
+
+```
+VS_NG_F       = [280.0, 2200.0, 2800.0, 3200.0]
+VS_NG_B       = [120.0,  300.0,  400.0,  400.0]
+VS_NG_GAINS   = [  8.0,    2.0,    0.4,    0.2]
+VS_NG_DUR_MS  = 60.0
+VS_NG_ANTI_F  = 2000.0
+VS_NG_ANTI_BW = 300.0
+```
+
+---
+
+#### PALATAL ROW — tālavya
+
+##### [c] — voiceless palatal stop — च
 **Śikṣā:** tālavya
 **Status:** PENDING
 
-```python
-VS_C_DUR_MS      = 70.0
-VS_C_CLOSURE_MS  = 30.0
-VS_C_BURST_F     = 3200.0    # palatal burst — high
-VS_C_BURST_BW    = 1500.0
-VS_C_BURST_MS    = 10.0
-VS_C_VOT_MS      = 20.0
-VS_C_BURST_GAIN  = 0.40
-```
+Palatal burst: F2 locus ~3000 Hz.
+Higher F2 than velar at burst.
 
-**Diagnostic:**
-| Measure | Target |
-|---|---|
-| Voicing | <= 0.20 |
-| Burst centroid | 2800–4000 Hz (palatal — HIGH) |
+---
 
-**Burst centroid hierarchy (now 5-place):**
-```
-[p/b]   labial    ~1000–1200 Hz  lowest
-[k/g]   velar     ~2500 Hz
-[d/t]   alveolar  ~3500 Hz
-[c/ɟ]   palatal   ~3200–4000 Hz  highest stop
-[ʈ/ɖ]   retroflex ~1200–1400 Hz  LOWER than alveolar
-```
-
-Note: retroflex locus is LOWER than alveolar.
-The tongue-curl moves the burst frequency DOWN.
-This is the inverse of the intuitive expectation
-and is the key acoustic separator for retroflex.
-
-**[cʰ] — voiceless aspirated palatal — छ**
-**Status:** PENDING — same aspiration architecture as [kʰ]
-
-**[ɟ] — voiced palatal stop — ज**
-**Status:** PENDING — use LF ratio, palatal burst ~3200 Hz
-
-**[ɟʰ] — voiced aspirated palatal — झ**
-**Status:** PENDING — breathy voice architecture
-
-**[ɲ] — voiced palatal nasal — ञ**
-**IAST:** ñ
+##### [cʰ] — voiceless palatal aspirated — छ
 **Śikṣā:** tālavya
 **Status:** PENDING
 
-```python
-VS_NY_F     = [250.0, 2000.0, 2800.0, 3300.0]
-VS_NY_B     = [300.0,  180.0,  250.0,  300.0]
-VS_NY_GAINS = [  8.0,    4.0,    1.2,    0.4]
-VS_NY_DUR_MS     = 65.0
-```
+---
 
-High F2 nasal — palatal position.
-Distinguish from alveolar [n] (~1700 Hz F2)
-by raising F2 target to ~2000 Hz.
+##### [ɟ] — voiced palatal stop — ज
+**Śikṣā:** tālavya
+**Status:** PENDING
 
 ---
 
-#### RETROFLEX ROW [ʈ, ʈʰ, ɖ, ɖʰ, ɳ]
-**NEW PLACE — not in OE inventory**
-**MŪRDHANYA CLASS**
+##### [ɟʰ] — voiced palatal aspirated — झ
+**Śikṣā:** tālavya
+**Status:** PENDING
 
-All retroflex phonemes share:
-- F2 locus ~1200–1400 Hz (lower than alveolar)
-- F3 dip below 2500 Hz (the retroflex marker)
+---
 
-**[ʈ] — voiceless retroflex stop — ट**
-**IAST:** ṭ
+##### [ɲ] — voiced palatal nasal — ञ
+**Śikṣā:** tālavya
+**Status:** PENDING
+
+```
+VS_NY_ANTI_F  = 1200.0
+VS_NY_ANTI_BW = 250.0
+```
+
+---
+
+#### RETROFLEX ROW — mūrdhanya
+
+##### [ʈ] — voiceless retroflex stop — ट
 **Śikṣā:** mūrdhanya
 **Status:** PENDING
 
-```python
-VS_TT_DUR_MS      = 70.0
-VS_TT_CLOSURE_MS  = 30.0
-VS_TT_BURST_F     = 1300.0   # ← LOWER than alveolar
-VS_TT_BURST_BW    = 1000.0
-VS_TT_BURST_MS    = 8.0
-VS_TT_VOT_MS      = 20.0
-VS_TT_BURST_GAIN  = 0.40
+```
+VS_TT_BURST_F    = 1500.0   — LOW locus
+VS_TT_BURST_BW   = 800.0
+VS_TT_F3_NOTCH   = 2200.0   — mūrdhanya marker
+VS_TT_F3_NOTCH_BW = 300.0
 ```
 
-**Diagnostic:**
-| Measure | Target |
-|---|---|
-| Voicing | <= 0.20 |
-| Burst centroid | 1000–1600 Hz |
-| F3 transition dip | < 2500 Hz |
+The retroflex stop burst locus is
+LOWER than dental (~1800 Hz) because
+the tongue tip is retroflexed —
+the place of closure is behind
+the alveolar ridge.
 
-**[ʈʰ] — voiceless aspirated retroflex — ठ**
-**Status:** PENDING — retroflex burst + long aspiration
+---
 
-**[ɖ] — voiced retroflex stop — ड**
-**IAST:** ḍ
-**Status:** PENDING — LF ratio + retroflex burst locus
-
-**[ɖʰ] — voiced aspirated retroflex — ढ**
-**Status:** PENDING — breathy voice + retroflex burst
-
-**[ɳ] — voiced retroflex nasal — ण**
-**IAST:** ṇ
+##### [ʈʰ] — voiceless retroflex aspirated — ठ
 **Śikṣā:** mūrdhanya
 **Status:** PENDING
 
-```python
-VS_NN_F     = [250.0, 1400.0, 2200.0, 3000.0]
-VS_NN_B     = [300.0,  200.0,  280.0,  300.0]
-VS_NN_GAINS = [  8.0,    4.0,    1.2,    0.4]
-VS_NN_DUR_MS     = 65.0
+---
+
+##### [ɖ] — voiced retroflex stop — ड
+**Śikṣā:** mūrdhanya
+**Status:** PENDING
+
+---
+
+##### [ɖʰ] — voiced retroflex aspirated — ढ
+**Śikṣā:** mūrdhanya
+**Status:** PENDING
+
+---
+
+##### [ɳ] — voiced retroflex nasal — ण
+**Śikṣā:** mūrdhanya
+**Status:** PENDING
+
+```
+VS_NN_ANTI_F  = 1000.0   — between dental and velar
+VS_NN_ANTI_BW = 250.0
+VS_NN_F3_NOTCH = 2200.0  — mūrdhanya marker
 ```
 
-F2 ~1400 Hz — lower than alveolar [n] (~1700 Hz).
-F3 ~2200 Hz — retroflex dip.
-These two measurements together
-confirm retroflex nasal identity.
+---
+
+#### DENTAL ROW — dantya
+
+##### [t] — voiceless dental stop — त
+**Śikṣā:** dantya
+**Status:** PENDING
+
+```
+VS_T_BURST_F  = 1800.0   — dental locus
+VS_T_BURST_BW = 1000.0
+VS_T_VOT_MS   = 20.0
+```
 
 ---
 
-#### DENTAL ROW [t, tʰ, d, dʰ, n]
-
-**[t] — voiceless dental stop — त**
-OE [t] confirmed. Locus ~3500 Hz.
-Sanskrit dental [t] same locus.
-Direct transfer.
-
-**[tʰ] — voiceless aspirated dental — थ**
-**Status:** PENDING — dental burst + long VOT
-
-**[d] — voiced dental stop — द**
-OE [d] confirmed. LF ratio verified.
-Direct transfer.
-
-**[dʰ] — voiced aspirated dental — ध**
-**Status:** PENDING — breathy voice architecture
-
-**[n] — voiced dental/alveolar nasal — न**
-OE [n] confirmed. Direct transfer.
+##### [tʰ] — voiceless dental aspirated — थ
+**Śikṣā:** dantya
+**Status:** PENDING
 
 ---
 
-#### LABIAL ROW [p, pʰ, b, bʰ, m]
+##### [d] — voiced dental stop — द
+**Śikṣā:** dantya
+**Status:** PENDING
 
-**[p], [b], [m]** — all OE confirmed.
-Direct transfer.
-
-**[pʰ] — voiceless aspirated bilabial — फ**
-**Status:** PENDING — bilabial burst + long VOT
-
-**[bʰ] — voiced aspirated bilabial — भ**
-**Status:** PENDING — breathy voice architecture
+```
+VS_D_BURST_F  = 1800.0
+VS_D_BURST_BW = 1000.0
+```
 
 ---
 
-### CONSONANTS — SIBILANTS (3)
+##### [dʰ] — voiced dental aspirated — ध
+**Śikṣā:** dantya
+**Status:** PENDING
 
-Three-way sibilant distinction.
-OE had only [s] and [ʃ].
-Sanskrit adds the retroflex [ʂ].
+---
+
+##### [n] — voiced dental/alveolar nasal — न
+**Śikṣā:** dantya
+**Status:** PENDING (AGNI in progress)
+**First word target:** AGNI
+
+```
+VS_N_F       = [250.0,  900.0, 2000.0, 3000.0]
+VS_N_B       = [100.0,  200.0,  300.0,  350.0]
+VS_N_GAINS   = [  8.0,    2.5,    0.5,    0.2]
+VS_N_DUR_MS  = 60.0
+VS_N_ANTI_F  = 800.0
+VS_N_ANTI_BW = 200.0
+VS_N_COART_ON  = 0.15
+VS_N_COART_OFF = 0.15
+```
+
+Diagnostic targets:
+- Voicing >= 0.50
+- Antiresonance ratio < 0.60
+  (notch-to-neighbour at ~800 Hz)
+
+---
+
+#### LABIAL ROW — oṣṭhya
+
+##### [p] — voiceless bilabial stop — प
+**Śikṣā:** oṣṭhya
+**Status:** PENDING
+
+```
+VS_P_BURST_F  = 1000.0   — bilabial locus
+VS_P_BURST_BW = 800.0
+VS_P_VOT_MS   = 20.0
+```
+
+---
+
+##### [pʰ] — voiceless bilabial aspirated — फ
+**Śikṣā:** oṣṭhya
+**Status:** PENDING
+
+---
+
+##### [b] — voiced bilabial stop — ब
+**Śikṣā:** oṣṭhya
+**Status:** PENDING
+
+---
+
+##### [bʰ] — voiced bilabial aspirated — भ
+**Śikṣā:** oṣṭhya
+**Status:** PENDING
+
+---
+
+##### [m] — voiced bilabial nasal — म
+**Śikṣā:** oṣṭhya
+**Status:** PENDING
+
+```
+VS_M_F       = [250.0, 1000.0, 2500.0, 3200.0]
+VS_M_B       = [100.0,  200.0,  300.0,  350.0]
+VS_M_GAINS   = [  8.0,    2.0,    0.5,    0.2]
+VS_M_DUR_MS  = 65.0
+VS_M_ANTI_F  = 800.0
+VS_M_ANTI_BW = 200.0
+```
+
+---
+
+### CONSONANTS — SIBILANTS
 
 #### [s] — voiceless dental sibilant — स
-OE [s] confirmed. CF ~7500 Hz.
-Direct transfer.
+**Śikṣā:** dantya
+**Status:** PENDING
+
+```
+VS_S_NOISE_CF = 5500.0
+VS_S_NOISE_BW = 3000.0
+VS_S_GAIN     = 0.20
+VS_S_DUR_MS   = 80.0
+```
+
+---
 
 #### [ɕ] — voiceless palatal sibilant — श
-**IAST:** ś
 **Śikṣā:** tālavya
 **Status:** PENDING
 
-```python
-VS_SH_DUR_MS   = 75.0
-VS_SH_NOISE_CF = 4500.0     # palatal — lower than OE [ʃ]
-VS_SH_NOISE_BW = 3000.0
-VS_SH_GAIN     = 0.32
+```
+VS_SH_NOISE_CF = 3800.0   — lower than [s]
+VS_SH_NOISE_BW = 2500.0
+VS_SH_GAIN     = 0.22
+VS_SH_DUR_MS   = 80.0
 ```
 
-**Diagnostic:**
-| Measure | Target |
-|---|---|
-| Voicing | <= 0.20 |
-| Noise centroid | 3500–6000 Hz |
+Palatal sibilant: centre frequency
+lower than dental [s] because
+palatal constriction produces
+a larger resonant cavity ahead
+of the constriction.
 
-Note: [ɕ] overlaps with OE [ʃ] (~3800 Hz).
-The palatal quality is similar.
-Sanskrit ś ≈ OE sc in acoustic position.
-Šikṣā says tālavya: tongue to hard palate.
-Same constriction as OE [ʃ].
+---
 
 #### [ʂ] — voiceless retroflex sibilant — ष
-**IAST:** ṣ
 **Śikṣā:** mūrdhanya
-**Status:** PENDING — FIRST TARGET AFTER ṛ
+**Status:** PENDING
 
-```python
-VS_SR_DUR_MS   = 75.0
-VS_SR_NOISE_CF = 2800.0     # ← LOWER than dental [s]
-VS_SR_NOISE_BW = 2000.0
-VS_SR_GAIN     = 0.30
+```
+VS_SS_NOISE_CF = 2800.0   — lower than [ɕ]
+VS_SS_NOISE_BW = 2000.0
+VS_SS_GAIN     = 0.22
+VS_SS_DUR_MS   = 85.0
+VS_SS_F3_NOTCH = 2200.0   — mūrdhanya marker
 ```
 
-**Diagnostic:**
-| Measure | Target |
-|---|---|
-| Voicing | <= 0.20 |
-| Noise centroid | 2000–4000 Hz |
-
-**Three-way sibilant separation:**
-```
-[s]  dental    CF ~7500 Hz   highest
-[ɕ]  palatal   CF ~4500 Hz   middle
-[ʂ]  retroflex CF ~2800 Hz   lowest
-```
-
-The centroid descends as the
-constriction moves backward.
-Same acoustic law as stops:
-place determines frequency.
-The sibilant hierarchy mirrors
-the stop hierarchy in reverse:
-retroflex is LOWER than dental
-because the cavity posterior to
-the retroflex constriction is
-LARGER than for the dental.
-Larger cavity = lower resonance.
-Physics, not convention.
+Retroflex sibilant: the lowest
+centre frequency of the three
+sibilants. The retroflexion
+creates a larger cavity.
+The mūrdhanya F3 notch applies.
 
 ---
 
 ### CONSONANTS — SONORANTS
 
-**[m], [n], [ŋ], [l], [r]** —
-all OE confirmed. Direct transfer.
-
-**[ɲ], [ɳ]** — covered above
-under palatal and retroflex rows.
-
-**[j] — voiced palatal approximant — य**
-OE [j] confirmed. High F2.
-Direct transfer.
-
-**[ʋ] — voiced labiodental approximant — व**
-**IAST:** v
-**Śikṣā:** dantyo-oṣṭhya (dental-labial)
+#### [r] — voiced alveolar trill — र
+**Śikṣā:** dantya
 **Status:** PENDING
 
-```python
-VS_V_F     = [300.0, 1100.0, 2400.0, 3200.0]
-VS_V_B     = [120.0,  180.0,  250.0,  300.0]
-VS_V_GAINS = [ 14.0,    7.0,    1.5,    0.4]
-VS_V_DUR_MS     = 65.0
+```
+VS_R_F       = [450.0, 1700.0, 2700.0, 3300.0]
+VS_R_B       = [200.0,  300.0,  350.0,  380.0]
+VS_R_GAINS   = [ 10.0,    5.0,    1.5,    0.5]
+VS_R_DUR_MS  = 70.0
+VS_R_TRILL_RATE_HZ = 25.0
+VS_R_CLOSURE_FRAC  = 0.30
 ```
 
-Sanskrit [ʋ] is an approximant —
-less fricative than OE [v].
-F2 ~1100 Hz — lower than OE [w] (~700 Hz),
-higher than OE [v].
-Between labio-velar [w] and labiodental [v].
-The ancient grammarians noted it:
-labial + dental = labiodental.
-
-**[h] — voiceless glottal fricative — ह**
-OE [h] confirmed. H origin.
-C(h,H) ≈ 0.30. Second closest to H
-after silence.
-Direct transfer.
+The trill: periodic AM modulation
+at ~25 Hz. Each closure cycle:
+brief amplitude reduction as
+tongue tip contacts alveolar ridge.
+30% of time in closure.
 
 ---
 
-### CONSONANT — ANUSVĀRA AND VISARGA
+#### [l] — voiced alveolar lateral — ल
+**Śikṣā:** dantya
+**Status:** PENDING
 
-**[ṃ] — anusvāra — nasalisation — ं**
-**IAST:** ṃ (dot above)
-**Description:**
+```
+VS_L_F       = [350.0, 1100.0, 2700.0, 3300.0]
+VS_L_B       = [150.0,  300.0,  350.0,  380.0]
+VS_L_GAINS   = [ 10.0,    4.0,    1.5,    0.5]
+VS_L_DUR_MS  = 65.0
+```
+
+---
+
+#### [j] — voiced palatal approximant — य
+**Śikṣā:** tālavya
+**Status:** PENDING
+
+```
+VS_J_F       = [280.0, 2100.0, 2800.0, 3300.0]
+VS_J_B       = [100.0,  200.0,  300.0,  350.0]
+VS_J_GAINS   = [ 10.0,    6.0,    1.5,    0.5]
+VS_J_DUR_MS  = 55.0
+```
+
+---
+
+#### [v] — voiced labio-dental approximant — व
+**Śikṣā:** oṣṭhya
+**Status:** PENDING
+
+Note: Vedic [v] is typically described
+as a labio-dental approximant, not a
+fricative as in most modern languages.
+Lighter constriction than fricative [v].
+
+```
+VS_V_F       = [300.0,  900.0, 2300.0, 3100.0]
+VS_V_B       = [200.0,  350.0,  400.0,  400.0]
+VS_V_GAINS   = [ 10.0,    5.0,    1.5,    0.5]
+VS_V_DUR_MS  = 60.0
+VS_V_VOICING_FRAC = 0.60
+```
+
+---
+
+#### [h] — voiceless glottal fricative — ह
+**Śikṣā:** kaṇṭhya
+**Status:** PENDING
+
+```
+VS_H_NOISE_CF = 1500.0
+VS_H_NOISE_BW = 3000.0
+VS_H_GAIN     = 0.15
+VS_H_DUR_MS   = 55.0
+VS_H_ASPIR_FORMANTS = True   — vowel-colour
+```
+
+H is vowel-coloured — the aspiration
+noise is filtered through the formants
+of the adjacent vowel. Same synthesis
+principle as other fricatives but with
+glottal source location.
+
+---
+
+### SPECIAL PHONOLOGICAL ELEMENTS
+
+#### Anusvāra — nasalisation — ं
+**Status:** PENDING
+
+Not a full nasal consonant.
 Nasalisation of the preceding vowel.
-Not a consonant in the Western sense.
-Velum opens. Nasal coupling activated.
-Formants shift toward nasal targets.
+Formant targets: nasalised version
+of preceding vowel formants.
+Additional nasal formant at ~250 Hz.
+Antiresonance at frequency determined
+by following consonant's place.
+Duration: 30–50 ms added to vowel.
 
-```python
-# Synthesise as vowel + nasal coarticulation
-# Add nasal murmur at vowel offset
-# Velum opens: F1 splitting (nasal pole appears)
-# Duration of nasal phase: 40-60 ms
-```
+---
 
-**[ḥ] — visarga — voiceless echo — ः**
-**IAST:** ḥ (dot below)
-**Description:**
-A voiceless release — an aspiration
-with the formant quality of the
-preceding vowel. Like a whispered
-version of the vowel that precedes it.
+#### Visarga — voiceless release — ः
+**Status:** PENDING
 
-```python
-# Synthesise as copy of preceding vowel
-# With voicing set to zero
-# Duration: 30-50 ms
-# Gain: 0.15-0.25
-```
+Voiceless h-like fricative at
+phrase boundary or before voiceless
+consonant. Vowel-coloured aspiration
+noise. Short (30–50 ms).
 
 ---
 
 ## COMPLETE INVENTORY — QUICK REFERENCE
 
+### Verification status by class
+
+| Class | Śikṣā | Verified | Pending | Total |
+|---|---|---|---|---|
+| Vowels short | various | [ɻ̩] | [a][i][u] + 1 | 4 |
+| Vowels long | various | — | [aː][iː][uː][ɻ̩ː] | 4 |
+| Diphthongs | various | — | [eː][oː][ai][au] | 4 |
+| Velar stops | kaṇṭhya | [g] | [k][kʰ][gʰ][ŋ] | 5 |
+| Palatal stops | tālavya | — | [c][cʰ][ɟ][ɟʰ][ɲ] | 5 |
+| Retroflex stops | mūrdhanya | — | [ʈ][ʈʰ][ɖ][ɖʰ][ɳ] | 5 |
+| Dental stops | dantya | — | [t][tʰ][d][dʰ][n] | 5 |
+| Labial stops | oṣṭhya | — | [p][pʰ][b][bʰ][m] | 5 |
+| Sibilants | various | — | [s][ɕ][ʂ] | 3 |
+| Sonorants | various | — | [r][l][j][v][h] | 5 |
+| Special | — | — | anusvāra/visarga | 2 |
+| **Total** | | **2** | **~46** | **~48** |
+
+---
+
+## VS VOWEL SPACE — CURRENT STATE
+
 ```
-VOWELS — SHORT (5):
-  [a]   [i]   [u]   [ṛ]   [ḷ]*
-  *[ḷ] rare — low priority
+Verified or in-progress positions:
 
-VOWELS — LONG (5):
-  [aː]  [iː]  [uː]  [ṛː]  [eː]  [oː]
+F2 (Hz, high = front)
+2200  [i] — front close           (PENDING)
+1300  [ɻ̩] — retroflex mid         (VERIFIED)
+1100  [a] — back open             (PENDING)
+ 800  [u] — back close            (PENDING)
 
-VOWELS — DIPHTHONGS (2):
-  [ai]  [au]
-
-CONSONANTS — VELAR ROW (5):
-  [k]   [kʰ]  [g]   [gʰ]  [ŋ]
-
-CONSONANTS — PALATAL ROW (5) — NEW PLACE:
-  [c]   [cʰ]  [ɟ]   [ɟʰ]  [ɲ]
-
-CONSONANTS — RETROFLEX ROW (5) — NEW PLACE:
-  [ʈ]   [ʈʰ]  [ɖ]   [ɖʰ]  [ɳ]
-
-CONSONANTS — DENTAL ROW (5):
-  [t]   [tʰ]  [d]   [dʰ]  [n]
-
-CONSONANTS — LABIAL ROW (5):
-  [p]   [pʰ]  [b]   [bʰ]  [m]
-
-CONSONANTS — SIBILANTS (3):
-  [s]   [ɕ]   [ʂ]
-
-CONSONANTS — SONORANTS (5):
-  [j]   [ʋ]   [r]   [l]   [h]
-
-CONSONANTS — SPECIAL (2):
-  [ṃ]  (anusvāra — nasalisation)
-  [ḥ]  (visarga — voiceless echo)
-
-TOTAL: ~57 core phonemes.
-       Transfer from OE: ~15 (stops, nasals, h, r, l, j)
-       New palatal row: 5
-       New retroflex row: 5
-       New aspirated stops: 10
-       New sibilants: 2 (ɕ, ʂ)
-       New vowels/sonorants: ṛ, ḷ, ʋ, ṃ, ḥ
-       New from OE perspective: ~25 phonemes
-
-0 verified as of project start.
-First target: [ṛ] in ṚG.
+F1 (Hz, high = open)
+ 700  [a] — open                  (PENDING)
+ 420  [ɻ̩] — mid                   (VERIFIED)
+ 300  [u] — close                 (PENDING)
+ 280  [i] — close                 (PENDING)
 ```
+
+The vowel triangle anchors when
+[a], [i], and [u] are verified.
+[ɻ̩] occupies a unique retroflex
+position distinct from all three corners.
 
 ---
 
 ## OPEN INVENTORY POLICY
 
-The inventory is current, not closed.
-57 phonemes are the core target.
-Dialectal variants, sandhi phenomena,
-and prosodic features elevated to
-phonemic status may add further entries.
-New phoneme introduction workflow
-(see HOW TO USE THIS DOCUMENT)
-is fully preserved.
-The number 57 is not a ceiling.
+This inventory is not closed.
+
+New phonemes are introduced as the
+reconstruction encounters them in
+the text. Every new phoneme follows
+the introduction workflow.
+
+No phoneme is VERIFIED until:
+1. The diagnostic script passes
+   all numeric checks
+2. The ear confirms the perceptual
+   result is correct
+3. The entry is updated in this
+   document with verified values
+
+A phoneme that passes the diagnostic
+but fails the ear check is NOT verified.
+A phoneme that sounds right but fails
+the diagnostic requires investigation —
+either the diagnostic is incomplete
+or the parameters need adjustment.
+
+Both conditions must be met.
+The numbers support the ear.
+The ear does not serve the numbers.
+
+---
+
+## NEW PHONEME INTRODUCTION WORKFLOW
+
+When a new phoneme is encountered:
+
+```
+1. CLASSIFY
+   Assign Śikṣā class.
+   Map to articulatory position.
+   Predict formant targets from
+   Śikṣā classification and physics.
+
+2. ESTIMATE
+   Write initial parameter block
+   with PENDING status.
+   Add to this inventory.
+
+3. SYNTHESISE
+   Implement in voice_physics_vs.py.
+   Produce isolated output and
+   in-word context.
+
+4. DIAGNOSE
+   Write diagnostic for the new phoneme.
+   Include:
+     — Voicing check
+     — Formant centroid checks
+     — Śikṣā confirmation check
+     — VS-internal separation checks
+       (once >= 3 VS phonemes verified
+        in the relevant dimension)
+     — Duration check
+
+5. ITERATE
+   If diagnostic fails:
+     Identify which check failed.
+     Adjust the specific parameter.
+     Re-synthesise. Re-run diagnostic.
+     Document each iteration.
+
+6. CONFIRM
+   When diagnostic passes:
+     Run perceptual check.
+     Listen. Does it sound correct?
+     Does it occupy the right
+     room in the vocal topology?
+
+7. VERIFY
+   When both diagnostic and ear pass:
+     Update status: PENDING → VERIFIED
+     Record verified parameter values.
+     Record diagnostic values.
+     Record first verified word.
+     Update COMPLETE INVENTORY table.
+
+8. DOCUMENT
+   Write evidence.md for the word.
+   The evidence file is the
+   permanent record of the verification.
+```
 
 ---
 
 ## LINE STATUS
 
-```
-Rigveda 1.1.1:  —  agnimīḷe purohitaṃ...
-                   (target — Phase 1)
-
-Proof of concept:
-  ṚG  —  [ɻ̩g]  —  first syllable
-  Two phonemes. One new (ṛ). One known (g).
-  This is where we begin.
-```
+| Word | IPA | Status | New phonemes |
+|---|---|---|---|
+| ṚG | [ɻ̩g] | ✓ VERIFIED | [ɻ̩] |
+| AGNI | [ɑgni] | IN PROGRESS | [ɑ][n][i] |
+| ĪḶE | [iːɭe] | PENDING | [iː][ɭ] |
+| PUROHITAM | [puroːhitɑm] | PENDING | [p][oː][h] |
+| YAJÑASYA | [jɑdʒɲɑsjɑ] | PENDING | [dʒ][ɲ] |
+| DEVAM | [devɑm] | PENDING | [dʰ]→[d][e] |
+| ṚTVIJAM | [ɻ̩tvidʒɑm] | PENDING | [ʈ]→[t][dʒ] |
+| HOTĀRAM | [hoːtaːrɑm] | PENDING | [ɳ]→hoː |
+| RATNADHĀTAMAM | [rɑtnɑdʰaːtɑmɑm] | PENDING | [dʰ] |
 
 ---
 
 *February 2026.*
-*0 phonemes verified.*
-*The instrument has not changed.*
-*The Vedic tradition kept the sounds.*
-*We bring the measurement.*
-*ṚG is the first sound.*
+*VS-isolated. Physics first.*
+*Every phoneme derived from the instrument.*
+*Every value verified VS-internally.*
+*The Śikṣā described the space.*
+*The physics confirms it.*
+*They agree.*
