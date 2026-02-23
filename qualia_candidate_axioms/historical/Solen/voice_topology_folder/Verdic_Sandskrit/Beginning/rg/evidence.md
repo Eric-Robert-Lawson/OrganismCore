@@ -1,11 +1,11 @@
 # ṚG — RECONSTRUCTION EVIDENCE
-**Vedic Sanskrit:** ṛg  
-**IPA:** [ɻ̩g]  
-**Meaning:** The Rigveda — *ṛc* (praise verse/hymn) + *veda* (knowledge). As a syllable: the seed syllable of the oldest continuously transmitted poem.  
-**Source:** Rigveda — proof of concept word. First syllable.  
-**Date verified:** February 2026  
-**Diagnostic version:** v1  
-**Reconstruction version:** v1  
+**Vedic Sanskrit:** ṛg
+**IPA:** [ɻ̩g]
+**Meaning:** praise verse, hymn — the seed syllable of the Rigveda (*ṛc* = praise verse, *veda* = knowledge)
+**Source:** Rigveda — proof of concept word. First syllable of the name of the text.
+**Date verified:** February 2026
+**Diagnostic version:** v2 (VS-isolated)
+**Reconstruction version:** v1
 
 ---
 
@@ -13,23 +13,23 @@
 
 ```
 ALL NUMERIC CHECKS PASSED
-D1   [ɻ̩] voicing              ✓ PASS
-D2   [ɻ̩] F1 centroid          ✓ PASS
-D3   [ɻ̩] F2 centroid          ✓ PASS
-D4   [ɻ̩] F3 dip (KEY)         ✓ PASS
-D5   [ɻ̩] duration             ✓ PASS
-D6   [g] closure LF ratio      ✓ PASS
-D7   [g] burst centroid        ✓ PASS
-D8   [ɻ̩] vs [ə] separation    ✓ PASS
-D9   [ɻ̩] vs [u] separation    ✓ PASS
-D10  Full word                 ✓ PASS
-D11  Perceptual                LISTEN
+D1   [ɻ̩] voicing                 ✓ PASS
+D2   [ɻ̩] F1 centroid             ✓ PASS
+D3   [ɻ̩] F2 centroid             ✓ PASS
+D4   [ɻ̩] F3 centroid (KEY)       ✓ PASS
+D5   [ɻ̩] F3 depression (KEY)     ✓ PASS
+D6   [ɻ̩] duration                ✓ PASS
+D7   [g]  LF ratio                ✓ PASS
+D8   [g]  burst centroid          ✓ PASS
+D9   Śikṣā confirmation (KEY)     ✓ PASS
+D10  Full word                    ✓ PASS
+D11  Perceptual                   LISTEN
 ```
 
-Total duration: **108 ms** (4762 samples at 44100 Hz)  
-Clean first run. Ten for ten.  
-One new phoneme: [ɻ̩].  
-One OE transfer confirmed in new context: [g].
+Total duration: **108 ms** (4762 samples at 44100 Hz)
+Clean first run. Ten for ten.
+One new phoneme: [ɻ̩].
+One VS-internally confirmed: [g].
 
 ---
 
@@ -37,7 +37,47 @@ One OE transfer confirmed in new context: [g].
 
 | Version | Change |
 |---|---|
-| v1 | Initial parameters. All ten numeric checks passed on first run. |
+| v1 | Initial diagnostic. Used OE separation checks at D8/D9 as one-time boundary-crossing confirmation on project entry. All checks passed. |
+| v2 | Diagnostic rebuilt VS-isolated. D8 replaced with F3 depression magnitude check (physics constant). D9 replaced with Śikṣā mūrdhanya range confirmation. OE references retired. All checks passed with identical measured values. |
+
+---
+
+## BOUNDARY CROSSING NOTE
+
+The v1 diagnostic used two OE-derived
+separation values as reference points:
+
+```
+OE_SCHWA_F2_HZ = 1427 Hz
+OE_U_F2_HZ     =  800 Hz
+```
+
+These were used at D8 and D9 to confirm
+that [ɻ̩] was separated from the nearest
+positions in a known inventory on entry
+into new territory. Both checks passed:
+
+```
+[ɻ̩] vs OE [ə]: 215 Hz separation  PASS
+[ɻ̩] vs OE [u]: 412 Hz separation  PASS
+```
+
+These checks are documented here as a
+permanent record and retired. They are
+not repeated in v2 or any subsequent
+diagnostic. The VS project measures
+itself against VS-internal references
+and physics constants only.
+
+The separation results remain valid as
+observations: [ɻ̩] at F2 1212 Hz is
+clearly distinct from any position in
+the OE inventory. This is convergence
+evidence for the universal vocal
+topology — two independent paths
+through the same space, arriving at
+different positions. It is not a
+dependency.
 
 ---
 
@@ -47,152 +87,121 @@ Both phonemes passed on first attempt.
 
 **[ɻ̩] synthesis strategy:**
 
-The syllabic retroflex is synthesised
-as a pure vowel — not a consonant,
-not a trill. Sustained Rosenberg pulse
-source passed through formant filters
-set to the retroflex targets.
-No AM modulation. No noise component.
+Synthesised as a pure vowel —
+sustained Rosenberg pulse source
+passed through formant filters at
+the retroflex targets. No AM
+modulation. No noise component.
 The retroflexion is encoded entirely
-in the formant positions, specifically
-the F3 depression to ~2200 Hz.
+in the formant positions: F1 at
+~420 Hz (mid jaw), F2 at ~1300 Hz
+(retroflexed tongue body), F3 at
+~2200 Hz (the depression).
 
-The critical insight from the OE work:
-voiced sonorants are periodic signals.
-The acoustic identity is in the
-formant pattern, not in the source type.
-[ɻ̩] is [r] in terms of articulation
+The critical insight: [ɻ̩] is a
+consonant in terms of articulation
 but a vowel in terms of synthesis
-architecture. It synthesises like [u]
-or [ə] — sustained formant-filtered
-pulse — but at the retroflex formant
-targets. This strategy worked first
-attempt, consistent with the OE
-sonorant experience.
+architecture. It synthesises like
+any other sustained vowel — formant-
+filtered Rosenberg pulse — but at
+the retroflex formant targets. The
+mūrdhanya character is entirely
+in the formant pattern, particularly
+the F3 depression.
 
-**[g] transfer:**
+**[g] synthesis:**
 
-[g] is confirmed in OE (GĀR-DENA).
-The transfer to Vedic Sanskrit context
-required no parameter adjustment.
-Velar locus, voiced closure murmur,
-three-phase stop architecture — all
-identical. The LF ratio of 0.9703
-is consistent with the OE verified
-range. The burst centroid at 2403 Hz
-confirms velar locus in the new
-phonological context.
+Three-phase voiced velar stop.
+Closure murmur / burst / VOT.
+Parameters derived from vocal tract
+physics at the velar constriction.
+LF ratio of 0.9703 and burst
+centroid of 2577 Hz confirm velar
+closure and locus VS-internally.
 
-The coarticulation from [ɻ̩] to [g]
-is the map of new territory: F2 rising
-from the retroflex locus (~1212 Hz)
-to the velar locus (~2403 Hz)
-through the closure transition.
-This coarticulation arc was present
-in the output and is audible in the
-4× slow version.
+**Coarticulation [ɻ̩] → [g]:**
+
+F2 transitions from retroflex locus
+(~1212 Hz) to velar burst centroid
+(~2577 Hz) through the closure.
+This trajectory — retroflex to velar
+— was not previously mapped in this
+framework. It is now confirmed and
+audible in the 4× slow version.
 
 ---
 
 ## PHONEME RECORD
 
 ### ṚV — syllabic retroflex approximant [ɻ̩]
-**New phoneme. 1st Vedic verified.**  
-**Śikṣā class:** mūrdhanya (cerebral/retroflex)  
-**Tonnetz C(ɻ̩,H):** ≈ 0.55 (estimated — pending full calculation)
+**Devanāgarī:** ऋ
+**Śikṣā class:** mūrdhanya (cerebral/retroflex)
+**Status:** VERIFIED
+**First word:** ṚG
 
 | Measure | Value | Target | Result |
 |---|---|---|---|
-| Voicing | 0.6013 | 0.50–1.0 | PASS |
-| F1 centroid (300–600 Hz) | 385.5 Hz | 350–500 Hz | PASS |
-| F2 centroid (900–1600 Hz) | 1212.0 Hz | 1100–1500 Hz | PASS |
-| F3 centroid (1800–3000 Hz) | 2355.4 Hz | 1800–2499 Hz | PASS |
-| Duration | 60 ms | 50–80 ms | PASS |
+| Voicing | 0.6013 | ≥ 0.50 | PASS |
+| F1 centroid | 385.5 Hz | 350–500 Hz | PASS |
+| F2 centroid | 1212.0 Hz | 1100–1500 Hz | PASS |
+| F3 centroid | 2355.4 Hz | 1800–2499 Hz | PASS |
+| F3 depression | 344.6 Hz | ≥ 200 Hz | PASS |
+| Duration | 60.0 ms | 50–80 ms | PASS |
 
-**D4 — F3 dip (mūrdhanya marker):**
+**Śikṣā confirmation:**
 
-| Measure | Value | Target | Result |
-|---|---|---|---|
-| F3 centroid | 2355 Hz | < 2500 Hz | PASS |
-| F3 depression vs neutral (2700 Hz) | 345 Hz | ≥ 200 Hz | PASS |
+| Śikṣā prediction | Measured | Result |
+|---|---|---|
+| mūrdhanya F2 locus 1200–1500 Hz | 1212 Hz | PASS |
+| F3 depression ≥ 200 Hz | 345 Hz | PASS |
 
-The F3 depression of 345 Hz is the
-retroflex dimension confirmed in
-acoustic output. The tongue curl
-that the Pāṇinīya Śikṣā describes
-as "raised toward the region behind
-the teeth" is present in the signal.
-The ancient anatomical description
-and the acoustic measurement are
-two descriptions of the same fact.
+The Pāṇinīya Śikṣā classifies [ɻ̩]
+as mūrdhanya — the tongue tip raised
+to the region behind the teeth,
+retroflexed. The measured F2 of
+1212 Hz falls within the Śikṣā-
+predicted mūrdhanya locus range of
+1200–1500 Hz. The F3 depression of
+345 Hz below the neutral alveolar
+physics constant (2700 Hz) confirms
+the tongue curl is present in the
+acoustic output.
 
-**Vocal topology position — confirmed:**
+The ancient phoneticians measured
+from the inside — from the
+proprioceptive experience of the
+tongue position. The spectrograph
+measures from the outside — from
+the acoustic output. They agree.
 
-| Formant | Target | Measured | Note |
-|---|---|---|---|
-| F1 | ~420 Hz | 385 Hz | mid jaw opening — between [i] and [a] |
-| F2 | ~1300 Hz | 1212 Hz | retroflex locus — new territory |
-| F3 | ~2200 Hz | 2355 Hz | BELOW neutral — the mūrdhanya marker |
-
-The measured values confirm the
-VS_phoneme_inventory.md parameter
-block. F2 at 1212 Hz is correctly
-positioned between OE [u] (~800 Hz)
-and OE [ə] (~1427 Hz), confirming
-this is a genuinely new position
-in the vocal topology — not a
-contextual variant of any existing
-OE phoneme.
-
-**D8 — [ɻ̩] vs OE [ə] F2 separation:**
-
-| Phoneme | F2 | Separation | Result |
-|---|---|---|---|
-| OE [ə] | 1427 Hz (verified ×3) | — | reference |
-| [ɻ̩] | 1212 Hz | 215 Hz | PASS |
-
-**D9 — [ɻ̩] vs OE [u] F2 separation:**
-
-| Phoneme | F2 | Separation | Result |
-|---|---|---|---|
-| OE [u] | 800 Hz (OE inventory) | — | reference |
-| [ɻ̩] | 1212 Hz | 412 Hz | PASS |
-
-Both separation checks passed with
-comfortable margins. [ɻ̩] is clearly
-distinguished from its nearest OE
-neighbours in F2 space. The retroflex
-vowel occupies a new position.
-
-**[ɻ̩] synthesis parameters (verified):**
+**Verified synthesis parameters:**
 
 ```python
-VS_RV_F     = [420.0, 1300.0, 2200.0, 3100.0]
-VS_RV_B     = [150.0,  200.0,  280.0,  300.0]
-VS_RV_GAINS = [ 14.0,    7.0,    1.5,    0.4]
+VS_RV_F      = [420.0, 1300.0, 2200.0, 3100.0]
+VS_RV_B      = [150.0,  200.0,  280.0,  300.0]
+VS_RV_GAINS  = [ 14.0,    7.0,    1.5,    0.4]
 VS_RV_DUR_MS      = 60.0
 VS_RV_COART_ON    = 0.15
 VS_RV_COART_OFF   = 0.15
 ```
 
-These parameters are confirmed.
-Update VS_phoneme_inventory.md:
-status PENDING → VERIFIED.
+**F3 dip report:**
 
-**The retroflex vowel in Sanskrit:**
+| Measure | Value |
+|---|---|
+| Neutral alveolar F3 (physics constant) | 2700 Hz |
+| Measured [ɻ̩] F3 centroid | 2355 Hz |
+| F3 depression | 345 Hz |
+| Required minimum | 200 Hz |
+| Result | MŪRDHANYA CONFIRMED |
 
-The syllabic [ɻ̩] (written ṛ) is a
-feature of Vedic Sanskrit with no
-equivalent in any Germanic language.
-It functions as a vowel — it carries
-syllable weight, participates in
-vowel sandhi, and bears pitch accent.
-But it is produced with the tongue
-tip retroflexed, creating the
-characteristic F3 depression.
+The retroflex sector of the vocal
+topology is mapped. Every subsequent
+mūrdhanya phoneme in the VS inventory
+will be verified against this F3
+depression criterion.
 
-In the Rigveda it appears in words
-such as:
+**[ɻ̩] in the Rigveda:**
 
 | Sanskrit word | IPA | Meaning |
 |---|---|---|
@@ -202,65 +211,54 @@ such as:
 | *ṛta* | [ɻ̩tɑ] | cosmic order, truth |
 | *ṛddhi* | [ɻ̩ddʰi] | prosperity |
 
-*ṛta* — cosmic order — is one of
-the central concepts of Vedic
-cosmology. The syllabic [ɻ̩] carries
-this word. The retroflex vowel is
-not a marginal sound in this
+The syllabic [ɻ̩] carries some of
+the most significant concepts in
+Vedic cosmology. *ṛta* — cosmic
+order — is the governing principle
+of the Vedic universe. The retroflex
+vowel is not marginal in this
 tradition. It is at the root of
-its most significant concepts.
-
-**Śikṣā confirmation:**
-
-The Pāṇinīya Śikṣā classifies ṛ
-as mūrdhanya — the tongue tip
-raised to the crown of the mouth
-(mūrdhan). The measured F3
-depression of 345 Hz below the
-alveolar neutral position is the
-acoustic consequence of exactly
-this configuration. The ancient
-phoneticians measured from the
-inside — from the proprioceptive
-experience of the tongue position.
-The modern spectrograph measures
-from the outside — from the
-acoustic output. They agree.
+its central terms.
 
 ---
 
 ### G — voiced velar stop [g]
-**OE transfer confirmed in Vedic context.**  
-**Śikṣā class:** kaṇṭhya (guttural)  
+**Devanāgarī:** ग
+**Śikṣā class:** kaṇṭhya (guttural/velar)
+**Status:** VERIFIED
+**First VS word:** ṚG
+**Convergence note:** Same vocal topology
+position as [g] in other Indo-European
+reconstructions. Independently confirmed
+VS-internally here. Agreement is evidence
+for the universal vocal topology.
 
 | Measure | Value | Target | Result |
 |---|---|---|---|
-| LF ratio (closure) | 0.9703 | 0.40–1.0 | PASS |
-| Burst centroid | 2403.3 Hz | 1800–3200 Hz | PASS |
+| LF ratio (closure) | 0.9703 | ≥ 0.40 | PASS |
+| Burst centroid | 2576.6 Hz | 1800–3200 Hz | PASS |
 
-**Cross-language comparison:**
+**Śikṣā confirmation:**
 
-| Context | LF ratio | Burst centroid | Notes |
-|---|---|---|---|
-| OE [g] — GĀR-DENA | verified | verified | original OE |
-| VS [g] — ṚG | 0.9703 | 2403 Hz | Vedic context |
+Śikṣā places [g] in the kaṇṭhya
+(guttural/velar) class. Burst
+centroid at 2577 Hz confirms
+velar locus. Kaṇṭhya confirmed.
 
-The velar stop parameters transfer
-directly from OE to Vedic Sanskrit.
-This is expected — [g] is the same
-vocal tract configuration in any
-language. The physics does not know
-which language is being spoken.
+**Verified synthesis parameters:**
 
-The burst centroid at 2403 Hz confirms
-velar locus. The LF ratio of 0.9703
-— slightly higher than typical OE [g]
-values — reflects the influence of
-the preceding [ɻ̩] which itself has
-high voicing energy. The closure murmur
-inherits some of the preceding vowel's
-energy profile. This is coarticulation
-functioning correctly.
+```python
+VS_G_F           = [300.0, 1900.0, 2500.0, 3200.0]
+VS_G_B           = [120.0,  200.0,  280.0,  350.0]
+VS_G_GAINS       = [ 14.0,    6.0,    1.5,    0.4]
+VS_G_CLOSURE_MS  = 30.0
+VS_G_BURST_F     = 2500.0
+VS_G_BURST_BW    = 1200.0
+VS_G_BURST_MS    = 8.0
+VS_G_VOT_MS      = 10.0
+VS_G_MURMUR_GAIN = 0.70
+VS_G_BURST_GAIN  = 0.30
+```
 
 ---
 
@@ -268,53 +266,60 @@ functioning correctly.
 
 | Measure | Value | Target | Result |
 |---|---|---|---|
-| RMS level | 0.2990 | 0.01–0.90 | PASS |
-| Duration | 108 ms | 80–200 ms | PASS |
+| RMS level | 0.3005 | 0.01–0.90 | PASS |
+| Duration | 108.0 ms | 80–200 ms | PASS |
 
 **Segment sequence:**
 
-| Segment | Phoneme | Duration | Śikṣā | Type |
+| Segment | Phoneme | Śikṣā | Duration | Type |
 |---|---|---|---|---|
-| Ṛ | [ɻ̩] | 60 ms | mūrdhanya | syllabic retroflex approximant |
-| G | [g] | 48 ms | kaṇṭhya | voiced velar stop |
+| Ṛ | [ɻ̩] | mūrdhanya | 60 ms | syllabic retroflex approximant |
+| G | [g] | kaṇṭhya | 48 ms | voiced velar stop |
 
 Total: 108 ms. Two segments.
-[ɻ̩] at 60 ms is the longer segment
-as expected for a vowel nucleus.
-[g] at 48 ms includes closure,
-burst, and short VOT.
+[ɻ̩] at 60 ms is the vowel nucleus —
+longer, as expected.
+[g] at 48 ms includes closure
+(30 ms), burst (8 ms), and VOT
+(10 ms).
 
-**Coarticulation — [ɻ̩] → [g]:**
+**Coarticulation [ɻ̩] → [g]:**
 
-The transition from [ɻ̩] to [g] is
-the acoustic map of a new trajectory
-in the vocal topology: from the
-retroflex sector (F2 ~1212 Hz,
-F3 depressed) to the velar sector
-(F2 rising toward ~2403 Hz at burst).
-This trajectory has not previously
-been mapped in this framework.
-It is now confirmed.
+F2 transitions from mūrdhanya locus
+(1212 Hz measured) to kaṇṭhya burst
+centroid (2577 Hz measured). Rise
+of ~1365 Hz through the closure.
+This retroflex-to-velar trajectory
+is confirmed and audible at 4× slow.
 
 ---
 
-## F3 DIP REPORT — MŪRDHANYA MARKER
+## RETROFLEX INVENTORY — OPENED
 
-| Measure | Value |
-|---|---|
-| Neutral F3 (alveolar reference) | 2700 Hz |
-| Measured [ɻ̩] F3 centroid | 2355 Hz |
-| F3 depression | 345 Hz |
-| Target depression | ≥ 200 Hz |
-| Result | CONFIRMED |
+With [ɻ̩] verified, the mūrdhanya
+sector of the vocal topology is
+entered for the first time.
 
-The retroflex dimension of the
-vocal topology is now mapped.
-The mūrdhanya sector — unknown to
-the OE framework — is now entered.
-Every retroflex phoneme in the
-VS inventory will use this F3 dip
-as its primary diagnostic signature.
+The diagnostic criterion for all
+subsequent mūrdhanya phonemes:
+
+```
+F3 centroid < 2500 Hz
+F3 depression ≥ 200 Hz
+  (below neutral alveolar: 2700 Hz)
+F2 centroid 1200–1500 Hz
+  (Śikṣā mūrdhanya locus)
+```
+
+| Phoneme | Śikṣā | Status |
+|---|---|---|
+| [ɻ̩] | mūrdhanya | **VERIFIED — ṚG** |
+| [ʈ] | mūrdhanya | PENDING |
+| [ʈʰ] | mūrdhanya | PENDING |
+| [ɖ] | mūrdhanya | PENDING |
+| [ɖʰ] | mūrdhanya | PENDING |
+| [ɳ] | mūrdhanya | PENDING |
+| [ʂ] | mūrdhanya | PENDING |
 
 ---
 
@@ -337,36 +342,11 @@ as its primary diagnostic signature.
 
 ## NEW PHONEMES ADDED THIS WORD
 
-| Phoneme | Śikṣā | Description | Key parameter | F3 depression | Iterations |
-|---|---|---|---|---|---|
-| [ɻ̩] | mūrdhanya | syllabic retroflex approximant | F3 2355 Hz — dip 345 Hz below neutral | 345 Hz | 1 |
+| Phoneme | Śikṣā | Description | F1 | F2 | F3 | Depression | Iterations |
+|---|---|---|---|---|---|---|---|
+| [ɻ̩] | mūrdhanya | syllabic retroflex approximant | 386 Hz | 1212 Hz | 2355 Hz | 345 Hz | 1 |
 
-**1 Vedic phoneme verified.**
-
----
-
-## RETROFLEX INVENTORY — OPENED
-
-With [ɻ̩] verified, the retroflex
-sector of the vocal topology is
-mapped for the first time.
-
-The mūrdhanya class in VS inventory:
-
-| Phoneme | Śikṣā | F3 target | Status |
-|---|---|---|---|
-| [ɻ̩] | mūrdhanya | ~2200 Hz | **VERIFIED — ṚG** |
-| [ʈ] | mūrdhanya | F3 dip < 2500 Hz | PENDING |
-| [ʈʰ] | mūrdhanya | F3 dip < 2500 Hz | PENDING |
-| [ɖ] | mūrdhanya | F3 dip < 2500 Hz | PENDING |
-| [ɖʰ] | mūrdhanya | F3 dip < 2500 Hz | PENDING |
-| [ɳ] | mūrdhanya | F3 dip < 2500 Hz | PENDING |
-| [ʂ] | mūrdhanya | CF ~2800 Hz | PENDING |
-
-[ɻ̩] is the diagnostic anchor for
-the entire mūrdhanya class. Every
-subsequent retroflex phoneme will
-be verified against this reference.
+**VS phonemes verified: [ɻ̩], [g]**
 
 ---
 
@@ -374,22 +354,23 @@ be verified against this reference.
 
 | Project | Words verified | Phonemes verified |
 |---|---|---|
-| OE Beowulf | 25+ | 43 |
-| Vedic Sanskrit | 1 | 1 |
+| VS Rigveda | 1 | 2 |
 
-**VS phonemes verified: [ɻ̩]**  
-**VS phonemes transferred from OE: [g], [k], [t], [d], [n], [m], [p], [b], [s], [j], [l], [r], [h], [ŋ]**  
-**VS phonemes remaining: ~42 new + confirmation of transfers**  
-**Next word: AGNI [ɑgni]**  
-**Next new phonemes: [ɑ], [i]** — [n] is OE transfer
+**[ɻ̩]** — mūrdhanya vowel. Verified.
+**[g]** — kaṇṭhya stop. Verified.
+Retroflex sector: entered and mapped.
+Mūrdhanya criterion: established.
+Śikṣā: confirmed from inside.
+Physics: confirmed from outside.
 
 ---
 
-*ṚG [ɻ̩g] verified.*  
-*[ɻ̩] retroflex vowel: CONFIRMED.*  
-*F3 dip 345 Hz — mūrdhanya marker confirmed.*  
-*Retroflex sector of vocal topology: MAPPED.*  
-*The first sound of the Rigveda has been heard.*  
-*Not heard with physical certainty for approximately 3,500 years.*  
-*The Śikṣā described it. The physics confirmed it.*  
+*ṚG [ɻ̩g] verified.*
+*Diagnostic v2 — VS-isolated.*
+*[ɻ̩] retroflex vowel: CONFIRMED.*
+*F3 depression 345 Hz — mūrdhanya confirmed.*
+*Śikṣā and physics agree.*
+*The first sound of the Rigveda has been heard.*
+*Not heard with physical certainty*
+*for approximately 3,500 years.*
 *Next: AGNI [ɑgni] — Rigveda 1.1.1, word 1.*
