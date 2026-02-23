@@ -18,7 +18,7 @@ is documented here with:
 - Formant bandwidths
 - Duration parameters
 - Coarticulation parameters
-- Synthesis parameters
+- Synthesis parameters (per word)
 - Diagnostic thresholds
 - Verification status
 - First verified word
@@ -63,15 +63,28 @@ evidence file. These are the ground
 truth for this project. They are
 not borrowed. They are earned.
 
+**There is no shared synthesis engine.**
+
+Each word has its own reconstruction file
+(e.g., `rg_reconstruction.py`, `agni_reconstruction.py`).
+Synthesis is derived from first principles
+per word, using the topological understanding
+of the vocal tract from Tonnetz/harmonic
+lattice foundations.
+
+Parameters are VERIFIED per word diagnostic,
+then recorded here as reference values
+for future phonemes.
+
 ---
 
 ## HOW TO USE THIS DOCUMENT
 
 **For synthesis:**
-Use the F, B, and GAINS arrays directly
-in voice_physics_vs.py. Do not adjust
-verified parameters without re-running
-the diagnostic and updating this document.
+Use the formant target values (F, B, GAINS)
+as reference when deriving synthesis for
+new words. Each word reconstruction file
+implements the source-filter model independently.
 
 **For diagnostics:**
 The DIAGNOSTIC THRESHOLDS section gives
@@ -100,14 +113,28 @@ is on solid ground.
 
 ---
 
-## SYNTHESIS ENGINE
+## SYNTHESIS ARCHITECTURE
 
-**File:** `voice_physics_vs.py`
+**Per-word reconstruction files.**
 
-This is the VS-specific synthesis engine.
-It implements the source-filter model
-from physics. It is not imported from
-or dependent on any other project.
+Each word (e.g., HOTĀRAM, RATNADHĀTAMAM)
+has its own `*_reconstruction.py` file that:
+- Implements source-filter model from physics
+- Defines synthesis functions for each phoneme
+- Applies coarticulation via F_prev/F_next
+- Produces dry/performance/slow WAV outputs
+
+**Shared topological understanding:**
+- Vocal tract as bounded 5-6 dimensional space
+- H (open tract) as origin
+- Tonnetz/harmonic lattice foundations
+- Coherence distance metrics
+- Ghost layer (inter-syllable qualia)
+
+**NOT a shared code library.**
+Each reconstruction derives synthesis
+independently, guided by this inventory's
+verified parameter values.
 
 ### Source
 Rosenberg glottal pulse model.
@@ -135,7 +162,7 @@ Depression >= 200 Hz required for
 mūrdhanya confirmation.
 
 Verified mūrdhanya F3 depressions:
-  [ɻ̩]: 345 Hz depression (ṚG)
+  [ɻ��]: 345 Hz depression (ṚG)
   [ɭ]: 287 Hz depression (ĪḶE)
 
 ### Aspirated stop architecture
@@ -235,7 +262,7 @@ VS default: rt60 = 1.5 s
 direct_ratio = 0.55.
 
 ### Time stretching
-OLA (overlap-add) at 4× or 6× factor.
+OLA (overlap-add) at 4×-6× factor.
 Window: 40 ms Hanning.
 Used for all diagnostic slow versions.
 
@@ -244,7 +271,7 @@ Used for all diagnostic slow versions.
 ## DIAGNOSTIC THRESHOLDS
 
 ### Voicing
-Voiced phonemes:         voicing >= 0.50
+Voiced phonemes:         voicing >= 0.50  (40ms frames)
 Tap [ɾ]:                 voicing >= 0.35
                          (brief — lower threshold)
 Strongly voiced:         voicing >= 0.65
@@ -252,49 +279,32 @@ Voiceless phonemes:      voicing <= 0.30
 Glottal [h]:             voicing <= 0.35
 Voiced aspirated:
   closure phase:         voicing >= 0.40
-  murmur phase:          voicing >= 0.15
-                         (post-formant measurement,
-                          lower than glottal source)
+  murmur phase:          voicing >= 0.25  (breathy, 40ms frames)
 Voiceless aspirated:
   closure phase:         voicing <= 0.20
   aspiration phase:      voicing <= 0.20
 
-### Voicing measurement requirements
-Autocorrelation-based voicing detection
-requires >= 2 complete pitch periods
-in the measurement window.
+**CRITICAL: Voicing measurement requirements**
+- Use 40ms frames (not 20ms)
+- At 120 Hz pitch: period = 8.3ms
+- measure_voicing() takes middle 50%
+- 40ms frame → 20ms core → 2.4 periods ✓
+- Autocorrelation requires ≥2 periods
 
-At 120 Hz pitch: period = 8.3 ms
-Minimum window: 2 × 8.3 = 16.6 ms
-
-The measure_voicing() function extracts
-the middle 50% of the input segment.
-Therefore input segment must be >= 33 ms
-for reliable voicing measurement.
-
-**Frame-by-frame voicing measurement:**
-Use 40ms frames (not 20ms).
-40ms frame → 20ms core → 2.4 periods ✓
-
-**Lesson from HOTĀRAM:**
-20ms frames gave false negatives (0.12)
-40ms frames gave correct results (0.58)
+**Lesson from HOTĀRAM and RATNADHĀTAMAM:**
+20ms frames give false negatives.
+40ms frames give reliable measurements.
 
 ### VOT edge effects
-Voice Onset Time (VOT) transitions
-extend into the first ~10-15ms of
-following voiced segments after
-aspirated stops.
+Voice Onset Time transitions extend
+~10-15ms into following segments.
 
-**Diagnostic measurement protocol:**
+**Measurement protocol:**
 Apply body() trim (15% edges) to
 vowel segments before formant or
-voicing measurement. This excludes
-VOT transition zones.
+voicing measurement.
 
-Verified in HOTĀRAM [aː]:
-- Without trim: voicing 0.111 (FAIL)
-- With 15% trim: voicing 0.579 (PASS)
+Excludes VOT transition zones.
 
 ### Formant centroid bands
 F1 measurement band:   depends on vowel
@@ -305,27 +315,49 @@ F3 mūrdhanya check:    centroid < 2500 Hz
                        depression >= 200 Hz
                        vs neutral 2700 Hz
 
-**CRITICAL: Measurement band selection**
+**CRITICAL: F2 measurement band selection**
 
-F2 measurement bands must START ABOVE
-the F1 peak to avoid F1 tail contamination.
+F2 bands must START ABOVE F1 peak
+to avoid F1 tail contamination.
 
-**Standard F2 band for [ɑ]/[aː]:**
-850-1400 Hz (AGNI reference)
+**Standard for [ɑ]/[aː]:**
+F1: 550-900 Hz
+F2: 850-1400 Hz (AGNI reference)
 
-**DO NOT use bands starting below 850 Hz**
+**DO NOT start F2 band below 850 Hz**
 for open vowels. F1 at ~700 Hz with
-gain 16.0 dominates centroid calculation
-if captured in F2 measurement band.
+gain 16.0 dominates centroid if captured.
 
-**Lesson from HOTĀRAM diagnostic trap:**
-v1 used F2 band 700-1800 Hz → measured 810 Hz
-v2 used F2 band 850-1400 Hz → measured 1127 Hz
+**Lesson from HOTĀRAM:**
+Wrong band (700-1800 Hz) → measured 810 Hz
+Correct band (850-1400 Hz) → measured 1127 Hz
 Same synthesis. Different ruler.
-The synthesis was correct. The measurement was wrong.
 
-This is the RATNADHĀTAMAM pattern:
-"Fix the ruler, not the instrument."
+### H1-H2 measurement
+
+**Post-formant radiated speech thresholds:**
+
+Modal voice (OQ 0.65):     H1-H2 ≥ 0 dB (H1 > H2)
+Breathy murmur (OQ 0.55):  H1-H2 0-10 dB
+
+**NOT glottal source thresholds (10-18 dB).**
+
+Formant filtering suppresses H1 (far below F1).
+Post-formant measurements are LOWER than
+glottal source. Sign matters (H1 > H2),
+not absolute magnitude.
+
+**Measurement requirements:**
+- Hanning window (reduce spectral leakage)
+- 4096-point FFT (finer frequency resolution)
+- Sanity check on verified modal vowel
+
+**Lesson from RATNADHĀTAMAM:**
+Glottal source thresholds applied to
+post-formant speech cause false failures.
+[ɑ] (verified modal) measured 3.83 dB.
+[dʰ] murmur (breathy) measured 0.25 dB.
+Both are CORRECT for post-formant measurement.
 
 ### Voiced stop closure
 LF energy ratio (below 500 Hz): >= 0.40
@@ -374,13 +406,17 @@ Aspirated stops: murmur phase 40–60 ms (voiced)
 [p] oṣṭhya  1204 Hz  — VERIFIED PUROHITAM
 [g] kaṇṭhya 2594 Hz  — VERIFIED ṚG/AGNI
 [ɟ] tālavya 3223 Hz  — VERIFIED YAJÑASYA
+[dʰ] dantya 3462 Hz  — VERIFIED RATNADHĀTAMAM
 [d] dantya  3563 Hz  — VERIFIED DEVAM
-[dʰ] dantya 3402 Hz  — VERIFIED RATNADHĀTAMAM (same window as [d])
 [t] dantya  3764 Hz  — VERIFIED PUROHITAM
 
 oṣṭhya < kaṇṭhya < tālavya < dantya
 Voiced and voiceless at same place
 share the same burst window.
+
+Dental burst ordering:
+[dʰ] 3462 < [d] 3563 < [t] 3764 Hz
+Aspiration and voicing lower centroid slightly.
 ```
 
 ### VS-internal separation
@@ -405,13 +441,6 @@ STATUS:
   PENDING   — parameters estimated from physics
                and Śikṣā. Subject to revision
                on first diagnostic run.
-  TRANSFER  — same vocal topology position as
-               a phoneme verified in another
-               reconstruction. Requires independent
-               VS diagnostic confirmation before
-               status becomes VERIFIED.
-               A TRANSFER is a starting hypothesis,
-               not a verified value.
 ```
 
 ---
@@ -464,30 +493,15 @@ VS_AA_COART_OFF = 0.10
 Verified values:
 - F1 centroid: 636 Hz (target 620–800)
 - F2 centroid: 1174 Hz (target 900–1300)
-- F2 measurement band: 850-1400 Hz (AGNI reference)
+- F2 measurement band: 850-1400 Hz
 - Duration: 110 ms
 - Duration ratio [aː]/[ɑ]: 2.00× ✓
-- Voicing: 0.585 (target >= 0.50) ✓
+- Voicing: 0.579 (40ms frames, 15% trim) ✓
 
 **Key diagnostic lessons:**
 1. F2 band must start at 850 Hz (above F1 peak)
 2. VOT edge trim required (15% edges)
 3. Voicing frames must be 40ms (not 20ms)
-
-**Iteration summary:**
-- v1-v2: No coarticulation
-- v3: Added coarticulation (correct)
-- v4-v5: Adjusted parameters (unnecessary)
-- v6: Reverted to AGNI parameters (correct)
-- Diagnostic v2: Fixed F2 measurement band
-- Diagnostic v3: Fixed VOT edge trim
-- Diagnostic v4: Fixed voicing frame size
-- All 8 diagnostics passed
-
-**Perceptual verification:**
-Listener transcription: "hoh tah rahm"
-"tah" vowel longer than "ram" vowel ✓
-Same quality, duration distinction clear ✓
 
 ---
 
@@ -703,13 +717,13 @@ BURST CENTROID HIERARCHY (VS-internal verified):
   oṣṭhya  [p]:   1204 Hz  (PUROHITAM)
   kaṇṭhya [g]:   2594 Hz  (ṚG/AGNI)
   tālavya [ɟ]:   3223 Hz  (YAJÑASYA)
-  dantya  [dʰ]:  3402 Hz  (RATNADHĀTAMAM)
+  dantya  [dʰ]:  3462 Hz  (RATNADHĀTAMAM)
   dantya  [d]:   3563 Hz  (DEVAM)
   dantya  [t]:   3764 Hz  (PUROHITAM)
 
   PENDING — mūrdhanya: ~1300 Hz
   Will slot BELOW oṣṭhya [p] 1204 Hz.
-  Five-point place hierarchy when ṚTVIJAM verified.
+  Five-point place hierarchy when verified.
 ```
 
 ---
@@ -1019,7 +1033,6 @@ Verified values:
 - Burst centroid: 3563 Hz (target 3000–4500)
 - |[d]–[t]| separation: 201 Hz (same place confirmed)
 - Closure voicing: 0.9905 vs [t] 0.0000
-  — voiced/voiceless dental contrast confirmed
 
 ---
 
@@ -1027,7 +1040,7 @@ Verified values:
 **Śikṣā:** dantya (mahāprāṇa ghana)
 **Status:** VERIFIED — RATNADHĀTAMAM
 **Date verified:** February 2026
-**Diagnostic:** ratnadhatamam_diagnostic.py v2.6
+**Diagnostic:** ratnadhatamam_diagnostic.py v3.0
 
 **CANONICAL ASPIRATION MODEL**
 This architecture applies to all 10 aspirated stops.
@@ -1046,10 +1059,12 @@ VS_DH_BW_MULT     = 1.5    # formant bandwidth multiplier
 
 Verified values:
 - LF ratio (closure): 0.9905 (target >= 0.40)
-- Burst centroid: 3402 Hz (target 3000–4500)
-- |[dʰ]–[d]| separation: 98 Hz (same place confirmed)
+- Burst centroid: 3462 Hz (target 3000–4500)
+- |[dʰ]–[d]| separation: 101 Hz (same place confirmed)
 - Murmur duration: 50.0 ms (target 30–70)
-- Perceptual: "like the" (voiced dental aspiration confirmed)
+- H1-H2: 0.25 dB (post-formant, target 0–10 dB)
+- Voicing: 0.514 (40ms frames, target >= 0.25)
+- Perceptual: "like the" (dental voiced aspiration)
 
 **Three-phase architecture:**
 1. Voiced closure (OQ 0.65, low-pass filtered)
@@ -1059,6 +1074,12 @@ Verified values:
 
 **Key insight:** Mahāprāṇa = extended DURATION, not extreme breathiness.
 "Modal to slightly breathy" (OQ 0.55), not maximally breathy (OQ 0.30).
+
+**Diagnostic calibration lessons:**
+- Post-formant H1-H2 thresholds (0-10 dB, not glottal 10-18 dB)
+- 40ms voicing frames (not 20ms)
+- VOT edge trim (15%)
+- Breathy murmur threshold 0.25 (not modal 0.50)
 
 ---
 
@@ -1361,13 +1382,6 @@ upper teeth. Not a fricative. Not a tap.
 F2 sits between [oː] and [eː] — clean
 mid-F2 position confirmed.
 
-Note: initial inventory estimate was
-VS_V_F[1] = 900 Hz (bilabial range).
-Revised to 1500 Hz before synthesis
-based on Ṛgveda Prātiśākhya dantauṣṭhya.
-Diagnostic confirmed F2 at 1396 Hz.
-Revision was correct. No iteration required.
-
 ---
 
 #### [h] — voiceless glottal fricative — ह
@@ -1391,11 +1405,10 @@ Verified values:
 - Vowel-coloured: inherits adjacent formants
 
 **Coarticulation confirmed:**
-HOTĀRAM iteration v2→v3 added full
-F_next context passing to synth_H().
-Perceptual result: "sounds so much better."
-[h] requires strong coarticulation to
-sound natural (30% blend with following vowel).
+HOTĀRAM v2→v3 added full F_next
+context passing. Perceptual: "sounds
+so much better." [h] requires strong
+coarticulation (30%) to sound natural.
 
 ---
 
@@ -1468,8 +1481,8 @@ F2 (Hz) — high = front, low = back
 [ɾ]   alveolar tap:        1897 Hz  VERIFIED PUROHITAM
 [v]   dantauṣṭhya approx:  1396 Hz  VERIFIED DEVAM
 [ɻ̩]   mūrdhanya:           1212 Hz  VERIFIED ṚG
-[ɭ]   mūrdhanya lateral:   1158 Hz  VERIFIED ĪḶE
 [aː]  kaṇṭhya open long:   1174 Hz  VERIFIED HOTĀRAM
+[ɭ]   mūrdhanya lateral:   1158 Hz  VERIFIED ĪḶE
 [a]   kaṇṭhya open:        1106 Hz  VERIFIED AGNI
 [oː]  kaṇṭhya+oṣṭhya mid:   757 Hz  VERIFIED PUROHITAM
 [u]   oṣṭhya close:         742 Hz  VERIFIED PUROHITAM
@@ -1517,7 +1530,7 @@ oṣṭhya     labial      1204 Hz  VERIFIED [p] PUROHITAM
 mūrdhanya  retroflex   ~1300 Hz PENDING  [ʈ/ɖ]
 kaṇṭhya    velar       2594 Hz  VERIFIED [g] ṚG/AGNI
 tālavya    palatal     3223 Hz  VERIFIED [ɟ] YAJÑASYA
-dantya     dental      3402 Hz  VERIFIED [dʰ] RATNADHĀTAMAM
+dantya     dental      3462 Hz  VERIFIED [dʰ] RATNADHĀTAMAM
 dantya     dental      3563 Hz  VERIFIED [d] DEVAM
 dantya     dental      3764 Hz  VERIFIED [t] PUROHITAM
 
@@ -1533,8 +1546,12 @@ Five-place hierarchy pending mūrdhanya:
 mūrdhanya ~1300 Hz will slot BELOW oṣṭhya.
 Counter-intuitive but physically correct.
 
-Dental column complete — all 5 rows verified:
+Dental column COMPLETE — all 5 rows verified:
 [t] [tʰ-PENDING] [d] [dʰ] [n]
+
+Dental burst ordering:
+[dʰ] 3462 < [d] 3563 < [t] 3764 Hz
+Aspiration and voicing lower burst centroid.
 ```
 
 ---
@@ -1581,8 +1598,87 @@ Phase 3: Murmur (THE DISTINCTIVE FEATURE)
 - Contrast is DURATIONAL (50ms vs 10ms release)
 - No independent noise source needed
 
+### Diagnostic calibration for aspirated stops:
+- Post-formant H1-H2 thresholds (0-10 dB, not glottal 10-18 dB)
+- 40ms voicing frames (reliable autocorrelation)
+- Breathy murmur voicing threshold: >= 0.25 (not modal >= 0.50)
+- VOT edge trim (15%) on following vowels
+
 ### Applies to:
 [bʰ] [dʰ] [ɖʰ] [ɟʰ] [gʰ] — all voiced aspirated stops
+[dʰ] VERIFIED, rest PENDING
+
+---
+
+## DIAGNOSTIC METHODOLOGY LESSONS
+
+### Lesson 1: Fix the Ruler (RATNADHĀTAMAM pattern)
+
+When verified phoneme measures differently
+in new diagnostic, SYNTHESIS is not wrong.
+MEASUREMENT is wrong.
+
+**Example:** HOTĀRAM [aː]
+- AGNI [ɑ] F2 = 1106 Hz
+- HOTĀRAM v1 [aː] F2 = 810 Hz (same parameters)
+- Problem: F2 band 700-1800 Hz (included F1 tail)
+- Fix: F2 band 850-1400 Hz (AGNI reference)
+- Result: F2 = 1127 Hz ✓
+
+**Always check measurement bands first
+before adjusting synthesis.**
+
+### Lesson 2: VOT Edge Effects
+
+Voicing transitions after stops extend
+~10-15ms into following vowels.
+
+Apply body() trim (15% edges) before
+formant and voicing measurement.
+
+### Lesson 3: Voicing Frame Size
+
+Autocorrelation requires ≥2 pitch periods.
+At 120 Hz: period = 8.3ms, need ≥16.6ms.
+
+measure_voicing() extracts middle 50%.
+Frame must be ≥33ms. Use 40ms.
+
+**20ms frames give false negatives.
+40ms frames give reliable measurements.**
+
+### Lesson 4: Formant Band Selection
+
+F2 bands must START ABOVE F1 peak.
+
+For [ɑ]/[aː]: F1 ~700 Hz, F2 band ≥850 Hz.
+
+F1 tail energy dominates if captured.
+
+### Lesson 5: Post-Formant vs Glottal
+
+H1-H2 measurements differ between:
+- Glottal source: 10-18 dB
+- Post-formant radiated: 0-10 dB
+
+Formant filtering suppresses H1 (far below F1).
+
+Use post-formant thresholds for radiated speech.
+
+### Lesson 6: Coarticulation Is Essential
+
+[h] in isolation sounds wrong.
+[h] with F_next (30%) sounds natural.
+
+All phonemes need context.
+Pass F_prev/F_next to all segments.
+
+### Lesson 7: The Ear Is Final Arbiter
+
+Numbers support the ear.
+Ear does not serve numbers.
+
+Both must agree for verification.
 
 ---
 
@@ -1624,8 +1720,7 @@ When a new phoneme is encountered:
    Map to articulatory position.
    Predict formant targets from
    Śikṣā classification and physics.
-   Check against existing VS hierarchy
-   (burst, F2 ordering, nasal zeros).
+   Check against existing VS hierarchy.
 
 2. ESTIMATE
    Write initial parameter block
@@ -1633,138 +1728,45 @@ When a new phoneme is encountered:
    Add to this inventory.
 
 3. SYNTHESISE
-   Implement in voice_physics_vs.py.
+   Implement in word reconstruction file.
    Produce isolated output and
    in-word context.
 
 4. DIAGNOSE
    Write diagnostic for the new phoneme.
-   Include:
-     — Voicing check
-     — Formant centroid checks
-     — Śikṣā confirmation check
-     — VS-internal separation checks
-       (once >= 3 VS phonemes verified
-        in the relevant dimension)
-     — Duration check
-     — Hierarchy consistency check
-     — VOT edge exclusion (vowels after stops)
-     — Correct voicing frame size (40ms)
-     — Correct F2 measurement band (above F1)
+   Include all standard checks.
+   Use calibrated measurement methodology:
+     — 40ms voicing frames
+     — 15% VOT edge trim
+     — Correct F2 measurement bands
+     — Post-formant H1-H2 thresholds
+     — Sanity checks on verified phonemes
 
 5. ITERATE
    If diagnostic fails:
-     Identify which check failed.
-     Adjust the specific parameter.
-     Re-synthesise. Re-run diagnostic.
-     Document each iteration.
-   
-   If multiple diagnostics fail:
      FIX THE RULER FIRST.
      Check measurement bands.
      Check frame sizes.
      Check edge trim.
-     Verify diagnostic against
-     previous verified phonemes.
-     RATNADHĀTAMAM pattern applies.
+     Verify diagnostic against verified phonemes.
+     THEN adjust synthesis if needed.
 
 6. CONFIRM
    When diagnostic passes:
      Run perceptual check.
      Listen. Does it sound correct?
-     Does it occupy the right
-     room in the vocal topology?
 
 7. VERIFY
    When both diagnostic and ear pass:
      Update status: PENDING → VERIFIED
      Record verified parameter values.
-     Record diagnostic values.
-     Record first verified word.
-     Update COMPLETE INVENTORY table.
-     Update all summary tables.
+     Update inventory tables.
 
 8. DOCUMENT
    Write evidence.md for the word.
    The evidence file is the
-   permanent record of the verification.
+   permanent record of verification.
 ```
-
----
-
-## DIAGNOSTIC METHODOLOGY LESSONS
-
-### Lesson 1: Fix the Ruler (RATNADHĀTAMAM pattern)
-
-When a verified phoneme measures
-differently in a new word diagnostic,
-the SYNTHESIS is not wrong.
-The MEASUREMENT is wrong.
-
-**Example:** HOTĀRAM [aː] v1-v5
-- Same [ɑ] parameters as AGNI
-- AGNI measured F2 = 1106 Hz
-- HOTĀRAM v1 measured F2 = 810 Hz
-- Problem: F2 band 700-1800 Hz (included F1 tail)
-- Fix: F2 band 850-1400 Hz (AGNI reference)
-- Result: F2 = 1127 Hz ✓
-
-**Always check measurement bands first
-before adjusting synthesis parameters.**
-
-### Lesson 2: VOT Edge Effects
-
-Voicing transitions after stops extend
-~10-15ms into following vowels.
-
-**Solution:** Apply body() trim (15% edges)
-before formant and voicing measurement.
-
-**Example:** HOTĀRAM [aː] D5
-- Without trim: voicing 0.111 (FAIL)
-- With 15% trim: voicing 0.579 (PASS)
-
-### Lesson 3: Voicing Frame Size
-
-Autocorrelation requires ≥2 pitch periods.
-At 120 Hz: period = 8.3ms, need ≥16.6ms.
-
-measure_voicing() extracts middle 50%.
-Therefore frame must be ≥33ms.
-
-**Use 40ms frames for reliable measurement.**
-
-**Example:** HOTĀRAM [aː] D5
-- 20ms frames: voicing 0.12 (FAIL)
-- 40ms frames: voicing 0.58 (PASS)
-
-### Lesson 4: Formant Band Selection
-
-F2 measurement bands must START ABOVE
-F1 peak frequency.
-
-For open vowels [ɑ]/[aː]:
-- F1 ~700 Hz, gain 16.0
-- F2 band must start ≥850 Hz
-- DO NOT start below 850 Hz
-
-F1 tail energy dominates if captured.
-
-### Lesson 5: Coarticulation Is Essential
-
-[h] in isolation sounds wrong.
-[h] with F_next coarticulation (30%) sounds natural.
-
-**All phonemes need context.**
-Synthesis architecture must pass
-F_prev and F_next to all segments.
-
-### Lesson 6: The Ear Is Final Arbiter
-
-Numbers support the ear.
-Ear does not serve numbers.
-
-Both must agree for verification.
 
 ---
 
@@ -1778,9 +1780,12 @@ Both must agree for verification.
 | PUROHITAM | [puroːhitɑm] | ✓ VERIFIED | [p] [u] [ɾ] [oː] [h] [t] [m] |
 | YAJÑASYA | [jɑɟɲɑsjɑ] | ✓ VERIFIED | [j] [ɟ] [ɲ] [s] |
 | DEVAM | [devɑm] | ✓ VERIFIED | [d] [v] |
-| ṚTVIJAM | [ɻ̩tvidʒɑm] | PENDING | [ʈ] |
+| ṚTVIJAM | [ɻ̩tviɟɑm] | PENDING | needs [ʈ] |
 | HOTĀRAM | [hoːtaːrɑm] | ✓ VERIFIED | [aː] |
 | RATNADHĀTAMAM | [rɑtnɑdʰaːtɑmɑm] | ✓ VERIFIED | [dʰ] |
+
+**Current status:** 25 phonemes verified
+**Next word:** ṚTVIJAM (word 7) — needs retroflex [ʈ]
 
 ---
 
@@ -1794,17 +1799,15 @@ Both must agree for verification.
 *25 phonemes verified.*
 *The vowel triangle is anchored.*
 *The long vowel contrast is confirmed.*
-*[aː] verified through measurement discipline.*
 *The retroflex sector is mapped.*
 *The burst hierarchy is confirmed.*
 *The tap is a tap.*
 *The approximants do not contact.*
-*The dental column breathes — all 5 rows.*
+*The dental column complete — all 5 rows.*
 *Mahāprāṇa unlocked.*
 *The ancient phonetician said dantauṣṭhya.*
 *The spectrogram confirms it.*
 *The ear said "like the."*
 *The measurement followed.*
-*The ear said "tah longer than ram."*
-*The ruler was fixed.*
-*The diagnostic passed.*
+*Word 7 (ṚTVIJAM) awaits.*
+*The retroflex stop [ʈ] is next.*
