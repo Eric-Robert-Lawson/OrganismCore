@@ -78,6 +78,57 @@ for future phonemes.
 
 ---
 
+## METHODOLOGICAL FOUNDATION
+
+**This reconstruction uses the Tonnetz-vocal topology framework.**
+
+**The process:**
+
+1. **Tonnetz analysis** (Euler 1739)
+   - Coherence space with origin (tonic)
+   - Distance metric (ratio complexity)
+   - Geodesics (voice leading)
+   - Arc types (harmonic trajectories)
+
+2. **Vocal topology derivation** (February 2026)
+   - Coherence space with origin (H - open tract)
+   - Distance metric (articulatory displacement)
+   - Geodesics (CV syllables)
+   - Arc types (prosodic trajectories)
+
+3. **Connection** (Tonnetz_voice_topology_bridge.md)
+   - Realized: same mathematical structure
+   - Different physical substrates
+   - Language IS music (structurally)
+
+4. **Application to Vedic Sanskrit**
+   - Śikṣā classifications → acoustic targets
+   - Synthesis from principles
+   - Verification via convergence
+
+**The Tonnetz was the key that unlocked the structure.**
+
+The vocal tract is the physical instrument that
+instantiates it. Every phoneme derivation uses
+this unified framework - not imported from other
+projects, but guided by the principles discovered
+through the Tonnetz-vocal topology connection.
+
+**This is principles-first reconstruction:**
+- Physics derives the space (vocal topology)
+- Tonnetz provides the framework (coherence principles)
+- Śikṣā maps the space from inside (ancient phonetics)
+- Convergence of all three = verification
+
+Where a VS phoneme happens to match a phoneme
+verified in another project (e.g., [g] velar stop),
+this is convergence evidence for the universal
+topology - the same physics produces the same
+result. It is NOT a dependency or transfer of
+values. Both projects independently derived the
+same position in the same physical space.
+
+---
 ## HOW TO USE THIS DOCUMENT
 
 **For synthesis:**
