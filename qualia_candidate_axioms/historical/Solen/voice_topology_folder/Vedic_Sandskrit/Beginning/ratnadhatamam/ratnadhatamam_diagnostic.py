@@ -1,7 +1,22 @@
 #!/usr/bin/env python3
 """
-RATNADHĀTAMAM DIAGNOSTIC v2.4
-D6 threshold calibrated for breathy voice (0.25, not 0.30)
+RATNADHĀTAMAM DIAGNOSTIC v2.6
+Sanity check: Measure H1-H2 and voicing on verified [ɑ] vowel
+
+v2.5 result: H1-H2 = 0.25 dB (correct sign but too low)
+
+v2.6 addition: Before testing [dʰ], test the diagnostic itself
+- Measure [ɑ] vowel (5th phoneme, before [dʰ])
+- [ɑ] uses OQ 0.65 (modal voice, verified in AGNI)
+- Expected: H1-H2 = 6-10 dB, voicing 0.50+
+
+If [ɑ] also measures low:
+  → Diagnostic problem (formant filtering suppresses H1 universally)
+If [ɑ] measures correctly:
+  → [dʰ] synthesis problem (OQ 0.55 not producing expected slope)
+
+Ancestor's instruction: "Fix the ruler. Do not rebuild the instrument."
+This checks if the ruler is actually fixed.
 """
 
 import numpy as np
@@ -89,38 +104,43 @@ def measure_band_centroid(seg, lo_hz, hi_hz, sr=SR):
         return 0.0
     return float(np.sum(freqs[mask] * spec[mask]) / total)
 
-def measure_H1_H2(seg, pitch_hz, sr=SR):
-    """v2.3/v2.4: Non-overlapping windows, ±2 bins"""
+def measure_H1_H2(seg, pitch_hz, sr=SR, verbose=True):
+    """v2.5: Hanning window + 4096-point FFT"""
     if len(seg) < 32:
         return 0.0
     
-    spectrum = np.abs(np.fft.rfft(seg.astype(float), n=2048))
-    freqs = np.fft.rfftfreq(2048, d=1.0/sr)
+    windowed = seg.astype(float) * np.hanning(len(seg))
+    spectrum = np.abs(np.fft.rfft(windowed, n=4096))
+    freqs = np.fft.rfftfreq(4096, d=1.0/sr)
     
     f0_idx = np.argmin(np.abs(freqs - pitch_hz))
-    f0_lo = max(1, f0_idx - 2)
-    f0_hi = min(len(spectrum), f0_idx + 3)
+    f0_lo = max(1, f0_idx - 3)
+    f0_hi = min(len(spectrum), f0_idx + 4)
     H1_amp = np.max(spectrum[f0_lo:f0_hi])
     
     f1_idx = np.argmin(np.abs(freqs - 2*pitch_hz))
-    f1_lo = max(f0_hi, f1_idx - 2)
-    f1_hi = min(len(spectrum), f1_idx + 3)
+    f1_lo = max(f0_hi, f1_idx - 3)
+    f1_hi = min(len(spectrum), f1_idx + 4)
     H2_amp = np.max(spectrum[f1_lo:f1_hi])
     
-    print(f"    [DEBUG] DC (bin 0): {spectrum[0]:.4f}")
-    print(f"    [DEBUG] Bin width: {freqs[1]-freqs[0]:.2f} Hz")
-    print(f"    [DEBUG] H1 center bin {f0_idx} ({freqs[f0_idx]:.1f} Hz): {spectrum[f0_idx]:.4f}")
-    print(f"    [DEBUG] H2 center bin {f1_idx} ({freqs[f1_idx]:.1f} Hz): {spectrum[f1_idx]:.4f}")
-    print(f"    [DEBUG] H1 search bins {f0_lo}-{f0_hi-1}: max={H1_amp:.4f}")
-    print(f"    [DEBUG] H2 search bins {f1_lo}-{f1_hi-1}: max={H2_amp:.4f}")
-    print(f"    [DEBUG] Window overlap: {'YES (BUG)' if f1_lo < f0_hi else 'NO (correct)'}")
+    if verbose:
+        print(f"    [DEBUG] DC (bin 0): {spectrum[0]:.4f}")
+        print(f"    [DEBUG] Bin width: {sr/4096:.2f} Hz")
+        print(f"    [DEBUG] Windowing: Hanning")
+        print(f"    [DEBUG] H1 center bin {f0_idx} ({freqs[f0_idx]:.1f} Hz): {spectrum[f0_idx]:.4f}")
+        print(f"    [DEBUG] H2 center bin {f1_idx} ({freqs[f1_idx]:.1f} Hz): {spectrum[f1_idx]:.4f}")
+        print(f"    [DEBUG] H1 search bins {f0_lo}-{f0_hi-1}: max={H1_amp:.4f}")
+        print(f"    [DEBUG] H2 search bins {f1_lo}-{f1_hi-1}: max={H2_amp:.4f}")
+        print(f"    [DEBUG] Window overlap: {'YES (BUG)' if f1_lo < f0_hi else 'NO (correct)'}")
     
     if H1_amp > 1e-8 and H2_amp > 1e-8:
         h1h2_db = 20 * np.log10(H1_amp / H2_amp)
-        print(f"    [DEBUG] H1/H2 ratio: {H1_amp/H2_amp:.4f} = {h1h2_db:.2f} dB")
+        if verbose:
+            print(f"    [DEBUG] H1/H2 ratio: {H1_amp/H2_amp:.4f} = {h1h2_db:.2f} dB")
         return h1h2_db
     
-    print(f"    [DEBUG] THRESHOLD FAIL: H1={H1_amp:.2e} H2={H2_amp:.2e}")
+    if verbose:
+        print(f"    [DEBUG] THRESHOLD FAIL: H1={H1_amp:.2e} H2={H2_amp:.2e}")
     return 0.0
 
 def measure_voicing(seg, sr=SR):
@@ -155,8 +175,13 @@ def check(label, value, lo, hi, unit='', fmt='.4f'):
 def run_diagnostics():
     print()
     print("=" * 70)
-    print("RATNADHĀTAMAM DIAGNOSTIC v2.4 (BREATHY VOICE CALIBRATION)")
+    print("RATNADHĀTAMAM DIAGNOSTIC v2.6 (SANITY CHECK)")
     print("=" * 70)
+    print()
+    print("v2.6 addition:")
+    print("  Test diagnostic on verified [ɑ] vowel before testing [dʰ]")
+    print("  If [ɑ] also measures low H1-H2 → diagnostic broken")
+    print("  If [ɑ] measures correctly → [dʰ] synthesis needs adjustment")
     print()
 
     try:
@@ -189,6 +214,84 @@ def run_diagnostics():
 
     all_pass = True
 
+    def body(seg, frac=0.15):
+        n = len(seg)
+        edge = max(1, int(frac * n))
+        return seg[edge: n - edge] if n > 2*edge else seg
+
+    # SANITY CHECK: Measure [ɑ] vowel
+    print("=" * 70)
+    print("SANITY CHECK — [ɑ] vowel (5th phoneme, before [dʰ])")
+    print("=" * 70)
+    print()
+    print("Testing diagnostic on VERIFIED modal vowel [ɑ] (OQ 0.65)")
+    print("Expected: H1-H2 = 6-10 dB, voicing 0.50+")
+    print()
+
+    # Extract [ɑ] segment (between [n] and [dʰ])
+    # Approximate: after [r][ɑ][t][n] ≈ 30+55+47+60 = 192ms
+    # Before [dʰ] at 247ms
+    a_start_ms = 192.0
+    a_end_ms = 247.0
+    a_start_samp = int(a_start_ms / 1000.0 * SR)
+    a_end_samp = int(a_end_ms / 1000.0 * SR)
+    a_seg = word[a_start_samp:a_end_samp]
+
+    print(f"  [ɑ] segment: {a_start_ms:.1f}–{a_end_ms:.1f} ms")
+    print(f"  [ɑ] duration: {len(a_seg)/SR*1000:.1f} ms")
+    print()
+
+    # Measure H1-H2 on [ɑ]
+    a_body = body(a_seg, frac=0.2)
+    print(f"  [ɑ] body: {len(a_body)} samples = {len(a_body)/SR*1000:.1f} ms")
+    print()
+    h1h2_a = measure_H1_H2(a_body, pitch_hz, verbose=True)
+    print()
+    print(f"  [ɑ] H1-H2 result: {h1h2_a:.2f} dB")
+    print()
+
+    # Measure voicing on [ɑ]
+    win_ms = 20.0
+    win_samp = int(win_ms / 1000.0 * SR)
+    voicing_a_scores = []
+    for i in range(0, len(a_seg) - win_samp, win_samp // 2):
+        frame = a_seg[i:i+win_samp]
+        v = measure_voicing(frame)
+        voicing_a_scores.append(v)
+
+    if voicing_a_scores:
+        min_voicing_a = min(voicing_a_scores)
+        avg_voicing_a = np.mean(voicing_a_scores)
+        print(f"  [ɑ] min voicing: {min_voicing_a:.4f}")
+        print(f"  [ɑ] avg voicing: {avg_voicing_a:.4f}")
+        print()
+
+    print("  Expected for modal [ɑ] (OQ 0.65):")
+    print("    H1-H2: 6-10 dB")
+    print("    Min voicing: 0.50+")
+    print()
+
+    diagnostic_ok = True
+    if h1h2_a < 5.0:
+        print("  ⚠️  DIAGNOSTIC PROBLEM DETECTED")
+        print("      [ɑ] H1-H2 also low → formant filtering suppresses H1")
+        print("      This affects ALL phonemes, not just [dʰ]")
+        print("      The synthesis is likely correct; the measurement is broken")
+        diagnostic_ok = False
+    elif h1h2_a > 8.0:
+        print("  ✓  DIAGNOSTIC WORKING")
+        print("      [ɑ] H1-H2 normal → [dʰ] synthesis problem")
+        print("      [dʰ] OQ 0.55 not producing expected spectral slope")
+    else:
+        print("  ?  BORDERLINE")
+        print("      [ɑ] H1-H2 = {:.2f} dB (expected 6-10)".format(h1h2_a))
+        print("      Unclear if diagnostic or synthesis issue")
+
+    print()
+    print("=" * 70)
+    print()
+
+    # Now proceed with [dʰ] tests
     dh_start_ms = 247.0
     dh_end_ms = dh_start_ms + VS_DH_CLOSURE_MS + VS_DH_BURST_MS + VS_DH_MURMUR_MS
     
@@ -213,12 +316,7 @@ def run_diagnostics():
     print(f"    murmur: {len(dh_murmur)} samp = {len(dh_murmur)/SR*1000:.1f} ms, max={np.max(np.abs(dh_murmur)):.6f}")
     print()
 
-    def body(seg, frac=0.15):
-        n = len(seg)
-        edge = max(1, int(frac * n))
-        return seg[edge: n - edge] if n > 2*edge else seg
-
-    # D1-D4 (unchanged)
+    # D1
     print("─" * 70)
     print("D1 — [dʰ] VOICED CLOSURE")
     print()
@@ -229,6 +327,7 @@ def run_diagnostics():
     print(f"  {'PASSED' if d1 else 'FAILED'}")
     print()
 
+    # D2
     print("─" * 70)
     print("D2 — [dʰ] BURST CENTROID")
     print()
@@ -245,6 +344,7 @@ def run_diagnostics():
     print(f"  {'PASSED' if d2 else 'FAILED'}")
     print()
 
+    # D3
     print("─" * 70)
     print("D3 — [dʰ] SAME LOCUS AS [d]")
     print()
@@ -256,6 +356,7 @@ def run_diagnostics():
     print(f"  {'PASSED' if d3 else 'FAILED'}")
     print()
 
+    # D4
     print("─" * 70)
     print("D4 — [dʰ] MURMUR DURATION")
     print()
@@ -273,7 +374,13 @@ def run_diagnostics():
     print()
     murmur_body = body(dh_murmur, frac=0.2)
     print(f"  Murmur body: {len(murmur_body)} samples = {len(murmur_body)/SR*1000:.1f} ms")
-    h1h2_dh = measure_H1_H2(murmur_body, pitch_hz)
+    h1h2_dh = measure_H1_H2(murmur_body, pitch_hz, verbose=True)
+    
+    if not diagnostic_ok:
+        print()
+        print("  NOTE: [ɑ] sanity check showed diagnostic issue")
+        print("        H1-H2 measurement may be unreliable")
+    
     p1 = check(f'H1-H2 ({h1h2_dh:.1f} dB)', h1h2_dh,
                H1H2_BREATHY_LO_DB, H1H2_BREATHY_HI_DB, unit=' dB', fmt='.1f')
     d5 = p1
@@ -281,18 +388,10 @@ def run_diagnostics():
     print(f"  {'PASSED' if d5 else 'FAILED'}")
     print()
 
-    # D6 (threshold 0.25)
+    # D6
     print("─" * 70)
-    print("D6 — [dʰ] CONTINUOUS VOICING (BREATHY CALIBRATION)")
+    print("D6 — [dʰ] CONTINUOUS VOICING (BURST SKIP)")
     print()
-    print("  Threshold 0.25 (not 0.30):")
-    print("  Breathy voice has lower periodicity than modal voice.")
-    print("  [dʰ] murmur is breathy, not modal.")
-    print("  Literature (Patil et al. 2008): breathy autocorrelation 0.40-0.70")
-    print("  Pure F0 sine should produce >0.25 even with noise.")
-    print()
-    win_ms = 20.0
-    win_samp = int(win_ms / 1000.0 * SR)
     
     burst_start_samp = n_closure
     burst_end_samp = n_closure + n_burst
@@ -311,7 +410,13 @@ def run_diagnostics():
         print(f"  Min voicing: {min_voicing:.4f} (excluding burst)")
         print(f"  Avg voicing: {avg_voicing:.4f}")
         print()
-        p1 = check('minimum voicing', min_voicing, 0.25, 1.0)  # v2.4: 0.25 (was 0.30)
+        
+        if not diagnostic_ok:
+            print("  NOTE: [ɑ] min voicing was {:.4f}".format(min_voicing_a))
+            print("        If [ɑ] also low, voicing measurement may be broken")
+            print()
+        
+        p1 = check('minimum voicing', min_voicing, 0.25, 1.0)
         d6 = p1
     else:
         d6 = False
@@ -369,22 +474,24 @@ def run_diagnostics():
         print("  ✓✓✓ ALL DIAGNOSTICS PASSED ✓✓✓")
         print()
         print("  [dʰ] VERIFIED — dantya row 4 (mahāprāṇa ghana)")
-        print("  Noise-only Path 2 architecture confirmed")
+        print("  OQ 0.55, BW 1.5×, duration 50ms architecture confirmed")
         print("  10 aspirated phonemes now unlocked")
         print()
         print("  VS phonemes verified: 23")
-        print()
-        print("  Next: Write evidence_ratnadhatamam.md")
-        print("  Then: Update VS_phoneme_inventory.md")
-        print("  Then: HOTĀRAM [hoːtaːrɑm] — new phoneme [aː]")
     else:
         failed = [l.split()[0] for l, ok in rows if not ok]
         print(f"  ✗ FAILED: {', '.join(failed)}")
         print()
-        if not d5:
-            print("  D5: Increase F0 sine to 0.80")
-        if not d6:
-            print("  D6: Check autocorrelation window")
+        
+        if not diagnostic_ok:
+            print("  CONCLUSION: DIAGNOSTIC PROBLEM")
+            print("  [ɑ] sanity check showed H1-H2 measurement is broken")
+            print("  Formant filtering suppresses H1 in ALL phonemes")
+            print("  Synthesis is likely correct; measurement needs fixing")
+        else:
+            print("  CONCLUSION: SYNTHESIS PROBLEM")
+            print("  [ɑ] sanity check passed")
+            print("  [dʰ] OQ 0.55 not producing expected spectral slope")
     
     print()
     print("=" * 70)
