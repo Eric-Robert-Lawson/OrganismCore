@@ -1,26 +1,25 @@
 #!/usr/bin/env python3
 """
-HOTĀRAM v3 — Full coarticulation implementation
+HOTĀRAM v6 — Revert to AGNI verified parameters
 Rigveda 1.1.1, word 8
 
-ITERATION v2→v3:
-  Problem: [aː] and [ɑ] formants still measuring low (v1=v2)
-           Coarticulation parameters existed but not used
-           [h] sounds too noisy (no vowel context)
+ITERATION v5→v6:
+  Problem: F2 measuring low across all iterations (v1-v5)
+           Isolated [ɑ] F2=762 Hz vs target 1100 Hz
+           BUT: AGNI verified [ɑ] F2=1106 Hz with SAME parameters
   
-  Cause: Synthesis functions don't implement coarticulation
-         No F_prev/F_next parameters
-         Phonemes synthesized in isolation, then concatenated
+  Diagnosis: MEASUREMENT PROBLEM, not synthesis problem
+           - Diagnostic F2 band starts at 700 Hz (captures F1 tail)
+           - AGNI F2 band starts at 850 Hz (excludes F1 tail)
+           - F1 gain (16.0) dominates centroid calculation
+           - Measured centroid pulled down by F1 energy
   
-  Fix: Implement AGNI coarticulation architecture
-       - All functions accept F_prev, F_next
-       - Blend formant targets at onset/offset
-       - Use inventory coarticulation weights
-       - Pass contexts in word synthesis
+  Fix: REVERT to AGNI verified parameters
+       NO synthesis changes needed
+       Parameters were correct all along
+       Diagnostic will be fixed separately
   
-  Expected: Formants reach targets at steady-state
-            Voicing improves
-            [h] sounds vowel-colored (darker)
+  Ancestor directive: "The synthesis is correct. Fix the ruler."
 
 February 2026
 """
@@ -36,11 +35,11 @@ DTYPE = np.float32
 os.makedirs("output_play", exist_ok=True)
 
 # ============================================================================
-# PHONEME PARAMETERS (from VS inventory)
+# PHONEME PARAMETERS (v6 - AGNI VERIFIED VALUES RESTORED)
 # ============================================================================
 
 # [h] voiceless glottal fricative — VERIFIED PUROHITAM
-VS_H_F_APPROX = [500.0, 1500.0, 2500.0, 3500.0]  # neutral formant context
+VS_H_F_APPROX = [500.0, 1500.0, 2500.0, 3500.0]
 VS_H_B        = [200.0,  300.0,  400.0,  500.0]
 VS_H_GAINS    = [  0.3,    0.2,    0.15,   0.1]
 VS_H_DUR_MS    = 65.0
@@ -62,11 +61,12 @@ VS_T_BURST_BW   = 1500.0
 VS_T_BURST_MS   = 7.0
 VS_T_VOT_MS     = 15.0
 VS_T_BURST_GAIN = 0.38
-VS_T_LOCUS_F    = [700.0, 1800.0, 2500.0, 3500.0]  # VOT formant context
+VS_T_LOCUS_F    = [700.0, 1800.0, 2500.0, 3500.0]
 
 # [aː] long open central unrounded — PENDING (this word)
-VS_AA_F      = [700.0, 1100.0, 2550.0, 3400.0]
-VS_AA_B      = [130.0,  160.0,  220.0,  280.0]
+# v6: RESTORED to AGNI verified values
+VS_AA_F      = [700.0, 1100.0, 2550.0, 3400.0]  # AGNI original
+VS_AA_B      = [130.0,  160.0,  220.0,  280.0]  # AGNI original
 VS_AA_GAINS  = [ 16.0,    6.0,    1.5,    0.5]
 VS_AA_DUR_MS = 110.0
 VS_AA_COART_ON  = 0.10
@@ -83,8 +83,9 @@ VS_R_COART_ON  = 0.15
 VS_R_COART_OFF = 0.15
 
 # [ɑ] short open central unrounded — VERIFIED AGNI
-VS_A_F      = [700.0, 1100.0, 2550.0, 3400.0]
-VS_A_B      = [130.0,  160.0,  220.0,  280.0]
+# v6: RESTORED to AGNI verified values
+VS_A_F      = [700.0, 1100.0, 2550.0, 3400.0]  # AGNI original
+VS_A_B      = [130.0,  160.0,  220.0,  280.0]  # AGNI original
 VS_A_GAINS  = [ 16.0,    6.0,    1.5,    0.5]
 VS_A_DUR_MS = 55.0
 VS_A_COART_ON  = 0.12
@@ -181,23 +182,14 @@ def ola_stretch(sig, factor=6.0, sr=SR):
     return f32(out)
 
 # ============================================================================
-# PHONEME SYNTHESIS FUNCTIONS (v3 - AGNI coarticulation pattern)
+# PHONEME SYNTHESIS FUNCTIONS
 # ============================================================================
 
 def synth_H(F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
-    """
-    [h] voiceless glottal fricative (VERIFIED PUROHITAM)
-    v3: Accepts F_next for vowel context coarticulation.
-    
-    [h] is acoustically transparent — inherits formant
-    context from adjacent vowel. Without F_next, noise
-    is too bright (generic broadband). With F_next=[oː],
-    noise is darker, vowel-colored.
-    """
+    """[h] voiceless glottal fricative (VERIFIED PUROHITAM)"""
     n = int(VS_H_DUR_MS * dil / 1000.0 * SR)
     noise = np.random.randn(n)
     
-    # Blend formant context with following vowel
     f_ctx = list(VS_H_F_APPROX)
     if F_next is not None:
         for k in range(min(len(F_next), len(f_ctx))):
@@ -210,14 +202,10 @@ def synth_H(F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
     return f32(out)
 
 def synth_OO(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
-    """
-    [oː] long close-mid back rounded (VERIFIED PUROHITAM)
-    v3: Full coarticulation with F_prev, F_next
-    """
+    """[oː] long close-mid back rounded (VERIFIED PUROHITAM)"""
     n = int(VS_OO_DUR_MS * dil / 1000.0 * SR)
     src = rosenberg_pulse(n, pitch_hz)
     
-    # Blend formants
     f_mean = list(VS_OO_F)
     if F_prev is not None:
         for k in range(min(len(F_prev), len(VS_OO_F))):
@@ -233,11 +221,7 @@ def synth_OO(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
     return f32(out)
 
 def synth_T(pitch_hz=PITCH_HZ, dil=1.0):
-    """
-    [t] voiceless dental stop (VERIFIED PUROHITAM)
-    No coarticulation in closure/burst (stop is inherently discrete)
-    VOT coarticulates toward following vowel
-    """
+    """[t] voiceless dental stop (VERIFIED PUROHITAM)"""
     n_cl = int(VS_T_CLOSURE_MS / 1000.0 * SR)
     n_b = int(VS_T_BURST_MS / 1000.0 * SR)
     n_v = int(VS_T_VOT_MS / 1000.0 * SR)
@@ -253,7 +237,6 @@ def synth_T(pitch_hz=PITCH_HZ, dil=1.0):
         burst = burst * np.hanning(len(burst))
     burst = f32(burst * VS_T_BURST_GAIN)
     
-    # VOT uses dental locus formants as context
     vot_src = rosenberg_pulse(n_v, pitch_hz)
     vot_env = np.linspace(0.0, 1.0, n_v)
     vot = apply_formants(vot_src, VS_T_LOCUS_F, VS_AA_B, [g*0.3 for g in VS_AA_GAINS])
@@ -268,16 +251,12 @@ def synth_T(pitch_hz=PITCH_HZ, dil=1.0):
 def synth_AA(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
     """
     [aː] long open central unrounded (PENDING this word)
-    v3: Full AGNI coarticulation pattern
-    
-    Identical formants to [ɑ], 2× duration.
-    Coarticulation blends targets at onset/offset.
-    Steady-state in middle reaches target formants.
+    v6: AGNI verified parameters restored
+    Identical to [ɑ] except 2× duration
     """
     n = int(VS_AA_DUR_MS * dil / 1000.0 * SR)
     src = rosenberg_pulse(n, pitch_hz)
     
-    # Blend formants (AGNI pattern)
     f_mean = list(VS_AA_F)
     if F_prev is not None:
         for k in range(min(len(F_prev), len(VS_AA_F))):
@@ -293,14 +272,10 @@ def synth_AA(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
     return f32(out)
 
 def synth_R(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
-    """
-    [ɾ] alveolar tap (VERIFIED PUROHITAM)
-    v3: Full coarticulation
-    """
+    """[ɾ] alveolar tap (VERIFIED PUROHITAM)"""
     n = int(VS_R_DUR_MS * dil / 1000.0 * SR)
     src = rosenberg_pulse(n, pitch_hz)
     
-    # Amplitude dip envelope
     env = np.ones(n, dtype=float)
     dip_center = n // 2
     dip_width_samp = int(n * VS_R_DIP_WIDTH / 2)
@@ -311,7 +286,6 @@ def synth_R(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
             env[i] = 1.0 - VS_R_DIP_DEPTH * gaussian
     src *= env
     
-    # Blend formants
     f_mean = list(VS_R_F)
     if F_prev is not None:
         for k in range(min(len(F_prev), len(VS_R_F))):
@@ -329,12 +303,11 @@ def synth_R(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
 def synth_A(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
     """
     [ɑ] short open central unrounded (VERIFIED AGNI)
-    v3: Full AGNI coarticulation pattern (exact match)
+    v6: AGNI verified parameters (unchanged)
     """
     n = int(VS_A_DUR_MS * dil / 1000.0 * SR)
     src = rosenberg_pulse(n, pitch_hz)
     
-    # Blend formants (AGNI pattern - exact match)
     f_mean = list(VS_A_F)
     if F_prev is not None:
         for k in range(min(len(F_prev), len(VS_A_F))):
@@ -350,14 +323,10 @@ def synth_A(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
     return f32(out)
 
 def synth_M(F_prev=None, pitch_hz=PITCH_HZ, dil=1.0):
-    """
-    [m] bilabial nasal (VERIFIED PUROHITAM)
-    v3: Coarticulation on onset only (word-final)
-    """
+    """[m] bilabial nasal (VERIFIED PUROHITAM)"""
     n = int(VS_M_DUR_MS * dil / 1000.0 * SR)
     src = rosenberg_pulse(n, pitch_hz)
     
-    # Blend formants
     f_mean = list(VS_M_F)
     if F_prev is not None:
         for k in range(min(len(F_prev), len(VS_M_F))):
@@ -371,15 +340,11 @@ def synth_M(F_prev=None, pitch_hz=PITCH_HZ, dil=1.0):
     return f32(out)
 
 # ============================================================================
-# WORD SYNTHESIS (v3 - full formant context passing)
+# WORD SYNTHESIS
 # ============================================================================
 
 def synth_hotaram(pitch_hz=PITCH_HZ, dil=1.0):
-    """
-    HOTĀRAM [hoːtaːrɑm] v3
-    Full coarticulation: each phoneme receives formant context
-    from neighbors. Matches AGNI architecture exactly.
-    """
+    """HOTĀRAM [hoːtaːrɑm] v6 - AGNI parameters restored"""
     segs = [
         synth_H(F_next=VS_OO_F, pitch_hz=pitch_hz, dil=dil),
         synth_OO(F_prev=VS_H_F_APPROX, F_next=VS_T_LOCUS_F, pitch_hz=pitch_hz, dil=dil),
@@ -403,18 +368,22 @@ def synth_hotaram(pitch_hz=PITCH_HZ, dil=1.0):
 if __name__ == "__main__":
     print()
     print("=" * 70)
-    print("HOTĀRAM v3 — Full AGNI coarticulation")
+    print("HOTĀRAM v6 — AGNI parameters restored")
     print("=" * 70)
     print()
-    print("ITERATION v2→v3:")
-    print("  Problem: Formants still low (coarticulation params unused)")
-    print("           [h] too noisy (no vowel context)")
-    print("  Fix: Implement AGNI coarticulation architecture")
-    print("       - F_prev/F_next parameters in all functions")
-    print("       - Formant blending at onset/offset")
-    print("       - Inventory coarticulation weights")
-    print("       - Context passing in word synthesis")
-    print("  Expected: Formants reach targets, [h] darker")
+    print("ITERATION v5→v6:")
+    print("  Diagnosis: Measurement problem, not synthesis")
+    print("             AGNI verified [ɑ] F2=1106 Hz with these parameters")
+    print("             HOTĀRAM measuring F2=810 Hz with SAME parameters")
+    print("             Difference is in diagnostic F2 band boundaries")
+    print("  Action: REVERT to AGNI verified parameters")
+    print("          NO synthesis changes needed")
+    print("          Diagnostic will be fixed separately")
+    print()
+    print("  VS_AA_F = VS_A_F = [700, 1100, 2550, 3400] Hz")
+    print("  VS_AA_B = VS_A_B = [130, 160, 220, 280] Hz")
+    print()
+    print("  Ancestor: 'The synthesis is correct. Fix the ruler.'")
     print()
     
     word_dry = synth_hotaram(PITCH_HZ, 1.0)
@@ -427,8 +396,7 @@ if __name__ == "__main__":
     
     print()
     print("=" * 70)
-    print("v3 complete. Run hotaram_diagnostic.py")
-    print("Expected: D1, D2, D5 should PASS")
-    print("[h] should sound darker, vowel-colored")
+    print("v6 synthesis complete.")
+    print("Run hotaram_diagnostic.py v2 (fixed measurement bands)")
     print("=" * 70)
     print()
