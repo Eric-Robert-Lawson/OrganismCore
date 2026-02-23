@@ -1095,8 +1095,8 @@ When a new phoneme is encountered:
 |---|---|---|---|
 | ṚG | [ɻ̩g] | ✓ VERIFIED | [ɻ̩] |
 | AGNI | [ɑgni] | ✓ VERIFIED | [ɑ][n][i] |
-| ĪḶE | [iːɭe] | IN PROGRESS | [iː][ɭ] |
-| PUROHITAM | [puroːhitɑm] | PENDING | [p][oː][h] |
+| ĪḶE | [iːɭe] | ✓ VERIFIED | [iː][ɭ] |
+| PUROHITAM | [puroːhitɑm] | IN PROGRESS | [p][oː][h] |
 | YAJÑASYA | [jɑdʒɲɑsjɑ] | PENDING | [dʒ][ɲ] |
 | DEVAM | [devɑm] | PENDING | [dʰ]→[d][e] |
 | ṚTVIJAM | [ɻ̩tvidʒɑm] | PENDING | [ʈ]→[t][dʒ] |
