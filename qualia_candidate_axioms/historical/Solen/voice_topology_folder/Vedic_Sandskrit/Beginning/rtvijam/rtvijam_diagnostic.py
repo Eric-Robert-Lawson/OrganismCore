@@ -163,7 +163,7 @@ def run_diagnostics():
     version = None
     params_found = False
     
-    for v in ['v6', 'v5', 'v4', 'v3', 'v2', '']:
+    for v in ['v7','v6', 'v5', 'v4', 'v3', 'v2', '']:
         module_name = f"rtvijam_reconstruction{'_' + v if v else ''}"
         try:
             mod = __import__(module_name)
@@ -193,6 +193,7 @@ def run_diagnostics():
 
     # Load audio
     audio_paths = [
+        "output_play/rtvijam_dry_v7.wav",
         "output_play/rtvijam_dry_v6.wav",
         "output_play/rtvijam_dry_v5.wav",
         "output_play/rtvijam_dry_v4.wav",
