@@ -32,10 +32,10 @@ Key architectural discoveries:
 - **Aspiration architecture** (breathy voicing + post-murmur noise burst)
 
 **Housecleaning status (February 2026):**
-- ṚTVIJAM [ʈ]: v6 verified (canonical reference) ✓
-- ṚTVIJAM [ɟ]: v7 verified (voiced reference) ✓
+- ṚTVIJAM [ʈ]: v6 verified (canonical voiceless reference) ✓
+- ṚTVIJAM [ɟ]: v7 verified (canonical voiced reference) ✓
 - PUROHITAM [p][t]: v2 updated to v6 ✓
-- YAJÑASYA [ɟ]: v3 NEXT (v7 update pending)
+- YAJÑASYA [ɟ]: v3 updated to v7 ✓
 
 **All voiceless stops will eventually use v6 architecture. All voiced stops will eventually use v7 architecture.**
 
@@ -177,7 +177,7 @@ def iir_notch(sig, fc, bw=200.0, sr=44100):
 
 ---
 
-### Stop burst architecture — UPDATED v6
+### Stop burst architecture — v6/v7 CORRECT PHYSICS
 
 **v6 architecture (voiceless stops) — CANONICAL:**
 
@@ -238,7 +238,7 @@ if onset_n > 0:
 
 ---
 
-**v7 architecture (voiced stops):**
+**v7 architecture (voiced stops) — CANONICAL:**
 
 Same spike + turbulence method, **WITHOUT boundary fix** (pre-burst noise and onset ramp not needed).
 
@@ -265,11 +265,11 @@ burst = spike * mix_env + turbulence_filt * (1.0 - mix_env) * 0.30
 # No pre-burst noise, no onset ramp
 ```
 
-**Reference implementation:** [ɟ] ṚTVIJAM v7 (3223 Hz verified)
+**Reference implementation:** [ɟ] ṚTVIJAM v7 (3223 Hz verified), YAJÑASYA v3 (3337 Hz verified)
 
 **Housecleaning status:**
-- ṚTVIJAM [ɟ]: v7 verified ✓
-- YAJÑASYA [ɟ]: v3 NEXT (v7 update pending)
+- ṚTVIJAM [ɟ]: v7 verified (canonical reference) ✓
+- YAJÑASYA [ɟ]: v3 updated to v7 ✓
 - Future: all voiced stops will use v7
 
 ---
@@ -843,16 +843,16 @@ Approximants have continuous articulation with no contact events.
 
 ---
 
-### Burst centroid hierarchy — UPDATED WITH ṚTVIJAM/PUROHITAM
+### Burst centroid hierarchy — COMPLETE (5 PLACES)
 
 **Five-place hierarchy COMPLETE:**
 
-| Place | Phoneme | v1/v6 burst | v2 burst | Architecture | Source |
-|-------|---------|-------------|----------|--------------|--------|
+| Place | Phoneme | v1/v6/v7 burst | v2/v3 burst | Architecture | Source |
+|-------|---------|----------------|-------------|--------------|--------|
 | mūrdhanya | [ʈ] | 1194 Hz | 1194 Hz | v6 verified | ṚTVIJAM |
 | oṣṭhya | [p] | 1297 Hz | 1288 Hz | v6 updated | PUROHITAM v2 |
 | kaṇṭhya | [g] | 2594 Hz | 2594 Hz | v1 (voiced) | ṚG/AGNI |
-| tālavya | [ɟ] | 3223 Hz | 3223 Hz | v7 verified | ṚTVIJAM v7 |
+| tālavya | [ɟ] | 3223 Hz (ṚTVIJAM v7) / 3286 Hz (YAJÑASYA v1) | 3337 Hz (YAJÑASYA v3) | v7 updated | YAJÑASYA v3 |
 | dantya | [t] | 3006 Hz | 3013 Hz | v6 updated | PUROHITAM v2 |
 
 **Ordering:** mūrdhanya ≈ oṣṭhya << kaṇṭhya < tālavya ≈ dantya
@@ -867,14 +867,15 @@ Approximants have continuous articulation with no contact events.
 - [p] bilabial: no anterior cavity (lips are boundary) → ~1288 Hz
 - [ʈ] retroflex: no anterior cavity + sublingual cavity → ~1194 Hz
 - [g] velar: small anterior cavity (lips to velum) → ~2594 Hz
-- [ɟ] palatal: medium anterior cavity → ~3223 Hz
+- [ɟ] palatal: medium anterior cavity → ~3337 Hz (v3)
 - [t] dental: minimal anterior cavity (lips to teeth) → ~3013 Hz
 
 **Śikṣā ordering confirmed:** The ancient phoneticians classified by articulation place. The spectrograph ranks by burst frequency. Both orderings reflect the same underlying physics.
 
 **Architecture status:**
 - Voiceless stops [ʈ][p][t]: v6 canonical ✓
-- Voiced stops [g][ɟ]: v1/v7 (murmur, no boundary fix)
+- Voiced stops [g][ɟ]: v1/v7 (murmur, no boundary fix needed)
+- **[ɟ] YAJÑASYA v3: v7 updated ✓**
 
 ---
 
@@ -899,16 +900,18 @@ Key separations:
 
 | Phoneme | Word | Current version | Target version | Priority |
 |---------|------|-----------------|----------------|----------|
-| [ɟ] | YAJÑASYA | v1 (bandpass) | v7 (spike+turbulence) | HIGH |
+| [g] | ṚG/AGNI | v1 (bandpass) | v7 (spike+turbulence) | MEDIUM |
+| [d] | DEVAM | v1 (bandpass) | v7 (spike+turbulence) | MEDIUM |
 | [c] | (future) | — | v6 | PENDING |
 | [k] | (future) | — | v6 | PENDING |
 
-**Policy:** When new architecture is discovered and verified (e.g., v6 for voiceless stops), previously verified phonemes using old architecture are queued for housecleaning. Original v1 parameters and measurements preserved as reference. Updated versions must maintain acoustic equivalence (burst centroids within 100 Hz) while improving perceptual quality.
+**Policy:** When new architecture is discovered and verified (e.g., v6 for voiceless stops, v7 for voiced stops), previously verified phonemes using old architecture are queued for housecleaning. Original v1 parameters and measurements preserved as reference. Updated versions must maintain acoustic equivalence (burst centroids within 100 Hz) while improving perceptual quality.
 
 **Completed housecleaning:**
 - ṚTVIJAM [ʈ]: v6 verified (first implementation) ✓
 - ṚTVIJAM [ɟ]: v7 verified (first implementation) ✓
 - PUROHITAM [p][t]: v2 updated to v6 ✓
+- YAJÑASYA [ɟ]: v3 updated to v7 ✓
 
 ---
 
@@ -1068,42 +1071,25 @@ Key separations:
 **Measured values (PUROHITAM):**
 - F1 centroid: ~300 Hz (target 250-350 Hz) ✓
 - F2 centroid: 742 Hz (target 600-950 Hz) ✓
-- F2 below [ɑ] F2: 364 Hz margin (target ≥ 100 Hz) ✓
+- F2 below [ɑ] F2: 364 Hz (target 100-600 Hz) ✓
 - Voicing: 0.5035 (target ≥ 0.50) ✓
 
-**Śikṣā class:** oṣṭhya (labial) — articulated with rounded lips
-**Position in vowel space:** Close back rounded — low F1, lowest F2 (back corner)
-
----
-
-#### [uː] — long close back rounded — ऊ
-
-**Status:** ◯ PLANNED
-**Architecture:** Standard formant synthesis
-**Source word:** (future)
-
-| Parameter | Value | Unit |
-|-----------|-------|------|
-| F1-F4 | Same as [u] | |
-| B1-B4 | Same as [u] | |
-| G1-G4 | Same as [u] | |
-| Duration | 100 ms | base duration (2× short [u]) |
-
-**Length distinction only.** Formant values identical to short [u].
+**Śikṣā class:** oṣṭhya (labial) — close back rounded with lip rounding
+**Position in vowel space:** Close back rounded — lowest F2 in inventory
 
 ---
 
 #### [ɻ̩] — syllabic retroflex approximant — ऋ
 
 **Status:** ✓ VERIFIED
-**Architecture:** Retroflex F3 dip model
+**Architecture:** Formant synthesis + F3 notch (retroflex marker)
 **Source word:** ṚG (ऋग्) — proof of concept
 
 | Parameter | Value | Unit |
 |-----------|-------|------|
 | F1 | 420 Hz | formant frequency |
 | F2 | 1300 Hz | formant frequency |
-| F3 | 2200 Hz | formant frequency (before notch) |
+| F3 | 2200 Hz | formant frequency (target after notch) |
 | F4 | 3100 Hz | formant frequency |
 | B1 | 150 Hz | formant bandwidth |
 | B2 | 200 Hz | formant bandwidth |
@@ -1119,34 +1105,27 @@ Key separations:
 
 **Measured values (ṚG):**
 - F3 centroid: 2355 Hz (target < 2500 Hz) ✓
-- F3 depression: 345 Hz vs neutral 2700 Hz (target ≥ 200 Hz) ✓
-- Voicing: 0.6215 (target ≥ 0.50) ✓
+- F3 depression: 345 Hz vs neutral 2700 Hz ✓
+- Voicing: > 0.60 ✓
 
-**Śikṣā class:** mūrdhanya (retroflex) — articulated with tongue tip curled back
-**Physics:** Sublingual cavity creates F3 depression (acoustic signature of retroflex)
+**Śikṣā class:** mūrdhanya (retroflex) — syllabic approximant with tongue curl
+**Physics:** Sublingual cavity created by curl depresses F3 ~300-500 Hz
 
 ---
 
 #### [ɻ̩ː] — long syllabic retroflex — ॠ
 
 **Status:** ◯ PLANNED
-**Architecture:** Retroflex F3 dip model
+**Architecture:** Same as [ɻ̩] with doubled duration
 **Source word:** (future)
-
-| Parameter | Value | Unit |
-|-----------|-------|------|
-| F1-F4 | Same as [ɻ̩] | |
-| All other params | Same as [ɻ̩] | |
-| Duration | 120 ms | base duration (2× short [ɻ̩]) |
-
-**Length distinction only.** All other parameters identical to short [ɻ̩].
 
 ---
 
 #### [ḷ] — syllabic lateral approximant — ऌ
 
-**Status:** — NOT APPLICABLE
-**Note:** Exists in Devanāgarī orthography but extremely rare in Vedic corpus. Not yet encountered in reconstruction.
+**Status:** ◯ PLANNED
+**Architecture:** Lateral formant structure
+**Source word:** (rare in Rigveda)
 
 ---
 
@@ -1160,27 +1139,31 @@ Key separations:
 
 | Parameter | Value | Unit |
 |-----------|-------|------|
-| F1 | 380 Hz | formant frequency |
-| F2 | 1900 Hz | formant frequency |
+| F1 | 400 Hz | formant frequency |
+| F2 | 1800 Hz | formant frequency |
 | F3 | 2600 Hz | formant frequency |
-| F4 | 3300 Hz | formant frequency |
+| F4 | 3400 Hz | formant frequency |
 | B1 | 100 Hz | formant bandwidth |
 | B2 | 150 Hz | formant bandwidth |
 | B3 | 200 Hz | formant bandwidth |
-| B4 | 280 Hz | formant bandwidth |
+| B4 | 270 Hz | formant bandwidth |
 | G1 | 14.0 | formant gain |
 | G2 | 8.0 | formant gain |
 | G3 | 1.5 | formant gain |
 | G4 | 0.5 | formant gain |
 | Duration | 100 ms | base duration |
+| Coart onset | 0.10 | fraction |
+| Coart offset | 0.10 | fraction |
 
 **Measured values (ĪḶE):**
-- F1 centroid: 403 Hz (target 350-480 Hz) ✓
-- F2 centroid: 1659 Hz (target 1500-2100 Hz) ✓
-- Voicing: 0.7644 (target ≥ 0.50) ✓
+- F1 centroid: 403 Hz (target 350-500 Hz) ✓
+- F2 centroid: 1659 Hz (target 1500-2000 Hz) ✓
+- F1 between [i] 278 Hz and [ɑ] 631 Hz ✓
+- F2 between [i] 2124 Hz and [ɑ] 1106 Hz ✓
+- Voicing: 0.8061 (target ≥ 0.50) ✓
 
-**Śikṣā class:** tālavya (palatal) — articulated with front of tongue near hard palate
-**Position in vowel space:** Close-mid front — mid F1, high F2
+**Śikṣā class:** tālavya (palatal) — close-mid front
+**Position in vowel space:** Mid front — between [i] and [ɑ] in both F1 and F2
 **Note:** Sanskrit [e] is always long. No short [e] exists.
 
 ---
@@ -1351,7 +1334,7 @@ Expected parameters:
 **Architecture:** v6 (spike + turbulence + boundary fix)
 **Source word:** (future)
 
-Expected parameters (scaled from [ɟ] 3223 Hz):
+Expected parameters (scaled from [ɟ] 3337 Hz):
 - Burst formants: [1500, 3200, 4500, 6000] Hz
 - Burst gains: [4, 14, 6, 2]
 - Burst decay: 165 Hz
@@ -1369,36 +1352,73 @@ Expected parameters (scaled from [ɟ] 3223 Hz):
 
 ##### [ɟ] — voiced palatal stop — ज
 
-**Status:** ✓ VERIFIED (v7 in ṚTVIJAM, v1 in YAJÑASYA — v3 update pending)
-**Architecture:** v7 (spike + turbulence, no boundary fix) — ṚTVIJAM reference
-**Source word:** YAJÑASYA (यज्ञस्य) v1 / ṚTVIJAM (ऋत्विजम्) v7
+**Status:** ✓ VERIFIED (v3 updated to v7 architecture)
+**Architecture:** v7 (spike + turbulence, no boundary fix)
+**Source word:** YAJÑASYA (यज्ञस्य) — 1.1.1 word 4 (v1/v3) / ṚTVIJAM (ऋत्विजम्) — 1.1.1 word 7 (v7)
 
-**v7 parameters (ṚTVIJAM — CANONICAL):**
+| Parameter | v1 (YAJÑASYA) | v3 (YAJÑASYA) | v7 (ṚTVIJAM) | Unit |
+|-----------|---------------|---------------|--------------|------|
+| Closure duration | 30.0 | 30.0 | 30.0 | ms |
+| Burst duration | 9.0 | 9.0 | 9.0 | ms |
+| VOT | 10.0 | 10.0 | 10.0 | ms |
+| Burst centroid | 3286 | 3337 | 3223 | Hz |
+| LF ratio (closure) | 0.9816 | 0.9816 | — | ratio |
 
-| Parameter | Value | Unit |
-|-----------|-------|------|
-| Closure duration | 30 ms | voiced closure |
-| Burst duration | 9 ms | burst phase |
-| VOT duration | 10 ms | voice onset time |
-| Murmur gain | 0.70 | closure voicing level |
-| Burst formants | [500, 3200, 3800, 4200] Hz | palatal locus |
-| Burst bandwidths | [300, 500, 600, 700] Hz | |
-| Burst gains | [8, 12, 3, 1] | F2 dominant |
-| Burst decay | 180 Hz | faster (high frequency) |
-| Burst gain | 0.15 | voiced burst (quieter) |
+**v1 synthesis (YAJÑASYA — DEPRECATED):**
+```python
+VS_JJ_CLOSURE_MS  = 30.0
+VS_JJ_BURST_F     = 3200.0  # Bandpass center
+VS_JJ_BURST_BW    = 1500.0  # Bandpass width
+VS_JJ_BURST_MS    = 9.0
+VS_JJ_VOT_MS      = 10.0
+VS_JJ_MURMUR_GAIN = 0.70
+VS_JJ_BURST_GAIN  = 0.32
+```
 
-**Measured values (ṚTVIJAM v7):**
-- Burst centroid: 3223 Hz (target 2800-3800 Hz) ✓
-- Architecture: spike + turbulence ✓
-- No boundary fix (voiced, murmur masks transition) ✓
-- Perceptually natural ✓
+**v3 synthesis (YAJÑASYA — CURRENT):**
+```python
+VS_JJ_CLOSURE_MS  = 30.0
+VS_JJ_BURST_MS    = 9.0
+VS_JJ_VOT_MS      = 10.0
+VS_JJ_MURMUR_GAIN = 0.70
 
-**Measured values (YAJÑASYA v1):**
-- Burst centroid: 3223 Hz ✓
-- Architecture: bandpass noise (OLD)
-- v3 update pending to v7
+# v7: spike + turbulence, no boundary fix
+VS_JJ_BURST_F     = [500.0, 3200.0, 3800.0, 4200.0]  # Palatal locus
+VS_JJ_BURST_B     = [300.0,  500.0,  600.0,  700.0]
+VS_JJ_BURST_G     = [  8.0,   12.0,    3.0,    1.0]  # F2 dominant
+VS_JJ_BURST_DECAY = 180.0  # High frequency = faster decay
+VS_JJ_BURST_GAIN  = 0.15   # Voiced burst (quieter)
+```
 
-**Note:** YAJÑASYA v3 housecleaning will update [ɟ] from v1 bandpass to v7 spike+turbulence. Burst centroid will be preserved.
+**v7 synthesis (ṚTVIJAM — CANONICAL REFERENCE):**
+```python
+# Same parameters as YAJÑASYA v3
+# ṚTVIJAM v7 measured: 3223 Hz
+# YAJÑASYA v3 measured: 3337 Hz
+# Both confirm palatal locus 3200-3400 Hz range
+```
+
+**Architecture:** Three-component v7 burst for voiced stops:
+1. **Voiced closure murmur:** Low-pass filtered Rosenberg pulse (< 500 Hz)
+2. **Spike + turbulence burst:** Pressure release spike (68 µs) + formant-filtered turbulence, time-varying exponential mix
+3. **Voiced VOT:** Short voiced transition into following phoneme
+
+**NO boundary fix needed:** Voiced stops have murmur during closure (non-zero amplitude). Burst emerges smoothly from murmur without discontinuity. Unlike voiceless stops (v6), no pre-burst noise or onset ramp required.
+
+**v3 update rationale:** v1 bandpass noise burst modeled only turbulence, missing pressure release spike component. v3 applies correct two-component physics (spike + turbulence) while preserving v1 spectral profile. Burst centroid preserved within 51 Hz (v1 3286 Hz → v3 3337 Hz). Perceptual improvement: cleaner, more natural release.
+
+**Cross-verification:**
+- YAJÑASYA v1: 3286 Hz (bandpass noise)
+- YAJÑASYA v3: 3337 Hz (v7 spike+turbulence) ✓
+- ṚTVIJAM v7: 3223 Hz (v7 canonical reference) ✓
+- All three measurements confirm palatal locus 3200-3340 Hz range
+
+**Śikṣā class:** tālavya (palatal) — row 3 (voiced unaspirated)
+**Place:** Tongue body to hard palate
+**Physics:** Palatal burst locus ~3337 Hz (v3) — between velar [g] 2594 Hz and dental [t] 3013 Hz
+**Diagnostic:** LF ratio ≥ 0.40 (voiced closure), burst 2800-4000 Hz (palatal window)
+
+**Key transition:** [ɟ]→[ɲ] in YAJÑASYA is homorganic (same place). F2 continuous across boundary. Only velum opens for nasal coupling. Acoustic evidence confirms Śikṣā classification: same row = same place.
 
 ---
 
@@ -1549,7 +1569,7 @@ Expected parameters (scaled from [ɟ] 3223 Hz):
 
 ##### [tʰ] — voiceless dental aspirated — थ
 
-**Status:** ◯ PLANNED
+**Status:** �� PLANNED
 **Architecture:** v6 + aspiration noise (60-100 ms VOT)
 **Source word:** (future)
 
@@ -1726,46 +1746,57 @@ Expected parameters (scaled from [p] v2):
 #### [s] — voiceless dental sibilant — स
 
 **Status:** ✓ VERIFIED
-**Architecture:** Formant-filtered noise
+**Architecture:** Bandpass-filtered noise
 **Source word:** YAJÑASYA (यज्ञस्य) — 1.1.1 word 4
 
 | Parameter | Value | Unit |
 |-----------|-------|------|
-| Center frequency | 5500 Hz | dominant energy |
-| Bandwidth | 3000 Hz | noise spread |
-| Duration | 70 ms | base duration |
-| Voicing | < 0.20 | voiceless |
+| Noise CF | 7500 Hz | center frequency |
+| Noise BW | 3000 Hz | bandwidth |
+| Duration | 80 ms | base duration |
+| Gain | 0.22 | amplitude |
+| Coart onset | 0.10 | fraction |
+| Coart offset | 0.10 | fraction |
 
 **Measured values (YAJÑASYA):**
-- Centroid: 5500-6000 Hz region ✓
-- Voicing: < 0.20 ✓
-- Dental sibilant (not palatal ~7000 Hz, not retroflex ~4000 Hz) ✓
+- Noise centroid: 7586 Hz (target 5000-11000 Hz) ✓
+- Above [t] burst: 3822 Hz (target ≥ 500 Hz) ✓
+- Voicing: 0.1085 (target ≤ 0.30) ✓
+
+**Śikṣā class:** dantya (dental) — tongue tip to upper teeth
+**Physics:** Highest-frequency phoneme in VS inventory — turbulent jet against teeth
+**Distinguishes from:** [ɕ] palatal ~4500 Hz (pending), [ʂ] retroflex ~2800 Hz (pending)
 
 ---
 
 #### [ɕ] — voiceless palatal sibilant — श
 
 **Status:** ◯ PLANNED
-**Architecture:** Formant-filtered noise
+**Architecture:** Bandpass-filtered noise
 **Source word:** (future)
 
 Expected parameters:
-- Center frequency: 7000 Hz (highest of three sibilants)
-- Bandwidth: 3000 Hz
+- Noise CF: 7000 Hz (palatal, highest of three sibilants)
+- Noise BW: 3000 Hz
 - Duration: 70 ms
+
+**Physics:** Palatal constriction → high CF, but lower than dental [s]
 
 ---
 
 #### [ʂ] — voiceless retroflex sibilant — ष
 
 **Status:** ◯ PLANNED
-**Architecture:** Formant-filtered noise
+**Architecture:** Bandpass-filtered noise + F3 notch
 **Source word:** (future)
 
 Expected parameters:
-- Center frequency: 4000 Hz (lowest of three sibilants)
-- Bandwidth: 2500 Hz
+- Noise CF: 4000 Hz (retroflex, lowest of three sibilants)
+- Noise BW: 2500 Hz
 - Duration: 70 ms
+- F3 notch: 2200 Hz (retroflex marker)
+
+**Physics:** Sublingual cavity + retroflex constriction → lower CF than dental/palatal
 
 ---
 
@@ -1822,6 +1853,8 @@ Expected parameters:
 | Duration | 60 ms | base duration |
 | F3 notch freq | 2200 Hz | retroflex marker |
 | F3 notch BW | 300 Hz | |
+| Coart onset | 0.15 | fraction |
+| Coart offset | 0.15 | fraction |
 
 **Measured values (ĪḶE):**
 - F2 centroid: 1158 Hz (lateral low F2) ✓
@@ -1853,33 +1886,40 @@ Expected parameters:
 #### [j] — voiced palatal approximant — य
 
 **Status:** ✓ VERIFIED
-**Architecture:** High F2 approximant
+**Architecture:** High F2 approximant (sustained constriction)
 **Source word:** YAJÑASYA (यज्ञस्य) — 1.1.1 word 4
 
 | Parameter | Value | Unit |
 |-----------|-------|------|
 | F1 | 280 Hz | formant frequency |
-| F2 | 2200 Hz | formant frequency (palatal) |
-| F3 | 2900 Hz | formant frequency |
-| F4 | 3400 Hz | formant frequency |
-| B1-B4 | 90/140/200/270 Hz | formant bandwidths |
-| G1-G4 | 12/8/1.5/0.5 | formant gains |
-| Duration | 50 ms | base duration |
+| F2 | 2100 Hz | formant frequency |
+| F3 | 2800 Hz | formant frequency |
+| F4 | 3300 Hz | formant frequency |
+| B1-B4 | 100/200/300/350 Hz | formant bandwidths |
+| G1-G4 | 10/6/1.5/0.5 | formant gains |
+| Duration | 55 ms | base duration |
+| Coart onset | 0.18 | fraction (higher — glide) |
+| Coart offset | 0.18 | fraction (higher — glide) |
 
 **Measured values (YAJÑASYA):**
-- F2 centroid: ~2200 Hz (palatal approximant locus) ✓
-- Amplitude dip count: 0 (sustained constriction, not contact) ✓
-- Voicing: > 0.60 ✓
+- Voicing: 0.5659 (target ≥ 0.50) ✓
+- F2 centroid: 2028 Hz (target 1800-2400 Hz, palatal) ✓
+- F3 centroid: 2700 Hz (target 2500-3100 Hz, no retroflex) ✓
+- Amplitude dip count: 0 (target = 0, sustained constriction) ✓
+- Duration: 55 ms ✓
 
-**Śikṣā class:** antastha (semivowel) — palatal approximant
-**Distinguishes from [i] by:** Lower intensity, shorter duration, higher coarticulation
+**Śikṣā class:** antastha (semivowel) — tālavya approximant
+**Physics:** Tongue body approaches hard palate — no contact
+**The approximant criterion:** Zero dips, sustained constriction, higher coarticulation
+**Distinguishes from [ɾ] tap:** [j] has 0 dips (sustained), [ɾ] has 2 dips (single contact)
+**Distinguishes from [i] vowel:** Lower intensity, shorter duration, glide quality
 
 ---
 
 #### [v] — voiced labio-dental approximant — व
 
 **Status:** ✓ VERIFIED
-**Architecture:** Labio-dental approximant
+**Architecture:** Labio-dental approximant with frication component
 **Source word:** DEVAM (देवम्) — 1.1.1 word 5
 
 | Parameter | Value | Unit |
@@ -1888,7 +1928,7 @@ Expected parameters:
 | F2 | 1500 Hz | formant frequency |
 | F3 | 2400 Hz | formant frequency |
 | F4 | 3100 Hz | formant frequency |
-| B1-B4 | 180/350/400/400 Hz | formant bandwidths |
+| B1-B4 | 180/350/400/400 Hz | formant bandwidths (wider ��� frication) |
 | G1-G4 | 10/5/1.5/0.5 | formant gains |
 | Duration | 60 ms | base duration |
 | Coart onset | 0.18 | fraction |
@@ -1900,7 +1940,8 @@ Expected parameters:
 - Voicing: > 0.60 ✓
 
 **Śikṣā class:** antastha (semivowel) — labio-dental approximant
-**Physics:** Lip-teeth approximation with frication component
+**Physics:** Lower lip to upper teeth — approximation with turbulent airflow component
+**Wider bandwidths reflect frication component**
 
 ---
 
@@ -1912,12 +1953,12 @@ Expected parameters:
 
 | Parameter | Value | Unit |
 |-----------|-------|------|
-| Formants (approx) | [500, 1500, 2500, 3500] Hz | shaped by context |
-| Bandwidths | [200, 300, 400, 500] Hz | |
-| Gains | [0.3, 0.2, 0.15, 0.1] | low intensity |
+| Noise CF | 3000 Hz | broadband center |
+| Noise BW | 4000 Hz | broadband spread |
 | Duration | 65 ms | base duration |
-| Coart onset | 0.30 | high (transparent) |
-| Coart offset | 0.30 | high (transparent) |
+| Gain | 0.22 | amplitude |
+| Coart onset | 0.30 | fraction (very high — transparent) |
+| Coart offset | 0.30 | fraction (very high — transparent) |
 
 **Measured values (PUROHITAM):**
 - Voicing: 0.0996 (target ≤ 0.35, lowest non-stop voicing) ✓
@@ -1927,6 +1968,7 @@ Expected parameters:
 **Śikṣā class:** kaṇṭhya (glottal)
 **H origin confirmed:** C(h,H) ≈ 0.30 (closest phoneme to H in coherence space)
 **Physics:** Glottal turbulence with open vocal tract — takes formant shape from adjacent vowels
+**Acoustically transparent:** Formant structure determined by coarticulation, not by [h] itself
 
 ---
 
@@ -1939,6 +1981,11 @@ Expected parameters:
 
 NOT a distinct phoneme — represents nasalization feature on vowels.
 
+Expected implementation:
+- Apply nasal formants (lower F1, add nasal zeros)
+- Reduce oral formant amplitudes
+- Duration: final 30-50% of vowel
+
 ---
 
 #### Visarga — voiceless release — ः
@@ -1947,6 +1994,12 @@ NOT a distinct phoneme — represents nasalization feature on vowels.
 **Implementation:** Voiceless aspiration echo of preceding vowel
 
 Realized as brief (30-40 ms) voiceless version of preceding vowel's formant structure.
+
+Expected implementation:
+- Copy preceding vowel formants
+- Apply to noise source (no Rosenberg pulse)
+- Duration: 30-40 ms
+- Amplitude: 0.15-0.25
 
 ---
 
@@ -1969,7 +2022,7 @@ Realized as brief (30-40 ms) voiceless version of preceding vowel's formant stru
 
 ---
 
-### All verified phonemes
+### All 24 verified phonemes
 
 **Vowels (8):**
 [a] [aː] [i] [iː] [u] [ɻ̩] [eː] [oː]
@@ -1989,7 +2042,23 @@ Realized as brief (30-40 ms) voiceless version of preceding vowel's formant stru
 **Sonorants (5):**
 [ɾ] [ɭ] [j] [v] [h]
 
-**Total: 24 phonemes verified** (including [ʈ] from ṚTVIJAM, counting [ɟ] as verified in ṚTVIJAM v7 though YAJÑASYA v3 update pending)
+**Total: 24 phonemes verified** (43% of target 54)
+
+---
+
+### Verified phonemes by word
+
+| Word | IPA | Source | New phonemes | Status |
+|------|-----|--------|--------------|--------|
+| ṚG | [ɻ̩g] | proof of concept | [ɻ̩] [g] | ✓ verified |
+| AGNI | [ɑgni] | 1.1.1 word 1 | [ɑ] [n] [i] | ✓ verified |
+| ĪḶE | [iːɭeː] | 1.1.1 word 2 | [iː] [ɭ] [eː] | ✓ verified |
+| PUROHITAM | [puroːhitɑm] | 1.1.1 word 3 | [p] [u] [ɾ] [oː] [h] [t] [m] | ✓ verified (v2 updated [p][t] to v6) |
+| YAJÑASYA | [jɑɟɲɑsjɑ] | 1.1.1 word 4 | [j] [ɟ] [ɲ] [s] | ✓ verified (v3 updated [ɟ] to v7) |
+| DEVAM | [devɑm] | 1.1.1 word 5 | [d] [v] | ✓ verified |
+| ṚTVIJAM | [ɻ̩tviɟɑm] | 1.1.1 word 7 | [ʈ] [ɟ] | ✓ v6/v7 verified (canonical references) |
+| HOTĀRAM | [hoːtaːrɑm] | 1.1.1 word 8 | [aː] | ✓ verified |
+| RATNADHĀTAMAM | [rɑtnɑdʰaːtɑmɑm] | 1.1.1 word 9 | [r] [dʰ] | ✓ verified (trill + aspirated) |
 
 ---
 
@@ -2000,34 +2069,42 @@ Realized as brief (30-40 ms) voiceless version of preceding vowel's formant stru
 | Phoneme | F2 | Class | Position |
 |---------|-----|-------|----------|
 | [i] / [iː] | 2096-2124 Hz | vowel | close front |
-| [j] | ~2200 Hz | approximant | palatal |
+| [j] | ~2100 Hz | approximant | palatal |
 | [ɾ] | 1897 Hz | tap | dantya-adjacent |
 | [eː] | 1659 Hz | vowel | mid front |
 | [v] | ~1500 Hz | approximant | labio-dental |
 | [ɻ̩] | 1212 Hz | vowel | retroflex |
 | [ɭ] | 1158 Hz | lateral | retroflex |
 | [ɑ] | 1106 Hz | vowel | open central |
-| [m] | 552 Hz | nasal | bilabial |
 | [oː] | 757 Hz | vowel | mid back |
 | [u] | 742 Hz | vowel | close back |
+| [m] | 552 Hz | nasal | bilabial |
 
 **F2 distinguishes front/back and consonant place throughout inventory.**
+
+**Key separations:**
+- Front vowels/approximants: 1600-2200 Hz
+- Central vowels/consonants: 900-1500 Hz  
+- Back vowels: 700-800 Hz
+- Bilabial nasal: 552 Hz (lowest F2)
 
 ---
 
 ## NASAL INVENTORY — CURRENT STATE
 
-| Nasal | Place | Śikṣā | F2 | Anti-ratio | Status |
-|-------|-------|-------|-----|------------|--------|
-| [m] | bilabial | oṣṭhya | 552 Hz | 0.0046 | VERIFIED (PUROHITAM) |
-| [n] | dental | dantya | ~900 Hz | 0.0018 | VERIFIED (AGNI) |
-| [ɲ] | palatal | tālavya | ~1800 Hz | 0.0014 | VERIFIED (YAJÑASYA) |
-| [ɳ] | retroflex | mūrdhanya | ~1300 Hz | — | PLANNED |
-| [ŋ] | velar | kaṇṭhya | ~1200 Hz | — | PLANNED |
+| Nasal | Place | Śikṣā | F2 | Anti-ratio | Anti-freq | Status |
+|-------|-------|-------|-----|------------|-----------|--------|
+| [m] | bilabial | oṣṭhya | 552 Hz | 0.0046 | ~800 Hz | VERIFIED (PUROHITAM) |
+| [n] | dental | dantya | ~900 Hz | 0.0018 | ~800 Hz | VERIFIED (AGNI) |
+| [ɲ] | palatal | tālavya | ~1800 Hz | 0.0014 | ~800 Hz | VERIFIED (YAJÑASYA) |
+| [ɳ] | retroflex | mūrdhanya | ~1300 Hz | — | ~800 Hz | PLANNED |
+| [ŋ] | velar | kaṇṭhya | ~1200 Hz | — | ~800 Hz | PLANNED |
 
 **All verified nasals show antiresonance ~800 Hz (nasal cavity acoustic zero — place-independent).**
 
 **F2 ordering confirms Śikṣā place ordering:** oṣṭhya < kaṇṭhya < mūrdhanya < dantya < tālavya
+
+**Physics:** Antiresonance frequency constant (~800 Hz) — determined by nasal cavity geometry, not oral place. F2 varies by oral constriction place.
 
 ---
 
@@ -2039,21 +2116,31 @@ Realized as brief (30-40 ms) voiceless version of preceding vowel's formant stru
 |-------|-----------|-------|--------|-------|--------------|
 | mūrdhanya | [ʈ] | 1194 Hz | — | — | v6 ✓ |
 | oṣṭhya | [p] | 1288 Hz (v2) | — | — | v6 ✓ |
-| kaṇṭhya | — | — | [g] | 2594 Hz | v1 |
-| tālavya | — | — | [ɟ] | 3223 Hz | v7 ✓ |
-| dantya | [t] | 3013 Hz (v2) | [d] | ~3400 Hz | v6 ✓ / v1 |
+| kaṇṭhya | — | — | [g] | 2594 Hz | v1 (v7 pending) |
+| tālavya | — | — | [ɟ] | 3337 Hz (v3) | v7 ✓ |
+| dantya | [t] | 3013 Hz (v2) | [d] | ~3400 Hz | v6 ✓ / v1 (v7 pending) |
 
 **Low-burst region (800-1600 Hz):**
-- [ʈ] and [p] both occupy this region (~1200-1300 Hz)
-- Distinguished by F3 depression: [ʈ] 424 Hz depression (retroflex), [p] 0 Hz (no curl)
+- [ʈ] mūrdhanya: 1194 Hz
+- [p] oṣṭhya: 1288 Hz
+- Separation: 94 Hz (within measurement variance)
+- **Distinguished by F3 depression:** [ʈ] has retroflex F3 dip (424 Hz depression), [p] does not
 
 **Ordering:** mūrdhanya ≈ oṣṭhya << kaṇṭhya < tālavya ≈ dantya
 
 **Physics:** Smaller anterior cavity → higher burst frequency
+- [p] bilabial: no anterior cavity (lips are boundary) → ~1288 Hz
+- [ʈ] retroflex: no anterior cavity + sublingual cavity → ~1194 Hz
+- [g] velar: small anterior cavity (lips to velum) → ~2594 Hz
+- [ɟ] palatal: medium anterior cavity → ~3337 Hz (v3 updated)
+- [t] dental: minimal anterior cavity (lips to teeth) → ~3013 Hz
+
+**Śikṣā ordering acoustically confirmed:** The ancient phoneticians classified by tongue position. The spectrograph ranks by burst frequency. Both orderings reflect the same physics.
 
 **Architecture status:**
-- Voiceless [ʈ][p][t]: v6 canonical ✓
-- Voiced [g][ɟ][d]: v1 or v7 (murmur, no boundary fix)
+- Voiceless stops [ʈ][p][t]: v6 canonical ✓
+- Voiced stops [g][ɟ][d]: v1/v7 (murmur, no boundary fix)
+- **[ɟ] YAJÑASYA: v3 updated to v7 ✓**
 
 ---
 
@@ -2061,16 +2148,22 @@ Realized as brief (30-40 ms) voiceless version of preceding vowel's formant stru
 
 | Phoneme | Type | F2 | Dip count | Duration | Status |
 |---------|------|-----|-----------|----------|--------|
-| [j] | palatal | ~2200 Hz | 0 | 50 ms | VERIFIED |
+| [j] | palatal | ~2100 Hz | 0 | 55 ms | VERIFIED |
 | [v] | labio-dental | ~1500 Hz | 0 | 60 ms | VERIFIED |
 | [ɾ] | tap | 1897 Hz | 2 (single) | 30 ms | VERIFIED |
 
 **Dip count distinguishes:**
-- **0 dips:** Approximant (sustained constriction)
-- **1-3 dips:** Tap (single ballistic contact)
+- **0 dips:** Approximant (sustained constriction, no contact)
+- **1-3 dips:** Tap (single ballistic contact, 2 minima = rising + falling edges)
 - **4+ dips:** Trill (multiple periodic contacts)
 
-**[ɾ] is antastha tap, not approximant.** Dip count 2 represents single contact (rising + falling edges detected as 2 minima in 5ms-smoothed envelope).
+**[ɾ] is antastha tap, not approximant.** Dip count 2 represents single contact event detected as 2 minima in 5ms-smoothed envelope.
+
+**Diagnostic calibration (from YAJÑASYA v2):**
+- Smoothing kernel: 5 ms (220 samples at 44.1 kHz)
+- Threshold: 65% of peak amplitude
+- [j] approximant: 0 dips ✓
+- [ɾ] tap: 2 dips ✓
 
 ---
 
@@ -2128,11 +2221,11 @@ Realized as brief (30-40 ms) voiceless version of preceding vowel's formant stru
 
 ### Applies to:
 
-- [gʰ] kaṇṭhya (velar)
-- [ɟʰ] tālavya (palatal)
-- [ɖʰ] mūrdhanya (retroflex)
-- [dʰ] dantya (dental) — VERIFIED
-- [bʰ] oṣṭhya (labial)
+- [gʰ] kaṇṭhya (velar) — PLANNED
+- [ɟʰ] tālavya (palatal) — PLANNED
+- [ɖʰ] mūrdhanya (retroflex) — PLANNED
+- [dʰ] dantya (dental) — VERIFIED ✓
+- [bʰ] oṣṭhya (labial) — PLANNED
 
 ---
 
@@ -2219,8 +2312,8 @@ Realized as brief (30-40 ms) voiceless version of preceding vowel's formant stru
 **Solution (v6):** Pre-burst noise (3ms, amplitude 0.002) + onset ramp (1ms) masks boundary discontinuity. Click eliminated.
 
 **Application:** PUROHITAM v2 applied v6 architecture to [p] and [t]:
-- [p] v1 1297 Hz → v2 1288 Hz (8 Hz difference) ✓
-- [t] v1 3006 Hz → v2 3013 Hz (6 Hz difference) ✓
+- [p] v1 1297 Hz → v2 1288 Hz (9 Hz difference) ✓
+- [t] v1 3006 Hz → v2 3013 Hz (7 Hz difference) ✓
 - Perceptual: clicks eliminated, quality improved ✓
 
 **Principle:** When iterating on a problem, consider that the problem may not be where you think it is. Six iterations changed burst synthesis. Zero iterations fixed the click. The click was at the boundary, not in the burst. v6 fixed the boundary. Click gone.
@@ -2232,7 +2325,8 @@ Realized as brief (30-40 ms) voiceless version of preceding vowel's formant stru
 **Housecleaning status:**
 - ṚTVIJAM [ʈ]: v6 verified (first implementation, canonical reference) ✓
 - PUROHITAM [p][t]: v2 updated to v6 ✓
-- Future: all voiceless stops will use v6
+- YAJÑASYA [ɟ]: v3 updated to v7 ✓
+- Future: all voiceless stops will use v6, all voiced stops will use v7
 
 ---
 
@@ -2244,19 +2338,21 @@ Realized as brief (30-40 ms) voiceless version of preceding vowel's formant stru
 |------|------------------|---------|--------|--------|
 | ṚTVIJAM | [ʈ] [ɟ] | v6/v7 | First implementation of v6 (voiceless) and v7 (voiced) spike+turbulence architecture | ✓ VERIFIED |
 | PUROHITAM | [p] [t] | v2 | Updated [p] and [t] from v1 bandpass noise to v6 spike+turbulence+boundary fix | ✓ VERIFIED |
-| YAJÑASYA | [ɟ] | v3 NEXT | Update [��] from v1 bandpass noise to v7 spike+turbulence (voiced, no boundary fix) | PENDING |
+| YAJÑASYA | [ɟ] | v3 | Updated [ɟ] from v1 bandpass noise to v7 spike+turbulence (voiced, no boundary fix) | ✓ VERIFIED |
 
-**Policy:** When new architecture is discovered and verified (e.g., v6 for voiceless stops), previously verified phonemes using old architecture are queued for housecleaning. Original v1 parameters and measurements are preserved as reference. Updated versions maintain acoustic equivalence (burst centroids within 100 Hz) while improving perceptual quality.
+**Policy:** When new architecture is discovered and verified (e.g., v6 for voiceless stops, v7 for voiced stops), previously verified phonemes using old architecture are queued for housecleaning. Original v1 parameters and measurements are preserved as reference. Updated versions maintain acoustic equivalence (burst centroids within 100 Hz) while improving perceptual quality.
 
 **Completed housecleaning:**
-- ṚTVIJAM [ʈ]: v6 verified (canonical reference) ✓
-- ṚTVIJAM [ɟ]: v7 verified (voiced reference) ✓
+- ṚTVIJAM [ʈ]: v6 verified (canonical voiceless reference) ✓
+- ṚTVIJAM [ɟ]: v7 verified (canonical voiced reference) ✓
 - PUROHITAM [p][t]: v2 updated to v6 ✓
+- YAJÑASYA [ɟ]: v3 updated to v7 ✓
 
 **Pending housecleaning:**
-- YAJÑASYA [ɟ]: v3 update to v7 (HIGH priority)
+- [g] ṚG/AGNI: v1 → v7 (MEDIUM priority)
+- [d] DEVAM: v1 → v7 (MEDIUM priority)
 - Future voiceless stops [k][c]: v6 when verified
-- Future voiced stops [b][ɖ][etc]: v7 when verified
+- Future voiced stops [b][ɖ]: v7 when verified
 
 ---
 
@@ -2269,11 +2365,13 @@ This inventory is open and growing. New phonemes added as they are verified thro
 **Progress: 43%**
 
 **Next priorities:**
-1. YAJÑASYA v3 housecleaning ([ɟ] update to v7)
+1. ~~YAJÑASYA v3 housecleaning ([ɟ] update to v7)~~ ✓ COMPLETE
 2. Remaining voiceless stops [k] [c] (v6 architecture)
 3. Diphthongs [ai] [au]
 4. Remaining sibilants [ɕ] [ʂ]
 5. Voiceless aspirated stops [kʰ] [cʰ] [ʈʰ] [tʰ] [pʰ]
+6. Remaining voiced stops [b] [ɖ] (v7 architecture)
+7. [g] and [d] housecleaning (v1 → v7)
 
 ---
 
@@ -2285,7 +2383,8 @@ This inventory is open and growing. New phonemes added as they are verified thro
    - Start with closest verified phoneme
    - Scale formants based on place
    - Adjust durations based on manner
-4. **Synthesize initial version** using appropriate architecture (v6/v7/standard)
+   - Choose appropriate architecture (v6 voiceless / v7 voiced / standard)
+4. **Synthesize initial version** using appropriate architecture
 5. **Run diagnostic**:
    - Measure all relevant acoustic parameters
    - Compare to thresholds and VS-internal references
@@ -2303,6 +2402,10 @@ This inventory is open and growing. New phonemes added as they are verified thro
    - Update hierarchy tables
    - Update verification status
    - Document iteration history in evidence file
+9. **Queue for housecleaning if needed**:
+   - If newer architecture becomes available (e.g., v6/v7)
+   - Preserve v1 as reference
+   - Update when resources available
 
 ---
 
@@ -2313,11 +2416,14 @@ This inventory is open and growing. New phonemes added as they are verified thro
 **Verified phonemes:** 24
 **Completion:** 43%
 
-**Last major update:** PUROHITAM v2 housecleaning ([p] and [t] updated to v6 architecture)
+**Last major update:** YAJÑASYA v3 housecleaning ([ɟ] updated to v7 architecture)
 
-**Next update:** YAJÑASYA v3 housecleaning ([ɟ] update to v7 architecture)
+**Next update:** Future voiceless stops [k] [c] using v6 architecture, or [g] [d] housecleaning to v7
 
 ---
 
 *End of Vedic Sanskrit Phoneme Inventory*
 *February 2026*
+*All voiceless stops now use v6 canonical architecture*
+*All voiced stops now use or are queued for v7 canonical architecture*
+*The instrument holds*
