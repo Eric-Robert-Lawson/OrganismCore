@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """
-PUROHITAM v2 — UPDATE [t] AND [p] TO v6 (SPIKE + TURBULENCE)
+PUROHITAM RECONSTRUCTION v2 — FINAL CORRECTION
+Vedic Sanskrit: purohitam [puroːhitɑm]
 Rigveda 1.1.1, word 4
-purohitam [puroːhitɑm]
 
-ITERATION v1→v2:
-  v1: [t] and [p] used OLD bandpass noise burst method
-  v2: Apply v6 architecture (spike + turbulence + boundary fix)
+ARCHITECTURE UPDATE v1→v2 (FINAL):
+  v1: [t] and [p] used OLD bandpass noise burst
+  v2: [t] and [p] use v6 (spike + turbulence + boundary fix)
   
-  Both are VOICELESS stops → need boundary fix to prevent click
+  FINAL CORRECTION: [p] formants adjusted to match v1 centroid 1297 Hz
+  Based on verified ṚTVIJAM [ʈ] architecture scaled appropriately
   
-  Acoustically: measurements should be IDENTICAL
-  Perceptually: should sound CLEANER (no click artifacts)
+  [p] v1: 1297 Hz → v2 target: ~1297 Hz (F2 at 1300 Hz, gain 16.0)
+  [t] v1: 3006 Hz → v2 target: ~3006 Hz (VERIFIED ✓)
 
 February 2026
 """
@@ -30,16 +31,17 @@ os.makedirs("output_play", exist_ok=True)
 # PHONEME PARAMETERS
 # ============================================================================
 
-# [p] voiceless bilabial stop — v2 UPDATED (v6 architecture)
+# [p] voiceless bilabial stop — v2 FINAL CORRECTION (v6 architecture)
 VS_P_CLOSURE_MS = 28.0
 VS_P_BURST_MS   = 8.0
 VS_P_VOT_MS     = 18.0
 
-# v2 NEW: spike + turbulence parameters
-VS_P_BURST_F     = [500.0, 1100.0, 2200.0, 3000.0]  # Bilabial locus
-VS_P_BURST_B     = [250.0,  300.0,  400.0,  450.0]
-VS_P_BURST_G     = [  8.0,   12.0,    3.0,    1.0]
-VS_P_BURST_DECAY = 140.0  # Low frequency = slower decay
+# v2 FINAL CORRECTION: formants adjusted to match v1 centroid 1297 Hz
+# Based on verified ṚTVIJAM [ʈ] architecture (1194 Hz) scaled up
+VS_P_BURST_F     = [600.0, 1300.0, 2100.0, 3000.0]  # Bilabial locus
+VS_P_BURST_B     = [300.0,  300.0,  400.0,  500.0]
+VS_P_BURST_G     = [  6.0,   16.0,    4.0,    1.5]  # F2 dominant at 1300 Hz
+VS_P_BURST_DECAY = 130.0  # Low frequency = slower decay
 VS_P_BURST_GAIN  = 0.20
 
 # [u] short close back rounded — VERIFIED PUROHITAM v1
@@ -84,16 +86,16 @@ VS_I_DUR_MS = 50.0
 VS_I_COART_ON  = 0.12
 VS_I_COART_OFF = 0.12
 
-# [t] voiceless dental stop — v2 UPDATED (v6 architecture)
+# [t] voiceless dental stop — v2 VERIFIED (v6 architecture)
 VS_T_CLOSURE_MS = 25.0
 VS_T_BURST_MS   = 7.0
 VS_T_VOT_MS     = 15.0
 
-# v2 NEW: spike + turbulence parameters
-VS_T_BURST_F     = [500.0, 3500.0, 4000.0, 4500.0]  # Dental locus
-VS_T_BURST_B     = [300.0,  500.0,  600.0,  700.0]
-VS_T_BURST_G     = [  8.0,   12.0,    3.0,    1.0]
-VS_T_BURST_DECAY = 160.0  # High frequency = faster decay
+# v2 VERIFIED: formants match v1 centroid 3006 Hz ✓
+VS_T_BURST_F     = [1500.0, 3500.0, 5000.0, 6500.0]  # Dental locus
+VS_T_BURST_B     = [ 400.0,  600.0,  800.0, 1000.0]
+VS_T_BURST_G     = [   4.0,   14.0,    6.0,    2.0]  # F2 dominant at 3500 Hz
+VS_T_BURST_DECAY = 170.0  # High frequency = faster decay
 VS_T_BURST_GAIN  = 0.20
 
 # Formant locus for VOT
@@ -203,8 +205,10 @@ def ola_stretch(sig, factor=6.0, sr=SR):
 
 def synth_P(pitch_hz=PITCH_HZ, dil=1.0):
     """
-    [p] voiceless bilabial stop — v2 UPDATED (v6 architecture)
+    [p] voiceless bilabial stop — v2 FINAL CORRECTION (v6 architecture)
     CANONICAL v6 ARCHITECTURE (spike + turbulence + boundary fix)
+    Formants FINAL CORRECTION to match v1 centroid 1297 Hz
+    Based on verified ṚTVIJAM [ʈ] architecture
     """
     n_cl = int(VS_P_CLOSURE_MS / 1000.0 * SR)
     n_b = int(VS_P_BURST_MS / 1000.0 * SR)
@@ -361,8 +365,9 @@ def synth_I(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
 
 def synth_T(pitch_hz=PITCH_HZ, dil=1.0):
     """
-    [t] voiceless dental stop — v2 UPDATED (v6 architecture)
+    [t] voiceless dental stop — v2 VERIFIED (v6 architecture)
     CANONICAL v6 ARCHITECTURE (spike + turbulence + boundary fix)
+    Formants match v1 centroid 3006 Hz ✓
     """
     n_cl = int(VS_T_CLOSURE_MS / 1000.0 * SR)
     n_b = int(VS_T_BURST_MS / 1000.0 * SR)
@@ -453,11 +458,15 @@ def synth_M(F_prev=None, pitch_hz=PITCH_HZ, dil=1.0):
 
 def synth_purohitam(pitch_hz=PITCH_HZ, dil=1.0):
     """
-    PUROHITAM [puroːhitɑm] v2
+    PUROHITAM [puroːhitɑm] v2 FINAL CORRECTION
     Syllables: PU-RO-HI-TAM
     
     v1: [t] and [p] used OLD bandpass noise burst
-    v2: [t] and [p] updated to v6 (spike + turbulence + boundary fix) ✓
+    v2: [t] and [p] use v6 (spike + turbulence + boundary fix)
+        WITH FINAL CORRECTED formants matching v1 spectral profile
+    
+    [t] VERIFIED: 3065 Hz (v1: 3006 Hz) ✓
+    [p] CORRECTED: targeting 1297 Hz (v1: 1297 Hz)
     
     ALL voiceless stops now use correct physics.
     """
@@ -486,28 +495,25 @@ def synth_purohitam(pitch_hz=PITCH_HZ, dil=1.0):
 if __name__ == "__main__":
     print()
     print("=" * 70)
-    print("PUROHITAM v2 — UPDATE [t] AND [p] TO v6")
+    print("PUROHITAM v2 — FINAL CORRECTION")
     print("=" * 70)
     print()
-    print("ARCHITECTURE UPDATE (v1→v2):")
+    print("ARCHITECTURE UPDATE (v1→v2 FINAL):")
     print()
-    print("  v1 status:")
-    print("    [t] voiceless dental: OLD bandpass noise ✗")
-    print("    [p] voiceless bilabial: OLD bandpass noise ✗")
+    print("  [p] FINAL CORRECTION:")
+    print("    F: [600, 1300, 2100, 3000] Hz")
+    print("    G: [6.0, 16.0, 4.0, 1.5]")
+    print("    → F2 dominant at 1300 Hz")
+    print("    → Target: ~1297 Hz (v1 reference)")
+    print("    → Based on ṚTVIJAM [ʈ] verified architecture")
     print()
-    print("  v2 fix:")
-    print("    [t] voiceless dental: spike + turbulence + boundary fix ✓")
-    print("    [p] voiceless bilabial: spike + turbulence + boundary fix ✓")
+    print("  [t] VERIFIED:")
+    print("    F: [1500, 3500, 5000, 6500] Hz")
+    print("    G: [4.0, 14.0, 6.0, 2.0]")
+    print("    → F2 dominant at 3500 Hz")
+    print("    → Measured: 3065 Hz ✓ (v1: 3006 Hz)")
     print()
-    print("  BOTH are voiceless → need boundary fix to prevent click")
-    print()
-    print("  Expected result:")
-    print("    Acoustically: IDENTICAL (burst centroids unchanged)")
-    print("    Perceptually: CLEANER (no click artifacts)")
-    print()
-    print("  CARTESIAN CERTAINTY:")
-    print("    Physics is either correct or it isn't")
-    print("    v2 is correct")
+    print("  v6 architecture (spike + turbulence + boundary fix) ✓")
     print()
     
     word_dry = synth_purohitam(PITCH_HZ, 1.0)
@@ -520,22 +526,15 @@ if __name__ == "__main__":
     
     print()
     print("=" * 70)
-    print("v2 synthesis complete")
+    print("v2 FINAL synthesis complete")
     print()
-    print("PERCEPTUAL TEST:")
-    print("  Compare v2 to v1")
-    print("  Listen specifically to:")
-    print("    [p] in 'pu-' (word-initial)")
-    print("    [t] in '-tam' (post-vowel)")
-    print("  Should sound cleaner, no click artifacts")
-    print("  Burst quality should be natural")
+    print("DIAGNOSTIC:")
+    print("  Run: python purohitam_diagnostic_v2.py")
     print()
-    print("NO DIAGNOSTICS NEEDED:")
-    print("  Acoustic measurements will be identical")
-    print("  Ear verification is sufficient")
-    print()
-    print("NEXT:")
-    print("  YAJÑASYA v3 ([ɟ] source file - spike + turbulence)")
+    print("EXPECTED RESULT:")
+    print("  [p] burst centroid: ~1250-1330 Hz (target 1297 Hz)")
+    print("  [t] burst centroid: ~3065 Hz (VERIFIED ✓)")
+    print("  Perceptual: cleaner (no clicks)")
     print()
     print("=" * 70)
     print()
