@@ -341,7 +341,7 @@ STATUS:
 
 ### VOWELS — SHORT
 
-#### [a] ��� short open central unrounded — अ
+#### [a] --- short open central unrounded — अ
 **Śikṣā:** kaṇṭhya (guttural)
 **Status:** VERIFIED — AGNI
 **Date verified:** February 2026
@@ -794,7 +794,7 @@ VS_TT_F3_NOTCH    = 2200.0
 VS_TT_F3_NOTCH_BW = 300.0
 ```
 
-Burst locus ~1300 Hz �� LOWER than
+Burst locus ~1300 Hz LOWER than
 oṣṭhya [p] 1204 Hz. Counter-intuitive
 but physically correct: the tongue tip
 curled back creates a LARGE anterior
@@ -932,7 +932,7 @@ Verified values:
 
 ##### [p] — voiceless bilabial stop — प
 **Śikṣā:** oṣṭhya
-**Status:** VERIFIED �� PUROHITAM
+**Status:** VERIFIED PUROHITAM
 **Date verified:** February 2026
 **Diagnostic:** purohitam_diagnostic.py v1
 
