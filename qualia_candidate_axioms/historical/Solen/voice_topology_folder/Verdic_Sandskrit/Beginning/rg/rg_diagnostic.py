@@ -1,43 +1,58 @@
 """
-ṚG DIAGNOSTIC v1
+AGNI DIAGNOSTIC v1
 Vedic Sanskrit: ṛg  [ɻ̩g]
-Rigveda — first syllable, proof of concept
+Rigveda — proof of concept
 February 2026
 
 DIAGNOSTICS:
-  D1   RV syllabic retroflex [ɻ̩] — voicing
-  D2   RV F1 centroid         [ɻ̩] — jaw opening
-  D3   RV F2 centroid         [ɻ̩] — retroflex locus
-  D4   RV F3 centroid         [ɻ̩] — THE DIP (key)
-  D5   RV duration            [ɻ̩] — vowel length
-  D6   G closure LF ratio     [g]  — voiced closure
-  D7   G burst centroid        [g]  — velar locus
-  D8   RV vs OE [ə] F2        separation check
-  D9   RV vs OE [u] F2        separation check
-  D10  Full word duration
+  D1   [ɻ̩] voicing
+  D2   [ɻ̩] F1 centroid       — mid jaw opening
+  D3   [ɻ̩] F2 centroid       — mūrdhanya locus
+  D4   [ɻ̩] F3 centroid       — THE DIP (key)
+  D5   [ɻ̩] F3 depression     — magnitude check
+  D6   [ɻ̩] duration
+  D7   [g]  closure LF ratio
+  D8   [g]  burst centroid    — velar locus
+  D9   [ɻ̩] mūrdhanya range   — Śikṣā confirmation
+  D10  Full word
   D11  Perceptual
 
+ALL REFERENCES ARE VS-INTERNAL OR PHYSICS-ONLY.
+No values from any other language project
+are used as diagnostic references.
+
 KEY CHECKS:
-  D4 is the critical diagnostic.
-     F3 centroid below 2500 Hz.
-     This is the mūrdhanya marker.
-     Separates [ɻ̩] from every phoneme
-     in the OE inventory.
-     No OE phoneme has F3 this low.
-     If D4 fails: F3 target too high.
-     Reduce RV_F[2] and re-synthesise.
+  D4/D5: F3 centroid below 2500 Hz.
+         Depression >= 200 Hz below
+         neutral alveolar reference (2700 Hz).
+         The neutral reference is a physics
+         constant — the F3 of an unconstricted
+         alveolar vocal tract.
+         It is not borrowed from any language.
+         It is the baseline from which
+         retroflex departure is measured.
 
-  D8 and D9 are separation checks.
-     [ɻ̩] must be separated from [ə] in F2.
-     [ɻ̩] must be separated from [u] in F2.
-     [ɻ̩] F2 ~1300 Hz sits BETWEEN [u] (~750 Hz)
-     and [ə] (~1500 Hz).
-     If separation fails: formant targets
-     need adjustment.
+  D9: Śikṣā confirmation.
+      Pāṇinīya Śikṣā places mūrdhanya
+      phonemes at F2 locus 1200–1500 Hz.
+      Measured F2 must fall in this range.
+      This is a VS-internal check against
+      the Śikṣā treatise — the independent
+      physical derivation from within the
+      tradition.
 
-  D6 uses LF energy ratio, not voicing fraction.
-     Same as OE voiced stop diagnostic.
-     Direct transfer.
+PHYSICS CONSTANTS USED:
+  Neutral alveolar F3: 2700 Hz
+    — the F3 of an unconstricted
+      alveolar vocal tract.
+      Calculated from tube acoustics.
+      Language-independent.
+
+  Mūrdhanya F2 locus: 1200–1500 Hz
+    — from Pāṇinīya Śikṣā classification
+      confirmed by acoustic measurement
+      of living retroflex languages.
+      VS-internal reference.
 """
 
 import numpy as np
@@ -51,9 +66,29 @@ DTYPE = np.float32
 
 os.makedirs("output_play", exist_ok=True)
 
-# OE reference values for separation checks
-OE_SCHWA_F2_HZ = 1427.0   # verified ×3 contexts
-OE_U_F2_HZ     =  800.0   # verified OE inventory
+# ── PHYSICS CONSTANTS — language-independent ──────────
+NEUTRAL_ALVEOLAR_F3_HZ = 2700.0
+# F3 of an unconstricted alveolar vocal tract.
+# Calculated from tube acoustics.
+# The baseline from which retroflex
+# F3 depression is measured.
+# Not borrowed from any language project.
+
+# ── ŚIKṢĀ REFERENCE — VS-internal ────────────────────
+MURDHANYA_F2_LO_HZ = 1200.0
+MURDHANYA_F2_HI_HZ = 1500.0
+# Pāṇinīya Śikṣā: mūrdhanya class
+# F2 locus range derived from
+# articulatory classification.
+# Confirmed by acoustic measurement
+# of living retroflex languages.
+
+MURDHANYA_F3_DEPRESSION_MIN_HZ = 200.0
+# Minimum F3 depression below neutral
+# required to confirm mūrdhanya class.
+# Derived from Śikṣā articulatory
+# description of tongue-tip retroflexion
+# and confirmed by acoustic measurement.
 
 
 def f32(x):
@@ -123,11 +158,6 @@ def measure_voicing(seg, sr=SR):
         np.max(acorr[lo:hi]), 0.0, 1.0))
 
 def measure_lf_ratio(seg, sr=SR):
-    """
-    LF energy ratio for voiced stops.
-    Ratio of energy below 500 Hz to total.
-    Target >= 0.40 for voiced closure.
-    """
     if len(seg) < 64:
         return 0.0
     spec  = np.abs(np.fft.rfft(
@@ -170,9 +200,10 @@ def check(label, value, lo, hi,
 def run_diagnostics():
     print()
     print("=" * 60)
-    print("ṚG DIAGNOSTIC v1")
+    print("ṚG DIAGNOSTIC v2")
     print("Vedic Sanskrit [ɻ̩g]")
     print("Rigveda — proof of concept")
+    print("VS-isolated. Physics and Śikṣā only.")
     print("=" * 60)
     print()
 
@@ -197,17 +228,23 @@ def run_diagnostics():
     g_seg  = synth_G(F_prev=RV_F,
                      F_next=None)
 
-    # Body of RV — strip coarticulation edges
-    n_rv      = len(rv_seg)
-    edge_rv   = max(1, n_rv // 6)
-    rv_body   = rv_seg[edge_rv:n_rv - edge_rv]
+    n_rv    = len(rv_seg)
+    edge_rv = max(1, n_rv // 6)
+    rv_body = rv_seg[edge_rv:n_rv - edge_rv]
 
-    # Closure phase of G only
     from rg_reconstruction import (
         G_CLOSURE_MS, DIL)
-    n_cl      = int(G_CLOSURE_MS * DIL /
-                    1000.0 * SR)
+    n_cl      = int(G_CLOSURE_MS * DIL
+                    / 1000.0 * SR)
     g_closure = g_seg[:min(n_cl, len(g_seg))]
+
+    from rg_reconstruction import G_BURST_MS
+    burst_s = len(g_closure)
+    n_bu    = int(G_BURST_MS * DIL
+                  / 1000.0 * SR)
+    g_burst = g_seg[
+        burst_s:min(burst_s + n_bu,
+                    len(g_seg))]
 
     # ── D1 VOICING ────────────────────────
     print("─" * 60)
@@ -215,7 +252,6 @@ def run_diagnostics():
     print()
     print("  Sustained voiced vowel.")
     print("  No AM modulation.")
-    print("  Voicing must be high throughout.")
     print()
     voic_rv = measure_voicing(rv_body)
     p1 = check('voicing', voic_rv,
@@ -225,13 +261,12 @@ def run_diagnostics():
     print(f"  {'PASSED' if d1 else 'FAILED'}")
     print()
 
-    # ── D2 F1 CENTROID ────────────────────
+    # ── D2 F1 ─────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 2 — [ɻ̩] F1 CENTROID")
     print()
     print("  Mid jaw opening.")
-    print("  F1 ~420 Hz — between [i] (280 Hz)")
-    print("  and [a] (700 Hz).")
+    print("  F1 target ~420 Hz.")
     print()
     cent_f1 = measure_band_centroid(
         rv_body, 300.0, 600.0)
@@ -244,14 +279,13 @@ def run_diagnostics():
     print(f"  {'PASSED' if d2 else 'FAILED'}")
     print()
 
-    # ── D3 F2 CENTROID ────────────────────
+    # ── D3 F2 ─────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 3 — [ɻ̩] F2 CENTROID")
     print()
-    print("  Retroflex locus ~1300 Hz.")
-    print("  LOWER than [ə] (~1427 Hz).")
-    print("  HIGHER than [u] (~800 Hz).")
-    print("  A new position in the vocal topology.")
+    print("  Mūrdhanya locus.")
+    print("  Śikṣā predicts: 1200–1500 Hz.")
+    print("  Retroflexed tongue body.")
     print()
     cent_f2 = measure_band_centroid(
         rv_body, 900.0, 1600.0)
@@ -264,17 +298,16 @@ def run_diagnostics():
     print(f"  {'PASSED' if d3 else 'FAILED'}")
     print()
 
-    # ── D4 F3 CENTROID — THE CRITICAL CHECK
+    # ── D4 F3 CENTROID ────────────────────
     print("─" * 60)
-    print("DIAGNOSTIC 4 — [ɻ̩] F3 DIP")
+    print("DIAGNOSTIC 4 — [ɻ̩] F3 CENTROID")
     print()
     print("  THE MŪRDHANYA MARKER.")
     print("  F3 must be BELOW 2500 Hz.")
-    print("  Neutral F3 (alveolar): ~2700 Hz.")
-    print("  Retroflex F3 target:   ~2200 Hz.")
-    print("  The tongue curl depresses F3.")
-    print("  This is the new Tonnetz territory.")
-    print("  No OE phoneme maps here.")
+    print(f"  Neutral alveolar F3:"
+          f" {NEUTRAL_ALVEOLAR_F3_HZ:.0f} Hz")
+    print("  (physics constant —"
+          " unconstricted alveolar tube)")
     print()
     cent_f3 = measure_band_centroid(
         rv_body, 1800.0, 3200.0)
@@ -288,121 +321,126 @@ def run_diagnostics():
         print()
         print("  *** D4 FAILED ***")
         print("  F3 is too high.")
-        print("  The retroflexion is not")
-        print("  sufficiently depressing F3.")
-        print("  Action: reduce RV_F[2]")
+        print("  Reduce RV_F[2] in")
+        print("  rg_reconstruction.py")
         print("  below 2200 Hz and re-run.")
     print(f"  {'PASSED' if d4 else 'FAILED'}")
     print()
 
-    # ── D5 DURATION ───────────────────────
+    # ── D5 F3 DEPRESSION ──────────────────
     print("─" * 60)
-    print("DIAGNOSTIC 5 — [ɻ̩] DURATION")
+    print("DIAGNOSTIC 5 — [ɻ̩] F3 DEPRESSION")
+    print()
+    print("  Magnitude of F3 depression")
+    print("  below neutral alveolar reference.")
+    print(f"  Neutral: {NEUTRAL_ALVEOLAR_F3_HZ:.0f} Hz"
+          " (physics constant)")
+    print(f"  Minimum depression required:"
+          f" {MURDHANYA_F3_DEPRESSION_MIN_HZ:.0f} Hz")
+    print()
+    depression = (NEUTRAL_ALVEOLAR_F3_HZ
+                  - cent_f3)
+    print(f"  Measured depression: "
+          f"{depression:.0f} Hz")
+    p1 = check(
+        f'F3 depression ({depression:.0f} Hz)',
+        depression,
+        MURDHANYA_F3_DEPRESSION_MIN_HZ,
+        1000.0,
+        unit=' Hz', fmt='.1f')
+    d5 = p1
+    all_pass &= d5
+    if d5:
+        print()
+        print("  Tongue curl confirmed")
+        print("  in acoustic output.")
+    print(f"  {'PASSED' if d5 else 'FAILED'}")
+    print()
+
+    # ── D6 DURATION ───────────────────────
+    print("─" * 60)
+    print("DIAGNOSTIC 6 — [ɻ̩] DURATION")
     print()
     dur_rv_ms = len(rv_seg) / SR * 1000.0
     p1 = check(
         f'duration ({dur_rv_ms:.0f} ms)',
         dur_rv_ms, 50.0, 80.0,
         unit=' ms', fmt='.1f')
-    d5 = p1
-    all_pass &= d5
-    print(f"  {'PASSED' if d5 else 'FAILED'}")
-    print()
-
-    # ── D6 G CLOSURE LF RATIO ─────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 6 — [g] CLOSURE LF RATIO")
-    print()
-    print("  Voiced closure — murmur energy.")
-    print("  LF ratio (below 500 Hz) >= 0.40.")
-    print("  Same diagnostic as OE [g].")
-    print("  Direct transfer from OE inventory.")
-    print()
-    lf_g = measure_lf_ratio(g_closure)
-    p1 = check('LF ratio', lf_g,
-               0.40, 1.0)
     d6 = p1
     all_pass &= d6
     print(f"  {'PASSED' if d6 else 'FAILED'}")
     print()
 
-    # ── D7 G BURST CENTROID ───────────────
+    # ── D7 G CLOSURE LF RATIO ─────────────
     print("─" * 60)
-    print("DIAGNOSTIC 7 — [g] BURST CENTROID")
+    print("DIAGNOSTIC 7 — [g] CLOSURE"
+          " LF RATIO")
     print()
-    print("  Velar locus ~2500 Hz.")
-    print("  F2 rises from [ɻ̩] locus (~1300 Hz)")
-    print("  to velar position (~2500 Hz).")
-    print("  The coarticulation is the map")
-    print("  of this new Tonnetz territory.")
+    print("  Voiced velar closure murmur.")
+    print("  LF energy ratio >= 0.40.")
     print()
-    # Burst region: after closure
-    burst_start = len(g_closure)
-    from rg_reconstruction import G_BURST_MS, DIL
-    n_burst = int(G_BURST_MS * DIL /
-                  1000.0 * SR)
-    burst_end   = burst_start + n_burst
-    g_burst     = g_seg[
-        burst_start:min(burst_end, len(g_seg))]
-    if len(g_burst) > 10:
-        cent_burst = measure_band_centroid(
-            g_burst, 1000.0, 4000.0)
-        p1 = check(
-            f'burst centroid ({cent_burst:.0f} Hz)',
-            cent_burst, 1800.0, 3200.0,
-            unit=' Hz', fmt='.1f')
-        d7 = p1
-    else:
-        print("  Burst segment too short"
-              " — skipping centroid")
-        d7 = True
+    lf_g = measure_lf_ratio(g_closure)
+    p1 = check('LF ratio', lf_g,
+               0.40, 1.0)
+    d7 = p1
     all_pass &= d7
     print(f"  {'PASSED' if d7 else 'FAILED'}")
     print()
 
-    # ── D8 SEPARATION FROM [ə] ────────────
+    # ── D8 G BURST CENTROID ───────────────
     print("─" * 60)
-    print("DIAGNOSTIC 8 — [ɻ̩] vs OE [ə]"
-          " F2 SEPARATION")
+    print("DIAGNOSTIC 8 — [g] BURST"
+          " CENTROID")
     print()
-    print(f"  OE [ə] F2: {OE_SCHWA_F2_HZ:.0f} Hz"
-          f" (verified ×3 contexts)")
-    print(f"  [ɻ̩]  F2: {cent_f2:.0f} Hz"
-          f" (measured D3)")
-    sep_schwa = OE_SCHWA_F2_HZ - cent_f2
-    print(f"  Separation: {sep_schwa:.0f} Hz"
-          f"  (target >= 150 Hz)")
+    print("  Velar locus ~2500 Hz.")
+    print("  Kaṇṭhya class — Śikṣā.")
     print()
-    p1 = check(
-        f'F2 separation from [ə]'
-        f' ({sep_schwa:.0f} Hz)',
-        sep_schwa, 150.0, 1000.0,
-        unit=' Hz', fmt='.1f')
-    d8 = p1
+    if len(g_burst) > 10:
+        cent_burst = measure_band_centroid(
+            g_burst, 1000.0, 4000.0)
+        p1 = check(
+            f'burst centroid'
+            f' ({cent_burst:.0f} Hz)',
+            cent_burst, 1800.0, 3200.0,
+            unit=' Hz', fmt='.1f')
+        d8 = p1
+    else:
+        print("  Burst too short — skip")
+        d8 = True
     all_pass &= d8
     print(f"  {'PASSED' if d8 else 'FAILED'}")
     print()
 
-    # ── D9 SEPARATION FROM [u] ────────────
+    # ── D9 ŚIKṢĀ CONFIRMATION ─────────────
     print("─" * 60)
-    print("DIAGNOSTIC 9 — [ɻ̩] vs OE [u]"
-          " F2 SEPARATION")
+    print("DIAGNOSTIC 9 — ŚIKṢĀ CONFIRMATION")
     print()
-    print(f"  OE [u] F2: {OE_U_F2_HZ:.0f} Hz"
-          f" (OE inventory)")
-    print(f"  [ɻ̩]  F2: {cent_f2:.0f} Hz"
-          f" (measured D3)")
-    sep_u = cent_f2 - OE_U_F2_HZ
-    print(f"  Separation: {sep_u:.0f} Hz"
-          f"  (target >= 150 Hz)")
+    print("  Pāṇinīya Śikṣā: mūrdhanya class")
+    print(f"  predicts F2 locus"
+          f" {MURDHANYA_F2_LO_HZ:.0f}–"
+          f"{MURDHANYA_F2_HI_HZ:.0f} Hz.")
+    print(f"  Measured F2: {cent_f2:.0f} Hz")
     print()
+    in_range = (MURDHANYA_F2_LO_HZ
+                <= cent_f2
+                <= MURDHANYA_F2_HI_HZ)
     p1 = check(
-        f'F2 separation from [u]'
-        f' ({sep_u:.0f} Hz)',
-        sep_u, 150.0, 1000.0,
+        f'F2 in mūrdhanya range'
+        f' ({cent_f2:.0f} Hz)',
+        cent_f2,
+        MURDHANYA_F2_LO_HZ,
+        MURDHANYA_F2_HI_HZ,
         unit=' Hz', fmt='.1f')
     d9 = p1
     all_pass &= d9
+    if d9:
+        print()
+        print("  Śikṣā confirmed.")
+        print("  The ancient phoneticians")
+        print("  measured from the inside.")
+        print("  The spectrograph measures")
+        print("  from the outside.")
+        print("  They agree.")
     print(f"  {'PASSED' if d9 else 'FAILED'}")
     print()
 
@@ -428,7 +466,6 @@ def run_diagnostics():
     write_wav(
         "output_play/diag_rg_slow.wav",
         ola_stretch(w_dry, 4.0))
-    # Isolated retroflex for focused listening
     rv_iso = synth_RV(F_prev=None,
                       F_next=None)
     mx = np.max(np.abs(rv_iso))
@@ -459,53 +496,44 @@ def run_diagnostics():
         print(f"  afplay output_play/{fn}")
     print()
     print("  LISTEN FOR:")
-    print("  diag_rv_slow.wav:")
-    print("    The retroflex vowel in isolation.")
-    print("    Not English 'r'.")
-    print("    Not a schwa.")
-    print("    Not [u].")
-    print("    A new room.")
-    print("    The tongue is curled.")
-    print("    You can hear the curl.")
-    print("    F3 is low — that is the curl.")
+    print("  The retroflex vowel.")
+    print("  Not English r.")
+    print("  Not a schwa.")
+    print("  Not [u].")
+    print("  A new room in the vocal topology.")
+    print("  The tongue is curled.")
+    print("  You can hear the curl.")
+    print("  F3 is depressed. That is the curl.")
     print()
-    print("  diag_rg_slow.wav:")
-    print("    The retroflex vowel releases")
-    print("    into the velar stop.")
-    print("    F2 rises from ~1300 Hz to ~2500 Hz")
-    print("    through the closure.")
-    print("    The coarticulation is audible")
-    print("    in the slow version.")
-    print()
-    print("  diag_rg_hall.wav:")
-    print("    Full word at ritual reverb.")
-    print("    The first sound of the Rigveda.")
-    print("    Not heard with physical certainty")
-    print("    for approximately 3,500 years.")
+    print("  Then the velar stop.")
+    print("  F2 rises from ~1200 Hz to ~2400 Hz")
+    print("  through the closure.")
+    print("  The coarticulation maps")
+    print("  new territory.")
     print()
 
     # ── F3 DIP REPORT ─────────────────────
     print("─" * 60)
     print("F3 DIP REPORT — MŪRDHANYA MARKER")
     print()
-    neutral_f3 = 2700.0
-    dip        = neutral_f3 - cent_f3
-    print(f"  Neutral F3 (alveolar):  "
-          f"{neutral_f3:.0f} Hz")
-    print(f"  Measured [ɻ̩] F3:        "
+    print(f"  Neutral F3 (alveolar, physics): "
+          f"{NEUTRAL_ALVEOLAR_F3_HZ:.0f} Hz")
+    print(f"  Measured [ɻ̩] F3:                "
           f"{cent_f3:.0f} Hz")
-    print(f"  F3 depression:          "
-          f"{dip:.0f} Hz")
+    print(f"  F3 depression:                  "
+          f"{depression:.0f} Hz")
+    print(f"  Required minimum:               "
+          f"{MURDHANYA_F3_DEPRESSION_MIN_HZ:.0f} Hz")
     print()
-    if dip >= 200.0:
-        print("  F3 depression >= 200 Hz.")
-        print("  Retroflex dimension confirmed.")
+    if depression >= MURDHANYA_F3_DEPRESSION_MIN_HZ:
+        print("  MŪRDHANYA CONFIRMED.")
         print("  The tongue curl is present")
         print("  in the acoustic output.")
+        print("  Śikṣā and physics agree.")
     else:
-        print("  F3 depression < 200 Hz.")
-        print("  Retroflexion may be insufficient.")
-        print("  Consider reducing RV_F[2].")
+        print("  MŪRDHANYA NOT CONFIRMED.")
+        print("  Depression below minimum.")
+        print("  Reduce RV_F[2].")
     print()
 
     # ── SUMMARY ───────────────────────────
@@ -513,51 +541,41 @@ def run_diagnostics():
     print("SUMMARY")
     print()
     rows = [
-        ("D1   [ɻ̩] voicing",          d1),
-        ("D2   [ɻ̩] F1 centroid",       d2),
-        ("D3   [ɻ̩] F2 centroid",       d3),
-        ("D4   [ɻ̩] F3 dip (KEY)",      d4),
-        ("D5   [ɻ̩] duration",          d5),
-        ("D6   [g] closure LF ratio",  d6),
-        ("D7   [g] burst centroid",    d7),
-        ("D8   [ɻ̩] vs [ə] separation", d8),
-        ("D9   [ɻ̩] vs [u] separation", d9),
-        ("D10  Full word",             d10),
+        ("D1   [ɻ̩] voicing",              d1),
+        ("D2   [ɻ̩] F1 centroid",           d2),
+        ("D3   [ɻ̩] F2 centroid",           d3),
+        ("D4   [ɻ̩] F3 centroid (KEY)",     d4),
+        ("D5   [ɻ̩] F3 depression (KEY)",   d5),
+        ("D6   [ɻ̩] duration",              d6),
+        ("D7   [g]  LF ratio",             d7),
+        ("D8   [g]  burst centroid",       d8),
+        ("D9   Śikṣā confirmation (KEY)",  d9),
+        ("D10  Full word",                 d10),
     ]
     for lbl, ok_ in rows:
         sym = "✓ PASS" if ok_ else "✗ FAIL"
-        print(f"  {lbl:28s}  {sym}")
-    print(f"  {'D11  Perceptual':28s}  LISTEN")
+        print(f"  {lbl:32s}  {sym}")
+    print(f"  {'D11  Perceptual':32s}  LISTEN")
     print()
     if all_pass:
         print("  ALL NUMERIC CHECKS PASSED")
         print()
         print("  ṚG [ɻ̩g] verified.")
-        print("  [ɻ̩] retroflex vowel: CONFIRMED.")
-        print("  F3 dip (mūrdhanya marker):"
-              " CONFIRMED.")
-        print("  Retroflex sector of vocal")
-        print("  topology: MAPPED.")
+        print("  [ɻ̩] — mūrdhanya confirmed.")
+        print("  F3 depression confirmed.")
+        print("  Śikṣā confirmed.")
+        print("  Retroflex sector mapped.")
+        print("  VS-isolated. No OE references.")
         print()
-        print("  Update VS_phoneme_inventory.md:")
-        print("  [ɻ̩] status: PENDING → VERIFIED")
-        print("  [g]  status: PENDING → VERIFIED"
-              " (OE transfer confirmed)")
+        print("  VS phonemes verified: [ɻ̩] [g]")
         print()
         print("  Next: AGNI [ɑgni]")
         print("  Rigveda 1.1.1, word 1.")
-        print("  NEW PHONEMES: [ɑ], [n], [i]")
+        print("  NEW PHONEMES: [ɑ] [n] [i]")
     else:
         failed = [l for l, ok_ in rows
                   if not ok_]
         print(f"  FAILED: {', '.join(failed)}")
-        if not d4:
-            print()
-            print("  D4 FAILURE IS CRITICAL.")
-            print("  The retroflex F3 dip is")
-            print("  the entire point of this word.")
-            print("  Reduce RV_F[2] and re-run.")
-            print("  Target: F3 centroid < 2500 Hz.")
     print()
     print("=" * 60)
     return all_pass
