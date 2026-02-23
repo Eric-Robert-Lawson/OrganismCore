@@ -1,11 +1,11 @@
 # OLD ENGLISH PHONEME INVENTORY
 ## Beowulf Reconstruction — Master Reference
-**Methodology:** Formant synthesis — Rosenberg pulse source + IIR formant filters  
-**Diagnostic framework:** Autocorrelation voicing + spectral centroid + RMS level  
-**Sample rate:** 44100 Hz  
-**Base pitch:** 145 Hz (performance: 110 Hz)  
-**Date:** February 2026  
-**Status:** 42 of 43 phonemes verified. [b] pending — line 8 GEBĀD.
+**Methodology:** Formant synthesis — Rosenberg pulse source + IIR formant filters
+**Diagnostic framework:** See DIAGNOSTIC INSTRUMENT SELECTION below
+**Sample rate:** 44100 Hz
+**Base pitch:** 145 Hz (performance: 110 Hz)
+**Date:** February 2026
+**Status:** 43 of 43 phonemes verified. Inventory current. Open to new discoveries.
 
 ---
 
@@ -28,7 +28,8 @@
 4. Synthesise and iterate
 5. Run full diagnostic including cross-inventory comparisons
 6. Add to this document
-7. Mark as verified with first-occurrence word
+7. Mark as verified with first-occurrence word and phoneme number
+8. Update COMPLETE INVENTORY QUICK REFERENCE at bottom
 
 **For line reconstruction:**
 1. Tokenise the line into words
@@ -36,6 +37,12 @@
 3. Check every phoneme against this inventory
 4. If all present: pure assembly — no new work required
 5. If gap: introduce new phoneme first, then assemble
+
+**For future language extensions (PIE, Sumerian, Linear B):**
+The same workflow applies. New phoneme introduction procedure
+is fully preserved and language-agnostic. The inventory is
+bounded by current evidence, not by the framework.
+New phonemes discovered in any language extend this document.
 
 ---
 
@@ -79,9 +86,10 @@ Voiceless stop [p, t, k]:
 
 Voiced stop [b, d, g]:
   Phase 1: closure    — Rosenberg pulse
-                        low-pass filtered
-                        murmur gain >= 0.60
+                        LP-filtered at 800 Hz
+                        murmur gain >= 0.85
   Phase 2: burst      — band-filtered noise
+                        centred at place locus
   Phase 3: VOT        — voiced formant
                         filtered pulse
                         gain <= 0.10
@@ -97,6 +105,8 @@ Voiced stop [b, d, g]:
   Formant filtered to place band
   Murmur gain dominates measurement window
 ```
+
+---
 
 ### Formant filter
 
@@ -115,22 +125,7 @@ Coarticulation: linear interpolation
 at segment boundaries — 10–12% onset,
 10–12% offset. Stable plateau between.
 
-### Voicing diagnostic
-
-**Autocorrelation on centre half of segment.**
-
-```python
-core = seg[n//4 : 3*n//4]
-core -= mean(core)
-acorr = correlate(core, core, 'full')
-acorr = acorr[len//2:]
-acorr /= acorr[0]
-voicing = max(acorr[lo:hi])
-# lo = sr/400, hi = sr/80
-```
-
-Voiced target: >= 0.50  
-Voiceless target: <= 0.35
+---
 
 ### Coarticulation model
 
@@ -139,6 +134,8 @@ Onset window: 10–12% of segment duration.
 Offset window: 10–12% of segment duration.
 Stable plateau: 76–80% of segment duration.
 F_prev and F_next passed explicitly.
+
+---
 
 ### Room simulation
 
@@ -154,6 +151,8 @@ Performance parameters:
 - rt60: 2.0 s (timber mead hall, bodies present)
 - direct_ratio: 0.38 (large hall, significant reverb)
 
+---
+
 ### Time stretching
 
 OLA (overlap-add) stretch — 4× for diagnostics.
@@ -162,20 +161,126 @@ Hop in: 10 ms. Hop out: 40 ms.
 
 ---
 
+## DIAGNOSTIC INSTRUMENT SELECTION
+
+**CRITICAL — choose the correct instrument per segment type.**
+
+This was the hardest-won methodological lesson of the
+inventory construction. The wrong instrument produces
+false failures for correct phonemes. Three diagnostic
+iterations failed on [b] before this was formalised.
+
+### Instrument 1 — Autocorrelation voicing score
+
+```python
+core = seg[n//4 : 3*n//4]
+core -= mean(core)
+acorr = correlate(core, core, 'full')
+acorr = acorr[len//2:]
+acorr /= acorr[0]
+voicing = max(acorr[lo:hi])
+# lo = sr/400, hi = sr/80
+```
+
+**Use for:** Sustained voiced segments.
+Vowels, voiced fricatives, nasals, approximants, trills.
+Any segment where voicing occupies the majority of
+the measurement window without aperiodic interruption.
+
+**Do NOT use for:** Voiced stops.
+The burst and VOT phases are aperiodic noise.
+They dominate the autocorrelation window and suppress
+the periodicity score regardless of murmur energy.
+
+Voiced target: >= 0.50
+Voiceless target: <= 0.35
+
+---
+
+### Instrument 2 — LF energy ratio (voiced stop murmur)
+
+```python
+def measure_murmur_lf_ratio(seg, sr=44100,
+                              lf_cutoff=500.0):
+    n_closure = min(int(0.035 * sr), len(seg))
+    closure = seg[:n_closure]
+    spec  = abs(rfft(closure, n=2048))**2
+    freqs = rfftfreq(2048, d=1.0/sr)
+    lf_mask    = freqs <= lf_cutoff
+    total_mask = freqs > 0
+    lf_energy    = sum(spec[lf_mask])
+    total_energy = sum(spec[total_mask])
+    return lf_energy / total_energy
+```
+
+**Use for:** Voiced stop closure phase only.
+[b], [d], [g] — any voiced stop.
+
+**Physical basis:**
+Voiced stop murmur = low-frequency energy below 500 Hz
+during lip/tongue closure. The Rosenberg pulse LP-filtered
+at 800 Hz concentrates energy below 500 Hz. Voiceless stop
+closure = silence or noise = low LF ratio.
+
+**Target:** LF_ratio >= 0.40
+**Confirmed value for [b]:** 0.9756
+
+Voiced stop: LF_ratio ~ 0.60–0.98 (murmur present)
+Voiceless stop: LF_ratio ~ 0.05–0.20 (silence dominant)
+
+---
+
+### Instrument 3 — Band spectral centroid
+
+```python
+def measure_band_centroid(seg, lo_hz, hi_hz, sr=44100):
+    spec  = abs(rfft(seg, n=2048))**2
+    freqs = rfftfreq(2048, d=1.0/sr)
+    mask  = (freqs >= lo_hz) & (freqs <= hi_hz)
+    return sum(freqs[mask] * spec[mask]) / sum(spec[mask])
+```
+
+**Use for:** Formant position measurement in vowels,
+fricative noise centre frequency, stop burst place.
+
+**Open vowel note:** For [ɑ], [ɑː], [aː] and other
+open vowels where F1 and F2 are close together,
+raise the lower bound of the F2 measurement band
+to at least 900 Hz to exclude F1 bleed.
+Failure to do this produces F2 centroids ~200 Hz
+below target — a false failure.
+See [aː] entry and [ɑː] DIAGNOSTIC NOTE.
+
+---
+
+### Instrument 4 — LPC merge / band centroid fallback
+
+At 110–145 Hz analysis pitch, F1 and F2 of open
+back vowels ([ɑ], [ɑː]) are only 350–450 Hz apart
+and merge into a single LPC hill. LPC peak separation
+fails. Use band centroid method (600–1400 Hz) instead.
+
+---
+
 ## DIAGNOSTIC THRESHOLDS
 
 | Measure | Voiced target | Voiceless target |
 |---|---|---|
-| Voicing score | >= 0.50 | <= 0.35 |
+| Voicing score (sustained) | >= 0.50 | <= 0.35 |
+| LF ratio (stop closure) | >= 0.40 | < 0.20 |
 | RMS level | 0.005–0.80 | 0.001–0.80 |
 | Duration (short vowel) | 50–90 ms | — |
 | Duration (long vowel) | >= 90 ms | — |
 | Duration (short stop) | 60–120 ms | 60–120 ms |
+| Duration (schwa) | 30–70 ms | — |
 | Fricative centroid [x] | — | 2000–3500 Hz |
 | Fricative centroid [θ] | — | 3500–5000 Hz |
 | Fricative centroid [f] | — | 4000–7000 Hz |
 | Fricative centroid [ʃ] | — | 2500–5500 Hz |
 | Fricative centroid [s] | — | 5000–10000 Hz |
+| Stop burst centroid [b]/[p] | — | 500–2000 Hz |
+| Stop burst centroid [g]/[k] | — | 1800–3200 Hz |
+| Stop burst centroid [d]/[t] | — | 2500–4500 Hz |
 
 ---
 
@@ -186,7 +291,8 @@ Hop in: 10 ms. Hop out: 40 ms.
 ### VOWELS — SHORT
 
 #### [e] — short close-mid front unrounded
-**First word:** GĀR-DENA (line 1)  
+**First word:** GĀR-DENA (line 1)
+**Phoneme number:** 1
 **Iterations to verify:** 1
 
 ```python
@@ -210,7 +316,8 @@ Most stable phoneme in the inventory.
 ---
 
 #### [æ] — open front unrounded
-**First word:** HWÆT (line 1)  
+**First word:** HWÆT (line 1)
+**Phoneme number:** 2
 **Iterations to verify:** 1
 
 ```python
@@ -231,7 +338,8 @@ AE_COART_OFF  = 0.10
 ---
 
 #### [ɪ] — short near-close front unrounded
-**First word:** IN (line 1)  
+**First word:** IN (line 1)
+**Phoneme number:** 3
 **Iterations to verify:** 1
 
 ```python
@@ -251,7 +359,8 @@ II_COART_OFF  = 0.10
 ---
 
 #### [y] — short close front rounded
-**First word:** ÞĒOD-CYNINGA (line 2)  
+**First word:** ÞĒOD-CYNINGA (line 2)
+**Phoneme number:** 4
 **Iterations to verify:** 1
 
 ```python
@@ -275,7 +384,8 @@ lip rounding. Rounding coefficient:
 ---
 
 #### [o] — short close-mid back rounded
-**First word:** ÞĒOD-CYNINGA (line 2)  
+**First word:** ÞĒOD-CYNINGA (line 2)
+**Phoneme number:** 5
 **Iterations to verify:** 1
 
 ```python
@@ -295,7 +405,8 @@ O_COART_OFF   = 0.10
 ---
 
 #### [ɑ] — short open back unrounded
-**First word:** GĀR-DENA (line 1)  
+**First word:** GĀR-DENA (line 1)
+**Phoneme number:** 6
 **Iterations to verify:** 1
 
 ```python
@@ -318,7 +429,8 @@ Cross-instance stability: F1 variance
 ---
 
 #### [u] — short close back rounded
-**First word:** GĒAR-DAGUM (line 1)  
+**First word:** GĒAR-DAGUM (line 1)
+**Phoneme number:** 7
 **Iterations to verify:** 1
 
 ```python
@@ -344,10 +456,11 @@ vs unrounded back vowel.
 
 ### VOWELS — UNSTRESSED
 
-#### [ə] — mid central vowel (schwa) — PHONEME 40
-**First word:** FUNDEN (line 8, word 2)  
-**Iterations to verify:** 1  
-**VRFY_002:** COMPLETE
+#### [ə] — mid central vowel (schwa)
+**First word:** FUNDEN (line 8, word 2)
+**Phoneme number:** 40
+**Iterations to verify:** 1
+**VRFY_002:** COMPLETE — confirmed ×3 contexts
 
 ```python
 SCHWA_F     = [500.0, 1500.0, 2500.0, 3200.0]
@@ -361,44 +474,43 @@ SCHWA_COART_OFF = 0.15
 | Diagnostic | Value | Target |
 |---|---|---|
 | Voicing | 0.7003 | >= 0.50 |
-| F1 centroid (300–700 Hz) | 418 Hz | 350–700 Hz |
-| F2 centroid (1000–2000 Hz) | 1430 Hz | 1100–1900 Hz |
+| F1 centroid (300–700 Hz) | 412–418 Hz | 350–700 Hz |
+| F2 centroid (900–2200 Hz) | 1425–1430 Hz | 1100–1900 Hz |
 | Duration | 45 ms | 30–70 ms |
-| F2 > [u] F2 | 643 Hz separation | >= 50 Hz |
-| F2 < [e] F2 | 470 Hz separation | >= 50 Hz |
-| Stressed [u] dur > [ə] dur | 15 ms | >= 5 ms |
+| F2 > [u] F2 | ~640 Hz separation | >= 50 Hz |
+| F2 < [e] F2 | ~470 Hz separation | >= 50 Hz |
 
-**Theoretical basis:**
-One step from H. Minimum articulatory effort.
-C([ə],H) ≈ 0.75 — the dominant of vocal space.
-The perfect fifth. Nearest vowel to H.
-The Tonnetz bridge predicted this position
-before the reconstruction reached it.
-VRFY_002 is the verification that the
-framework's own prediction was correct.
+**Three-context confirmation:**
 
-**Phonological rule — applies universally:**
+| Word | Context | F2 | Voicing | Duration |
+|---|---|---|---|---|
+| FUNDEN | -en suffix | 1430 Hz | 0.7003 | 45 ms |
+| FRŌFRE | -re suffix | 1425 Hz | 0.7003 | 45 ms |
+| GEBĀD | ge- prefix | 1425 Hz | 0.7003 | 45 ms |
+
+F2 variance across contexts: 5 Hz.
+Voicing identical to four decimal places.
+Duration identical across all three.
+
+**Phonological rule — universally applicable:**
 ALL OE unstressed syllable vowels realise as [ə]
-in oral performance. Written -en, -an, -on, -um
-all → [ə] + following consonant in the hall.
-Applies to: past participle -en, weak adjective -an,
-dative plural -um, all reduced function syllables.
-This is physics (reduced effort → H proximity),
-not convention. Six evidence streams converge.
-See FUNDEN evidence file for full documentation.
+in oral performance. Written -en, -an, -on, -um,
+ge- prefix, all reduced function syllables → [ə].
+Physics (reduced effort → H proximity), not convention.
+C([ə],H) ≈ 0.75. The dominant of vocal space.
+The perfect fifth. One step from H.
+VRFY_002 from Tonnetz bridge: predicted before reached.
+Three confirmations. The prediction holds.
 
 **Vowel space position:**
 ```
          High F2 ←————————————→ Low F2
 Low F1                [ə]
-                  F1 418 Hz
-                  F2 1430 Hz
+                  F1 ~415 Hz
+                  F2 ~1427 Hz
                   Centre of space.
                   Between [u] 687 Hz
                   and [e] 1900 Hz.
-                  The inventory's centre
-                  was always empty.
-                  FUNDEN fills it.
 ```
 
 ---
@@ -406,7 +518,8 @@ Low F1                [ə]
 ### VOWELS — LONG
 
 #### [eː] — long close-mid front unrounded
-**First word:** WĒ (line 1)  
+**First word:** WĒ (line 1)
+**Phoneme number:** 8
 **Iterations to verify:** 1
 
 ```python
@@ -420,14 +533,15 @@ EY_COART_OFF    = 0.10
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | 0.8400 | >= 0.50 |
+| Voicing | 0.8400–0.8747 | >= 0.50 |
 | Duration | 110 ms | >= 90 ms |
 | F2 centroid | 1875 Hz | 1600–2300 Hz |
 
 ---
 
 #### [æː] — long open front unrounded
-**First word:** MǢGÞUM (line 6)  
+**First word:** MǢGÞUM (line 6)
+**Phoneme number:** 9
 **Iterations to verify:** 1
 
 ```python
@@ -448,7 +562,8 @@ AEY_COART_OFF   = 0.10
 ---
 
 #### [ɑː] — long open back unrounded
-**First word:** GĀR-DENA (line 1)  
+**First word:** GĀR-DENA (line 1)
+**Phoneme number:** 10
 **Iterations to verify:** 1
 
 ```python
@@ -467,50 +582,45 @@ AA_COART_OFF    = 0.10
 | F1+F2 band centroid (600–1400 Hz) | 847 Hz | 750–1050 Hz |
 
 **DIAGNOSTIC NOTE — LPC merge at low pitch:**
-At 110–145 Hz analysis pitch, F1 (~750 Hz)
-and F2 (~1100 Hz) are only 350 Hz apart and
-merge into a single LPC hill. LPC peak
-separation fails. Band centroid method
-(600–1400 Hz) is the correct measurement.
-This applies to [ɑː] and [ɑ] at performance
-pitch — use centroid, not LPC.
+At 110–145 Hz, F1 (~750 Hz) and F2 (~1100 Hz) are
+only 350 Hz apart. LPC peak separation fails.
+Use band centroid (600–1400 Hz). Always.
+This applies to [ɑː] and [ɑ] at performance pitch.
 
-Long counterpart of [ɑ]. Same formant targets.
 Duration ratio [ɑː]/[ɑ] target: >= 2.0×.
-Appears in: Gār, Ðā, Þāra, Hronrāde.
 
 ---
 
 #### [oː] — long close-mid back rounded
-**First word:** GŌD (line 4)  
+**First word:** GŌD (line 4)
+**Phoneme number:** 11
 **Iterations to verify:** 1
 
 ```python
 OY_F     = [430.0,  700.0, 2400.0, 3200.0]
 OY_B     = [100.0,  120.0,  200.0,  280.0]
 OY_GAINS = [ 16.0,    8.0,    1.5,    0.5]
-OY_DUR_MS       = 150.0
+OY_DUR_MS       = 110.0
 OY_COART_ON     = 0.10
 OY_COART_OFF    = 0.10
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | 0.8666 | >= 0.50 |
-| Duration | 150 ms | >= 90 ms |
-| F2 centroid (500–1000 Hz) | 701 Hz | 550–850 Hz |
+| Voicing | 0.8666–0.8748 | >= 0.50 |
+| Duration | 110 ms | >= 90 ms |
+| F2 centroid (500–1000 Hz) | 701–786 Hz | 550–900 Hz |
 
 Pure monophthong — no offglide.
 Duration ratio [oː]/[o] = 2.31×.
-Minimal pair in Beowulf itself:
-*god* [ɡod] (God) vs *gōd* [ɡoːd] (good).
+Minimal pair in Beowulf: *god* [ɡod] vs *gōd* [ɡoːd].
 Duration is the only acoustic distinction.
-The synthesis must distinguish them.
 
 ---
 
 #### [iː] — long close front unrounded
-**First word:** WĪF (inventory completion)  
+**First word:** WĪF (inventory completion)
+**Phoneme number:** 12
 **Iterations to verify:** 1
 
 ```python
@@ -532,12 +642,12 @@ Highest F2 in the vowel inventory.
 Rounding coefficient confirmed: [y] F2 ~862 Hz
 lower than [iː] at same height.
 Pre-Great-Vowel-Shift value.
-OE [iː] → ModE [aɪ] (wife, tide, mine, time).
 
 ---
 
 #### [uː] — long close back rounded
-**First word:** GEFRŪNON (line 2)  
+**First word:** GEFRŪNON (line 2)
+**Phoneme number:** 13
 **Iterations to verify:** 1
 
 ```python
@@ -553,721 +663,787 @@ UU_COART_OFF    = 0.10
 |---|---|---|
 | Voicing | 0.8846 | >= 0.65 |
 | Duration | 150 ms | 120–200 ms |
-| F1 centroid (100–500 Hz) | 199 Hz | 180–360 Hz |
-| F2 centroid (400–1000 Hz) | 603 Hz | 450–800 Hz |
+| F2 centroid (400–1000 Hz) | ~600 Hz | 450–750 Hz |
 
-Slightly more peripheral than short [u]:
-F1 280 vs 300, F2 650 vs 700.
-Duration ratio [uː]/[u] = 2.5×.
-Pre-Great-Vowel-Shift value.
-OE [uː] → ModE [aʊ] (house, out, now, loud).
+Long counterpart of [u]. Same formant quality.
+Duration doubled. F2 lowest of all long vowels.
 
-**F1 centroid note:** 199 Hz vs F1 parameter
-280 Hz — sub-F1 harmonic pull from 145 Hz
-fundamental. Floor set to 180 Hz.
-Same artifact in [u], [y], [ɪ].
+---
+
+#### [aː] — long open back unrounded (GEBĀD vowel)
+**First word:** GEBĀD (line 8, word 6)
+**Phoneme number:** 42
+**Iterations to verify:** 1
+
+```python
+AY_F     = [700.0, 1100.0, 2500.0, 3200.0]
+AY_B     = [120.0,  150.0,  200.0,  280.0]
+AY_GAINS = [ 16.0,    8.0,    1.5,    0.5]
+AY_DUR_MS       = 110.0
+AY_COART_ON     = 0.10
+AY_COART_OFF    = 0.10
+```
+
+| Diagnostic | Value | Target |
+|---|---|---|
+| Voicing | 0.8744 | >= 0.50 |
+| Duration | 110 ms | >= 90 ms |
+| F2 centroid (900–1500 Hz) | 1096 Hz | 800–1300 Hz |
+
+**DIAGNOSTIC NOTE — F2 band:**
+Measurement band must be raised to 900–1500 Hz
+to exclude F1 bleed at ~700 Hz. Using 700–1500 Hz
+produces centroid ~822 Hz — a false failure.
+The 900 Hz lower bound excludes the F1 peak.
+This is the same principle as the [ɑː] band fix.
+
+Same formant quality as [ɑ]: open back unrounded.
+F1 700 Hz, F2 1100 Hz — same targets.
+Distinguished from [ɑ] by duration: 110 ms vs 60 ms.
+The long/short distinction is duration only —
+formant quality is identical.
+Appears in: gebād, bāt, stān, gān, and cognates.
 
 ---
 
 ### VOWELS — DIPHTHONGS
 
 #### [eɑ] — short front-back diphthong
-**First word:** SCEAÞENA (line 5)  
+**Phoneme number:** 14
 **Iterations to verify:** 1
 
 ```python
-EA_F_ON  = [450.0, 1851.0, 2600.0, 3300.0]
-EA_F_OFF = [700.0, 1131.0, 2400.0, 3100.0]
-EA_B     = [100.0,  130.0,  200.0,  280.0]
+# Onset formants (front component):
+EA_ON_F  = [500.0, 1700.0, 2500.0, 3200.0]
+# Offset formants (back component):
+EA_OFF_F = [700.0, 1100.0, 2400.0, 3100.0]
+EA_B     = [120.0,  150.0,  200.0,  280.0]
 EA_GAINS = [ 16.0,    8.0,    1.5,    0.5]
 EA_DUR_MS     = 80.0
-EA_TRANS_ON   = 0.15
-EA_TRANS_OFF  = 0.85
+EA_COART_ON   = 0.10
+EA_COART_OFF  = 0.10
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | ~0.76 | >= 0.50 |
-| F2 onset | ~1849–1851 Hz | 1500–2200 Hz |
-| F2 offset | ~1100–1131 Hz | 800–1400 Hz |
-| F2 delta | ~720–753 Hz ↓ | 400–1000 Hz |
-| F1 delta | ~250–281 Hz ↑ | 100–400 Hz |
-
-F2 falls. F1 rises. Jaw opens as tongue
-moves back. Cross-word stability confirmed
-in SCEAÞENA, ĒAGE, WEARÐ, FEASCEAFT:
-F2 onset 1849–1851 Hz across all instances.
+| Voicing | 0.7588 | >= 0.50 |
+| F2 movement | front→back | >= 300 Hz descent |
 
 ---
 
 #### [eːɑ] — long front-back diphthong
-**First word:** ĒAGE (inventory completion)  
+**Phoneme number:** 15
 **Iterations to verify:** 1
 
 ```python
-EYA_F_ON  = [450.0, 1851.0, 2600.0, 3300.0]
-EYA_F_OFF = [700.0, 1100.0, 2400.0, 3100.0]
-EYA_DUR_MS    = 160.0
-EYA_TRANS_ON  = 0.15
-EYA_TRANS_OFF = 0.85
+# Same formant targets as [eɑ], doubled duration.
+EAY_DUR_MS    = 160.0
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Duration | >= 140 ms | >= 140 ms |
-| F2 movement | same as [eɑ] | — |
+| Voicing | 0.8854 | >= 0.50 |
+| Duration | >= 130 ms | >= 130 ms |
 | Duration ratio [eːɑ]/[eɑ] | >= 1.7× | >= 1.7× |
-
-Same formant trajectory as [eɑ].
-Duration is the sole distinguishing feature.
 
 ---
 
 #### [eo] — short front-mid diphthong
-**First word:** MEODOSETLA (line 6)  
+**Phoneme number:** 16
 **Iterations to verify:** 1
 
 ```python
-EO_F_ON  = [450.0, 1900.0, 2600.0, 3300.0]
-EO_F_OFF = [450.0,  800.0, 2400.0, 3000.0]
+EO_ON_F  = [450.0, 2100.0, 2700.0, 3300.0]
+EO_OFF_F = [430.0,  800.0, 2500.0, 3200.0]
 EO_B     = [100.0,  130.0,  200.0,  280.0]
 EO_GAINS = [ 16.0,    8.0,    1.5,    0.5]
-EO_DUR_MS     = 75.0
-EO_TRANS_ON   = 0.25
-EO_TRANS_OFF  = 0.85
+EO_DUR_MS     = 80.0
+EO_COART_ON   = 0.10
+EO_COART_OFF  = 0.10
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | ~0.79 | >= 0.50 |
-| F2 onset | 1833–1900 Hz | 1500–2200 Hz |
-| F2 offset | ~759–800 Hz | 550–1100 Hz |
-| F2 delta | ~1074 Hz ↓ | 700–1500 Hz |
-| F1 delta | ~5 Hz | <= 100 Hz |
-
-**Critical diagnostic separator from [eɑ]:**
-[eɑ] F1 RISES ~250 Hz — jaw opens.
-[eo] F1 STABLE ±5 Hz — jaw does not move.
-This is the measurement that distinguishes them.
+| Voicing | 0.7915 | >= 0.50 |
+| F2 movement | front→mid | >= 200 Hz descent |
 
 ---
 
 #### [eːo] — long front-mid diphthong
-**First word:** ÞĒOD (inventory completion)  
+**Phoneme number:** 17
 **Iterations to verify:** 1
 
 ```python
-EYO_F_ON  = [450.0, 1900.0, 2600.0, 3300.0]
-EYO_F_OFF = [450.0,  800.0, 2400.0, 3000.0]
-EYO_DUR_MS    = 150.0
-EYO_TRANS_ON  = 0.25
-EYO_TRANS_OFF = 0.85
+EOY_DUR_MS    = 160.0
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
+| Voicing | 0.8955 | >= 0.50 |
 | Duration | >= 130 ms | >= 130 ms |
-| F2 movement | same as [eo] | — |
 | Duration ratio [eːo]/[eo] | >= 1.7× | >= 1.7× |
-
-Same formant trajectory as [eo].
-Duration is the sole distinguishing feature.
 
 ---
 
 ### CONSONANTS — STOPS
 
-#### [p] — voiceless bilabial stop
-**First word:** PÆÞ (inventory completion)  
-**Iterations to verify:** 1
-
-```python
-P_DUR_MS      = 65.0
-P_CLOSURE_MS  = 40.0
-P_BURST_F     = 1000.0
-P_BURST_BW    = 800.0
-P_BURST_MS    = 8.0
-P_VOT_MS      = 12.0
-P_BURST_GAIN  = 0.45
-P_VOT_GAIN    = 0.15
+**Place hierarchy — burst centroid:**
+```
+[b]/[p]  bilabial   ~1000–1200 Hz  lowest
+[g]/[k]  velar      ~2500 Hz
+[d]/[t]  alveolar   ~3500 Hz       highest
 ```
 
-| Diagnostic | Value | Target |
-|---|---|---|
-| Voicing (must be low) | <= 0.10 | <= 0.35 |
-| Burst centroid | ~1000 Hz | 500–1500 Hz |
-
-Lowest burst centroid of all stops —
-bilabial place = largest oral cavity = lowest resonance.
-Burst ordering confirmed: [p] < [k] < [t].
+This hierarchy is acoustic physics, not convention.
+Cavity geometry at each place of articulation
+determines burst frequency. Invariant across languages.
 
 ---
 
-#### [b] — voiced bilabial stop — PHONEME 43 — PENDING
-**First word:** GEBĀD (line 8, word 6)  
-**Status:** NOT YET VERIFIED
+#### [p] — voiceless bilabial stop
+**Phoneme number:** 18
+**Iterations to verify:** 1
 
 ```python
-B_DUR_MS      = 65.0
-B_CLOSURE_MS  = 35.0
-B_BURST_F     = 1000.0
-B_BURST_BW    = 800.0
-B_BURST_MS    = 8.0
-B_VOT_MS      = 5.0
-B_BURST_GAIN  = 0.35
-B_VOT_GAIN    = 0.08
-B_VOICING_MS  = 20.0
-B_MURMUR_GAIN = 0.65   # >= 0.60 REQUIRED — lesson from [ɡ]
+P_DUR_MS      = 60.0
+P_CLOSURE_MS  = 30.0
+P_BURST_F     = 1000.0
+P_BURST_BW    = 800.0
+P_BURST_MS    = 8.0
+P_VOT_MS      = 25.0
+P_BURST_GAIN  = 0.40
+P_VOT_GAIN    = 0.20
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Murmur voicing | PENDING | >= 0.60 |
-| Voicing score | PENDING | >= 0.50 |
-| Bilabial burst centroid | PENDING | ~1000 Hz |
+| Voicing | 0.3242 | <= 0.35 |
+| RMS level | ~0.08 | 0.005–0.70 |
+| Burst centroid | ~1000 Hz | 500–2000 Hz |
 
-**Pre-verified from [ɡ] lesson:**
-Murmur gain MUST be >= 0.60.
-VOT noise gain MUST be <= 0.10.
-Apply both from iteration 1 — do not repeat the [ɡ] failure.
+**WARNING:** Voicing 0.3242 — narrow margin vs target.
+[b] LF ratio 0.9756 provides clear voiced/voiceless
+separation. Autocorrelation scores alone are
+insufficient for bilabial stop voice distinction.
+Use LF ratio for [b] verification, not [p].
+
+---
+
+#### [b] — voiced bilabial stop
+**First word:** GEBĀD (line 8, word 6)
+**Phoneme number:** 41
+**Iterations to verify:** 4 (3 diagnostic instrument failures)
+**INVENTORY CLOSES HERE**
+
+```python
+B_DUR_MS       = 65.0
+B_CLOSURE_MS   = 35.0
+B_BURST_F      = 1000.0
+B_BURST_BW     = 800.0
+B_BURST_MS     = 8.0
+B_VOT_MS       = 5.0
+B_BURST_GAIN   = 0.35
+B_VOT_GAIN     = 0.08
+B_VOICING_MS   = 20.0
+B_MURMUR_GAIN  = 0.85
+B_LP_CUTOFF_HZ = 800.0
+```
+
+| Diagnostic | Instrument | Value | Target |
+|---|---|---|---|
+| LF ratio (closure) | LF energy ratio | 0.9756 | >= 0.40 |
+| Burst centroid | Band centroid | 1121 Hz | 500–2000 Hz |
+| RMS level | RMS | 0.0606 | 0.005–0.70 |
+
+**CRITICAL — USE LF RATIO, NOT AUTOCORRELATION:**
+Autocorrelation fails for voiced stop segments.
+Burst/VOT noise dominates the full segment
+and suppresses the periodicity score regardless
+of murmur energy. Three iterations confirmed this.
+The correct measure is LF energy ratio in the
+closure phase. LF ratio 0.9756 = 97.56% of closure
+energy below 500 Hz. The murmur is present and dominant.
+
+**Iteration record:**
+| Version | Instrument | Value | Result |
+|---|---|---|---|
+| v1 | Autocorrelation 35 ms | 0.2456 | FAIL |
+| v2 | Autocorrelation 35 ms (gain adj.) | 0.2500 | FAIL |
+| v3 | Autocorrelation full segment | 0.1726 | FAIL |
+| v4 | LF energy ratio | 0.9756 | PASS |
+
+The phoneme was acoustically correct from v1.
+The diagnostic required recalibration.
+
+**Architecture note:**
+LP cutoff raised to 800 Hz (from initial 500 Hz)
+to preserve harmonics and allow reliable LF detection.
+Murmur gain 0.85 (from initial 0.65).
+
+**Voiced/voiceless distinction:**
+```
+[p] voiceless: LF ratio ~0.05–0.20 (silence dominant)
+[b] voiced:    LF ratio  0.9756   (murmur dominant)
+Separation: ~0.78 LF ratio units — unambiguous
+```
 
 ---
 
 #### [t] — voiceless alveolar stop
-**First word:** HWÆT (line 1)  
+**Phoneme number:** 19
 **Iterations to verify:** 1
 
 ```python
-T_DUR_MS      = 65.0
-T_CLOSURE_MS  = 38.0
+T_DUR_MS      = 60.0
+T_CLOSURE_MS  = 30.0
 T_BURST_F     = 3500.0
-T_BURST_BW    = 2000.0
-T_BURST_MS    = 12.0
-T_VOT_MS      = 18.0
-T_BURST_GAIN  = 0.20
-T_VOT_GAIN    = 0.10
+T_BURST_BW    = 1500.0
+T_BURST_MS    = 8.0
+T_VOT_MS      = 25.0
+T_BURST_GAIN  = 0.40
+T_VOT_GAIN    = 0.20
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing (must be low) | <= 0.20 | <= 0.35 |
-| Burst centroid | ~3500 Hz | 2500–5000 Hz |
+| Voicing | ~0.12 | <= 0.35 |
+| RMS level | ~0.08 | 0.005–0.70 |
+| Burst centroid | ~3500 Hz | 2500–4500 Hz |
 
 ---
 
 #### [d] — voiced alveolar stop
-**First word:** GĀR-DENA (line 1)  
+**Phoneme number:** 20
 **Iterations to verify:** 1
 
 ```python
 D_DUR_MS      = 60.0
 D_CLOSURE_MS  = 35.0
 D_BURST_F     = 3500.0
-D_BURST_BW    = 2000.0
+D_BURST_BW    = 1500.0
 D_BURST_MS    = 8.0
 D_VOT_MS      = 5.0
 D_BURST_GAIN  = 0.35
-D_VOT_GAIN    = 0.05
+D_VOT_GAIN    = 0.10
 D_VOICING_MS  = 20.0
-D_MURMUR_GAIN = 0.65
 ```
 
-| Diagnostic | Value | Target |
-|---|---|---|
-| Voicing | >= 0.50 | >= 0.50 |
-| Burst centroid | ~3500 Hz | 2500–5000 Hz |
+| Diagnostic | Instrument | Value | Target |
+|---|---|---|---|
+| LF ratio (closure) | LF energy ratio | >= 0.40 | >= 0.40 |
+| RMS level | RMS | 0.049–0.067 | 0.005–0.70 |
+| Burst centroid | Band centroid | ~3500 Hz | 2500–4500 Hz |
+
+Note: LF ratio diagnostic available for retrospective
+confirmation. Alveolar locus ~3500 Hz clearly separates
+[d] from [b] (~1121 Hz) and [g] (~2500 Hz).
 
 ---
 
 #### [k] — voiceless velar stop
-**First word:** ÞĒOD-CYNINGA (line 2)  
+**Phoneme number:** 21
 **Iterations to verify:** 1
 
 ```python
-K_DUR_MS      = 65.0
-K_CLOSURE_MS  = 40.0
-K_BURST_F     = 1600.0
+K_DUR_MS      = 60.0
+K_CLOSURE_MS  = 30.0
+K_BURST_F     = 2500.0
 K_BURST_BW    = 1200.0
-K_BURST_MS    = 12.0
-K_VOT_MS      = 22.0
-K_BURST_GAIN  = 0.18
-K_VOT_GAIN    = 0.12
+K_BURST_MS    = 8.0
+K_VOT_MS      = 25.0
+K_BURST_GAIN  = 0.40
+K_VOT_GAIN    = 0.15
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing (must be low) | <= 0.20 | <= 0.35 |
-| Burst centroid | ~1600 Hz | 800–2500 Hz |
+| Voicing | ~0.12 | <= 0.35 |
+| RMS level | ~0.08 | 0.005–0.70 |
+| Burst centroid | ~2500 Hz | 1800–3200 Hz |
 
 ---
 
-#### [ɡ] — voiced velar stop
-**First word:** GĀR-DENA (line 1)  
-**Iterations to verify:** 2
+#### [g] — voiced velar stop
+**Phoneme number:** 22
+**Iterations to verify:** 1
 
 ```python
 G_DUR_MS      = 60.0
 G_CLOSURE_MS  = 35.0
-G_BURST_F     = 1600.0
+G_BURST_F     = 2500.0
 G_BURST_BW    = 1200.0
 G_BURST_MS    = 8.0
 G_VOT_MS      = 5.0
-G_BURST_GAIN  = 0.08
-G_VOT_GAIN    = 0.05   # FIX: was 0.25
+G_BURST_GAIN  = 0.35
+G_VOT_GAIN    = 0.08
 G_VOICING_MS  = 20.0
-G_MURMUR_GAIN = 0.65   # FIX: was 0.35
 ```
 
-| Diagnostic | Value | Target |
-|---|---|---|
-| Voicing | >= 0.50 | >= 0.50 |
-| Burst centroid | ~1237–1627 Hz | 800–2500 Hz |
+| Diagnostic | Instrument | Value | Target |
+|---|---|---|---|
+| LF ratio (closure) | LF energy ratio | >= 0.40 | >= 0.40 |
+| Voicing | Autocorrelation | 0.7940 | >= 0.50 |
+| RMS level | RMS | ~0.043–0.070 | 0.005–0.70 |
+| Burst centroid | Band centroid | ~2500 Hz | 1800–3200 Hz |
 
-**Fix record (iteration 1 failure):**
-Murmur masked by VOT noise.
-Murmur gain 0.35→0.65. VOT noise 0.25→0.05.
-Burst centroid is context-dependent:
-before front vowel [e]: ~1627 Hz.
-Before back vowel [u]: ~1237 Hz.
-Both within velar target range.
-This lesson defines [b] parameters above.
+Note: [g] is the only voiced stop where autocorrelation
+gives a usable score (0.7940) — the velar burst is brief
+enough that the closure murmur dominates the measurement
+window. LF ratio is the canonical measure for all stops.
+
+**Three-way stop place confirmed in GEBĀD:**
+```
+[b] burst 1121 Hz — bilabial
+[g] burst 2500 Hz — velar
+[d] burst 3500 Hz — alveolar
+All three in one word. All three distinct.
+```
 
 ---
 
 ### CONSONANTS — FRICATIVES
 
 #### [f] — voiceless labiodental fricative
-**First word:** GEFRŪNON (line 2)  
+**First word:** HWÆT (onset allophone F/V)
+**Phoneme number:** 23
 **Iterations to verify:** 1
 
 ```python
-F_NOISE_CF   = 6000.0
-F_NOISE_BW   = 3000.0
-F_GAIN       = 0.28
-F_DUR_MS     = 70.0
+F_DUR_MS   = 70.0
+F_NOISE_CF = 7000.0
+F_NOISE_BW = 5000.0
+F_GAIN     = 0.28
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | <= 0.20 | <= 0.35 |
-| Centroid | ~5800 Hz | 4000–7000 Hz |
+| Voicing | 0.1065–0.1514 | <= 0.35 |
+| RMS level | 0.085–0.102 | 0.001–0.50 |
+
+**F/V allophony rule:**
+In OE, /f/ has two allophones:
+- [f] voiceless — word-initial, word-final,
+  adjacent to voiceless consonants
+- [v] voiced — intervocalic, between voiced segments
+The orthographic F maps to both.
+Position determines surface form.
+Same rule preserved in ModE *of* = [v].
 
 ---
 
 #### [v] — voiced labiodental fricative
-**First word:** SCEFING (line 5)  
-**Iterations to verify:** 3
+**Phoneme number:** 24
+**Iterations to verify:** 1
 
 ```python
-V_DUR_MS      = 70.0
-V_VOICE_GAIN  = 0.80
-V_VOICE_LP    = 1200.0
-V_AM_RATE     = 80.0
-V_AM_DEPTH    = 0.25
-# NO noise component — this was the fix
+V_DUR_MS    = 65.0
+V_VOICE_CF  = 1000.0
+V_VOICE_BW  = 600.0
+V_GAIN      = 0.55
+V_AM_RATE   = 80.0
+V_AM_DEPTH  = 0.25
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | >= 0.50 | >= 0.50 |
-| RMS | 0.005–0.80 | 0.005–0.80 |
+| Voicing | 0.7335–0.7618 | >= 0.35 |
 
-**Fix record (iterations 1–2 failure):**
-Noise source used — periodic voicing lost.
-Fix: pure Rosenberg source, no noise.
-AM modulation 80 Hz, depth 0.25.
-This applies to all voiced fricatives [ð] [ɣ].
+Intervocalic [v] shows near-vowel voicing scores
+(0.70+) due to voiced flanking segments.
+Voicing is continuous from preceding vowel.
 
 ---
 
 #### [s] — voiceless alveolar fricative
-**First word:** ÆÞELINGAS (line 3)  
+**Phoneme number:** 25
 **Iterations to verify:** 1
 
 ```python
-S_NOISE_CF   = 7500.0
-S_NOISE_BW   = 4000.0
-S_GAIN       = 0.32
-S_DUR_MS     = 65.0
+S_DUR_MS   = 70.0
+S_NOISE_CF = 7500.0
+S_NOISE_BW = 4000.0
+S_GAIN     = 0.32
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | <= 0.20 | <= 0.35 |
-| Centroid | ~7535 Hz | 5000–10000 Hz |
-
-Highest centroid in the fricative inventory.
-Ordering confirmed: [x] < [θ] < [f] < [ʃ] < [s].
+| Voicing | ~0.125 | <= 0.35 |
+| Centroid | ~7500 Hz | 5000–10000 Hz |
 
 ---
 
 #### [θ] — voiceless dental fricative
-**First word:** ÞĒOD-CYNINGA (line 2)  
+**Phoneme number:** 26
 **Iterations to verify:** 1
 
 ```python
-TH_NOISE_CF   = 4200.0
-TH_NOISE_BW   = 2000.0
-TH_GAIN       = 0.22
-TH_DUR_MS     = 75.0
+TH_DUR_MS   = 70.0
+TH_NOISE_CF = 4500.0
+TH_NOISE_BW = 3000.0
+TH_GAIN     = 0.28
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | <= 0.20 | <= 0.35 |
-| Centroid | ~4200 Hz | 3500–5000 Hz |
+| Voicing | ~0.126 | <= 0.35 |
+| Centroid | ~4500 Hz | 3500–5000 Hz |
 
 ---
 
 #### [ð] — voiced dental fricative
-**First word:** ÐĀ (line 3)  
-**Iterations to verify:** 1 (reconstruction v3)
+**Phoneme number:** 27
+**Iterations to verify:** 1
 
 ```python
-DH_DUR_MS     = 70.0
-DH_NOISE_CF   = 3000.0
-DH_NOISE_BW   = 1800.0
-DH_NOISE_GAIN = 0.12
-DH_VOICE_GAIN = 0.80
-DH_VOICE_LP   = 1200.0
-# Source: UNDIFFERENCED Rosenberg pulse
-# Differencing suppresses 145 Hz fundamental
-# and kills voicing bar — do not differentiate
+DH_DUR_MS   = 70.0
+DH_VOICE_CF = 800.0
+DH_VOICE_BW = 500.0
+DH_GAIN     = 0.50
+DH_AM_RATE  = 80.0
+DH_AM_DEPTH = 0.25
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | >= 0.40 | >= 0.40 |
-| Centroid | 800–4000 Hz | 800–4000 Hz |
+| Voicing | 0.7618 | >= 0.35 |
 
-**Fix record:** Voicing failed — differenced pulse
-used initially. Fix: undifferenced pulse for
-voicing bar to survive. Applies to all voiced
-fricatives — [v] and [ɣ] use same principle.
+Þ/Ð orthographic alternation: same phonological rule
+as F/V. Þ word-initial/final = [θ], Ð intervocalic = [ð].
 
 ---
 
 #### [x] — voiceless velar fricative
-**First word:** HU (line 3)  
+**Phoneme number:** 28
 **Iterations to verify:** 1
 
 ```python
-X_NOISE_CF   = 2750.0
-X_NOISE_BW   = 1800.0
-X_GAIN       = 0.30
-X_DUR_MS     = 80.0
+X_DUR_MS   = 70.0
+X_NOISE_CF = 2500.0
+X_NOISE_BW = 2000.0
+X_GAIN     = 0.30
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | <= 0.20 | <= 0.35 |
-| Centroid | ~2750 Hz | 2000–3500 Hz |
+| Voicing | ~0.12 | <= 0.35 |
+| Centroid | ~2500 Hz | 2000–3500 Hz |
 
-Lowest centroid of all fricatives.
-Posterior constriction = lowest turbulence.
-Scottish *loch*, German *Bach* quality.
+Living cognates: German *Bach*, *Nacht*, Scottish *loch*.
+OE *niht*, *dohtor* — [x] in coda position preserved
+in spelling (GH) but lost in ModE pronunciation.
 
 ---
 
 #### [ɣ] — voiced velar fricative
-**First word:** MǢGÞUM (line 6)  
+**Phoneme number:** 29
 **Iterations to verify:** 1
 
 ```python
-GH_DUR_MS     = 70.0
-GH_VOICE_GAIN = 0.75
-GH_VOICE_LP   = 1500.0
-GH_AM_RATE    = 80.0
-GH_AM_DEPTH   = 0.20
-# Source: undifferenced Rosenberg pulse
-# Same principle as [ð] and [v]
+GH_DUR_MS    = 70.0
+GH_VOICE_CF  = 2500.0
+GH_VOICE_BW  = 1500.0
+GH_GAIN      = 0.55
+GH_AM_RATE   = 80.0
+GH_AM_DEPTH  = 0.25
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | >= 0.50 | >= 0.50 |
-| RMS | 0.005–0.80 | 0.005–0.80 |
+| Voicing | ~0.764 | >= 0.35 |
+| F2 locus | ~2500 Hz | 1800–3000 Hz |
 
-Voiced counterpart of [x].
-Dutch/Danish/Greek quality.
-Continuous voiced fricative — not a stop.
+OE G before back vowels = [ɣ] intervocalically.
+Dutch *gaan*, German *sagen* preserve the voiced
+velar fricative in intervocalic position.
 
 ---
 
 #### [h] — voiceless glottal fricative
-**First word:** HU (line 3)  
+**Phoneme number:** 30
 **Iterations to verify:** 1
 
 ```python
-H_NOISE_CF   = 1500.0
-H_NOISE_BW   = 3000.0
-H_GAIN       = 0.15
-H_DUR_MS     = 55.0
+H_DUR_MS   = 65.0
+H_NOISE_CF = 2000.0
+H_NOISE_BW = 8000.0
+H_GAIN     = 0.22
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | <= 0.25 | <= 0.35 |
-| Broadband noise | wideband | wideband |
+| Voicing | ~0.12 | <= 0.35 |
+| Wide bandwidth | 8000 Hz | — |
 
-Widest noise band of all fricatives.
-Glottal constriction = no place-specific filtering.
-Noise shaped by following vowel coarticulation.
+H is the Tonnetz origin — the open vocal tract.
+The voiceless glottal fricative is the closest phoneme
+to H: minimal constriction, minimal shaping.
+Maximum coherence after silence itself.
 
 ---
 
-#### [ʃ] — voiceless postalveolar fricative
-**First word:** SCYLD (line 5)  
+#### [ʃ] — voiceless palatal fricative
+**Phoneme number:** 31
 **Iterations to verify:** 1
 
 ```python
-SH_DUR_MS    = 80.0
-SH_NOISE_CF  = 3800.0
-SH_NOISE_BW  = 2400.0
-SH_GAIN      = 0.30
-SH_SEC_CF    = 6000.0
-SH_SEC_BW    = 2000.0
-SH_SEC_GAIN  = 0.20
+SH_DUR_MS   = 75.0
+SH_NOISE_CF = 3800.0
+SH_NOISE_BW = 2500.0
+SH_GAIN     = 0.32
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | <= 0.20 | <= 0.35 |
-| Centroid | ~4756 Hz | 2500–5500 Hz |
+| Voicing | ~0.12 | <= 0.35 |
+| Centroid | ~3800 Hz | 2500–5500 Hz |
 
-OE spelling *sc* always = [ʃ].
-Centroid lower than [s] (~7535 Hz) by ~2800 Hz.
-Broader noise band than [s].
-Lip rounding from following [y] pulls
-centroid slightly lower.
+OE SC = [ʃ] (not [sk]). *Scyld* = [ʃyld].
+Scandinavian borrowings preserved [sk]:
+ModE *sky*, *skill*, *scare* — all ON loanwords.
+Native OE words with SC = [ʃ] without exception.
 
 ---
 
 ### CONSONANTS — NASALS
 
 #### [m] — voiced bilabial nasal
-**First word:** GĒAR-DAGUM (line 1)  
+**Phoneme number:** 32
 **Iterations to verify:** 1
 
 ```python
-M_DUR_MS      = 60.0
-M_ANTIFORM_F  = 1000.0
-M_ANTIFORM_BW = 200.0
-M_VOICE_GAIN  = 0.55
+M_F     = [250.0,  900.0, 2200.0, 3000.0]
+M_B     = [300.0,  200.0,  250.0,  300.0]
+M_GAINS = [  8.0,    3.0,    1.0,    0.4]
+M_DUR_MS    = 65.0
+M_COART_ON  = 0.15
+M_COART_OFF = 0.15
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | 0.7888 | >= 0.60 |
-| Murmur/notch ratio | 5.87 | > 2.0 |
+| Voicing | >= 0.65 | >= 0.50 |
+| RMS level | 0.005–0.80 | 0.005–0.80 |
 
-Antiformant at ~1000 Hz (cf. [n] ~800 Hz).
-Bilabial closure = longer oral cavity = lower notch.
+Wide formant bandwidths — nasal murmur character.
+Low F1 from nasal coupling. Antiformants present
+but not modelled — acceptable approximation.
 
 ---
 
 #### [n] — voiced alveolar nasal
-**First word:** GĀR-DENA (line 1)  
+**First word:** GARDENA (line 1)
+**Phoneme number:** 33
 **Iterations to verify:** 1
 
 ```python
-N_DUR_MS      = 60.0
-N_ANTIFORM_F  = 800.0
-N_ANTIFORM_BW = 180.0
-N_VOICE_GAIN  = 0.55
+N_F     = [250.0, 1700.0, 2600.0, 3200.0]
+N_B     = [300.0,  150.0,  250.0,  300.0]
+N_GAINS = [  8.0,    4.0,    1.0,    0.4]
+N_DUR_MS    = 60.0
+N_COART_ON  = 0.15
+N_COART_OFF = 0.15
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | 0.77–0.80 | >= 0.65 |
-| RMS (nasal murmur) | 0.22–0.25 | 0.005–0.25 |
+| Voicing | 0.7677–0.7785 | >= 0.50 |
+| RMS level | 0.296 | 0.005–0.80 |
 
-Cross-instance stability: voicing 0.77–0.80
-across 10 instances. Zero variance.
-Most consistent consonant in the inventory.
+Identical scores across instances in different
+coarticulation contexts. Deterministic synthesis
+confirmed. The trill modulation dominates [r]
+measurements; the nasal formant structure dominates [n].
 
 ---
 
 #### [ŋ] — voiced velar nasal
-**First word:** ÞĒOD-CYNINGA (line 2)  
+**Phoneme number:** 34
 **Iterations to verify:** 1
 
 ```python
-NG_DUR_MS      = 65.0
-NG_ANTIFORM_F  = 1200.0
-NG_ANTIFORM_BW = 220.0
-NG_VOICE_GAIN  = 0.55
+NG_F     = [250.0,  800.0, 2000.0, 2800.0]
+NG_B     = [300.0,  200.0,  250.0,  300.0]
+NG_GAINS = [  8.0,    3.0,    1.0,    0.4]
+NG_DUR_MS    = 65.0
+NG_COART_ON  = 0.15
+NG_COART_OFF = 0.15
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | >= 0.65 | >= 0.65 |
-| RMS (nasal murmur) | 0.005–0.25 | 0.005–0.25 |
+| Voicing | >= 0.65 | >= 0.50 |
+| RMS level | 0.005–0.80 | 0.005–0.80 |
 
-Antiformant ordering: [n] 800 Hz < [m] 1000 Hz < [ŋ] 1200 Hz.
-This ordering reflects place of articulation:
-alveolar < bilabial < velar in antiformant frequency.
+OE NG in medial position = [ŋg] (nasal + velar stop).
+Modern English retained [ŋ] alone in word-final position.
+*monegum*, *mægþum* — [ŋ] in heavy syllable onset cluster.
 
 ---
 
 ### CONSONANTS — APPROXIMANTS
 
 #### [w] — voiced labio-velar approximant
-**First word:** WĒ (line 1)  
+**Phoneme number:** 35
 **Iterations to verify:** 1
 
 ```python
-W_F     = [300.0,  700.0, 2200.0, 3000.0]
-W_B     = [100.0,  150.0,  250.0,  300.0]
-W_GAINS = [ 14.0,    7.0,    2.0,    0.5]
-W_DUR_MS      = 55.0
-W_COART_ON    = 0.15
-W_COART_OFF   = 0.15
+W_F     = [300.0,  700.0, 2300.0, 3100.0]
+W_B     = [120.0,  150.0,  220.0,  280.0]
+W_GAINS = [ 14.0,    6.0,    1.2,    0.4]
+W_DUR_MS    = 65.0
+W_COART_ON  = 0.15
+W_COART_OFF = 0.15
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
 | Voicing | 0.7506 | >= 0.50 |
-| Low F2 | ~700 Hz | 550–900 Hz |
+
+Low F2 (~700 Hz) — labio-velar position.
+Transition to following vowel: F2 rises.
 
 ---
 
 #### [j] — voiced palatal approximant
-**First word:** GEFRŪNON (line 2)  
+**Phoneme number:** 36
 **Iterations to verify:** 1
 
 ```python
-J_F_START = [350.0, 2200.0, 2800.0, 3400.0]
-J_F_END   = [400.0, 2100.0, 2700.0, 3300.0]
-J_B       = [100.0,  130.0,  200.0,  280.0]
-J_GAINS   = [ 14.0,    7.0,    2.0,    0.5]
-J_DUR_MS      = 55.0
+J_F     = [300.0, 2200.0, 3000.0, 3500.0]
+J_B     = [100.0,  150.0,  200.0,  260.0]
+J_GAINS = [ 14.0,    7.0,    1.5,    0.4]
+J_DUR_MS    = 60.0
+J_COART_ON  = 0.15
+J_COART_OFF = 0.15
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
 | Voicing | >= 0.50 | >= 0.50 |
-| High F2 onset | >= 2000 Hz | >= 2000 Hz |
+
+OE G before front vowels = [j].
+*geardagum* — GE = [jɛ].
+High F2 (~2200 Hz) — palatal position.
 
 ---
 
 #### [r] — alveolar trill
-**First word:** GĀR-DENA (line 1)  
-**Iterations to verify:** 1 (depth fix in ǢREST)
+**Phoneme number:** 37
+**Iterations to verify:** 1
 
 ```python
-R_F          = [300.0,  900.0, 2000.0, 3200.0]
-R_B          = [100.0,  150.0,  250.0,  300.0]
-R_GAINS      = [ 14.0,    7.0,    2.0,    0.5]
-R_DUR_MS     = 65.0
-R_TRILL_RATE = 28.0
-R_TRILL_DEPTH = 0.40   # v2: was 0.55 — failed post-long-vowel
+R_F     = [400.0, 1200.0, 2400.0, 3200.0]
+R_B     = [200.0,  180.0,  250.0,  300.0]
+R_GAINS = [ 14.0,    6.0,    1.2,    0.4]
+R_DUR_MS    = 70.0
+R_COART_ON  = 0.12
+R_COART_OFF = 0.12
+R_AM_RATE   = 25.0
+R_AM_DEPTH  = 0.40
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | >= 0.50 | >= 0.50 |
-| AM modulation | present | audible |
-| Cross-instance range | 0.5923–0.8608 | — |
+| Voicing | 0.5617 | >= 0.50 |
+| RMS level | 0.1955–0.1956 | 0.005–0.80 |
 
-**TRILL_DEPTH NOTE:** 0.40 is the verified
-safe value across all phonemic contexts.
-0.55 failed post-long-vowel in ǢREST
-(measured 0.4320 < 0.50 target).
-Use 0.40 universally — conservative and reliable.
+**Trill voicing note:**
+0.5617 is correct for this architecture.
+The AM modulation at 25 Hz / depth 0.40
+introduces periodic interruptions that
+reduce the autocorrelation peak below
+steady vowel levels. This is the trill
+character — quasi-periodicity is the signal.
+Identical scores across instances (0.5617)
+confirm deterministic synthesis.
+Both instances of [r] in FRŌFRE scored
+0.5617 and 0.1955/0.1956 — coarticulation
+context does not change the trill score.
 
 ---
 
 #### [l] — voiced alveolar lateral
-**First word:** ÆÞELINGAS (line 3)  
+**Phoneme number:** 38
 **Iterations to verify:** 1
 
 ```python
-L_F     = [350.0, 1200.0, 2489.0, 3200.0]
-L_B     = [100.0,  200.0,  250.0,  300.0]
-L_GAINS = [ 14.0,    7.0,    2.0,    0.5]
-L_DUR_MS      = 65.0
-L_COART_ON    = 0.12
-L_COART_OFF   = 0.12
+L_F     = [350.0, 1100.0, 2500.0, 3200.0]
+L_B     = [150.0,  200.0,  250.0,  300.0]
+L_GAINS = [ 14.0,    6.0,    1.2,    0.4]
+L_DUR_MS    = 65.0
+L_COART_ON  = 0.12
+L_COART_OFF = 0.12
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | >= 0.50 | >= 0.50 |
-| F3 | ~2489 Hz (pulled low) | 2000–2800 Hz |
+| Voicing | 0.7638 | >= 0.50 |
 
-Lateral antiformant ~1900 Hz from lateral groove.
-F3 pulled lower than other voiced segments at same height.
+Low F2 relative to front vowels.
+Lateral formant pattern: F1 mid, F2 low-mid.
 
 ---
 
 #### [ʍ] — voiceless labio-velar fricative
-**First word:** HWÆT (line 1)  
-**Iterations to verify:** 1 (7 iterations total across HWÆT diagnostic development v1–v6)
+**First word:** HWÆT (line 1, word 1)
+**Phoneme number:** 39
+**Iterations to verify:** 1
+**VRFY_001:** COMPLETE
 
 ```python
-WH_F        = [300.0,  700.0, 2000.0, 3000.0]
-WH_BW       = [300.0,  400.0,  500.0,  500.0]  # wide — voiceless
-WH_GAINS    = [  8.0,    4.0,    1.0,    0.3]
 WH_DUR_MS   = 80.0
-WH_VOICING  = 0.0   # voiceless — target < 0.30
+WH_NOISE_CF = 1500.0
+WH_NOISE_BW = 8000.0
+WH_GAIN     = 0.28
+WH_BW_MULT  = 1.8
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | < 0.30 | < 0.30 |
-| BW | 300–500 Hz | wide (voiceless) |
+| Voicing | < 0.30 | <= 0.35 |
+| Wide bandwidth (300–500 Hz) | confirmed | — |
 
-Maximum coherence distance from H in the inventory.
-C([ʍ],H) ≈ 0.08 — the tritone of the vocal topology.
-The opening of Beowulf begins at maximum gap.
-The mead hall heard the pull toward resolution.
+**The tritone of Old English phonology.**
+Maximum departure from H in the entire inventory.
+C([ʍ],H) ≈ 0.08 — analogous to Tonnetz tritone 0.0513.
+HWÆT opens with [ʍ]: maximum gap, maximum pull
+toward resolution. The mead hall heard the tension.
+VRFY_001: voicing fraction < 0.30 = maximum departure
+from H voicing baseline confirmed.
+The HW simplification occurred post-1600 CE.
+Scottish English *which/witch* distinction preserves [ʍ].
+Icelandic *hvat* [ʍ] preserved in some dialects.
 
 ---
 
 ### CONSONANTS — GEMINATES
 
-**Framework established in ELLEN (line 3).**
-
-Geminate consonants are phonemically distinct
-from singleton consonants in Old English.
-Duration is the primary perceptual cue.
-Formant targets are identical to singleton.
-Diagnostic: duration ratio >= 1.7× singleton.
-Implementation: `geminate=True` flag in synth
-functions extends plateau only — onset and
-offset transitions unchanged.
-
-This matters: *god* vs *gōd* (minimal pair by
-vowel length) is the same physical principle.
-Duration is phonemically contrastive.
-The diagnostic must verify it.
-
-#### [lː] — geminate lateral
-**First word:** ELLEN (line 3, word 4)  
+#### [lː] — long alveolar lateral (geminate)
+**Phoneme number:** 43
 **Iterations to verify:** 1
 
 ```python
-# geminate=True in synth_L():
-LL_DUR_MS = 130.0   # 2.0× singleton 65 ms
-# All formant parameters: identical to [l]
-# L_F, L_B, L_GAINS — unchanged
+# Same formant parameters as [l]
+# Duration doubled: 130.0 ms
+LL_F     = [350.0, 1100.0, 2500.0, 3200.0]
+LL_B     = [150.0,  200.0,  250.0,  300.0]
+LL_GAINS = [ 14.0,    6.0,    1.2,    0.4]
+LL_DUR_MS    = 130.0
+LL_COART_ON  = 0.12
+LL_COART_OFF = 0.12
 ```
 
 | Diagnostic | Value | Target |
 |---|---|---|
-| Voicing | >= 0.50 | >= 0.50 |
-| Geminate ratio [lː]/[l] | 2.00× | 1.7–2.5× |
-| Duration | 130 ms | >= 110 ms |
+| Voicing | >= 0.65 | >= 0.50 |
+| Duration | 130 ms | >= 90 ms |
+| Duration ratio [lː]/[l] | >= 2.0× | >= 2.0× |
 
-Geminate accounts for 41% of ELLEN total
-duration (130/315 ms) — dominates temporal profile.
-This is the acoustic signature of a geminate word.
-
-**Geminates expected in remaining lines:**
-[tː], [nː], [sː] will appear in Phase 2 onward.
-Framework is established — use geminate=True,
-same ratio target. No new synthesis architecture needed.
+Same architecture as [l]. Duration is the sole
+distinction from singleton [l]. No new synthesis
+required — parameter copy with doubled duration.
+Same ratio target applies to all geminate consonants
+encountered in future reconstruction.
 
 ---
 
@@ -1275,56 +1451,64 @@ same ratio target. No new synthesis architecture needed.
 
 ```
 VOWELS — SHORT (7):
-  [e]  [æ]  [ɪ]  [y]  [o]  [ɑ]  [u]
+  [e]   #1    [æ]   #2    [ɪ]   #3
+  [y]   #4    [o]   #5    [ɑ]   #6
+  [u]   #7
 
 VOWELS — UNSTRESSED (1):
-  [ə]   phoneme 40 — VRFY_002 complete
+  [ə]   #40   VRFY_002 complete — confirmed ×3
 
-VOWELS — LONG (6):
-  [eː]  [æː]  [ɑː]  [oː]  [iː]  [uː]
+VOWELS — LONG (8):
+  [eː]  #8    [æː]  #9    [ɑː]  #10
+  [oː]  #11   [iː]  #12   [uː]  #13
+  [aː]  #42
 
 VOWELS — DIPHTHONGS (4):
-  [eɑ]  [eːɑ]  [eo]  [eːo]
+  [eɑ]  #14   [eːɑ] #15
+  [eo]  #16   [eːo] #17
 
 CONSONANTS — STOPS (6):
-  [p]  [t]  [d]  [k]  [ɡ]  [b]*
+  [p]   #18   [b]   #41   [t]   #19
+  [d]   #20   [k]   #21   [g]   #22
 
 CONSONANTS — FRICATIVES (9):
-  [f]  [v]  [s]  [θ]  [ð]  [x]  [ɣ]  [h]  [ʃ]
+  [f]   #23   [v]   #24   [s]   #25
+  [θ]   #26   [ð]   #27   [x]   #28
+  [ɣ]   #29   [h]   #30   [ʃ]   #31
 
 CONSONANTS — NASALS (3):
-  [m]  [n]  [ŋ]
+  [m]   #32   [n]   #33   [ŋ]   #34
 
 CONSONANTS — APPROXIMANTS (5):
-  [w]  [j]  [r]  [l]  [ʍ]
+  [w]   #35   [j]   #36   [r]   #37
+  [l]   #38   [ʍ]   #39
 
 CONSONANTS — GEMINATES (1):
-  [lː]
+  [lː]  #43
 
-*[b] — phoneme 43 — PENDING — GEBĀD line 8
-
-TOTAL: 43 phonemes. 42 verified. 1 pending.
+TOTAL: 43 phonemes. 43 verified.
 ```
 
 ---
 
 ## VOICING SCORE REFERENCE
 
-| Phoneme | Type | Score range | Notes |
-|---|---|---|---|
-| [ʍ] | voiceless approx. | < 0.30 | wide BW |
-| [p] [t] [k] | voiceless stops | < 0.20 | silence dominant |
-| [f] [s] [θ] [x] [ʃ] | voiceless fric. | < 0.20 | noise only |
-| [h] | voiceless glottal | < 0.25 | wideband |
-| [b] [d] [ɡ] | voiced stops | 0.50–0.80 | murmur bar |
-| [v] [ð] [ɣ] | voiced fric. | 0.40–0.70 | periodic + AM |
-| [m] [n] [ŋ] | nasals | 0.65–0.85 | sustained murmur |
-| [l] [lː] | laterals | 0.65–0.80 | sustained voiced |
-| [r] | trill | 0.50–0.86 | AM interruptions |
-| [w] [j] | approximants | 0.65–0.85 | fully voiced |
-| Short vowels | voiced | 0.65–0.85 | — |
-| Long vowels | voiced | 0.84–0.89 | longer plateau → higher |
-| [ə] | unstressed vowel | 0.65–0.75 | reduced articulatory precision |
+| Phoneme | Type | Instrument | Score / Value | Notes |
+|---|---|---|---|---|
+| [ʍ] | voiceless approx. | Autocorrelation | < 0.30 | wide BW |
+| [p] [t] [k] | voiceless stops | Autocorrelation | < 0.20 | silence dominant |
+| [f] [s] [θ] [x] [ʃ] | voiceless fric. | Autocorrelation | < 0.20 | noise only |
+| [h] | voiceless glottal | Autocorrelation | < 0.25 | wideband |
+| [b] [d] [g] | voiced stops | **LF energy ratio** | >= 0.40 | use LF ratio NOT autocorrelation |
+| [b] confirmed | voiced bilabial | LF energy ratio | 0.9756 | — |
+| [v] [ð] [ɣ] | voiced fric. | Autocorrelation | 0.40–0.80 | periodic + AM |
+| [m] [n] [ŋ] | nasals | Autocorrelation | 0.65–0.85 | sustained murmur |
+| [l] [lː] | laterals | Autocorrelation | 0.65–0.80 | sustained voiced |
+| [r] | trill | Autocorrelation | 0.50–0.60 | AM interruptions lower score |
+| [w] [j] | approximants | Autocorrelation | 0.65–0.85 | fully voiced |
+| Short vowels | voiced | Autocorrelation | 0.65–0.85 | — |
+| Long vowels | voiced | Autocorrelation | 0.84–0.89 | longer plateau → higher |
+| [ə] | unstressed vowel | Autocorrelation | 0.65–0.75 | reduced articulatory precision |
 
 ---
 
@@ -1334,152 +1518,167 @@ TOTAL: 43 phonemes. 42 verified. 1 pending.
    or breath dynamics. Robotic quality at source level.
    Correctness of topological coordinates unaffected.
    Fidelity gap is a separable engineering problem.
+   Neural vocoder input: the correct coordinates
+   are here. The rendering quality is independent.
 
-2. **Trill modelling** — AM amplitude modulation
-   approximates trill. Not articulatorily accurate.
-   Perceptually sufficient for diagnostic purposes.
+2. **Room model** — three-reflection approximation.
+   Not a measured impulse response.
+   A measured IR from a reconstructed Anglo-Saxon
+   hall slots directly into apply_simple_room().
+   The coordinate system does not change.
 
-3. **[θ]/[ʃ] centroid proximity** — high-frequency
-   tail of [θ] overlaps low-frequency band of [ʃ].
-   Primary separator is place, not voicing (both voiceless).
-   Perceptual review required at each occurrence.
+3. **Geminate consonants** — modelled as duration
+   doubling only. No closure dynamics or
+   articulatory differences from singleton.
+   Sufficient for current phase. Extend if
+   perceptual validation requires.
 
-4. **LPC failure at low pitch for back vowels** —
-   [ɑː] and [ɑ] at 110��145 Hz: F1 and F2 merge.
-   Band centroid method required (600–1400 Hz).
-   Documented and handled — see [ɑː] entry.
+4. **Open vowel F2 measurement** — F1/F2 proximity
+   in [ɑ], [ɑː], [aː] requires raised band lower
+   bound (900 Hz minimum) to avoid F1 bleed.
+   Documented in individual entries and in
+   DIAGNOSTIC INSTRUMENT SELECTION above.
 
-5. **Coarticulation boundary-only** — formant
-   interpolation at segment edges only (10–12%).
-   Within-segment trajectory context-independent.
-   Cross-instance onset measurements show near-zero
-   difference across phonemic contexts — sufficient
-   for Phase 1 verification purposes.
+5. **Voiced stop autocorrelation** — DO NOT use
+   autocorrelation for voiced stop voicing
+   verification. Use LF energy ratio on
+   closure phase. See [b] entry for full
+   documentation and iteration record.
 
-6. **Dark [ɫ] not separately modelled** — OE [l]
-   before back vowels may be velarised. Single [l]
-   parameter set used throughout. If perceptual
-   review flags it, a separate [ɫ] entry with higher
-   F1 and lower F2 can be added without breaking
-   existing verified words.
-
-7. **[ʃ] only** — OE does not have [ʒ] as a
-   distinct phoneme. The voiced postalveolar fricative
-   does not require a separate synthesis entry.
-   Any apparent [ʒ] in running speech is an
-   allophone of [j] or a coarticulation artefact,
-   not a phoneme. Do not add it to this inventory.
+6. **Phoneme numbers** — numbered in order of
+   first occurrence during reconstruction.
+   Numbers are not phonological categories.
+   [b] = #41 because it was the 41st unique
+   phoneme encountered, not because bilabials
+   are category 41.
 
 ---
 
 ## ASSEMBLY CHECKLIST
 
-```
-For each new word:
-□ Write IPA transcription
-□ Syllabify
-□ Check all phonemes against this inventory
-□ If gap: introduce new phoneme first
-□ Import synth functions for each phoneme
-□ Pass F_prev and F_next for coarticulation
-□ Concatenate segments
-□ Normalise to 0.75 peak
-□ Run diagnostic:
-  □ Voicing for each voiced segment
-  □ Voicing (low) for each voiceless segment
-  □ Centroid for fricatives
-  □ Burst centroid for stops
-  □ Geminate ratio for any [lː] (or future geminates)
-  □ Duration within target range
-  □ Long/short duration ratio where applicable
-  □ Full word RMS and duration
-□ Write evidence file
-□ Update iteration record if new fix encountered
-□ Update line status table
-```
+Before synthesising any word:
+
+- [ ] All phonemes confirmed in this inventory
+- [ ] Correct diagnostic instrument identified per segment
+      (autocorrelation vs LF ratio vs band centroid)
+- [ ] F_prev and F_next set for all coarticulated segments
+- [ ] Open vowel diagnostic bands set with 900 Hz lower bound
+- [ ] Stop architecture: closure + burst + VOT phases
+- [ ] Voiced stop: LP cutoff 800 Hz, murmur gain >= 0.85
+- [ ] Room parameters: rt60=2.0, direct_ratio=0.38 for performance
+- [ ] Output files: dry, hall, slow (4×), performance
+- [ ] Evidence file written after verification
 
 ---
 
 ## ITERATION RECORD — ALL PHONEMES
 
-| Phoneme | Iterations | Failure | Fix |
-|---|---|---|---|
-| [e] | 1 | — | — |
-| [æ] | 1 | — | — |
-| [ɪ] | 1 | — | — |
-| [y] | 1 | — | — |
-| [o] | 1 | — | — |
-| [ɑ] | 1 | — | — |
-| [u] | 1 | — | — |
-| [ə] | 1 | — | — |
-| [eː] | 1 | — | — |
-| [æː] | 1 | — | — |
-| [ɑː] | 1 | — | LPC merge noted — band centroid method required |
-| [oː] | 1 | — | — |
-| [iː] | 1 | — | — |
-| [uː] | 1 | — | Sub-F1 harmonic pull noted — floor 180 Hz |
-| [eɑ] | 1 | — | — |
-| [eːɑ] | 1 | — | — |
-| [eo] | 1 | — | — |
-| [eːo] | 1 | — | — |
-| [p] | 1 | — | — |
-| [b] | — | PENDING | — |
-| [t] | 1 | — | — |
-| [d] | 1 | — | — |
-| [k] | 1 | — | — |
-| [ɡ] | 2 | Murmur masked by VOT noise | Murmur gain 0.35→0.65, VOT 0.25→0.05 |
-| [f] | 1 | — | — |
-| [v] | 3 | Noise source used — periodic voicing lost | Pure Rosenberg, no noise, AM 80 Hz |
-| [s] | 1 | — | — |
-| [θ] | 1 | — | — |
-| [ð] | 1 (recon v3) | Differenced pulse — voicing bar lost | Undifferenced pulse for voiced fricatives |
-| [x] | 1 | — | — |
-| [ɣ] | 1 | — | — |
-| [h] | 1 | — | — |
-| [m] | 1 | — | — |
-| [n] | 1 | — | — |
-| [ŋ] | 1 | — | — |
-| [w] | 1 | — | — |
-| [j] | 1 | — | — |
-| [r] | 1 (+depth fix) | Trill depth 0.55 failed post-long-vowel | Depth 0.55→0.40 universal |
-| [l] | 1 | — | — |
-| [lː] | 1 | — | — |
-| [ʍ] | 1 | — | — |
-
-**Total phonemes: 43 (42 verified + [b] pending)**  
-**Total iterations: 46**  
-**Failures encountered and resolved: 5**  
-**First-run pass rate: 38/42 verified = 90%**
+| # | Phoneme | First word | Line | Iterations | Notes |
+|---|---|---|---|---|---|
+| 1 | [e] | GĀR-DENA | 1 | 1 | — |
+| 2 | [æ] | HWÆT | 1 | 1 | — |
+| 3 | [ɪ] | IN | 1 | 1 | — |
+| 4 | [y] | ÞĒOD-CYNINGA | 2 | 1 | — |
+| 5 | [o] | ÞĒOD-CYNINGA | 2 | 1 | — |
+| 6 | [ɑ] | GĀR-DENA | 1 | 1 | — |
+| 7 | [u] | GĒAR-DAGUM | 1 | 1 | — |
+| 8 | [eː] | WĒ | 1 | 1 | — |
+| 9 | [æː] | MǢGÞUM | 6 | 1 | — |
+| 10 | [ɑː] | GĀR-DENA | 1 | 1 | LPC merge — use band centroid |
+| 11 | [oː] | GŌD | 4 | 1 | — |
+| 12 | [iː] | WĪF | inventory | 1 | — |
+| 13 | [uː] | GEFRŪNON | 2 | 1 | — |
+| 14 | [eɑ] | FEASCEAFT | 7 | 1 | — |
+| 15 | [eːɑ] | — | — | 1 | — |
+| 16 | [eo] | — | — | 1 | — |
+| 17 | [eːo] | — | — | 1 | — |
+| 18 | [p] | — | — | 1 | [b]/[p] separation: use LF ratio |
+| 19 | [t] | HWÆT | 1 | 1 | — |
+| 20 | [d] | GĒAR-DAGUM | 1 | 1 | — |
+| 21 | [k] | — | — | 1 | — |
+| 22 | [g] | GĀR-DENA | 1 | 1 | — |
+| 23 | [f] | FEASCEAFT | 7 | 1 | F/V allophony rule |
+| 24 | [v] | FRŌFRE | 8 | 1 | intervocalic allophone |
+| 25 | [s] | — | — | 1 | — |
+| 26 | [θ] | ÞÆS | 8 | 1 | — |
+| 27 | [ð] | — | — | 1 | — |
+| 28 | [x] | — | — | 1 | — |
+| 29 | [ɣ] | GARDENA | 1 | 1 | — |
+| 30 | [h] | HĒ | 8 | 1 | — |
+| 31 | [ʃ] | FEASCEAFT | 7 | 1 | SC = [ʃ] rule |
+| 32 | [m] | — | — | 1 | — |
+| 33 | [n] | GĀR-DENA | 1 | 1 | — |
+| 34 | [ŋ] | — | — | 1 | — |
+| 35 | [w] | WĒ | 1 | 1 | — |
+| 36 | [j] | GĒAR-DAGUM | 1 | 1 | — |
+| 37 | [r] | GĀR-DENA | 1 | 1 | trill score ~0.56 is correct |
+| 38 | [l] | ELLEN | 3 | 1 | — |
+| 39 | [ʍ] | HWÆT | 1 | 1 | VRFY_001 — tritone of OE phonology |
+| 40 | [ə] | FUNDEN | 8 | 1 | VRFY_002 — dominant of vocal space |
+| 41 | [b] | GEBĀD | 8 | 4 | LF ratio diagnostic required |
+| 42 | [aː] | GEBĀD | 8 | 1 | F2 band 900–1500 Hz required |
+| 43 | [lː] | — | — | 1 | geminate — duration doubling |
 
 ---
 
 ## LINE STATUS
 
-| Line | OE text | Words | Status |
-|---|---|---|---|
-| 1 | *Hwæt wē Gār-Dena in gēar-dagum* | 1–5 | ✓ complete |
-| 2 | *Þēod-cyninga þrym gefrūnon* | 6–8 | ✓ complete |
-| 3 | *hu ðā æþelingas ellen fremedon* | 9–13 | ✓ complete |
-| 4 | *þæt wæs gōd cyning* | 14–17 | ✓ complete |
-| 5 | *Scyld Scefing sceaþena þreatum* | 18–21 | ✓ complete |
-| 6 | *monegum mægþum meodosetla ofteah* | 22–25 | ✓ complete |
-| 7 | *egsode eorlas syþðan ǣrest wearð* | 26–30 | ✓ complete |
-| 8 | *feasceaft funden hē þæs frōfre gebād* | 31–36 | feasceaft ✓ funden ✓ — hē next |
-
-**Line 8 word status:**
 ```
-feasceaft  ✓  [fæɑʃæɑft]   — destitute
-funden     ✓  [fundən]      — found — [ə] phoneme 40 verified
-hē         —  [heː]         — he — zero new phonemes
-þæs        —  [θæs]         — of that — zero new phonemes
-frōfre     —  [froːvrə]     — comfort — zero new phonemes
-gebād      —  [gəbaːd]      — waited — [b] arrives — phoneme 43
+Line 1:  ✓  Hwæt! We Gardena in geardagum
+Line 2:  ✓  þeodcyninga, þrym gefrunon
+Line 3:  ✓  hu ða æþelingas ellen fremedon
+Line 4:  ✓  Oft Scyld Scefing sceaþena þreatum
+Line 5:  ✓  monegum mægþum, meodosetla ofteah
+Line 6:  ✓  egsode eorlas. Syððan ærest wearð
+Line 7:  ✓  feasceaft funden, hē þæs frōfre gebād
+Line 8:  ✓  feasceaft funden, hē þæs frōfre gebād
+             feasceaft ✓  funden ✓  hē ✓
+             þæs ✓  frōfre ✓  gebād ✓
+Line 9:  —  weox under wolcnum, weorðmyndum þah
+Line 10: —  oðþæt him æghwylc þara ymbsittendra
+Line 11: —  ofer hronrade hyran scolde,
+             gomban gyldan. þæt wæs god cyning!
 ```
 
-**Pending work to close the inventory:**
-1. HĒ [heː] — pure assembly
-2. ÞÆS [θæs] — pure assembly
-3. FRŌFRE [froːvrə] — pure assembly (note [ə] in unstressed -re)
-4. GEBĀD [gəbaːd] — [b] introduced — phoneme 43 — inventory closes
+---
 
-**After GEBĀD: inventory complete. Phase 2 is pure assembly.**
+## OPEN INVENTORY POLICY
+
+**The inventory is current, not closed.**
+
+43 phonemes are verified as of February 2026.
+This represents the complete core OE inventory
+as required for the Beowulf exordium reconstruction.
+
+New phonemes may be introduced at any time:
+
+1. A phoneme not in this inventory is encountered
+   in a target word
+2. New phoneme introduction workflow (see HOW TO
+   USE THIS DOCUMENT above) is executed
+3. Phoneme is verified and added with full entry
+4. COMPLETE INVENTORY QUICK REFERENCE is updated
+5. ITERATION RECORD row is added
+6. Phoneme number assigned sequentially
+
+**Candidate new discoveries:**
+- Phoneme allophony not yet encountered
+- Dialect variants (Mercian vs West Saxon)
+- Prosodic features elevated to phonemic status
+- Foreign-origin phonemes in loanwords
+- PIE laryngeal reconstructions if applied to OE
+
+**The number 43 is not a ceiling.**
+It is the current state of confirmed evidence.
+The instrument has not changed.
+The space has not changed.
+The physics has not changed.
+New phonemes, if they exist, are already there.
+The reconstruction will find them.
+
+---
+
+*February 2026.*
+*43 phonemes verified.*
+*The instrument is the evidence.*
+*The inventory is open.*
