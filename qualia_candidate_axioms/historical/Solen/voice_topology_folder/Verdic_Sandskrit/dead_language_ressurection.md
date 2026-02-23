@@ -17,13 +17,16 @@ constraining it from below — from the
 physics of the instrument rather than
 from the history of the record.
 
-The methodology was developed in the
-course of reconstructing the phonology
-of Old English as spoken in the poem
-Beowulf. It is stated here in general
-terms so that it can be applied to any
-dead language for which a phonological
-reconstruction is attempted.
+The methodology is stated here in
+general terms so that it can be applied
+to any dead language for which a
+phonological reconstruction is attempted.
+It is not specific to any one language.
+It derives from the physics of the
+instrument — the human vocal tract —
+which is the same instrument in every
+language, in every century, in every
+culture.
 
 ---
 
@@ -42,9 +45,10 @@ vocal tract can produce and that the
 human auditory system can receive and
 distinguish. This space is universal.
 It is the same space for a speaker
-in 8th century Mercia and a speaker
-today. It was the same space 50,000
-years ago when language first emerged.
+in 8th century Mercia, a Vedic reciter
+in 1500 BCE, and a speaker today.
+It was the same space 50,000 years
+ago when language first emerged.
 It will be the same space 50,000 years
 from now.
 
@@ -117,7 +121,8 @@ tongue height. F2 correlates with
 tongue frontness/backness. F3 and
 above carry secondary information
 about lip rounding, pharyngeal
-constriction, and other fine details.
+constriction, retroflex position,
+and other fine details.
 
 **These relationships are physical
 laws, not linguistic conventions.**
@@ -204,7 +209,7 @@ live. The physics predicts it.
 
 ## IV. THE TONNETZ AND PROSODIC STRUCTURE
 
-The **tonnetz** is a two-dimensional
+The **Tonnetz** is a two-dimensional
 lattice representation of harmonic
 relationships. In music theory, it
 maps the relationships between
@@ -237,34 +242,29 @@ coherent pitch intervals. But all
 languages use it implicitly in
 prosody. Stress, intonation,
 and rhythm all ride on pitch
-modulation. The pitch patterns
-that are easiest to produce and
-perceive are those that move along
-harmonically coherent paths.
+modulation.
 
-OE poetry — the alliterative
-tradition of Beowulf — was composed
-to be performed aloud. The metre
-organises stressed and unstressed
-syllables in patterns that map
-onto rhythmic and prosodic structures
-that the auditory system finds
-coherent. The alliteration links
-syllables by initial consonant —
-which means by formant transition
-pattern — creating acoustic
-parallelism that operates below
-conscious phoneme identification.
+Vedic Sanskrit makes this explicit
+in a way unique in recorded history.
+The pitch accent system —
+udātta, anudātta, svarita —
+is a three-value system that maps
+directly onto the Tonnetz coherence
+gradient: departure from H, return
+toward H, and the glide between.
+The Samaveda notates the melodic
+contours of Vedic recitation
+explicitly, confirming that the
+language was designed to be sung,
+not merely spoken. This is the
+most explicit ancient confirmation
+of the language-is-music claim.
 
-The poem was engineered, over
-generations of oral composition
-and performance, to sound
-maximally good when produced by
-a human voice in a resonant space.
-
-**The acoustic optimisation of the
-poem is not incidental. It is
-the substance of the art.**
+**The acoustic optimisation of Vedic
+recitation is not incidental.
+It is the substance of the art.
+The Vedic tradition knew this
+and said so directly.**
 
 ---
 
@@ -293,18 +293,23 @@ receives them there, and the
 physics of resonant cavities
 puts them there.
 
-A speaker of the dead language,
-hearing the reconstruction, would
-recognise it as correct not
-primarily because it matches the
-written record but because it
-feels right in the mouth and
-sounds right to the ear. Because
-the instrument is being played
-correctly. Because the acoustic
-space is being occupied in the
-way that the instrument, used
-well, naturally occupies it.
+For Vedic Sanskrit, there is a
+third convergence stream available
+to no other dead language project:
+the Śikṣā treatises. These are
+ancient Indian phonetic science
+documents that independently derived
+the same vocal tract topology —
+the same five articulatory dimensions,
+the same attractor basins — from
+the inside, from the proprioceptive
+experience of trained reciters,
+approximately 2,500 years ago.
+
+**Where the physics-derived reconstruction,
+the historical record, and the Śikṣā
+treatises all converge, the reconstruction
+is triply confirmed.**
 
 ---
 
@@ -355,26 +360,18 @@ jointly define a region of the
 acoustic space that is both
 optimal and beautiful.**
 
-If the historical speakers heard
-the reconstruction and found it
-slightly wrong in cultural detail,
-they would still find it beautiful
-— because it is using their
-instrument correctly. And if
-the reconstruction has in any
-place found a more optimal
-position in the acoustic space
-than the historical language
-actually occupied, the speakers
-might find it more beautiful
-than their own language — a
-more fully realised version of
-what their phonological system
-was reaching toward.
-
-**This is not a failure of
-accuracy. It is a success of
-a different and deeper kind.**
+Vedic Sanskrit, with its
+precisely documented pitch accent,
+its five-place consonant system
+covering the full articulatory
+range of the vocal tract, and
+its tradition of oral performance
+maintained for 3,500 years,
+is the strongest available evidence
+that this prediction is correct.
+The tradition survived because
+it sounds right. The physics
+explains why.
 
 ---
 
@@ -401,29 +398,23 @@ of the vocal tract. And they
 are shared — any human producing
 the same vocal tract configuration
 has the same proprioceptive
-experience. The qualia of
-producing [æː] are the same
-for an OE speaker and a modern
-speaker, because the tongue
-position, jaw opening, and
-resulting acoustic output are
-the same.
+experience.
 
-This means the reconstruction
-is not only an acoustic artifact.
-It is a re-embodiment. When the
-synthesis produces [æː] at the
-correct formant frequencies, it
-is not just generating a sound
-that matches historical evidence.
-It is specifying the exact
-physical configuration of a
-human vocal tract that has not
-been actively assumed for over
-a millennium — and the qualia
-associated with that configuration
-are recoverable, in principle,
-by any human who produces it.
+The retroflex consonants of
+Vedic Sanskrit — the mūrdhanya
+class — produce a distinctive
+proprioceptive experience: the
+tongue tip curled back, the
+resonant cavity reshaped,
+the F3 depressed. This experience
+is recoverable. The configuration
+still exists in the instrument.
+Any speaker who produces the
+retroflex position experiences
+what a Vedic reciter experienced.
+The qualia are not locked in
+history. They are locked in the
+physics of the tube.
 
 **The language is not dead in
 the body. It is only absent
@@ -434,7 +425,54 @@ not changed.**
 
 ---
 
-## VIII. EPISTEMOLOGICAL STATUS
+## VIII. THE ŚIKṢĀ AS INTERNAL
+## VALIDATION SYSTEM
+
+The Vedic Sanskrit reconstruction
+has a unique resource: the Śikṣā
+treatises provide an independent
+internal validation system derived
+from within the tradition itself.
+
+The Śikṣā classified every Sanskrit
+phoneme by its place and manner of
+articulation — kaṇṭhya (guttural/velar),
+tālavya (palatal), mūrdhanya (retroflex),
+dantya (dental), oṣṭhya (labial) —
+and prescribed precise articulatory
+configurations for each.
+
+These classifications map directly
+to formant targets in the acoustic
+space. The Śikṣā authors were
+describing the same physical
+positions that acoustic measurement
+confirms. They arrived at the
+five-dimensional vocal topology
+from the inside — from practice —
+rather than from outside measurement.
+
+**This is an independent derivation
+of the same structure. The convergence
+is not coincidence. It is the physics,
+described twice, from different
+directions, by different cultures,
+separated by centuries.**
+
+The Śikṣā is used in this project
+as a primary evidence stream —
+not as a secondary source, not
+as corroboration. It is an
+independent physical derivation.
+Where the acoustic measurement
+and the Śikṣā agree, the
+reconstruction is confirmed.
+Where they diverge, the divergence
+is investigated.
+
+---
+
+## IX. EPISTEMOLOGICAL STATUS
 
 The physical derivation approach
 produces claims with the following
@@ -447,9 +485,9 @@ determined by physics and anatomy:
   given vocal tract configuration
   are what they are. They are
   calculable from cavity geometry.
-  If the historical reconstruction
-  specifies a configuration, the
-  acoustic output is determinate.
+  If the reconstruction specifies
+  a configuration, the acoustic
+  output is determinate.
 
 - The limits of the acoustic
   phonological space are fixed
@@ -467,20 +505,21 @@ determined by physics and anatomy:
 supported but not fully determined:
 
 - A mature literary language
-  with a sophisticated poetic
+  with a sophisticated recitation
   tradition was a near-optimal
   solution in the acoustic space.
 
 - The prosodic structures of
-  the poetry were optimised
-  for acoustic beauty in
+  Vedic recitation were optimised
+  for acoustic coherence in
   performance.
 
-- The convergence of historical
-  and physical approaches
-  indicates the reconstruction
-  is in the right region of
-  the acoustic space.
+- The convergence of the physical
+  derivation, the historical record,
+  and the Śikṣā treatises indicates
+  the reconstruction is in the
+  correct region of the acoustic
+  space.
 
 **Weak claims** — plausible but
 not formally derivable:
@@ -491,16 +530,15 @@ not formally derivable:
 
 - The reconstruction would be
   immediately intelligible to
-  a historical speaker without
+  a Vedic speaker without
   accommodation.
 
-- The cultural-indexical details
-  of the language — accent,
-  register, performance style —
-  are accurately captured.
+- The regional and temporal
+  variation within Vedic Sanskrit
+  is accurately captured.
 
 **The weak claims are where
-the standard historical approach
+the historical and Śikṣā evidence
 is indispensable. The strong
 and medium claims are where
 the physical derivation approach
@@ -508,67 +546,91 @@ provides independent evidence.**
 
 ---
 
-## IX. PRACTICAL IMPLICATIONS
-### For reconstruction projects
+## X. PRACTICAL IMPLICATIONS
+### For the Vedic Sanskrit reconstruction
 
 1. **Build the synthesiser from
    physics first.** Implement the
    source-filter model. Derive
    formant targets from vocal
-   tract geometry, not from
-   transcriptions alone.
+   tract geometry and Śikṣā
+   classification. Not from
+   transcriptions of modern
+   Hindi or Sanskrit textbooks.
 
-2. **Use the acoustic space as
+2. **Use the Śikṣā as a primary
+   evidence stream.** Every phoneme
+   has a Śikṣā classification.
+   Every Śikṣā classification has
+   a corresponding acoustic target.
+   The mapping is in
+   VS_phoneme_inventory.md.
+
+3. **Use the acoustic space as
    a constraint.** If a proposed
    phoneme inventory clusters
    phonemes too close together
    in F1/F2 space, the inventory
    is suspicious regardless of
    what the historical record says.
-   Natural languages do not do this.
 
-3. **Verify from the instrument,
+4. **Verify from the instrument,
    not just from the record.**
    A phoneme that passes acoustic
    diagnostics — voicing, formant
-   placement, spectral shape — is
-   more trustworthy than one that
+   placement, spectral shape,
+   antiresonance — is more
+   trustworthy than one that
    only matches a transcription
    convention.
 
-4. **Take the beauty criterion
-   seriously.** If the
-   reconstruction sounds harsh,
-   cluttered, or uncomfortable
-   to produce, something is
-   probably wrong. Natural
-   languages used by competent
-   speakers over centuries do
-   not sound that way.
+5. **Take the beauty criterion
+   seriously.** If the reconstruction
+   sounds harsh, cluttered, or
+   uncomfortable to produce,
+   something is probably wrong.
+   A tradition maintained for
+   3,500 years by trained reciters
+   does not sound that way.
 
-5. **Apply the tonnetz to
-   prosody.** The pitch and
-   rhythm structures of the
-   language should be analysed
-   for harmonic coherence.
-   A reconstructed prosody that
-   violates harmonic structure
-   is suspect.
+6. **Apply the Tonnetz to
+   prosody.** The pitch accent
+   system — udātta, anudātta,
+   svarita — maps directly to
+   Tonnetz arc types. The mapping
+   is documented in
+   Vedic_Tonnetz_Bridge.md.
+   Every word has an accent pattern.
+   Every accent pattern has an
+   arc type. Implement both.
 
-6. **Preserve the qualia link.**
+7. **Preserve the qualia link.**
    The reconstruction should
    specify not just acoustic
    output but articulatory
    configuration — the actual
    physical positions of tongue,
-   lips, jaw, velum. These are
+   lips, jaw, velum, tongue tip
+   (retroflex or not). These are
    the embodied memory of the
    language. They are recoverable.
    They should be recovered.
 
+8. **Verify against living reciters.**
+   The Vedic recitation tradition
+   is alive. Acoustic measurement
+   of living Brahmin reciters
+   performing the Rigveda provides
+   a ground truth unavailable for
+   any other ancient language.
+   Where the reconstruction matches
+   the living tradition, it is
+   confirmed. Where it diverges,
+   the divergence must be explained.
+
 ---
 
-## X. THE CORE STATEMENT
+## XI. THE CORE STATEMENT
 
 **A dead language reconstructed
 from the physics of the instrument
@@ -582,13 +644,16 @@ all human language.**
 
 The historical record tells us
 where to look in the acoustic
-space. The physics tells us
-what is there. The auditory
-system tells us what is coherent.
-The poetic tradition tells us
-what was considered beautiful.
+space. The Śikṣā tells us what
+the trained ear heard from the
+inside. The physics tells us what
+is there. The auditory system
+tells us what is coherent. The
+recitation tradition tells us
+what 3,500 years of performance
+practice converged upon.
 
-These four constraints together
+These five constraints together
 define a region of possibility.
 The reconstruction lives in
 that region. Whether it lands
@@ -608,7 +673,49 @@ not invented.**
 
 ---
 
-*Developed in the course of reconstructing*
-*the phonology of Beowulf, February 2026.*
-*34 phonemes verified. 6 remaining.*
-*The instrument is the evidence.*
+## ARCHITECTURE NOTE
+
+This project is built on the
+universal vocal topology substrate.
+It does not depend on any other
+language reconstruction project.
+It does not inherit parameters
+from Old English or any other
+language. It derives every phoneme
+target from:
+
+1. The physics of the vocal tract
+2. The Śikṣā treatises
+3. The historical orthographic record
+4. Comparative Indo-European evidence
+5. Acoustic measurement of living
+   cognate languages and living
+   Vedic reciters
+6. Perceptual validation
+
+Where a phoneme target matches a
+target independently verified in
+another language project — for
+example, velar stop [g] — this is
+recorded as **convergence evidence
+for the universal topology**, not
+as a dependency. The same physics
+produces the same result in any
+language. The agreement is the point.
+
+The synthesis engine —
+`voice_physics_vs.py` — is
+VS-specific. It shares architectural
+patterns with other reconstruction
+engines because those patterns
+implement universal physics.
+It does not import from them.
+
+---
+
+*February 2026.*
+*The instrument is universal.*
+*The language is specific.*
+*The reconstruction derives the specific*
+*from the universal.*
+*Physics first. Always.*
