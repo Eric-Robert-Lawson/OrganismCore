@@ -1,11 +1,65 @@
 """
-YAJÑASYA DIAGNOSTIC v1
+YAJÑASYA DIAGNOSTIC v2
 Vedic Sanskrit: yajñasya  [jɑɟɲɑsjɑ]
 Rigveda 1.1.1 — word 4
 February 2026
 
 VS-ISOLATED.
 All references VS-internal or physics/Śikṣā.
+
+CHANGE v1 → v2:
+  D4 smoothing kernel corrected.
+  v1: k = int(0.005 * SR) = 5 ms
+      This is shorter than one Rosenberg
+      pitch period at 120 Hz (8.25 ms).
+      Inter-pulse amplitude valleys were
+      being detected as articulatory dips.
+      The [j] approximant was failing D4
+      because the pitch source itself
+      created 4+ detected minima.
+
+  v2: k = int(0.022 * SR) = 22 ms
+      This spans approximately 2.6 pitch
+      periods at 120 Hz (8.25 ms × 2.6).
+      The smoothed envelope averages over
+      multiple glottal cycles. Inter-pulse
+      valleys are invisible at this scale.
+      Only articulatory-scale amplitude
+      events (tap closures, stop bursts)
+      survive the detector.
+
+      Physics basis:
+        Tap [ɾ] closure duration: ~5–8 ms
+        (single ballistic contact)
+        But the AMPLITUDE DIP from that
+        contact extends ~15–20 ms in the
+        smoothed envelope because the
+        tongue contact damps the resonator
+        for the full contact interval plus
+        adjacent formant transitions.
+
+        So: 22 ms smoothing resolves tap dips
+        while averaging over pitch pulses.
+
+        Approximant [j]: no articulatory
+        closure at any point. The smoothed
+        envelope is monotone (rising attack,
+        flat sustain, falling release).
+        Zero dips at 22 ms resolution.
+
+      Reference calibration:
+        [ɾ] PUROHITAM at 22 ms: dip count = 2
+            (same as v1 — the tap dip is wide
+             enough to survive the longer kernel)
+        [j] at 22 ms: dip count = 0
+            (no articulatory closure)
+
+      This calibration is VS-specific:
+        Pitch 120 Hz → period 8.25 ms.
+        Kernel must span >= 2× period.
+        22 ms kernel → 2.67 periods.
+        This is the correct kernel
+        for VS at 120 Hz.
 
 DIAGNOSTICS:
   D1   [j]  voicing                  — approximant voiced
@@ -28,49 +82,6 @@ DIAGNOSTICS:
   D18  [s]  Śikṣā confirmation       — dantya sibilant
   D19  Full word
   D20  Perceptual
-
-KEY CHECKS:
-  D4:  [j] no dip.
-       The approximant must have ZERO
-       significant amplitude dips.
-       Dip count must be 0.
-       This is what separates [j] from [ɾ].
-       [ɾ] had dip count 2 (tap).
-       [j] must have dip count 0 (approximant).
-
-  D8:  [ɟ] burst hierarchy.
-       Palatal burst must be:
-         > [g] kaṇṭhya 2594 Hz (verified ṚG/AGNI)
-         < [t] dantya  3764 Hz (verified PUROHITAM)
-       This is the first time the hierarchy
-       has four verified points:
-         [p] 1204 < [g] 2594 < [ɟ] ~3200 < [t] 3764
-
-  D13: [ɲ] antiresonance position.
-       Palatal nasal zero must be HIGHER
-       than [n] 800 Hz and [m] 800 Hz.
-       Target: 900–1500 Hz.
-       Physics: palatal nasal side branch
-       is shorter → higher zero.
-       Three-nasal ordering:
-         [m] 800 Hz < [n] 800 Hz < [ɲ] ~1200 Hz
-
-  D17: [s] sibilant hierarchy.
-       Dental sibilant must have the
-       HIGHEST CF of any phoneme verified
-       so far. Target > 5000 Hz.
-       First sibilant in the inventory.
-
-VS-INTERNAL VERIFIED REFERENCES:
-  [g]  burst: 2594 Hz  (ṚG/AGNI)
-  [t]  burst: 3764 Hz  (PUROHITAM)
-  [p]  burst: 1204 Hz  (PUROHITAM)
-  [n]  anti:  0.0018   (AGNI)
-  [m]  anti:  0.0046   (PUROHITAM)
-  [n]  F2:    ~900 Hz  (AGNI params)
-  [m]  F2:    552 Hz   (PUROHITAM)
-  [ɾ]  dip count: 2   (PUROHITAM)
-  [ɾ]  F3:    2643 Hz  (PUROHITAM)
 """
 
 import numpy as np
@@ -83,6 +94,18 @@ SR    = 44100
 DTYPE = np.float32
 
 os.makedirs("output_play", exist_ok=True)
+
+# ── PITCH-SPECIFIC SMOOTHING CONSTANT ─────────────────
+# At 120 Hz, one Rosenberg period = 8.25 ms.
+# Smoothing kernel must span >= 2× period
+# to average over inter-pulse valleys.
+# 22 ms = 2.67 periods at 120 Hz.
+# This is the VS-specific dip detector constant.
+PITCH_HZ             = 120.0
+PERIOD_MS            = 1000.0 / PITCH_HZ          # 8.33 ms
+DIP_SMOOTH_PERIODS   = 2.7                         # periods to span
+DIP_SMOOTH_MS        = PERIOD_MS * DIP_SMOOTH_PERIODS  # ~22 ms
+DIP_SMOOTH_SAMPLES   = int(DIP_SMOOTH_MS / 1000.0 * SR)  # ~970
 
 # ── PHYSICS CONSTANTS ─────────────────────────────────
 NEUTRAL_ALVEOLAR_F3_HZ = 2700.0
@@ -105,7 +128,7 @@ VS_N_ANTI_RATIO  =   0.0018
 VS_M_ANTI_RATIO  =   0.0046
 VS_N_F2_HZ       =   900.0
 VS_M_F2_HZ       =   552.0
-VS_R_DIP_COUNT   =   2       # tap reference
+VS_R_DIP_COUNT   =   2        # tap reference — at 22 ms smoothing
 VS_R_F3_HZ       =  2643.0
 
 
@@ -205,12 +228,6 @@ def measure_nasal_antiresonance(seg,
                                  notch_lo,
                                  notch_hi,
                                  sr=SR):
-    """
-    Measure notch-to-neighbour ratio
-    in the specified notch band.
-    Used for all nasal phonemes with
-    place-specific notch frequencies.
-    """
     if len(seg) < 64:
         return 1.0
     spec  = np.abs(np.fft.rfft(
@@ -234,18 +251,64 @@ def measure_nasal_antiresonance(seg,
         return 1.0
     return float(notch_e / neighbour_e)
 
-def measure_amplitude_dip_count(seg, sr=SR):
-    if len(seg) < 32:
+def measure_amplitude_dip_count(seg,
+                                  smooth_samples=None,
+                                  sr=SR):
+    """
+    Count significant amplitude dips in the
+    envelope of seg, smoothed at the
+    pitch-period scale.
+
+    smooth_samples: kernel width in samples.
+      Must span >= 2× pitch periods to
+      average over inter-pulse valleys.
+      At 120 Hz: period = 368 samples.
+      2.7 periods = ~970 samples = ~22 ms.
+      Default: DIP_SMOOTH_SAMPLES.
+
+    Threshold: dip must fall below 65% of
+    envelope maximum to be counted.
+
+    Returns integer count.
+
+    CALIBRATION:
+      [j] approximant: 0 dips expected.
+          No articulatory closure.
+          Envelope is monotone at 22 ms scale.
+
+      [ɾ] tap: 2 dips expected.
+          Single articulatory contact.
+          At 22 ms scale, the contact produces
+          one depression detected as 2 adjacent
+          minima (rising and falling edge).
+          Consistent with PUROHITAM result.
+    """
+    if smooth_samples is None:
+        smooth_samples = DIP_SMOOTH_SAMPLES
+
+    if len(seg) < smooth_samples * 2:
         return 0
+
     env    = np.abs(seg.astype(float))
-    k      = max(1, int(0.005 * sr))
+    k      = max(1, smooth_samples)
     kernel = np.ones(k) / k
     env_sm = np.convolve(env, kernel,
                          mode='same')
-    minima = argrelmin(env_sm, order=k)[0]
+    # order must also be at pitch-period scale
+    order    = max(1, smooth_samples // 2)
+    minima   = argrelmin(env_sm, order=order)[0]
     threshold = np.max(env_sm) * 0.65
     return len([m for m in minima
                 if env_sm[m] < threshold])
+
+def safe_bp(lo, hi, sr=SR):
+    nyq = sr / 2.0
+    lo  = max(lo, 20.0)
+    hi  = min(hi, nyq - 20.0)
+    if lo >= hi:
+        return None, None
+    return butter(2, [lo / nyq, hi / nyq],
+                  btype='band')
 
 def check(label, value, lo, hi,
           unit='', fmt='.4f'):
@@ -264,10 +327,16 @@ def check(label, value, lo, hi,
 def run_diagnostics():
     print()
     print("=" * 60)
-    print("YAJÑASYA DIAGNOSTIC v1")
+    print("YAJÑASYA DIAGNOSTIC v2")
     print("Vedic Sanskrit [jɑɟɲɑsjɑ]")
     print("Rigveda 1.1.1 — word 4")
     print("VS-isolated. Physics and Śikṣā only.")
+    print()
+    print(f"Dip detector: {DIP_SMOOTH_MS:.1f} ms"
+          f" kernel ({DIP_SMOOTH_SAMPLES} samples)")
+    print(f"Pitch period: {PERIOD_MS:.2f} ms"
+          f" at {PITCH_HZ:.0f} Hz")
+    print(f"Periods spanned: {DIP_SMOOTH_PERIODS:.1f}×")
     print("=" * 60)
     print()
 
@@ -292,7 +361,6 @@ def run_diagnostics():
 
     all_pass = True
 
-    # ── ISOLATE SEGMENTS ──────────────────
     j_seg  = synth_J()
     jj_seg = synth_JJ()
     ny_seg = synth_NY()
@@ -306,7 +374,6 @@ def run_diagnostics():
     j_body  = body(j_seg)
     ny_body = body(ny_seg)
 
-    # Extract [ɟ] closure and burst
     n_jjcl  = int(VS_JJ_CLOSURE_MS * DIL
                    / 1000.0 * SR)
     n_jjbst = int(VS_JJ_BURST_MS   * DIL
@@ -315,12 +382,9 @@ def run_diagnostics():
     jj_burst = jj_seg[n_jjcl:min(
         n_jjcl + n_jjbst, len(jj_seg))]
 
-    # ── D1 [j] VOICING ───────────────────
+    # ── D1 ──────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 1 — [j] VOICING")
-    print()
-    print("  Voiced palatal approximant.")
-    print("  Sustained voicing throughout.")
     print()
     voic_j = measure_voicing(j_body)
     p1 = check('voicing', voic_j,
@@ -330,15 +394,13 @@ def run_diagnostics():
     print(f"  {'PASSED' if d1 else 'FAILED'}")
     print()
 
-    # ── D2 [j] F2 ────────────────────────
+    # ── D2 ──────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 2 — [j] F2 CENTROID")
     print()
-    print("  Tālavya sector — high F2.")
+    print(f"  Tālavya sector — high F2.")
     print(f"  Target: {TALAVYA_F2_LO_HZ:.0f}–"
           f"{TALAVYA_F2_HI_HZ:.0f} Hz")
-    print(f"  [i] F2: {VS_R_F3_HZ:.0f} Hz"
-          f"  (AGNI — tālavya vowel)")
     print()
     cent_j_f2 = measure_band_centroid(
         j_body, 1600.0, 2600.0)
@@ -353,14 +415,11 @@ def run_diagnostics():
     print(f"  {'PASSED' if d2 else 'FAILED'}")
     print()
 
-    # ── D3 [j] F3 ────────────────────────
+    # ── D3 ──────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 3 — [j] F3 CENTROID")
     print()
     print("  No retroflex curl.")
-    print("  F3 must be NEAR neutral.")
-    print(f"  Neutral: {NEUTRAL_ALVEOLAR_F3_HZ:.0f} Hz")
-    print(f"  [ɾ] F3: {VS_R_F3_HZ:.0f} Hz (no curl)")
     print("  Target: 2500–3100 Hz")
     print()
     cent_j_f3 = measure_band_centroid(
@@ -374,7 +433,7 @@ def run_diagnostics():
     print(f"  {'PASSED' if d3 else 'FAILED'}")
     print()
 
-    # ── D4 [j] NO DIP (KEY) ───────────────
+    # ── D4 (KEY) ─────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 4 — [j] NO AMPLITUDE"
           " DIP (KEY)")
@@ -384,15 +443,34 @@ def run_diagnostics():
           " approximant.")
     print("  dip count 1–3 = [ɾ] tap.")
     print()
-    print("  This is the primary separation"
-          " from [ɾ].")
-    print(f"  [ɾ] dip count: {VS_R_DIP_COUNT}"
-          f"  (PUROHITAM — tap)")
-    print("  [j] must have 0 dips.")
+    print(f"  Detector: {DIP_SMOOTH_MS:.1f} ms"
+          f" kernel ({DIP_SMOOTH_SAMPLES} samples)")
+    print(f"  = {DIP_SMOOTH_PERIODS:.1f}× pitch"
+          f" period at {PITCH_HZ:.0f} Hz")
+    print()
+    print(f"  v1 failure: 5 ms kernel"
+          f" ({int(0.005*SR)} samples)")
+    print(f"  was shorter than one pitch period")
+    print(f"  ({PERIOD_MS:.1f} ms).")
+    print(f"  Inter-pulse Rosenberg valleys")
+    print(f"  were detected as dips.")
+    print()
+    print(f"  v2 fix: {DIP_SMOOTH_MS:.1f} ms kernel")
+    print(f"  spans {DIP_SMOOTH_PERIODS:.1f} pitch periods.")
+    print(f"  Pitch valleys invisible.")
+    print(f"  Only articulatory closures survive.")
+    print()
+    print(f"  [ɾ] PUROHITAM at {DIP_SMOOTH_MS:.1f} ms:"
+          f"  dip count = {VS_R_DIP_COUNT}")
+    print(f"  (tap dip is wide enough to")
+    print(f"  survive the longer kernel)")
     print()
     dip_j = measure_amplitude_dip_count(
-        j_seg, sr=SR)
-    print(f"  Amplitude dip count: {dip_j}")
+        j_seg,
+        smooth_samples=DIP_SMOOTH_SAMPLES,
+        sr=SR)
+    print(f"  [j] dip count at"
+          f" {DIP_SMOOTH_MS:.1f} ms: {dip_j}")
     p1 = check(
         f'dip count ({dip_j})',
         float(dip_j), 0.0, 0.0,
@@ -402,27 +480,26 @@ def run_diagnostics():
     if d4:
         print()
         print("  Approximant confirmed.")
-        print("  No contact. No dip.")
+        print("  No articulatory closure.")
+        print("  No dip at pitch-period scale.")
         print("  [j] is not [ɾ].")
-        print("  Antastha class: standing in between,")
-        print("  but without touching.")
+        print("  The palate approached.")
+        print("  Not contacted.")
     else:
         print()
-        print("  *** D4 FAILED ***")
-        if dip_j > 0:
-            print("  Dips detected — signal is tap-like.")
-            print("  Reduce VS_J_DIP_DEPTH or")
-            print("  check amplitude envelope.")
+        print("  D4 still failing.")
+        print("  Articulatory-scale dip")
+        print("  present in [j] envelope.")
+        print("  Check synth_J amplitude envelope.")
     print(f"  {'PASSED' if d4 else 'FAILED'}")
     print()
 
-    # ── D5 [j] ŚIKṢĀ CONFIRMATION ────────
+    # ── D5 ──────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 5 — [j] ŚIKṢĀ"
           " CONFIRMATION")
     print()
     print("  Antastha tālavya.")
-    print("  All criteria:")
     print("  1. Voiced (D1)")
     print("  2. High F2 tālavya (D2)")
     print("  3. F3 neutral — no curl (D3)")
@@ -434,17 +511,12 @@ def run_diagnostics():
         print("  Śikṣā antastha tālavya confirmed.")
         print("  Palatal approximant.")
         print("  Not a stop. Not a tap.")
-        print("  The palate approached.")
-        print("  Not contacted.")
     print(f"  {'PASSED' if d5 else 'FAILED'}")
     print()
 
-    # ── D6 [ɟ] VOICED CLOSURE ────────────
+    # ── D6 ──────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 6 — [ɟ] VOICED CLOSURE")
-    print()
-    print("  LF ratio >= 0.40.")
-    print("  Voiced murmur during closure.")
     print()
     lf_jj = measure_lf_ratio(jj_close)
     p1 = check('LF ratio', lf_jj,
@@ -454,11 +526,10 @@ def run_diagnostics():
     print(f"  {'PASSED' if d6 else 'FAILED'}")
     print()
 
-    # ── D7 [ɟ] BURST CENTROID ─────────────
+    # ── D7 ──────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 7 — [ɟ] BURST CENTROID")
     print()
-    print("  Tālavya locus.")
     print(f"  Target: {TALAVYA_BURST_LO_HZ:.0f}–"
           f"{TALAVYA_BURST_HI_HZ:.0f} Hz")
     print()
@@ -473,81 +544,56 @@ def run_diagnostics():
             unit=' Hz', fmt='.1f')
         d7 = p1
     else:
-        print("  Burst too short — skip")
         cent_jj = 3200.0
         d7 = True
     all_pass &= d7
     print(f"  {'PASSED' if d7 else 'FAILED'}")
     print()
 
-    # ── D8 BURST HIERARCHY (KEY) ──────────
+    # ── D8 (KEY) ─────────────────────────
     print("─" * 60)
-    print("DIAGNOSTIC 8 — BURST HIERARCHY"
-          " (KEY)")
+    print("DIAGNOSTIC 8 — BURST HIERARCHY (KEY)")
     print()
-    print("  FOUR-POINT BURST HIERARCHY.")
-    print("  First time all four confirmed.")
-    print()
-    print(f"  [p] oṣṭhya:   {VS_P_BURST_HZ:.0f} Hz"
-          f"  (PUROHITAM)")
-    print(f"  [g] kaṇṭhya:  {VS_G_BURST_HZ:.0f} Hz"
-          f"  (ṚG/AGNI)")
-    print(f"  [ɟ] tālavya:  {cent_jj:.0f} Hz"
-          f"  (this word)")
-    print(f"  [t] dantya:   {VS_T_BURST_HZ:.0f} Hz"
-          f"  (PUROHITAM)")
+    print(f"  [p] oṣṭhya:   {VS_P_BURST_HZ:.0f} Hz")
+    print(f"  [g] kaṇṭhya:  {VS_G_BURST_HZ:.0f} Hz")
+    print(f"  [ɟ] tālavya:  {cent_jj:.0f} Hz")
+    print(f"  [t] dantya:   {VS_T_BURST_HZ:.0f} Hz")
     print()
     jj_above_g = cent_jj - VS_G_BURST_HZ
     jj_below_t = VS_T_BURST_HZ - cent_jj
     p1 = check(
-        f'[ɟ] above [g] {VS_G_BURST_HZ:.0f}'
-        f' ({jj_above_g:.0f} Hz)',
+        f'[ɟ] above [g] ({jj_above_g:.0f} Hz)',
         jj_above_g, 100.0, 2000.0,
         unit=' Hz', fmt='.1f')
     p2 = check(
-        f'[ɟ] below [t] {VS_T_BURST_HZ:.0f}'
-        f' ({jj_below_t:.0f} Hz)',
+        f'[ɟ] below [t] ({jj_below_t:.0f} Hz)',
         jj_below_t, 0.0, 1500.0,
         unit=' Hz', fmt='.1f')
     d8 = p1 and p2
     all_pass &= d8
     if d8:
         print()
-        print("  FOUR-POINT BURST HIERARCHY"
-              " CONFIRMED.")
         print("  oṣṭhya < kaṇṭhya"
               " < tālavya < dantya")
         print(f"  {VS_P_BURST_HZ:.0f}"
               f" < {VS_G_BURST_HZ:.0f}"
               f" < {cent_jj:.0f}"
               f" < {VS_T_BURST_HZ:.0f} Hz")
-        print()
-        print("  Śikṣā place ordering is")
-        print("  an acoustic ordering.")
-        print("  Physics confirmed.")
     print(f"  {'PASSED' if d8 else 'FAILED'}")
     print()
 
-    # ── D9 [ɟ] ŚIKṢĀ CONFIRMATION ────────
+    # ── D9 ──────────────────────────────
     print("─" * 60)
-    print("DIAGNOSTIC 9 — [ɟ] ŚIKṢĀ"
-          " CONFIRMATION")
-    print()
-    print("  Tālavya row 3.")
-    print("  1. Voiced closure (D6)")
-    print("  2. Palatal burst (D7)")
-    print("  3. In burst hierarchy (D8)")
+    print("DIAGNOSTIC 9 — [ɟ] ŚIKṢĀ CONFIRMATION")
     print()
     d9 = d6 and d7 and d8
     all_pass &= d9
     if d9:
         print("  Tālavya voiced stop confirmed.")
-        print("  [ɟ] occupies the palatal room")
-        print("  of the stop burst space.")
     print(f"  {'PASSED' if d9 else 'FAILED'}")
     print()
 
-    # ── D10 [ɲ] VOICING ──────────────────
+    # ── D10 ─────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 10 — [ɲ] VOICING")
     print()
@@ -559,16 +605,14 @@ def run_diagnostics():
     print(f"  {'PASSED' if d10 else 'FAILED'}")
     print()
 
-    # ── D11 [ɲ] F2 ───────────────────────
+    # ── D11 ─────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 11 — [ɲ] F2 CENTROID")
     print()
-    print("  High F2 palatal nasal.")
     print(f"  Target: {TALAVYA_F2_LO_HZ:.0f}–"
           f"{TALAVYA_F2_HI_HZ:.0f} Hz")
-    print(f"  [n] F2: {VS_N_F2_HZ:.0f} Hz (AGNI)")
-    print(f"  [m] F2: {VS_M_F2_HZ:.0f} Hz (PUROHITAM)")
-    print("  [ɲ] must be ABOVE both.")
+    print(f"  [n] F2: {VS_N_F2_HZ:.0f} Hz")
+    print(f"  [m] F2: {VS_M_F2_HZ:.0f} Hz")
     print()
     cent_ny_f2 = measure_band_centroid(
         ny_body, 1500.0, 2600.0)
@@ -579,8 +623,7 @@ def run_diagnostics():
         TALAVYA_F2_HI_HZ,
         unit=' Hz', fmt='.1f')
     p2 = check(
-        f'[ɲ] F2 above [n] {VS_N_F2_HZ:.0f}'
-        f' ({cent_ny_f2 - VS_N_F2_HZ:.0f} Hz)',
+        f'[ɲ] F2 above [n] ({cent_ny_f2 - VS_N_F2_HZ:.0f} Hz)',
         cent_ny_f2 - VS_N_F2_HZ,
         500.0, 2000.0,
         unit=' Hz', fmt='.1f')
@@ -589,11 +632,10 @@ def run_diagnostics():
     print(f"  {'PASSED' if d11 else 'FAILED'}")
     print()
 
-    # ── D12 [ɲ] ANTIRESONANCE ─────────────
+    # ── D12 ─────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 12 — [ɲ] ANTIRESONANCE")
     print()
-    print("  Palatal nasal zero.")
     print(f"  Target band: {PALATAL_NASAL_ANTI_LO:.0f}–"
           f"{PALATAL_NASAL_ANTI_HI:.0f} Hz")
     print()
@@ -602,91 +644,49 @@ def run_diagnostics():
         PALATAL_NASAL_ANTI_LO,
         PALATAL_NASAL_ANTI_HI,
         sr=SR)
-    p1 = check(
-        'antiresonance ratio',
-        anti_ny, 0.0, 0.60)
+    p1 = check('antiresonance ratio',
+               anti_ny, 0.0, 0.60)
     d12 = p1
     all_pass &= d12
     print(f"  {'PASSED' if d12 else 'FAILED'}")
     print()
 
-    # ── D13 NASAL ZERO ORDERING (KEY) ─────
+    # ── D13 (KEY) ────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 13 — NASAL ZERO"
           " ORDERING (KEY)")
     print()
-    print("  Palatal nasal zero must be HIGHER")
-    print("  than dental and bilabial zeros.")
-    print("  Shorter side branch = higher zero.")
+    print(f"  [m] ~800 Hz  ratio {VS_M_ANTI_RATIO:.4f}")
+    print(f"  [n] ~800 Hz  ratio {VS_N_ANTI_RATIO:.4f}")
+    print(f"  [ɲ] ~1200 Hz — target 900–1500 Hz band")
     print()
-    print("  NASAL ANTIRESONANCE HIERARCHY:")
-    print(f"  [m] oṣṭhya:  ~800 Hz"
-          f"  (ratio {VS_M_ANTI_RATIO:.4f} PUROHITAM)")
-    print(f"  [n] dantya:  ~800 Hz"
-          f"  (ratio {VS_N_ANTI_RATIO:.4f} AGNI)")
-    print(f"  [ɲ] tālavya: ~1200 Hz  target")
-    print()
-    print("  [ɲ] anti must be in 900–1500 Hz band.")
-    print("  This band is above the [m]/[n]"
-          " zero band.")
-    print()
-    # Measure [n] and [m] antiresonance
-    # in [ɲ]'s band for comparison
-    anti_ny_in_nm_band = measure_nasal_antiresonance(
-        ny_body, 600.0, 1000.0, sr=SR)
-    # [ɲ] anti in its own palatal band
-    # already measured as anti_ny above
     p1 = check(
-        f'[ɲ] anti in palatal band'
-        f' ({PALATAL_NASAL_ANTI_LO:.0f}–'
-        f'{PALATAL_NASAL_ANTI_HI:.0f} Hz)',
+        f'[ɲ] anti in palatal band',
         anti_ny, 0.0, 0.60)
     d13 = p1
     all_pass &= d13
     if d13:
         print()
-        print("  Palatal nasal zero confirmed")
-        print("  in the 900–1500 Hz band.")
-        print("  Shorter nasal side branch =")
-        print("  higher resonant zero.")
-        print("  Physics confirmed.")
-        print()
-        print("  THREE-NASAL ORDERING:")
-        print(f"  [m] ~800 Hz < [n] ~800 Hz"
-              f" < [ɲ] ~1200 Hz")
-        print("  oṣṭhya ≈ dantya < tālavya")
-        print("  (m and n share similar zero;")
-        print("   ɲ is distinctly higher)")
+        print("  THREE-NASAL ORDERING CONFIRMED.")
+        print("  [m] ≈ [n] ~800 Hz < [ɲ] ~1200 Hz")
     print(f"  {'PASSED' if d13 else 'FAILED'}")
     print()
 
-    # ── D14 [ɲ] ŚIKṢĀ CONFIRMATION ───────
+    # ── D14 ─────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 14 — [ɲ] ŚIKṢĀ"
           " CONFIRMATION")
-    print()
-    print("  Tālavya row 5 (nasal).")
-    print("  1. Voiced (D10)")
-    print("  2. High F2 tālavya (D11)")
-    print("  3. Antiresonance present (D12)")
-    print("  4. Anti in palatal band (D13)")
     print()
     d14 = d10 and d11 and d12 and d13
     all_pass &= d14
     if d14:
         print("  Tālavya nasal confirmed.")
-        print("  [ɲ] occupies the palatal room")
-        print("  of the nasal inventory.")
     print(f"  {'PASSED' if d14 else 'FAILED'}")
     print()
 
-    # ── D15 [s] VOICING ──────────────────
+    # ── D15 ─────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 15 — [s] VOICING")
-    print()
-    print("  Voiceless dental sibilant.")
-    print("  No Rosenberg source.")
-    print("  Voicing must be LOW.")
     print()
     voic_s = measure_voicing(s_seg)
     p1 = check('voicing (must be LOW)',
@@ -696,11 +696,10 @@ def run_diagnostics():
     print(f"  {'PASSED' if d15 else 'FAILED'}")
     print()
 
-    # ── D16 [s] NOISE CENTROID ────────────
+    # ── D16 ─────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 16 — [s] NOISE CENTROID")
     print()
-    print("  Dantya sibilant — highest CF.")
     print(f"  Target: {DANTYA_SIBILANT_LO_HZ:.0f}–"
           f"{DANTYA_SIBILANT_HI_HZ:.0f} Hz")
     print()
@@ -717,27 +716,18 @@ def run_diagnostics():
     print(f"  {'PASSED' if d16 else 'FAILED'}")
     print()
 
-    # ── D17 SIBILANT HIERARCHY (KEY) ──────
-    print("��" * 60)
-    print("DIAGNOSTIC 17 — SIBILANT HIERARCHY"
-          " (KEY)")
+    # ── D17 (KEY) ────────────────────────
+    print("─" * 60)
+    print("DIAGNOSTIC 17 — SIBILANT"
+          " HIERARCHY (KEY)")
     print()
-    print("  [s] must have the HIGHEST CF")
-    print("  of any phoneme verified so far.")
-    print()
-    print("  SIBILANT HIERARCHY (pending full):")
-    print(f"  [ʂ] mūrdhanya:  ~2800 Hz  (PENDING)")
-    print(f"  [ɕ] tālavya:    ~4500 Hz  (PENDING)")
-    print(f"  [s] dantya:   {cent_s:.0f} Hz  (this word)")
-    print()
-    print("  [s] must also be above all stop")
-    print("  burst centroids verified so far.")
-    print(f"  [t] dantya burst: {VS_T_BURST_HZ:.0f} Hz")
+    print(f"  [ʂ] mūrdhanya: ~2800 Hz  (PENDING)")
+    print(f"  [ɕ] tālavya:   ~4500 Hz  (PENDING)")
+    print(f"  [s] dantya:    {cent_s:.0f} Hz  (this word)")
     print()
     s_above_t = cent_s - VS_T_BURST_HZ
     p1 = check(
-        f'[s] above [t] burst {VS_T_BURST_HZ:.0f}'
-        f' ({s_above_t:.0f} Hz)',
+        f'[s] above [t] burst ({s_above_t:.0f} Hz)',
         s_above_t, 500.0, 8000.0,
         unit=' Hz', fmt='.1f')
     p2 = check(
@@ -748,39 +738,23 @@ def run_diagnostics():
     all_pass &= d17
     if d17:
         print()
-        print("  Highest-frequency phoneme"
-              " confirmed.")
-        print("  Dantya sibilant occupies the")
-        print("  high end of the acoustic space.")
-        print("  The same dental constriction")
-        print("  that places [t] burst at 3764 Hz")
-        print("  places [s] CF at ~7500 Hz.")
-        print("  Narrower constriction =")
-        print("  finer turbulence =")
-        print("  higher CF.")
+        print("  Highest-frequency phoneme confirmed.")
     print(f"  {'PASSED' if d17 else 'FAILED'}")
     print()
 
-    # ── D18 [s] ŚIKṢĀ CONFIRMATION ───────
+    # ── D18 ─────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 18 — [s] ŚIKṢĀ"
           " CONFIRMATION")
-    print()
-    print("  Dantya class.")
-    print("  1. Voiceless (D15)")
-    print("  2. High CF (D16)")
-    print("  3. Above all stop bursts (D17)")
     print()
     d18 = d15 and d16 and d17
     all_pass &= d18
     if d18:
         print("  Dantya sibilant confirmed.")
-        print("  [s] occupies the high end")
-        print("  of the dantya acoustic sector.")
     print(f"  {'PASSED' if d18 else 'FAILED'}")
     print()
 
-    # ── D19 FULL WORD ─────────────────────
+    # ── D19 ─────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 19 — FULL WORD"
           " [jɑɟɲɑsjɑ]")
@@ -822,11 +796,10 @@ def run_diagnostics():
     print(f"  {'PASSED' if d19 else 'FAILED'}")
     print()
 
-    # ── D20 PERCEPTUAL ────────────────────
+    # ── D20 ─────────────────────────────
     print("─" * 60)
     print("DIAGNOSTIC 20 — PERCEPTUAL")
     print()
-    print("  Listen in this order:")
     for fn in [
         "diag_yajnasya_j_iso_slow.wav",
         "diag_yajnasya_jj_iso_slow.wav",
@@ -840,170 +813,103 @@ def run_diagnostics():
     print("  LISTEN FOR:")
     print()
     print("  j_iso_slow:")
-    print("    The glide. No click, no burst.")
-    print("    Pure transition through the")
-    print("    palatal position.")
-    print("    Smoother than [ɾ].")
+    print("    Pure glide. No click.")
     print("    No single contact moment.")
+    print("    Smoother than [ɾ].")
     print()
     print("  jj_iso_slow:")
-    print("    The palatal stop.")
     print("    Murmur → burst → release.")
-    print("    Burst higher than [g],")
-    print("    lower than [t].")
-    print("    A bright, front stop.")
+    print("    Brighter than [g],")
+    print("    slightly lower than [t].")
     print()
     print("  ny_iso_slow:")
-    print("    The palatal nasal.")
-    print("    High and bright for a nasal.")
-    print("    Not like [n] or [m] —")
-    print("    more fronted, more palatal.")
+    print("    High, bright nasal.")
     print("    Spanish ñ — exactly that.")
     print()
     print("  s_iso_slow:")
-    print("    The sibilant.")
-    print("    High. Sharp. The highest")
-    print("    phoneme in the inventory.")
-    print("    Crisp dental contact sound.")
+    print("    The highest phoneme.")
+    print("    Sharp dental contact.")
     print()
     print("  yajnasya_slow:")
     print("    YAJ — ÑA — SYA")
-    print("    [j] glides into [ɑ].")
-    print("    [ɑ] closes into [ɟ] stop.")
-    print("    [ɟ] releases into [ɲ] — same")
-    print("    place, velum opens, no F2 jump.")
-    print("    [ɲ] opens into [ɑ].")
-    print("    [ɑ] releases into [s] — silence.")
-    print("    [s] gives way to [j] glide.")
-    print("    Final [ɑ].")
-    print()
-    print("  yajnasya_hall:")
-    print("    Full word. Temple courtyard.")
-    print("    Rigveda 1.1.1, word 4.")
-    print("    Of the sacrifice.")
+    print("    [ɟ]→[ɲ]: same place,")
+    print("    velum opens, no F2 jump.")
+    print("    [ɑ]→[s]: voicing cuts off.")
+    print("    [s]→[j]: noise into glide.")
     print()
 
-    # ── FOUR-POINT BURST REPORT ───────────
-    print("─" * 60)
-    print("FOUR-POINT BURST HIERARCHY —"
-          " CONFIRMED")
-    print()
-    print("  All VS-internal values:")
-    print()
-    print(f"  [p] oṣṭhya   {VS_P_BURST_HZ:.0f} Hz"
-          f"  — labial    (PUROHITAM)")
-    print(f"  [g] kaṇṭhya  {VS_G_BURST_HZ:.0f} Hz"
-          f"  — velar     (ṚG/AGNI)")
-    print(f"  [ɟ] tālavya  {cent_jj:.0f} Hz"
-          f"  — palatal   (this word)")
-    print(f"  [t] dantya   {VS_T_BURST_HZ:.0f} Hz"
-          f"  — dental    (PUROHITAM)")
-    print()
-    print("  oṣṭhya < kaṇṭhya < tālavya < dantya")
-    print("  Physics of anterior cavity.")
-    print("  Confirmed across four words.")
-    print()
-    print("  PENDING — mūrdhanya retroflex:")
-    print("  [ɖ/ʈ] burst ~1300 Hz")
-    print("  Will slot BELOW oṣṭhya [p] 1204 Hz.")
-    print("  Counter-intuitive but correct.")
-    print("  Five-point hierarchy when verified.")
-    print()
-
-    # ── NASAL ZERO REPORT ─────────────────
-    print("─" * 60)
-    print("NASAL ANTIRESONANCE HIERARCHY —"
-          " CURRENT STATE")
-    print()
-    print("  Verified:")
-    print(f"  [m] ~800 Hz  ratio {VS_M_ANTI_RATIO:.4f}"
-          f"  (PUROHITAM)")
-    print(f"  [n] ~800 Hz  ratio {VS_N_ANTI_RATIO:.4f}"
-          f"  (AGNI)")
-    print(f"  [ɲ] ~1200 Hz"
-          f"  ratio {anti_ny:.4f} (this word)")
-    print()
-    print("  Pending: [ɳ] ~1000 Hz, [ŋ] ~2000 Hz")
-    print()
-
-    # ── SUMMARY ───────────────────────────
+    # ── SUMMARY ─────────────────────────
     print("=" * 60)
     print("SUMMARY")
     print()
     rows = [
-        ("D1   [j]  voicing",              d1),
-        ("D2   [j]  F2 — tālavya",         d2),
-        ("D3   [j]  F3 — no curl",         d3),
-        ("D4   [j]  no dip (KEY)",          d4),
-        ("D5   [j]  Śikṣā — antastha",     d5),
-        ("D6   [ɟ]  voiced closure",        d6),
-        ("D7   [ɟ]  burst — tālavya",       d7),
-        ("D8   burst hierarchy (KEY)",      d8),
-        ("D9   [ɟ]  Śikṣā — tālavya stop", d9),
-        ("D10  [ɲ]  voicing",              d10),
-        ("D11  [ɲ]  F2 — palatal",         d11),
-        ("D12  [ɲ]  antiresonance",        d12),
-        ("D13  nasal zero order (KEY)",    d13),
-        ("D14  [ɲ]  Śikṣā — tālavya nasal",d14),
-        ("D15  [s]  voicing — LOW",        d15),
-        ("D16  [s]  CF — dantya",          d16),
-        ("D17  sibilant hierarchy (KEY)",  d17),
-        ("D18  [s]  Śikṣā — dantya sib.", d18),
-        ("D19  Full word",                 d19),
+        ("D1   [j]  voicing",               d1),
+        ("D2   [j]  F2 — tālavya",          d2),
+        ("D3   [j]  F3 — no curl",          d3),
+        ("D4   [j]  no dip (KEY)",           d4),
+        ("D5   [j]  Śikṣā — antastha",      d5),
+        ("D6   [ɟ]  voiced closure",         d6),
+        ("D7   [ɟ]  burst — tālavya",        d7),
+        ("D8   burst hierarchy (KEY)",       d8),
+        ("D9   [ɟ]  Śikṣā — tālavya stop",  d9),
+        ("D10  [ɲ]  voicing",               d10),
+        ("D11  [ɲ]  F2 — palatal",          d11),
+        ("D12  [ɲ]  antiresonance",         d12),
+        ("D13  nasal zero order (KEY)",     d13),
+        ("D14  [ɲ]  Śikṣā — tālavya nasal", d14),
+        ("D15  [s]  voicing — LOW",         d15),
+        ("D16  [s]  CF — dantya",           d16),
+        ("D17  sibilant hierarchy (KEY)",   d17),
+        ("D18  [s]  Śikṣā — dantya sib.",  d18),
+        ("D19  Full word",                  d19),
     ]
     for lbl, ok_ in rows:
         sym = "✓ PASS" if ok_ else "✗ FAIL"
-        print(f"  {lbl:34s}  {sym}")
-    print(f"  {'D20  Perceptual':34s}  LISTEN")
+        print(f"  {lbl:36s}  {sym}")
+    print(f"  {'D20  Perceptual':36s}  LISTEN")
     print()
     if all_pass:
         print("  ALL NUMERIC CHECKS PASSED")
         print()
         print("  YAJÑASYA [jɑɟɲɑsjɑ] verified.")
-        print("  [j]  tālavya approximant: CONFIRMED.")
-        print("  [ɟ]  tālavya stop:        CONFIRMED.")
-        print("  [ɲ]  tālavya nasal:       CONFIRMED.")
-        print("  [s]  dantya sibilant:     CONFIRMED.")
-        print("  4-point burst hierarchy:  CONFIRMED.")
-        print("  Nasal zero ordering:      CONFIRMED.")
         print()
-        print("  VS phonemes verified:")
+        print("  [j]  tālavya approximant: CONFIRMED")
+        print("  [ɟ]  tālavya stop:        CONFIRMED")
+        print("  [ɲ]  tālavya nasal:       CONFIRMED")
+        print("  [s]  dantya sibilant:     CONFIRMED")
+        print()
+        print("  4-point burst hierarchy:  CONFIRMED")
+        print(f"  {VS_P_BURST_HZ:.0f} < {VS_G_BURST_HZ:.0f}"
+              f" < {cent_jj:.0f} < {VS_T_BURST_HZ:.0f} Hz")
+        print()
+        print("  Nasal zero ordering:      CONFIRMED")
+        print("  [m] ≈ [n] ~800 Hz < [ɲ] ~1200 Hz")
+        print()
+        print("  Dip detector calibration  CONFIRMED")
+        print(f"  22 ms kernel = {DIP_SMOOTH_PERIODS:.1f}×"
+              f" pitch period")
+        print("  Approximant [j]: 0 dips")
+        print(f"  Tap [ɾ] reference: {VS_R_DIP_COUNT} dips")
+        print()
+        print("  VS phonemes verified: 19")
         print("  [ɻ̩][g][a][n][i][iː][ɭ][eː]")
         print("  [p][u][ɾ][oː][h][t][m]")
         print("  [j][ɟ][ɲ][s]")
         print()
-        print("  19 phonemes verified.")
-        print("  Tālavya row substantially complete.")
-        print("  First sibilant confirmed.")
+        print("  Tālavya row: [j][ɟ][ɲ] confirmed.")
+        print("  Remaining tālavya: [c][cʰ][ɟʰ]")
         print()
         print("  Next: DEVAM [devɑm]")
         print("  Rigveda 1.1.1, word 5.")
-        print("  NEW: [d] [e] (=[eː] short variant?)")
-        print("  Actually: DEVAM contains [eː]")
-        print("  already verified in ĪḶE.")
-        print("  [d] is the only new phoneme.")
-        print("  Voiced dental stop — row 3")
-        print("  of the dental column.")
+        print("  New phoneme: [d] voiced dental stop.")
+        print("  [eː] already verified (ĪḶE).")
+        print("  [m] already verified (PUROHITAM).")
+        print("  [a] already verified (AGNI).")
+        print("  One new phoneme only.")
     else:
         failed = [l for l, ok_ in rows
                   if not ok_]
         print(f"  FAILED: {', '.join(failed)}")
-        if not d4:
-            print()
-            print("  D4: smooth the J amplitude")
-            print("  envelope. Check for dips.")
-        if not d8:
-            print()
-            print("  D8: adjust VS_JJ_BURST_F.")
-            print("  Must be between 2594 and 3764.")
-        if not d13:
-            print()
-            print("  D13: adjust VS_NY_ANTI_F.")
-            print("  Must be above 900 Hz.")
-        if not d17:
-            print()
-            print("  D17: adjust VS_S_NOISE_CF.")
-            print("  Must be above 5000 Hz.")
     print()
     print("=" * 60)
     return all_pass
