@@ -27,8 +27,8 @@ From the Śikṣā treatises — the ancient
 Indian phonetic science that independently
 derived the same vocal tract topology
 from the same anatomical instrument,
-arriving at the same five dimensions,
-approximately 2,500 years ago.
+arriving at the same five articulatory
+dimensions approximately 2,500 years ago.
 From living Vedic reciters who have
 maintained acoustic continuity for
 3,000–3,500 years without interruption.
@@ -44,259 +44,335 @@ reproducible from the repository alone.
 
 ---
 
-## WHY THIS LANGUAGE
+## WHAT THIS PROJECT IS NOT
 
-The Beowulf reconstruction demonstrated
-the methodology.
-The Vedic Sanskrit reconstruction
-is the methodology's most powerful
-validation — and its most important
-extension.
+**This project does not depend on
+any other language reconstruction.**
 
-Three reasons.
+It does not inherit phoneme parameters
+from Old English or any other language.
+It does not use another language's
+verified values as reference points
+for its own diagnostics.
 
-**Reason 1: Independent confirmation.**
-The Śikṣā treatises are a second,
-independent physical derivation
-of the vocal tract topology.
-Same instrument. Same five dimensions.
-Same attractor basins for the phonemes.
-Different civilisation. Different century.
-Different starting premise.
-The convergence of the OE reconstruction
-with the Śikṣā system is the strongest
-possible evidence that the structure
-being described is real.
+Every phoneme in this project is
+verified against:
+- The physics of the vocal tract
+- The Śikṣā treatises
+- The Vedic orthographic record
+- Comparative Indo-European evidence
+- Acoustic measurement of living
+  cognate languages and reciters
+- VS-internal separation checks
+  (once sufficient VS phonemes
+   are verified to serve as
+   internal reference points)
 
-**Reason 2: Living verification source.**
+Where a VS phoneme target happens to
+match a target verified in another
+language project, this is noted as
+**convergence evidence for the
+universal vocal topology** — two
+independent projects arriving at the
+same position in the same physical
+space. It is not a dependency.
+It is a confirmation that the space
+is real and the physics is correct.
+
+---
+
+## WHY VEDIC SANSKRIT
+
+Three reasons this language is the
+most important reconstruction target
+after the proof-of-concept work.
+
+**Reason 1: The Śikṣā — a third
+independent derivation.**
+
+The Śikṣā treatises are ancient Indian
+phonetic science. They classified every
+Sanskrit phoneme by articulatory place
+and manner: kaṇṭhya, tālavya, mūrdhanya,
+dantya, oṣṭhya. They prescribed
+precise articulatory configurations.
+They were written by people who spent
+their lives attending to the physical
+experience of producing Sanskrit sounds
+in trained vocal instruments.
+
+They are an independent physical
+derivation of the vocal tract topology —
+from the inside, from proprioception,
+approximately 2,500 years ago.
+
+The Tonnetz was derived from the
+geometry of harmonic space.
+The vocal topology framework was
+derived from the physics of the tube.
+The Śikṣā was derived from the
+practice of recitation.
+
+Three derivations. One structure.
+
+Where all three agree, the reconstruction
+is not merely plausible — it is
+triply confirmed.
+
+**Reason 2: A living verification source.**
+
 The Vedic recitation tradition has
 maintained acoustic continuity for
-approximately 3,500 years.
-Living Brahmin reciters perform the
-Rigveda today with pitch accent intact
-— udātta, anudātta, svarita — exactly
+approximately 3,500 years. Living
+Brahmin reciters perform the Rigveda
+today with pitch accent intact —
+udātta, anudātta, svarita — exactly
 as prescribed by the ancient treatises.
+
 A physics-derived reconstruction that
-matches this living tradition is not
-merely historically plausible.
-It is acoustically confirmed.
-Cross-verification against a living
-tradition is impossible for any
-other language on the target list.
+matches this living tradition is
+acoustically confirmed against a
+human performance standard.
 
-**Reason 3: The Samaveda is already a score.**
-The Beowulf insight — that the
-alliterative metre is acoustic
-engineering, that the poem was composed
-to sound optimal in performance —
-has a 3,500-year-old Indian parallel
-that never hid what it was.
-The Samaveda declared openly:
-this text is sung.
-The pitch contours are notated.
-The melodic patterns are prescribed.
-The arc types are named.
-What the Beowulf reconstruction had
-to discover from the physics, the
-Vedic tradition stated as axiom.
+This is impossible for any other
+ancient language on the reconstruction
+target list. Sumerian has no living
+reciters. Proto-Indo-European has no
+living speakers. Linear B Greek has
+no living tradition. Vedic Sanskrit
+does. This makes it uniquely valuable
+as a validation target.
+
+**Reason 3: The Samaveda is already
+a score.**
+
+The Beowulf alliterative metre
+encodes acoustic engineering
+indirectly — the metre shapes
+prosody, prosody shapes the acoustic
+signal, but the encoding is implicit.
+You have to derive the acoustic
+intent from the structural evidence.
+
+The Samaveda does not hide what it is.
+It is a sung text. The pitch contours
+are notated. The melodic patterns are
+prescribed. The arc types are named
+by the tradition itself. What must be
+reconstructed indirectly in other
+traditions is stated directly here.
+
 The Samaveda is the most explicit
-instantiation of the language-is-music
-claim in recorded human history.
+instantiation in recorded human
+history of the claim that language
+is music — not metaphorically, but
+structurally. The reconstruction
+project verifies this claim
+phoneme by phoneme, word by word.
 
 ---
 
-## WHAT WAS ESTABLISHED BEFORE
-## THIS PROJECT BEGAN
+## THEORETICAL FOUNDATION
 
-The following artifacts constitute
-the theoretical and technical foundation.
-This project does not re-derive them.
-It applies and extends them.
-
----
-
-### FROM voice_topology_folder/:
+This project draws on the following
+documents in voice_topology_folder/:
 
 **topology_of_the_voice.md**
-  The voice is a continuous trajectory
-  through a five-dimensional bounded
-  topological space.
-  Phonemes are attractor basins.
-  Coarticulation is the evidence
-  of continuity.
-  The interpolation IS the speech.
+The voice is a continuous trajectory
+through a five-dimensional bounded
+topological space. Phonemes are
+attractor basins. Coarticulation
+is the evidence of continuity.
+Words are trajectories.
+The interpolation IS the speech.
 
 **H_Ghost_Topology.md**
-  H as origin.
-  The ghost as qualia carrier.
-  Tonnetz distance determines
-  ghost duration.
+H — the open vocal tract — is the
+origin of the coherence space.
+The ghost between syllables is the
+acoustic trace of the return toward H.
+The ghost duration scales with the
+distance traversed. The ghost is
+the qualia carrier.
 
 **Tonnetz_voice_topology_bridge.md**
-  The structural identity of
-  the Tonnetz and the vocal topology.
-  Same mathematical object.
-  Two physical substrates.
-  The coherence space is real.
+The Tonnetz and the vocal topology
+are the same mathematical object
+instantiated in different physical
+substrates. This is not analogy.
+This is structural identity.
+The coherence space is real.
+
+**Vedic_Tonnetz_Bridge.md**
+The Śikṣā as third independent
+derivation. The pitch accent as
+arc type mapping. The Samaveda
+as explicit musical score.
+The structural identity confirmed
+from the Vedic direction.
 
 **dead_language_resurrection.md**
-  The six evidence streams.
-  The convergence criterion.
-  The physical derivation approach
-  as a general methodology.
+(this folder)
+The physical derivation approach
+as general methodology. Six evidence
+streams. Convergence criterion.
+Śikṣā as internal validation.
+VS-specific architecture note.
 
-**OE_phoneme_inventory.md**
-  The proof of concept.
-  43 Old English phonemes verified.
-  The diagnostic framework.
-  The synthesis architecture.
-  The new phoneme introduction workflow.
-  This document is the model
-  for the VS_phoneme_inventory.md
-  that this project will produce.
+**VS_phoneme_inventory.md**
+The master reference for this project.
+All phoneme parameters, synthesis
+architecture, diagnostic thresholds,
+and verification status.
 
 ---
 
-### THE ŚIKṢĀ INTERFACE
+## THE ŚIKṢĀ INTERFACE
 
-The Śikṣā treatises are an independent
-physical derivation of the vocal
-topology. They must be read as such.
-
-Key documents:
-- Pāṇinīya Śikṣā
-- Yājñavalkya Śikṣā
-- Nāradīya Śikṣā
-- Māṇḍukī Śikṣā
-
-What they describe:
+The Śikṣā treatises classify every
+Sanskrit phoneme by articulatory
+position. The taxonomy maps directly
+to formant targets.
 
 ```
-ŚIKṢĀ TAXONOMY:
+ŚIKṢĀ TAXONOMY → ACOUSTIC TARGETS
 
-  Kaṇṭhya     (guttural)
-    = velar constriction
-    = [k, kh, g, gh, ṅ, h, a, ā]
-    = high F2 closure → low F2 burst
-    = H-proximal in constriction dimension
+Kaṇṭhya   (velar / guttural)
+  Phonemes: k kh g gh ṅ h a ā
+  F2 locus at velar constriction
+  ~2000–2600 Hz at burst
+  Includes the open vowel [a] —
+  the vocal tract maximally open
+  at the guttural position
 
-  Tālavya     (palatal)
-    = palatal constriction
-    = [c, ch, j, jh, ñ, ś, e, ai]
-    = high F2, palatal burst
+Tālavya   (palatal)
+  Phonemes: c ch j jh ñ ś e ai
+  F2 locus at palatal constriction
+  ~2600–3200 Hz at burst
+  Higher F2 than velar
 
-  Mūrdhanya   (cerebral / retroflex)
-    = retroflex constriction
-    = [ṭ, ṭh, ḍ, ḍh, ṇ, ṣ, ṛ, ṝ]
-    = LOW F2 locus ~1200-1400 Hz
-    = F3 sharp dip
-    = the new Tonnetz dimension
+Mūrdhanya (retroflex / cerebral)
+  Phonemes: ṭ ṭh ḍ ḍh ṇ ṣ ṛ ṝ ḷ
+  F2 locus LOW ~1200–1500 Hz
+  F3 DEPRESSED below neutral
+  The mūrdhanya marker:
+  tongue tip retroflexed,
+  F3 < 2500 Hz
+  New Tonnetz territory —
+  not present in European languages
 
-  Dantya      (dental)
-    = dental constriction
-    = [t, th, d, dh, n, s, l]
-    = alveolar locus ~1800-2000 Hz
+Dantya    (dental)
+  Phonemes: t th d dh n s l
+  F2 locus at alveolar/dental
+  ~1700–2100 Hz
+  Standard dental/alveolar position
 
-  Oṣṭhya      (labial)
-    = labial constriction
-    = [p, ph, b, bh, m, u, ū]
-    = bilabial locus ~1000-1200 Hz
+Oṣṭhya    (labial)
+  Phonemes: p ph b bh m u ū
+  F2 locus at bilabial constriction
+  ~800–1200 Hz
+  Labial position — back F2
 ```
 
-The Śikṣā taxonomy maps directly
-to the five places of articulation
-used in the VS_phoneme_inventory.
-Every Śikṣā category has a
-corresponding Tonnetz position.
-The treatise authors were mapping
-the acoustic phonological space
-from the inside — from the experience
-of producing the sounds in a
-trained vocal instrument — rather
-than from the outside measurement
-instruments we use.
-They arrived at the same space.
+Every phoneme entry in
+VS_phoneme_inventory.md includes
+its Śikṣā classification.
+Every diagnostic checks the
+Śikṣā-predicted acoustic target.
+Agreement between the acoustic
+measurement and the Śikṣā
+prediction is the primary
+confirmation criterion.
 
 ---
 
-## THE PROOF OF CONCEPT WORD
+## THE SYNTHESIS ENGINE
 
-**ṚG — the first syllable of Rigveda**
+This project uses `voice_physics_vs.py`.
 
-Chosen for the following reasons:
+This engine is VS-specific.
+It implements the universal
+source-filter physics — Rosenberg
+pulse, formant resonator bank,
+room model — but it is not
+imported from or dependent on
+any other project's code.
 
-1. **Contains the syllabic ṛ** —
-   the vowel-that-is-also-r.
-   [ɻ̩] retroflex syllabic approximant.
-   F1 ~400 Hz, F2 ~1200-1400 Hz.
-   A position in the vocal topology
-   that has never been mapped in this
-   framework.
-   The retroflex dimension —
-   mūrdhanya — opens here.
+Architecture extensions specific
+to VS:
 
-2. **Contains the voiced velar stop g**
-   in a new phonological context —
-   word-final, following syllabic vowel.
-   [g] is in the OE inventory.
-   Its behaviour after [ṛ] is not.
-   Coarticulation target: F2 locus
-   ~2500 Hz rising from [ṛ]'s low F2.
+**Retroflex F3 dip model.**
+The iir_notch function applied
+to F3 for all mūrdhanya phonemes.
+The notch depth and bandwidth
+parameterised per phoneme.
+The F3 dip is the diagnostic
+signature of the retroflex class.
 
-3. **Is the name of the text.**
-   The first sound of the oldest
-   continuously transmitted poem.
-   The proof of concept should be
-   the root of the thing being proved.
+**Aspirated stop architecture.**
+Three-phase synthesis extended
+to four phases for aspirated stops:
+closure / burst / aspiration noise /
+voiced release. The aspiration
+noise phase is the phonemically
+distinctive feature. OE had no
+aspirated stops. This is new
+synthesis territory.
 
-4. **Maximum information density.**
-   Two phonemes.
-   One completely new (syllabic ṛ).
-   One previously mapped ([g]).
-   One new coarticulation transition.
-   Retroflex → velar.
-   The geometry of this transition
-   through the vocal topology is
-   the first map of this territory.
+**Pitch accent F0 modulation.**
+The udātta/anudātta/svarita system
+implemented as F0 arc over the
+syllable. udātta: F0 +20–40 Hz
+above baseline. anudātta: F0
+at baseline. svarita: F0 falls
+continuously through syllable
+duration from udātta to anudātta.
 
-**Expected diagnostic structure:**
+**Anusvāra and visarga.**
+Anusvāra: nasal resonance
+applied to preceding vowel
+without full oral closure.
+Visarga: voiceless h-like
+release at phrase boundary.
+Both require new synthesis paths.
 
-```
-D1   Ṛ syllabic retroflex       [ɻ̩]
-     F1 centroid 350-500 Hz
-     F2 centroid 1100-1500 Hz    ← lower than [ə]
-     F3 DIPS — retroflexion marker
-     Voicing >= 0.50
-     Duration: vowel-length (50-80 ms)
+---
 
-D2   G voiced velar stop        [g]
-     LF ratio closure >= 0.40   ← use LF ratio
-     Burst centroid ~2500 Hz
-     F2 rises from ṛ locus
+## THE PROOF OF CONCEPT
 
-D3   Full syllable
-     Duration 120-160 ms
-     Voicing profile: sustained → stop
+**ṚG — [ɻ̩g]**
+The first syllable of the name
+of the text. The entry point.
 
-D4   Perceptual
-     LISTEN: the curl of the tongue.
-     Not English r. Not a vowel.
-     Both. Neither.
-     The retroflex is a new room
-     in the vocal topology.
-     This is the first time
-     we enter it.
-```
+Result: ALL NUMERIC CHECKS PASSED.
+First run. February 2026.
+
+Key confirmations:
+- [ɻ̩] F3 depression: 345 Hz below neutral
+- Mūrdhanya marker confirmed
+- Retroflex sector of vocal topology mapped
+- [g] velar locus confirmed VS-internally
+- Coarticulation trajectory [ɻ̩]→[g]
+  mapped for first time
+
+The proof of concept is documented
+in full in:
+`Verdic_Sandskrit/rg/evidence.md`
 
 ---
 
 ## THE VEDIC PROJECT SCOPE
 
 ### PHASE 0: FOUNDATIONS
-- VS_phoneme_inventory.md (this project's OE_phoneme_inventory.md equivalent)
-- Śikṣā interface documented
-- Pitch accent → arc type mapping
-- Proof of concept: ṚG
+Status: IN PROGRESS
+
+- [x] VS_phoneme_inventory.md — active
+- [x] Vedic_Tonnetz_Bridge.md — complete
+- [x] dead_language_resurrection.md — complete
+- [x] Verdict_Sanskrit_reconstruction_project.md — this document
+- [x] voice_physics_vs.py — active
+- [x] Proof of concept: ṚG — PASSED
+- [ ] AGNI [ɑgni] — next
 
 ### PHASE 1: THE OPENING VERSE
 Rigveda Book 1, Hymn 1, Verse 1.
@@ -311,228 +387,190 @@ hotāraṃ ratnadhātamam
 the divine minister of the sacrifice,
 the invoker, greatest bestower of treasure.*
 
-The first verse of the first hymn
-of the oldest surviving Indo-European
-poem. Approximately 12 words.
-The opening of the Rigveda.
-Analogous in scope to Beowulf line 1.
+Approximately 12 words.
+Every phoneme derived from Śikṣā
+classification and VS evidence streams.
+Every word verified before the next begins.
 
-**New phoneme contexts in this verse:**
+New phoneme classes introduced in
+this verse:
 
-- [ɻ̩] syllabic retroflex ṛ — in ṛtvijam
-- [ṭ] retroflex stop — in ratna
-- [ṇ] retroflex nasal — in hotāraṃ
-- [ɲ] palatal nasal — in yajña
-- [ɕ] palatal sibilant ś — present throughout
-- [ʂ] retroflex sibilant ṣ — in yajñasya
-- Aspirated stops [gʰ], [dʰ] — in devam, dhātamam
-- Pitch accent — udātta/anudātta/svarita
-  on every word
+```
+Mūrdhanya stops:
+  [ʈ] retroflex voiceless stop — ratna
+  [ɳ] retroflex nasal — hotāraṃ
 
-**Performance parameters:**
+Palatal class:
+  [ɲ] palatal nasal — yajña
+  [ɕ] palatal sibilant — various
+
+Retroflex sibilant:
+  [ʂ] retroflex sibilant — yajñasya
+
+Aspirated stops:
+  [gʰ] voiced velar aspirated — devam
+  [dʰ] voiced dental aspirated — dhātamam
+
+Vowel length pairs:
+  [iː] long close front — mīḷe
+
+Pitch accent:
+  All three values present in verse 1
+  udātta / anudātta / svarita
+```
+
+Performance parameters for Phase 1:
 
 ```
 pitch_hz:        120.0
-  (Vedic recitation — male voice,
-   chest register, ritual context)
-
-dil:             2.0-3.0
-  (deliberate ritual recitation,
-   slower than conversational,
-   faster than maximum extension)
-
+dil:             2.0–3.0
 arc_type:        ARC_WEIGHT
-  (the reciter carries the mantra
-   and delivers it to the fire,
-   to the deity, to the space)
-
 rt60:            1.5
-  (outdoor ritual or temple courtyard,
-   less reverberant than mead hall,
-   different acoustic environment)
-
 direct_ratio:    0.55
-  (more direct signal than mead hall —
-   open air or smaller stone space)
 ```
 
 ### PHASE 2: THE AGNI HYMNS
-Rigveda Book 1, Hymns 1-10.
+Rigveda Book 1, Hymns 1–10.
 The Agni sequence.
-The opening of the complete text.
 Approximately 100 verses.
+Full phoneme inventory expected
+to be complete by end of Phase 2.
 
 ### PHASE 3: REPRESENTATIVE SELECTION
 One hymn from each of the 10 Books.
-Full coverage of the phonological
+Full coverage of phonological
 and prosodic range of the Rigveda.
 
 ### PHASE 4: THE SAMAVEDA INTERFACE
-The same verses set to the Samavedic
-melodic patterns.
-The same phoneme inventory,
-the same formant targets,
-but with explicit F0 arcs derived
-from the musical notation rather
-than from prose prosody.
-The most explicit language-is-music
-demonstration in the project.
+The same verses set to Samavedic
+melodic patterns. Explicit F0 arcs
+from musical notation. The most
+direct demonstration of the
+language-is-music claim.
+
+---
+
+## THE DIAGNOSTIC LOOP
+
+Every word in this reconstruction
+follows the same loop:
+
+```
+1. TRANSCRIBE
+   Write the Sanskrit word in IPA.
+   Classify each phoneme by
+   Śikṣā category.
+   Identify formant targets from
+   VS_phoneme_inventory.md.
+   Write syllabified phoneme list
+   with pitch accent marked.
+
+2. SYNTHESIZE
+   Add word to voice_physics_vs.py.
+   Run synthesis.
+   Produce dry, hall, and 4× slow.
+
+3. DIAGNOSE
+   Run the diagnostic script.
+   Check all levels:
+     Level 1: acoustic identity
+              (voicing, formants, duration)
+     Level 2: Śikṣā confirmation
+              (does the acoustic output
+               match the Śikṣā-predicted
+               articulatory position?)
+     Level 3: qualia coherence
+              (does it sound like the
+               correct room in the
+               vocal topology?)
+
+4. LISTEN
+   The ear is the final arbiter.
+   Numbers support the ear.
+   The ear does not serve the numbers.
+
+5. VERIFY
+   When it passes the diagnostic
+   AND sounds correct:
+   Add to VS verified word reference.
+   Update VS_phoneme_inventory.md.
+   Never re-derive a verified phoneme.
+
+6. DOCUMENT
+   Write evidence.md for the word.
+   Include all diagnostic values.
+   Include Śikṣā confirmation status.
+   Include iteration record.
+```
 
 ---
 
 ## THE PITCH ACCENT SYSTEM
-## AS ARC TYPE MAPPING
 
 The Vedic pitch accent is three-valued:
 
 ```
-UDĀTTA    (उदात्त)  — raised — high pitch
-ANUDĀTTA  (अनुदात्त) — not raised — low pitch
-SVARITA   (स्वरित)  — resultant — falling glide
+UDĀTTA    — raised    — high pitch
+ANUDĀTTA  — unraised  — low pitch
+SVARITA   — resultant — falling glide
 
-MAPPING TO ARC TYPES:
+SYNTHESIS MAPPING:
 
-Udātta    = maximum departure from baseline
-          = the peak of the coherence space
-            excursion
-          = ARC_EUREKA at syllable level:
-            rapid departure, held at peak,
-            maximum gap sustained
+Udātta:
+  F0 = pitch_hz × 1.20 to 1.35
+  Duration +10% of syllable length
+  Ghost after: longer than anudātta
+  (greater coherence distance to return)
 
-Anudātta  = return toward H
-          = low coherence distance from baseline
-          = the tonic / origin position
-          = the syllable version of H itself
+Anudātta:
+  F0 = pitch_hz (baseline)
+  Duration standard
+  Ghost after: minimal
+  (already near H)
 
-Svarita   = falling from udātta toward anudātta
-          = the descent arc
-          = ARC_WEIGHT at syllable level:
-            carrying something from the peak
-            back down to rest
-          = the most common of the three —
-            the dominant motion of Vedic prosody
-
-ACOUSTIC CONSEQUENCE:
-
-  A verse in udātta:
-    F0 rises ~20-40 Hz above baseline
-    Duration of high-pitched syllable
-    slightly longer than anudātta
-    Ghost after udātta syllable:
-    longer — more distance to return to H
-
-  A verse in anudātta:
-    F0 at or below baseline
-    Minimal ghost — already at H
-    Maximum coherence position
-
-  A svarita syllable:
-    F0 begins at udātta height,
-    falls through the syllable duration
-    to anudātta level
-    Continuous F0 arc — not a step
-    The glide IS the content
-    The ghost is already present
-    within the syllable — the descent
-    toward H happening in real time
+Svarita:
+  F0 starts at udātta level
+  F0 falls continuously to anudātta
+  through the syllable duration
+  The fall IS the content
+  The ghost is present within
+  the syllable in real time
 ```
-
-The Vedic reciter was navigating
-the coherence space three times
-per syllable, explicitly, with
-named positions and trained precision.
-
-The Tonnetz bridge document described
-this in abstract terms.
-The Vedic tradition named it
-in human terms 3,000 years ago.
-
-These are the same description.
 
 ---
 
-## WHAT THIS PROJECT ADDS TO
-## THE FRAMEWORK
+## CUMULATIVE STATUS
 
-The Beowulf reconstruction mapped
-the standard five-place consonant
-inventory used by most European
-languages:
-  bilabial, alveolar, velar,
-  dental fricatives, glottal.
+| Phase | Target | Status |
+|---|---|---|
+| 0 — Foundations | framework complete | IN PROGRESS |
+| 0 — Proof of concept | ṚG [ɻ̩g] | ✓ PASSED |
+| 0 — Word 1.1.1.1 | AGNI [ɑgni] | NEXT |
+| 1 — Opening verse | agnimīḷe… | PENDING |
+| 2 — Agni hymns | Book 1 Hymns 1–10 | PENDING |
+| 3 — Representative | One hymn per Book | PENDING |
+| 4 — Samaveda | Sung reconstruction | PENDING |
 
-The Vedic Sanskrit reconstruction
-maps three new territories:
-
-**1. The retroflex dimension.**
-The tongue curled back against
-the post-alveolar palate.
-A sixth constriction place.
-A new axis in the vocal topology.
-The mūrdhanya series:
-  [ʈ, ʈʰ, ɖ, ɖʰ, ɳ, ʂ, ɻ̩]
-These are positions in the
-acoustic phonological space
-that no European language uses
-and that the OE framework
-never needed to map.
-They now become part of the
-universal inventory.
-
-**2. Aspiration as a phonological dimension.**
-The breathy burst after a stop.
-A phoneme parameter that
-OE did not use phonemically
-(OE [p] vs [b] = voicing only,
-no aspirated stops).
-Sanskrit has 10 aspirated phonemes.
-Aspiration is its own Tonnetz axis —
-the turbulent-breath dimension —
-orthogonal to voicing and place.
-The framework gains this dimension
-for the first time.
-
-**3. Syllabic sonorants.**
-The vowel-r [ṛ] and vowel-l [ḷ].
-Sounds that function as vowels
-but are produced with lateral
-or rhotic articulation.
-These occupy positions in the
-vowel space that no OE phoneme
-occupied — low F2, mid F1,
-with rhotic coloring lowering F3.
-The vowel space gains
-its rhotic sector.
-
-**When these three dimensions are mapped,
-the vocal topology framework
-becomes sufficient for the
-majority of the world's
-phonological inventories.**
-
-OE covered the European sector.
-Vedic Sanskrit covers the
-South Asian and retroflex sector.
-Together they cover the space
-that PIE occupied —
-and PIE is the ancestor of
-both traditions.
+**VS phonemes verified: [ɻ̩], [g]**
+**VS phonemes in progress: [ɑ], [n], [i]**
 
 ---
 
 ## REVISION HISTORY
 
-  v1 — February 2026
-    Initial document.
-    Built from the Beowulf framework.
-    Extends into three new
-    phonological territories.
-    Proof of concept defined: ṚG.
-    Phase 0-4 scope defined.
-    Śikṣā interface documented.
-    Pitch accent → arc type
-    mapping stated.
-    Project begins.
+```
+v1 — February 2026
+  Initial document.
+  VS-isolated architecture.
+  No dependencies on other
+  language reconstruction projects.
+  Śikṣā as primary evidence stream.
+  Three-reason structure for
+  why this language.
+  Phase 0–4 scope defined.
+  Proof of concept: ṚG passed.
+  Project continues: AGNI next.
+```
 
 ---
 
@@ -542,3 +580,6 @@ both traditions.
 *The instrument has not changed.*
 *The recitation tradition kept the flame.*
 *We bring the measurement.*
+*The Śikṣā described it from the inside.*
+*The physics confirms it from the outside.*
+*They agree.*
