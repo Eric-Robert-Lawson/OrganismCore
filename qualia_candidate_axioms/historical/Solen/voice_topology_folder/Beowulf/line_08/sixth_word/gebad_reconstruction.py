@@ -21,103 +21,36 @@ SYLLABLE STRUCTURE:
   Syllable 1: [gə]   — unstressed — ge- prefix
   Syllable 2: [baːd] — stressed   — heavy
 
-THE ge- PREFIX:
-  OE ge- is a verbal prefix marking
-  completion or result. Present in
-  many OE past participles and past
-  tenses. Always unstressed.
-  Always realises as [gə] in performance:
-  [g] + [ə].
-  This is the third appearance of [ə]
-  in the reconstruction.
-  First:  FUNDEN  -en suffix
-  Second: FRŌFRE  -re suffix
-  Third:  GEBĀD   ge- prefix
-  The schwa rule holds across prefixes
-  as well as suffixes.
-
 [b] — VOICED BILABIAL STOP — PHONEME 41:
-  Same architecture as [d] and [g]:
-  three phases:
+  Three-phase architecture:
     Phase 1: closure   — lips sealed
                          Rosenberg pulse
-                         low-pass filtered murmur
-                         murmur gain >= 0.60
+                         low-pass filtered at 800 Hz
+                         murmur gain 0.85
     Phase 2: burst     — bilabial release
-                         band-filtered noise
-                         F = 1000 Hz (bilabial locus)
-    Phase 3: VOT       — voiced formant onset
+                         band-filtered noise ~1000 Hz
+                         (bilabial locus — lowest stop)
+    Phase 3: VOT       — voiced onset
                          gain <= 0.10
-  Place: bilabial
-    F2 locus ~1000 Hz — lowest of all stops
-    [p]/[b]: bilabial ~1000 Hz
-    [t]/[d]: alveolar ~3500 Hz
-    [k]/[g]: velar    ~2500 Hz
-  Voicing: murmur during closure
-    Low-pass filtered pulse in closure phase
-    Murmur gain >= 0.60 required
+  v2 changes from v1:
+    LP cutoff raised: 500 Hz → 800 Hz
+    Murmur gain raised: 0.65 → 0.85
+    Both changes address murmur voicing
+    detection in autocorrelation measure.
 
 [aː] — LONG OPEN BACK UNROUNDED:
   Same formant targets as verified [ɑ]:
     F1 700, F2 1100, F3 2500, F4 3200
   Duration: 110 ms (long — 2× short)
-  Same treatment as all long/short pairs.
-  No new derivation required.
-  The macron on Ā marks length.
-
-COARTICULATION NOTES:
-  [g] → [ə]:
-    Velar stop into unstressed schwa.
-    F_next for [g] burst = SCHWA_F.
-    Velar locus ~2500 Hz transitions
-    toward central schwa position.
-
-  [ə] → [b]:
-    Unstressed schwa into voiced bilabial stop.
-    F_next for [ə] = B locus (~1000 Hz).
-    F2 falls from schwa (~1500 Hz) toward
-    bilabial locus (~1000 Hz) at [ə] offset.
-
-  [b] → [aː]:
-    Voiced bilabial stop into long open vowel.
-    Bilabial locus ~1000 Hz.
-    F1 rises sharply at release (jaw opens).
-    F2 rises from ~1000 Hz toward ~1100 Hz.
-    The transition is brief — bilabial and
-    open back vowel share low F2 region.
-
-  [aː] → [d]:
-    Long open vowel into voiced alveolar stop.
-    F_next for [aː] = D locus (~3500 Hz).
-    F2 rises sharply at offset.
-
-  [d] word-final:
-    Alveolar stop close.
-    Word boundary after [d].
-    Ghost returns toward H.
-
-CONTEXT:
-  feasceaft funden, hē þæs frōfre gebād
-  he of-that comfort waited
-  gebād is the main verb of the clause.
-  The past tense of gebīdan — to wait,
-  to experience, to abide.
-  He waited. He endured. He received.
-  The verb that closes line 8 and closes
-  the description of Scyld's origin.
-  The inventory closes on the word
-  that names waiting.
-
-PERFORMANCE PARAMETERS:
-  pitch_hz     = 110.0
-  dil          = 2.5
-  rt60         = 2.0
-  direct_ratio = 0.38
+  No change from v1.
+  Diagnostic band fix in v2 diagnostic.
 
 CHANGE LOG:
   v1 — initial parameters
-       [b] introduced — phoneme 41
-       inventory closes
+       [b] murmur voicing FAIL (0.2456 < 0.60)
+       [aː] F2 centroid FAIL (822 < 900 Hz)
+  v2 — [b] LP cutoff 500→800 Hz, murmur gain 0.65→0.85
+       [aː] diagnostic band fix (in diagnostic file)
 """
 
 import numpy as np
@@ -132,7 +65,7 @@ os.makedirs("output_play", exist_ok=True)
 
 
 # ============================================================
-# PARAMETERS — from verified inventory + new [b]
+# PARAMETERS
 # ============================================================
 
 # G — voiced velar stop [g]
@@ -155,23 +88,21 @@ SCHWA_COART_ON  = 0.15
 SCHWA_COART_OFF = 0.15
 
 # B — voiced bilabial stop [b] — NEW PHONEME 41
-# Bilabial place: F2 locus ~1000 Hz
-# Three-phase architecture: closure + burst + VOT
-# Murmur gain >= 0.60 required for voiced stop
-B_DUR_MS      = 65.0
-B_CLOSURE_MS  = 35.0
-B_BURST_F     = 1000.0   # bilabial locus — lowest stop
-B_BURST_BW    = 800.0
-B_BURST_MS    = 8.0
-B_VOT_MS      = 5.0
-B_BURST_GAIN  = 0.35
-B_VOT_GAIN    = 0.08
-B_VOICING_MS  = 20.0
-B_MURMUR_GAIN = 0.65     # >= 0.60 required
+# v2: LP cutoff raised 500→800 Hz
+#     murmur gain raised 0.65→0.85
+B_DUR_MS       = 65.0
+B_CLOSURE_MS   = 35.0
+B_BURST_F      = 1000.0
+B_BURST_BW     = 800.0
+B_BURST_MS     = 8.0
+B_VOT_MS       = 5.0
+B_BURST_GAIN   = 0.35
+B_VOT_GAIN     = 0.08
+B_VOICING_MS   = 20.0
+B_MURMUR_GAIN  = 0.85    # v2: raised from 0.65
+B_LP_CUTOFF_HZ = 800.0   # v2: raised from 500 Hz
 
 # AY — long open back unrounded [aː]
-# Same formant targets as verified [ɑ]
-# Duration doubled: 110 ms
 AY_F     = [700.0, 1100.0, 2500.0, 3200.0]
 AY_B     = [120.0,  150.0,  200.0,  280.0]
 AY_GAINS = [ 16.0,    8.0,    1.5,    0.5]
@@ -360,11 +291,7 @@ def synth_G(F_next=None, pitch_hz=PITCH_HZ,
 def synth_SCHWA(F_prev=None, F_next=None,
                  pitch_hz=PITCH_HZ,
                  dil=DIL, sr=SR):
-    """
-    Mid central vowel [ə] — phoneme 40.
-    Third appearance: ge- prefix.
-    Same parameters as FUNDEN and FRŌFRE.
-    """
+    """Mid central vowel [ə] — phoneme 40. Third appearance."""
     dur_ms = SCHWA_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     T      = 1.0 / sr
@@ -423,23 +350,8 @@ def synth_B(F_next=None, pitch_hz=PITCH_HZ,
              dil=DIL, sr=SR):
     """
     Voiced bilabial stop [b] — PHONEME 41.
-    Last phoneme in the OE inventory.
-    Inventory closes here.
-
-    Architecture:
-      Phase 1: closure — lips sealed
-               Rosenberg pulse low-pass filtered
-               murmur gain B_MURMUR_GAIN >= 0.60
-      Phase 2: burst — bilabial release
-               band-filtered noise at ~1000 Hz
-               (bilabial locus — lowest of stops)
-      Phase 3: VOT — brief voiced onset
-               gain <= 0.10
-
-    Place distinction by burst frequency:
-      [b]/[p]: ~1000 Hz  bilabial
-      [d]/[t]: ~3500 Hz  alveolar
-      [g]/[k]: ~2500 Hz  velar
+    v2: LP cutoff 800 Hz, murmur gain 0.85.
+    Bilabial locus ~1000 Hz — lowest stop.
     """
     dur_ms     = B_DUR_MS * dil
     n_s        = max(4, int(dur_ms / 1000.0 * sr))
@@ -447,15 +359,14 @@ def synth_B(F_next=None, pitch_hz=PITCH_HZ,
     n_burst    = max(2, int(B_BURST_MS   / 1000.0 * sr))
     n_vot      = max(2, int(B_VOT_MS     / 1000.0 * sr))
     n_voicing  = max(2, int(B_VOICING_MS / 1000.0 * sr))
-    # closure phase — voiced murmur
     src_v      = rosenberg_pulse(n_voicing, pitch_hz,
                                   oq=0.65, sr=sr)
     env_v      = np.linspace(
         B_MURMUR_GAIN, 0.0,
         n_voicing).astype(DTYPE)
-    # low-pass filter the murmur — bilabial closure
+    # v2: LP cutoff raised to 800 Hz
     nyq        = sr / 2.0
-    lp_        = min(500.0 / nyq, 0.499)
+    lp_        = min(B_LP_CUTOFF_HZ / nyq, 0.499)
     b_lp, a_lp = butter(2, lp_, btype='low')
     voiced_cl  = f32(lfilter(
         b_lp, a_lp,
@@ -464,7 +375,6 @@ def synth_B(F_next=None, pitch_hz=PITCH_HZ,
         max(0, n_closure - n_voicing), dtype=DTYPE)
     closure    = np.concatenate(
         [voiced_cl, silence])[:n_closure]
-    # burst phase — bilabial release ~1000 Hz
     noise_b    = np.random.randn(n_burst).astype(float)
     b_bp, a_bp = safe_bp(
         B_BURST_F - B_BURST_BW / 2,
@@ -474,7 +384,6 @@ def synth_B(F_next=None, pitch_hz=PITCH_HZ,
     env_bu     = np.linspace(1.0, 0.1,
                               n_burst).astype(DTYPE)
     burst      = f32(burst * env_bu)
-    # VOT — brief voiced onset
     noise_v2   = np.random.randn(n_vot).astype(float)
     b_vp, a_vp = safe_bp(500.0, 6000.0, sr)
     vot        = f32(lfilter(b_vp, a_vp, noise_v2)
@@ -496,12 +405,7 @@ def synth_B(F_next=None, pitch_hz=PITCH_HZ,
 def synth_AY(F_prev=None, F_next=None,
               pitch_hz=PITCH_HZ,
               dil=DIL, sr=SR):
-    """
-    Long open back unrounded [aː].
-    Same formant targets as verified [ɑ].
-    Duration: 110 ms * dil.
-    F1 700, F2 1100 — open back position.
-    """
+    """Long open back unrounded [aː]. F1 700, F2 1100, dur 110 ms."""
     dur_ms = AY_DUR_MS * dil
     n_s    = max(4, int(dur_ms / 1000.0 * sr))
     T      = 1.0 / sr
@@ -611,8 +515,7 @@ def apply_simple_room(sig, rt60=2.0,
     d2  = int(0.035 * sr)
     d3  = int(0.051 * sr)
     g   = 10 ** (-3.0 / (rt60 * sr))
-    rev = np.zeros(len(sig) + d3 + 1,
-                   dtype=float)
+    rev = np.zeros(len(sig) + d3 + 1, dtype=float)
     for i, s in enumerate(sig.astype(float)):
         rev[i] += s
         if i + d1 < len(rev):
@@ -638,35 +541,22 @@ def synth_gebad(pitch_hz=PITCH_HZ,
                  dil=DIL,
                  add_room=False,
                  sr=SR):
-    """
-    [g · ə · b · aː · d]
-    Syllable 1: [gə]   — unstressed ge- prefix
-    Syllable 2: [baːd] — stressed heavy syllable
-    [b] = phoneme 41. Inventory closes here.
-    """
+    """[g · ə · b · aː · d]"""
     g_seg     = synth_G(
         F_next=SCHWA_F,
-        pitch_hz=pitch_hz,
-        dil=dil, sr=sr)
+        pitch_hz=pitch_hz, dil=dil, sr=sr)
     schwa_seg = synth_SCHWA(
-        F_prev=None,
-        F_next=None,
-        pitch_hz=pitch_hz,
-        dil=dil, sr=sr)
+        F_prev=None, F_next=None,
+        pitch_hz=pitch_hz, dil=dil, sr=sr)
     b_seg     = synth_B(
         F_next=AY_F,
-        pitch_hz=pitch_hz,
-        dil=dil, sr=sr)
+        pitch_hz=pitch_hz, dil=dil, sr=sr)
     ay_seg    = synth_AY(
-        F_prev=AY_F,
-        F_next=None,
-        pitch_hz=pitch_hz,
-        dil=dil, sr=sr)
+        F_prev=AY_F, F_next=None,
+        pitch_hz=pitch_hz, dil=dil, sr=sr)
     d_seg     = synth_D(
-        F_prev=AY_F,
-        F_next=None,   # word boundary → H
-        pitch_hz=pitch_hz,
-        dil=dil, sr=sr)
+        F_prev=AY_F, F_next=None,
+        pitch_hz=pitch_hz, dil=dil, sr=sr)
     word      = np.concatenate([
         g_seg, schwa_seg, b_seg,
         ay_seg, d_seg])
@@ -686,39 +576,29 @@ def synth_gebad(pitch_hz=PITCH_HZ,
 
 if __name__ == "__main__":
     print()
-    print("GEBĀD RECONSTRUCTION v1")
+    print("GEBĀD RECONSTRUCTION v2")
     print("Old English [gəbaːd]")
     print("Beowulf line 8, word 6")
     print("NEW PHONEME: [b] — phoneme 41")
-    print("INVENTORY CLOSES HERE")
+    print("v2: [b] LP cutoff 800 Hz,"
+          " murmur gain 0.85")
     print()
 
-    w_dry = synth_gebad(
-        pitch_hz=PITCH_HZ, dil=DIL,
-        add_room=False)
-    write_wav("output_play/gebad_dry.wav",
-               w_dry, SR)
+    w_dry = synth_gebad(PITCH_HZ, DIL, False)
+    write_wav("output_play/gebad_dry.wav", w_dry, SR)
     print(f"  gebad_dry.wav"
           f"  ({len(w_dry)/SR*1000:.0f} ms)")
 
-    w_hall = synth_gebad(
-        pitch_hz=PITCH_HZ, dil=DIL,
-        add_room=True)
-    write_wav("output_play/gebad_hall.wav",
-               w_hall, SR)
+    w_hall = synth_gebad(PITCH_HZ, DIL, True)
+    write_wav("output_play/gebad_hall.wav", w_hall, SR)
     print("  gebad_hall.wav")
 
     w_slow = ola_stretch(w_dry, 4.0)
-    write_wav("output_play/gebad_slow.wav",
-               w_slow, SR)
+    write_wav("output_play/gebad_slow.wav", w_slow, SR)
     print("  gebad_slow.wav")
 
-    w_perf = synth_gebad(
-        pitch_hz=PITCH_PERF,
-        dil=DIL_PERF,
-        add_room=True)
-    write_wav("output_play/gebad_perf.wav",
-               w_perf, SR)
+    w_perf = synth_gebad(PITCH_PERF, DIL_PERF, True)
+    write_wav("output_play/gebad_perf.wav", w_perf, SR)
     print(f"  gebad_perf.wav"
           f"  ({len(w_perf)/SR*1000:.0f} ms)"
           f"  [110 Hz, dil 2.5, hall]")
@@ -730,6 +610,4 @@ if __name__ == "__main__":
     print()
     print("  hē þæs frōfre gebād —")
     print("  he of-that comfort waited.")
-    print("  Line 8 complete.")
-    print("  Inventory: 41 phonemes. Closed.")
     print()
