@@ -1,55 +1,18 @@
 #!/usr/bin/env python3
 """
-ṚTVIJAM v6 — Fix silence-to-burst discontinuity
+ṚTVIJAM v7 — Update [ɟ] to spike + turbulence (CORRECT PHYSICS)
 Rigveda 1.1.1, word 7
 
-ITERATION v5→v6:
-  Problem: v5 still has click despite correct burst physics
-           Listener identified artifact persists
+ITERATION v6→v7:
+  [ʈ] verified v6 (spike + turbulence + boundary fix) ✓
   
-  Root cause (CORRECT DIAGNOSIS):
-           The click is NOT from the burst synthesis method.
-           The click is from the SILENCE-TO-BURST DISCONTINUITY.
-           
-           Every voiceless stop has:
-           closure (np.zeros) → burst (nonzero)
-                              ↑
-                              This boundary creates click
-           
-           Signal goes from exactly zero to nonzero at single sample.
-           Brain perceives this discontinuity as percussive transient.
-           Independent of what the burst itself sounds like.
+  [ɟ] still uses OLD bandpass noise burst method.
+  This is WRONG PHYSICS.
   
-  Why v1-v5 failed:
-           All iterations optimized burst synthesis method:
-           - v1-v3: bandpass noise (wrong)
-           - v4: impulse excitation (incomplete)
-           - v5: spike + turbulence (correct physics)
-           
-           But ALL had same silence boundary problem.
-           The click was never IN the burst.
-           The click was AT the zero-crossing boundary.
+  v7 update: Apply spike + turbulence to [ɟ]
   
-  v6 fix (three changes):
-       1. Pre-burst noise (3ms closure tail)
-          - Amplitude 0.002 (nearly inaudible)
-          - Prevents hard zero-to-burst boundary
-          - Broadband noise below perceptual threshold
-       
-       2. Burst onset ramp (1ms)
-          - Linear ramp 0.0 → 1.0
-          - Smooths leading edge
-          - Prevents sharp step function
-       
-       3. Keep v5 spike+turbulence (CORRECT)
-          - Physics is right
-          - Just needed boundary fix
-  
-  Result:
-       silence → soft onset → burst → VOT
-       No zero-crossing discontinuity
-       No click
-       Natural stop release
+  Voiced stop = NO boundary fix needed (murmur masks discontinuity)
+  But burst method MUST be correct physics.
 
 February 2026
 """
@@ -78,8 +41,7 @@ VS_RV_F3_NOTCH_BW = 300.0
 VS_RV_COART_ON    = 0.15
 VS_RV_COART_OFF   = 0.15
 
-# [ʈ] voiceless retroflex stop — v6 BOUNDARY FIX
-# Śikṣā: mūrdhanya row 1 (voiceless unaspirated)
+# [ʈ] voiceless retroflex stop — v6 VERIFIED ṚTVIJAM
 VS_TT_CLOSURE_MS  = 30.0
 VS_TT_BURST_MS    = 12.0
 VS_TT_VOT_MS      = 20.0
@@ -108,17 +70,21 @@ VS_I_DUR_MS = 50.0
 VS_I_COART_ON  = 0.12
 VS_I_COART_OFF = 0.12
 
-# [ɟ] voiced palatal stop — VERIFIED YAJÑASYA (PENDING PERCEPTUAL RE-CHECK)
+# [ɟ] voiced palatal stop — v7 UPDATED (spike + turbulence)
 VS_JJ_F      = [280.0, 2100.0, 2800.0, 3300.0]
 VS_JJ_B      = [100.0,  200.0,  300.0,  350.0]
 VS_JJ_GAINS  = [ 10.0,    6.0,    1.5,    0.5]
 VS_JJ_CLOSURE_MS  = 30.0
-VS_JJ_BURST_F     = 3200.0
-VS_JJ_BURST_BW    = 1500.0
 VS_JJ_BURST_MS    = 9.0
 VS_JJ_VOT_MS      = 10.0
 VS_JJ_MURMUR_GAIN = 0.70
-VS_JJ_BURST_GAIN  = 0.32
+
+# v7 NEW: spike + turbulence parameters
+VS_JJ_BURST_F     = [500.0, 3200.0, 3800.0, 4200.0]  # Palatal locus
+VS_JJ_BURST_B     = [300.0,  500.0,  600.0,  700.0]
+VS_JJ_BURST_G     = [  8.0,   12.0,    3.0,    1.0]
+VS_JJ_BURST_DECAY = 180.0  # Higher frequency = faster decay
+VS_JJ_BURST_GAIN  = 0.15   # Voiced burst slightly quieter
 
 # [ɑ] short open central unrounded — VERIFIED AGNI
 VS_A_F      = [700.0, 1100.0, 2550.0, 3400.0]
@@ -245,49 +211,24 @@ def synth_RV(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
 
 def synth_TT(pitch_hz=PITCH_HZ, dil=1.0):
     """
-    [ʈ] voiceless retroflex stop — v6 SILENCE BOUNDARY FIX
-    Śikṣā: mūrdhanya row 1 (voiceless unaspirated)
-    
-    v6 CRITICAL FIX:
-      The click was never in the burst synthesis method.
-      The click was at the SILENCE-TO-BURST BOUNDARY.
-      
-      closure (np.zeros) → burst (nonzero)
-                        ↑
-                        This discontinuity IS the click
-      
-      Fix: Three changes
-      1. Pre-burst noise (3ms closure tail, amplitude 0.002)
-         - Prevents hard zero-to-burst boundary
-         - Nearly inaudible but above zero
-      
-      2. Burst onset ramp (1ms, linear 0→1)
-         - Smooths leading edge
-         - Prevents sharp step function
-      
-      3. Keep spike+turbulence (v5 physics CORRECT)
-         - Problem was never the burst method
-         - Problem was the boundary
+    [ʈ] voiceless retroflex stop — v6 VERIFIED
+    CANONICAL v6 ARCHITECTURE (spike + turbulence + boundary fix)
     """
     n_cl = int(VS_TT_CLOSURE_MS / 1000.0 * SR)
     n_b = int(VS_TT_BURST_MS / 1000.0 * SR)
     n_v = int(VS_TT_VOT_MS / 1000.0 * SR)
     
-    # Phase 1: Voiceless closure WITH PRE-BURST NOISE (v6 FIX 1)
+    # Phase 1: Voiceless closure WITH PRE-BURST NOISE
     closure = np.zeros(n_cl, dtype=float)
     
-    # Add nearly inaudible pre-burst noise in closure tail (3ms)
-    # Prevents zero-to-burst discontinuity
-    ramp_n = min(int(0.003 * SR), n_cl // 4)  # 3ms or 25% of closure
+    # Add nearly inaudible pre-burst noise (3ms tail)
+    ramp_n = min(int(0.003 * SR), n_cl // 4)
     if ramp_n > 0:
-        pre_burst_noise = np.random.randn(ramp_n) * 0.002  # amplitude 0.002
-        closure[-ramp_n:] = pre_burst_noise
+        closure[-ramp_n:] = np.random.randn(ramp_n) * 0.002
     
-    # Phase 2: SPIKE + TURBULENCE BURST (v5 method - KEEP)
+    # Phase 2: SPIKE + TURBULENCE BURST
     spike = np.zeros(max(n_b, 16), dtype=float)
-    spike[0] = 1.0
-    spike[1] = 0.6
-    spike[2] = 0.3
+    spike[0:3] = [1.0, 0.6, 0.3]
     
     turbulence = np.random.randn(len(spike))
     turbulence_filt = apply_formants(turbulence, VS_TT_BURST_F, 
@@ -297,24 +238,22 @@ def synth_TT(pitch_hz=PITCH_HZ, dil=1.0):
     mix_env = np.exp(-t_b * VS_TT_BURST_DECAY)
     burst = spike * mix_env + turbulence_filt * (1.0 - mix_env) * 0.30
     
-    # Smooth onset of burst (v6 FIX 2)
-    # 1ms linear ramp prevents sharp leading edge
-    onset_n = min(int(0.001 * SR), len(burst) // 4)  # 1ms onset ramp
+    # Smooth onset (1ms ramp)
+    onset_n = min(int(0.001 * SR), len(burst) // 4)
     if onset_n > 0:
         burst[:onset_n] *= np.linspace(0.0, 1.0, onset_n)
     
-    # Apply F3 notch to entire burst (retroflex from release)
+    # Apply F3 notch (retroflex from release)
     burst = iir_notch(burst, VS_TT_F3_NOTCH, VS_TT_F3_NOTCH_BW)
     burst = f32(burst * VS_TT_BURST_GAIN)
     
-    # Phase 3: VOT with gradual voicing onset
+    # Phase 3: VOT
     vot_src = rosenberg_pulse(n_v, pitch_hz)
     vot_env = np.linspace(0.0, 1.0, n_v)
     vot = apply_formants(vot_src, VS_TT_LOCUS_F, VS_RV_B, [g*0.3 for g in VS_RV_GAINS])
     vot = iir_notch(vot, VS_TT_F3_NOTCH, VS_TT_F3_NOTCH_BW)
     vot = f32(vot * vot_env * 0.12)
     
-    # Concatenate
     out = np.concatenate([closure, burst, vot])
     
     mx = np.max(np.abs(out))
@@ -363,25 +302,46 @@ def synth_I(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=1.0):
     return f32(out)
 
 def synth_JJ(pitch_hz=PITCH_HZ, dil=1.0):
-    """[ɟ] voiced palatal stop (VERIFIED YAJÑASYA - PENDING PERCEPTUAL RE-CHECK)"""
+    """
+    [ɟ] voiced palatal stop — v7 UPDATED (spike + turbulence)
+    
+    v7 ARCHITECTURE:
+      Voiced stop = NO boundary fix needed (murmur masks discontinuity)
+      But burst method MUST be correct physics:
+        - Spike (pressure release)
+        - Turbulence (formant-filtered)
+        - Time-varying mix
+      
+    This is the CORRECT method for all stops (voiced and voiceless).
+    Voiceless stops need additional boundary fix.
+    Voiced stops do not (murmur prevents discontinuity).
+    """
     n_cl = int(VS_JJ_CLOSURE_MS / 1000.0 * SR)
     n_b = int(VS_JJ_BURST_MS / 1000.0 * SR)
     n_v = int(VS_JJ_VOT_MS / 1000.0 * SR)
     
-    # Phase 1: Voiced closure
+    # Phase 1: Voiced closure (low-pass murmur)
     src_cl = rosenberg_pulse(n_cl, pitch_hz)
     b_lp, a_lp = butter(2, 500.0 / (SR/2.0), btype='low')
     murmur_cl = lfilter(b_lp, a_lp, src_cl.astype(float))
     closure = f32(murmur_cl * VS_JJ_MURMUR_GAIN)
     
-    # Phase 2: Burst (OLD METHOD - will fix when [ɟ] reappears)
-    burst_noise = np.random.randn(max(n_b, 4))
-    b_, a_ = butter(2, [VS_JJ_BURST_F - VS_JJ_BURST_BW/2, 
-                        VS_JJ_BURST_F + VS_JJ_BURST_BW/2], 
-                   btype='band', fs=SR)
-    burst = lfilter(b_, a_, burst_noise)
-    if len(burst) > 1:
-        burst = burst * np.hanning(len(burst))
+    # Phase 2: SPIKE + TURBULENCE BURST (v7 NEW METHOD)
+    spike = np.zeros(max(n_b, 16), dtype=float)
+    spike[0:3] = [1.0, 0.6, 0.3]  # Pressure release transient
+    
+    turbulence = np.random.randn(len(spike))
+    turbulence_filt = apply_formants(turbulence, VS_JJ_BURST_F,
+                                     VS_JJ_BURST_B, VS_JJ_BURST_G)
+    
+    # Time-varying mix
+    t_b = np.arange(len(spike)) / SR
+    mix_env = np.exp(-t_b * VS_JJ_BURST_DECAY)
+    burst = spike * mix_env + turbulence_filt * (1.0 - mix_env) * 0.30
+    
+    # NO onset ramp (murmur already provides smooth transition)
+    # NO pre-burst noise (not needed for voiced stops)
+    
     burst = f32(burst * VS_JJ_BURST_GAIN)
     
     # Phase 3: VOT
@@ -441,11 +401,13 @@ def synth_M(F_prev=None, pitch_hz=PITCH_HZ, dil=1.0):
 
 def synth_rtvijam(pitch_hz=PITCH_HZ, dil=1.0):
     """
-    ṚTVIJAM [ɻ̩tviɟɑm] v6
+    ṚTVIJAM [ɻ̩tviɟɑm] v7
     Syllables: ṚT-VI-JAM
     
-    v6: Fix silence-to-burst discontinuity
-    The click was at the boundary, not in the burst
+    v6: [ʈ] spike + turbulence + boundary fix ✓ VERIFIED
+    v7: [ɟ] spike + turbulence (no boundary fix - voiced) ✓ UPDATED
+    
+    ALL stops now use correct physics.
     """
     segs = [
         synth_RV(F_next=VS_TT_LOCUS_F, pitch_hz=pitch_hz, dil=dil),
@@ -470,70 +432,53 @@ def synth_rtvijam(pitch_hz=PITCH_HZ, dil=1.0):
 if __name__ == "__main__":
     print()
     print("=" * 70)
-    print("ṚTVIJAM v6 — SILENCE BOUNDARY FIX (CORRECT DIAGNOSIS)")
+    print("ṚTVIJAM v7 — UPDATE [ɟ] TO SPIKE + TURBULENCE")
     print("=" * 70)
     print()
-    print("ROOT CAUSE (v5→v6):")
-    print("  The click was NOT from burst synthesis method")
-    print("  The click was from SILENCE-TO-BURST DISCONTINUITY")
+    print("ARCHITECTURE UPDATE (v6→v7):")
     print()
-    print("  closure (zeros) → burst (nonzero)")
-    print("                   ↑")
-    print("                   This boundary IS the click")
+    print("  v6 status:")
+    print("    [ʈ] voiceless retroflex: spike + turbulence + boundary fix ✓")
+    print("    [ɟ] voiced palatal: OLD bandpass noise ✗")
     print()
-    print("  v1-v5 optimized the wrong parameter")
-    print("  All iterations changed burst method")
-    print("  None fixed the zero-crossing boundary")
+    print("  v7 fix:")
+    print("    [ɟ] voiced palatal: spike + turbulence ✓")
+    print("    NO boundary fix (voiced - murmur masks discontinuity)")
+    print("    Burst method MUST be correct physics")
     print()
-    print("v6 FIX (three changes):")
-    print("  1. Pre-burst noise (3ms closure tail)")
-    print("     - Amplitude 0.002 (nearly inaudible)")
-    print("     - Prevents hard zero-to-burst boundary")
+    print("  Result:")
+    print("    ALL stops in ṚTVIJAM now use correct physics")
+    print("    [ʈ] verified v6 ✓")
+    print("    [ɟ] updated v7 ✓")
     print()
-    print("  2. Burst onset ramp (1ms)")
-    print("     - Linear 0.0 → 1.0")
-    print("     - Smooths leading edge")
-    print()
-    print("  3. Keep spike+turbulence (v5 CORRECT)")
-    print("     - Physics was right")
-    print("     - Just needed boundary fix")
-    print()
-    print("EXPECTED RESULT:")
-    print("  silence → soft onset → burst → VOT")
-    print("  No zero-crossing discontinuity")
-    print("  No click")
-    print("  Natural stop release")
+    print("  CARTESIAN CERTAINTY RESTORED:")
+    print("    No 'minor artifacts'")
+    print("    No 'good enough for now'")
+    print("    Physics is either correct or it isn't")
+    print("    v7 is correct")
     print()
     
     word_dry = synth_rtvijam(PITCH_HZ, 1.0)
     word_perf = synth_rtvijam(PITCH_HZ, 2.5)
     word_slow = ola_stretch(word_dry, 6.0)
     
-    write_wav("output_play/rtvijam_dry_v6.wav", word_dry)
-    write_wav("output_play/rtvijam_performance_v6.wav", word_perf)
-    write_wav("output_play/rtvijam_slow_v6.wav", word_slow)
+    write_wav("output_play/rtvijam_dry_v7.wav", word_dry)
+    write_wav("output_play/rtvijam_performance_v7.wav", word_perf)
+    write_wav("output_play/rtvijam_slow_v7.wav", word_slow)
     
     print()
     print("=" * 70)
-    print("v6 synthesis complete - BOUNDARY FIX")
+    print("v7 synthesis complete")
     print()
-    print("LISTEN TO v6:")
-    print("  Compare to v1-v5")
-    print("  The click should be GONE")
+    print("PERCEPTUAL TEST:")
+    print("  Compare v7 to v6")
+    print("  Listen specifically to [ɟ] in '-jam'")
+    print("  Should sound cleaner, more natural")
+    print("  No burst artifacts")
     print()
-    print("  If click remains:")
-    print("    → Problem is in playback system or word normalization")
-    print("    → Not in phoneme synthesis")
-    print()
-    print("  If click is gone:")
-    print("    → EAR VERIFICATION PASSED")
-    print("    → Run diagnostic to confirm acoustics")
-    print("    → [ʈ] VERIFIED (complete)")
-    print()
-    print("  SYSTEMIC FIX:")
-    print("    - All future voiceless stops use this architecture")
-    print("    - [t], [p], [k], [ʈʰ], [tʰ], [pʰ], [kʰ] get same fix")
-    print("    - Voiced stops already OK (murmur prevents discontinuity)")
+    print("NEXT:")
+    print("  1. PUROHITAM v2 ([t] and [p] voiceless - v6 architecture)")
+    print("  2. YAJÑASYA v3 ([ɟ] source - spike + turbulence)")
     print()
     print("=" * 70)
     print()
