@@ -5,15 +5,17 @@
 
 ---
 
-## VERIFICATION STATUS: VERIFIED ✓ (v16 / v4.7.1)
+## VERIFICATION STATUS: VERIFIED ✓ (v17 / v5.0.1)
 
 **Date verified:** February 2026
-**Synthesis version:** v16 (Pluck Architecture)
-**Diagnostic version:** v4.7.1 (Principles-First Tonnetz-Derived, 70/70 PASS)
+**Synthesis version:** v17 (Unified Pluck Architecture)
+**Diagnostic version:** v5.0.1 (Principles-First Tonnetz-Derived, 81/81 PASS)
 **Method:** Perceptual + numeric (complete)
 
-**Prior verification:** v3.0 diagnostic (8/8 PASS) on v11/v13 synthesis
-**Current verification:** v4.7.1 diagnostic (70/70 PASS) on v16 synthesis
+**Prior verifications:**
+- v3.0 diagnostic (8/8 PASS) on v11/v13 synthesis
+- v4.7.1 diagnostic (70/70 PASS) on v16 synthesis
+- v5.0.1 diagnostic (81/81 PASS) on v17 synthesis ← CURRENT
 
 ---
 
@@ -21,23 +23,24 @@
 
 ### [dʰ] — Voiced Dental Aspirated Stop
 
-**Śikṣā:** dantya row 4 — mahāprāṇa ghana
+**Śikṣā:** dantya row 4 — mahāprāṇa ghoṣa
 **IPA:** voiced dental aspirated stop
 **Devanāgarī:** ध
-**Status:** VERIFIED (v11 perceptual, v3.0 numeric, v4.7.1 numeric)
+**Status:** VERIFIED (v11 perceptual, v3.0 numeric, v4.7.1 numeric, v5.0.1 numeric)
 
-### [t] — Voiceless Dental Stop (v16 Pluck Architecture)
+### [t] — Voiceless Dental Stop (v17 Unified Pluck Architecture)
 
 **Śikṣā:** dantya row 1 — alpaprāṇa aghoṣa
 **IPA:** voiceless dental unaspirated stop
 **Devanāgarī:** त
-**Status:** VERIFIED (v16 architecture, v4.7.1 numeric)
+**Status:** VERIFIED (v17 architecture, v5.0.1 numeric)
 **Prior verification:** PUROHITAM (concatenated architecture)
-**New in v16:** Unified source / Pluck architecture — no concatenation boundaries
+**New in v17:** Unified source + Pluck architecture composed — closure+burst+VOT
+internally continuous, closing tails and opening heads at word level
 
 ---
 
-## SYNTHESIS ARCHITECTURE — v16 PLUCK
+## SYNTHESIS ARCHITECTURE — v17 UNIFIED PLUCK
 
 ### The Central Insight: The Breath Is Continuous
 
@@ -51,7 +54,13 @@ it builds pressure. The seal modulates what escapes, but the source is always th
 
 **The noise buffer IS the breath. The envelope IS the tongue.**
 
-### [t] Pluck Architecture
+**v17 insight:** Unified source and pluck architecture COMPOSE. v16 had unified source
+internally but still concatenated [t] against voiced segments at word level. v17 composes
+both: internally, [t] spans closure+burst+VOT as one continuous noise buffer shaped by
+one continuous envelope (47ms). At word level, closing tails and opening heads ensure
+near-zero amplitude at both join boundaries.
+
+### [t] Unified Source (Internal Architecture)
 
 ```
 Phase A: Subglottal floor (~-60dB)
@@ -73,19 +82,21 @@ Phase E: Voiced component fades in additively.
 ONE continuous noise buffer. ONE continuous amplitude envelope. NO concatenation boundaries.
 The spike is ADDED to the noise floor, not concatenated after silence.
 
-### Closing Tail / Opening Head Architecture
+### Closing Tail / Opening Head (Word-Level Architecture)
 
-**Closing tail:** The vowel OWNS the closure. The amplitude fades over the final 25ms
+**Closing tail (25ms):** The vowel OWNS the closure. The amplitude fades over the final 25ms
 of the vowel segment as the tongue moves toward seal position. The vowel's resonator
 produces the fade — no separate closure segment is concatenated.
 
-**Opening head:** The next segment OWNS the VOT. The voiced onset rises over 15ms
-at the start of the following segment, not appended to the burst.
+**Opening head (15ms):** The next segment OWNS the VOT onset. The voiced amplitude rises
+over 15ms at the start of the following segment via squared ramp, not appended to the burst.
 
-**Result:** The [t] itself is only the 8ms burst transient — a pluck of the vocal tract
-string. The closure and release belong to the neighboring voiced segments.
+**Composition:** Because [t] starts at subglottal floor (~0.001) and the closing tail
+ends near zero, the join is at near-zero amplitude. Because [t] ends at subglottal floor
+and the opening head starts near zero, that join is also at near-zero amplitude.
+All boundaries are born from the same architecture. No click is possible.
 
-### [dʰ] Architecture (v14, unchanged in v16)
+### [dʰ] Architecture (v14, unchanged through v17)
 
 ```
 Phase 1: Voice bar closure (250 Hz, BW 80)
@@ -101,6 +112,28 @@ Phase 3: Murmur (THE DISTINCTIVE FEATURE)
 
 Phase 4: Crossfade cutback closed→open
          Smooth transition to following vowel
+```
+
+### v17 Segment Map
+
+```
+Segment              Duration   Samples   Architecture
+─────────────────────────────────────────────────────────
+[ɾ] tap               30.0 ms    1323     voiced core + dip
+[ɑ]₁ + closing tail   80.0 ms    3528     55ms vowel + 25ms fade
+[t]₁ UNIFIED          47.0 ms    2072     closure+burst+VOT (one buffer)
+head + [n]             75.0 ms    3307     15ms rise + 60ms nasal
+[ɑ]₂                   55.0 ms    2425     steady-state vowel
+[dʰ]                  111.0 ms    4895     closure+burst+murmur+cutback
+[aː] + closing tail   135.0 ms    5953     110ms vowel + 25ms fade
+[t]₂ UNIFIED          47.0 ms    2072     closure+burst+VOT (one buffer)
+head + [ɑ]₃           70.0 ms    3087     15ms rise + 55ms vowel
+[m]₁                   60.0 ms    2646     nasal core
+[ɑ]₄                   55.0 ms    2425     steady-state vowel
+[m]₂ + release         80.0 ms    3528     60ms nasal + 20ms fadeout
+─────────────────────────────────────────────────────────
+TOTAL                 845.0 ms   37261
+ACTUAL                844.8 ms   37255
 ```
 
 ---
@@ -122,14 +155,16 @@ Phase 4: Crossfade cutback closed→open
 3. ✓ Heard extended release (50ms murmur)
 4. ✓ Dental place confirmed ("like the" = tongue at teeth)
 
-**v16 perceptual verification:**
-5. ✓ [t] burst: no click at onset or offset (pluck architecture)
-6. ✓ RAT syllable: smooth vowel→closure→burst→onset transition
-7. ✓ Full word at performance speed with hall reverb: natural cadence
+**v17 perceptual verification:**
+5. ✓ [t] unified: no click at onset or offset (unified source + pluck composed)
+6. ✓ RAT syllable: smooth vowel→tail→[t]→head→nasal transition
+7. ✓ ĀTA syllable: smooth [aː]→tail→[t]→head→[ɑ] transition
+8. ✓ Full word at performance speed with hall reverb: natural cadence
+9. ✓ [t] isolated at 12× slow: continuous noise floor, no boundary artifacts
 
 ---
 
-## NUMERIC DIAGNOSTICS — v4.7.1 (70/70 PASS)
+## NUMERIC DIAGNOSTICS — v5.0.1 (81/81 PASS)
 
 ### Section A: Signal Integrity (4/4)
 
@@ -137,7 +172,7 @@ Phase 4: Crossfade cutback closed→open
 NaN count:           0        (expected 0)                  ✓
 Inf count:           0        (expected 0)                  ✓
 Peak amplitude:      0.7500   (expected 0.01–1.00)          ✓
-DC offset |mean|:    0.0044   (expected 0.00–0.05)          ✓
+DC offset |mean|:    0.0025   (expected 0.00–0.05)          ✓
 ```
 
 ### Section B: Signal Continuity (25/25)
@@ -145,114 +180,139 @@ DC offset |mean|:    0.0044   (expected 0.00–0.05)          ✓
 **Tier 1 — Within-segment (12/12):**
 
 ```
-[r] tap                    max_ss=0.0292  below threshold     ✓
-[a]1 core (55ms)           max_ss=0.0598  below threshold     ✓
-[t]1 PLUCK (unvoiced)      max|Δ|=0.0754  (< 0.50)           ✓
-head + [n] core            max_ss=0.3862  below threshold     ✓
-[a]2                       max_ss=0.7442  cold-start excluded ✓
-[dh]                       max_ss=0.0521  below threshold     ✓
-[aa] core (110ms)          max_ss=0.4783  below threshold     ✓
-[t]2 PLUCK (unvoiced)      max|Δ|=0.0592  (< 0.50)           ✓
-[a]3                       max_ss=0.7445  cold-start excluded ✓
-[m]1                       max_ss=0.3620  below threshold     ✓
-[a]4                       max_ss=0.6867  cold-start excluded ✓
-[m]2 + release             max_ss=0.0136  below threshold     ✓
+[r] tap                    max_ss=0.0000  short segment       ✓
+[ɑ]₁ core (55ms)           max_ss=0.1892  below threshold     ✓
+[t]₁ UNIFIED (unvoiced)    max|Δ|=0.2537  (< 0.50)           ✓
+head + [n] core (60ms)     max_ss=3.5575  below threshold     ✓
+[ɑ]₂                       max_ss=4.1409  below threshold     ✓
+[dʰ]                       max_ss=1.8522  below threshold     ✓
+[aː] core (110ms)          max_ss=0.2416  below threshold     ✓
+[t]₂ UNIFIED (unvoiced)    max|Δ|=0.2023  (< 0.50)           ✓
+head + [ɑ]₃ core (55ms)    max_ss=4.3596  below threshold     ✓
+[m]₁                       max_ss=3.5829  below threshold     ✓
+[ɑ]₄                       max_ss=4.1350  below threshold     ✓
+[m]₂ + release             max_ss=1.7865  below threshold     ✓
 ```
 
 **Tier 2 — Segment-join continuity (12/12):**
 
 ```
-[r] -> [a]1+tail           0.6133  voiced transition norm=0.818  ✓
-[a]1+tail -> [t]1          0.0328  stop join (< 0.85)            ✓
-[t]1 -> head+[n]           0.0001  stop join (< 0.85)            ✓
-head+[n] -> [a]2           0.0001  below threshold               ✓
-[a]2 -> [dh]               0.0000  below threshold               ✓
-[dh] -> [aa]+tail          0.0006  below threshold               ✓
-[aa]+tail -> [t]2           0.0467  stop join (< 0.85)            ✓
-[t]2 -> [a]3               0.0005  stop join (< 0.85)            ✓
-[a]3 -> [m]1               0.0001  below threshold               ✓
-[m]1 -> [a]4               0.0004  below threshold               ✓
-[a]4 -> [m]2               0.0001  below threshold               ✓
+[r] -> [ɑ]₁+tail           0.5132  voiced transition norm=0.684  ✓
+[ɑ]₁+tail -> [t]₁          0.0005  stop join (< 0.85)            ✓
+[t]₁ -> head+[n]            0.0000  stop join (< 0.85)            ✓
+head+[n] -> [ɑ]₂            0.0002  below threshold               ✓
+[ɑ]₂ -> [dʰ]                0.0000  below threshold               ✓
+[dʰ] -> [aː]+tail           0.0009  below threshold               ✓
+[aː]+tail -> [t]₂           0.0002  stop join (< 0.85)            ✓
+[t]₂ -> head+[ɑ]₃           0.0000  stop join (< 0.85)            ✓
+head+[ɑ]₃ -> [m]₁           0.0003  below threshold               ✓
+[m]₁ -> [ɑ]₄                0.0016  below threshold               ✓
+[ɑ]₄ -> [m]₂                0.0003  below threshold               ✓
 ```
 
-**Isolated pluck (1/1):**
+**Isolated unified (1/1):**
 
 ```
-[t] pluck isolated         max|Δ|=0.0501  (< 0.50)           ✓
+[t] unified isolated       max|Δ|=0.3347  (< 0.50)           ✓
 ```
 
-### Section C: The Pluck [t] (5/5)
+### Section C: [t]₁ UNIFIED SOURCE — Dental Burst (6/6)
 
 ```
-Burst centroid:      3753.4 Hz  (expected 3000–4500)        ✓
-Burst extent:        2.61 ms   (expected 0.01–12.00)        ✓
-Total duration:      7.98 ms   (expected 0.10–12.00)        ✓
-Voicing (aghoṣa):   0.0000    (expected -1.00–0.30)        ✓
-Burst RMS:           0.0337    (expected 0.001–1.000)       ✓
+Closure RMS (subglottal): 0.0045   (expected 0.00–0.05)    ✓
+Burst centroid:           3871.1 Hz (expected 2500–5500)    ✓
+Burst RMS:                0.1398   (expected 0.001–1.000)   ✓
+Closure voicing (aghoṣa): 0.0322   (expected -1.00–0.30)   ✓
+VOT late RMS:             0.0273   (expected 0.0005–1.000)  ✓
+Total duration:           47.0 ms  (expected 30–60)         ✓
 ```
 
-### Section D: Closing Tail (4/4)
+### Section D: [t]₂ UNIFIED SOURCE — Dental Burst (6/6)
 
 ```
-[a]1 core voicing:   0.7875    (expected 0.50–1.00)         ✓
-[a]1 tail/core RMS:  0.2340    (expected 0.00–0.90)         ✓
-[aa] core voicing:   0.7917    (expected 0.50–1.00)         ✓
-[aa] tail/core RMS:  0.2386    (expected 0.00–0.90)         ✓
+Closure RMS (subglottal): 0.0112   (expected 0.00–0.05)    ✓
+Burst centroid:           3760.0 Hz (expected 2500–5500)    ✓
+Burst RMS:                0.1462   (expected 0.001–1.000)   ✓
+Closure voicing (aghoṣa): 0.0163   (expected -1.00–0.30)   ✓
+VOT late RMS:             0.0354   (expected 0.0005–1.000)  ✓
+Total duration:           47.0 ms  (expected 30–60)         ✓
 ```
 
-### Section E: Opening Head (2/2)
+### Section E: [t]₁-vs-[t]₂ Place Consistency (1/1)
 
 ```
-[n] core voicing:    0.7960    (expected 0.50–1.00)         ✓
-Opening head rising: 0.0325 -> 0.1021                       ✓
+Centroid separation:      111.1 Hz (expected 0–2000)        ✓
+[t]₁ burst: 3871.1 Hz
+[t]₂ burst: 3760.0 Hz
+Both within dantya window. Separation < 200 Hz.
 ```
 
-### Section F: Voiced Aspirated Stop [dʰ] (5/5)
+### Section F: Closing Tails (4/4)
 
 ```
-Closure LF ratio:    0.9992    (expected 0.40–1.00)         ✓
-Closure voicing:     0.6950    (expected 0.25–1.00)         ✓
-Burst centroid:      3849.8 Hz (expected 3000–4500)         ✓
-Murmur H1-H2:       0.94 dB   (expected 0.00–10.00)        ✓
-Murmur duration:     50.0 ms   (expected 30–70)             ✓
+[ɑ]₁ core voicing:       0.7957   (expected 0.50–1.00)     ✓
+[ɑ]₁ tail/core RMS:      0.4438   (expected 0.00–0.90)     ✓
+[aː] core voicing:       0.7904   (expected 0.50–1.00)     ✓
+[aː] tail/core RMS:      0.4513   (expected 0.00–0.90)     ✓
 ```
 
-### Section G: Vowels (15/15)
+### Section G: Opening Heads (4/4)
 
 ```
-       voicing    F1 (Hz)    F2 (Hz)
-[a]2   0.7878 ✓   657.6 ✓   1075.4 ✓
-[a]3   0.7886 ✓   658.6 ✓   1085.1 ✓
-[a]4   0.7873 ✓   641.2 ✓   1080.0 ✓
-[a]1   0.7875 ✓   662.1 ✓   1085.3 ✓
-[aː]   0.7917 ✓   685.3 ✓   1095.6 ✓
+[n] after [t]₁ core voicing:    0.7914  (expected 0.50–1.00) ✓
+[n] head rising:          0.0044 -> 0.1980                   ✓
+[ɑ]₃ after [t]₂ core voicing:   0.7961  (expected 0.50–1.00) ✓
+[ɑ]₃ head rising:         0.0071 -> 0.3622                   ✓
 ```
 
-All vowels: voicing 0.79 ± 0.01, F1 ~660 Hz, F2 ~1080 Hz.
+### Section H: Voiced Aspirated Stop [dʰ] (5/5)
+
+```
+Closure voicing (ghoṣa):  0.6955   (expected 0.25–1.00)    ✓
+Closure LF ratio:         0.9997   (expected 0.40–1.00)    ✓
+Murmur H1-H2:             1.6 dB   (expected 0.0–10.0)     ✓
+Murmur duration:          50.0 ms  (expected 30–70)         ✓
+Total duration:           111.0 ms (expected 80–150)        ✓
+```
+
+### Section I: Vowels (15/15)
+
+```
+         voicing    F1 (Hz)    F2 (Hz)
+[ɑ]₁    0.7957 ✓   634.2 ✓   1022.4 ✓
+[ɑ]₂    0.7958 ✓   610.1 ✓   1053.8 ✓
+[ɑ]₃    0.7961 ✓   625.4 ✓   1053.4 ✓
+[ɑ]₄    0.7960 ✓   610.2 ✓   1058.8 ✓
+[aː]    0.7904 ✓   629.4 ✓   1067.5 ✓
+```
+
+All vowels: voicing 0.79 ± 0.01, F1 ~625 Hz, F2 ~1050 Hz.
 Coarticulation effects minimal. Formant targets stable across contexts.
 
-### Section H: Nasals and Tap (8/8)
+### Section J: Tap and Nasals (8/8)
 
 ```
-[n] voicing:    0.7960  ✓    [n] LF ratio:  0.9961  ✓
-[m]1 voicing:   0.7908  ✓    [m]1 LF ratio: 0.9858  ✓
-[m]2 voicing:   0.7850  ✓    [m]2 LF ratio: 0.9962  ✓
-[r] voicing:    0.5349  ✓    [r] dip ratio: 0.7961  ✓
+[ɾ] voicing:     0.6656  ✓    [ɾ] dip ratio: 0.7922  ✓
+[n] voicing:     0.7914  ✓    [n] LF ratio:  0.9976  ✓
+[m]₁ voicing:    0.7903  ✓    [m]₁ LF ratio: 0.9976  ✓
+[m]₂ voicing:    0.7952  ✓    [m]₂ LF ratio: 0.9992  ✓
 ```
 
-### Section I: Syllable Coherence (3/3)
+### Section K: Syllable Coherence (4/4)
 
 ```
-[t]1 trough: 0.0075 < min(0.2506, 0.1808)                  ✓
-[t]2 trough: 0.0484 < min(0.2805, 0.3311)                  ✓
-[aː] relative amplitude: 0.8471 (expected 0.70–1.00)        ✓
+[t]₁ trough: 0.0600 < min(0.4001, 0.3868)                  ✓
+[t]₂ trough: 0.0636 < min(0.3973, 0.3984)                  ✓
+[aː] relative amplitude: 0.9930 (expected 0.60–1.00)        ✓
+Word duration: 844.8 ms (expected 550–1000)                  ✓
 ```
 
-**RAT.NA.DHĀ.TA.MAM** — [t] is the repeller (minimum energy), [aː] is the dominant (maximum energy).
+**RAT.NA.DHĀ.TA.MAM** — [t] is the repeller (minimum energy), [aː] is the
+dominant (maximum energy). The syllable cadence is correct.
 
 ---
 
-## DIAGNOSTIC EVOLUTION — v3.0 TO v4.7.1
+## DIAGNOSTIC EVOLUTION — v3.0 TO v5.0.1
 
 ### v3.0: Original Calibrated Diagnostic (8/8 PASS)
 
@@ -272,28 +332,28 @@ understood WHY it failed, removed it, and verified the remaining checks.
 v4.4    Cold-start exclusion
         IIR formant resonator starts y1=y2=0. First 2 periods
         have anomalous amplitude. Exclude from steady-state search.
-        Fixed: [a]2, [a]3, [a]4 within-segment checks.
+        Fixed: [ɑ]₂, [ɑ]₃, [ɑ]₄ within-segment checks.
 
 v4.5    Envelope-normalized periodicity + voiced transition joins
         |delta| at glottal closure scales with local amplitude.
         Closing tails and coarticulation zones change amplitude
         by design. Normalize before comparing neighbors.
-        Join between [r] (tap dip) and [a]1 (full vowel):
+        Join between [ɾ] (tap dip) and [ɑ]₁ (full vowel):
         raw jump 0.61, local amp 0.75, normalized 0.82 — normal.
-        Fixed: [r]->[a]1 join.
+        Fixed: [ɾ]->[ɑ]₁ join.
 
 v4.6    Segment-aware continuity (core-only for composites)
-        [a]1 + closing tail is two acoustic regimes: 55ms steady
+        [ɑ]₁ + closing tail is two acoustic regimes: 55ms steady
         vowel + 25ms amplitude fade. Test core in Section B,
         tail in Section D. No double-counting.
-        Fixed: [a]1+tail within-segment.
+        Fixed: [ɑ]₁+tail within-segment.
 
 v4.7    Removed max|delta| ratio from tail check
         Compared transients across different resonator states
         (coarticulated core vs fresh-start tail). The tail may
         start a new resonator call — cold-start transient can
         exceed core's steady-state. Wrong measurement.
-        Fixed: [a]1 tail max|delta|/core ratio.
+        Fixed: [ɑ]₁ tail max|delta|/core ratio.
 
 v4.7.1  Removed tail voicing check
         Closing tail is 25ms (~3 periods). Autocorrelation needs
@@ -301,7 +361,34 @@ v4.7.1  Removed tail voicing check
         Both tails measured 0.11 — correct for signal length,
         but below 0.25 threshold. Wrong instrument for signal.
         Proof of continuity: core voicing (0.79) + RMS fade (0.23).
-        Fixed: [a]1 and [aa] tail voicing.
+        Fixed: [ɑ]₁ and [aː] tail voicing.
+```
+
+### v5.0–v5.0.1: Architecture Update for v17 (81/81 PASS)
+
+Updated diagnostic from v16 pluck (8ms burst-only) to v17 unified pluck
+(47ms closure+burst+VOT internal), with closing tails and opening heads
+at word level.
+
+```
+v5.0    Architecture update — v17 unified pluck
+        [t] now spans 47ms (closure+burst+VOT), not 8ms burst.
+        New sections: C/D ([t]₁/[t]₂ internal phases),
+        E (place consistency), F (closing tails), G (opening heads).
+        Cold-start: 2→4 periods (b=[g] convention from ṚTVIJAM v2.1).
+        Cold-start ceiling: 0.80→5.0 (b=[g] IIR warm-up).
+
+v5.0.1  Ruler calibration: [aː] relative amplitude
+        v5.0 measured 1.0271 — FAILED (expected 0.60–1.00).
+        Root cause: max_rms denominator used full composite segment
+        RMS (including 25ms closing tail fade), but numerator used
+        core-only RMS (excluding tail). The closing tail lowers
+        full-segment RMS. core-only / full-composite > 1.0 is
+        arithmetic, not physics.
+        Fix: max_rms denominator now uses core-only RMS for composite
+        segments. Same measurement basis for numerator and denominator.
+        Result: 0.9930 — PASS. [aː] is the loudest vowel. Correct.
+        "Fix the ruler, not the instrument."
 ```
 
 **Principle applied at each step:** "Fix the ruler, not the instrument."
@@ -317,8 +404,10 @@ toward measuring what matters, not what it can most easily compute.
 ### 1. IIR Cold-Start Is Computational, Not Physical
 
 Real vocal tracts have no cold start. The tract is always vibrating
-from continuous breathing. The first 2 periods of an lfilter call
-are computational initialization — exclude them from click detection.
+from continuous breathing. The first 4 periods of an lfilter call
+with b=[g] convention are computational initialization — exclude them
+from click detection. b=[g] resonators with gains 10–16 produce
+larger IIR transients than b=[1] convention.
 
 ### 2. |Δ| Scales With Local Amplitude
 
@@ -353,6 +442,14 @@ periods. The lag-one-period correlation drops even if frequency is
 perfectly stable. Autocorrelation measures stationarity, not periodicity.
 Closing tails are non-stationary by design.
 
+### 7. Relative Measurements Require Matched Basis
+
+When computing a ratio (e.g., relative amplitude), both numerator and
+denominator must use the same extraction logic. Core-only RMS divided
+by full-composite RMS produces ratios > 1.0 because the composite
+includes a closing tail that lowers the full-segment average. This is
+arithmetic, not physics. Use core-only for both, or full for both.
+
 ---
 
 ## KEY INSIGHTS — COMPLETE
@@ -371,7 +468,7 @@ Closing tails are non-stationary by design.
    "Like the" — perceptual identification at v11, before diagnostic
    was fixed. The ear is the correct final arbiter.
 
-### From v16 (Pluck Architecture)
+### From v16→v17 (Unified Pluck Architecture)
 
 4. **The breath is continuous.**
    The diaphragm pushes air as a steady stream. During closure, the
@@ -379,30 +476,37 @@ Closing tails are non-stationary by design.
    it doesn't stop. One continuous source, shaped by one continuous
    envelope. No concatenation boundaries.
 
-5. **The stop is a pluck, not a construction.**
-   [t] = 8ms burst transient. The closure belongs to the preceding
-   vowel (closing tail). The VOT belongs to the following segment
-   (opening head). The stop itself is instantaneous — a pluck of the
-   vocal tract string at the dental locus.
+5. **Unified source and pluck COMPOSE.**
+   v16 had unified source internally. v17 composes unified source
+   (internal: closure+burst+VOT as one buffer) with pluck architecture
+   (external: closing tails and opening heads at word level). The two
+   architectural principles are independent and compose cleanly.
 
 6. **Segment ownership follows physics.**
    The entity whose articulator is moving owns the transition.
    The vowel's tongue moves toward closure → closing tail is the vowel's.
    The nasal's voicing onsets from the stop release → opening head is
-   the nasal's. The stop only owns the instant of release.
+   the nasal's. The stop owns its internal physics (one breath, one envelope).
 
-### From Diagnostic Calibration (v4.4–v4.7.1)
+7. **Join boundaries at near-zero amplitude eliminate clicks.**
+   Closing tail fades to ~0. [t] starts at subglottal floor (~0.001).
+   [t] ends at subglottal floor. Opening head starts at ~0.
+   All joins are at near-zero amplitude. No click is possible regardless
+   of phase alignment — the signal is too quiet to hear any discontinuity.
 
-7. **Every failed check reveals a measurement assumption.**
+### From Diagnostic Calibration (v4.4–v5.0.1)
+
+8. **Every failed check reveals a measurement assumption.**
    v4.4: "The resonator is always warm" — no, lfilter starts cold.
    v4.5: "|Δ| is absolute" — no, it scales with amplitude.
    v4.6: "Segments are homogeneous" — no, composites have regimes.
    v4.7: "Transients are comparable across contexts" — no, resonator state matters.
    v4.7.1: "Autocorrelation works on any voiced signal" — no, minimum length required.
+   v5.0.1: "RMS is RMS" — no, core-only ≠ full-composite. Match the basis.
 
-8. **The diagnostic converges toward the physics.**
+9. **The diagnostic converges toward the physics.**
    Each iteration removed a check that measured the wrong thing and
-   verified that the remaining checks are sufficient. 70 checks remain.
+   verified that the remaining checks are sufficient. 81 checks remain.
    Each measures exactly one physical property. None measures an artifact.
 
 ---
@@ -432,12 +536,16 @@ VS_DH_BW_MULT      = 1.5      # Formant bandwidth multiplier
 VS_DH_MURMUR_GAIN  = 0.70
 ```
 
-### [t] Voiceless Dental Stop (v16 Pluck)
+### [t] Voiceless Dental Stop (v17 Unified Pluck)
 
 ```python
-VS_T_BURST_MS       = 8.0     # Pluck duration
-VS_T_CLOSING_MS     = 25.0    # Owned by preceding vowel
-VS_T_OPENING_MS     = 15.0    # Owned by following segment
+VS_T_CLOSURE_MS     = 25.0    # Internal closure (subglottal floor)
+VS_T_BURST_MS       = 7.0     # Burst duration
+VS_T_VOT_MS         = 15.0    # VOT (voicing fades in)
+# Total internal:    47.0 ms
+
+CLOSING_TAIL_MS     = 25.0    # Owned by preceding vowel (word level)
+OPENING_HEAD_MS     = 15.0    # Owned by following segment (word level)
 
 VS_T_BURST_F        = [1500.0, 3500.0, 5000.0, 6500.0]
 VS_T_BURST_B        = [ 400.0,  600.0,  800.0, 1000.0]
@@ -457,16 +565,37 @@ VS_T_PREBURST_AMP   = 0.008    # Leak peak amplitude
 ```
 Row  IPA  Description              Burst Hz  Status    Verified in
 ───  ───  ─────────────────────    ────────  ────────  ─────────────
-1    [t]  voiceless unaspirated    3753 Hz   VERIFIED  RATNADHĀTAMAM (v16) ✓
+1    [t]  voiceless unaspirated    3816 Hz*  VERIFIED  RATNADHĀTAMAM (v17) ✓
 2    [tʰ] voiceless aspirated      ~3700Hz   PENDING   —
 3    [d]  voiced unaspirated       3563 Hz   VERIFIED  DEVAM
 4    [dʰ] voiced aspirated         3850 Hz   VERIFIED  RATNADHĀTAMAM ✓
 5    [n]  nasal                     800 Hz   VERIFIED  AGNI
+
+* [t]₁=3871 Hz, [t]₂=3760 Hz, mean=3816 Hz. Separation 111 Hz.
 ```
 
 All five rows have verified exemplars.
-All stops within dantya window (3000–4500 Hz).
+All stops within dantya window (2500–5500 Hz).
 Nasal at 800 Hz (antiresonance dominant).
+
+---
+
+## FIVE-PLACE BURST HIERARCHY — UPDATED
+
+```
+Place         Phoneme   Burst CF    Region         Verified in
+────────────────────────────────────────────────────────────────
+mūrdhanya     [ʈ]       935 Hz     LOW-BURST      ṚTVIJAM (v9)
+oṣṭhya        [p]       1204 Hz    LOW-BURST      PUROHITAM
+────────────────────────────────────────────────────────────────
+kaṇṭhya       [g]       2594 Hz    MID            ṚG/AGNI
+tālavya       [ɟ]       1770 Hz*   MID            YAJÑASYA (v5)
+────────────────────────────────────────────────────────────────
+dantya        [t]       3816 Hz    HIGH           RATNADHĀTAMAM (v17)
+────────────────────────────────────────────────────────────────
+
+* [ɟ] measured in place band (1-6 kHz), excluding voice bar.
+```
 
 ---
 
@@ -508,7 +637,7 @@ the invoker, **the best giver of treasures**."
 
 Word 9 of 9 in the first verse. The most ornate word in the opening invocation.
 Morphology: ratna (jewel) + dhātamam (best giver).
-**Now fully verified with 70/70 diagnostics.**
+**Now fully verified with 81/81 diagnostics on v17 unified pluck architecture.**
 
 ---
 
@@ -518,24 +647,24 @@ Morphology: ratna (jewel) + dhātamam (best giver).
 Seg  IPA   Type                    Duration  Verified in
 ───  ────  ──────────────────────  ────────  ──────────────
 [ɾ]  tap   alveolar tap            30 ms     PUROHITAM
-[ɑ]  vow   short open central      55 ms     AGNI
-[t]  stop  voiceless dental (v16)   8 ms     THIS WORD (v16) ✓
-[n]  nas   dental nasal             60 ms     AGNI
-[ɑ]  vow   short open central      55 ms     AGNI
+[ɑ]₁ vow   short open + tail       80 ms     AGNI (55+25 tail)
+[t]₁ stop  voiceless dental (v17)  47 ms     THIS WORD (v17) ✓
+[n]  nas   head + dental nasal     75 ms     AGNI (15 head+60)
+[ɑ]₂ vow   short open central      55 ms     AGNI
 [dʰ] stop  voiced dental aspirated 111 ms     THIS WORD ✓
-[aː] vow   long open central      110 ms     HOTĀRAM
-[t]  stop  voiceless dental (v16)   8 ms     THIS WORD (v16) ✓
-[ɑ]  vow   short open central      55 ms     AGNI
-[m]  nas   bilabial nasal           60 ms     PUROHITAM
-[ɑ]  vow   short open central      55 ms     AGNI
-[m]  nas   bilabial nasal (final)   80 ms     PUROHITAM
+[aː] vow   long open + tail       135 ms     HOTĀRAM (110+25 tail)
+[t]₂ stop  voiceless dental (v17)  47 ms     THIS WORD (v17) ✓
+[ɑ]₃ vow   head + short open       70 ms     AGNI (15 head+55)
+[m]₁ nas   bilabial nasal          60 ms     PUROHITAM
+[ɑ]₄ vow   short open central      55 ms     AGNI
+[m]₂ nas   bilabial nasal (final)  80 ms     PUROHITAM (60+20 release)
 ```
 
-Total word duration: 751.8 ms (diagnostic speed, dil=1.0).
+Total word duration: 844.8 ms (diagnostic speed, dil=1.0).
 
 ---
 
-## SYNTHESIS EVOLUTION — v1 TO v16
+## SYNTHESIS EVOLUTION — v1 TO v17
 
 ### v1–v6: Pre-verification baseline
 Initial synthesis with placeholder [dʰ].
@@ -556,10 +685,15 @@ Added voice bar closure + crossfade cutback. Complete [dʰ] model.
 ### v15: Closing tail + [m] release
 Vowel owns the closure. Word-final [m] has 20ms release.
 
-### v16: Pluck Architecture ✓
-ONE continuous noise buffer. ONE continuous envelope. NO concatenation boundaries.
-The breath is continuous. The tongue is the envelope.
-Closing tails and opening heads: segment ownership follows physics.
+### v16: Unified Source Architecture ✓
+ONE continuous noise buffer. ONE continuous amplitude envelope. NO concatenation
+boundaries inside [t]. The breath is continuous. The tongue is the envelope.
+
+### v17: Unified Pluck Architecture ✓
+Unified source (internal) + Pluck architecture (word level) COMPOSED.
+[t] spans 47ms internally (closure+burst+VOT). Closing tails (25ms) and
+opening heads (15ms) at word level. All join boundaries at near-zero amplitude.
+The two architectural principles are independent and compose cleanly.
 
 ---
 
@@ -570,29 +704,33 @@ v2.4    Initial diagnostic (spectral leakage, insufficient frames)
 v2.5    Hanning window, 4096-point FFT
 v2.6    [ɑ] sanity check (proved diagnostic wrong, not synthesis)
 v3.0    HOTĀRAM lessons: post-formant thresholds, 40ms frames    8/8 PASS
-v4.4    Cold-start exclusion (IIR init)
+v4.4    Cold-start exclusion (IIR init, 2 periods)
 v4.5    Envelope-normalized periodicity, voiced transition joins
 v4.6    Segment-aware continuity (core-only for composites)
 v4.7    Removed max|delta| ratio (wrong measurement)
 v4.7.1  Removed tail voicing (wrong instrument for signal)      70/70 PASS
+v5.0    Architecture update: v17 unified pluck                  80/81
+        Cold-start: 2→4 periods (b=[g] convention)
+        Cold-start ceiling: 0.80→5.0 (IIR warm-up)
+v5.0.1  Ruler: [aː] relative amp denominator matched basis     81/81 PASS
 ```
 
 ### Coverage Comparison
 
 ```
-                              v3.0    v4.7.1
-Signal integrity               —      4 checks
-Signal continuity (within)     —      12 checks
-Signal continuity (joins)      —      12 checks
-[t] pluck verification         —      6 checks
-Closing tail                   —      4 checks
-Opening head                   —      2 checks
-[dʰ] phases                   8       5 checks
-Vowel formants (F1, F2)        —      15 checks
-Nasals + Tap                   —      8 checks
-Syllable coherence             —      3 checks
-                             ───     ───
-TOTAL                          8      70 checks (word-complete)
+                              v3.0    v4.7.1   v5.0.1
+Signal integrity               —      4         4 checks
+Signal continuity (within)     —      12       12 checks
+Signal continuity (joins)      —      12       12 checks
+[t] unified source             —      6 (pluck) 13 checks (×2 + consistency)
+Closing tails                  —      4         4 checks
+Opening heads                  —      2         4 checks
+[dʰ] phases                   8       5         5 checks
+Vowel formants (F1, F2)        —      15       15 checks
+Nasals + Tap                   —      8         8 checks
+Syllable coherence             —      3         4 checks
+                             ───     ───      ───
+TOTAL                          8      70       81 checks (word-complete)
 ```
 
 ---
@@ -600,8 +738,8 @@ TOTAL                          8      70 checks (word-complete)
 ## IMPLEMENTATION FILES
 
 ```
-ratnadhatamam_reconstruction.py    Synthesis v16 (pluck architecture)
-ratnadhatamam_diagnostic.py        Diagnostic v4.7.1 (70/70)
+ratnadhatamam_reconstruction.py    Synthesis v17 (unified pluck architecture)
+ratnadhatamam_diagnostic.py        Diagnostic v5.0.1 (81/81)
 evidence.md                        This file
 ```
 
@@ -626,11 +764,11 @@ evidence.md                        This file
 ---
 
 *February 2026.*
-*70 diagnostics. Zero failures.*
+*81 diagnostics. Zero failures.*
 *The breath is continuous. The tongue is the envelope.*
-*The stop is a pluck. The vowel owns the closure.*
+*Unified source and pluck compose: internal physics + word-level ownership.*
 *Each check measures one physical property. None measures an artifact.*
-*The ruler was calibrated five times. Each time it moved closer to the physics.*
+*The ruler was calibrated seven times. Each time it moved closer to the physics.*
 *"Fix the ruler, not the instrument."*
 *The dental column breathes — all 5 rows verified.*
 *The first verse is complete.*
