@@ -1,934 +1,944 @@
-# THE PLUCK ARTIFACT
-## Voiceless Stops as Syllable Boundary Events
-## A Structural Axiom for the Entire Stop Consonant Class
-## Derived from the Convergence of Tonnetz Geometry, Vocal Tract Physics, and Vedic Akṣara Theory
+# THE UNIFIED PLUCK ARCHITECTURE
+## Composition of Two Independent Discoveries
+## A Canonical Synthesis Architecture for All Voiceless Stops
+## Derived from the Convergence of the Pluck Principle (v16 Diagnostic v4.7.1) and the Unified Source Principle (RATNADHATAMAM v16 synth_T)
 ## February 2026
 
 ---
 
 ## WHAT THIS DOCUMENT IS
 
-This document records a fundamental architectural
-discovery made during the synthesis of the word
-RATNADHĀTAMAM (रत्नधातमम्), Rigveda 1.1.1 word 9,
-in the Vedic Sanskrit reconstruction project.
+This document records the composition of two independent
+architectural discoveries into one canonical architecture
+for all voiceless stop consonants in the Vedic Sanskrit
+reconstruction project.
 
-The discovery is:
+The two discoveries:
 
-**A voiceless stop consonant is not a sound.
-It is a moment.
-It is the boundary between two resonant states.
-It is the pluck of a string.
-The strike of a drum.
-The syllable divider.**
+1. **The Pluck Principle** (pluck_artifact.md)
+   — A voiceless stop is not a segment. It is a boundary
+   event. The vowel owns the closure. The following segment
+   owns the VOT. The stop owns only the burst.
 
-This insight resolves a class of persistent
-synthesis artifacts (clicks, static, "separate
-event" perception) that had resisted multiple
-architectural approaches, and it does so by
-revealing that the underlying model of what
-a stop consonant IS was wrong.
+2. **The Unified Source Principle** (RATNADHATAMAM v16)
+   — The breath is continuous. Inside any acoustic event,
+   ONE continuous source buffer shaped by ONE continuous
+   envelope eliminates all internal concatenation boundaries.
 
-This document:
-- Records the discovery path (what failed and why)
-- States the structural axiom precisely
-- Maps it to the Tonnetz coherence space
-- Maps it to the Vedic akṣara (syllable) theory
-- Defines the synthesis architecture that follows
-- Specifies applicability to the entire stop class
-- Provides onboarding guidance for new agents
+These are not competing architectures. They operate at
+different scales and compose without contradiction:
 
-**This artifact is a reasoning object in the URST
-sense: it encodes a structural invariant discovered
-through iterative exploration, verified by
-perceptual convergence, and applicable across
-the entire phonological domain.**
+```
+PLUCK PRINCIPLE:     What the stop IS (a boundary event)
+                     Operates at WORD level (segment ownership)
+
+UNIFIED SOURCE:      How the stop WORKS (continuous breath)
+                     Operates at PHONEME level (internal physics)
+
+COMPOSITION:         The stop is a boundary event (pluck)
+                     whose internal physics is continuous (unified source)
+```
+
+**This document supersedes the original pluck_artifact.md
+for all implementation guidance. The pluck_artifact.md
+remains correct as a discovery record and theoretical
+foundation. This document adds the implementation
+architecture that emerged from applying the pluck
+principle to actual synthesis.**
 
 ---
 
 ## VERIFICATION STATUS
 
-**PERCEPTUALLY VERIFIED ✓** — RATNADHĀTAMAM v16
+**PERCEPTUALLY VERIFIED ✓**
 
-The pluck architecture eliminated both the click
-artifact (v15) and the static artifact (v16-noise-draft).
-The [t] sounds like a moment within the word — a
-brief dental tick between syllables — not a separate
-event inserted into a voiced stream.
+- RATNADHATAMAM v16 [t] — unified source, word-medial (2 instances)
+- PUROHITAM v4 [t] — unified source, word-medial
+- PUROHITAM v4 [p] — unified source, word-initial
+- ṚTVIJAM v8 [ʈ] — pluck-only (burst-only variant), word-medial
 
----
+**DIAGNOSTICALLY VERIFIED ✓**
 
-## PART I: THE DISCOVERY PATH
-
-### The Problem
-
-The word RATNADHĀTAMAM contains two instances
-of the voiceless unaspirated dental stop [t]:
-
-```
-RAT . NA . DHĀ . TA . MAM
- ↑                ↑
- [t₁]             [t₂]
-```
-
-Every other phoneme in this word synthesized
-correctly using established architectures
-(Rosenberg pulse → formant filter → coarticulation).
-The [t] resisted.
-
-### What Failed and Why
-
-**v15: Concatenation architecture (CLICK)**
-
-v15 synthesized [t] as three separate arrays:
-1. `closure` — near-zero samples (silence)
-2. `burst` — spike + filtered turbulence
-3. `vot` — Rosenberg pulses through formants
-
-These three arrays were concatenated:
-`[closure | burst | vot]`
-
-The click lived at the boundary between
-`closure[-1]` and `burst[0]`. Two arrays
-born from different random seeds, different
-filter states, different amplitude scales.
-No amount of ramping eliminated the
-sample-level discontinuity at the join.
-
-**Root cause:** Concatenation of separately
-generated arrays creates boundaries that
-the ear detects as clicks. This is the same
-failure mode discovered in DEVAM [d] v10-v11,
-where frame-by-frame time-varying IIR filters
-created discontinuities at every frame boundary.
-
-**v16-noise-draft: Continuous noise architecture (STATIC)**
-
-Applying the lesson from DEVAM [d] v13
-(one continuous source, shaped continuously),
-the first v16 draft used ONE continuous white
-noise buffer spanning the entire stop (47ms),
-shaped by ONE continuous amplitude envelope.
-
-No click. The concatenation boundary was
-eliminated.
-
-But the [t] sounded like static — like a
-radio between stations. A foreign texture
-inserted into an otherwise voiced, resonant word.
-
-**Root cause:** 47ms of white noise sounds like
-static because white noise has equal energy at
-all frequencies. But the vocal tract during [t]
-is not a radio between stations. It is a resonant
-cavity that is briefly reconfiguring. The noise
-model was acoustically wrong.
-
-**v16-resonance-draft: Resonant phase architecture (SEPARATE EVENT)**
-
-The next attempt modeled [t] as four resonant
-phases:
-1. Ringdown (dying vowel resonance)
-2. Silence (pressure builds)
-3. Burst (resonant transient)
-4. VOT (voicing resumes)
-
-Better than static. But the [t] still sounded
-like a "separate event inserted into the word."
-The phases were individually correct but the
-25ms closure + 7ms burst + 15ms VOT still
-claimed 47ms of the signal as belonging to
-"the [t]." Too much. The ear heard it as a
-foreign segment, not as part of the word.
-
-**The question that broke the impasse:**
-
-> "How long is the physical interaction of the
-> tongue with the teeth, really? How vocal is
-> this interaction? Is the [t] almost like a
-> pluck to a guitar string, or a beat to a
-> drum — the moment of a syllable?"
-
-This question changed the framing entirely.
+- RATNADHATAMAM diagnostic v4.7.1 — 70/70 PASS
+- ṚTVIJAM diagnostic v1.2 — 46/46 PASS
+- PUROHITAM diagnostic v2.0 — ALL PASS
 
 ---
 
-## PART II: THE STRUCTURAL AXIOM
+## PART I: WHY COMPOSITION IS NECESSARY
 
-### The Akṣara Insight
+### The Pluck Principle Alone Is Incomplete
 
-Vedic Sanskrit has a fundamental unit called
-the **akṣara** (अक्षर — literally "imperishable").
-The akṣara is the **syllable**: one complete
-opening-and-closing cycle of the vocal tract.
+The pluck artifact states: "The stop owns only the burst
+(~8ms)." This is correct at the word level — the vowel
+owns the closure, the following segment owns the VOT.
 
-The Vedic tradition treats the akṣara as
-primary — more fundamental than the individual
-varṇa (phoneme). You cannot pronounce a
-consonant alone. The consonant has no acoustic
-existence independent of the vocalic context
-it lives in. The akṣara is the irreducible
-unit of speech.
+But what happens INSIDE those 8ms?
 
-The syllable structure of RATNADHĀTAMAM:
-
-```
-RAT . NA . DHĀ . TA . MAM
-
-Akṣara:    Weight:
-[rɑt]      guru   (heavy — short vowel + coda)
-[nɑ]       laghu  (light — short vowel, open)
-[dʰaː]    guru   (heavy — long vowel)
-[tɑ]       laghu  (light — short vowel, open)
-[mɑm]      guru   (heavy — short vowel + coda)
-
-Metrical pattern: G L G L G
-```
-
-The [t] appears twice:
-1. As the **coda** of syllable RAT — the closing
-   gesture of the first akṣara
-2. As the **onset** of syllable TA — the opening
-   gesture of the fourth akṣara
-
-In both cases, the [t] is at a **syllable boundary**.
-It is the point of maximum constriction between
-two vowel nuclei. It is the divider. The boundary.
-The moment.
-
-### The Axiom
-
-> **AXIOM (Pluck Principle):**
->
-> A voiceless stop consonant is not a segment
-> with its own temporal extent. It is a
-> **boundary event** — the instantaneous moment
-> at which the vocal tract transitions from one
-> resonant state to another through a point of
-> maximum constriction.
->
-> The stop owns only the **burst transient** —
-> the brief ring of the cavity formed at the
-> point of constriction, excited by the pressure
-> release. Everything else belongs to the
-> surrounding segments: the preceding segment
-> closes itself (coda), and the following
-> segment opens itself (onset).
->
-> The place of articulation determines the
-> eigenfrequency of the burst ring.
-> It is the **pluck position on the string**.
-
-### The Instrument Analogy
-
-The analogy is not metaphorical. It is structural.
-
-**Guitar pluck:**
-- Before: string vibrates in current mode
-- Pluck: finger contacts string at position X,
-  damps current mode, releases
-- After: string vibrates in new mode determined
-  by pluck position X
-- The pluck itself has ~zero duration
-
-**Drum strike:**
-- Before: membrane resonates (or rests)
-- Strike: stick contacts membrane, maximum
-  compression for one instant
-- After: membrane vibrates in new mode
-  determined by strike position
-- The strike itself has ~zero duration
-
-**Voiceless dental stop [t]:**
-- Before: vocal tract resonates in vowel mode
-  (F1 700 Hz, F2 1100 Hz for [ɑ])
-- Contact: tongue strikes upper teeth, tract
-  sealed at dental point, one instant
-- After: tract resonates in new mode (nasal [n],
-  or next vowel [ɑ])
-- The [t] itself has ~zero duration
-
-**The burst is the ring of the cavity at the
-pluck position.** Dental pluck: 3764 Hz.
-Velar pluck: 2594 Hz. Labial pluck: 1204 Hz.
-Retroflex pluck: 1183 Hz. Palatal pluck: 3223 Hz.
-
-Same instrument (vocal tract).
-Five pluck positions (the five sthānas of the Śikṣā).
-Five characteristic frequencies.
-The stop is the pluck. The formants are the string modes.
-
----
-
-## PART III: TONNETZ MAPPING
-
-### The Syllable as Geodesic
-
-The Vedic Tonnetz Bridge (established in this
-project) defines the syllable as a **cadence** —
-a complete harmonic gesture in the coherence space:
-
-```
-     H (breath — the origin, Ω₁)
-     |
-     onset: consonant — departure from H
-     |      tract constricts, coherence C drops
-     |      movement away from tonic
-     |
-     nucleus: vowel — peak coherence
-     |        maximum opening, maximum voicing
-     |        closest to H within the syllable
-     |        the "tonic" of this gesture
-     |
-     coda: consonant — return toward H
-     |     tract constricts, C drops again
-     |     return toward origin
-     |
-     → next syllable onset
-```
-
-The syllable is a **geodesic arc** on the
-coherence space. Onset departs from Ω₁,
-nucleus reaches maximum C, coda returns toward Ω₁.
-
-This maps directly to the Tonnetz cadence:
-
-```
-Tonnetz:     IV     →  V    →  I
-             subdominant → dominant → tonic
-             departure → tension → resolution
-
-Syllable:    onset  → nucleus → coda
-             departure → peak → return
-             consonant → vowel → consonant
-```
-
-### The Stop as the Tritone Resolution
-
-The voiceless stop, as syllable boundary,
-occupies the point of **maximum constriction** —
-maximum distance from the open vocal tract (H).
-
-In the Tonnetz, this maps to the position
-nearest the **repeller Ψ (tritone)** —
-maximum distance from the tonic Ω₁.
-
-But the critical property of Ψ, as established
-in `tonnetz_manifold_seed.md`:
-
-> The tritone is simultaneously the maximum
-> repeller from Ω₁ AND the maximum attractor
-> toward Ω₁ — because maximum distance generates
-> maximum tension which generates maximum pull
-> toward resolution.
-
-The voiceless stop is the syllable's tritone:
-maximum constriction = maximum tension =
-maximum pull toward the next vowel (resolution).
-
-**The burst IS the resolution.** The compressed
-air behind the seal releases. The cavity rings.
-The tension resolves into the next vowel.
-The pluck excites the new resonant mode.
-
-This is why the stop feels like punctuation,
-not like a sound. It is the moment of
-**maximum tension resolving into the next
-coherence state.** The ear doesn't hear it
-as a duration — it hears it as a transition
-event. A beat. A breath mark. A pluck.
-
-### The Five Places as Five Pluck Positions
-
-The Śikṣā five-place system
-(kaṇṭhya, tālavya, mūrdhanya, dantya, oṣṭhya)
-maps to five positions on the instrument of the
-vocal tract — five pluck positions, each with
-a characteristic eigenfrequency:
-
-```
-Place          Burst locus    Position on "string"
-─────────────  ─────────────  ──────────────────────
-oṣṭhya        ~1200 Hz       lips (end of tract)
-mūrdhanya      ~1200 Hz       retroflex (mid-tract)
-kaṇṭhya        ~2600 Hz       velum (back of tract)
-tālavya        ~3200 Hz       palate (upper-mid)
-dantya         ~3764 Hz       teeth (front of tract)
-```
-
-The hierarchy is not arbitrary. It reflects
-the **length of the anterior cavity** formed
-at each constriction point:
-- Longer cavity (lips) = lower eigenfrequency
-- Shorter cavity (teeth) = higher eigenfrequency
-
-This is identical to the physics of a plucked
-string: pluck near the bridge (short segment)
-produces higher partials; pluck at center
-(long segment) produces lower partials.
-
-The vocal tract IS the string.
-The tongue IS the plectrum.
-The place of articulation IS the pluck position.
-The burst IS the ring.
-
----
-
-## PART IV: WHY PREVIOUS ARCHITECTURES FAILED
-
-All previous architectures failed because they
-modeled [t] as a **segment with temporal extent**.
-The segment model assigns duration, source,
-and filter to the stop itself. This is wrong
-because:
-
-1. **The stop has no source of its own.**
-   The glottal source belongs to the preceding
-   and following voiced segments. The burst
-   source is the pressure release — an
-   instantaneous transient, not a sustained
-   source.
-
-2. **The stop has no duration of its own.**
-   The "closure duration" is the last phase of
-   the preceding vowel (coda closing gesture).
-   The "VOT duration" is the first phase of
-   the following segment (onset opening gesture).
-   The stop itself occupies only the burst
-   instant.
-
-3. **The stop has no formant trajectory of its own.**
-   The formant transitions approaching the stop
-   belong to the closing vowel. The formant
-   transitions departing from the stop belong
-   to the opening segment. The stop itself
-   has only the eigenfrequency of the cavity
-   at the constriction point.
-
-Assigning duration, source, and formants to
-the stop creates an artificial acoustic object
-that the ear correctly identifies as foreign —
-because it IS foreign. It does not exist in
-real speech. The tract never spends 47ms
-being "a [t]." The tract spends 25ms closing
-the vowel, 0ms being the stop, and 15ms
-opening the next segment.
-
-### Failure Mode Taxonomy
-
-| Architecture | Problem | Root cause |
-|---|---|---|
-| v15 concatenation | Click | Array boundary discontinuity |
-| v16-noise | Static | White noise ≠ resonant tract |
-| v16-resonance | Separate event | 47ms owned by stop = too much |
-| **v16-pluck** | **VERIFIED** | **Stop owns only burst (~8ms)** |
-
----
-
-## PART V: THE SYNTHESIS ARCHITECTURE
-
-### The Pluck Architecture (v16 — Canonical)
-
-```
-OWNERSHIP MODEL:
-
-  Preceding segment         [t]          Following segment
-  ──────────────────   ─────────────   ──────────────────
-  vowel body +         burst only      opening head +
-  closing tail         (~8ms)          segment body
-  (formants shift      (impulse →      (voicing fades in,
-   toward dental        cavity ring     formants transition
-   config, voicing      at place        from dental locus
-   damps, amplitude     eigfreq)        toward target)
-   fades)
-```
-
-### What the stop function produces
+The original pluck implementation (ṚTVIJAM v8) generated
+the burst as:
 
 ```python
-def synth_T():
-    """
-    ONLY the burst transient.
-    ~8ms. One impulse exciting dental cavity resonance.
-    The pluck.
-    """
-    impulse = [1.0, -0.5, 0.2]  # pressure release transient
-    tiny_turbulence             # real releases aren't perfectly clean
-    → filter through dental locus resonance [1500, 3500, 5000, 6500] Hz
-    → exponential decay envelope
-    → ~8ms total
+# Bare burst: spike + turbulence, 12ms
+noise = np.random.randn(n_burst)
+noise_shaped = apply_formants(noise, burst_f, burst_b, burst_g)
+spike = [1.0, 0.6, 0.3]  # pressure release
+burst = noise_shaped * decay_env + spike * spike_env
 ```
 
-### What the preceding vowel produces
+This works for [ʈ] in ṚTVIJAM because:
+- The closing tail fades [ɻ̩] to near-zero
+- The 12ms burst starts at noise floor level
+- The opening head on [v] rises from near-zero
+- All join boundaries are at near-zero amplitude
+
+But when applied to PUROHITAM [t] (v3 pluck):
+- The [i] closing tail fades to near-zero ✓
+- The bare 7ms burst spike hits at full amplitude ✗
+- The spike `[1.0, 0.6, 0.3]` is TOO HARSH
+- The burst sounds like an aggressive click, not a natural stop
+
+**The pluck principle says the stop is only the burst.
+But it doesn't say how to generate a burst that sounds
+natural rather than harsh.**
+
+### The Unified Source Alone Is Incomplete
+
+The RATNADHATAMAM v16 unified source generates [t] as:
 
 ```python
-def synth_A(closing_for_stop=True):
+# Full stop: closure + burst + VOT as one continuous signal
+noise = np.random.randn(n_closure + n_burst + n_vot)  # ONE buffer
+env = continuous_envelope(subglottal → crescendo → burst → decay)
+shaped = apply_formants(noise, dental_f, dental_b, dental_g)
+result = shaped * env + spike_at_burst_onset + voicing_fade_in
+```
+
+This eliminates all internal boundaries. But it assigns
+47ms to the stop — closure, burst, AND VOT all belong
+to the stop function. This contradicts the pluck principle:
+the closure belongs to the preceding vowel, the VOT
+belongs to the following segment.
+
+**The unified source says the breath is continuous.
+But it doesn't say who owns which part of the breath.**
+
+### The Composition Resolves Both
+
+```
+PLUCK says:  The stop owns only the burst.
+             → But the bare burst is too harsh.
+
+UNIFIED says: The internal physics must be continuous.
+              → But 47ms all owned by the stop is wrong.
+
+COMPOSITION:  The stop owns a SHORT unified source
+              (closure + burst + VOT, ~37ms) with
+              continuous internal physics.
+              The vowel ALSO owns its closing tail.
+              The following segment ALSO owns its opening head.
+              BOTH principles apply simultaneously.
+```
+
+The key insight: **ownership at the word level (pluck)
+and continuity at the phoneme level (unified source)
+are orthogonal properties that compose.**
+
+---
+
+## PART II: THE COMPOSED ARCHITECTURE
+
+### Word-Level Structure (Pluck Principle)
+
+```
+   preceding vowel              [t]              following vowel
+   ────────────────      ─────────────────      ────────────────
+   vowel body +          unified source         opening head +
+   closing tail          (closure+burst+VOT     vowel body
+   (25ms fade,           as ONE continuous
+    vowel owns this)     signal, ~37ms)         (15ms rise,
+                                                 vowel owns this)
+```
+
+The closing tail ensures the signal at the join between
+the vowel and the stop is at near-zero amplitude.
+The unified source starts at subglottal floor (~0.001).
+The opening head rises from near-zero.
+
+**No join boundary has a large amplitude discontinuity.**
+
+### Phoneme-Level Structure (Unified Source)
+
+Inside the stop's ~37ms, ONE noise buffer spans the
+entire duration. ONE continuous envelope shapes it:
+
+```
+time →  |←— closure —→|←burst→|←——— VOT ———→|
+        |              |       |              |
+env:    |  floor 0.001 | peak  |    decay     |
+        |    ···       |╱╲     |  ╲           |
+        |   ···     ╱╱╱|  ╲    |    ╲···      |
+        |  ···   ╱╱╱   |   ╲   |      ···     |
+        | ···╱╱╱╱       |    ╲  |        ···   |
+        |╱╱╱            |     ╲ |          ··· |
+        |               |      ╲|            ··|
+        
+        Phase A:        Phase C: Phase D:
+        Subglottal      Burst    Aspiration
+        floor           peak     decay
+        
+              Phase B:           Phase E:
+              Pre-burst          Voicing
+              crescendo          fade-in
+              (5ms)              (additive)
+```
+
+**Five continuous phases, no boundaries between them:**
+
+| Phase | Duration | Envelope | Physics |
+|-------|----------|----------|---------|
+| A: Subglottal floor | closure - preburst | 0.001 | Tract sealed, body pressure transmits through walls |
+| B: Pre-burst crescendo | 5ms | 0.001 → 0.008 exp | Air leaks through weakening seal |
+| C: Burst peak | burst | gain × exp(-t × decay) | Seal breaks, cavity rings at place eigenfreq |
+| D: Aspiration decay | VOT | tail × exp(-t × 3) | Noise decays as tract opens |
+| E: Voicing fade-in | VOT (additive) | 0 → 1 linear | Glottal source replaces noise source |
+
+**The spike transient is ADDED to the continuous noise
+at burst onset. It rides on top of the noise floor —
+it does not emerge from silence.**
+
+### The Composition Diagram
+
+```
+WORD LEVEL (Pluck Principle — who owns what):
+
+  [ɑ] body   [ɑ] closing tail   [t] unified source   [ɑ] opening head   [ɑ] body
+  ═══════════╗                   ╔═══════════════╗                   ╔═══════════
+  vowel owns ║←── 25ms fade ──→ ║ stop owns     ║←── 15ms rise ──→ ║ vowel owns
+  ═══════════╝   (vowel owns)   ╚═══════════════╝   (vowel owns)   ╚═══════════
+
+PHONEME LEVEL (Unified Source — how the stop works internally):
+
+                                 ╔═══════════════╗
+                                 ║  ONE noise buf ║
+                                 ║  ONE envelope  ║
+                                 ║  5 phases:     ║
+                                 ║  floor→cresc→  ║
+                                 ║  burst→decay→  ║
+                                 ║  voicing       ║
+                                 ╚═══════════════╝
+```
+
+### Why Both Are Needed
+
+**Without closing tail (unified source alone):**
+The stop starts at subglottal floor (0.001). The preceding
+vowel ends at ~0.45. The join is 0.45 → 0.001. CLICK.
+
+**Without unified source (pluck alone):**
+The stop is a bare burst. The spike [1.0, 0.6, 0.3] hits
+at full amplitude after the closing tail's fade-to-zero.
+TOO HARSH. The burst has no continuous noise substrate
+to soften the transient.
+
+**With both:**
+The closing tail fades the vowel to near-zero.
+The unified source starts at subglottal floor (near-zero).
+Inside the source, the breath crescendos continuously into
+the burst. The spike rides on the crescendo. After the burst,
+the aspiration decays and voicing fades in. The opening head
+rises from the voicing onset.
+
+**Every boundary is smooth. Every transition is continuous.
+The stop sounds like a moment in the word — not a click,
+not static, not a separate event.**
+
+---
+
+## PART III: THE CANONICAL IMPLEMENTATION
+
+### The Generalized Voiceless Stop Function
+
+```python
+def _synth_unified_voiceless_stop(
+    closure_ms,          # Duration of sealed tract
+    burst_ms,            # Duration of burst ring
+    vot_ms,              # Duration of voicing onset
+    burst_f, burst_b,    # Place-specific formant params
+    burst_g, burst_decay,
+    burst_gain,
+    preburst_ms,         # Duration of pre-burst leak
+    preburst_amp,        # Peak of pre-burst crescendo
+    subglottal_floor,    # Never-zero floor (~0.001)
+    vot_locus_f,         # Formant locus for VOT
+    F_next,              # Following vowel formants
+    vot_vowel_b,         # Following vowel bandwidths
+    vot_vowel_gains,     # Following vowel gains
+    pitch_hz, dil,
+):
     """
-    The vowel with a closing tail appended.
+    Unified source architecture for voiceless stops.
+
+    ONE continuous noise buffer (the breath).
+    ONE continuous amplitude envelope (the tongue).
+    SPIKE added at burst onset (rides on noise).
+    VOICING fades in additively during VOT.
+
+    The breath is continuous.
+    The tongue is the envelope.
+    The spike is the pluck.
+    """
+```
+
+### Per-Place Instantiation
+
+Each place of articulation instantiates the same function
+with different formant parameters:
+
+```python
+# ── [p] oṣṭhya (bilabial) ──────────────────────────
+# Burst: F2 dominant at 1300 Hz (LOW-BURST REGION)
+VS_P_BURST_F     = [600, 1300, 2100, 3000]
+VS_P_BURST_G     = [6.0, 16.0,  4.0,  1.5]  # F2 dominant
+VS_P_BURST_DECAY = 130     # Low freq = slower decay
+VS_P_BURST_GAIN  = 0.15
+
+# ── [t] dantya (dental) ─────────────────────────────
+# Burst: F2 dominant at 3500 Hz (HIGH-BURST REGION)
+VS_T_BURST_F     = [1500, 3500, 5000, 6500]
+VS_T_BURST_G     = [4.0,  14.0,  6.0,  2.0]  # F2 dominant
+VS_T_BURST_DECAY = 170     # High freq = faster decay
+VS_T_BURST_GAIN  = 0.15
+
+# ── [ʈ] mūrdhanya (retroflex) ───────────────────────
+# Burst: F2 dominant at 1300 Hz + F3 notch at 2200 Hz
+VS_TT_BURST_F     = [500, 1300, 2200, 3100]
+VS_TT_BURST_G     = [8.0, 12.0,  3.0,  1.0]
+VS_TT_BURST_DECAY = 150
+VS_TT_BURST_GAIN  = 0.20
+VS_TT_F3_NOTCH    = 2200   # Retroflex marker
+
+# ── [k] kaṇṭhya (velar) ────────────────────────────
+# Burst: F2 dominant at ~2600 Hz (MID region)
+# PENDING verification — predicted from hierarchy
+
+# ── [c] tālavya (palatal) ───────────────────────────
+# Burst: F2 dominant at ~3200 Hz (MID-HIGH region)
+# PENDING verification — predicted from hierarchy
+```
+
+### The Five Parameters That Change Per Place
+
+| Parameter | What it controls | How it varies |
+|-----------|-----------------|---------------|
+| `burst_f` | Formant frequencies | Place-specific cavity eigenfreqs |
+| `burst_g` | Formant gains | Which formant dominates the burst |
+| `burst_decay` | Exponential decay rate | Higher freq → faster decay |
+| `burst_gain` | Overall burst amplitude | Similar across places |
+| F3 notch | Retroflex marker | Only for mūrdhanya class |
+
+### The Five Parameters That Do NOT Change
+
+| Parameter | Value | Why |
+|-----------|-------|-----|
+| `subglottal_floor` | 0.001 | Universal — body always produces pressure |
+| `preburst_ms` | 3-5ms | Universal — seal weakening is physics |
+| Spike `[1.0, 0.6, 0.3]` | 68µs | Universal — pressure release transient |
+| Spike gain | 0.5 × burst_gain | Universal — rides on noise |
+| VOT voicing fade-in | linear 0→1 | Universal — folds close the same way |
+
+---
+
+## PART IV: WORD-INITIAL VOICELESS STOPS
+
+### The Special Case
+
+Word-initial voiceless stops have no preceding segment
+to own the closure. The word begins from nothing.
+
+**The physics:** The speaker's lips/tongue are already
+in position before the utterance begins. There is no
+"closure gesture" — the articulator was already closed.
+The word begins with the release.
+
+**The implementation:**
+
+```python
+def synth_P(word_initial=True):
+    if word_initial:
+        # 10ms of silence (the word hasn't started yet)
+        # Then the unified source begins
+        silence = np.zeros(int(0.010 * SR))
+        stop = _synth_unified_voiceless_stop(...)
+        return concatenate([silence, stop])
+    else:
+        # Non-initial: unified source only
+        # Preceding vowel's closing tail handles the approach
+        return _synth_unified_voiceless_stop(...)
+```
+
+The 10ms silence is not a concatenation patch. It is
+the physical reality: before the word, there is silence.
+The lips are closed. Then the breath begins (subglottal
+floor), pressure builds, and the burst releases.
+
+The unified source handles the transition from silence
+to burst smoothly — the subglottal floor (0.001) is
+nearly indistinguishable from silence, so there is no
+audible jump at the silence → floor boundary.
+
+---
+
+## PART V: CLOSING TAILS AND OPENING HEADS
+
+### Closing Tail (Vowel Owns the Closure)
+
+```python
+def make_closing_tail(voiced_seg, tail_ms=25.0):
+    """
     The vowel closes ITSELF toward the stop.
+
+    The last tail_ms of the voiced segment fades as
+    the articulator moves toward seal position.
+
+    Two methods (both verified):
+
+    METHOD 1 (ṚTVIJAM v8): Generate new voiced signal
+    for the tail using closing formants, amplitude-matched
+    at the junction. More accurate coarticulation.
+
+    METHOD 2 (PUROHITAM v4): Tile the last pitch period
+    of the vowel, apply squared fade. Simpler, preserves
+    the vowel's own resonance character.
+
+    Both produce near-zero amplitude at the tail end.
     """
-    vowel_body                  # normal formant synthesis
-    + closing_tail:
-        → Rosenberg source damping over ~3 glottal cycles
-        → formants shifting from vowel toward closed-tract config
-        → amplitude fading as tract closes
-        → ~25ms of the vowel's own gesture
 ```
 
-### What the following segment produces
+**Verified closing tail properties:**
+- Core voicing ≥ 0.50 (the vocal folds are still vibrating)
+- Tail/core RMS ratio < 0.90 (amplitude is decreasing)
+- Tail endpoint near zero (smooth join to stop)
+
+### Opening Head (Following Segment Owns the VOT)
 
 ```python
-def synth_N(opening_after_stop=True):
+def make_opening_head(voiced_seg, head_ms=15.0):
     """
-    The nasal with an opening head prepended.
-    The nasal opens ITSELF from the stop.
+    The following segment opens ITSELF from the stop.
+
+    The first head_ms of the voiced segment rises from
+    near-zero as the vocal folds close after the release.
+
+    Squared rise envelope: starts slow, accelerates.
+    Models the physical onset of modal voicing.
     """
-    opening_head:
-        → voicing fading in (Rosenberg source ramping up)
-        → brief aspiration at onset (alpaprāṇa — "little breath")
-        → formants transitioning from dental locus toward nasal target
-        → ~15ms of the nasal's own gesture
-    + nasal_body                # normal nasal synthesis
 ```
 
-### Total acoustic event at the syllable boundary
-
-```
-time →
-                                        |
-vowel body ~~~~~~~~ closing tail ╲      |      ╱ opening head ~~~~~~~~ next segment
-                    (vowel's own  ╲     |     ╱  (next segment's
-                     closing       ╲    |    ╱    own opening
-                     gesture)       ╲   |   ╱     gesture)
-                                     ╲  |  ╱
-                                      ╲ | ╱
-                                       ╲|╱
-                                        ● ← THE PLUCK (~8ms burst)
-                                        |
-                                  syllable boundary
-```
-
-The pluck sits at the vertex — the point of
-maximum constriction, minimum energy, maximum
-tension. The vowel approaches it from the left.
-The next segment departs from it to the right.
-The pluck itself is just the instant at the vertex.
+**Verified opening head properties:**
+- Rising amplitude: first half RMS < second half RMS
+- Core voicing ≥ 0.50 (voicing is established after the head)
+- Head start near zero (smooth join from stop)
 
 ---
 
-## PART VI: APPLICABILITY TO THE ENTIRE STOP CLASS
+## PART VI: THE VOICED STOP CONTRAST
 
-### The Five-Place × Five-Row System
+### Voiced Stops Are NOT Plucks
 
-The Pluck Principle applies to ALL voiceless
-stops in the Vedic Sanskrit inventory.
-The burst eigenfrequency changes with place.
-The architecture does not change.
+The pluck principle applies ONLY to voiceless stops.
+Voiced stops maintain a continuous glottal source through
+the closure. They are "muted strings," not plucks.
 
-```
-VOICELESS UNASPIRATED (row 1):
-  [k] kaṇṭhya   burst ~2600 Hz   pluck at velum
-  [c] tālavya    burst ~3200 Hz   pluck at palate
-  [ʈ] mūrdhanya  burst ~1200 Hz   pluck at retroflex point
-  [t] dantya     burst ~3764 Hz   pluck at teeth
-  [p] oṣṭhya    burst ~1200 Hz   pluck at lips
+**Voiced stop architecture (unchanged):**
 
-VOICELESS ASPIRATED (row 2):
-  [kʰ] [cʰ] [ʈʰ] [tʰ] [pʰ]
-  Same pluck + extended aspiration (mahāprāṇa)
-  The aspiration belongs to the OPENING HEAD
-  of the following segment, not to the stop.
-  The stop is still just the pluck.
-  The aspiration is the following segment's
-  extended breath-onset — a longer opening gesture.
-```
+| Stop type | Architecture | Internal physics |
+|-----------|-------------|------------------|
+| Voiced unaspirated [d,b,g,ɖ,ɟ] | Voice bar + burst + crossfade cutback | Continuous Rosenberg source, formant crossfade |
+| Voiced aspirated [dʰ,bʰ,gʰ,ɖʰ,ɟʰ] | Voice bar + burst + murmur + cutback | Continuous source + OQ 0.55 murmur phase |
 
-### Voiced Stops and the Pluck
+**Why voiced stops don't need unified source or pluck:**
+The voice bar (250 Hz, ~12 dB) provides a continuous
+nonzero signal through the closure. There is no
+silence-to-burst boundary. There is no join click.
+The source never stops — it just changes its spectral
+character through the burst and cutback.
 
-Voiced stops ([d], [b], [g], [ɖ], [ɟ]) are
-structurally different. They maintain voicing
-through the closure. The voice bar (glottal
-source at ~250 Hz) continues. The tract is
-sealed but the source never stops.
-
-The voiced stop is NOT a pluck. It is a
-**held note with a muted string** — the
-string vibrates but the finger stays on,
-damping the higher modes. The release
-(burst) is the finger lifting — the string
-rings in its full mode.
-
-This is why voiced stops required a different
-architecture (v13 crossfade cutback) and why
-the pluck architecture is specific to the
-voiceless class:
+**The taxonomy (complete):**
 
 ```
-VOICELESS STOP:  silence → PLUCK → new resonance
-                 (boundary event, ~zero duration)
+VOICELESS UNASPIRATED: UNIFIED PLUCK
+  → Closing tail + unified source (floor→burst→VOT) + opening head
+  → [k] [c] [ʈ] [t] [p]
 
-VOICED STOP:     voice bar → burst → crossfade
-                 (sustained source, has duration)
+VOICELESS ASPIRATED:   UNIFIED PLUCK + EXTENDED ASPIRATION
+  → Closing tail + unified source (floor→burst→long aspiration→VOT)
+  → [kʰ] [cʰ] [ʈʰ] [tʰ] [pʰ]
+  → PREDICTED: Aspiration phase extends the noise decay (50-70ms)
+  → The aspiration is NOT a separate source — it is the same
+    continuous noise buffer with a slower decay envelope
+  → PENDING VERIFICATION
 
-ASPIRATED STOP:  PLUCK → extended aspiration → voicing
-                 (pluck + long opening head)
+VOICED UNASPIRATED:    VOICE BAR + CROSSFADE CUTBACK
+  → Voice bar closure + burst + closed→open crossfade
+  → [g] [ɟ] [ɖ] [d] [b]
+  → VERIFIED: [d] DEVAM v13, [ɟ] YAJÑASYA/ṚTVIJAM v8
 
-VOICED ASPIRATED: voice bar → burst → murmur → crossfade
-                  (v14 architecture, unchanged)
+VOICED ASPIRATED:      VOICE BAR + MURMUR + CROSSFADE CUTBACK
+  → Voice bar closure + burst + OQ 0.55 murmur + crossfade
+  → [gʰ] [ɟʰ] [ɖʰ] [dʰ] [bʰ]
+  → VERIFIED: [dʰ] RATNADHATAMAM v14
 ```
-
-### The Complete Taxonomy
-
-| Stop type | Architecture | The stop is: |
-|---|---|---|
-| Voiceless unaspirated | **PLUCK** (v16) | A boundary event. The pluck. |
-| Voiceless aspirated | **PLUCK + long opening** | A pluck followed by extended breath. |
-| Voiced unaspirated | **Crossfade cutback** (v13) | A held note. The muted string. |
-| Voiced aspirated | **Voice bar + murmur** (v14) | A held note releasing into breath. |
-
-The voiceless/voiced distinction maps to:
-
-```
-VOICELESS: The string is SILENT before the pluck.
-           The pluck creates the new vibration.
-           The stop is the beginning of something.
-
-VOICED:    The string is VIBRATING through the closure.
-           The release lets it ring fully.
-           The stop is the continuation of something.
-```
-
-This is the Śikṣā distinction between
-aghoṣa (voiceless — "without voice")
-and ghoṣa (voiced — "with voice").
-The ancient phoneticians described exactly
-this: the presence or absence of the sustained
-source through the closure. The pluck vs.
-the muted string.
 
 ---
 
-## PART VII: THE DEEPER INSIGHT — LANGUAGE IS MUSIC
+## PART VII: THE UNIFIED SOURCE INTERNAL PHASES — DETAILED
 
-The Tonnetz manifold seed established that
-musical harmony and vocal topology share
-identical deep structure. The Pluck Principle
-confirms this at the level of articulation:
+### Phase A: Subglottal Floor (Closure)
 
-**Musical performance and speech performance
-use the same physical gestures.**
+```
+Duration:  closure_ms - preburst_ms
+Envelope:  constant 0.001 (~-60 dB)
+Source:    White noise (same buffer as all other phases)
+Physics:   The diaphragm pushes air. The tract is sealed.
+           Subglottal pressure transmits through tract walls
+           and soft tissue at very low amplitude. The signal
+           is never truly zero — the body is alive, producing
+           pressure. Digital zero is an artifact of discrete
+           representation. The subglottal floor prevents it.
+```
 
-A guitarist:
-- Lets a chord ring (vowel)
-- Damps the strings (stop closure)
-- Plucks to excite new chord (burst)
-- New chord rings (next vowel)
+**Why 0.001 and not 0.0:**
+Digital zero followed by nonzero creates an audible
+transient regardless of the nonzero value. Even 0.001
+followed by 0.002 is smooth. Zero followed by 0.001 is
+a step function at the resolution of 16-bit audio.
+The subglottal floor eliminates all zero-to-nonzero
+transitions inside the stop.
 
-A Vedic reciter:
-- Lets a vowel ring (akṣara nucleus)
-- Closes the tract at dental/velar/labial point (coda)
-- Releases the seal (burst)
-- New vowel rings (next akṣara nucleus)
+### Phase B: Pre-Burst Crescendo (Leak)
 
-The five places of articulation ARE the
-five positions on the fretboard.
+```
+Duration:  preburst_ms (3-5ms)
+Envelope:  0.001 → preburst_amp, exponential
+           crescendo = floor + (peak - floor) * exp(3*(t-1))
+Source:    Same noise buffer (continuous)
+Physics:   Intraoral pressure builds behind the seal.
+           The seal weakens. Air begins escaping through
+           the narrowing gap between articulator and passive
+           surface. Turbulence increases as flow velocity
+           increases through the shrinking aperture.
+           The crescendo IS the seal breaking.
+```
 
-The burst locus hierarchy IS the harmonic
-series of the instrument.
+### Phase C: Burst Peak (The Pluck)
 
-The syllable IS the cadence.
+```
+Duration:  burst_ms (7-12ms)
+Envelope:  burst_gain * exp(-t * burst_decay)
+Source:    Same noise buffer + ADDED spike [1.0, 0.6, 0.3]
+Physics:   The seal breaks. Compressed air explodes through
+           the cavity formed at the constriction point.
+           The cavity rings at its eigenfrequency (the place
+           locus). The spike is the initial pressure release
+           transient — the first 68µs (3 samples at 44.1kHz).
+           The noise is the sustained turbulence as air flows
+           through the opening constriction. The formant filter
+           selects the place-specific resonance from the noise.
+```
 
-The stop IS the pluck.
+**The spike rides on the noise:**
+```
+Before unified source:  [0, 0, 0, 0, SPIKE!, turbulence...]
+                                     ↑ too harsh (emerges from silence)
 
-The Samaveda — the Veda of melody — is not
-a metaphorical connection between language
-and music. It is a literal description of
-the physical identity between vocal production
-and musical performance.
+With unified source:    [...floor, floor, crescendo..., SPIKE+noise, turbulence...]
+                                                        ↑ natural (rides on continuous signal)
+```
 
-The reconstruction project verifies this
-identity phoneme by phoneme, word by word.
-The Pluck Principle is one structural axiom
-within that verification.
+### Phase D: Aspiration Decay (Post-Burst Noise)
+
+```
+Duration:  vot_ms
+Envelope:  burst_tail * exp(-t * 3), floored at subglottal
+Source:    Same noise buffer (continuous)
+Physics:   The constriction opens. Turbulence decreases as
+           the aperture widens. The noise source decays toward
+           the subglottal baseline. For unaspirated stops,
+           this is brief (~15ms). For aspirated stops, this
+           extends to 40-70ms (mahāprāṇa — "great breath").
+```
+
+### Phase E: Voicing Fade-In (Additive)
+
+```
+Duration:  vot_ms (same interval as Phase D)
+Envelope:  linear 0 → 1
+Source:    Rosenberg pulse (NEW source, not from noise buffer)
+Physics:   The vocal folds close after the voiceless interval.
+           Voicing resumes. The periodic source gradually
+           replaces the aperiodic source. The formants are
+           shaped by the following vowel's target (via VOT
+           locus interpolation). The transition from noise
+           to voicing IS the VOT — Voice Onset Time.
+```
+
+**Voicing is additive, not replacing:**
+During VOT, both noise (decaying) and voicing (rising)
+are present simultaneously. This is physically correct —
+the tract transitions gradually from turbulent to modal
+airflow. The two sources overlap.
 
 ---
 
-## PART VIII: IMPLICATIONS FOR THE RECONSTRUCTION PROJECT
+## PART VIII: DIAGNOSTIC ARCHITECTURE
 
-### Architectural Update Required
+### What the Diagnostic Measures
 
-The VS phoneme inventory (VS_phoneme_inventory.md)
-must be updated:
+The unified pluck architecture requires diagnostics at
+TWO levels:
 
+**Word level (pluck principle):**
 ```
-CURRENT ARCHITECTURE NOTE:
-  - v6 stop burst architecture — canonical for voiceless stops
-  - v7 stop burst architecture — canonical for voiced medial
-  - v13 crossfade cutback — canonical for voiced word-initial
+Section: Closing tail
+  - Core voicing ≥ 0.50 (folds vibrating during closure gesture)
+  - Tail/core RMS ratio < 0.90 (amplitude fading)
 
-REQUIRED UPDATE:
-  - v16 PLUCK architecture — canonical for voiceless stops
-    (replaces v6 for voiceless unaspirated)
-  - v6 architecture DEPRECATED for new words
-  - v13 crossfade cutback — UNCHANGED for voiced stops
-  - v14 aspirated architecture — UNCHANGED for voiced aspirated
+Section: Opening head
+  - Core voicing ≥ 0.50 (folds vibrating after VOT)
+  - Head rising: first-half RMS < second-half RMS
 
-  NEW CATEGORIES:
-  - Closing tail: appended to vowels before voiceless stops
-  - Opening head: prepended to segments after voiceless stops
-  - Aspiration head: extended opening head for voiceless aspirated
+Section: Syllable coherence
+  - Stop is amplitude trough between adjacent vowels
+  - The stop amplitude < min(preceding, following) amplitude
 ```
 
-### Impact on Pending Phonemes
-
-The following unverified voiceless stops will
-use the Pluck architecture:
-
+**Phoneme level (unified source):**
 ```
-[kʰ] kaṇṭhya aspirated  — pluck at ~2600 Hz + long opening
-[cʰ] tālavya aspirated   — pluck at ~3200 Hz + long opening
-[ʈʰ] mūrdhanya aspirated — pluck at ~1200 Hz + long opening
-[tʰ] dantya aspirated    — pluck at ~3764 Hz + long opening
-[pʰ] oṣṭhya aspirated   — pluck at ~1200 Hz + long opening
-[c]  tālavya unaspirated — pluck at ~3200 Hz
-[k]  kaṇṭhya unaspirated — pluck at ~2600 Hz (re-verify with pluck)
-```
+Section: Stop internal phases
+  - Closure RMS ≤ 0.05 (subglottal floor, nearly silent)
+  - Burst centroid in place-specific band
+  - Burst RMS > 0.001 (burst is audible)
+  - Closure voicing ≤ 0.30 (aghoṣa confirmed)
+  - VOT late RMS > 0.0005 (voicing emerging)
+  - Total duration in expected range
 
-### Impact on Word Synthesis
-
-All word-level synthesis functions must be
-updated to use the syllable-boundary model:
-
-1. Syllabify the word (akṣara structure)
-2. Identify voiceless stops at boundaries
-3. Assign closing tails to preceding vowels
-4. Assign opening heads to following segments
-5. The stop itself produces only the burst
-
-### Impact on Diagnostic Scripts
-
-Diagnostics for voiceless stops should measure:
-
-```
-OLD: closure duration, burst centroid, VOT duration
-     (assumed the stop owned all three)
-
-NEW: burst centroid ONLY (the stop's own measurement)
-     + closing tail quality (vowel's measurement)
-     + opening head quality (next segment's measurement)
-     + perceptual: does the [t] sound like a MOMENT
-       in the word, or a SEGMENT in the word?
+Section: Place contrast (if multiple stops in word)
+  - Centroid separation ≥ 500 Hz between distinct places
 ```
 
-The perceptual criterion is now primary:
-the stop must sound like punctuation, not
-like a phoneme. If it sounds like a separate
-event, the architecture is wrong regardless
-of what the numbers say.
+### The Internal Phase Extraction
+
+```python
+def extract_unified_stop_phases(stop_seg, silence_ms,
+                                closure_ms, burst_ms, vot_ms):
+    """
+    Split a unified source stop into its internal phases
+    by duration. Each phase can be measured independently.
+    
+    Returns: (silence, closure, burst, vot)
+    """
+```
+
+This function cuts the unified signal at the phase
+boundaries defined by the parameter durations. Because
+the signal is continuous (no internal boundaries), the
+cuts are arbitrary measurement windows — they don't
+correspond to any discontinuity in the signal.
+
+### The Perceptual Criterion (Primary)
+
+Numbers support the ear, not the reverse.
+
+After all numeric diagnostics pass, the perceptual
+test is:
+
+```
+1. Listen at 12× slow: burst should sound like a brief
+   resonant tick at the place-specific frequency.
+
+2. Listen at 6× slow: stop should sound like punctuation
+   between syllables. Not a hiss. Not a gap. Not a
+   separate event. A moment.
+
+3. Listen at performance speed with room reverb:
+   stop should be inaudible as a separate entity.
+   It should be felt as rhythm — the beat of the
+   syllable structure.
+
+4. The [t] should NOT sound "too harsh" or "too much."
+   If it does, the burst gain or the pre-burst
+   crescendo needs adjustment. The unified source
+   parameters are the tuning knobs.
+```
 
 ---
 
-## PART IX: FOR NEW AGENTS
+## PART IX: THE ṚTVIJAM VARIANT — BURST-ONLY PLUCK
 
-### If You Are Onboarding to This Project
+### When Unified Source Is Not Required
 
-Read these documents in this order:
+ṚTVIJAM v8 uses a burst-only pluck for [ʈ] — no
+internal closure phase, no VOT phase. Just 12ms of
+shaped noise + spike. This works because:
 
-1. **AGENTS.md** — project-level grounding
-2. **Subdomain_AGENTS.md** — subdomain grounding
-3. **tonnetz_manifold_seed.md** — coherence space geometry
-4. **the_convergence_artifact.md** — three independent derivations
-5. **Vedic_Tonnetz_Bridge.md** — the Tonnetz-vocal topology bridge
-6. **VS_phoneme_inventory.md** — phoneme inventory and architectures
-7. **THIS DOCUMENT** — the Pluck Principle
+1. The closing tail on [ɻ̩] fades to near-zero
+2. The burst starts at noise floor (not subglottal —
+   there's no closure phase to create the floor)
+3. The opening head on [v] rises from near-zero
+4. All joins are at near-zero amplitude
 
-### The Core Understanding
+**When burst-only is sufficient:**
+- The closing tail endpoint is very close to zero
+- The burst duration is short (≤ 12ms)
+- The burst gain is moderate (≤ 0.20)
+- The perceptual test passes (no harshness)
+
+**When unified source is needed:**
+- The closing tail doesn't fade low enough
+- The burst feels too harsh or aggressive
+- The stop needs more than ~12ms of signal
+- The word-initial case (no preceding segment)
+
+**The burst-only pluck is a special case of the
+unified source where closure_ms = 0 and vot_ms = 0.**
+
+They are the same architecture at different parameter
+settings, not competing architectures.
+
+---
+
+## PART X: THE VOICELESS ASPIRATED PREDICTION
+
+### Mahāprāṇa = Extended Aspiration Phase
+
+The unified pluck architecture predicts the voiceless
+aspirated stop architecture:
 
 ```
-The vocal tract is an instrument.
-The breath is the bow / the airstream.
-The tongue, lips, velum are the fingers.
-The formants are the resonant modes.
-The vowel is the sustained note.
-The stop is the pluck / the beat / the strike.
-The syllable is the cadence.
-The verse is the composition.
+VOICELESS UNASPIRATED (alpaprāṇa):
+  closure (floor) → crescendo → burst → SHORT decay → voicing
+  Total noise: ~37ms
+  Aspiration: ~15ms (brief)
+
+VOICELESS ASPIRATED (mahāprāṇa):
+  closure (floor) → crescendo → burst → LONG decay → voicing
+  Total noise: ~70ms
+  Aspiration: ~50ms (extended)
 ```
+
+**The aspiration IS Phase D with a longer duration and
+slower decay rate.** It is NOT a separate source. It is
+the same continuous noise buffer with a shallower
+exponential decay. The breath continues longer before
+voicing takes over.
+
+**This is the Śikṣā distinction:**
+- Alpaprāṇa = "little breath" = short Phase D
+- Mahāprāṇa = "great breath" = long Phase D
+
+Same architecture. One parameter change: aspiration_ms
+and decay rate. The ancient phoneticians described
+exactly this: the duration of the breath after release.
+
+**PENDING VERIFICATION.** No voiceless aspirated stop
+has been synthesized yet. This is a prediction from
+the unified pluck architecture, not a verified result.
+
+---
+
+## PART XI: RELATIONSHIP TO OTHER ARCHITECTURAL PRINCIPLES
+
+### The Architecture Stack
+
+```
+LEVEL 1: ROSENBERG PULSE + FORMANT FILTER
+  The fundamental synthesis unit.
+  Glottal source → vocal tract filter → acoustic output.
+  Established: AGNI v1 (the first word).
+  Applies to: ALL voiced phonemes.
+
+LEVEL 2: COARTICULATION
+  Formant interpolation between adjacent phonemes.
+  12-18% weighting toward neighbor's formants.
+  Established: AGNI v1.
+  Applies to: ALL phonemes in context.
+
+LEVEL 3: UNIFIED PLUCK (THIS DOCUMENT)
+  Voiceless stops as boundary events with continuous
+  internal physics.
+  Closing tail + unified source + opening head.
+  Established: RATNADHATAMAM v16 + PUROHITAM v4.
+  Applies to: ALL voiceless stops.
+
+LEVEL 4: VOICE BAR + CROSSFADE CUTBACK
+  Voiced stops as continuous-source events with
+  spectral transitions.
+  Established: DEVAM v13.
+  Applies to: ALL voiced stops.
+
+LEVEL 5: MURMUR (OQ REDUCTION)
+  Voiced aspirated stops: modal → slightly breathy.
+  OQ 0.55, BW × 1.5, 40-60ms duration.
+  Established: RATNADHATAMAM v14 (for [dʰ]).
+  Applies to: ALL voiced aspirated stops.
+
+LEVEL 6: SYLLABLE-LEVEL COHERENCE
+  Amplitude envelope follows akṣara structure.
+  Stops are troughs. Vowels are peaks.
+  Measured by syllable-level diagnostics.
+  Applies to: ALL words.
+```
+
+Each level composes with the levels below it.
+The unified pluck (Level 3) uses the Rosenberg pulse
+(Level 1) for its VOT voicing component, and
+coarticulation (Level 2) for its VOT formant locus.
+
+### The Discovery Sequence
+
+```
+AGNI:          Rosenberg + formants + coarticulation
+PUROHITAM v1:  [p] [t] bandpass noise burst (OLD)
+DEVAM:         [d] crossfade cutback (Level 4)
+ṚTVIJAM v6:   [ʈ] spike + turbulence + boundary fix
+RATNADHATAMAM: [dʰ] voice bar + murmur (Level 5)
+               [t] v16 unified source (the breath is continuous)
+ṚTVIJAM v8:   [ʈ] pluck (burst-only, the click was at the join)
+PUROHITAM v4:  [p] [t] unified pluck (COMPOSITION)
+```
+
+**The composition was not planned. It emerged from the
+convergence of two independent solutions to two
+independent problems:**
+- Unified source solved the internal click (within the stop)
+- Pluck solved the join click (between segments)
+- Both were needed. Neither alone was sufficient.
+
+---
+
+## PART XII: FOR NEW AGENTS
+
+### If You Are Implementing a New Voiceless Stop
+
+1. **Use `_synth_unified_voiceless_stop()`** with the
+   appropriate place-specific formant parameters.
+
+2. **Use `make_closing_tail()`** on the preceding vowel
+   (unless the stop is word-initial).
+
+3. **Use `make_opening_head()`** on the following vowel
+   (unless the stop is word-final — then use release tail).
+
+4. **Set burst formants** from the five-place hierarchy:
+   ```
+   oṣṭhya:    ~1200 Hz (LOW-BURST)
+   mūrdhanya:  ~1200 Hz (LOW-BURST + F3 notch)
+   kaṇṭhya:   ~2600 Hz (MID)
+   tālavya:    ~3200 Hz (MID-HIGH)
+   dantya:     ~3764 Hz (HIGH)
+   ```
+
+5. **Listen.** The ear is the final arbiter. If the stop
+   sounds too harsh, reduce `burst_gain`. If it sounds
+   too quiet, increase `burst_gain`. If it sounds like
+   static, the formants are wrong. If it sounds like a
+   separate event, the durations are too long.
 
 ### What You Must Not Do
 
-**Do not model voiceless stops as segments.**
-They are not segments. They are boundary events.
-If you generate a signal longer than ~10ms for
-a voiceless unaspirated stop, something is wrong.
+**Do not concatenate separately generated arrays.**
+The closure, burst, and VOT must come from ONE noise
+buffer shaped by ONE envelope. Concatenation creates
+the click that this architecture eliminates.
 
-**Do not assign closure to the stop.**
-The closure belongs to the preceding vowel.
-The vowel closes itself. The stop does not
-own the silence before it.
+**Do not use digital zero.**
+The subglottal floor (0.001) prevents zero-to-nonzero
+transients. Even during "silence," the signal is at
+floor level.
 
-**Do not assign VOT to the stop.**
-The VOT belongs to the following segment.
-The following segment opens itself. The stop
-does not own the voicing onset after it.
+**Do not assign more than ~12ms of burst to the stop.**
+If the stop sounds too long, it is a separate event,
+not a pluck. Reduce the burst duration. The closure
+and VOT are owned by the adjacent segments.
 
-**Do not use white noise as the stop source.**
-White noise = static. The burst is an impulse
-exciting a cavity resonance. The cavity selects
-the eigenfrequency. The source is impulsive,
-not sustained.
+**Do not skip the closing tail.**
+Without the closing tail, the vowel-to-stop join will
+click. The tail is what makes the pluck work at the
+word level.
 
-### What You Must Verify
+### Decision Tree for New Stops
 
-After synthesizing a word with voiceless stops:
-
-1. Listen at 12× slow to the burst in isolation.
-   It should sound like a brief resonant tick —
-   one ring at the place-specific frequency.
-
-2. Listen at 6× slow to the full word.
-   The stop should sound like punctuation —
-   a beat between syllables. Not a hiss.
-   Not a gap. Not an event. A moment.
-
-3. Listen at performance speed with room reverb.
-   The stop should be inaudible as a separate
-   entity. It should be felt as rhythm.
-   The syllable boundaries should be the
-   rhythm of the verse.
+```
+Is the stop voiceless?
+├── YES → UNIFIED PLUCK
+│   ├── Word-initial? → 10ms silence + unified source + opening head
+│   ├── Word-medial?  → closing tail + unified source + opening head
+│   └── Word-final?   → closing tail + unified source + release tail
+│
+└── NO (voiced) →
+    ├── Aspirated?
+    │   └── YES → VOICE BAR + BURST + MURMUR + CUTBACK (Level 5)
+    └── NO → VOICE BAR + BURST + CUTBACK (Level 4)
+```
 
 ---
 
-## PART X: THE SELF-REFERENTIAL NOTE
-
-This artifact exemplifies the OrganismCore principle
-of **explainability by construction**: the reasoning
-path from failure to insight to axiom to architecture
-is itself a traceable, auditable trajectory.
-
-The discovery path:
-```
-v15 click → "concatenation boundaries are artifacts"
-  → v16-noise → "but continuous noise is static"
-    → v16-resonance → "but 47ms of resonance is a separate event"
-      → "how long is the physical interaction really?"
-        → "it's a pluck — essentially zero duration"
-          → "the syllable is the unit, the stop is the boundary"
-            → "the vowel closes itself, the next segment opens itself"
-              → "the stop owns only the burst"
-                → v16-pluck → VERIFIED ✓
-```
-
-Each step eliminated one incorrect model.
-Each failure was informative.
-The final architecture could not have been
-derived without the preceding failures.
-
-This is RARFL operating in real time:
-- Reasoning trajectories (synthesis attempts)
-  are evaluated against a reward signal
-  (perceptual verification)
-- Structural axioms (the Pluck Principle)
-  emerge from the derivative reasoning space
-  formed by assimilated trajectories
-- The axiom refines future navigation
-  (all subsequent voiceless stops use this architecture)
-
-The Pluck Principle is itself a Meta-RDU:
-a reasoning object whose domain of operation
-is other reasoning objects (the synthesis
-architectures for the stop consonant class).
-
----
-
-## PART XI: EPISTEMOLOGICAL STATUS
-
-### Confidence Assessment
-
-| Claim | Confidence | Basis |
-|---|---|---|
-| Voiceless [t] burst at ~3764 Hz | HIGH | VS-internal measurement, multiple words |
-| Pluck architecture eliminates click | HIGH | Perceptual verification, v16 |
-| Pluck architecture eliminates static | HIGH | Perceptual verification, v16 |
-| Stop as boundary event (not segment) | HIGH | Convergence of Tonnetz, akṣara, synthesis |
-| Applicability to all voiceless stops | MEDIUM-HIGH | Architecture confirmed for [t], physics predicts generalization |
-| Applicability to aspirated stops | MEDIUM | Theoretical (pluck + extended opening), not yet synthesized |
-| Voiced stops are "muted string" not "pluck" | MEDIUM | Consistent with v13 crossfade architecture, not yet tested against pluck model |
-
-### Open Questions
-
-1. Does the pluck model work for voiceless stops
-   at all five places, or does it need per-place
-   tuning beyond the burst eigenfrequency?
-
-2. How does the aspirated stop's extended aspiration
-   interact with the pluck model? Is the aspiration
-   a longer opening head, or does it require a
-   separate architectural component?
-
-3. Should the closing tail parameters vary by
-   vowel quality (short [ɑ] vs long [aː] vs
-   front [i] vs back [u])?
-
-4. At what point does the syllable-level synthesis
-   model need to become a fully continuous
-   articulatory trajectory model, rather than
-   segments + tails + heads + plucks?
-
-### What This Proves About the Method
-
-The Pluck Principle was not derived from
-spectrographic analysis of existing recordings.
-It was not machine-learned from corpus data.
-It was not copied from a textbook.
-
-It was derived from:
-1. **Physics** (the vocal tract is a resonant cavity)
-2. **Tonnetz geometry** (the syllable is a cadence)
-3. **Vedic akṣara theory** (the syllable is the fundamental unit)
-4. **Iterative synthesis failure** (what doesn't work reveals what does)
-5. **Perceptual verification** (the ear is the final arbiter)
-
-Five independent constraints converging on one
-architecture. This is the same convergence pattern
-established in `the_convergence_artifact.md` —
-multiple independent derivations arriving at the
-same structure. When this happens, the structure
-is real.
-
----
-
-## SUMMARY
+## PART XIII: SUMMARY
 
 ```
-THE PLUCK PRINCIPLE:
+THE UNIFIED PLUCK ARCHITECTURE:
 
-A voiceless stop consonant is not a sound.
-It is a moment.
-It is the boundary between two resonant states.
-It is the pluck of the string.
-The strike of the drum.
-The syllable divider.
+Two principles, composed:
 
-The vowel closes itself toward the boundary.
-The next segment opens itself from the boundary.
-The stop owns only the burst —
-one impulse exciting the cavity resonance
-at the place-specific eigenfrequency.
+  PLUCK (what the stop IS):
+    A voiceless stop is a boundary event.
+    The vowel closes itself (closing tail).
+    The next segment opens itself (opening head).
+    The stop owns only the burst — the pluck.
+
+  UNIFIED SOURCE (how the stop WORKS):
+    The breath is continuous.
+    ONE noise buffer. ONE envelope.
+    Five phases: floor → crescendo → burst → decay → voicing.
+    The spike rides on the noise.
+    No internal boundaries.
+
+Together:
+    The closing tail brings the signal to near-zero.
+    The unified source starts at near-zero (subglottal floor).
+    The burst emerges from continuous noise, not from silence.
+    The voicing fades in as the noise fades out.
+    The opening head rises from near-zero.
+
+    No join is loud-to-silent.
+    No internal boundary is concatenated.
+    No burst is naked.
+    No closure is digital zero.
+
+    The stop sounds like a moment in the word.
+    Not a click. Not static. Not a separate event.
+    A pluck. A beat. A syllable boundary.
 
 The five places are five pluck positions.
-The five frequencies are five string modes.
+The five eigenfrequencies are five string modes.
+The unified source is the continuous breath.
+The envelope is the tongue.
 The syllable is the cadence.
-The stop is the beat.
+The word is the verse.
 
-This is not metaphor.
-This is the physics of the vocal tract
-viewed through the geometry of the Tonnetz
-and confirmed by the Vedic akṣara.
+Verified:
+  [t] dantya — RATNADHATAMAM v16, PUROHITAM v4
+  [p] oṣṭhya — PUROHITAM v4
+  [ʈ] mūrdhanya — ṚTVIJAM v8 (burst-only variant)
 
-The instrument plays music.
-The vocal tract plays language.
-They are the same act.
+Predicted:
+  [k] kaṇṭhya, [c] tālavya — same architecture, different formants
+  [kʰ] [cʰ] [ʈʰ] [tʰ] [pʰ] — same architecture, extended Phase D
+
+The architecture is complete.
+The physics is correct.
+The ear confirmed it.
 ```
 
 ---
@@ -936,10 +946,13 @@ They are the same act.
 ## REVISION HISTORY
 
 ```
-v1.0  February 2026  Initial artifact.
-      Discovery context: RATNADHĀTAMAM v16.
-      Verified for [t] dantya (dental).
+v1.0  February 2026
+      Initial composition document.
+      Unifies pluck_artifact.md (discovery record) with
+      RATNADHATAMAM v16 unified source (implementation).
+      Verified for [t], [p], [ʈ].
       Theoretical extension to full voiceless class.
+      Prediction for voiceless aspirated stops.
 ```
 
 ---
@@ -947,13 +960,12 @@ v1.0  February 2026  Initial artifact.
 ## RELATED DOCUMENTS
 
 ```
-tonnetz_manifold_seed.md          — coherence space geometry
-the_convergence_artifact.md       — three independent derivations
+pluck_artifact.md                 — The Pluck Principle (discovery record)
+ratnadhatamam_reconstruction.py   — v16 unified source implementation
+purohitam_reconstruction.py       — v4 unified pluck implementation
+rtvijam_reconstruction.py         — v8 pluck-only variant
+tonnetz_manifold_seed.md          — Coherence space geometry
 Vedic_Tonnetz_Bridge.md           — Tonnetz ↔ vocal topology bridge
-VS_phoneme_inventory.md           — phoneme inventory (update required)
-the_meta_process_artifact.md      — meta-cognitive methodology
-devam/evidence.md                 — [d] v13 crossfade discovery
-ratnadhatamam_v16.py              — implementation of pluck architecture
-AGENTS.md                         — project-level semantic grounding
-Subdomain_AGENTS.md               — subdomain-level grounding
+VS_phoneme_inventory.md           — Phoneme inventory
+AGENTS.md                         — Project-level grounding
 ```
