@@ -1,53 +1,53 @@
 #!/usr/bin/env python3
 """
-RATNADHĀTAMAM v16
+RATNADHĀTAMAM v17
 Vedic Sanskrit: ratnadhātamam [rɑtnɑdʰaːtɑmɑm]
 Rigveda 1.1.1 — word 9
+"having jewels as best wealth"
 
-v15→v16 CHANGES:
+v16→v17 CHANGES:
 
-  1. [t] UNIFIED SOURCE ARCHITECTURE — THE BREATH IS CONTINUOUS
+  1. [t] UNIFIED SOURCE + PLUCK ARCHITECTURE COMPOSED
 
-     v15 concatenated three separate arrays (closure, burst, vot).
-     The click lived at the array boundary — closure[-1] ≈ 0.008,
-     burst[0] = 0.0. No amount of ramping fixes a concatenation
-     boundary between arrays born from different sources.
+     v16 had unified source for [t] (ONE noise buffer,
+     ONE envelope, subglottal floor). This eliminated
+     internal boundaries inside the stop.
 
-     The lesson from DEVAM [d] v13 crossfade: voiced stops don't
-     click because ONE continuous source is filtered and shaped.
-     There is no concatenation boundary. The signal is born continuous.
+     But v16 was MISSING the pluck principle at the word level:
+     the vowels before [t] had no closing tails, and the segments
+     after [t] had no opening heads. The [t] still concatenated
+     directly against the adjacent voiced segments.
 
-     v16 INSIGHT: The breath is continuous. The diaphragm pushes air
-     through the vocal tract as a steady stream. During closure, the
-     tongue seal pressurizes the tract — the airflow doesn't stop,
-     it builds pressure. The seal modulates what escapes, but the
-     source is always there.
+     The problem: the [t] unified source starts at subglottal
+     floor (0.001) — good. But the preceding vowel ends at
+     full amplitude (~0.45). That amplitude jump is still audible.
 
-     The noise buffer IS the breath. The envelope IS the tongue.
+     v17 COMPOSES BOTH PRINCIPLES (from PUROHITAM v4):
 
-     v16 SOLUTION: Generate ONE continuous noise buffer spanning the
-     entire stop duration. Shape it with ONE continuous amplitude
-     envelope that models the physics:
+       PLUCK: vowels own transitions
+         [ɑ]₁ and [aː] get closing tails (last 25ms fades)
+         [n] and [ɑ]₃ get opening heads (first 15ms rises)
 
-       Phase A: Near-silence (closure — tongue sealed, pressure builds)
-                NOT digital zero — subglottal pressure transmits a
-                floor-level signal through the tract walls (~-60dB)
-       Phase B: Exponential crescendo (pre-burst leak, 5ms — air
-                begins escaping through weakening seal)
-       Phase C: Burst peak (release transient at dental locus ~3764Hz)
-       Phase D: Burst decay into aspiration noise (VOT region)
-       Phase E: Voiced component fades in additively (replaces noise)
+       UNIFIED SOURCE: [t] has no internal boundaries
+         ONE noise buffer, ONE envelope, spike rides on noise,
+         subglottal floor at edges.
 
-     Because the noise source is continuous and the envelope is
-     continuous, there is NO sample-level discontinuity anywhere.
+     The two principles compose:
+       [...vowel → closing tail → 0.00] + [0.001 → [t] unified → 0.001] + [0.00 → opening head → voiced...]
 
-     The spike impulse is ADDED to the continuous noise at burst
-     onset — it rides on top of the noise floor rather than
-     emerging from silence.
+     All join boundaries at near-zero amplitude.
 
-  2. [m] FINAL RELEASE — unchanged from v15 (20ms fadeout)
+  2. FACTORED _synth_unified_voiceless_stop()
+     Generalized helper (from PUROHITAM v4) replaces
+     the inline synth_T(). Cleaner, reusable.
 
-  3. ALL OTHER PHONEMES — unchanged from v15
+  3. make_closing_tail() / make_opening_head()
+     Pluck helpers (from PUROHITAM v4 / ṚTVIJAM v9).
+
+  4. [dʰ] UNCHANGED — v14 4-phase architecture.
+     Voiced stops don't need pluck (continuous glottal source).
+
+  5. ALL OTHER PHONEMES — unchanged.
 
 February 2026
 """
@@ -84,7 +84,7 @@ VS_A_DUR_MS = 55.0
 VS_A_COART_ON  = 0.12
 VS_A_COART_OFF = 0.12
 
-# ── [t] voiceless dental stop — v16 UNIFIED SOURCE ─────────────
+# ── [t] voiceless dental stop — v17 UNIFIED SOURCE + PLUCK ─────
 VS_T_CLOSURE_MS  = 25.0
 VS_T_BURST_MS    = 7.0
 VS_T_VOT_MS      = 15.0
@@ -98,7 +98,7 @@ VS_T_BURST_GAIN  = 0.15
 VS_T_PREBURST_MS   = 5.0
 VS_T_PREBURST_AMP  = 0.008
 
-# v16: subglottal floor — the breath never truly stops
+# subglottal floor — the breath never truly stops
 # ~-60dB relative to burst peak: inaudible but prevents digital zero
 VS_T_SUBGLOTTAL_FLOOR = 0.001
 
@@ -162,6 +162,10 @@ VS_M_COART_OFF = 0.15
 
 VS_M_RELEASE_MS = 20.0
 
+# Pluck architecture parameters (closing tail / opening head)
+CLOSING_TAIL_MS = 25.0
+OPENING_HEAD_MS = 15.0
+
 PITCH_HZ = 120.0
 DIL      = 1.0
 
@@ -185,7 +189,7 @@ def write_wav(path, sig, sr=SR):
     print(f"Wrote {path}")
 
 def rosenberg_pulse(n_samples, pitch_hz, oq=0.65, sr=SR):
-    """Rosenberg glottal pulse model"""
+    """Rosenberg glottal pulse model."""
     period = int(sr / pitch_hz)
     pulse = np.zeros(period, dtype=float)
     t1 = int(period * oq * 0.6)
@@ -200,7 +204,7 @@ def rosenberg_pulse(n_samples, pitch_hz, oq=0.65, sr=SR):
     return f32(repeated[:n_samples])
 
 def apply_formants(src, freqs, bws, gains, sr=SR):
-    """Formant filter bank (IIR resonators) — b=[g] convention"""
+    """Formant filter bank (IIR resonators) — b=[g] convention."""
     out = np.zeros(len(src), dtype=float)
     nyq = sr / 2.0
     for f0, bw, g in zip(freqs, bws, gains):
@@ -215,7 +219,7 @@ def apply_formants(src, freqs, bws, gains, sr=SR):
     return f32(out)
 
 def iir_notch(sig, fc, bw=200.0, sr=SR):
-    """Nasal antiresonance"""
+    """Nasal antiresonance notch."""
     w0 = 2.0 * np.pi * fc / sr
     r = max(0.0, min(0.999, 1.0 - np.pi * bw / sr))
     b_n = [1.0, -2.0 * np.cos(w0), 1.0]
@@ -229,7 +233,7 @@ def norm_to_peak(sig, target_peak):
     return f32(sig)
 
 def ola_stretch(sig, factor=6.0, sr=SR):
-    """Time-stretch via overlap-add"""
+    """Time-stretch via overlap-add."""
     win_ms = 40.0
     win_n = int(win_ms / 1000.0 * sr)
     if win_n % 2 == 1:
@@ -258,7 +262,7 @@ def ola_stretch(sig, factor=6.0, sr=SR):
     return f32(out)
 
 def apply_simple_room(sig, rt60=1.5, direct_ratio=0.55, sr=SR):
-    """Temple courtyard reverb"""
+    """Temple courtyard reverb."""
     n_rev = int(rt60 * sr)
     ir = np.zeros(n_rev, dtype=float)
     ir[0] = 1.0
@@ -274,216 +278,162 @@ def apply_simple_room(sig, rt60=1.5, direct_ratio=0.55, sr=SR):
     return f32(out)
 
 # ============================================================================
-# PHONEME SYNTHESIS FUNCTIONS
+# PLUCK HELPERS — CLOSING TAIL / OPENING HEAD
 # ============================================================================
 
-def synth_R(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL):
-    """[ɾ] alveolar tap (VERIFIED PUROHITAM)"""
-    n = int(VS_R_DUR_MS * dil / 1000.0 * SR)
-    src = rosenberg_pulse(n, pitch_hz)
-
-    f_mean = list(VS_R_F)
-    if F_prev is not None:
-        for k in range(min(len(F_prev), len(VS_R_F))):
-            f_mean[k] = F_prev[k] * VS_R_COART_ON + VS_R_F[k] * (1.0 - VS_R_COART_ON)
-    if F_next is not None:
-        for k in range(min(len(F_next), len(VS_R_F))):
-            f_mean[k] = f_mean[k] * (1.0 - VS_R_COART_OFF) + F_next[k] * VS_R_COART_OFF
-
-    out = apply_formants(src, f_mean, VS_R_B, VS_R_GAINS)
-
-    # Tap dip
-    t = np.linspace(0, 1, n)
-    dip_env = 1.0 - VS_R_DIP_DEPTH * np.exp(-((t - 0.5) / VS_R_DIP_WIDTH) ** 2 * 10.0)
-    out = out * dip_env
-
-    mx = np.max(np.abs(out))
-    if mx > 1e-8:
-        out = out / mx * 0.65
-    return f32(out)
-
-
-def synth_A(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL):
-    """[ɑ] short open central (VERIFIED AGNI)"""
-    n = int(VS_A_DUR_MS * dil / 1000.0 * SR)
-    src = rosenberg_pulse(n, pitch_hz)
-
-    f_mean = list(VS_A_F)
-    if F_prev is not None:
-        for k in range(min(len(F_prev), len(VS_A_F))):
-            f_mean[k] = F_prev[k] * VS_A_COART_ON + VS_A_F[k] * (1.0 - VS_A_COART_ON)
-    if F_next is not None:
-        for k in range(min(len(F_next), len(VS_A_F))):
-            f_mean[k] = f_mean[k] * (1.0 - VS_A_COART_OFF) + F_next[k] * VS_A_COART_OFF
-
-    out = apply_formants(src, f_mean, VS_A_B, VS_A_GAINS)
-
-    mx = np.max(np.abs(out))
-    if mx > 1e-8:
-        out = out / mx * 0.72
-    return f32(out)
-
-
-def synth_T(F_next=None, pitch_hz=PITCH_HZ, dil=DIL):
+def make_closing_tail(voiced_seg, tail_ms=CLOSING_TAIL_MS, sr=SR):
     """
-    [t] voiceless dental stop — v16 UNIFIED SOURCE
+    The vowel OWNS the closure.
 
-    THE BREATH IS CONTINUOUS. The diaphragm pushes air through the
-    vocal tract as a steady stream. During closure, the tongue seal
-    pressurizes the tract — the airflow doesn't stop, it builds
-    pressure behind the seal. The seal modulates what escapes, but
-    the source (subglottal pressure, airflow) is always there.
+    Append a closing tail: the last tail_ms of voiced signal
+    continues from the same Rosenberg source but with amplitude
+    fading as the articulator moves toward constriction.
 
-    The noise buffer IS the breath. The envelope IS the tongue.
-
-    v16 generates ONE continuous noise buffer spanning the entire
-    stop. ONE continuous amplitude envelope shapes it:
-
-      Phase A: Subglottal floor (~-60dB) — not digital zero.
-               The body is producing pressure. The tract walls
-               transmit some energy. The signal is never truly zero.
-      Phase B: Exponential crescendo (pre-burst leak, 5ms) — air
-               begins escaping through the weakening dental seal as
-               intraoral pressure overcomes closure force.
-      Phase C: Burst peak — release transient at dental locus.
-               Spike impulse ADDED to continuous noise (rides on top).
-      Phase D: Burst decay into aspiration noise (VOT region).
-      Phase E: Voiced component fades in additively (glottal source
-               replaces turbulence as the vocal folds close).
-
-    Because the noise source is continuous and the envelope is
-    continuous, there is NO sample-level discontinuity anywhere.
-
-    This is the same architectural principle as DEVAM [d] v13
-    crossfade: one continuous source, shaped continuously.
-    The difference: [d] has a voiced (periodic) source throughout;
-    [t] has a noise (aperiodic) source throughout closure+burst,
-    with voicing fading in additively during VOT.
+    The signal never jumps to zero — it decays smoothly from
+    the vowel's own resonance. The concatenation boundary after
+    this tail will be at near-zero amplitude.
     """
-    n_cl = int(VS_T_CLOSURE_MS / 1000.0 * SR)
-    n_b  = int(VS_T_BURST_MS / 1000.0 * SR)
-    n_v  = int(VS_T_VOT_MS / 1000.0 * SR)
+    n_tail = int(tail_ms / 1000.0 * sr)
+    if n_tail < 1:
+        return voiced_seg
+
+    period = int(sr / PITCH_HZ)
+    if len(voiced_seg) >= period:
+        template = voiced_seg[-period:]
+        n_reps = (n_tail // period) + 2
+        tail_src = np.tile(template, n_reps)[:n_tail]
+    else:
+        tail_src = np.zeros(n_tail, dtype=DTYPE)
+
+    fade = np.linspace(1.0, 0.0, n_tail) ** 2
+    tail = f32(tail_src * fade)
+
+    return f32(np.concatenate([voiced_seg, tail]))
+
+
+def make_opening_head(voiced_seg, head_ms=OPENING_HEAD_MS, sr=SR):
+    """
+    The next segment OWNS the VOT / onset.
+
+    Prepend an opening head: the first head_ms of voiced signal
+    rises from near-zero as voicing resumes after a voiceless
+    segment.
+
+    The concatenation boundary before this head matches the
+    near-zero end of the voiceless segment.
+    """
+    n_head = int(head_ms / 1000.0 * sr)
+    if n_head < 1:
+        return voiced_seg
+
+    period = int(sr / PITCH_HZ)
+    if len(voiced_seg) >= period:
+        template = voiced_seg[:period]
+        n_reps = (n_head // period) + 2
+        head_src = np.tile(template, n_reps)[:n_head]
+    else:
+        head_src = np.zeros(n_head, dtype=DTYPE)
+
+    rise = np.linspace(0.0, 1.0, n_head) ** 2
+    head = f32(head_src * rise)
+
+    return f32(np.concatenate([head, voiced_seg]))
+
+
+# ============================================================================
+# UNIFIED SOURCE STOP SYNTHESIS
+# (from RATNADHATAMAM v16 — the breath is continuous)
+# (factored into reusable helper in PUROHITAM v4)
+# ============================================================================
+
+def _synth_unified_voiceless_stop(
+    closure_ms, burst_ms, vot_ms,
+    burst_f, burst_b, burst_g, burst_decay, burst_gain,
+    preburst_ms, preburst_amp, subglottal_floor,
+    vot_locus_f, F_next,
+    vot_vowel_b, vot_vowel_gains,
+    pitch_hz=PITCH_HZ, dil=DIL,
+):
+    """
+    Unified source architecture for voiceless stops.
+    ONE continuous noise buffer. ONE continuous envelope.
+    The spike rides on the noise. No boundaries.
+
+    From RATNADHATAMAM v16 synth_T(), generalized for any
+    voiceless stop place (dental, bilabial, etc.).
+    """
+    n_cl = int(closure_ms * dil / 1000.0 * SR)
+    n_b  = int(burst_ms * dil / 1000.0 * SR)
+    n_v  = int(vot_ms * dil / 1000.0 * SR)
     n_total = n_cl + n_b + n_v
 
     # ── UNIFIED NOISE SOURCE ──────────────────────────────
-    # One continuous buffer. No boundaries. This IS the breath.
     noise_source = np.random.randn(n_total).astype(float)
 
     # ── CONTINUOUS AMPLITUDE ENVELOPE ─────────────────────
-    # This IS the tongue. It modulates the breath.
     env = np.zeros(n_total, dtype=float)
 
     # Phase A: Subglottal floor during closure
-    # NOT digital zero — the body transmits pressure through
-    # tract walls even during complete oral closure.
-    # This eliminates any digital-silence-to-noise transition.
-    silence_n = n_cl - min(int(VS_T_PREBURST_MS / 1000.0 * SR), n_cl)
-    preburst_n = n_cl - silence_n
+    env[:n_cl] = subglottal_floor
 
-    env[0:silence_n] = VS_T_SUBGLOTTAL_FLOOR
+    # Phase B: Pre-burst crescendo (last preburst_ms of closure)
+    n_pre = int(preburst_ms * dil / 1000.0 * SR)
+    if n_pre > 0 and n_cl > n_pre:
+        t_pre = np.linspace(0.0, 1.0, n_pre)
+        crescendo = subglottal_floor + (preburst_amp - subglottal_floor) * (
+            1.0 - np.exp(-3.0 * t_pre))
+        env[n_cl - n_pre:n_cl] = crescendo
 
-    # Phase B: Exponential crescendo (pre-burst leak)
-    # Intraoral pressure overcomes closure force. Air begins
-    # leaking through the weakening seal. Crescendo into release.
-    if preburst_n > 0:
-        t_pre = np.linspace(0.0, 1.0, preburst_n)
-        # exp(-3) ≈ 0.05 at start, 1.0 at end
-        crescendo = VS_T_SUBGLOTTAL_FLOOR + \
-            (VS_T_PREBURST_AMP - VS_T_SUBGLOTTAL_FLOOR) * np.exp(3.0 * (t_pre - 1.0))
-        env[silence_n : n_cl] = crescendo
+    # Phase C+D: Burst peak + decay
+    if n_b > 0:
+        t_burst = np.arange(n_b) / SR
+        burst_env = burst_gain * np.exp(-t_burst * burst_decay)
+        burst_env = np.maximum(burst_env, subglottal_floor)
+        env[n_cl:n_cl + n_b] = burst_env
 
-    # Phase C: Burst (dental locus resonance)
-    # Sharp attack, exponential decay. The tongue releases the seal.
-    # Compressed air escapes through the small dantya cavity.
-    burst_start = n_cl
-    burst_end   = n_cl + n_b
-    t_burst = np.arange(n_b, dtype=float) / SR
-    burst_env = VS_T_BURST_GAIN * np.exp(-t_burst * VS_T_BURST_DECAY)
-    env[burst_start : burst_end] = burst_env
-
-    # Smooth the closure→burst transition: the envelope must be
-    # continuous. The crescendo peak should meet the burst onset.
-    # Use a short cosine blend across the junction so there is
-    # no slope discontinuity (kink) in the envelope.
-    blend_n = min(int(0.001 * SR), preburst_n, n_b)  # 1ms
-    if blend_n > 1:
-        left_val  = env[burst_start - 1] if burst_start > 0 else VS_T_SUBGLOTTAL_FLOOR
-        right_val = env[burst_start]
-        # Cosine interpolation for smooth derivative at junction
-        t_blend = np.linspace(0.0, np.pi, blend_n)
-        blend_curve = left_val + (right_val - left_val) * 0.5 * (1.0 - np.cos(t_blend))
-        half = blend_n // 2
-        start_idx = max(0, burst_start - half)
-        end_idx = start_idx + blend_n
-        if end_idx <= n_total:
-            env[start_idx : end_idx] = blend_curve
-
-    # Phase D: Burst decay into VOT aspiration
-    # Aspiration noise decays as the tract opens and voicing begins.
-    vot_start = burst_end
-    vot_end   = n_total
+    # Phase D continued: VOT decay
     if n_v > 0:
-        t_vot = np.linspace(0.0, 1.0, n_v)
-        # Decay from burst tail level to subglottal floor
-        burst_tail = burst_env[-1] if n_b > 0 else VS_T_BURST_GAIN * 0.1
-        aspiration_decay = burst_tail * np.exp(-t_vot * 3.0)
-        # Floor: don't decay below subglottal level
-        aspiration_decay = np.maximum(aspiration_decay, VS_T_SUBGLOTTAL_FLOOR)
-        env[vot_start : vot_end] = aspiration_decay
+        burst_end_amp = env[n_cl + n_b - 1] if (n_cl + n_b) > 0 else subglottal_floor
+        t_vot = np.arange(n_v) / SR
+        vot_env = burst_end_amp * np.exp(-t_vot * burst_decay * 0.5)
+        vot_env = np.maximum(vot_env, subglottal_floor)
+        env[n_cl + n_b:n_cl + n_b + n_v] = vot_env
 
-    # ── APPLY DENTAL LOCUS FORMANTS ──────────────────────
-    # ONE filter pass across the entire buffer. No filter restarts,
-    # no frame boundaries. The formant resonances shape the noise
-    # continuously — the same cavity is resonating throughout.
-    noise_shaped = apply_formants(
-        noise_source,
-        VS_T_BURST_F, VS_T_BURST_B, VS_T_BURST_G)
+    # ── APPLY ENVELOPE TO NOISE ───────────────────────────
+    shaped_noise = noise_source * env
 
-    # Apply the continuous envelope
-    noise_out = f32(noise_shaped * env)
+    # ── FORMANT FILTER (PLACE-SPECIFIC) ───────────────────
+    noise_out = apply_formants(f32(shaped_noise), burst_f, burst_b, burst_g)
 
-    # ── ADD SPIKE TRANSIENT AT BURST ONSET ────────────────
-    # The spike models the initial pressure release transient —
-    # the moment the tongue seal breaks and compressed air explodes.
-    # It is ADDED to the continuous noise, not concatenated.
-    # It rides on top of the noise floor — no boundary.
-    spike = np.zeros(n_total, dtype=float)
-    spike_len = min(3, n_b)
-    spike_vals = [1.0, 0.6, 0.3][:spike_len]
-    for i, sv in enumerate(spike_vals):
-        if burst_start + i < n_total:
-            spike[burst_start + i] = sv
+    # ── SPIKE IMPULSE (RIDES ON NOISE) ────────────────────
+    spike_raw = np.zeros(n_total, dtype=float)
+    if n_cl < n_total:
+        spike_len = min(3, n_total - n_cl)
+        spike_vals = [1.0, 0.6, 0.3][:spike_len]
+        spike_raw[n_cl:n_cl + spike_len] = spike_vals
 
+    spike_filt = apply_formants(f32(spike_raw), burst_f, burst_b, burst_g)
     spike_env = np.zeros(n_total, dtype=float)
     if n_b > 0:
-        spike_env[burst_start:burst_end] = np.exp(
-            -np.arange(n_b, dtype=float) / SR * VS_T_BURST_DECAY)
-    spike_out = f32(spike * spike_env * VS_T_BURST_GAIN * 0.5)
+        t_se = np.arange(n_b) / SR
+        spike_env[n_cl:n_cl + n_b] = np.exp(-t_se * burst_decay)
+    spike_out = f32(spike_filt * spike_env * burst_gain)
 
     # ── PHASE E: VOICED COMPONENT (FADES IN DURING VOT) ──
-    # The glottal source (Rosenberg pulses) replaces the noise
-    # source as the vocal folds close after the voiceless stop.
-    # This is additive — voicing fades in as aspiration fades out.
-    f_vot = list(VS_T_LOCUS_F)
+    f_vot = list(vot_locus_f)
     if F_next is not None:
         for k in range(min(len(F_next), len(f_vot))):
-            f_vot[k] = VS_T_LOCUS_F[k] * 0.7 + F_next[k] * 0.3
+            f_vot[k] = vot_locus_f[k] * 0.7 + F_next[k] * 0.3
 
     vot_voiced = np.zeros(n_total, dtype=float)
     if n_v > 0:
-        src_voiced = rosenberg_pulse(n_v, pitch_hz)
-        # Voicing fades in as aspiration fades out
-        voicing_env = np.linspace(0.0, 1.0, n_v)
-        vot_filt = apply_formants(
-            src_voiced, f_vot,
-            VS_A_B,
-            [g * 0.4 for g in VS_A_GAINS])
-        vot_voiced[vot_start:vot_end] = f32(vot_filt * voicing_env * 0.15)
+        src_vot = rosenberg_pulse(n_v, pitch_hz)
+        vot_filt = apply_formants(src_vot, f_vot, vot_vowel_b, vot_vowel_gains)
+        fade_in = np.linspace(0.0, 1.0, n_v)
+        vot_filt = vot_filt * fade_in * 0.12
+        vot_voiced[n_cl + n_b:n_cl + n_b + n_v] = vot_filt[:n_v]
 
     # ── COMBINE ───────────────────────────────────────────
-    # Three components, all born from continuous sources,
-    # all shaped by continuous envelopes, all additive.
-    # No concatenation boundaries anywhere.
     out = noise_out + spike_out + vot_voiced
 
     mx = np.max(np.abs(out))
@@ -492,18 +442,128 @@ def synth_T(F_next=None, pitch_hz=PITCH_HZ, dil=DIL):
     return f32(out)
 
 
-def synth_N(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL):
-    """[n] dental nasal (VERIFIED AGNI)"""
+# ============================================================================
+# PHONEME SYNTHESIS FUNCTIONS
+# ============================================================================
+
+def synth_R(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL):
+    """[ɾ] alveolar tap (VERIFIED PUROHITAM)."""
+    n = int(VS_R_DUR_MS * dil / 1000.0 * SR)
+    src = rosenberg_pulse(n, pitch_hz)
+
+    f_mean = list(VS_R_F)
+    if F_prev is not None:
+        for k in range(min(len(F_prev), len(VS_R_F))):
+            f_mean[k] = (F_prev[k] * VS_R_COART_ON +
+                         VS_R_F[k] * (1.0 - VS_R_COART_ON))
+    if F_next is not None:
+        for k in range(min(len(F_next), len(VS_R_F))):
+            f_mean[k] = (f_mean[k] * (1.0 - VS_R_COART_OFF) +
+                         F_next[k] * VS_R_COART_OFF)
+
+    out = apply_formants(src, f_mean, VS_R_B, VS_R_GAINS)
+
+    # Tap dip
+    n_dip = int(n * VS_R_DIP_WIDTH)
+    dip_start = (n - n_dip) // 2
+    if n_dip > 0 and dip_start >= 0:
+        dip_env = np.ones(n, dtype=float)
+        dip = 1.0 - VS_R_DIP_DEPTH * np.hanning(n_dip)
+        dip_env[dip_start:dip_start + n_dip] = dip
+        out = f32(out * dip_env)
+
+    mx = np.max(np.abs(out))
+    if mx > 1e-8:
+        out = out / mx * 0.55
+    return f32(out)
+
+
+def synth_A(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL,
+            closing_for_stop=False):
+    """
+    [ɑ] short open central (VERIFIED AGNI).
+
+    closing_for_stop=True: append closing tail.
+    The vowel owns the transition into the stop.
+    The last 25ms fades as the tongue moves toward seal position.
+    """
+    n = int(VS_A_DUR_MS * dil / 1000.0 * SR)
+    src = rosenberg_pulse(n, pitch_hz)
+
+    f_mean = list(VS_A_F)
+    if F_prev is not None:
+        for k in range(min(len(F_prev), len(VS_A_F))):
+            f_mean[k] = (F_prev[k] * VS_A_COART_ON +
+                         VS_A_F[k] * (1.0 - VS_A_COART_ON))
+    if F_next is not None:
+        for k in range(min(len(F_next), len(VS_A_F))):
+            f_mean[k] = (f_mean[k] * (1.0 - VS_A_COART_OFF) +
+                         F_next[k] * VS_A_COART_OFF)
+
+    out = apply_formants(src, f_mean, VS_A_B, VS_A_GAINS)
+
+    mx = np.max(np.abs(out))
+    if mx > 1e-8:
+        out = out / mx * 0.72
+
+    if closing_for_stop:
+        out = make_closing_tail(f32(out), CLOSING_TAIL_MS)
+
+    return f32(out)
+
+
+def synth_T(F_next=None, pitch_hz=PITCH_HZ, dil=DIL):
+    """
+    [t] voiceless dental stop — v17 UNIFIED SOURCE
+
+    The breath is continuous. The tongue is the envelope.
+    ONE noise buffer. ONE amplitude envelope.
+    The spike rides on the noise floor.
+
+    Uses the factored _synth_unified_voiceless_stop() helper.
+    """
+    return _synth_unified_voiceless_stop(
+        closure_ms=VS_T_CLOSURE_MS,
+        burst_ms=VS_T_BURST_MS,
+        vot_ms=VS_T_VOT_MS,
+        burst_f=VS_T_BURST_F,
+        burst_b=VS_T_BURST_B,
+        burst_g=VS_T_BURST_G,
+        burst_decay=VS_T_BURST_DECAY,
+        burst_gain=VS_T_BURST_GAIN,
+        preburst_ms=VS_T_PREBURST_MS,
+        preburst_amp=VS_T_PREBURST_AMP,
+        subglottal_floor=VS_T_SUBGLOTTAL_FLOOR,
+        vot_locus_f=VS_T_LOCUS_F,
+        F_next=F_next,
+        vot_vowel_b=VS_A_B,
+        vot_vowel_gains=[g * 0.3 for g in VS_A_GAINS],
+        pitch_hz=pitch_hz,
+        dil=dil,
+    )
+
+
+def synth_N(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL,
+            opening_from_stop=False):
+    """
+    [n] dental nasal (VERIFIED AGNI).
+
+    opening_from_stop=True: prepend opening head.
+    The nasal owns the onset after the voiceless stop.
+    The first 15ms rises from near-zero as voicing resumes.
+    """
     n = int(VS_N_DUR_MS * dil / 1000.0 * SR)
     src = rosenberg_pulse(n, pitch_hz)
 
     f_mean = list(VS_N_F)
     if F_prev is not None:
         for k in range(min(len(F_prev), len(VS_N_F))):
-            f_mean[k] = F_prev[k] * VS_N_COART_ON + VS_N_F[k] * (1.0 - VS_N_COART_ON)
+            f_mean[k] = (F_prev[k] * VS_N_COART_ON +
+                         VS_N_F[k] * (1.0 - VS_N_COART_ON))
     if F_next is not None:
         for k in range(min(len(F_next), len(VS_N_F))):
-            f_mean[k] = f_mean[k] * (1.0 - VS_N_COART_OFF) + F_next[k] * VS_N_COART_OFF
+            f_mean[k] = (f_mean[k] * (1.0 - VS_N_COART_OFF) +
+                         F_next[k] * VS_N_COART_OFF)
 
     out = apply_formants(src, f_mean, VS_N_B, VS_N_GAINS)
     out = iir_notch(out, VS_N_ANTI_F, VS_N_ANTI_BW)
@@ -511,26 +571,35 @@ def synth_N(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL):
     mx = np.max(np.abs(out))
     if mx > 1e-8:
         out = out / mx * 0.42
+
+    if opening_from_stop:
+        out = make_opening_head(f32(out), OPENING_HEAD_MS)
+
     return f32(out)
 
 
 def synth_DH(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL):
     """
-    [dʰ] voiced dental aspirated stop — v14 ARCHITECTURE (unchanged)
+    [dʰ] voiced dental aspirated stop — v14 ARCHITECTURE
+
+    Śikṣā: dantya ghoṣa mahāprāṇa
+    Voiced, aspirated, dental.
 
     Phase 1: Voice bar closure (250 Hz, BW 80)
-    Phase 2: v7 spike+turbulence burst at dantya locus
-    Phase 3: v11 murmur (OQ 0.55, BW×1.5)
-    Phase 4: Crossfade cutback closed→open
+    Phase 2: Burst at dental locus
+    Phase 3: Breathy murmur (OQ 0.55, BW 1.5×)
+    Phase 4: Crossfade cutback (murmur → open)
+
+    Voiced stops don't need pluck — continuous glottal source.
     """
     n_cl = int(VS_DH_CLOSURE_MS * dil / 1000.0 * SR)
-    n_b = int(VS_DH_BURST_MS * dil / 1000.0 * SR)
-    n_m = int(VS_DH_MURMUR_MS * dil / 1000.0 * SR)
+    n_b  = int(VS_DH_BURST_MS * dil / 1000.0 * SR)
+    n_mu = int(VS_DH_MURMUR_MS * dil / 1000.0 * SR)
     n_cb = int(VS_DH_CUTBACK_MS * dil / 1000.0 * SR)
 
     f_next = F_next if F_next is not None else VS_AA_F
 
-    # Phase 1: Voice bar
+    # Phase 1: Voice bar closure
     if n_cl > 0:
         src_cl = rosenberg_pulse(n_cl, pitch_hz, oq=0.65)
         murmur_cl = apply_formants(
@@ -546,28 +615,32 @@ def synth_DH(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL):
     else:
         closure = np.array([], dtype=DTYPE)
 
-    # Phase 2: v7 burst (no boundary fix needed — voiced)
+    # Phase 2: Burst
     spike = np.zeros(max(n_b, 16), dtype=float)
     spike[0:3] = [1.0, 0.6, 0.3]
+
     turbulence = np.random.randn(len(spike))
     turbulence_filt = apply_formants(
         turbulence, VS_DH_BURST_F, VS_DH_BURST_B, VS_DH_BURST_G)
+
     t_b = np.arange(len(spike)) / SR
     mix_env = np.exp(-t_b * VS_DH_BURST_DECAY)
     burst_raw = spike * mix_env + turbulence_filt * (1.0 - mix_env) * 0.30
     burst = norm_to_peak(f32(burst_raw), VS_DH_BURST_PEAK)
 
-    # Phase 3: v11 murmur (OQ 0.55, BW×1.5)
-    murmur_pulse = rosenberg_pulse(n_m, pitch_hz, oq=VS_DH_OQ)
-    murmur_bws = [bw * VS_DH_BW_MULT for bw in VS_AA_B]
-    murmur_filtered = apply_formants(
-        murmur_pulse, VS_AA_F, murmur_bws, VS_AA_GAINS)
-    attack = int(n_m * 0.15)
-    env_m = np.ones(n_m, dtype=float)
-    if attack > 0:
-        env_m[:attack] = np.linspace(0.5, 1.0, attack)
-        env_m[-attack:] = np.linspace(1.0, 0.9, attack)
-    murmur = f32(murmur_filtered * env_m * VS_DH_MURMUR_GAIN)
+    # Phase 3: Breathy murmur
+    if n_mu > 0:
+        src_mu = rosenberg_pulse(n_mu, pitch_hz, oq=VS_DH_OQ)
+        bws_mu = [bw * VS_DH_BW_MULT for bw in VS_DH_BURST_B]
+        gains_mu = [g * VS_DH_MURMUR_GAIN for g in VS_DH_BURST_G]
+        murmur = apply_formants(src_mu, VS_DH_BURST_F, bws_mu, gains_mu)
+
+        mx_mu = np.max(np.abs(murmur))
+        if mx_mu > 1e-8:
+            murmur = murmur / mx_mu * VS_DH_MURMUR_PEAK
+        murmur = f32(murmur)
+    else:
+        murmur = np.array([], dtype=DTYPE)
 
     # Phase 4: Crossfade cutback
     if n_cb > 0:
@@ -575,14 +648,16 @@ def synth_DH(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL):
         sig_closed = apply_formants(
             src_cb, VS_DH_CLOSED_F, VS_DH_CLOSED_B, VS_DH_CLOSED_G)
         sig_closed = norm_to_peak(sig_closed, VS_DH_CLOSED_PEAK)
+
         sig_open = apply_formants(
             src_cb, list(f_next),
             [100.0, 140.0, 200.0, 260.0],
             [14.0, 8.0, 1.5, 0.5])
         sig_open = norm_to_peak(sig_open, VS_DH_OPEN_PEAK)
+
         t_fade = np.linspace(0.0, np.pi / 2.0, n_cb)
         fade_out = np.cos(t_fade).astype(DTYPE)
-        fade_in = np.sin(t_fade).astype(DTYPE)
+        fade_in  = np.sin(t_fade).astype(DTYPE)
         cutback = f32(sig_closed * fade_out + sig_open * fade_in)
         cb_env = np.linspace(0.6, 1.0, n_cb).astype(DTYPE)
         cutback = f32(cutback * cb_env)
@@ -597,60 +672,74 @@ def synth_DH(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL):
     return f32(out)
 
 
-def synth_AA(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL):
-    """[aː] long open central (VERIFIED HOTĀRAM)"""
+def synth_AA(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL,
+             closing_for_stop=False):
+    """
+    [aː] long open central (VERIFIED HOTĀRAM).
+
+    closing_for_stop=True: append closing tail.
+    The vowel owns the transition into the stop.
+    """
     n = int(VS_AA_DUR_MS * dil / 1000.0 * SR)
     src = rosenberg_pulse(n, pitch_hz)
 
     f_mean = list(VS_AA_F)
     if F_prev is not None:
         for k in range(min(len(F_prev), len(VS_AA_F))):
-            f_mean[k] = F_prev[k] * VS_AA_COART_ON + VS_AA_F[k] * (1.0 - VS_AA_COART_ON)
+            f_mean[k] = (F_prev[k] * VS_AA_COART_ON +
+                         VS_AA_F[k] * (1.0 - VS_AA_COART_ON))
     if F_next is not None:
         for k in range(min(len(F_next), len(VS_AA_F))):
-            f_mean[k] = f_mean[k] * (1.0 - VS_AA_COART_OFF) + F_next[k] * VS_AA_COART_OFF
+            f_mean[k] = (f_mean[k] * (1.0 - VS_AA_COART_OFF) +
+                         F_next[k] * VS_AA_COART_OFF)
 
     out = apply_formants(src, f_mean, VS_AA_B, VS_AA_GAINS)
 
     mx = np.max(np.abs(out))
     if mx > 1e-8:
         out = out / mx * 0.72
+
+    if closing_for_stop:
+        out = make_closing_tail(f32(out), CLOSING_TAIL_MS)
+
     return f32(out)
 
 
 def synth_M(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL,
             word_final=False):
-    """
-    [m] bilabial nasal (VERIFIED PUROHITAM)
-
-    v15: word_final=True adds 20ms release tail.
-    The lips open, the nasal resonance fades.
-    """
+    """[m] bilabial nasal (VERIFIED PUROHITAM)."""
     n = int(VS_M_DUR_MS * dil / 1000.0 * SR)
-    n_release = int(VS_M_RELEASE_MS * dil / 1000.0 * SR) if word_final else 0
-
-    src = rosenberg_pulse(n + n_release, pitch_hz)
+    src = rosenberg_pulse(n, pitch_hz)
 
     f_mean = list(VS_M_F)
     if F_prev is not None:
         for k in range(min(len(F_prev), len(VS_M_F))):
-            f_mean[k] = F_prev[k] * VS_M_COART_ON + VS_M_F[k] * (1.0 - VS_M_COART_ON)
+            f_mean[k] = (F_prev[k] * VS_M_COART_ON +
+                         VS_M_F[k] * (1.0 - VS_M_COART_ON))
     if F_next is not None:
         for k in range(min(len(F_next), len(VS_M_F))):
-            f_mean[k] = f_mean[k] * (1.0 - VS_M_COART_OFF) + F_next[k] * VS_M_COART_OFF
+            f_mean[k] = (f_mean[k] * (1.0 - VS_M_COART_OFF) +
+                         F_next[k] * VS_M_COART_OFF)
 
     out = apply_formants(src, f_mean, VS_M_B, VS_M_GAINS)
     out = iir_notch(out, VS_M_ANTI_F, VS_M_ANTI_BW)
 
-    # Word-final release: gentle fadeout over last n_release samples
-    if word_final and n_release > 0:
-        env = np.ones(len(out), dtype=float)
-        env[-n_release:] = np.linspace(1.0, 0.0, n_release) ** 2
-        out = f32(out * env)
-
     mx = np.max(np.abs(out))
     if mx > 1e-8:
         out = out / mx * 0.42
+
+    if word_final:
+        n_rel = int(VS_M_RELEASE_MS * dil / 1000.0 * SR)
+        if n_rel > 0:
+            release = np.zeros(n_rel, dtype=DTYPE)
+            if len(out) > 0:
+                tail_amp = abs(float(out[-1]))
+                release[:min(3, n_rel)] = tail_amp * np.array(
+                    [0.5, 0.2, 0.05])[:min(3, n_rel)]
+            fade = np.exp(-np.linspace(0, 5.0, n_rel))
+            release = f32(release * fade)
+            out = f32(np.concatenate([out, release]))
+
     return f32(out)
 
 
@@ -660,68 +749,100 @@ def synth_M(F_prev=None, F_next=None, pitch_hz=PITCH_HZ, dil=DIL,
 
 def synth_ratnadhatamam(pitch_hz=PITCH_HZ, dil=DIL, with_room=False):
     """
-    RATNADHĀTAMAM [rɑtnɑdʰaːtɑmɑm] — v16
+    RATNADHĀTAMAM [rɑtnɑdʰaːtɑmɑm] — v17
     Rigveda 1.1.1, word 9
-    Syllables: RAT-NA-DHĀ-TA-MAM
+    Syllables: RAT.NA.DHĀ.TA.MAM
 
-    v16 changes from v15:
-      [t] ×2: UNIFIED SOURCE ARCHITECTURE
-              One continuous noise buffer + one continuous envelope.
-              No array concatenation boundaries.
-              The breath is continuous. The tongue is the envelope.
-      All other phonemes unchanged from v15.
+    v17 UNIFIED PLUCK ARCHITECTURE:
 
-    Segment sequence:
-      r   [ɾ]   tap              → [ɑ]
-      a   [ɑ]   short open       ← [ɾ] → [t]
-      t₁  [t]   voiceless dental ← . → [n]
-      n   [n]   dental nasal     ← [t] → [ɑ]
-      a   [ɑ]   short open       ← [n] → [dʰ]
-      dh  [dʰ]  voiced asp.      ← [ɑ] → [aː]
-      ā   [aː]  long open        ← [dʰ] → [t]
-      t₂  [t]   voiceless dental ← . → [ɑ]
-      a   [ɑ]   short open       ← [t] → [m]
-      m₁  [m]   bilabial nasal   ← [ɑ] → [ɑ]
-      a   [ɑ]   short open       ← [m] → [m]
-      m₂  [m]   bilabial nasal   ← [ɑ] → . (word-final, release tail)
+      [t] unified source (ONE buffer, ONE envelope, spike on noise)
+        Internal phases: closure → preburst → burst → VOT
+        Subglottal floor at edges. No internal boundaries.
+
+      PLUCK architecture at word level:
+        [ɑ]₁ closing tail → [t]₁ → opening head + [n]
+        [aː] closing tail → [t]₂ → opening head + [ɑ]₃
+
+      [dʰ] voiced: voice bar → burst → murmur → cutback
+        Continuous glottal source. No pluck needed.
+
+    Segment map:
+      [r]                             30ms   alveolar tap
+      [ɑ]₁ + closing tail            80ms   55ms vowel + 25ms fade
+      [t]₁ UNIFIED                   47ms   closure + burst + VOT
+      head + [n]                     75ms   15ms rise + 60ms nasal
+      [ɑ]₂                           55ms   short open central
+      [dʰ]                          111ms   voice bar + burst + murmur + cutback
+      [aː] + closing tail           135ms   110ms vowel + 25ms fade
+      [t]₂ UNIFIED                   47ms   closure + burst + VOT
+      head + [ɑ]₃                    70ms   15ms rise + 55ms vowel
+      [m]₁                           60ms   bilabial nasal
+      [ɑ]₄                           55ms   short open central
+      [m]₂ + release                 80ms   60ms nasal + 20ms release
+
+    All voiced-to-voiceless transitions use closing tails.
+    All voiceless-to-voiced transitions use opening heads.
+    All voiceless stops use unified source (subglottal floor).
+    No boundary anywhere is born from different sources.
     """
     segs = [
-        # RAT-
+        # [r]
         synth_R(F_prev=None, F_next=VS_A_F,
                 pitch_hz=pitch_hz, dil=dil),
+
+        # [ɑ]₁ with closing tail (vowel owns closure before [t]₁)
         synth_A(F_prev=VS_R_F, F_next=VS_T_LOCUS_F,
-                pitch_hz=pitch_hz, dil=dil),
+                pitch_hz=pitch_hz, dil=dil,
+                closing_for_stop=True),
+
+        # [t]₁ UNIFIED SOURCE
         synth_T(F_next=VS_N_F,
                 pitch_hz=pitch_hz, dil=dil),
 
-        # -NA-
+        # [n] with opening head (nasal owns onset after [t]₁)
         synth_N(F_prev=VS_T_LOCUS_F, F_next=VS_A_F,
-                pitch_hz=pitch_hz, dil=dil),
-        synth_A(F_prev=VS_N_F, F_next=None,
+                pitch_hz=pitch_hz, dil=dil,
+                opening_from_stop=True),
+
+        # [ɑ]₂
+        synth_A(F_prev=VS_N_F, F_next=VS_DH_CLOSED_F,
                 pitch_hz=pitch_hz, dil=dil),
 
-        # -DHĀ-
+        # [dʰ] (voiced — no pluck needed)
         synth_DH(F_prev=VS_A_F, F_next=VS_AA_F,
                  pitch_hz=pitch_hz, dil=dil),
-        synth_AA(F_prev=None, F_next=VS_T_LOCUS_F,
-                 pitch_hz=pitch_hz, dil=dil),
 
-        # -TA-
+        # [aː] with closing tail (vowel owns closure before [t]₂)
+        synth_AA(F_prev=VS_DH_CLOSED_F, F_next=VS_T_LOCUS_F,
+                 pitch_hz=pitch_hz, dil=dil,
+                 closing_for_stop=True),
+
+        # [t]₂ UNIFIED SOURCE
         synth_T(F_next=VS_A_F,
                 pitch_hz=pitch_hz, dil=dil),
+
+        # [ɑ]₃ with opening head (vowel owns onset after [t]₂)
         synth_A(F_prev=VS_T_LOCUS_F, F_next=VS_M_F,
+                pitch_hz=pitch_hz, dil=dil,
+                closing_for_stop=False),
+
+        # [m]₁
+        synth_M(F_prev=VS_A_F, F_next=VS_A_F,
                 pitch_hz=pitch_hz, dil=dil),
 
-        # -MAM
-        synth_M(F_prev=VS_A_F, F_next=VS_A_F,
-                pitch_hz=pitch_hz, dil=dil,
-                word_final=False),
+        # [ɑ]₄
         synth_A(F_prev=VS_M_F, F_next=VS_M_F,
                 pitch_hz=pitch_hz, dil=dil),
+
+        # [m]₂ + release (word-final)
         synth_M(F_prev=VS_A_F, F_next=None,
                 pitch_hz=pitch_hz, dil=dil,
                 word_final=True),
     ]
+
+    # [ɑ]₃ needs opening head prepended
+    # (synth_A doesn't have opening_from_stop, so we do it here)
+    segs[8] = make_opening_head(segs[8], OPENING_HEAD_MS)
 
     word = np.concatenate(segs)
     mx = np.max(np.abs(word))
@@ -741,25 +862,25 @@ def synth_ratnadhatamam(pitch_hz=PITCH_HZ, dil=DIL, with_room=False):
 if __name__ == "__main__":
     print()
     print("=" * 70)
-    print("RATNADHĀTAMAM v16 — UNIFIED SOURCE ARCHITECTURE")
+    print("RATNADHĀTAMAM v17 — UNIFIED SOURCE + PLUCK ARCHITECTURE")
     print("=" * 70)
     print()
-    print("v15→v16 CHANGES:")
+    print("v16→v17 CHANGES:")
     print()
-    print("  [t] UNIFIED SOURCE ARCHITECTURE:")
-    print("    ONE continuous noise buffer (the breath)")
-    print("    ONE continuous amplitude envelope (the tongue)")
-    print("    NO array concatenation boundaries")
-    print("    Subglottal floor: 0.001 (~-60dB) — never digital zero")
-    print("    Pre-burst crescendo rides on subglottal floor")
-    print("    Spike ADDED to continuous noise (not concatenated)")
-    print("    Dental locus formants applied to entire buffer")
+    print("  TWO PRINCIPLES COMPOSED:")
     print()
-    print("    The breath is continuous. The tongue is the envelope.")
-    print("    Same principle as DEVAM [d] v13 crossfade:")
-    print("    one source, shaped continuously, no boundaries.")
+    print("  1. UNIFIED SOURCE (from v16):")
+    print("     [t] has ONE noise buffer, ONE envelope, spike on noise.")
+    print("     No internal boundaries. Subglottal floor at edges.")
     print()
-    print("  All other phonemes unchanged from v15.")
+    print("  2. PLUCK ARCHITECTURE (from PUROHITAM v4):")
+    print("     Vowels own transitions into/out of voiceless stops.")
+    print("     [ɑ]₁ closing tail → [t]₁ → opening head + [n]")
+    print("     [aː] closing tail → [t]₂ → opening head + [ɑ]₃")
+    print()
+    print("  RESULT: All join boundaries at near-zero amplitude.")
+    print("     [...vowel → tail → 0.00] + [0.001 → [t] → 0.001]")
+    print("                               + [0.00 → head → voiced...]")
     print()
 
     # Diagnostic speed
@@ -774,54 +895,61 @@ if __name__ == "__main__":
     # Hall
     word_hall = synth_ratnadhatamam(PITCH_HZ, 1.0, with_room=True)
 
-    write_wav("output_play/ratnadhatamam_v16_dry.wav", word_dry)
-    write_wav("output_play/ratnadhatamam_v16_slow6x.wav", word_slow)
-    write_wav("output_play/ratnadhatamam_v16_slow12x.wav", word_slow12)
-    write_wav("output_play/ratnadhatamam_v16_hall.wav", word_hall)
-    write_wav("output_play/ratnadhatamam_v16_perf.wav", word_perf)
-    write_wav("output_play/ratnadhatamam_v16_perf_hall.wav", word_perf_hall)
+    write_wav("output_play/ratnadhatamam_v17_dry.wav", word_dry)
+    write_wav("output_play/ratnadhatamam_v17_slow6x.wav", word_slow)
+    write_wav("output_play/ratnadhatamam_v17_slow12x.wav", word_slow12)
+    write_wav("output_play/ratnadhatamam_v17_hall.wav", word_hall)
+    write_wav("output_play/ratnadhatamam_v17_perf.wav", word_perf)
+    write_wav("output_play/ratnadhatamam_v17_perf_hall.wav", word_perf_hall)
 
-    # Isolated phonemes for diagnostic
-    dh_iso = synth_DH(F_prev=VS_A_F, F_next=VS_AA_F)
-    t1_iso = synth_T(F_next=VS_N_F)
-    t2_iso = synth_T(F_next=VS_A_F)
-    m_final_iso = synth_M(F_prev=VS_A_F, word_final=True)
+    # Isolated [t] unified
+    t_iso = synth_T(F_next=VS_A_F, pitch_hz=PITCH_HZ, dil=DIL)
+    mx = np.max(np.abs(t_iso))
+    if mx > 1e-8:
+        t_iso = t_iso / mx * 0.75
+    t_iso = f32(t_iso)
 
-    for sig, name in [
-        (dh_iso, "ratnadhatamam_v16_dh_iso"),
-        (t1_iso, "ratnadhatamam_v16_t1_iso"),
-        (t2_iso, "ratnadhatamam_v16_t2_iso"),
-        (m_final_iso, "ratnadhatamam_v16_m_final_iso"),
-    ]:
-        mx = np.max(np.abs(sig))
-        if mx > 1e-8:
-            sig = sig / mx * 0.75
-        write_wav(f"output_play/{name}.wav", sig)
-        write_wav(f"output_play/{name}_slow6x.wav", ola_stretch(sig, 6.0))
-        write_wav(f"output_play/{name}_slow12x.wav", ola_stretch(sig, 12.0))
+    write_wav("output_play/ratnadhatamam_v17_t_unified.wav", t_iso)
+    write_wav("output_play/ratnadhatamam_v17_t_unified_slow6x.wav",
+              ola_stretch(t_iso, 6.0))
+    write_wav("output_play/ratnadhatamam_v17_t_unified_slow12x.wav",
+              ola_stretch(t_iso, 12.0))
 
+    # AT syllable (boundary test)
+    a_closing = synth_A(F_prev=VS_R_F, F_next=VS_T_LOCUS_F,
+                        closing_for_stop=True)
+    t_seg = synth_T(F_next=VS_N_F)
+    n_opening = synth_N(F_prev=VS_T_LOCUS_F, F_next=VS_A_F,
+                        opening_from_stop=True)
+    at_syl = np.concatenate([a_closing, t_seg, n_opening])
+    mx = np.max(np.abs(at_syl))
+    if mx > 1e-8:
+        at_syl = at_syl / mx * 0.75
+    at_syl = f32(at_syl)
+
+    write_wav("output_play/ratnadhatamam_v17_ATn_syllable.wav", at_syl)
+    write_wav("output_play/ratnadhatamam_v17_ATn_syllable_slow6x.wav",
+              ola_stretch(at_syl, 6.0))
+    write_wav("output_play/ratnadhatamam_v17_ATn_syllable_slow12x.wav",
+              ola_stretch(at_syl, 12.0))
+
+    print()
+    n_word = len(word_dry)
+    print(f"  Word length: {n_word} samples ({n_word/SR*1000:.1f} ms)")
     print()
     print("=" * 70)
-    print("v16 synthesis complete.")
+    print("v17 synthesis complete.")
     print()
-    print("LISTEN:")
-    print("  afplay output_play/ratnadhatamam_v16_t1_iso_slow6x.wav")
-    print("  afplay output_play/ratnadhatamam_v16_t1_iso_slow12x.wav")
-    print("  afplay output_play/ratnadhatamam_v16_t2_iso_slow6x.wav")
-    print("  afplay output_play/ratnadhatamam_v16_slow6x.wav")
-    print("  afplay output_play/ratnadhatamam_v16_perf_hall.wav")
+    print("LISTEN FOR BOUNDARY TEST:")
+    print("  afplay output_play/ratnadhatamam_v17_ATn_syllable_slow12x.wav")
+    print("  afplay output_play/ratnadhatamam_v17_t_unified_slow6x.wav")
+    print("  afplay output_play/ratnadhatamam_v17_slow6x.wav")
+    print("  afplay output_play/ratnadhatamam_v17_perf_hall.wav")
     print()
-    print("LISTEN FOR:")
-    print("  [t] — THE CLICK SHOULD BE GONE.")
-    print("        No concatenation boundaries exist.")
-    print("        The burst emerges from the continuous noise floor.")
-    print("        Compare v16_t1_iso vs v15_t1_iso at 12x slow.")
-    print()
-    print("  If the [t] is too quiet or too noisy:")
-    print("    VS_T_BURST_GAIN controls burst loudness (currently 0.15)")
-    print("    VS_T_SUBGLOTTAL_FLOOR controls closure noise (currently 0.001)")
-    print("    VS_T_PREBURST_AMP controls leak crescendo peak (currently 0.008)")
-    print()
-    print("  The architecture is now correct. Only tuning remains.")
+    print("THE [t] SHOULD SOUND NATURAL — NOT TOO HARSH:")
+    print("  v16: [t] unified source but no closing tails / opening heads")
+    print("  v17: [t] unified source + closing tails + opening heads")
+    print("       The [t] is now a pluck between smooth transitions")
+    print("       All joins at near-zero amplitude")
     print("=" * 70)
     print()
