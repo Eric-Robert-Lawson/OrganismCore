@@ -61,3 +61,4 @@ The documents are ordered as such:
 - operationalizing_ship_of_theseus.md
 - HUMAN_QUALIA_EXPANSION_ENGINEERING_FRAMEWORK.md
 - substrate_stack_theory.md
+- memory_as_informational_metabolism.md
