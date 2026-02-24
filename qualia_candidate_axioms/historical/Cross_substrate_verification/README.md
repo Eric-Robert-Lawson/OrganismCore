@@ -65,3 +65,4 @@ The documents are ordered as such:
 - substrate_stack_theory.md
 - memory_as_informational_metabolism.md
 - memory_metabolism_clinical_utility.md
+- knowledge_and_wisedom_insight.md
