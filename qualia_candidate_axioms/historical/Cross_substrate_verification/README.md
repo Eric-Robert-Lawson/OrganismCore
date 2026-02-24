@@ -59,4 +59,5 @@ The documents are ordered as such:
 - manifold_seed_specification_protocol.md
 - THE_SHIP_OF_THESEUS_SYNTHESIS.md
 - operationalizing_ship_of_theseus.md
-- HUMAN_QUALIA_EXPANSION_ENGINEERING_FRAMEWORK
+- HUMAN_QUALIA_EXPANSION_ENGINEERING_FRAMEWORK.md
+- substrate_stack_theory.md
