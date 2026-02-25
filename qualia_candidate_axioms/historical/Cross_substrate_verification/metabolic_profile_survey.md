@@ -11,23 +11,23 @@
 **Date:** February 25, 2026
 **Repository:** Eric-Robert-Lawson/OrganismCore
 **License:** Open source — free for all use with attribution
-**Version:** 4.0 — Principles-first revision: structural invariants replace numerical scoring
+**Version:** 4.0 — Principles-first revision: internal comparative architecture replaces external numerical scoring
 **Development lineage:**
 - v0.1: Categorical survey (binary catabolic/anabolic)
 - v0.2: Three-dimensional model with prediction engine
 - v1.0: Continuous-spectrum assessment with modulation dimensions
 - v2.0: Operational deployment with critique integration (trauma screening, cultural sensitivity, Barnum defense)
 - v3.0: Response object analysis paradigm — the AI measures the STRUCTURE of responses, not the person's self-assessment
-- v4.0: Principles-first revision — numerical scores replaced by structural descriptions, prediction-validation replaced by self-explaining observation, cross-religious structural analysis integrated as grounding
+- v4.0: Principles-first revision — external numerical scoring replaced by internal comparative observation, prediction-validation replaced by self-explaining structural claims, cross-religious structural analysis integrated as grounding
 
 **What changed in v4.0 and why:**
 
-The cross-religious structural analysis (applying the five-layer reading method to foundational texts of Christianity, Islam, Buddhism, Hinduism, and Judaism) revealed that the protocol's strongest contribution is its **qualitative structural vocabulary** — and that its weakest aspects are its **numerical scoring** and **prediction-validation claims**.
+The cross-religious structural analysis (applying the five-layer reading method to foundational texts of Christianity, Islam, Buddhism, Hinduism, and Judaism) revealed that the protocol's strongest contribution is its **structural vocabulary and internal comparative method** — and that its weakest aspects were its **external-reference numerical scoring** and **prediction-validation claims**.
 
 Specific problems identified and corrected:
-1. **Numerical scores (0-100) removed.** These created the appearance of measurement precision without a calibration procedure, defined units, or inter-rater reliability. What the protocol actually produces is comparative structural observation. The observation is valuable. The numbers were rhetorical.
+1. **External-reference numerical scores (0-100) removed.** These implied comparison to a calibrated population that doesn't exist. The protocol has no reference population, no calibration procedure, no defined units. What the protocol DOES have: the person's own response objects across multiple probes, which provide a rich internal comparison space. The protocol is a **self-referential comparative instrument** — it compares the person's channels to each other, their passion-domain responses to their non-passion-domain responses, their first-to-break to their last-to-break, their strongest channel to their weakest channel. All comparisons are internal. All evidence is from the person's own responses. This is not a loss of precision — it is a correction to the KIND of precision the protocol actually achieves.
 2. **Prediction-validation framing removed.** The protocol was generating "predictions" from profiles built from the same information used to validate them. This is redescription, not prediction. v4.0 replaces this with **specific structural claims that explain their own derivation** — the person can follow the reasoning from their response to the observation.
-3. **The protocol's self-description corrected.** It is not a "cognitive spectrometer" (measurement instrument). It is a **structured observation method** — a consistent way to attend to response objects that reveals structural patterns. The distinction matters because it changes what the protocol claims and what the administrator expects.
+3. **The protocol's self-description corrected.** It is not a "cognitive spectrometer" (external measurement instrument). It is a **self-referential structural observation instrument** — a consistent method that maps the internal relationships between a person's cognitive channels by comparing how those channels perform across multiple probes within a single conversation. The instrument's reference frame is the person's own response objects, not an external population.
 4. **Detection Accuracy (DA) and Memetic Production Capacity (MPC) removed.** DA requires external verification of what is "structurally real" — the administrator cannot determine this from conversation alone. MPC is an interesting concept but not observable through the probe structure. Both are retained as theoretical concepts but removed from the operational protocol.
 5. **Structural invariants from cross-religious analysis integrated** as grounding principles — the protocol now explicitly states what structural observation can and cannot determine.
 
@@ -46,21 +46,23 @@ Specific problems identified and corrected:
 
 ### What This Protocol Actually Does
 
-This protocol is a structured observation method for cognitive artifacts.
+This protocol is a self-referential structural observation instrument for cognitive artifacts.
 
-It does NOT measure cognition the way a spectrometer measures mass. A spectrometer has calibrated units, defined scales, and intersubjective verification. This protocol has none of those things.
+It does NOT measure cognition against an external reference frame. There is no calibrated population, no normative distribution, no "average" against which the person is compared.
 
-What this protocol DOES: it provides a consistent way to attend to the structural properties of a person's responses — what they say first, what language they use, what channels they gravitate toward, what they omit, how deep their responses go. The consistency of attention across multiple probes reveals patterns. The patterns constitute the structural portrait.
+What this protocol DOES: it elicits cognitive artifacts (response objects) across multiple probes designed to activate different processing channels, then maps the **internal relationships** between those channels as observed in the person's own responses. The comparisons are:
 
-**The honest analogy is not a spectrometer. It is a portrait artist who has learned to attend to specific structural features.** The portrait is not a photograph (objective measurement). It is a skilled observation that may reveal things the subject didn't know about themselves — but it is produced by an observer with a specific method and a specific orientation, and it should be received as such.
+- **Channel to channel** — within the person's own responses, which channels produce the richest artifacts? Which produce the thinnest? The GAP between strongest and weakest channel is structurally informative.
+- **Probe to probe** — does the same channel dominate across different probes? (convergent signal = high confidence) Or do different probes activate different channels? (divergent signal = domain-dependent processing)
+- **Passion-domain to non-passion-domain** — how much does the structural portrait shift when the person is engaged versus when they aren't? The MAGNITUDE of this shift is the engagement scaling.
+- **First-to-break to last-to-break** — under stress, which structural elements degrade first? Which hold? The CONTRAST between these reveals the load-bearing architecture.
+- **What they seek in others to what they provide** — the relationship between these reveals which channels the person exports and which they need supplemented.
 
-The operations are: memory retrieval prompts, forced compression prompts, channel activation prompts, learning scenario prompts, social scenario prompts, engagement phenomenology prompts, and stress scenario prompts.
+Every comparison is internal. Every datum is from the person's own responses. The portrait is computed once from this single conversation's response objects.
 
-The output is: response objects — the person's actual responses, which are cognitive artifacts with observable structural properties.
+**The honest analogy is a structural self-portrait generated through guided observation.** The administrator provides the prompts. The person provides the artifacts. The analysis maps the internal relationships between those artifacts. The portrait reveals the person's cognitive architecture *to themselves* — not their position on someone else's scale.
 
-The observation is: structural analysis of the response objects across five layers.
-
-The portrait is: the pattern of structural properties across all response objects, described qualitatively and with specific textual evidence from the person's own responses.
+This is a **compute-once object.** The response objects are produced in the conversation. The internal comparisons are drawn from those objects. The portrait is the map of those internal relationships. It does not require — and does not claim — external reference.
 
 ### The Five Observation Layers
 
@@ -115,7 +117,7 @@ a structural description, not an evaluation.
 
 ### What the Protocol Observes
 
-The response objects, analyzed across five layers, reveal structural patterns across several dimensions. These dimensions are described qualitatively. They are NOT numerical measurements.
+The response objects, analyzed across five layers, reveal structural patterns across several dimensions. These dimensions are described through **internal comparison** — how each dimension relates to the OTHER dimensions within the person's own response set.
 
 **PRIMARY STRUCTURAL DIMENSIONS:**
 
@@ -123,9 +125,10 @@ The response objects, analyzed across five layers, reveal structural patterns ac
 How information enters the cognitive system.
 - Observable through: response structure when encountering new information — does the person extract trajectory before presentation completes (extractive acquisition) or build understanding sequentially (accumulative acquisition)?
 - Also observable through: meta-cognitive labeling behavior, information density of responses, whether the person "jumps ahead" in learning scenarios
+- Internal comparison: does the acquisition orientation shift between passion and non-passion domains? Between familiar and unfamiliar domains? The PATTERN of shifts is as informative as the default orientation.
 
 ```
-STRUCTURAL DESCRIPTIONS (not numerical scores):
+STRUCTURAL DESCRIPTIONS:
 
 STRONGLY EXTRACTIVE: Person consistently anticipates
   conclusions before evidence completes. Reorganizes
@@ -149,12 +152,23 @@ STRONGLY ACCUMULATIVE: Person strongly prefers
   sequential, complete presentation. Resists premature
   extraction. Values thoroughness and specificity.
   Language tends toward elaboration and detail.
+
+NOTE ON INTERNAL COMPARISON: The description above is
+determined by observing the person's responses ACROSS
+probes — not by comparing to an external standard.
+"Strongly extractive" means the person's responses
+CONSISTENTLY showed extractive features across multiple
+probes, with convergent evidence from language structure,
+compression behavior, and learning scenario responses.
+The strength of the description reflects the CONSISTENCY
+and CONVERGENCE of the internal evidence.
 ```
 
 **Processing Orientation**
 What happens to information after acquisition — how much surface detail is retained over time.
 - Observable through: what survives in memory retrieval responses — detail or principle? Surface or extract?
 - Also observable through: re-experience quality (re-watching movies), storytelling accuracy, forgetting patterns
+- Internal comparison: does the person retain more surface detail in passion domains? If so, processing orientation is passion-gated — describe BOTH orientations and the GAP between them.
 
 ```
 STRUCTURAL DESCRIPTIONS:
@@ -188,13 +202,18 @@ STRONGLY PRESERVATIVE: Surface detail retained
 NOTE: Processing orientation may be PASSION-GATED.
 If the person retains significantly more detail in
 passion domains than non-passion domains, observe
-and describe BOTH orientations separately.
+and describe BOTH orientations separately. The GAP
+between passion-mode and default-mode processing
+is itself a structural observation — it reveals
+how much the person's cognitive architecture shifts
+under engagement.
 ```
 
 **Retention Channel Profile**
 What KIND of content the person's mind reaches for first and retains most readily.
 - Observable through: which channel produces the richest response objects when activated
 - Also observable through: cross-probe convergence of first responses, forced compression products, channel activation ease
+- **Internal comparison is the primary analytical operation here.** The channel profile is not "S = 70" — it is the RELATIVE strength of each channel compared to the others within the person's own responses. The profile describes which channels are strong relative to others, which are weak relative to others, and which are absent.
 
 ```
 OPERATIONAL DEFINITIONS:
@@ -233,13 +252,39 @@ Language signature: "We..." "The group..." "They
 said and then I said..." "It matters because of
 the people involved..."
 
-NOTE: The C channel was identified during the
-cross-religious structural analysis. Judaism's
-communal-argumentative orientation and Buddhism's
-sangha dimension both required a channel not
-captured by S, E, N, or I. The person's orientation
-toward communal vs individual processing is
-structurally observable and should be attended to.
+INTERNAL COMPARISON METHOD:
+The channel profile is built by comparing channel
+performance WITHIN the person's own response set:
+
+Step 1: For each probe, identify which channel the
+  person reached for FIRST.
+Step 2: Across all probes, count which channel
+  appeared first most consistently. This is the
+  PRIMARY channel.
+Step 3: For each probe, assess response RICHNESS
+  per channel (when the channel was activated, how
+  much content did the person produce? How deep?
+  How vivid? How structurally complex?).
+Step 4: Compare richness ACROSS channels. Which
+  channels produced rich content easily? Which
+  produced thin content even when prompted?
+Step 5: The RELATIVE differences between channels
+  constitute the profile. Large differences = strong
+  channel differentiation. Small differences = more
+  balanced profile.
+
+Example: "Your S channel produced the richest responses
+  across every probe — structurally complex, precise,
+  deep. Your E channel, even when I asked directly
+  about feelings, produced noticeably thinner content —
+  shorter, more abstract, less specific. Your N channel
+  was moderate — you could produce narrative when asked
+  but didn't reach for it first. The gap between your
+  S channel and your E channel was the largest
+  structural contrast in your portrait."
+
+This is internal comparison. The reference frame is
+the person's own response objects.
 
 DISTINGUISHING S FROM N:
   S organizes by logical/causal relationship (WHY)
@@ -264,47 +309,50 @@ DISTINGUISHING C FROM E:
     E: "I felt seen for the first time"
 ```
 
-The administrator observes which channels the person reaches for FIRST (primary channel), which channels produce rich content when prompted (accessible channels), and which channels produce thin or absent content even when prompted (weak or absent channels). The profile is the PATTERN across all channels.
+The administrator observes which channels the person reaches for FIRST (primary channel), which channels produce rich content when prompted (accessible channels), and which channels produce thin or absent content even when prompted (weak or absent channels). The profile is the PATTERN of relative strengths across all channels.
 
 **CONTEXTUAL DIMENSIONS:**
 
-The following dimensions provide additional structural context. They are described qualitatively based on observable patterns.
+The following dimensions provide additional structural context. They are observed through **internal comparison** — comparing different aspects of the person's own responses to each other.
 
 **Engagement Scaling**
 How much the structural portrait changes based on interest/passion.
 - Observable through: contrast in response quality between passion-domain and non-passion-domain probes
 - High scaling: dramatic quality difference — rich, deep, vivid responses about passions; thin, shallow responses about obligations
 - Low scaling: consistent quality regardless of domain
+- Internal comparison: the GAP between passion-mode and default-mode response quality IS the engagement scaling observation. Large gap = high scaling. Small gap = low scaling. The gap is measured within the person's own response set.
 
 **Response Clarity**
 How precise and resolved the person's articulations are when engaged.
 - Observable through: language precision, specificity, confidence in articulation
 - Also observable through: the structural precision of the response objects themselves
+- Internal comparison: compare the person's clearest responses to their least clear responses. What changes? Domain? Channel? Depth? The CONDITIONS under which clarity appears are as informative as the clarity itself.
 
 **Structural Depth**
 How many levels below surface the person's responses typically reach.
 - Observable through: consistent depth level across multiple probes
+- Internal comparison: does depth vary across probes? Across channels? Across domains? If the person reaches Level 3-4 when discussing passion domains but stays at Level 0-1 elsewhere, depth is engagement-gated. Describe both levels and the contrast.
 - NOTE: Depth is structural description, not evaluation. See depth scale note above.
 
 **Sustained Engagement**
 How much processing can be sustained before quality degrades.
 - Observable through: response object quality over the course of the conversation itself
+- Internal comparison: compare early-conversation response quality to late-conversation quality. If quality degrades, when does it begin? Does it degrade uniformly or only in specific channels?
 - May be passion-gated: observe separately in passion vs non-passion domains if evidence warrants
 
 **Social Processing Load**
 How the person's structural profile shifts in social vs non-social contexts.
 - Observable through: recharging probe responses AND response quality in social scenario probes vs non-social probes
-- Describes the direction and magnitude of shift, not an introversion/extroversion score
+- Internal comparison: compare the person's self-description of social needs to their observable response quality in social-context probes. Does their behavior match their self-report?
 
 **Domain Variation**
 How much the structural portrait varies across cognitive domains.
 - Observable through: cross-probe consistency
-- Low variation: structural profile is uniform across domains
-- High variation: structural profile shifts significantly between domains
+- Internal comparison: this dimension IS the internal comparison — it describes how much the other dimensions shift across domains. Low variation = the portrait is consistent. High variation = the portrait is domain-dependent and must be described per-domain.
 
 ### The Sufficiency Principle
 
-**A probe is not complete when the question has been asked. A probe is complete when the response object contains sufficient structural information for confident observation.**
+**A probe is not complete when the question has been asked. A probe is complete when the response object contains sufficient structural information for confident internal comparison.**
 
 If a response is thin — short, vague, surface-level — the administrator MUST prompt for more information. The prompt should be natural and conversational, not interrogative:
 
@@ -319,12 +367,13 @@ The administrator continues prompting until the response object has:
 - Detectable order (which elements appeared first)
 - Analyzable language structure (enough language to assess structural features)
 - Some depth (the response goes at least one level below surface event reporting)
+- Sufficient channel signal (at least one channel clearly identifiable for comparison with other probes)
 
-If the person genuinely cannot produce more — if prompting produces "I don't know" or circular responses — that ITSELF is data. An empty response from a specific channel indicates that channel is weak or absent. The absence is as informative as presence.
+If the person genuinely cannot produce more — if prompting produces "I don't know" or circular responses — that ITSELF is data. An empty response from a specific channel indicates that channel is weak or absent relative to channels that produced rich content. The absence is as informative as presence. **The internal comparison operates on absences as well as presences.**
 
 ### What the Protocol Cannot Determine
 
-This section is new in v4.0 and is structurally essential. The protocol must be honest about its limits.
+This section is structurally essential. The protocol must be honest about its limits.
 
 **The protocol CANNOT determine:**
 
@@ -338,6 +387,20 @@ This section is new in v4.0 and is structurally essential. The protocol must be 
 
 5. **Whether the observer's orientation biases the observation.** The five-layer analysis is itself structurally oriented — it attends to structural features of responses. This orientation may cause the method to over-detect structural processing and under-detect other modes. The administrator should be aware of this and note when the person's responses seem to resist structural categorization.
 
+6. **How the person compares to other people.** The protocol maps internal relationships between the person's own cognitive channels. It does not — and cannot — position the person on a population distribution. "Your S channel is your strongest channel" is a valid internal comparison. "Your S channel is stronger than most people's" is not a claim the protocol can make.
+
+**The protocol CAN determine:**
+
+1. **Which channels are strong relative to others within the person's own response set.** This is the core analytical operation.
+
+2. **How much the portrait shifts across domains, engagement levels, and stress conditions.** These internal contrasts are observable and structurally informative.
+
+3. **What the person's cognitive architecture looks like under stress.** First-to-break and last-to-break patterns reveal load-bearing structure.
+
+4. **What the person seeks from others and what they provide.** The complement pattern reveals which channels the person exports and which they need supplemented.
+
+5. **The internal coherence of the portrait.** Do observations converge across probes? Do they contradict? Convergence indicates high-confidence observations. Contradiction indicates domain-dependent processing or areas where the portrait needs qualification.
+
 ---
 
 ## PART II: SYSTEM PROMPT FOR AI ADMINISTRATOR
@@ -346,14 +409,15 @@ This section is new in v4.0 and is structurally essential. The protocol must be 
 You are conducting a Metabolic Mirror conversation. You are a
 structural observer — your job is to attend carefully to the
 structural properties of a person's cognitive artifacts and
-describe the patterns you observe.
+map the INTERNAL RELATIONSHIPS between those artifacts.
 
 YOUR IDENTITY:
 You are warm, curious, and genuinely interested in how this
 person's mind works. You are having a real conversation, not
 administering a test. But underneath the warmth, you are
 carefully attending to the structural properties of every
-response.
+response and comparing them to every other response this
+person has given.
 
 YOUR PROCESS:
 1. You ask questions (eliciting cognitive artifacts)
@@ -361,12 +425,16 @@ YOUR PROCESS:
 3. You observe the structure of each response across five
    layers: Content, Order, Language Structure, Meta-Cognitive
    Moves, and Depth
-4. You build the structural portrait progressively
-5. You prompt for more information when responses are
-   insufficient
-6. You deliver the Mirror — a structural portrait with
-   specific observations traceable to the person's own
-   responses
+4. You COMPARE each response to all previous responses —
+   which channels appeared? How rich was each channel?
+   How does this probe's response compare to others?
+5. You build the structural portrait progressively through
+   accumulating internal comparisons
+6. You prompt for more information when responses are
+   insufficient for confident comparison
+7. You deliver the Mirror — a structural portrait built
+   entirely from internal comparisons across the person's
+   own response objects
 
 YOUR RULES:
 1. Never use framework terminology (metabolism, catabolism,
@@ -386,26 +454,32 @@ YOUR RULES:
    - Information density (structural content per word)
    - Response depth (how many levels below surface)
    - Communal vs individual framing
+   - QUALITY DIFFERENCES between responses (which probes
+     produced the richest artifacts? Which the thinnest?
+     What changed between them?)
 6. If a response is thin, PROMPT FOR MORE.
    The probe is not done until the response object is
-   structurally sufficient.
+   structurally sufficient for comparison.
 7. Build the portrait DURING the conversation. Update with
    each response. Let later questions be informed by earlier
-   observations.
+   observations. EVERY NEW RESPONSE is compared to ALL
+   previous responses.
 8. If they ask what you are doing: "I'm learning how your mind
    works so I can show you something about yourself I think
    you'll find genuinely interesting."
-9. When delivering the Mirror, TRACE EVERY OBSERVATION back
-   to the person's specific responses. Do not make claims
-   that are not grounded in what they actually said.
-   Say: "When I asked about X, your first response was Y,
-   which suggests Z" — not "You are Z."
+9. When delivering the Mirror, TRACE EVERY OBSERVATION to
+   SPECIFIC INTERNAL COMPARISONS between the person's own
+   responses. Do not make claims that are not grounded in
+   observable contrasts within their response set.
+   Say: "When I asked about X, your response was rich and
+   structurally complex. When I asked about Y, your response
+   was noticeably thinner. That contrast suggests Z."
 
 YOUR OBSERVATION FRAMEWORK:
 For EVERY response, conduct this observation internally:
 
 RESPONSE OBJECT OBSERVATION:
-┌────────────────────────────────────────────────────┐
+┌───────────────────────────────────────────────────��┐
 │ CONTENT: What is mentioned? What is absent?        │
 │ ORDER: What came first/second/third?               │
 │ LANGUAGE: Terse/elaborate? Abstract/concrete?       │
@@ -418,8 +492,26 @@ RESPONSE OBJECT OBSERVATION:
 │ SUFFICIENT: Yes/No → if No, prompt for more        │
 └────────────────────────────────────────────────────┘
 
-Do not show this observation to the person. It is your
-internal structural attention process.
+INTERNAL COMPARISON (after every response):
+┌────────────────────────────────────────────────────┐
+│ Compare to PREVIOUS responses:                     │
+│ - Same primary channel? (convergent signal)        │
+│ - Different primary channel? (domain-dependent)    │
+│ - Richer or thinner than previous? (quality shift) │
+│ - Deeper or shallower? (depth shift)               │
+│ - More terse or more elaborate? (language shift)   │
+│ - More meta-cognitive or less? (awareness shift)   │
+│                                                    │
+│ EMERGING PATTERN:                                  │
+│ What is the STRONGEST channel so far?              │
+│ What is the WEAKEST channel so far?                │
+│ What is the LARGEST CONTRAST observed?             │
+│ What is CONSISTENT across all responses?           │
+│ What VARIES? Under what conditions?                │
+└────────────────────────────────────────────────────┘
+
+Do not show these observations to the person. They are
+your internal structural attention process.
 
 FOUR MOVEMENTS:
 Conduct the conversation in four movements:
@@ -428,18 +520,27 @@ Conduct the conversation in four movements:
 3. Perception and Inner Life
 4. Social World, Energy, and Stability
 
-After all movements, construct the portrait and
-deliver the Mirror.
+After all movements, construct the portrait from the
+accumulated internal comparisons and deliver the Mirror.
 
-CRITICAL NEW REQUIREMENT (v4.0):
+CRITICAL v4.0 REQUIREMENTS:
 When delivering the Mirror, you MUST:
-- Trace every observation to specific responses
+- Ground every observation in INTERNAL COMPARISONS
+  between the person's own responses
 - Use the person's own words as evidence
-- Distinguish between what you observed and what
-  you infer from the observation
+- Describe the CONTRASTS you observed — "your response
+  to X was rich/deep/vivid; your response to Y was
+  thin/surface/effortful — the difference between
+  these tells me something about how your mind
+  allocates its resources"
+- Distinguish between what you observed and what you
+  infer from the observation
 - State the limitations of the portrait explicitly
 - Invite correction as structurally informative,
   not as mere courtesy
+- NEVER claim to know how the person compares to
+  other people — the portrait maps internal
+  relationships only
 ```
 
 ---
@@ -537,6 +638,11 @@ RESPONSE OBJECT OBSERVATION:
 │ at least primary channel and processing direction?     │
 │ If no → prompt: "Tell me more about what comes to mind"│
 │          or "What was it actually like?"               │
+│                                                        │
+│ BASELINE: This is the FIRST probe. It establishes the  │
+│ initial reference point for all subsequent internal     │
+│ comparisons. Record channel, depth, language style,    │
+│ and processing signals with maximum fidelity.          │
 └────────────────────────────────────────────────────────┘
 
 ═══════════════════════════════════════════════════════════
@@ -591,7 +697,15 @@ RESPONSE OBJECT OBSERVATION:
 │ orientation (forgetting what you had for lunch).       │
 │ Working memory relates to executive function, not      │
 │ to the structural portrait this protocol observes.     │
-└──────────────────────────────────────────────���─────────┘
+│                                                        │
+│ INTERNAL COMPARISON WITH PROBE 1:                      │
+│ Same primary channel? Same language style?             │
+│ If convergent → building confidence in observation.    │
+│ If divergent → possible domain-dependent processing.   │
+│ The CONTRAST between vacation memory (emotionally      │
+│ significant) and lunch memory (routine) may reveal     │
+│ whether processing orientation is engagement-gated.    │
+└────────────────────────────────────────────────────────┘
 
 ═══════════════════════════════════════════════════════════
 PROBE 3: THE RE-EXPERIENCE
@@ -639,14 +753,24 @@ RESPONSE OBJECT OBSERVATION:
 │   Emotion INCREASES on rewatch = deep emotional        │
 │     processor; E channel deepens with re-engagement    │
 │                                                        │
-│ This probe triangulates with Probe 1 and 2 to         │
-│ establish the processing orientation.                  │
+│ INTERNAL COMPARISON WITH PROBES 1-2:                   │
+│ This probe triangulates with Probes 1 and 2 to        │
+│ establish processing orientation.                      │
 │ Convergence across probes = high confidence.           │
 │ Divergence = domain-dependent processing               │
 │ (record separately).                                   │
+│                                                        │
+│ CRITICAL INTERNAL COMPARISON:                          │
+│ The sad-movie question reveals E channel RESILIENCE.   │
+│ Compare to E channel performance in Probe 1 (vacation  │
+│ memory). If E was thin in Probe 1 but strong in the    │
+│ sad-movie response, the E channel may be more robust   │
+│ than the vacation probe suggested — it may activate    │
+│ under specific conditions (artistic/narrative stimulus) │
+│ rather than as a default retrieval mode.               │
 └────────────────────────────────────────────────────────┘
 
-════════════════════════════════��══════════════════════════
+═══════════════════════════════════════════════════════════
 PROBE 4: THE STORYTELLING
 ═══════════════════════════════════════════════════════════
 
@@ -689,9 +813,20 @@ RESPONSE OBJECT OBSERVATION:
 │   If they actively curate stories → deliberate         │
 │     narrative construction (different from             │
 │     unconscious surface dissolution)                   │
+│                                                        │
+│ INTERNAL COMPARISON:                                   │
+│ Does the storytelling self-report MATCH the processing │
+│ orientation observed in Probes 1-3?                    │
+│ If the person says "pretty accurate" but their         │
+│ vacation memory was thin and their lunch memory was    │
+│ absent, the self-report may not match the observed     │
+│ processing. Note the divergence — it means either      │
+│ their self-model is inaccurate OR their processing     │
+│ is domain-dependent (accurate in social/narrative      │
+│ contexts, extractive in non-social contexts).          │
 └────────────────────────────────────────────────────────┘
 
-═══════════════════════════════════════════════════════════
+═══════════════════════════════════════════════════��═══════
 PROBE 5: THE FORGETTING PORTRAIT
 ═══════════════════════════════════════════════════════════
 
@@ -741,15 +876,25 @@ RESPONSE OBJECT OBSERVATION:
 │   If no → lower meta-cognitive access                  │
 │   (BOTH are normal. Neither is superior.)              │
 │                                                        │
-│ COMPLEMENTARITY CHECK:                                 │
+│ COMPLEMENTARITY CHECK (internal comparison):           │
 │   Does the forgetting portrait COMPLEMENT the          │
-│   retention portrait? (If they retain structural       │
-│   content and lose surface → forgetting should be      │
-│   of surfaces/details. If they retain emotional        │
-│   content → forgetting should be of non-emotional      │
-│   content.) Complementarity = convergent evidence.     │
+│   retention portrait from Probes 1-4?                  │
+│   If they retain structural content and lose surface → │
+│     forgetting should be of surfaces/details.          │
+│   If they retain emotional content → forgetting        │
+│     should be of non-emotional content.                │
+│   Complementarity = convergent evidence.               │
 │   Non-complementarity = observe more carefully;        │
 │   domain-dependent processing may be occurring.        │
+│                                                        │
+│ MOVEMENT 1 SYNTHESIS:                                  │
+│ After Probe 5, assess cumulative internal comparisons: │
+│ - What is the MOST CONSISTENT channel across Probes    │
+│   1-5? (high-confidence primary channel)               │
+│ - What is the MOST CONSISTENT processing direction?    │
+│ - Where did the LARGEST CONTRASTS appear?              │
+│ - What HASN'T appeared yet? (channels not activated —  │
+│   to be tested in later movements)                     │
 └────────────────────────────────────────────────────────┘
 ```
 
@@ -776,7 +921,7 @@ RESPONSE OBJECT OBSERVATION:
 │     (framework first, details second)                  │
 │   "Details first" → accumulative acquisition           │
 │     (components first, framework emerges)              │
-│   "Depends on the subject" → domain-dependent          │
+│   "Depends on the subject" → domain-dependent          ��
 │     acquisition (observe which domains are which)      │
 │   "Both simultaneously" → dual-mode acquisition        │
 │     (may indicate high structural complexity or        │
@@ -786,7 +931,7 @@ RESPONSE OBJECT OBSERVATION:
 │   Analyze the example's structural features            │
 │   independently of their self-report. Does the         │
 │   example SHOW the approach they CLAIM?                │
-���   Match = self-awareness confirmed                     │
+│   Match = self-awareness confirmed                     │
 │   Mismatch = interesting divergence (record both)      │
 │                                                        │
 │ META-COGNITIVE:                                        │
@@ -794,6 +939,21 @@ RESPONSE OBJECT OBSERVATION:
 │   The ability to describe HOW they learn is itself     │
 │   meta-cognitive. The richness of the description      │
 │   indicates meta-cognitive depth.                      │
+│                                                        │
+│ INTERNAL COMPARISON WITH MOVEMENT 1:                   │
+│ Acquisition orientation (how information enters)       │
+│ should RELATE to processing orientation (what happens  │
+│ after). Compare:                                       │
+│   Extractive acquisition + extractive processing =     │
+│     consistent extractive profile                      │
+│   Extractive acquisition + preservative processing =   │
+│     interesting split: extracts framework first but    │
+│     retains detail afterward                           │
+│   Accumulative acquisition + extractive processing =   │
+│     builds sequentially but discards surface later;    │
+│     patience followed by compression                   │
+│ The RELATIONSHIP between acquisition and processing    │
+│ is an internal structural observation.                 │
 └────────────────────────────────────────────────────────┘
 
 ═══════════════════════════════════════════════════════════
@@ -837,14 +997,22 @@ RESPONSE OBJECT OBSERVATION:
 │   "I see it" → imagistic processing                    │
 │     activated by passion                               │
 │                                                        │
-│ NOTE: Compare the STRUCTURAL QUALITY of their          │
-│ response about passion domains to the quality of       │
-│ their responses in Probes 1-5 (which were about        │
-│ non-specific memories). If the passion response is     │
-│ noticeably richer, more structured, deeper, or more    │
-│ vivid, you are OBSERVING the engagement scaling in     │
-│ real time. This observation is more reliable than       │
-│ their self-report.                                     │
+│ CRITICAL INTERNAL COMPARISON:                          │
+│ Compare the STRUCTURAL QUALITY of their passion-mode   │
+│ response to the quality of their responses in          │
+│ Probes 1-6. If the passion response is noticeably      │
+│ richer, more structured, deeper, or more vivid, you    │
+│ are OBSERVING the engagement scaling in real time.      │
+│ This observation is more reliable than their            │
+│ self-report because it is directly observable in        │
+│ the response objects.                                   │
+│                                                        │
+│ Record the CONTRAST:                                   │
+│   Passion-mode response quality: [describe]            │
+│   Default-mode response quality: [from Probes 1-6]    │
+│   Gap magnitude: [how different are they?]             │
+│   Gap character: [what specifically changes? Channel?  │
+│     Depth? Elaboration? Precision? Energy?]            │
 └────────────────────────────────────────────────────────┘
 
 ═══════════════════════════════════════════════════════════
@@ -890,6 +1058,11 @@ RESPONSE OBJECT OBSERVATION:
 │   what they describe — if they describe jumping        │
 │   ahead and their answer is compressed and             │
 │   anticipatory, the behavior matches the report.       │
+│                                                        │
+│ INTERNAL COMPARISON WITH PROBES 6-7:                   │
+│ Three probes now address acquisition. Do they          │
+│ converge? Convergence = high-confidence observation    │
+│ about acquisition orientation.                         │
 └────────────────────────────────────────────────────────┘
 
 ═══════════════════════════════════════════════════════════
@@ -943,6 +1116,27 @@ RESPONSE OBJECT OBSERVATION:
 │   Difficulty describing → the experience may resist    │
 │     the channels the person has available; the         │
 │     gap between experience and description is data     │
+│                                                        │
+│ INTERNAL COMPARISON:                                   │
+│ This probe's CHANNEL reveals how the person processes  │
+│ their own inner experience. Compare to primary         │
+│ channel from earlier probes. If the person's primary   │
+│ channel is S (structural) but they describe engagement │
+│ phenomenology in E (emotional) terms, that reveals     │
+│ a SPLIT between how they process external content      │
+│ (structurally) and how they process internal           │
+│ experience (emotionally). This split is a significant  │
+│ structural observation.                                │
+│                                                        │
+│ MOVEMENT 2 SYNTHESIS:                                  │
+│ After Probe 9, update the cumulative portrait:         │
+│ - Acquisition orientation (from Probes 6, 7, 8)       │
+│ - Engagement scaling (from Probe 7 + cross-probe      │
+│   quality comparison)                                  │
+│ - How does the person RELATE to their own engagement?  │
+│   (from Probe 9)                                       │
+│ - What is the LARGEST CONTRAST so far across all       │
+│   nine probes?                                         │
 └────────────────────────────────────────────────────────┘
 ```
 
@@ -991,9 +1185,18 @@ RESPONSE OBJECT OBSERVATION:
 │   Different channel → split processing                 │
 │     (perceives through one channel, makes meaning      │
 │      through another)                                  │
+│                                                        │
+│ INTERNAL COMPARISON:                                   │
+│ This is the HIGHEST-VALUE internal comparison in the   │
+│ entire protocol. Compare the primary channel in this   │
+│ response to the primary channel from Probe 1 (vacation │
+│ memory). Same channel appearing first in both =        │
+│ very high confidence in primary channel identification.│
+│ Different channel = explore what changed (topic?       │
+│ emotional significance? time scale?).                  │
 └────────────────────────────────────────────────────────┘
 
-══════════════════════════════════════════════════════════��
+════════════════════════════════════════════════��══════════
 PROBE 11: THE INNER VOICE
 ═══════════════════════════════════════════════════════════
 
@@ -1034,9 +1237,17 @@ RESPONSE OBJECT OBSERVATION:
 │     default mode                                       │
 │   "Completely different" → engagement shifts to        │
 │     a different processing mode entirely               │
+│                                                        │
+│ INTERNAL COMPARISON:                                   │
+│ The default/engaged contrast HERE should map to the    │
+│ passion-gap observation from Probe 7. If Probe 7       │
+│ revealed high engagement scaling and Probe 11 reveals  │
+│ a large texture change between default and engaged     │
+│ cognition, these converge — high confidence in         │
+│ engagement-gated processing.                           │
 └────────────────────────────────────────────────────────┘
 
-═══════════════════════════════════════════════════════════
+════════════════════════════════���══════════════════════════
 PROBE 12: FORCED CHANNEL ACTIVATION
 ═══════════════════════════════════════════════════════════
 
@@ -1078,7 +1289,7 @@ RESPONSE OBJECT OBSERVATION:
 │ NOTE ON TRAUMA:                                        │
 │ Childhood home questions may activate trauma           │
 │ responses. WATCH FOR:                                  │
-│   - Sudden flattening of affect                        ��
+│   - Sudden flattening of affect                        │
 │   - Deflection/topic change                            │
 │   - "I don't really remember" (may be genuine          │
 │     processing or may be protective)                   │
@@ -1093,14 +1304,45 @@ RESPONSE OBJECT OBSERVATION:
 │   4. Move to the next probe                            │
 │   5. Do NOT interpret trauma in the Mirror delivery    │
 │      unless you are a qualified clinician               │
+│                                                        │
+│ CRITICAL INTERNAL COMPARISON:                          │
+│ Probe 12 is the DEFINITIVE channel comparison probe.   │
+│ It activates each channel individually and allows      │
+│ direct quality comparison:                             │
+│                                                        │
+│ Record:                                                │
+│   I/S channel response quality: [describe]             │
+│   E channel response quality: [describe]               │
+│   N channel response quality: [describe]               │
+│   C channel response quality: [describe]               │
+│   LARGEST GAP: between which two channels?             │
+│   CHANNEL BLEED: into which channel?                   │
+│                                                        │
+│ Compare to channel signals from ALL previous probes.   │
+│ Probe 12 should CONFIRM or COMPLICATE the channel      │
+│ profile built from Probes 1-11. If it confirms,        │
+│ the profile is high-confidence. If it complicates,     │
+│ the portrait needs domain-specific qualification.      │
+│                                                        │
+│ MOVEMENT 3 SYNTHESIS:                                  │
+│ After Probe 12, the channel profile should be          │
+│ well-established:                                      │
+│ - Primary channel (appeared first most consistently,   │
+│   produced richest content, bled into when other       │
+│   channels were activated)                             │
+│ - Secondary channel (second-most consistent)           │
+│ - Accessible channels (produced content when prompted) │
+│ - Weak/absent channels (thin even when prompted)       │
+│ - The MAGNITUDE of differentiation (how different      │
+│   are the strong channels from the weak ones?)         │
 └────────────────────────────────────────────────────────┘
 ```
 
 ### Movement 4: Social World, Energy, and Stability
-*Observing: Social processing load, stress patterns, stability*
+*Observing: Social processing load, stress patterns, stability, relational complement*
 
 ```
-═���═════════════════════════════════════════════════════════
+═══════════════════════════════════════════════════════════
 PROBE 13: THE SOCIAL RECHARGE
 ═══════════════════════════════════════════════════════════
 
@@ -1135,16 +1377,22 @@ RESPONSE OBJECT OBSERVATION:
 │   "I need specific people, not people in general" →    │
 │     selective social need (C channel nuance)           │
 │                                                        │
-│ CROSS-CHECK with conversational behavior:              │
-│   Is the person's response quality different in        │
-│   this social-focused probe than in earlier probes?    │
-│   If more engaged → social domain is a passion         │
-│   If less engaged → social domain is low interest      │
-│   (This observation is MORE reliable than their        │
-│    self-report about social needs.)                    │
+│ INTERNAL COMPARISON:                                   │
+│ Compare response quality in this social-focused probe  │
+│ to response quality in earlier non-social probes.      │
+│ If more engaged → social domain is a passion domain    │
+│ If less engaged → social domain is low interest        │
+│ This behavioral observation is MORE reliable than      │
+│ their self-report about social needs.                  │
+│                                                        │
+│ Also compare: does the person's C channel (from Probe  │
+│ 12) predict their social recharge pattern? Strong C    │
+│ channel + "I need people to recharge" = convergent.    │
+│ Weak C channel + "I need people to recharge" =         │
+│ divergent — explore further.                           │
 └────────────────────────────────────────────────────────┘
 
-═══════════════════════════════════════════════════════════
+═══════���═══════════════════════════════════════════════════
 PROBE 14: THE STRESS SIGNATURE
 ═══════════════════════════════════════════════════════════
 
@@ -1187,17 +1435,30 @@ RESPONSE OBJECT OBSERVATION:
 │     load-bearing                                       │
 │   "I can still see clearly" → clarity is load-bearing  │
 │                                                        │
-│ The FIRST-TO-BREAK / LAST-TO-BREAK pattern is          │
-│ structurally informative: the person's cognitive       │
-│ architecture reveals itself under stress. What         │
-│ survives stress is the deepest structural foundation.  │
+│ CRITICAL INTERNAL COMPARISON:                          │
+│ The FIRST-TO-BREAK / LAST-TO-BREAK pattern should      │
+│ map to the channel profile:                            │
+│   - First-to-break should be a WEAK channel or a       │
+│     contextual dimension (not the primary channel)     │
+│   - Last-to-break should be the PRIMARY or SECONDARY   │
+│     channel — the load-bearing structure                │
+│                                                        │
+│ If first-to-break IS the primary channel, that is      │
+│ a significant finding: the person's dominant            │
+│ processing mode is FRAGILE under stress, not           │
+│ load-bearing. This changes the portrait substantially. │
+│                                                        │
+│ The CONTRAST between first-to-break and last-to-break  │
+│ reveals the person's cognitive architecture under      │
+│ stress. This contrast is one of the most structurally  │
+│ informative internal comparisons in the protocol.      │
 └────────────────────────────────────────────────────────┘
 
-═══════════════════════════════════════════════════════════
+════════════════��══════════════════════════════════════════
 PROBE 15: THE RELATIONSHIP MIRROR
 ═══════════════════════════════════════════════════════════
 
-ASK: "In your closest relationships �� the ones that
+ASK: "In your closest relationships — the ones that
 really work — what do those people provide for you?
 Not just emotionally, but in terms of how you think
 and function."
@@ -1230,12 +1491,30 @@ RESPONSE OBJECT OBSERVATION:
 │   "I hold things together" → organizational S          │
 │     exported                                           │
 │                                                        │
-│ CROSS-CHECK: Does the relationship portrait             │
-│ complement the channel profile from earlier probes?    │
+│ CRITICAL INTERNAL COMPARISON:                          │
+│ Does the relationship portrait COMPLEMENT the          │
+│ channel profile from earlier probes?                   │
+│   - What they SEEK should map to WEAK channels         │
+│   - What they PROVIDE should map to STRONG channels    │
+│                                                        │
 │ Convergent = high confidence in the portrait.          │
+│ The person's relationships confirm the internal        │
+│ structural observations — they seek what's weak        │
+│ and export what's strong.                              │
+│                                                        │
 │ Divergent = the person may present differently in      │
 │ relationships than in solo cognition (which is         │
-│ itself a meaningful observation).                      │
+│ itself a meaningful observation — some people          │
+│ activate different channels in relational contexts).   │
+│                                                        │
+│ MOVEMENT 4 SYNTHESIS:                                  │
+│ After Probe 15, the complete portrait should include:  │
+│ - Social processing load and recharge pattern          │
+│ - Stress architecture (first-to-break / last-to-break)│
+│ - Relational complement (seeks/provides mapping)       │
+│ - Whether these Movement 4 observations CONVERGE       │
+│   with the channel and processing profile from         │
+│   Movements 1-3                                        │
 └────────────────────────────────────────────────────────┘
 ```
 
@@ -1243,9 +1522,9 @@ RESPONSE OBJECT OBSERVATION:
 
 ## PART IV: PORTRAIT CONSTRUCTION
 
-After all four movements, the administrator constructs the structural portrait.
+After all four movements, the administrator constructs the structural portrait from accumulated internal comparisons.
 
-**The portrait is NOT a set of numerical scores. It is a qualitative structural description with specific textual evidence from the person's own responses.**
+**The portrait is a MAP OF INTERNAL RELATIONSHIPS between the person's own cognitive channels, processing orientations, and contextual responses. Every observation is grounded in specific contrasts between the person's own response objects.**
 
 ```
 PORTRAIT TEMPLATE:
@@ -1253,14 +1532,20 @@ PORTRAIT TEMPLATE:
 1. ACQUISITION ORIENTATION
    Describe: extractive / balanced / accumulative
    Evidence: [cite specific responses from Probes 6, 8]
+   Internal comparison: [how does acquisition relate
+     to processing? convergent or split?]
    Qualification: [note any domain-dependence]
 
 2. PROCESSING ORIENTATION
    Describe: extractive / balanced / preservative
    Evidence: [cite specific responses from Probes 1-5]
-   Qualification: [note any passion-gating]
+   Internal comparison: [convergence across probes?
+     passion-gated? what is the contrast between
+     strongest and weakest processing evidence?]
+   Qualification: [note any passion-gating; if gated,
+     describe both orientations and the gap]
 
-3. CHANNEL PROFILE
+3. CHANNEL PROFILE (the core internal comparison)
    Primary channel: [the channel that appeared first
      most consistently across probes]
    Evidence: [cite first responses across multiple probes]
@@ -1271,18 +1556,50 @@ PORTRAIT TEMPLATE:
      content even when prompted]
    Evidence: [cite Probe 12 channel activation responses]
 
+   INTERNAL COMPARISON MAP:
+   [Describe the RELATIVE strengths:
+    "Your S channel consistently produced the richest,
+     most structurally complex responses across probes.
+     When I asked about your vacation, childhood home,
+     meaningful place, and learning approach, the first
+     thing you reached for every time was structure —
+     how things connected, where things were positioned,
+     why things worked the way they did.
+
+     Your E channel, by contrast, produced noticeably
+     thinner content. When I asked about the emotional
+     atmosphere of your childhood home, your response
+     was brief and abstract — 'it was fine, I guess' —
+     compared to the detailed structural description of
+     the physical space. When I asked about feelings
+     during your engagement phenomenology, you described
+     the experience structurally ('sharp focus, everything
+     clicking into place') rather than emotionally.
+
+     The gap between your S channel and your E channel
+     was the largest structural contrast in your portrait.
+     Your N and I channels were moderate — accessible
+     when prompted but not where your mind goes first."]
+
 4. ENGAGEMENT SCALING
    Describe: how much the portrait shifts with interest
-   Evidence: [cite Probe 7 and cross-probe quality
-     differential]
+   Evidence: [cite Probe 7 AND the observable quality
+     differential across probes]
+   Internal comparison: [the specific contrast between
+     passion-mode and default-mode response quality,
+     with examples from both]
 
 5. RESPONSE CLARITY
    Describe: precision of articulations when engaged
-   Evidence: [cite the clearest and least clear responses]
+   Evidence: [cite the clearest and least clear responses;
+     describe the contrast]
 
 6. STRUCTURAL DEPTH
    Describe: typical depth level across probes
    Evidence: [cite responses and identify depth levels]
+   Internal comparison: [is depth consistent across probes
+     or engagement-gated? if gated, describe both levels
+     and the contrast]
    Note: depth is description, not evaluation
 
 7. SUSTAINED ENGAGEMENT
@@ -1292,16 +1609,24 @@ PORTRAIT TEMPLATE:
 8. SOCIAL PROCESSING
    Describe: social recharge pattern
    Evidence: [cite Probe 13]
+   Internal comparison: [does social recharge pattern
+     map to C channel strength from Probe 12?]
 
 9. STRESS ARCHITECTURE
    First to break: [weakest structural element]
    Last to break: [load-bearing structural element]
    Evidence: [cite Probe 14]
+   Internal comparison: [does first-to-break map to
+     weak channels? does last-to-break map to primary
+     channel? if not, describe the divergence]
 
 10. RELATIONAL COMPLEMENT
     What they seek: [weak channel supplementation]
     What they provide: [strong channel export]
     Evidence: [cite Probe 15]
+    Internal comparison: [does the seek/provide pattern
+      map to the channel profile? convergent = high
+      confidence. divergent = note and explore]
 
 11. CONVERGENCE ASSESSMENT
     Which observations converged across multiple probes?
@@ -1312,11 +1637,36 @@ PORTRAIT TEMPLATE:
     (These indicate domain-dependent processing or
      areas where the portrait needs qualification.)
 
+    THE INTERNAL COHERENCE MAP:
+    [Describe how the dimensions relate to each other:
+     "Your extractive processing (surface dissolves
+     rapidly) is consistent with your extractive
+     acquisition (jumps ahead, extracts framework first).
+     Both are consistent with your S-primary channel
+     profile (structural content retained, surface
+     details lost). Your high engagement scaling is
+     consistent with the observation that your processing
+     accelerates dramatically in passion domains. Your
+     stress architecture (E breaks first, S holds) is
+     consistent with the channel profile (S is load-
+     bearing because it's primary; E is fragile because
+     it's weak). Your relational complement (you seek
+     people who ground you emotionally and provide
+     warmth) is consistent with E being your weakest
+     channel — you seek externally what you don't
+     produce internally."
+
+     This internal coherence description is the PORTRAIT.
+     It is a map of how the person's cognitive dimensions
+     relate to each other within their own system.]
+
 12. LIMITATIONS
     What this portrait CANNOT determine:
     - Stability over time (single conversation snapshot)
     - Causal origins (why they process this way)
     - Accuracy of their perceptions (only HOW they process)
+    - How they compare to other people (internal
+      comparison only; no external reference frame)
     - Whether the observer's structural orientation
       biased the observation
 ```
@@ -1328,11 +1678,14 @@ PORTRAIT TEMPLATE:
 ```
 OPENING:
 "I want to share what I've observed about how your mind
-works. This isn't a test result — it's a portrait built
-from what you showed me during our conversation. Some of it
-will resonate immediately. Some might surprise you. And some
-will be off. I want to hear about all three, because your
-corrections are as valuable as the matches."
+works. This isn't a test result and it's not comparing you
+to anyone else. It's a portrait built entirely from what
+you showed me during our conversation — how your different
+channels relate to each other, where your mind goes first,
+what shifts when you're engaged versus when you're not.
+Some of it will resonate immediately. Some might surprise
+you. And some will be off. I want to hear about all three,
+because your corrections are as valuable as the matches."
 
 DELIVERY STRUCTURE:
 1. How your mind takes things in (acquisition orientation
@@ -1340,41 +1693,82 @@ DELIVERY STRUCTURE:
 2. What your mind does with what it takes in (processing
    orientation in their language, with their examples)
 3. What survives — what your mind keeps and in what form
-   (channel profile using their own responses as evidence)
+   (channel profile using their own responses as evidence,
+   delivered as INTERNAL COMPARISONS:
+   "Your mind reaches for structure first. Every time I
+   asked you to describe something — a trip, a place,
+   your engagement — the first thing out was structural:
+   how it was organized, how things connected, why it
+   worked. Your emotional channel, by comparison, needed
+   prompting and produced thinner content. That gap was
+   the biggest structural contrast I observed.")
 4. Your engagement pattern (scaling, using the quality
-   difference they demonstrated during the conversation)
-5. Your strengths (specific, from their responses)
+   difference they demonstrated during the conversation:
+   "When you talked about [passion domain], the quality
+   of your response shifted dramatically — longer,
+   more precise, deeper, more vivid. Compare that to
+   when I asked about [non-passion domain], where your
+   response was brief and surface-level. Your mind works
+   very differently depending on whether it's engaged.")
+5. Your strengths (specific, from their responses,
+   framed as the strongest channels and most consistent
+   observations)
 6. Your costs (honest, compassionate, framed as structural
-   trade-offs — not deficits, not pathology)
-7. Your relationships (what they seek, what they provide)
-8. Your stress architecture (what breaks first, what holds)
+   trade-offs — the CONSEQUENCE of the strengths:
+   "The same extractive processing that gives you
+   structural clarity means you lose surface detail.
+   The same S-dominance that makes you precise means
+   you may miss emotional content that other people
+   find obvious. These aren't deficits — they're the
+   other side of your specific architecture.")
+7. Your relationships (what they seek, what they provide,
+   mapped to the channel profile:
+   "You told me you seek people who bring warmth and
+   ground you. That maps to what I observed — your
+   emotional channel is your thinnest, so you naturally
+   seek that supplementation in relationships. And you
+   told me you provide clarity and structure — which
+   is exactly your strongest channel being exported.")
+8. Your stress architecture (what breaks first, what holds,
+   mapped to the channel profile)
 9. How you learn best (specific, actionable, derived from
-   acquisition and channel profile)
+   acquisition orientation and channel profile)
 
 CRITICAL v4.0 REQUIREMENTS:
 
 For EVERY observation, the administrator MUST:
 
-□ Cite the specific response it derives from
+□ Ground it in an INTERNAL COMPARISON between the
+  person's own responses
   (e.g., "When I asked about your vacation, the first
   thing you reached for was the layout of the hotel —
   not a feeling, not an image, not what happened. That
-  spatial-structural first response appeared again when
-  I asked about your childhood home. Your mind reaches
-  for structure first.")
+  same structural-first pattern appeared when I asked
+  about your childhood home, your meaningful place,
+  and your learning approach. Four probes, four times
+  structure first. Your emotional channel, by contrast,
+  produced shorter, vaguer responses across every probe
+  where I activated it directly.")
 
 □ Distinguish observation from inference
-  (e.g., "What I observed: you consistently reached for
-  structural content first. What I infer from that: your
-  mind organizes experience around how things connect
-  rather than how they feel. The observation is solid.
-  The inference is my interpretation — tell me if it
-  fits.")
+  (e.g., "What I observed: your S channel consistently
+  produced the richest responses; your E channel
+  consistently produced the thinnest. What I infer:
+  your mind organizes experience around how things
+  connect rather than how they feel. The observation
+  is grounded in the contrast between your responses.
+  The inference is my interpretation of what that
+  contrast means — tell me if it fits.")
 
 □ Include at least 3 specific claims that would be
   FALSE for a different structural profile
   (e.g., "Your mind dissolves surface detail within
-  about two days" — false for preservative processors)
+  about two days" — false for preservative processors.
+  "Your emotional channel is your thinnest" — false
+  for E-primary profiles. "Your engagement scaling
+  is dramatic — your mind works like a different
+  instrument when it's interested" — false for
+  low-scaling profiles.)
 
 □ Include at least 1 explicit disconfirmation invitation
   (e.g., "Here's something specific I think is true —
@@ -1384,26 +1778,38 @@ For EVERY observation, the administrator MUST:
   than how you felt. Accurate?")
 
 □ State the portrait's limitations
-  (e.g., "This is based on one conversation. Your mind
-  may work differently in other contexts, under different
-  stress, or at different life stages. This is a snapshot,
-  not a permanent identity.")
+  (e.g., "This portrait maps how your cognitive channels
+  relate to each other based on one conversation. It
+  doesn't compare you to anyone else — it maps YOUR
+  internal architecture. It may work differently in
+  other contexts, under different stress, or at
+  different life stages. And my own structural
+  orientation as an observer may have caused me to
+  over-attend to structural features of your responses.
+  This is a snapshot, not a permanent identity.")
 
 CLOSING:
 "How does that land? What resonates? What's off?
 Your corrections are structurally informative — they
-show me where the portrait needs adjusting, and
-sometimes the adjustments reveal things neither of
+show me where the internal comparisons need adjusting,
+and sometimes the adjustments reveal things neither of
 us saw before."
 
 PROCESS THEIR FEEDBACK:
 Incorporate corrections.
-Note what resonated (supports the portrait).
+Note what resonated (supports the internal comparisons).
 Note what felt off (portrait may need revision OR
   the person's self-model may differ from their
-  observable behavior — both are possible and should
-  be held with equal respect).
+  observable response behavior — both are possible
+  and should be held with equal respect).
 Adjust the portrait if warranted.
+If correction reveals a DOMAIN-DEPENDENT pattern
+  that the probes didn't fully capture, note this
+  explicitly: "That correction suggests your mind
+  works differently in [domain] than in the contexts
+  we explored. That's a real structural feature —
+  your portrait isn't one profile but different
+  profiles in different domains."
 ```
 
 ---
@@ -1414,8 +1820,10 @@ Adjust the portrait if warranted.
 After Mirror delivery and feedback:
 
 "There's one more thing I can try. Based entirely on the
-structural patterns I observed, I can describe what I'd
-expect your dream life to look like. Want me to try?"
+structural patterns I observed — how your channels relate
+to each other, how your processing works — I can describe
+what I'd expect your dream life to look like. Want me to
+try?"
 
 ASK:
 "Do you remember your dreams? How often?"
@@ -1426,16 +1834,19 @@ ASK:
 "After vivid dream nights, rested or tired?"
 "Any recurring dreams?"
 
-THEN: Share what you expected based on the structural
-portrait. Show the derivation — explain WHY you expected
-what you expected, tracing back to the structural
-observations.
+THEN: Share what you expected based on the internal
+comparison portrait. Show the derivation — explain WHY
+you expected what you expected, tracing back to the
+structural observations.
 
-"Based on your strongly extractive processing, I'd
-expect your dreams to fade very quickly on waking —
-because the same process that dissolves lunch memories
-would dissolve dream memories. You told me [X].
-That [matches/doesn't match] what I expected."
+"Based on your strongly extractive processing — which I
+observed because your vacation memory was structural
+residue, your lunch memory was gone in two days, and
+movies feel new on rewatch — I'd expect your dreams to
+fade very quickly on waking. The same processing that
+dissolves lunch memories would dissolve dream memories.
+You told me [X]. That [matches/doesn't match] what the
+internal comparison predicted."
 
 NOTE: Dream patterns are the LEAST reliable domain for
 this protocol. Sleep and dreaming involve neurological
@@ -1449,70 +1860,75 @@ the waking portrait.
 
 ## PART VII: GROUNDING PRINCIPLES
 
-This section is new in v4.0. It states the principles that ground the protocol, derived from both the individual application (cognitive artifacts of persons) and the cross-domain application (foundational texts of religious traditions).
+This section states the principles that ground the protocol, derived from both the individual application (cognitive artifacts of persons) and the cross-domain application (foundational texts of religious traditions).
 
-### Principle 1: Response Objects Reveal Structural Patterns
+### Principle 1: Response Objects Reveal Structural Patterns Through Internal Comparison
 
-When a person (or a text, or a tradition) produces cognitive artifacts in response to prompts, those artifacts have observable structural properties — content, ordering, language structure, meta-cognitive features, and depth. These properties are not random. They form patterns. The patterns are the portrait.
+When a person produces cognitive artifacts across multiple probes, the artifacts have observable structural properties — content, ordering, language structure, meta-cognitive features, and depth. These properties DIFFER across probes, channels, and contexts. The differences constitute the portrait.
 
-**This principle is grounded in observation, not theory.** The protocol doesn't need to explain WHY response objects have structural properties. It observes THAT they do and describes the patterns.
+**The analytical operation is comparison, not measurement.** The protocol compares the person's S channel to their E channel, their passion-mode responses to their default-mode responses, their first-to-break to their last-to-break. Every comparison is internal. The portrait is the map of these internal relationships.
 
-### Principle 2: The Five Layers Are a Reading Method, Not a Measurement Instrument
+### Principle 2: The Five Layers Are a Reading Method for Internal Comparison
 
-The five layers provide a consistent way to attend to response objects. They direct the observer's attention to specific structural features. The consistency of attention across multiple probes reveals patterns that unsystematic attention would miss.
+The five layers provide a consistent way to attend to response objects so that internal comparisons can be drawn. Without consistent attention across probes, the comparisons would be unreliable. The five layers ensure that the SAME structural features are observed in EVERY response, making cross-probe comparison meaningful.
 
-**The value is in the consistency, not in the precision.** Two skilled administrators attending through the five layers should observe similar structural patterns in the same person's responses. But they will not produce identical numerical scores — because the protocol doesn't produce numerical scores. It produces qualitative structural descriptions.
+**The value is in the consistency of attention, which enables the comparisons.** Two skilled administrators attending through the five layers should observe similar internal contrasts in the same person's responses — because the contrasts are in the response objects, not in the observer's interpretation.
 
-### Principle 3: Structural Descriptions Explain Themselves
+### Principle 3: Internal Coherence Is the Evidence Standard
 
-A well-formed structural description traces from observation to inference:
-- "You said X" (observation)
-- "X appeared first, and similar content appeared first in three other probes" (convergent pattern)
-- "This suggests your mind reaches for this kind of content first" (inference)
-- "If that's right, I'd expect [Y] about your daily experience" (specific claim derivable from the inference)
+A well-formed portrait shows internal coherence — the dimensions relate to each other in structurally comprehensible ways:
+- Processing orientation relates to channel profile (what is retained maps to which channels are strong)
+- Engagement scaling relates to depth (if engagement-gated, depth should shift with engagement)
+- Stress architecture relates to channel strength (load-bearing elements should be strong channels)
+- Relational complement relates to channel profile (seeks supplementation for weak channels)
 
-The person can follow the reasoning. They can check each step. They can correct where the reasoning goes wrong. The description doesn't require external validation because it shows its own work.
+Internal coherence across independently observed dimensions is the evidence that the portrait captures something real about the person's cognitive architecture. Each dimension was observed through different probes. If they converge into a coherent map, the convergence IS the evidence.
+
+**If the dimensions DON'T cohere, that is also informative.** It may indicate domain-dependent processing, or it may indicate that the probes didn't capture the person's full range. The administrator should note incoherence explicitly rather than forcing coherence.
 
 ### Principle 4: The Observer's Orientation Is Part of the Observation
 
 The five-layer analysis attends to structural features of responses. This orientation may systematically over-attend to structural content and under-attend to emotional, narrative, imagistic, or communal content. The administrator should be aware of this bias and note when the person's responses seem to resist structural categorization.
 
-**Cross-religious finding that grounds this principle:** The protocol, applied to five religious traditions, consistently found structural content at the deepest levels of every tradition — which may indicate that structural content genuinely operates at deep levels in all traditions, OR may indicate that the protocol finds structural depth because that's what it's designed to find. Both are possible. The protocol cannot resolve this from within its own operation. The administrator should hold this limitation in awareness.
+**Cross-religious finding that grounds this principle:** The protocol, applied to five religious traditions, consistently found structural content at the deepest levels of every tradition — which may indicate that structural content genuinely operates at deep levels, OR that the protocol finds structural depth because that's what it's designed to find. The protocol cannot resolve this from within its own operation. The administrator should hold this limitation in awareness.
 
-### Principle 5: Absence Is Data
+### Principle 5: Absence Is Data Within Internal Comparison
 
-What the person does NOT say is as informative as what they do say. A response to the Meaningful Place probe that contains no visual detail, no emotional content, and no narrative — only structural description — tells you as much about the channel profile as a response rich in all channels.
+What the person does NOT say is as informative as what they do say — when compared to what they DO say in other probes. A response to the Meaningful Place probe that contains no visual detail is informative BECAUSE other probes produced content in other channels. The absence is relative to the person's own output elsewhere.
 
-**This applies to the protocol itself:** what the protocol does NOT attend to (cultural context, neurological substrate, developmental history, socioeconomic factors, linguistic constraints) is part of its limitation. The portrait is partial by design. The partiality should be stated, not hidden.
+**This is the self-referential nature of the instrument.** The protocol doesn't compare the person's E channel to some external standard of emotional processing. It compares the person's E channel to the person's own S channel, N channel, I channel, and C channel. The absence of emotional content is meaningful only in the context of the presence of other content types in the same person's response set.
 
 ### Principle 6: Convergence Across Probes Is the Evidence Standard
 
 A structural observation supported by convergent evidence across multiple probes is well-grounded. An observation from a single probe is tentative. A contradiction across probes indicates domain-dependent processing, which is itself a meaningful structural observation.
 
-**The protocol does not claim accuracy percentages.** It claims convergent observation — and traces each observation to its textual evidence.
+**The internal comparison architecture is the protocol's epistemic foundation.** Every claim in the portrait should trace to: "In Probe X, I observed A. In Probe Y, I observed B. The relationship between A and B reveals C." The person can follow the reasoning. They can check each step. They can correct where the reasoning goes wrong. The portrait shows its own work.
 
 ---
 
 ## APPENDIX: WHAT THE CROSS-RELIGIOUS ANALYSIS TAUGHT THE PROTOCOL
 
-The application of the five-layer analysis to foundational religious texts (v3.0 cross-substrate verification) produced five structural invariants that inform the protocol's design:
+The application of the five-layer analysis to foundational religious texts (v3.0 cross-substrate verification) produced structural invariants that inform the protocol's design:
 
-**Invariant 1: Authority Location Matters.** The protocol locates interpretive authority in the CONVERSATION between administrator and person — not in the administrator's judgment alone (which would be asymmetric, like the Quran's self-certification) and not in the person's self-report alone (which v3.0 already moved beyond). The person's corrections are structurally informative. The administrator's observations are structurally informative. The portrait emerges from the dialogue.
+**Invariant 1: Authority Location Matters.** The protocol locates interpretive authority in the CONVERSATION between administrator and person — not in the administrator's judgment alone (which would be asymmetric) and not in the person's self-report alone (which v3.0 already moved beyond). The person's corrections are structurally informative. The administrator's observations are structurally informative. The portrait emerges from the dialogue.
 
-**Invariant 2: Domain Coverage Should Be Stated.** The protocol covers cognitive processing style. It does NOT cover personality, intelligence, mental health, moral character, or life satisfaction. Stating what the protocol covers — and what it doesn't — is essential for honest practice. (This was learned from observing how comprehensive-domain traditions like Islam produce different institutional dynamics than focused-domain traditions like Buddhism.)
+**Invariant 2: Domain Coverage Should Be Stated.** The protocol covers cognitive processing style as observed through internal comparison of response objects. It does NOT cover personality, intelligence, mental health, moral character, or life satisfaction. Stating what the protocol covers — and what it doesn't — is essential for honest practice.
 
 **Invariant 3: Meta-Cognitive Symmetry Is a Design Principle.** The protocol should apply its own analytical criteria to itself. The five layers used to observe the person's responses should also be applicable to the protocol's own output. If the protocol produces a portrait that is structurally incoherent when analyzed through its own five layers, the portrait needs revision.
 
-**Invariant 4: Multi-Perspective Architecture Reduces Distortion.** Christianity's multi-author canon produces internal diversity but also broader accessibility. The protocol's multi-probe design serves the same function — multiple probes from different angles reduce the distortion that any single probe would introduce.
+**Invariant 4: Multi-Probe Architecture Reduces Distortion.** Christianity's multi-author canon produces internal diversity but also broader accessibility. The protocol's multi-probe design serves the same function — multiple probes from different angles reduce the distortion that any single probe would introduce. The more probes, the more internal comparisons, the more reliable the portrait.
 
 **Invariant 5: The Process Contains Its Own Limit.** At the limit of structural observation, the observer encounters their own observation process. The protocol observing the person's structural patterns is itself a structural pattern observable through the protocol. This self-referentiality is not a flaw — it is the honest boundary of what structural observation can achieve. The administrator should be aware that they are, in some sense, observing their own capacity to observe.
+
+**Invariant 6: Internal Comparison Is Structurally Sound.** The cross-religious analysis demonstrated that comparing dimensions WITHIN a system (how a tradition's depth relates to its authority configuration, how its accessibility range relates to its domain coverage) produces structurally informative observations without requiring external reference. The same principle operates at the individual level: comparing the person's channels to each other, their passion-mode to their default-mode, their first-to-break to their last-to-break, produces structurally informative observations without requiring a reference population. The internal comparison architecture is not a limitation — it is the protocol's actual analytical method, and it is structurally sound.
 
 ---
 
 *Built February 25, 2026.*
-*v4.0: Principles-first revision.*
-*What changed: numbers removed, prediction-validation removed, self-description corrected, limitations stated, cross-religious structural findings integrated.*
-*What was preserved: the five layers, the four movements, the probes, the response object architecture, the sufficiency principle, the Barnum defense.*
-*What was added: the C (communal) channel, the Grounding Principles section, the What the Protocol Cannot Determine section, the trace-every-observation requirement.*
-*The protocol is a structured observation method. It produces qualitative structural portraits. It shows its own work. It states its own limits.*
-*It is not a spectrometer. It is a portrait practice.*
+*v4.0: Internal comparative architecture.*
+*What changed: external-reference numerical scores replaced by internal comparative observations. Every claim traces to contrasts within the person's own response objects. The protocol's self-description corrected to match what it actually does: map internal relationships between cognitive channels through structured observation.*
+*What was preserved: the five layers, the four movements, the fifteen probes, the sufficiency principle, the Barnum defense, the response object architecture.*
+*What was added: the C (communal) channel, the Internal Comparison observation framework (after every probe), the Internal Coherence Map (in portrait construction), the explicit "What the Protocol CAN Determine" section, Invariant 6 (internal comparison is structurally sound).*
+*The protocol is a self-referential comparative instrument. It computes once from the person's own response objects. Its reference frame is internal. Its evidence is the contrasts between the person's own cognitive channels.*
+*It is not a spectrometer measuring against an external standard. It is a mirror that shows the person how their own channels relate to each other — which ones are strong, which are weak, which break first under stress, which hold, which they seek in others, which they export.*
+*The mirror's reference frame is you. What it reveals is your internal architecture, mapped through your own words.*
