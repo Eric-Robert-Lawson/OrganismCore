@@ -1,477 +1,480 @@
-# ĪḶE — RECONSTRUCTION EVIDENCE
-**Vedic Sanskrit:** īḷe
-**IPA:** [iːɭe]
-**Meaning:** I praise; I invoke
-**Source:** Rigveda 1.1.1 — word 2
-**Date verified:** February 2026
-**Diagnostic version:** v1 (VS-isolated)
-**Reconstruction version:** v1
+# EVIDENCE — ĪḶE
+## Rigveda 1.1.1, word 2
+## [iːɭeː] — "I praise"
+## February 2026
 
 ---
 
-## RESULT
+## VERIFICATION STATUS: VERIFIED ✓ (v1 / v1.0)
+
+- Synthesis: v1 (all-voiced lateral architecture, canonical HOTĀRAM v9 infrastructure)
+- Diagnostic: v1.0 (33/33 PASS)
+- Perceptual: clear [iː], distinct retroflex [ɭ] with audible F2 dip, natural [eː]
+
+---
+
+## NEW PHONEMES VERIFIED IN THIS WORD
+
+### [iː] — Long Close Front Unrounded Vowel
+
+- **Śikṣā classification:** tālavya (palatal)
+- **Architecture:** length variant of verified [i] (AGNI). Same formant targets, longer hold.
+- **Formants:** F1 ≈ 272 Hz (close), F2 ≈ 2163 Hz (front), F3 ≈ 2900 Hz
+- **Duration:** 100ms (2.0× short [i] at 50ms; ≥ 1.7× Śikṣā quantity threshold)
+- **Śikṣā note:** Śikṣā does not distinguish short and long by quality — only by quantity. Same tongue position. Same formant targets. Longer hold.
+
+### [ɭ] — Retroflex Lateral Approximant (NEW — dual Śikṣā class)
+
+- **Śikṣā classification:** mūrdhanya (retroflex) + lateral manner
+- **Architecture:** Rosenberg source → formant bank at lateral targets → iir_notch at F3 for mūrdhanya marker
+- **The first VS phoneme in two Śikṣā classes simultaneously.**
+- **Two simultaneous constraints verified:**
+  1. **Mūrdhanya:** F3 depression 418.5 Hz below neutral alveolar (2700 Hz). F3 centroid = 2281.5 Hz (< 2500 Hz threshold). The tongue tip is retroflexed.
+  2. **Lateral:** F2 = 1203 Hz (in lateral range 900–1400 Hz). Lateral airflow around the tongue sides reduces F2 relative to central approximants at the same place.
+- **If only the lateral is present:** plain [l], not [ɭ].
+- **If only the retroflex is present:** [ɻ̩], not [ɭ].
+- **The combination is the phoneme.**
+- **Amplitude dip:** 0.83× relative to [iː] (constriction damping)
+- **Wider bandwidths:** 200, 350, 400, 400 Hz (approximant constriction, same pattern as [v] in DEVAM)
+- **Coarticulation:** 15% weight (stronger than vowels — approximants are more context-sensitive)
+- **Duration:** 70ms
+
+### [eː] — Long Close-Mid Front Unrounded Vowel (confirmed)
+
+- **Śikṣā classification:** tālavya (palatal)
+- **Formants:** F1 ≈ 392 Hz (close-mid), F2 ≈ 1755 Hz (front)
+- **Duration:** 90ms
+- **Previously verified:** DEVAM v1 (F1 390 Hz, F2 1757 Hz). Values match within 2 Hz — cross-word consistency confirmed.
+- **Sanskrit note:** [e] is always long in Sanskrit — no short counterpart.
+
+---
+
+## SYNTHESIS ARCHITECTURE — v1 ALL-VOICED LATERAL
+
+### The Central Insight: Dual-Class Phoneme Synthesis
+
+ĪḶE introduces the first phoneme requiring **two independent acoustic markers** to be present simultaneously:
+
+| Marker | Acoustic Signature | Synthesis Mechanism | Diagnostic Test |
+|--------|-------------------|---------------------|-----------------|
+| Mūrdhanya (retroflex) | F3 depressed ≥ 200 Hz below 2700 Hz | `iir_notch()` at 2100 Hz, BW 350 Hz | D3: depression 418.5 Hz ✓ |
+| Lateral (manner) | F2 reduced to ~1100 Hz | Formant bank with F2 = 1100 Hz | D2: F2 = 1203 Hz ✓ |
+
+Neither marker alone produces [ɭ]. The notch without the low F2 gives [ɻ̩] (central retroflex). The low F2 without the notch gives [l] (plain lateral). Both together: [ɭ].
+
+### The F2 Trajectory — Acoustic Signature of ĪḶE
+
+The most dramatic formant movement in any word reconstructed so far:
 
 ```
-ALL NUMERIC CHECKS PASSED
-D1   [iː] voicing                 ✓ PASS
-D2   [iː] F2 — tālavya            ✓ PASS
-D3   [iː] duration                ✓ PASS
-D4   [iː] length ratio (KEY)      ✓ PASS
-D5   [iː] Śikṣā confirmation      ✓ PASS
-D6   [ɭ]  voicing                 ✓ PASS
-D7   [ɭ]  F2 — lateral            ✓ PASS
-D8   [ɭ]  F3 centroid (KEY)       ✓ PASS
-D9   [ɭ]  F3 depression (KEY)     ✓ PASS
-D10  [ɭ]  Śikṣā confirmation      ✓ PASS
-D11  [eː] voicing                 ✓ PASS
-D12  [eː] F1 — mid                ✓ PASS
-D13  [eː] F2 — mid                ✓ PASS
-D14  [eː] Śik��ā confirmation      ✓ PASS
-D15  Full word                    ✓ PASS
-D16  Perceptual                   LISTEN
+F2: 2163 Hz → 1203 Hz → 1755 Hz
+    [iː]       [ɭ]       [eː]
+    front    lateral    mid-front
 ```
 
-Total duration: **260 ms** (11460 samples at 44100 Hz)
-Clean first run. Fifteen for fifteen.
-Three new phonemes: [iː], [ɭ], [eː].
+A V-shaped dip of ~960 Hz descending and ~552 Hz ascending. This trajectory is the word's acoustic fingerprint — audible as the tongue moving from high front position, curling back into retroflex lateral, then releasing forward into mid front.
+
+### v1 Segment Map
+
+| SEG | Phoneme | Duration | Peak | Notes |
+|-----|---------|----------|------|-------|
+| 0 | [iː] long close front | 100ms | 0.70 | Tālavya; 2× short [i] |
+| 1 | [ɭ] retroflex lateral | 70ms | 0.65 | Mūrdhanya + lateral; F3 notch |
+| 2 | [eː] long close-mid front | 90ms | 0.70 | Tālavya; confirmed from DEVAM |
+| | **TOTAL** | **260ms** | | |
+
+### Coarticulation Chain
+
+| Transition | F2 Movement | F3 Movement | Physical |
+|------------|-------------|-------------|----------|
+| [iː] → [ɭ] | 2200 → 1100 Hz (drop) | 2900 → depressed | Tongue moves from palatal to retroflex; curls back |
+| [ɭ] → [eː] | 1100 → 1750 Hz (rise) | depressed → 2650 | Tongue uncurls from retroflex; moves forward to mid |
 
 ---
 
-## VERSION HISTORY
+## PERCEPTUAL VERIFICATION
 
-| Version | Change |
-|---|---|
-| v1 | Initial parameters. All fifteen numeric checks passed on first run. VS-isolated throughout. |
+### Listener Report
+- [iː]: bright, high front vowel, sustained — clearly long
+- [ɭ]: distinct from [l] — audible retroflexion, darker quality, F2 dip perceptible
+- [eː]: mid front, less bright than [iː], natural Sanskrit [e] quality
+- Word-level: the F2 dip through [ɭ] creates a characteristic "darkening" in the middle of the word
+- Syllable boundary Ī.ḶE is perceptually clear
 
----
-
-## ITERATION ANALYSIS
-
-All three new phonemes passed on first attempt.
-
-**[iː] synthesis strategy:**
-
-Identical synthesiser to verified [i]
-(AGNI). Duration parameter doubled:
-50 ms → 100 ms. No other changes.
-The measured F2 of 2096 Hz vs [i]
-F2 of 2124 Hz — a difference of
-28 Hz — confirms the quality is
-essentially identical. The only
-acoustic distinction is duration.
-This is the correct relationship
-for a vowel quantity contrast
-in Sanskrit.
-
-**[ɭ] synthesis strategy:**
-
-Two simultaneous constraints modelled
-with two separate mechanisms:
-
-1. Lateral F2 reduction: formant
-   bank targets set at VS_LL_F[1]
-   = 1100 Hz — lower than central
-   mūrdhanya [ɻ̩] at 1212 Hz. The
-   lateral airflow path around the
-   tongue sides reduces the effective
-   cavity length seen by F2, pulling
-   it below the central retroflex
-   position.
-
-2. Mūrdhanya F3 depression: iir_notch()
-   at VS_LL_F3_NOTCH = 2100 Hz,
-   bandwidth 350 Hz. Measured F3
-   centroid at 2413 Hz — depression
-   of 287 Hz below neutral alveolar
-   (2700 Hz). Exceeds the minimum of
-   200 Hz established in ṚG.
-
-Both constraints confirmed first run.
-The architecture correctly separates
-[ɭ] from plain [l] (no F3 depression)
-and from [ɻ̩] (no lateral F2 reduction).
-
-**[eː] synthesis strategy:**
-
-New formant targets at the mid-front
-tālavya position. F1 = 420 Hz (between
-[i] ~280 Hz and [ɑ] 631 Hz). F2 =
-1750 Hz (between [i] 2124 Hz and [ɑ]
-1106 Hz). Measured values (F1 403 Hz,
-F2 1659 Hz) confirm the mid position
-first run. Sanskrit [e] has no short
-counterpart — it is always long.
-Duration set at 90 ms accordingly.
+### Perceptual Validation
+- ✓ [iː] sounds like [i] but held longer (quantity, not quality)
+- ✓ [ɭ] does NOT sound like plain [l] (retroflexion audible)
+- ✓ [ɭ] does NOT sound like [ɻ̩] (lateral quality distinct from central)
+- ✓ [eː] is distinctly lower/less bright than [iː] (F1 higher, F2 lower)
+- ✓ Continuous voicing throughout — no gaps, no clicks
+- ✓ V-shaped F2 trajectory audible as tongue movement
 
 ---
 
-## PHONEME RECORD
+## NUMERIC DIAGNOSTICS — v1.0 (33/33 PASS)
 
-### IĪ — long close front unrounded [iː]
-**Devanāgarī:** ई
-**Śikṣā class:** tālavya (palatal)
-**Status:** VERIFIED
-**First word:** ĪḶE
+### Section A: Signal Integrity (4/4)
+| Check | Value | Range | Status |
+|-------|-------|-------|--------|
+| A1 no-NaN | — | — | PASS |
+| A2 no-Inf | — | — | PASS |
+| A3 peak-amplitude | 0.7500 | [0.01 - 1.00] | PASS |
+| A4 DC-offset | 0.0042 | [0.00 - 0.05] | PASS |
 
-| Measure | Value | Target | Result |
-|---|---|---|---|
-| Voicing | 0.7520 | ≥ 0.50 | PASS |
-| F2 centroid | 2096.2 Hz | 1900–2500 Hz | PASS |
-| Duration | 100.0 ms | ≥ 85 ms | PASS |
-| Length ratio vs [i] | 2.00× | ≥ 1.70× | PASS |
+### Section B: Signal Continuity (5/5)
+| Check | Value | Range | Status |
+|-------|-------|-------|--------|
+| B1 [iː] continuity | 0.0722 | [0.00 - 5.00] | PASS |
+| B2 [ɭ] continuity | 0.0808 | [0.00 - 5.00] | PASS |
+| B3 [eː] continuity | 0.1260 | [0.00 - 5.00] | PASS |
+| B join [iː]→[ɭ] | 0.2069 | [0.00 - 0.70] | PASS |
+| B join [ɭ]→[eː] | 0.0163 | [0.00 - 0.70] | PASS |
 
-**Śikṣā confirmation — D5:**
+### Section C: [iː] Long Close Front Vowel (5/5)
+| Check | Value | Range | Status |
+|-------|-------|-------|--------|
+| C1 voicing | 0.6770 | [0.50 - 1.00] | PASS |
+| C2 F1 (close) | 272.4 Hz | [200 - 400] Hz | PASS |
+| C3 F2 (front) | 2163.1 Hz | [1900 - 2500] Hz | PASS |
+| C4 duration (long) | 100.0 ms | [85 - 150] ms | PASS |
+| C5 relative amplitude | 1.0644 | [0.30 - 2.00] | PASS |
 
-| Check | Measure | Value | Target | Result |
-|---|---|---|---|---|
-| F2 quality match with [i] | \|2096 − 2124\| | 28 Hz | ≤ 200 Hz | PASS |
+### Section D: [ɭ] Retroflex Lateral Approximant (6/6)
+| Check | Value | Range | Status |
+|-------|-------|-------|--------|
+| D1 voicing | 0.5716 | [0.25 - 1.00] | PASS |
+| D2 F2 (lateral range) | 1203.2 Hz | [900 - 1400] Hz | PASS |
+| D3 F3 depression (mūrdhanya) | 418.5 Hz | [200 - 1200] Hz | PASS |
+| D4 F3 absolute | 2281.5 Hz | [1500 - 2500] Hz | PASS |
+| D5 amplitude dip | 0.8326 | [0.20 - 1.20] | PASS |
+| D6 F2 drop from [iː] | 959.9 Hz | [300 - 1500] Hz | PASS |
 
-Tālavya confirmed. The quantity
-distinction is clean: duration 2.00×,
-quality difference only 28 Hz in F2.
-Sanskrit phonemic vowel length operates
-by duration alone — same tongue
-position, same formant targets, longer
-hold. This is confirmed in the
-acoustic output.
+### Section E: [eː] Long Close-Mid Front Vowel (6/6)
+| Check | Value | Range | Status |
+|-------|-------|-------|--------|
+| E1 voicing | 0.6438 | [0.50 - 1.00] | PASS |
+| E2 F1 (close-mid) | 392.3 Hz | [300 - 550] Hz | PASS |
+| E3 F2 (front) | 1755.3 Hz | [1500 - 2100] Hz | PASS |
+| E4 relative amplitude | 0.9824 | [0.30 - 2.00] | PASS |
+| E5 F1 difference (mid > close) | 119.9 Hz | [30 - 400] Hz | PASS |
+| E6 F2 difference (close > mid) | 407.8 Hz | [50 - 800] Hz | PASS |
 
-**Vowel length pairs — VS inventory:**
+### Section F: F2 Trajectory Coherence (3/3)
+| Check | Value | Range | Status |
+|-------|-------|-------|--------|
+| F1 F2 drops [iː]→[ɭ] | 959.9 Hz | [200 - 1500] Hz | PASS |
+| F2 F2 rises [ɭ]→[eː] | 552.1 Hz | [100 - 1200] Hz | PASS |
+| F3 V-shaped trajectory | [ɭ] = valley | — | PASS |
 
-| Short | Long | Duration ratio | Quality difference |
-|---|---|---|---|
-| [i] 50 ms | [iː] 100 ms | 2.00× | 28 Hz F2 |
-| [ɑ] — | [ɑː] — | pending | pending |
-| [u] — | [uː] — | pending | pending |
-
-The [i]/[iː] pair is the first
-confirmed vowel length distinction
-in the VS inventory. The pattern —
-same formant targets, doubled duration
-— is established as the template for
-all subsequent long/short pairs.
-
-**Verified synthesis parameters:**
-
-```python
-VS_II_F      = [280.0, 2200.0, 2900.0, 3400.0]
-VS_II_B      = [ 80.0,  130.0,  180.0,  250.0]
-VS_II_GAINS  = [ 12.0,    8.0,    1.5,    0.5]
-VS_II_DUR_MS = 100.0
-VS_II_COART_ON  = 0.10
-VS_II_COART_OFF = 0.10
-```
-
----
-
-### Ḷ — retroflex lateral approximant [ɭ]
-**Devanāgarī:** ळ
-**Śikṣā class:** mūrdhanya (retroflex) + lateral
-**Status:** VERIFIED
-**First word:** ĪḶE
-
-| Measure | Value | Target | Result |
-|---|---|---|---|
-| Voicing | 0.6611 | ≥ 0.50 | PASS |
-| F2 centroid | 1157.8 Hz | 1000–1500 Hz | PASS |
-| F3 centroid | 2413.0 Hz | 1800–2499 Hz | PASS |
-| F3 depression | 287.0 Hz | ≥ 200 Hz | PASS |
-
-**Śikṣā confirmation — D10:**
-
-| Check | Measure | Value | Target | Result |
-|---|---|---|---|---|
-| Mūrdhanya: F3 depression | 2700 − 2413 | 287 Hz | ≥ 200 Hz | PASS |
-| Lateral: F2 below [ɻ̩] | 1212 − 1158 | 54 Hz | ≥ 0 Hz | PASS |
-
-Both constraints confirmed:
-- **Mūrdhanya:** tongue tip retroflexed.
-  F3 depressed 287 Hz below neutral.
-  The tongue curl is in the acoustic output.
-- **Lateral:** F2 reduced below central
-  [ɻ̩] at the same place. Lateral airflow
-  around the tongue sides is present.
-
-[ɭ] is not [l] — no F3 depression.
-[ɭ] is not [ɻ̩] — F2 reduced by lateral.
-[ɭ] is both simultaneously.
-
-**F3 dip report:**
-
-| Phoneme | F3 measured | Depression | Result |
-|---|---|---|---|
-| Neutral alveolar (physics) | 2700 Hz | — | reference |
-| [ɻ̩] (ṚG verified) | 2355 Hz | 345 Hz | CONFIRMED |
-| [ɭ] (this word) | 2413 Hz | 287 Hz | CONFIRMED |
-
-Both mūrdhanya phonemes show F3
-depression. The depression values
-differ — [ɻ̩] at 345 Hz is deeper
-than [ɭ] at 287 Hz — because the
-lateral airflow geometry of [ɭ]
-slightly modifies the sublingual
-cavity shape relative to the central
-[ɻ̩]. Both exceed the 200 Hz minimum.
-The tongue curl is the constant.
-The manner modifies the depth.
-This is physically expected.
-
-**Mūrdhanya inventory — current state:**
-
-| Phoneme | Śikṣā | F3 depression | Status |
-|---|---|---|---|
-| [ɻ̩] | mūrdhanya central | 345 Hz | **VERIFIED — ṚG** |
-| [ɭ] | mūrdhanya lateral | 287 Hz | **VERIFIED — ĪḶE** |
-| [ʈ] | mūrdhanya stop | pending | PENDING |
-| [ʈʰ] | mūrdhanya asp. stop | pending | PENDING |
-| [ɖ] | mūrdhanya voiced stop | pending | PENDING |
-| [ɖʰ] | mūrdhanya v. asp. stop | pending | PENDING |
-| [ɳ] | mūrdhanya nasal | pending | PENDING |
-| [ʂ] | mūrdhanya sibilant | pending | PENDING |
-
-Every mūrdhanya phoneme will show
-F3 depression. The criterion is
-established. The values will vary
-by manner and voicing. The constant
-is the tongue curl.
-
-**Verified synthesis parameters:**
-
-```python
-VS_LL_F           = [400.0, 1100.0, 2100.0, 3000.0]
-VS_LL_B           = [200.0,  350.0,  400.0,  400.0]
-VS_LL_GAINS       = [ 10.0,    5.0,    1.5,    0.4]
-VS_LL_DUR_MS      = 70.0
-VS_LL_F3_NOTCH    = 2100.0
-VS_LL_F3_NOTCH_BW = 350.0
-VS_LL_COART_ON    = 0.15
-VS_LL_COART_OFF   = 0.15
-```
+### Section G: Syllable Coherence (4/4)
+| Check | Value | Range | Status |
+|-------|-------|-------|--------|
+| G1 all-voiced | 0.7786 | [0.50 - 1.00] | PASS |
+| G2 word duration | 260.0 ms | [200 - 400] ms | PASS |
+| G3 vowels > lateral | 1.1548 | [0.80 - 5.00] | PASS |
+| G4 heavy syllable | 100.0 ms | [70 - 200] ms | PASS |
 
 ---
 
-### E — long close-mid front unrounded [eː]
-**Devanāgarī:** ए
-**Śikṣā class:** tālavya (palatal)
-**Status:** VERIFIED
-**First word:** ĪḶE
+## DIAGNOSTIC NOTES
 
-| Measure | Value | Target | Result |
-|---|---|---|---|
-| Voicing | 0.7444 | ≥ 0.50 | PASS |
-| F1 centroid | 402.9 Hz | 380–550 Hz | PASS |
-| F2 centroid | 1659.1 Hz | 1500–2000 Hz | PASS |
+### Clean Pass — No Ruler Calibration Required
 
-**Śikṣā confirmation — D14:**
+ĪḶE passed 33/33 on the first diagnostic version (v1.0). This is because:
 
-| Check | Measure | Value | Target | Result |
-|---|---|---|---|---|
-| F1 above [i] ~280 Hz | 403 − 280 | 123 Hz | ≥ 80 Hz | PASS |
-| F1 below [ɑ] 631 Hz | 631 − 403 | 228 Hz | ≥ 50 Hz | PASS |
-| F2 below [i] 2124 Hz | 2124 − 1659 | 465 Hz | ≥ 100 Hz | PASS |
-| F2 above [ɑ] 1106 Hz | 1659 − 1106 | 553 Hz | ≥ 100 Hz | PASS |
+1. **All segments are long enough for autocorrelation.** [iː] = 100ms, [ɭ] = 70ms, [eː] = 90ms. Even with warm cold-start (2 periods = 16.7ms) and edge trim, sufficient signal remains. No LF-ratio proxy fallback was triggered.
 
-Tālavya mid confirmed. [eː] sits
-cleanly between [i] and [ɑ] in both
-F1 and F2. The four-way check
-confirms the mid position VS-internally
-— all reference values verified within
-this project.
+2. **All-voiced regime from DEVAM v1.2 was pre-calibrated.** The warm cold-start, voiced→voiced join threshold (0.70), and adaptive trim were already tuned. ĪḶE inherits this calibration.
 
-**Note on Sanskrit [e]:**
+3. **Join amplitudes are small.** [iː]→[ɭ] = 0.2069, [ɭ]→[eː] = 0.0163. Both well within the 0.70 threshold. The coarticulation between these all-voiced segments produces smooth transitions.
 
-Sanskrit [e] is always long. There is
-no short counterpart *e in the
-classical Sanskrit phonological system.
-This distinguishes it from [i], [u],
-[ɑ] which all have short/long pairs.
-The duration of 90 ms reflects this
-inherent length. No length ratio
-check is required — there is no
-short [e] to compare against.
+### The Dual-Class Test (Section D) Is Definitive
 
-**Verified synthesis parameters:**
+The [ɭ] diagnostic is the most structurally demanding in the project so far:
+- **D2 + D6** prove lateral identity (F2 in range AND F2 drops from [iː])
+- **D3 + D4** prove mūrdhanya identity (F3 depressed AND F3 absolute < 2500)
+- **D5** proves approximant manner (amplitude dip from constriction)
 
-```python
-VS_EE_F      = [420.0, 1750.0, 2650.0, 3350.0]
-VS_EE_B      = [100.0,  140.0,  200.0,  260.0]
-VS_EE_GAINS  = [ 14.0,    8.0,    1.5,    0.5]
-VS_EE_DUR_MS = 90.0
-VS_EE_COART_ON  = 0.10
-VS_EE_COART_OFF = 0.10
-```
+Six independent measurements converge on the same conclusion. This is the convergence principle applied at the phoneme level.
 
 ---
 
-### Full word — D15
+## KEY INSIGHTS — COMPLETE
 
-| Measure | Value | Target | Result |
-|---|---|---|---|
-| RMS level | 0.3940 | 0.01–0.90 | PASS |
-| Duration | 260.0 ms | 200–380 ms | PASS |
+### From v1 Synthesis (Dual-Class Lateral Architecture)
 
-**Segment sequence:**
+- **Two Śikṣā classes can be synthesized simultaneously.** The formant bank handles the lateral identity (F2 position), and `iir_notch` handles the mūrdhanya identity (F3 depression). These are independent acoustic mechanisms that compose cleanly.
+- **The F3 notch is the retroflex marker, not the F2 position.** F2 tells you lateral vs central. F3 tells you retroflex vs alveolar. Both are needed for [ɭ].
+- **Cross-word [eː] consistency confirmed.** DEVAM v1: F1 = 390.2, F2 = 1757.0. ĪḶE v1: F1 = 392.3, F2 = 1755.3. Difference < 3 Hz on both formants. The parameters are stable.
 
-| Segment | Phoneme | Śikṣā | Duration | Type |
-|---|---|---|---|---|
-| Ī | [iː] | tālavya | 100 ms | long close front vowel |
-| Ḷ | [ɭ] | mūrdhanya + lateral | 70 ms | retroflex lateral approximant |
-| E | [eː] | tālavya | 90 ms | long close-mid front vowel |
+### From v1.0 Diagnostic (First-Pass Clean)
 
-Total: 260 ms. Three segments.
-[iː] at 100 ms is the longest — the
-long vowel nucleus of the first heavy
-syllable. [ɭ] at 70 ms is the
-consonant — approximant, not a stop,
-so duration is significant. [eː] at
-90 ms reflects the inherent length of
-Sanskrit [e].
+- **DEVAM v1.2 all-voiced calibration transfers directly.** Same warm cold-start, same join thresholds, same check_voicing() pattern. All-voiced words form a coherent measurement regime.
+- **The F2 trajectory section (F) is a new diagnostic pattern.** For words with dramatic formant movement, verifying the trajectory shape (not just individual segment values) catches errors that per-segment checks would miss.
+- **V-shaped F2 = acoustic signature.** This can serve as a word-level identity check in future work — if the V-shape is absent, the word is wrong regardless of individual phoneme values.
 
-**Coarticulation chain:**
+---
 
-| Transition | F2 start | F2 end | F3 start | F3 end |
-|---|---|---|---|---|
-| [iː] → [ɭ] | 2096 Hz | 1158 Hz | ~2900 Hz | 2413 Hz |
-| [ɭ] → [eː] | 1158 Hz | 1659 Hz | 2413 Hz | ~2650 Hz |
+## VERIFIED PARAMETERS
 
-[iː] → [ɭ]: F2 drops 938 Hz as the
-tongue moves from high-front palatal
-to retroflexed lateral. F3 drops as
-the tongue curl develops. Both drops
-are audible in the slow version.
+### [iː] Long Close Front Unrounded Vowel
+| Parameter | Value | Source |
+|-----------|-------|--------|
+| F1 | 280 Hz (target) / 272 Hz (measured) | [i] verified AGNI |
+| F2 | 2200 Hz (target) / 2163 Hz (measured) | [i] verified AGNI |
+| F3 | 2900 Hz | [i] verified AGNI |
+| F4 | 3400 Hz | [i] verified AGNI |
+| BW | 80, 130, 180, 250 Hz | Standard close vowel BW |
+| Duration | 100ms | 2× short [i] (50ms) |
+| Coarticulation | 10% on/off | Standard vowel |
 
-[ɭ] → [eː]: F2 rises 501 Hz as the
-tongue uncurls and moves to the mid
-front position. F3 rises as the
-retroflex geometry releases. The
-uncurling is audible — the transition
-from dark lateral to bright mid vowel.
+### [ɭ] Retroflex Lateral Approximant
+| Parameter | Value | Source |
+|-----------|-------|--------|
+| F1 | 400 Hz (target) | Principles-first |
+| F2 | 1100 Hz (target) / 1203 Hz (measured) | Lateral range |
+| F3 | 2100 Hz (target) / 2282 Hz (measured) | Depressed (mūrdhanya) |
+| F4 | 3000 Hz | Principles-first |
+| BW | 200, 350, 400, 400 Hz | Wide (approximant constriction) |
+| F3 notch center | 2100 Hz | Mūrdhanya marker |
+| F3 notch BW | 350 Hz | Calibrated |
+| F3 depression | 418.5 Hz (measured) | ≥ 200 Hz required |
+| Duration | 70ms | Approximant |
+| Amplitude dip | 0.83× | Constriction damping |
+| Coarticulation | 15% on/off | Strong (approximant) |
+
+### [eː] Long Close-Mid Front Unrounded Vowel (cross-word confirmed)
+| Parameter | DEVAM v1 | ĪḶE v1 | Δ |
+|-----------|----------|--------|---|
+| F1 measured | 390.2 Hz | 392.3 Hz | +2.1 Hz |
+| F2 measured | 1757.0 Hz | 1755.3 Hz | −1.7 Hz |
+| Duration | 90ms | 90ms | 0 |
+
+---
+
+## F2 TRAJECTORY — COMPLETE RECORD
+
+| Position | Phoneme | F2 (Hz) | Δ from previous |
+|----------|---------|---------|-----------------|
+| Word-initial | [iː] | 2163 | — |
+| Medial | [ɭ] | 1203 | −960 Hz (drop) |
+| Word-final | [eː] | 1755 | +552 Hz (rise) |
+
+**Shape:** V-shaped. **Valley:** [ɭ] at 1203 Hz. **Total excursion:** 960 Hz.
+
+---
+
+## MŪRDHANYA CLASS — CURRENT STATE
+
+| Phoneme | Manner | F3 Depression | F2 | Status |
+|---------|--------|---------------|-----|--------|
+| [ɻ̩] | central approximant (syllabic) | 345 Hz | 1212 Hz | ✓ VERIFIED (ṚG) |
+| **[ɭ]** | **lateral approximant** | **418.5 Hz** | **1203 Hz** | **✓ VERIFIED (ĪḶE v1)** |
+| [ʈ] | voiceless stop | — | — | — predicted |
+| [ʈʰ] | voiceless aspirated | — | — | — predicted |
+| [ɖ] | voiced stop | — | — | — predicted |
+| [ɖʰ] | voiced aspirated | — | — | — predicted |
+| [ɳ] | nasal | — | — | — predicted |
+| [ʂ] | voiceless sibilant | — | — | — predicted |
+
+**M��rdhanya: 2/8 verified.** F3 depression is the universal marker across all manner classes.
+
+---
+
+## APPROXIMANT CLASS — UPDATED
+
+| Phoneme | Place | F2 | Amplitude Dip | Status |
+|---------|-------|----|---------------|--------|
+| [j] | palatal | ~2100 Hz | — | ✓ VERIFIED (YAJÑASYA) |
+| [v] | labiodental | ~1461 Hz | 0.77× | ✓ VERIFIED (DEVAM v1) |
+| **[ɭ]** | **retroflex lateral** | **~1203 Hz** | **0.83×** | **✓ VERIFIED (ĪḶE v1)** |
+| [ɾ] | alveolar (tap) | ~1400 Hz | — | ✓ VERIFIED (HOTĀRAM, PUROHITAM) |
+| [l] | dental lateral | — | — | — predicted |
+
+**Approximants: 4/5 verified.** Amplitude dip is consistent: [v] 0.77×, [ɭ] 0.83× — constriction damping confirmed across the class.
 
 ---
 
 ## VS VOWEL SPACE — EXTENDED
 
-Full current state. All VS-internal.
-All values verified within this project.
+| Vowel | F1 (Hz) | F2 (Hz) | Height | Frontness | Duration |
+|-------|---------|---------|--------|-----------|----------|
+| [i] | ~280 | ~2124 | close | front | 50ms (short) |
+| **[iː]** | **272** | **2163** | **close** | **front** | **100ms (long)** |
+| **[eː]** | **392** | **1755** | **close-mid** | **front** | **90ms (long)** |
+| [ɑ] | ~631 | ~1106 | open | central | 55ms (short) |
+| [aː] | ~631 | ~1106 | open | central | 110ms (long) |
+| [u] | ~300 | ~750 | close | back | 50ms (short) |
+| [oː] | ~430 | ~800 | close-mid | back | 100ms (long) |
 
-| Phoneme | Śikṣā | F1 | F2 | F3 | Status |
-|---|---|---|---|---|---|
-| [i] | tālavya close | ~280 Hz | 2124 Hz | ~2900 Hz | AGNI |
-| [iː] | tālavya close long | ~280 Hz | 2096 Hz | ~2900 Hz | ĪḶE |
-| [eː] | tālavya mid | 403 Hz | 1659 Hz | ~2650 Hz | ĪḶE |
-| [ɻ̩] | mūrdhanya central | 385 Hz | 1212 Hz | 2355 Hz | ṚG |
-| [ɭ] | mūrdhanya lateral | ~400 Hz | 1158 Hz | 2413 Hz | ĪḶE |
-| [ɑ] | kaṇṭhya open | 631 Hz | 1106 Hz | ~2550 Hz | AGNI |
-
-**F2 ordering (front → back):**
-
-```
-[i]/[iː]  2096–2124 Hz  — tālavya close
-[eː]      1659 Hz       — tālavya mid
-[ɻ̩]       1212 Hz       — mūrdhanya central
-[ɭ]       1158 Hz       — mūrdhanya lateral
-[ɑ]       1106 Hz       — kaṇṭhya open
-```
-
-**Śikṣā F2 hierarchy confirmed:**
-
-```
-tālavya > mūrdhanya > kaṇṭhya
-```
-
-This ordering is predicted by the
-Pāṇinīya Śikṣā articulatory
-classification. It is confirmed in
-the acoustic measurements. The ancient
-phoneticians and the spectrograph
-continue to agree.
+**Front vowel column now complete:** [i]/[iː] (close) and [eː] (close-mid). F1 rises from close → mid (272 → 392 Hz). F2 drops from close → mid (2163 → 1755 Hz). Both confirmed by the E5/E6 diagnostic checks.
 
 ---
 
-## OUTPUT FILES
+## ŚIKṢĀ VALIDATION
+
+### [iː] — ई
+- Quality: tālavya ✓ — F2 = 2163 Hz (high front, palatal region)
+- Quantity: long ✓ — 100ms = 2× short [i]
+- Matches verified [i]: same formant targets, different duration only
+
+### [ɭ] — ळ
+- Place: mūrdhanya ✓ — F3 depression 418.5 Hz (tongue retroflexed)
+- Manner: lateral ✓ — F2 = 1203 Hz (lateral airflow reduces F2)
+- Dual classification confirmed: both markers present simultaneously
+- Distinct from [l] (dantya lateral): would lack F3 depression
+- Distinct from [ɻ̩] (mūrdhanya central): F2 would be different, no lateral quality
+
+### [eː] — ए
+- Quality: tālavya ✓ — F2 = 1755 Hz (mid front, palatal region)
+- Quantity: long ✓ — 90ms (Sanskrit [e] is always long)
+- F1 between [i] and [ɑ] ✓ — 392 Hz (between 272 and 631)
+- F2 between [i] and [ɑ] ✓ — 1755 Hz (between 2163 and 1106)
+
+---
+
+## WORD EVIDENCE
+
+| Property | Value |
+|----------|-------|
+| IPA | [iːɭeː] |
+| Duration | 260ms |
+| Segments | 3 |
+| Architecture | All-voiced, lateral + notch for [ɭ] |
+| New phonemes | [iː] (length variant), [ɭ] (dual-class) |
+| Confirmed phonemes | [eː] (from DEVAM v1, within 3 Hz) |
+| Diagnostic | 33/33 PASS (v1.0) |
+
+---
+
+## PHONEMES IN ĪḶE
+
+| # | IPA | Type | Status |
+|---|-----|------|--------|
+| 1 | [iː] | long close front vowel | ✓ NEW — length variant of verified [i] |
+| 2 | [ɭ] | retroflex lateral approximant | ✓ NEW — dual Śikṣā class (mūrdhanya + lateral) |
+| 3 | [eː] | long close-mid front vowel | ✓ confirmed (DEVAM v1, within 3 Hz) |
+
+---
+
+## SYNTHESIS EVOLUTION — v1
+
+### v1: Canonical Reconstruction ✓
+- Infrastructure from HOTĀRAM v9 (apply_formants with b=[1.0-r], rosenberg_pulse, norm_to_peak)
+- [iː] from verified [i] (AGNI) with doubled duration
+- [ɭ] principles-first: formant bank (lateral F2) + iir_notch (mūrdhanya F3)
+- [eː] parameters confirmed from DEVAM v1
+- All-voiced architecture from DEVAM v1.2 regime
+- 33/33 diagnostic PASS on first synthesis, first diagnostic version
+
+---
+
+## DIAGNOSTIC EVOLUTION — COMPLETE
+
+| Version | Tests | Pass | Fail | Key Change |
+|---------|-------|------|------|------------|
+| v1.0 | 33 | 33 | 0 | Initial — clean pass, no calibration needed |
+
+### Coverage
+- Signal integrity: 4 checks
+- Continuity: 5 checks (3 internal + 2 joins)
+- [iː] close front vowel: 5 checks
+- [ɭ] retroflex lateral: 6 checks (dual-class verification)
+- [eː] close-mid front vowel: 6 checks (including cross-vowel comparisons)
+- F2 trajectory coherence: 3 checks (V-shape verification)
+- Syllable coherence: 4 checks
+- **Total: 33 checks**
+
+---
+
+## UNIQUE CONTRIBUTIONS OF ĪḶE
+
+### 1. First Dual-Class Phoneme [ɭ]
+The first phoneme requiring two independent Śikṣā markers to be present simultaneously. Establishes the architectural pattern: formant bank handles manner class, iir_notch handles place class. These compose independently.
+
+### 2. First Long Front Vowel [iː]
+Proves that short/long vowel distinction in the Śikṣā is purely durational — same formant targets, different quantity. This validates the Śikṣā's classification system at the acoustic level.
+
+### 3. F2 Trajectory Verification (New Diagnostic Pattern)
+The V-shaped F2 trajectory (Section F) is a word-level diagnostic that catches errors individual phoneme checks would miss. This pattern should be applied to any future word with dramatic formant movement.
+
+### 4. Cross-Word [eː] Stability
+DEVAM v1 and ĪḶE v1 produce [eː] with F1 within 2.1 Hz and F2 within 1.7 Hz of each other. The synthesis parameters are stable across different coarticulation contexts, confirming the formant targets are correct.
+
+### 5. Second Mūrdhanya Phoneme
+After [ɻ̩] (ṚG), [ɭ] is the second mūrdhanya phoneme verified. Both show F3 depression (345 Hz and 418.5 Hz respectively), confirming that F3 depression is the universal mūrdhanya marker regardless of manner class.
+
+### 6. First-Pass Diagnostic Clean (33/33)
+No ruler calibration required. The DEVAM v1.2 all-voiced measurement regime transfers directly. This confirms that the all-voiced calibration is a stable, reusable regime — not word-specific tuning.
+
+---
+
+## IMPLEMENTATION FILES
 
 | File | Description |
-|---|---|
-| `ile_dry.wav` | Full word, no reverb, 120 Hz |
-| `ile_hall.wav` | Full word, temple courtyard RT60=1.5s |
-| `ile_slow.wav` | Full word, 4× time-stretched |
-| `ile_ii_isolated.wav` | [iː] isolated |
-| `ile_ii_isolated_slow.wav` | [iː] isolated, 4× slow |
-| `ile_ll_isolated.wav` | [ɭ] isolated |
-| `ile_ll_isolated_slow.wav` | [ɭ] isolated, 4× slow |
-| `ile_ee_isolated.wav` | [eː] isolated |
-| `ile_ee_isolated_slow.wav` | [eː] isolated, 4× slow |
-| `diag_ile_dry.wav` | Diagnostic dry output |
-| `diag_ile_hall.wav` | Diagnostic hall output |
-| `diag_ile_slow.wav` | Diagnostic slow output |
-| `diag_ile_ii_iso.wav` | Diagnostic [iː] isolated |
-| `diag_ile_ii_iso_slow.wav` | Diagnostic [iː] slow |
-| `diag_ile_ll_iso.wav` | Diagnostic [ɭ] isolated |
-| `diag_ile_ll_iso_slow.wav` | Diagnostic [ɭ] slow |
-| `diag_ile_ee_iso.wav` | Diagnostic [eː] isolated |
-| `diag_ile_ee_iso_slow.wav` | Diagnostic [eː] slow |
+|------|-------------|
+| `ile_reconstruction.py` | v1 synthesis — canonical infrastructure |
+| `ile_diagnostic.py` | v1.0 diagnostic — 33/33 PASS |
+| `output_play/ile_v1_dry.wav` | Dry synthesis |
+| `output_play/ile_v1_hall.wav` | Temple courtyard reverb |
+| `output_play/ile_v1_slow6x.wav` | 6× time stretch |
+| `output_play/ile_v1_slow12x.wav` | 12× time stretch |
+| `output_play/ile_v1_perf.wav` | Performance tempo (dil=2.5) |
+| `output_play/ile_v1_perf_hall.wav` | Performance tempo + reverb |
+| `output_play/ile_v1_perf_slow6x.wav` | Performance 6× stretch |
+| `output_play/ile_v1_ii_iso.wav` | Isolated [iː] |
+| `output_play/ile_v1_ll_iso.wav` | Isolated [ɭ] |
+| `output_play/ile_v1_ee_iso.wav` | Isolated [eː] |
 
 ---
 
-## NEW PHONEMES ADDED THIS WORD
+## CUMULATIVE INVENTORY STATE
 
-| Phoneme | Śikṣā | Description | F1 | F2 | F3 | Key diagnostic | Iterations |
-|---|---|---|---|---|---|---|---|
-| [iː] | tālavya | long close front unrounded | ~280 Hz | 2096 Hz | ~2900 Hz | length ratio 2.00× | 1 |
-| [ɭ] | mūrdhanya + lateral | retroflex lateral approximant | ~400 Hz | 1158 Hz | 2413 Hz | F3 depression 287 Hz | 1 |
-| [eː] | tālavya | long close-mid front unrounded | 403 Hz | 1659 Hz | ~2650 Hz | mid position confirmed | 1 |
+### Verified phonemes after ĪḶE: 26+
 
-**VS phonemes verified: [ɻ̩] [g] [ɑ] [n] [i] [iː] [ɭ] [eː]**
+**Vowels (short):** [ɑ], [i], [u]
+**Vowels (long):** [aː], [iː], [eː], [oː]
+**Stops (voiceless):** [t], [p]
+**Stops (voiced):** [d], [ɟ]
+**Stops (aspirated):** [dʰ]
+**Nasals:** [n], [m], [ɲ]
+**Approximants:** [j], [v], [ɾ], [ɭ]
+**Fricatives/Sibilants:** [s], [h]
+**Syllabic:** [ɻ̩]
 
----
+### Mūrdhanya class — 2/8 verified
+[ɻ̩] ✓ (ṚG), [ɭ] ✓ (ĪḶE)
 
-## CUMULATIVE STATUS
+### Approximant class — 4/5 verified
+[j] ✓, [v] ✓, [ɾ] ✓, [ɭ] ✓. Only [l] (dental lateral) remains.
 
-| Word | IPA | Source | New phonemes | Status |
-|---|---|---|---|---|
-| ṚG | [ɻ̩g] | proof of concept | [ɻ̩] | ✓ verified |
-| AGNI | [ɑgni] | 1.1.1 word 1 | [ɑ] [n] [i] | ✓ verified |
-| ĪḶE | [iːɭe] | 1.1.1 word 2 | [iː] [ɭ] [eː] | ✓ verified |
-| PUROHITAM | [puroːhitɑm] | 1.1.1 word 3 | [p] [uː] [oː] [h] | NEXT |
+### Front vowel column — complete
+[i]/[iː] (close), [eː] (close-mid). F1: 272→392 Hz. F2: 2163→1755 Hz.
 
 ---
 
 ## ETYMOLOGICAL NOTE
 
-*īḷe* is the first-person singular
-present indicative of the root *√iḍ*
-(to praise, to invoke, to make an
-offering). The long [iː] in the initial
-syllable carries the pitch accent —
-this is an udātta syllable, held at
-peak F0. The [ɭ] is rare in Sanskrit;
-it appears mainly in alternation with
-[ɖ] in certain phonological environments.
-The verb form *īḷe* is one of its most
-prominent instances.
-
-The opening verse of the Rigveda
-reads: *agnimīḷe purohitam* — "I praise
-Agni, the household priest." AGNI names
-the deity. ĪḶE names the act. The first
-two words of the oldest Indo-European
-poem are an invocation and the verb of
-praise. The physics of that verb —
-the long bright vowel, the dark retroflex
-lateral, the mid front release — has not
-been heard with certainty for
-approximately 3,500 years.
-
-It has been heard now.
+*īḷe* is the first person singular middle voice of √īḍ "to praise, worship." It is the second word of the Rigveda's opening verse: *agním īḷe puróhitam* — "I praise Agni, the household priest." The retroflex lateral [ɭ] is the intervocalic realization of the Vedic ḷ (ळ), the rarest consonant in the Rigvedic phoneme inventory.
 
 ---
 
-*ĪḶE [iːɭe] verified.*
-*Diagnostic v1 — VS-isolated.*
-*Three new phonemes confirmed first run.*
-*Mūrdhanya lateral mapped.*
-*VS vowel space extended to six positions.*
-*Śikṣā F2 hierarchy confirmed throughout.*
-*Eight VS phonemes verified: [ɻ̩] [g] [ɑ] [n] [i] [iː] [ɭ] [eː].*
-*Next: PUROHITAM [puroːhitɑm] — Rigveda 1.1.1, word 3.*
-*New territory: [p] labial stop, [uː] long back rounded,*
-*[oː] long mid back rounded, [h] glottal fricative.*
+## RELATED DOCUMENTS
+
+- `the_convergence_artifact.md` — Three independent derivations
+- `pluck_artifact.md` — Unified Pluck Architecture (not used: all-voiced)
+- `VS_phoneme_inventory.md` — Cumulative inventory
+- `Vedic_Tonnetz_Bridge.md` — Tonnetz ↔ Vedic mapping
+- `devam/evidence.md` — DEVAM v1 ([eː] verified, all-voiced regime)
+- `hotaram/evidence.md` — HOTĀRAM v9 (infrastructure ancestor)
+- `ratnadhatamam/evidence.md` — RATNADHĀTAMAM v17 (norm_to_peak canonical)
+
+---
+
+## LITERATURE REFERENCES
+
+- Ladefoged, P. & Maddieson, I. (1996). *The Sounds of the World's Languages.* — Retroflex laterals, F3 depression
+- Stevens, K. N. (1998). *Acoustic Phonetics.* — Lateral formant patterns, F2 reduction
+- Allen, W. S. (1953). *Phonetics in Ancient India.* — Śikṣā mūrdhanya classification
+- Deshpande, M. M. (1997). "Śaunakīya Caturādhyāyikā." — Prātiśākhya phonetic descriptions
+- Narasimhan, B. et al. (2004). "Retroflex consonants in Dravidian and Indo-Aryan." — F3 depression as retroflex marker
