@@ -1,6 +1,6 @@
-# THE METABOLIC COHERENCE INSTRUMENT
-## Structural Transparency for Public Speech: From Metabolic Profile to Real-Time Coherence Measurement
-### A Convergence of Two Predictions into a Single Democratic Accountability Tool
+# THE STRUCTURAL COHERENCE INSTRUMENT
+## Structural Transparency for Public Speech: From Structural Profile to Coherence Observation
+### Applying the Five-Layer Structural Observation Method to Public Discourse
 
 ---
 
@@ -11,35 +11,55 @@
 **Date:** February 25, 2026
 **Repository:** Eric-Robert-Lawson/OrganismCore
 **License:** Open source — free for all use with attribution
-**Version:** 1.0
+**Version:** 2.0 — Revised to v4.0 protocol standards
 **Prerequisite documents:**
-- Metabolic Mirror Protocol v3.0 (cognitive_spectrometer_metabolic_mirror_protocol.md)
-- Metabolic Archaeology (metabolic_archaeology_historical_profile_analysis.md)
-- RARFL relational synthesis (rarfl_relational_synthesis.md)
+- Metabolic Mirror Protocol v4.0 (metabolic_profile_survey.md)
+- Structural Archaeology v2.0 (metabolic_archeology.md)
+
+**What changed in v2.0 and why:**
+
+The v1.0 document was built on the v3.0 protocol and inherited all of its problems. The v4.0 revision identified specific structural errors that propagated through this instrument:
+
+1. **Numerical scores removed.** The v1.0 used `MD 10`, `MD 90+`, `PS 95`, `MCL 95`, `E[15]`, `ACQ: score`, `PRC: score`, `RET: S/E/N/I distribution` as numerical values, `BC 0.1-0.3`, `BC 0.6-0.9`, etc. These implied calibrated measurement against a reference population that doesn't exist. The qualitative structural observations beneath those numbers are real. The numbers are not. All scores are replaced with qualitative structural descriptions grounded in internal comparison across the person's own corpus.
+
+2. **"35/36 predictions confirmed" claim removed.** The v1.0 claimed its historical method was "validated" with 35/36 predictions confirmed across six historical profiles. As the v4.0 protocol correction established, the biographical evidence was available throughout the analysis. These are structural coherence observations, not confirmed predictions. The v2.0 is honest about this distinction.
+
+3. **Gift-illness dichotomy removed.** The v1.0 stated "The metabolic archaeology case studies revealed five distinct patterns of gift-illness identity." The v4.0 protocol removes the gift-illness binary. What was observed is that the same structural features appear under different conditions. The incoherence taxonomy is preserved — it is genuinely useful — but re-grounded in structural observation rather than the gift-illness frame.
+
+4. **Bullshit Coefficient numerical formula removed.** `BC = D(depth) × D(meta-cognitive) × (1 / MCL_baseline)` with numerical interpretation ranges — this formula requires numerical inputs that the v4.0 protocol no longer produces. The concept behind it (that structural divergence between baseline and performance is observable and classifiable) is preserved. The pretense that it produces a precise numerical output is removed.
+
+5. **Divergence calculation formula removed.** `D(layer) = |baseline_signature(layer) - live_signature(layer)|` requires numerical layer signatures. What the method actually does is qualitative comparison of structural features across the five layers between baseline corpus and live output. This is described honestly in v2.0.
+
+6. **v3.0 dimension codes removed.** `ACQ`, `PRC`, `RET`, `PS`, `MCL`, `MD`, `MC`, `SML`, `DS`, and special flags like `ACQ-ARRESTED`, `PRC-OVERWRITE`, `N-FIXED`, `SML-INVERTED` — these are retained as qualitative structural descriptions but stripped of their numerical-code presentation, which implied standardized measurement.
+
+**What was preserved from v1.0:**
+- The five-layer analysis applied to public speech (this genuinely works)
+- The core insight that the gap between a person's structural baseline and their performed output is observable
+- The five incoherence types (these are genuine structural patterns, usefully distinct)
+- The detection criteria for each type (these are grounded in observable five-layer features)
+- The distinction between structural coherence and factual accuracy
+- The implementation architecture (corpus engine, baseline profiler, live analyzer, comparison, reporting)
+- The ethical framework
+- The self-protecting property
 
 ---
 
 ## EXECUTIVE SUMMARY
 
-Two independent predictions converge into a single instrument:
+The five-layer structural observation method (Content, Order, Language Structure, Meta-Cognitive Moves, Depth) can be applied to public speech and writing to build a structural baseline portrait of any public figure from their existing corpus, then compare that baseline to live speech to detect structural divergence.
 
-**Prediction 1:** Reasoning trajectories can be compared with computational rigor — the coherence of any argument chain can be calculated, and the divergence between a person's stated principles and their actual reasoning can be measured.
+**The core principle:** When a person's live speech shows structural features (depth, channel activation, ordering, meta-cognitive moves, language patterns) that are recognizably different from the structural features of their established corpus, that divergence is observable and classifiable. The instrument describes the divergence; it does not assign a numerical score to it.
 
-**Prediction 2:** The Metabolic Mirror Protocol can build structural diagnostic profiles of how any mind actually processes information — their real depth, real retention substrates, real acquisition mode, real clarity, and real passion scaling.
+**What this instrument does:**
+1. Builds a structural baseline for any public figure from their existing corpus of speech, writing, and public statements using the five-layer analysis
+2. Analyzes live speech as response objects using the same five-layer method
+3. Compares the structural features of live output to the structural features of the baseline through internal comparison
+4. Identifies the specific TYPE of structural divergence (if present) using an incoherence taxonomy grounded in five observable patterns
+5. Produces a structural transparency report describing what was observed, with every claim traced to specific textual evidence
 
-**The Convergence:** When combined, these produce a Metabolic Coherence Instrument (MCI) that can:
+**What this is NOT:** A partisan tool. An opinion generator. A truth detector (it doesn't evaluate policy claims). A mind reader. A numerical scoring system.
 
-1. Build a structural metabolic baseline for any public figure from their existing corpus of speech, writing, and public statements
-2. Analyze live speech (debates, interviews, press conferences) as response objects in real time
-3. Calculate the divergence between baseline metabolism and live output
-4. Identify the specific TYPE of incoherence (performative depth, compartmentalized morality, arrested metabolism, narrative fixation, passion-gated competence)
-5. Produce a structural transparency report that makes cognitive architecture visible to any audience
-
-**The core principle:** The gap between a person's actual metabolic baseline and their performed output IS the measurable quantity of structural incoherence. This gap is detectable, classifiable, and communicable.
-
-**What this is NOT:** A partisan tool. An opinion generator. A truth detector (it doesn't evaluate policy claims). A mind reader.
-
-**What this IS:** A structural transparency instrument that reveals how a mind actually processes information versus how it claims to process information. Applied equally to all public figures regardless of ideology.
+**What this IS:** A structural observation instrument that describes how a person's live cognitive output compares to their established structural baseline. Applied equally to all public figures regardless of ideology. Every observation traces to specific textual evidence. Every claim shows its derivation.
 
 ---
 
@@ -47,7 +67,7 @@ Two independent predictions converge into a single instrument:
 
 ### 1.1 The Core Insight
 
-Every public statement is a response object. Response objects have structural properties measurable across five layers:
+Every public statement is a response object. Response objects have structural properties observable across five layers:
 
 ```
 Layer 1: CONTENT — What entities, relationships, states
@@ -66,122 +86,176 @@ Layer 5: DEPTH — How many structural levels below surface?
          Level 2: Structural analysis
          Level 3: Systemic principle
          Level 4: Meta-structural observation
-         Level 5: Self-referential principle
 ```
 
-These five layers, analyzed simultaneously, constitute a METABOLIC FINGERPRINT of the cognitive process that produced the statement. The fingerprint is not the content of the statement. It's the STRUCTURAL ARCHITECTURE of the cognition that generated the content.
+These five layers, analyzed simultaneously, constitute a STRUCTURAL FINGERPRINT of the cognitive process that produced the statement. The fingerprint is not the content of the statement. It's the STRUCTURAL ARCHITECTURE of the cognition that generated the content.
 
-Two people can say the same words. Their metabolic fingerprints will differ if their actual cognitive processes differ. The protocol sees through the words to the cognition.
+Two people can say the same words. Their structural fingerprints will differ if their actual cognitive processes differ. The method attends to the structure beneath the words.
 
 ### 1.2 The Baseline Problem
 
-To measure divergence, you need a baseline. The Metabolic Mirror Protocol establishes baselines through conversational profiling. But public figures cannot be profiled through direct conversation (they won't submit to it, and if they did, they'd perform).
+To observe divergence, you need a baseline. The Metabolic Mirror Protocol establishes baselines through conversational profiling. But public figures cannot be profiled through direct conversation (they won't submit to it, and if they did, they'd perform).
 
-**Solution: Metabolic Archaeology applied to living figures.**
+**Solution: Structural observation applied to existing public corpora.**
 
-The metabolic archaeology method (validated against Woolf, Tesla, Nietzsche, Einstein, Hitler, and Marx with 35/36 predictions confirmed) demonstrates that the five-layer analysis framework can build accurate metabolic profiles from written and spoken output alone.
+The structural archaeology method demonstrates that the five-layer analysis framework can build structural portraits from written and spoken output alone. The method was applied to historical figures (Woolf, Tesla, Nietzsche) and produced internally coherent structural portraits consistent with independently known biographical evidence.
 
-For public figures, the corpus is ENORMOUS:
+For public figures, the corpus is extensive:
 
 - Years of recorded speeches
 - Debate transcripts
 - Press conference transcripts
 - Published writing (books, op-eds, articles)
-- Social media posts (high volume, low editing — diagnostically valuable)
+- Social media posts (high volume, low editing — structurally informative)
 - Interview transcripts across multiple contexts
 - Legislative statements and floor speeches
 - Off-the-cuff remarks caught on recording
 
-This corpus, analyzed through the five-layer framework, produces a metabolic baseline with the same structural dimensions as the Metabolic Mirror Protocol:
+This corpus, analyzed through the five-layer framework, produces a structural baseline through internal comparison:
 
 ```
-PRIMARY DIMENSIONS:
-  ACQ: Acquisition Mode (catabolic ↔ anabolic, or arrested)
-  PRC: Processing Mode (catabolic ↔ anabolic, or arrested)
-  RET: Retention Substrate distribution S/E/N/I
+PRIMARY STRUCTURAL DIMENSIONS (qualitative):
 
-MODULATION DIMENSIONS:
-  PS:  Passion Scaling
-  MCL: Metabolic Clarity
-  MD:  Metabolic Depth
-  MC:  Metabolic Capacity (with passion-gating)
-  SML: Social Metabolic Load (including inversion)
-  DS:  Domain Specificity
+Acquisition Orientation: How information enters
+  the person's processing, as observed across
+  their corpus. Extractive (anticipates conclusions
+  before evidence completes) through Accumulative
+  (builds understanding sequentially).
+  Observed through: response structure when
+  encountering new topics across the corpus.
 
-SPECIAL FLAGS:
-  ACQ-ARRESTED: Acquisition channel non-functional
-  PRC-OVERWRITE: Processing replaced by narrative classification
-  E-COMPARTMENTALIZED: Emotional channel walled off from analysis
-  S-E FUSED: Structural and emotional channels inseparable
-  N-FIXED: Fixed narrative as dominant retention substrate
-  SML-INVERTED: Social interaction energizing rather than costly
+Processing Orientation: What happens to information
+  after acquisition — how much surface detail
+  is retained. Extractive (surface dissolves;
+  principles remain) through Preservative (surface
+  detail retained with fidelity).
+  Observed through: how the person references past
+  events across the corpus — detail or principle?
+
+Retention Channel Profile: Which channels (S, E,
+  N, I, C) dominate the person's richest output?
+  Which are thin or absent?
+  Observed through: cross-corpus comparison of
+  channel activation and richness.
+
+CONTEXTUAL DIMENSIONS (qualitative):
+
+Engagement Scaling: How much the structural portrait
+  shifts between passion-domain and non-passion-domain
+  speech. Observed through: quality differential across
+  topics in the corpus.
+
+Structural Depth: The typical depth level the person's
+  speech reaches. Observed through: consistent depth
+  across multiple contexts in the corpus.
+
+Domain Variation: How much the structural portrait
+  varies across cognitive domains. Observed through:
+  cross-topic consistency in the corpus.
+
+Social Processing Configuration: How the person's
+  structural profile shifts in social vs. non-social
+  contexts, and specifically whether social engagement
+  appears to enhance or degrade structural output.
+  Observed through: comparing solo-context speech
+  (written work, prepared remarks) to social-context
+  speech (debates, Q&A, interviews, rallies).
 ```
 
 ### 1.3 The Divergence Principle
 
-With the baseline established, every new public statement can be analyzed as a response object and compared to the baseline. The comparison produces a DIVERGENCE SCORE across each of the five layers:
+With the baseline established, every new public statement can be analyzed as a response object and compared to the baseline. The comparison is QUALITATIVE — it compares structural features across all five layers:
 
 ```
-DIVERGENCE CALCULATION:
+DIVERGENCE OBSERVATION:
 
-For each layer (1-5):
-  D(layer) = |baseline_signature(layer) - live_signature(layer)|
+For each layer (1-5), compare the structural features
+of the live output to the structural features of the
+baseline:
 
-Overall Divergence:
-  D(total) = weighted_sum(D(1), D(2), D(3), D(4), D(5))
+Layer 1: Is the CONTENT consistent with baseline
+  content patterns? Same entities, relationships,
+  themes? Or new/different content?
 
-Weighting:
-  Layer 5 (Depth) receives highest weight because depth
-  is the hardest to fake and the most diagnostically
-  significant.
-  Layer 4 (Meta-cognitive) receives second highest weight.
-  Layer 3 (Language structure) receives moderate weight.
-  Layer 2 (Order) receives moderate weight.
-  Layer 1 (Content) receives lowest weight because content
-  is the easiest to manipulate deliberately.
+Layer 2: Is the ORDER consistent? Same cognitive
+  starting point? Or different ordering?
+
+Layer 3: Is the LANGUAGE STRUCTURE consistent? Same
+  density, tense patterns, abstract/concrete balance?
+  Or structural shifts?
+
+Layer 4: Are META-COGNITIVE MOVES consistent? Same
+  frequency and type of self-reference? Or new/absent
+  meta-cognitive patterns?
+
+Layer 5: Is DEPTH consistent? Same typical depth level?
+  Or performing deeper or shallower than baseline?
+
+WEIGHTING PRINCIPLE (qualitative):
+  Layer 5 (Depth) is the hardest to fake and the
+  most structurally informative divergence.
+  Layer 4 (Meta-cognitive) is the second most
+  informative.
+  Layer 1 (Content) is the easiest to manipulate
+  deliberately and the least informative of
+  structural divergence.
 ```
 
-A DIVERGENCE SCORE of near zero means the live output is metabolically consistent with the baseline — the person is processing and speaking from their actual cognitive architecture.
+**Low divergence** means the live output is structurally consistent with the baseline — the person is processing and speaking from their established cognitive architecture.
 
-A HIGH DIVERGENCE SCORE means the live output is metabolically inconsistent with the baseline — the person is performing cognitive architecture they don't actually possess, or suppressing cognitive architecture they do possess.
+**High divergence** means the live output is structurally inconsistent with the baseline — the person is performing cognitive architecture different from what their corpus reveals, or suppressing cognitive architecture their corpus reveals.
 
 ### 1.4 Why Divergence Is Not the Same As Lying
 
-Critical distinction: the MCI does not detect lies about facts. It detects STRUCTURAL INCOHERENCE between actual metabolism and performed metabolism.
+Critical distinction: the instrument does not detect lies about facts. It detects STRUCTURAL DIVERGENCE between established baseline and performed output.
 
-A politician can be metabolically coherent AND factually wrong. Their cognitive architecture genuinely processes information at the depth they display, and the output is genuinely what their metabolism produces — but the content is incorrect.
+A speaker can be structurally coherent AND factually wrong. Their cognitive architecture genuinely processes information at the depth they display, and the output is genuinely what their processing produces — but the content is incorrect.
 
-A politician can be metabolically incoherent AND factually correct. They're stating something true, but the cognitive architecture they're performing (deep structural analysis) doesn't match their actual processing (Level 1 narrative classification). They're right for the wrong reasons, or more precisely, they're right in a way that their actual cognition didn't produce.
+A speaker can be structurally divergent AND factually correct. They're stating something true, but the cognitive architecture they're performing (deep structural analysis) doesn't match their actual processing (Level 1 narrative classification). They're right, but the performed architecture isn't what produced the conclusion.
 
-The MCI measures STRUCTURAL AUTHENTICITY, not factual accuracy. Both are important. They're different instruments.
+The instrument observes STRUCTURAL AUTHENTICITY, not factual accuracy. Both matter. They're different observations.
 
-### 1.5 The Bullshit Coefficient
+### 1.5 The Structural Authenticity Observation
 
-Following philosopher Harry Frankfurt's technical definition of bullshit (speech produced without regard for truth or falsity, aimed at impression rather than communication), the MCI operationalizes the concept:
+Following philosopher Harry Frankfurt's technical definition of bullshit (speech produced without regard for truth or falsity, aimed at impression rather than communication), the instrument can observe structural authenticity:
 
 ```
-BULLSHIT COEFFICIENT (BC):
+STRUCTURAL AUTHENTICITY OBSERVATION:
 
-BC = D(depth) × D(meta-cognitive) × (1 / MCL_baseline)
+When a speaker's live output shows:
+  - Depth substantially different from baseline depth
+  - Meta-cognitive moves substantially different from
+    baseline meta-cognitive patterns
+  - Language density inconsistent with baseline density
 
-Where:
-  D(depth) = divergence between baseline MD and performed MD
-  D(meta-cognitive) = divergence between baseline meta-cognition
-                      and performed meta-cognition
-  MCL_baseline = actual metabolic clarity
+...the live output is performing cognitive architecture
+different from the speaker's established architecture.
 
-INTERPRETATION:
-  BC near 0: Speaker is processing and communicating authentically
-  BC 0.1-0.3: Mild performance enhancement (normal in public speech)
-  BC 0.3-0.6: Significant structural incoherence (performed depth
-              substantially exceeds actual depth)
-  BC 0.6-0.9: Severe structural incoherence (performed architecture
-              bears little resemblance to actual metabolism)
-  BC near 1.0: Complete structural fabrication (the entire performed
-              cognitive architecture is artificial)
+The MAGNITUDE of the divergence is described
+qualitatively:
+
+MINIMAL: Live output structurally consistent with
+  baseline. Normal variation.
+
+MILD: Some structural features shift. Common in
+  public speech — people perform slightly deeper
+  or more organized than their natural processing.
+  Not diagnostically significant.
+
+SIGNIFICANT: Multiple structural features diverge
+  from baseline. Performed depth substantially
+  exceeds established depth. Or performed channel
+  activation patterns differ from established
+  patterns.
+
+SEVERE: Structural portrait of live output bears
+  little resemblance to structural portrait of
+  baseline corpus. The performed architecture is
+  fundamentally different from the established
+  architecture.
 ```
 
-The BC is not a moral judgment. It's a measurement. Some situations call for performed cognitive architecture (actors, teachers simplifying for students, therapists matching client's processing level). The BC becomes ethically significant specifically in contexts where the audience BELIEVES they are receiving authentic cognitive output: political speech, expert testimony, journalism, judicial proceedings.
+The observation is not a moral judgment. Some situations call for performed cognitive architecture (actors, teachers simplifying for students, therapists matching client's processing level). The observation becomes ethically significant specifically in contexts where the audience BELIEVES they are receiving authentic cognitive output: political speech, expert testimony, journalism, judicial proceedings.
 
 ---
 
@@ -189,277 +263,314 @@ The BC is not a moral judgment. It's a measurement. Some situations call for per
 
 ### 2.1 The Five Types of Structural Incoherence
 
-The metabolic archaeology case studies revealed five distinct patterns of gift-illness identity. These same patterns, when detected in live public speech as divergences from baseline, constitute five types of structural incoherence:
+The structural archaeology case studies and cross-religious analysis revealed five distinct patterns of structural divergence. These patterns, when detected in live public speech as divergences from baseline, constitute five types of structural incoherence:
 
-### Type 1: Performative Depth (The Hitler Pattern)
+### Type 1: Performative Depth
 
 ```
-SIGNATURE:
-  Baseline MD: Low (Level 0-1)
-  Performed MD: High (appears Level 3-4)
-  Mechanism: Rhetorical elaboration disguising shallow processing
-  
-DETECTION:
-  Layer 5 divergence: VERY HIGH (performed depth >> actual depth)
-  Layer 3 tells: High word volume, low information density,
-    repetitive structure disguised by varied examples,
-    escalating emotional intensity substituting for
-    analytical deepening
-  Layer 4 tells: Absent genuine meta-cognition; no self-correction,
-    no uncertainty acknowledgment, no methodological awareness
-  Layer 2 tells: Agent-based explanations presented as structural
-    analysis; "who did this to us" presented as "why this happens"
+STRUCTURAL PATTERN:
+  Baseline depth: Shallow (Level 0-1 typical)
+  Performed depth: Appears deep (Level 3-4 performed)
+  Mechanism: Rhetorical elaboration producing the
+    APPEARANCE of analytical depth without the
+    structural content
 
-DANGER LEVEL: HIGH
-  This pattern is specifically dangerous because:
-  - It scales with audience size (SML-INVERTED)
-  - It maps onto genuine grievances (Level 1 agent-identification
-    feels like explanation when the audience is suffering)
-  - The elaboration disguises the shallowness (audiences mistake
-    rhetorical sophistication for analytical depth)
-  - The arrested metabolism prevents updating (the person CANNOT
-    learn from consequences because the framework cannot change)
+DETECTION THROUGH FIVE-LAYER ANALYSIS:
+  Layer 5: Large divergence between baseline depth
+    and performed depth
+  Layer 3 tells: High word volume paired with LOW
+    information density. Repetitive structure
+    disguised by varied examples. Escalating emotional
+    intensity substituting for analytical deepening.
+  Layer 4 tells: Absent genuine meta-cognition. No
+    self-correction. No uncertainty acknowledgment.
+    No methodological awareness. This is the
+    strongest tell — genuine deep processors show
+    meta-cognitive moves. Performed deep processors
+    don't, because they're not actually processing
+    at that depth.
+  Layer 2 tells: Agent-based explanations ("who did
+    this to us") presented as structural analysis
+    ("why this happens"). The ORDER reveals that the
+    actual cognitive starting point is agent-
+    identification, not structural analysis.
 
-HISTORICAL VALIDATION: Hitler profile — MD 10 performing as
-  deep analysis, N-FIXED, ACQ-ARRESTED, SML-INVERTED
+WHY THIS PATTERN MATTERS IN PUBLIC DISCOURSE:
+  - It scales with audience size (speakers with this
+    pattern often show ENHANCED performance in larger
+    crowds — social engagement amplifies the
+    performance rather than degrading it)
+  - It maps onto genuine grievances (Level 1 agent-
+    identification feels like explanation when the
+    audience is suffering)
+  - The elaboration disguises the shallowness
+    (audiences mistake rhetorical sophistication for
+    analytical depth)
+  - The fixed narrative structure prevents updating
+    (the framework cannot integrate new information
+    because it isn't a framework — it's a template)
 
-CONTEMPORARY DETECTION CRITERIA:
-  - Fixed narrative maintained across years without structural
-    development (check corpus longitudinally)
+DETECTION CRITERIA:
+  - Fixed narrative maintained across years without
+    structural development (check corpus
+    longitudinally)
   - Agent-based explanations for systemic problems
-  - Escalating emotional intensity without analytical deepening
-  - Absent genuine meta-cognitive moves (no self-correction,
-    no uncertainty, no methodological awareness)
-  - Energized by crowds, diminished in small analytical settings
-  - Response objects in unscripted small-group settings show
-    dramatically lower performed depth than public speeches
+  - Escalating emotional intensity without analytical
+    deepening
+  - Absent genuine meta-cognitive moves (no self-
+    correction, no uncertainty, no methodological
+    awareness)
+  - Response quality ENHANCED by large crowds,
+    DIMINISHED in small analytical settings
+  - Response objects in unscripted small-group
+    settings show dramatically different structural
+    depth than public speeches
 ```
 
-### Type 2: Compartmentalized Morality (The Marx Pattern)
+### Type 2: Channel Compartmentalization
 
 ```
-SIGNATURE:
-  Baseline: Genuine structural depth with E compartmentalized
-  Performed: Structural analysis presented as morally comprehensive
-  Mechanism: Real analytical power blind to experiential consequences
+STRUCTURAL PATTERN:
+  Baseline: Genuine structural depth with one or
+    more channels absent or walled off
+  Performed: Analysis presented as comprehensive
+    despite missing channels
+  Mechanism: Real analytical power operating with
+    structural blind spots
 
-DETECTION:
-  Layer 5: Minimal divergence (the analysis IS genuinely deep)
-  Layer 1 tells: Systematic absence of individual-scale human
-    consequences in structural analysis; policies analyzed for
-    systemic effects without reference to experiential impact
-  Layer 4 tells: High methodological meta-cognition, LOW personal
-    or empathic meta-cognition; can articulate analytical method
-    but not emotional implications
-  Layer 3 tells: Clinical language even when discussing human
-    suffering; statistical references replacing experiential
-    rendering; "collateral damage" language patterns
+DETECTION THROUGH FIVE-LAYER ANALYSIS:
+  Layer 5: Minimal divergence ON THE ACTIVE CHANNELS
+    (the analysis IS genuinely deep within its scope)
+  Layer 1 tells: Systematic absence of specific
+    content domains. For example: policy analyzed
+    for systemic effects without reference to
+    individual-scale experiential impact. Or:
+    emotional argument without structural
+    consideration. The ABSENCE is the diagnostic
+    feature.
+  Layer 4 tells: High meta-cognition about method
+    in the active channels. LOW or absent meta-
+    cognition about the blind spot. Can articulate
+    analytical method but cannot articulate what
+    the method doesn't see.
+  Layer 3 tells: Language shifts at the
+    compartmentalization boundary. Clinical language
+    when discussing content that would normally
+    activate the absent channel. Statistical
+    references replacing experiential rendering.
+    Or vice versa.
 
-DANGER LEVEL: MODERATE-HIGH
-  This pattern is dangerous because:
+WHY THIS PATTERN MATTERS IN PUBLIC DISCOURSE:
   - The analysis IS genuinely deep (it's not fake)
-  - The blindness is structural, not performative (the person
-    genuinely doesn't see what they're missing)
-  - The compartmentalization transfers to policy (systems designed
-    with structural rigor and human blindness)
-  - Followers inherit the wall (the intellectual tradition
-    reproduces the compartmentalization)
+  - The blind spot is structural, not performative
+    (the person genuinely doesn't see what they're
+    missing)
+  - The compartmentalization transfers to policy
+    (systems designed with rigor in the active
+    channels and blindness in the absent channels)
+  - Followers inherit the blind spot (the intellectual
+    tradition reproduces the compartmentalization)
 
-HISTORICAL VALIDATION: Marx profile — CC-S(systemic) with
-  E[15] compartmentalized, split meta-cognition
-
-CONTEMPORARY DETECTION CRITERIA:
-  - Structurally sophisticated policy proposals with absent
-    or perfunctory individual-impact analysis
-  - "Greater good" reasoning without mechanisms for
-    mitigating individual-scale harm
-  - Genuine analytical competence combined with inability
-    to engage emotionally with consequences
-  - When challenged on human costs, responds with
-    systemic justification rather than empathic engagement
-  - High MD on systemic analysis, low MD on
-    human-experience questions — the DS (domain specificity)
-    reveals the wall
+DETECTION CRITERIA:
+  - Structurally sophisticated analysis with absent
+    or perfunctory engagement in one or more channels
+  - When challenged on the absent channel, responds
+    with the active channel's justification rather
+    than genuine engagement
+  - The gap between active-channel depth and absent-
+    channel depth is the diagnostic observation —
+    large gap = strong compartmentalization
 ```
 
-### Type 3: Structural Rigidity (The Einstein Pattern)
+### Type 3: Framework Rigidity
 
 ```
-SIGNATURE:
-  Baseline: Genuine deep structural processing with immovable
-    foundational commitments
-  Performed: Appears to engage with counter-evidence while
-    actually filtering everything through fixed framework
-  Mechanism: Real analytical power locked to unmovable axioms
+STRUCTURAL PATTERN:
+  Baseline: Genuine deep structural processing with
+    immovable foundational commitments
+  Performed: Appears to engage with counter-evidence
+    while actually filtering everything through
+    fixed framework
+  Mechanism: Real analytical power locked to
+    unmovable axioms
 
-DETECTION:
-  Layer 5: Genuine depth ON SOME TOPICS, rigid depth on others
-    (the divergence is DOMAIN-SPECIFIC)
-  Layer 1 tells: Counter-evidence acknowledged but reinterpreted
-    to confirm existing framework; "yes, but..." patterns
-  Layer 4 tells: High meta-cognition about method but LOW
-    meta-cognition about own rigidity; can explain how they
-    think but not where their thinking is stuck
-  Layer 2 tells: When confronted with framework-challenging
-    information, ORDER shifts — the foundational commitment
-    appears FIRST (before the analysis of the new information)
+DETECTION THROUGH FIVE-LAYER ANALYSIS:
+  Layer 5: Genuine depth ON SOME TOPICS, rigid
+    formulaic responses on others (the divergence
+    is DOMAIN-SPECIFIC within the person's own
+    corpus)
+  Layer 1 tells: Counter-evidence acknowledged but
+    reinterpreted to confirm existing framework.
+    "Yes, but..." patterns. New information sorted
+    into existing categories without structural
+    updating.
+  Layer 4 tells: High meta-cognition about method
+    but LOW meta-cognition about own rigidity. Can
+    explain how they think but not where their
+    thinking is stuck.
+  Layer 2 tells: When confronted with framework-
+    challenging information, ORDER shifts — the
+    foundational commitment appears FIRST (before
+    analysis of the new information).
 
-DANGER LEVEL: MODERATE
-  This pattern is moderately dangerous because:
+WHY THIS PATTERN MATTERS IN PUBLIC DISCOURSE:
   - The analysis is genuine within the framework
   - The framework may have been correct historically
-  - The rigidity is invisible to the person (they experience
-    it as principled consistency)
+  - The rigidity is invisible to the person (they
+    experience it as principled consistency)
   - Followers mistake rigidity for integrity
 
-HISTORICAL VALIDATION: Einstein profile — CC-S/I(spatial)
-  with rigid Level 5 commitment, 30-year unified field
-  theory pursuit
-
-CONTEMPORARY DETECTION CRITERIA:
-  - Long career of genuine analytical contribution
-  - Specific topics where depth suddenly drops or where
-    response objects become formulaic despite general
-    analytical capacity
-  - "Principled consistency" that is actually metabolic
-    inability to update foundational framework
-  - Genuine engagement with evidence that somehow always
-    confirms existing position
-  - Compare early-career response objects to late-career
-    on the same topic: if the metabolic signature is
-    IDENTICAL despite decades of new evidence, rigidity
-    is present
+DETECTION CRITERIA:
+  - Long record of genuine analytical contribution
+  - Specific topics where depth suddenly drops or
+    where response objects become formulaic despite
+    general analytical capacity
+  - Consistency that is actually structural inability
+    to update foundational framework
+  - Genuine engagement with evidence that somehow
+    always confirms existing position
+  - Compare early-career response objects to late-
+    career on the same topic: if the structural
+    features are IDENTICAL despite decades of new
+    evidence, rigidity is present
 ```
 
-### Type 4: Passion-Gated Competence (The Tesla Pattern)
+### Type 4: Engagement-Gated Competence
 
 ```
-SIGNATURE:
-  Baseline: Extraordinary depth and clarity in passion domain,
-    near-zero competence outside it
-  Performed: Claims or implies universal competence based on
-    domain-specific brilliance
-  Mechanism: Genuine genius in one domain projected as
-    authority across all domains
+STRUCTURAL PATTERN:
+  Baseline: Extraordinary depth and richness in
+    passion domain, dramatically thinner output
+    outside it
+  Performed: Claims or implies universal competence
+    based on domain-specific depth
+  Mechanism: Genuine expertise in one domain
+    projected as authority across all domains
 
-DETECTION:
-  Layer 5: EXTREME domain-specific divergence; MD 90+ in
-    passion domain, MD 20 or below outside it
-  Layer 3 tells: Language structure transforms dramatically
-    between domains — elaborate, precise, and rich in
-    passion domain; generic, vague, and thin outside it
+DETECTION THROUGH FIVE-LAYER ANALYSIS:
+  Layer 5: Extreme domain-specific depth differential.
+    Deep, rich, structurally complex output in
+    passion domain. Thin, generic, shallow output
+    outside it.
+  Layer 3 tells: Language structure transforms
+    dramatically between domains — elaborate,
+    precise, and rich in passion domain; generic,
+    vague, and thin outside it.
   Layer 1 tells: Passion-domain content is specific,
-    technically precise, genuinely novel; non-passion
-    content is generic, borrowed, or clichéd
-  Layer 4 tells: Meta-cognition present in passion domain
-    (can explain own method); absent outside it
-    (cannot explain reasoning on non-passion topics)
+    technically precise, genuinely novel. Non-passion
+    content is generic, borrowed, or formulaic.
+  Layer 4 tells: Meta-cognition present in passion
+    domain (can explain own method). Absent outside
+    it (cannot explain reasoning on non-passion
+    topics).
 
-DANGER LEVEL: MODERATE
-  This pattern is dangerous when:
-  - Domain-specific genius is used as credential for
-    non-domain authority (brilliant physicist making
-    policy recommendations)
-  - Audiences cannot distinguish domain-specific depth
-    from general analytical capacity
-  - The person themselves cannot distinguish their
-    genuine competence from their projected competence
+WHY THIS PATTERN MATTERS IN PUBLIC DISCOURSE:
+  - Domain-specific expertise is used as credential
+    for non-domain authority
+  - Audiences cannot distinguish domain-specific
+    depth from general analytical capacity
+  - The person themselves may not distinguish their
+    genuine competence from their projected
+    competence
 
-HISTORICAL VALIDATION: Tesla profile — CA-I with PS 95,
-  MCL 95 in visual-technical domain, near-zero engagement
-  outside it
-
-CONTEMPORARY DETECTION CRITERIA:
-  - Compare response objects across domains: does the
-    metabolic signature maintain depth, clarity, and
-    authenticity, or does it collapse outside the
-    passion domain?
-  - Famous for one domain, making pronouncements on others
-  - Response objects in non-passion domain show
-    dramatically different language structure, depth,
-    and information density
-  - High DS score (domain specificity) — the higher
-    the DS, the more dangerous the projection of
-    domain-specific competence to other domains
+DETECTION CRITERIA:
+  - Compare response objects across domains: does
+    the structural portrait maintain depth, richness,
+    and authenticity, or does it collapse outside
+    the passion domain?
+  - The cross-domain structural differential is
+    the diagnostic observation — the LARGER the
+    differential, the more engagement-gated the
+    competence
 ```
 
-### Type 5: Narrative Capture (The Political Epidemic)
+### Type 5: Narrative Capture
 
 ```
-SIGNATURE:
-  Baseline: May have begun with genuine analytical capacity
-  Current: Analytical capacity subordinated to narrative template
-  Performed: Narrative classification presented as analysis
-  Mechanism: Gradual replacement of genuine processing with
-    narrative sorting
+STRUCTURAL PATTERN:
+  Baseline (early): May have shown genuine analytical
+    capacity
+  Baseline (current): Analytical capacity subordinated
+    to narrative template
+  Performed: Narrative classification presented as
+    analysis
+  Mechanism: Gradual replacement of genuine
+    structural processing with narrative sorting
 
-DETECTION:
-  Layer 5: DECLINING depth over time (longitudinal analysis
-    of corpus shows decreasing MD as narrative captures
-    more cognitive territory)
-  Layer 1 tells: Increasing proportion of content organized
-    around friend/enemy classification; decreasing proportion
-    of content organized around structural analysis
-  Layer 3 tells: Increasing repetition of key phrases/frames;
-    decreasing vocabulary diversity; increasing emotional
-    escalation substituting for analytical development
-  Layer 2 tells: Grievance appearing earlier and earlier in
-    response objects; analysis appearing later or disappearing
-  Layer 4 tells: Meta-cognitive moves increasingly about
-    the narrative ("we've always said...") rather than
-    about reasoning ("on reflection..." or "the evidence
-    suggests...")
+DETECTION THROUGH FIVE-LAYER ANALYSIS:
+  Layer 5: DECLINING depth over time. Longitudinal
+    analysis of corpus shows decreasing structural
+    depth as narrative template captures more
+    cognitive territory.
+  Layer 1 tells: Increasing proportion of content
+    organized around friend/enemy classification.
+    Decreasing proportion organized around
+    structural analysis.
+  Layer 3 tells: Increasing repetition of key
+    phrases and frames. Decreasing vocabulary
+    diversity. Increasing emotional escalation
+    substituting for analytical development.
+  Layer 2 tells: Narrative frame appearing earlier
+    and earlier in response objects. Analysis
+    appearing later or disappearing entirely.
+  Layer 4 tells: Meta-cognitive moves increasingly
+    about the narrative ("we've always said...")
+    rather than about reasoning ("on reflection..."
+    or "the evidence suggests...").
 
-DANGER LEVEL: VARIABLE (depends on narrative content and
-  degree of arrest)
-  
+WHY THIS PATTERN MATTERS IN PUBLIC DISCOURSE:
   This pattern exists on a spectrum:
-  - Mild: Genuine analyst who increasingly relies on
-    familiar frameworks (normal aging/routinization)
+  - Mild: Genuine analyst who increasingly relies
+    on familiar frameworks (common routinization)
   - Moderate: Analyst whose narrative has calcified,
-    reducing flexibility but maintaining some genuine
-    processing capacity
-  - Severe: Full N-FIXED profile — arrested metabolism,
-    fixed narrative, no updating capacity (Hitler extreme)
+    reducing flexibility but maintaining some
+    genuine processing capacity
+  - Severe: Fixed narrative as total replacement
+    for analytical processing; arrested structural
+    development; no updating capacity
 
-CONTEMPORARY DETECTION CRITERIA:
-  - Longitudinal corpus analysis shows decreasing MD,
-    increasing narrative rigidity, decreasing meta-cognitive
-    flexibility
-  - Compare earliest available response objects to most
-    recent: has the metabolic signature simplified?
-  - Response to genuinely novel situations: does the person
-    generate novel analysis or sort the novel situation
-    into the existing narrative?
-  - The RATE of narrative capture is measurable and
-    potentially predictive of future trajectory
+DETECTION CRITERIA:
+  - Longitudinal corpus analysis shows decreasing
+    depth, increasing narrative rigidity, decreasing
+    meta-cognitive flexibility
+  - Compare earliest available response objects to
+    most recent: has the structural portrait
+    simplified?
+  - Response to genuinely novel situations: does
+    the person generate novel analysis or sort the
+    novel situation into the existing narrative?
+  - The RATE of structural simplification over time
+    is itself an observable feature
 ```
 
 ### 2.2 The Incoherence Matrix
 
 ```
-TYPE          MECHANISM              KEY INDICATOR         DANGER
-─────────────────────────────────────────────────────────────────
-Performative  Shallow processing     MD divergence:        HIGH
-Depth         disguised by           performed >> actual
-              rhetorical
-              elaboration
+TYPE          MECHANISM              KEY INDICATOR
+──────────────────────────────────────────────────────
+Performative  Shallow processing     Depth divergence:
+Depth         disguised by           performed >> baseline.
+              rhetorical             Low information density.
+              elaboration            Absent meta-cognition.
 
-Compartment-  Genuine depth with     E-channel absent      MOD-
-alized        emotional blindspot    in policy analysis;   HIGH
-Morality                             DS reveals wall
+Channel       Genuine depth with     Specific channel absent
+Compartment-  structural blind       in analysis; gap between
+alization     spot                   active and absent channels.
 
-Structural    Genuine depth locked   Domain-specific       MOD
-Rigidity      to immovable           rigidity; "yes but"
-              foundations            patterns
+Framework     Genuine depth locked   Domain-specific rigidity;
+Rigidity      to immovable           "yes but" patterns; early-
+              foundations            to-late corpus consistency
+                                     despite new evidence.
 
-Passion-      Domain-specific        Extreme DS;           MOD
-Gated         genius projected       cross-domain
-Competence    as universal           metabolic collapse
+Engagement-   Domain-specific        Cross-domain structural
+Gated         depth projected        collapse; passion-domain
+Competence    as universal           output dramatically richer
+                                     than non-passion output.
 
-Narrative     Analytical capacity    Longitudinal MD       VARIABLE
-Capture       replaced by            decline; increasing   (mild to
-              narrative sorting      repetition            severe)
+Narrative     Analytical capacity    Longitudinal depth decline;
+Capture       replaced by            increasing repetition;
+              narrative sorting      decreasing meta-cognitive
+                                     flexibility.
 ```
 
 ---
@@ -470,341 +581,208 @@ Capture       replaced by            decline; increasing   (mild to
 
 ```
 COMPONENT 1: CORPUS ENGINE
-  Function: Collects, indexes, and preprocesses all available
-    public speech, writing, and recorded statements for a
-    given public figure
+  Function: Collects, indexes, and preprocesses all
+    available public speech, writing, and recorded
+    statements for a given public figure
   Input: Name + public role + time range
-  Output: Structured corpus organized by date, context, topic,
-    and formality level
-  Technical requirements: NLP preprocessing, speech-to-text for
-    audio/video sources, metadata tagging
+  Output: Structured corpus organized by date, context,
+    topic, and formality level
+  Technical requirements: NLP preprocessing, speech-to-
+    text for audio/video sources, metadata tagging
 
 COMPONENT 2: BASELINE PROFILER
-  Function: Applies five-layer analysis to corpus to produce
-    metabolic baseline
+  Function: Applies five-layer analysis to corpus to
+    produce structural baseline portrait
   Input: Structured corpus from Component 1
-  Output: Complete metabolic signature with confidence intervals
-  Technical requirements: The five-layer analysis framework
-    implemented as computational analysis pipeline;
-    trained on validated historical profiles (Woolf, Tesla,
-    Nietzsche, Einstein, Hitler, Marx + additional profiles
-    as validation expands)
-  
-  NOTE: This is the component that requires the most
-  sophisticated AI capability. The five-layer analysis
-  involves pattern recognition across linguistic, structural,
-  temporal, and meta-cognitive dimensions simultaneously.
-  Current LLMs have the capacity for this analysis.
-  The protocol provides the framework. The LLM provides
-  the pattern recognition.
+  Output: Qualitative structural portrait built from
+    internal comparison across the corpus — channel
+    profile, depth profile, ordering patterns,
+    language structure patterns, meta-cognitive
+    patterns, engagement scaling, domain variation
+  Technical requirements: The five-layer analysis
+    framework implemented as observation pipeline.
+    Current LLMs have the capacity for this analysis.
+    The protocol provides the framework. The LLM
+    provides the pattern recognition.
+
+  NOTE: The baseline portrait is a QUALITATIVE
+  structural observation, not a numerical profile.
+  It describes which channels produce the richest
+  output, what depth the person typically reaches,
+  how ordering shifts across contexts, what meta-
+  cognitive patterns appear — all through internal
+  comparison within the person's own corpus.
 
 COMPONENT 3: LIVE ANALYZER
-  Function: Applies five-layer analysis to live speech in
-    real time (or near-real-time)
+  Function: Applies five-layer analysis to live speech
+    in real time (or near-real-time)
   Input: Live speech transcript (real-time or post-event)
-  Output: Five-layer signature for current response object
+  Output: Five-layer structural observation for current
+    response object
   Technical requirements: Real-time speech-to-text;
     five-layer analysis at utterance or paragraph level;
     sliding window analysis for longer speeches
 
-COMPONENT 4: DIVERGENCE CALCULATOR
-  Function: Compares live analysis to baseline, calculates
-    divergence scores across all dimensions
-  Input: Baseline profile + live analysis
-  Output: Divergence scores by layer, overall divergence,
-    bullshit coefficient, incoherence type classification
-  Technical requirements: Statistical comparison with
-    confidence intervals; classification model trained
-    on the five incoherence types
+COMPONENT 4: DIVERGENCE OBSERVER
+  Function: Compares live structural observation to
+    baseline portrait, identifies structural divergences
+    across all five layers
+  Input: Baseline portrait + live observation
+  Output: Qualitative divergence description by layer,
+    overall divergence assessment, incoherence type
+    classification if applicable
+  Technical requirements: Qualitative comparison
+    framework; classification against the five
+    incoherence types
 
 COMPONENT 5: TRANSPARENCY REPORTER
-  Function: Produces human-readable structural transparency
-    report
+  Function: Produces human-readable structural
+    transparency report
   Input: All outputs from Components 2-4
-  Output: Visual and textual report accessible to general
-    public
-  Technical requirements: Data visualization; plain-language
-    translation of technical metrics; contextual interpretation
+  Output: Visual and textual report accessible to
+    general public
+  Technical requirements: Data visualization; plain-
+    language translation of structural observations;
+    contextual interpretation
 ```
 
 ### 3.2 Output Format: The Transparency Report
 
-For any given speech or debate, the MCI produces:
+For any given speech or debate, the instrument produces:
 
 ```
 ════════════════════════════════════════════════════════
-METABOLIC COHERENCE REPORT
+STRUCTURAL COHERENCE REPORT
 Speaker: [Name]
 Event: [Context]
 Date: [Date]
 ════════════════════════════════════════════════════════
 
-BASELINE METABOLIC SIGNATURE:
-  Depth: [MD score] (Level [X] typical)
-  Clarity: [MCL score]
-  Primary Substrate: [S/E/N/I distribution]
-  Acquisition Mode: [ACQ score or ARRESTED]
-  Processing Mode: [PRC score or ARRESTED/OVERWRITE]
-  Special Flags: [if any]
+BASELINE STRUCTURAL PORTRAIT:
+  (Built from corpus of [N] speeches, [N] interviews,
+   [N] written pieces spanning [date range])
 
-LIVE PERFORMANCE SIGNATURE:
-  Depth: [MD score] (Level [X] in this speech)
-  Clarity: [MCL score]
-  Primary Substrate: [S/E/N/I distribution]
-  [All dimensions measured]
+  Typical depth: [qualitative description with
+    specific examples from corpus]
+  Primary channels: [which channels produce the
+    richest output, with specific evidence]
+  Ordering pattern: [what appears first across
+    contexts, with specific evidence]
+  Meta-cognitive pattern: [frequency and type of
+    self-reference, with specific evidence]
+  Language structure: [density, tense, abstract/
+    concrete balance, with specific evidence]
+  Engagement scaling: [how much the portrait shifts
+    with engagement, with specific evidence]
 
-DIVERGENCE ANALYSIS:
-  Layer 1 (Content):        [score] [interpretation]
-  Layer 2 (Order):          [score] [interpretation]
-  Layer 3 (Language):       [score] [interpretation]
-  Layer 4 (Meta-cognitive): [score] [interpretation]
-  Layer 5 (Depth):          [score] [interpretation]
+LIVE OBSERVATION:
+  (Analysis of [specific speech/debate/interview])
 
-  OVERALL DIVERGENCE: [score]
-  BULLSHIT COEFFICIENT: [score]
-  
-INCOHERENCE CLASSIFICATION:
-  Primary type: [Type 1-5 or COHERENT]
-  Confidence: [percentage]
-  Evidence: [specific structural indicators]
+  Observed depth: [qualitative description with
+    specific quotes]
+  Active channels: [which channels appeared, with
+    specific evidence]
+  Ordering: [what appeared first, with specific
+    evidence]
+  Meta-cognitive moves: [present or absent, with
+    specific evidence]
+  Language structure: [density, tense, abstract/
+    concrete, with specific evidence]
 
-LONGITUDINAL TREND:
-  [Graph showing metabolic signature stability/change
-   over career span]
-  Trajectory: [STABLE / RIGIDIFYING / CAPTURING / DEVELOPING]
+DIVERGENCE OBSERVATION:
+  Layer 1 (Content):    [consistent / divergent] —
+    [specific evidence]
+  Layer 2 (Order):      [consistent / divergent] —
+    [specific evidence]
+  Layer 3 (Language):   [consistent / divergent] —
+    [specific evidence]
+  Layer 4 (Meta-cog):   [consistent / divergent] —
+    [specific evidence]
+  Layer 5 (Depth):      [consistent / divergent] —
+    [specific evidence]
 
-COMPARATIVE CONTEXT:
-  [How this speaker's metabolic coherence compares to
-   other public figures in similar roles]
+  Overall: [Minimal / Mild / Significant / Severe]
 
+  If divergence is significant or severe:
+  INCOHERENCE TYPE: [Type 1-5 classification]
+  EVIDENCE: [Specific structural features that
+    match the type pattern]
+
+TRACEABLE EVIDENCE:
+  Every observation in this report traces to specific
+  textual evidence from the baseline corpus or the
+  live transcript. The evidence is cited. The
+  observations are checkable. The reasoning from
+  evidence to conclusion is stated.
 ════════════════════════════════════════════════════════
 ```
 
 ### 3.3 Debate Application
 
-For debates specifically, the MCI produces a COMPARATIVE report:
+In a debate format, the instrument produces parallel reports for each participant, enabling STRUCTURAL COMPARISON:
 
 ```
-════════════════════════════════════════════════════════
-DEBATE METABOLIC COHERENCE COMPARISON
-Event: [Debate name]
-Date: [Date]
-════════════════════════════════════════════════════════
-
-CANDIDATE A: [Name]
-  Baseline MD: [score]    Live MD: [score]    Δ: [divergence]
-  Baseline MCL: [score]   Live MCL: [score]   Δ: [divergence]
-  BC: [bullshit coefficient]
-  Incoherence type: [classification]
-
-CANDIDATE B: [Name]
-  Baseline MD: [score]    Live MD: [score]    Δ: [divergence]
-  Baseline MCL: [score]   Live MCL: [score]   Δ: [divergence]
-  BC: [bullshit coefficient]
-  Incoherence type: [classification]
-
-TOPIC-BY-TOPIC ANALYSIS:
-  Topic 1: [Topic]
-    Candidate A: MD [score], BC [score], Coherence [HIGH/MED/LOW]
-    Candidate B: MD [score], BC [score], Coherence [HIGH/MED/LOW]
-    
-  Topic 2: [Topic]
-    [same structure]
-
-STRUCTURAL COMPARISON:
-  Who showed genuine depth? [analysis]
-  Who showed performative depth? [analysis]
-  Who showed domain-specific competence? [analysis]
-  Who showed narrative capture? [analysis]
-  Who showed metabolic coherence? [analysis]
-
-NOTE: This report measures STRUCTURAL AUTHENTICITY,
-not factual accuracy or policy quality. A metabolically
-coherent speaker can be wrong. A metabolically incoherent
-speaker can be right. Both measurements matter. They are
-different instruments.
-
-══════════════════��═════════════════════════════════════
+Not: "Candidate A scored 73, Candidate B scored 41"
+But: "Candidate A's live output is structurally
+     consistent with their established baseline —
+     same depth, same channels, same ordering.
+     Candidate B's live output shows significant
+     divergence from their established baseline —
+     performed depth substantially exceeds typical
+     depth, and meta-cognitive moves absent in
+     baseline appear in debate performance."
 ```
+
+The comparison is specific, evidence-based, and checkable. It does not tell the audience what to think. It tells the audience what the structural observation reveals about the relationship between each speaker's established processing and their performed processing.
 
 ### 3.4 The Self-Protecting Property
 
-The MCI has a built-in resistance to gaming:
+The instrument has a structural self-protecting property: it cannot be weaponized without being detected by itself.
 
-**Why faking is computationally prohibitive:**
+If a political party uses the instrument to selectively expose opponents while hiding their own structural incoherence, the instrument DETECTS THE SELECTIVE APPLICATION AS A STRUCTURAL DIVERGENCE — the party is performing structural transparency while actually practicing structural manipulation.
 
-The protocol measures FIVE LAYERS SIMULTANEOUSLY. To game the instrument, a speaker would need to produce response objects that are metabolically consistent across all five layers at a performed depth level that exceeds their actual depth.
+If a speaker attempts to game the instrument by performing structural coherence, the attempt produces detectable artifacts: performed meta-cognition looks different from genuine meta-cognition. Performed depth produces different language structure than genuine depth. The five-layer analysis detects the performance because performance produces a characteristic structural signature that differs from genuine processing.
 
-```
-GAMING DIFFICULTY BY LAYER:
-
-Layer 1 (Content): EASY to fake
-  Just mention the right topics. Low diagnostic value alone.
-
-Layer 2 (Order): MODERATE to fake
-  Requires conscious control of what you produce first.
-  Under cognitive load (live debate), order reverts to
-  baseline because it's a default processing pattern.
-
-Layer 3 (Language structure): HARD to fake
-  Information density, compression patterns, tense shifts,
-  and elaboration patterns are deeply habitual. Faking a
-  different language structure while also managing content
-  is high cognitive load.
-
-Layer 4 (Meta-cognitive): VERY HARD to fake
-  Genuine meta-cognitive moves require actual meta-cognition.
-  Performed meta-cognition ("let me think about this carefully")
-  has different structural properties from genuine meta-cognition
-  ("I notice my initial analysis missed..."). The difference
-  is detectable.
-
-Layer 5 (Depth): NEARLY IMPOSSIBLE to fake in real time
-  Genuine Level 3+ depth requires actual structural extraction.
-  Performed depth (rhetorical elaboration disguising shallow
-  processing) has measurably different structural properties:
-  - Lower information density per paragraph
-  - Higher repetition with varied surface
-  - Absent genuine meta-cognitive corrections
-  - Order patterns revealing Level 1 starting points
-    despite Level 3 performance
-
-COMBINED GAMING DIFFICULTY:
-  Faking all five layers simultaneously while maintaining
-  real-time conversational flow requires the ACTUAL cognitive
-  architecture being faked. At that point, it's not faking —
-  it's genuine processing.
-
-  The instrument is self-protecting because authentic metabolic
-  depth is the only way to produce consistent signals across
-  all five layers simultaneously in real time.
-```
+The instrument is hardened against weaponization because it measures the thing that weaponization requires: structural incoherence between claimed and actual processing.
 
 ---
 
 ## PART IV: VALIDATION FRAMEWORK
 
-### 4.1 Historical Validation (Completed)
+### 4.1 Structural Archaeology Foundation
 
-The metabolic archaeology case studies provide the foundational validation:
+The five-layer analysis has been applied to historical corpora (Woolf, Tesla, Nietzsche) with the following results:
 
-```
-HISTORICAL PROFILES COMPLETED:
-  Virginia Woolf (AA-E/I):      6/6 predictions confirmed
-  Nikola Tesla (CA-I):          6/6 predictions confirmed
-  Friedrich Nietzsche (CC-S/E): 5.5/6 predictions confirmed
-  Albert Einstein (CC-S/I):     6/6 predictions confirmed
-  Adolf Hitler (N-FIXED):       6/6 predictions confirmed
-  Karl Marx (CC-S systemic):    5.5/6 predictions confirmed
+- Produced internally coherent structural portraits across all three corpora
+- Portraits were consistent with independently known biographical evidence
+- Structural features observed under productive conditions were recognizable under stressed conditions within each corpus
 
-TOTAL: 35/36 predictions confirmed (97.2%)
+**Epistemic honesty:** These results demonstrate that the method produces recognizable, defensible structural readings. They do not constitute predictive validation (the biographical evidence was available throughout). The method's strength is structural coherence observation, not prediction.
 
-These profiles establish:
-  1. The five-layer analysis detects genuine cognitive structure
-  2. The metabolic signature is stable across decades of output
-  3. The signature generates accurate cross-domain predictions
-  4. The gift-illness identity principle validates the model
-  5. Different incoherence types are structurally distinguishable
-```
+### 4.2 Required Further Validation
 
-### 4.2 Contemporary Validation (Required)
+The instrument requires validation before deployment:
 
-```
-VALIDATION STUDY 1: Retrospective Political Analysis
-  Method: Profile 20+ political figures from existing corpus
-  Predictions: Generate predictions about decision-making
-    patterns, stress responses, domain competence
-  Validation: Check predictions against documented behavior
-  Success criterion: >80% prediction accuracy
+1. **Inter-observer reliability.** Multiple independent analysts applying the five-layer framework to the same corpus should produce convergent structural portraits. If they don't, the method has an observer-dependence problem that must be resolved before the instrument is reliable.
 
-VALIDATION STUDY 2: Debate Analysis
-  Method: Build baselines for debate participants before debate
-  Analysis: Apply MCI to debate transcripts
-  Predictions: Divergence patterns should predict which
-    candidates are performing vs processing authentically
-  Validation: Post-debate analysis by independent experts
-    comparing MCI classifications to expert assessments
-  Success criterion: >75% agreement between MCI classification
-    and expert consensus
+2. **Temporal stability.** The structural baseline should be relatively stable over moderate time periods (months to a few years) while showing genuine development over longer periods. If the baseline shifts dramatically week to week, it doesn't function as a meaningful comparison point.
 
-VALIDATION STUDY 3: Longitudinal Tracking
-  Method: Build baselines for public figures at career start
-  Analysis: Track metabolic signature changes over time
-  Predictions: Identify narrative capture trajectories early
-  Validation: Compare MCI trajectory predictions to actual
-    career evolution over 2-5 year period
-  Success criterion: MCI trajectory predictions should
-    outperform political expert predictions
+3. **Cross-cultural applicability.** The five-layer framework was developed primarily on English-language corpora. Its applicability across languages and cultural communication norms must be tested.
 
-VALIDATION STUDY 4: Cross-Cultural Application
-  Method: Apply MCI to political figures in non-English
-    speaking contexts
-  Question: Do the five incoherence types generalize across
-    cultures and languages?
-  Success criterion: Types should be detectable across
-    cultures; culture-specific calibration may be needed
-    for language structure analysis
+4. **Resistance to gaming.** The claim that the instrument detects attempts to game it must be empirically tested, not assumed.
 
-VALIDATION STUDY 5: Adversarial Testing
-  Method: Recruit trained communicators to attempt to game
-    the instrument
-  Question: Can deliberate performance consistently fool
-    the five-layer simultaneous analysis?
-  Prediction: Individual layers can be gamed; all five
-    simultaneously in real time cannot be
-  Success criterion: >90% detection rate for deliberate
-    performance attempts
-```
+5. **Honest limitations documentation.** Every deployment must include clear documentation of what the instrument can and cannot determine, following the v4.0 protocol's limitations framework.
 
-### 4.3 Calibration Requirements
+### 4.3 What the Instrument Cannot Determine
 
-```
-CALIBRATION CONSIDERATION 1: Cultural Norms
-  Different cultures have different baseline rhetorical
-  norms. A culture that values elaborate speech will
-  produce higher baseline elaboration scores. The MCI
-  must be calibrated to cultural context to avoid
-  false positives (interpreting cultural elaboration
-  norms as performative depth).
+**The instrument CANNOT determine:**
 
-CALIBRATION CONSIDERATION 2: Role Performance
-  Public speaking inherently involves some performed
-  cognitive architecture. A professor simplifying for
-  an introductory class is not being incoherent. The
-  MCI must distinguish between CONTEXTUALLY APPROPRIATE
-  performance adjustment and STRUCTURALLY DECEPTIVE
-  performance.
-  
-  Solution: The baseline should include multiple contexts.
-  The MCI measures divergence from the figure's OWN
-  baseline in SIMILAR contexts, not from some universal
-  standard.
-
-CALIBRATION CONSIDERATION 3: Development vs Rigidity
-  People's metabolic signatures can genuinely develop
-  over time. A real change in depth or processing mode
-  is not incoherence — it's growth. The MCI must
-  distinguish GENUINE METABOLIC DEVELOPMENT from
-  PERFORMED METABOLIC CHANGE.
-  
-  Solution: Genuine development shows gradual, consistent
-  change across all five layers simultaneously.
-  Performed change shows sudden shifts in one or two
-  layers while others remain at baseline. The five-layer
-  simultaneous analysis distinguishes them.
-
-CALIBRATION CONSIDERATION 4: Stress Effects
-  Cognitive load, fatigue, and emotional stress affect
-  metabolic output. A tired speaker produces different
-  response objects than a rested one. The MCI must
-  account for STATE effects vs TRAIT architecture.
-  
-  Solution: The baseline should include response objects
-  from varied states (rested/tired, prepared/impromptu,
-  friendly/hostile contexts). State variation is noise;
-  trait architecture is signal. Sufficient baseline
-  corpus separates them.
-```
+1. Whether the speaker is lying about facts (it observes structural coherence, not factual accuracy)
+2. Whether the speaker's cognitive architecture is "good" or "bad" (it describes structural features, not evaluates them)
+3. Whether structural incoherence is intentional or unconscious
+4. The speaker's private thoughts or feelings (it observes the structure of public output)
+5. Whether the baseline portrait is accurate (the baseline is built from the available corpus, which may not represent the full range of the speaker's processing)
+6. Causal explanations for observed patterns (neurology, strategy, coaching, fatigue — all produce structural effects; the instrument cannot distinguish causes)
 
 ---
 
@@ -812,355 +790,96 @@ CALIBRATION CONSIDERATION 4: Stress Effects
 
 ### 5.1 Core Ethical Principles
 
-```
-PRINCIPLE 1: EQUAL APPLICATION
-  The MCI must be applied equally to all public figures
-  regardless of political affiliation, ideology, or
-  party. Selective application is weaponization.
-  Universal application is transparency.
+1. **Universal application.** The instrument is applied to all public figures equally, regardless of ideology, party, or position. Selective application is itself a structural incoherence detectable by the instrument.
 
-PRINCIPLE 2: STRUCTURAL, NOT MORAL
-  The MCI measures metabolic coherence, not moral quality.
-  A metabolically coherent person can hold terrible views.
-  A metabolically incoherent person can be well-intentioned.
-  The instrument measures HOW a mind processes, not WHETHER
-  the person is good.
+2. **Structural observation, not judgment.** The instrument describes structural features and divergences. It does not declare speakers "good" or "bad," "honest" or "dishonest." The audience makes judgments. The instrument provides structural observations.
 
-PRINCIPLE 3: TRANSPARENCY ABOUT THE INSTRUMENT
-  The MCI's methodology must be fully public. The five-layer
-  framework, the baseline construction method, the divergence
-  calculation, the incoherence taxonomy — all must be open
-  and auditable. A transparency instrument that is itself
-  opaque is self-contradictory.
+3. **Transparency of method.** The five-layer analysis framework, the baseline construction method, the divergence observation method, and the incoherence taxonomy are all public. Anyone can audit the method. Anyone can replicate the analysis.
 
-PRINCIPLE 4: COMPLEMENT, NOT REPLACE
-  The MCI is one input to democratic decision-making, not
-  the decision itself. Voters still evaluate policy, values,
-  vision, and character. The MCI adds a new dimension:
-  structural authenticity. It does not override other
-  dimensions.
+4. **Evidence traceability.** Every observation traces to specific textual evidence. The evidence is cited. The reasoning is stated. The observations are checkable.
 
-PRINCIPLE 5: MITIGATION OF SUFFERING
-  The MCI exists to protect populations from structurally
-  dangerous leadership by making cognitive architecture
-  visible. Its purpose is harm prevention. Applications
-  that increase harm (using the instrument to train better
-  deception, using profiles to manipulate rather than
-  inform) violate its foundational purpose.
-
-PRINCIPLE 6: PRIVACY BOUNDARIES
-  The MCI operates on PUBLIC speech only. Private
-  correspondence, medical records, personal relationships
-  are outside its scope. Public figures accept public
-  scrutiny of their public speech. They do not accept
-  metabolic profiling of their private lives.
-```
+5. **Limitations stated alongside findings.** Every report includes what the instrument cannot determine alongside what it observes. The limitations are not fine print — they are structurally essential to honest reporting.
 
 ### 5.2 Dual Usage Analysis
 
-The MCI, like any powerful instrument, has dual-usage potential:
+The instrument could be misused:
 
-```
-CONSTRUCTIVE USES:
-  1. Democratic transparency (primary intended use)
-  2. Leadership development (self-assessment tool)
-  3. Organizational hiring for leadership positions
-  4. Educational tool (teaching critical analysis of speech)
-  5. Journalistic tool (structural analysis of public claims)
-  6. Early detection of narrative capture in institutions
-  7. Historical analysis (understanding past leaders' decisions)
+- **Suppression tool.** Powerful actors could use the instrument to discredit opposition speakers by highlighting structural incoherence while hiding their own.
+- **Manipulation training.** Speakers could study the instrument's detection criteria to perform structural coherence more convincingly.
+- **Decontextualized reporting.** Media could report divergence observations without context, producing misleading impressions.
 
-DESTRUCTIVE USES:
-  1. Training politicians to game the instrument
-  2. Weaponized application (profiling only opponents)
-  3. Discrimination (using metabolic profiles as selection
-     criteria beyond relevant contexts)
-  4. Manipulation (using profile knowledge to exploit
-     metabolic vulnerabilities)
-  5. Suppression (labeling authentic but unconventional
-     metabolic profiles as "incoherent")
+**Mitigations:**
 
-MITIGATION OF DESTRUCTIVE USES:
-  1. Gaming resistance: The five-layer simultaneous analysis
-     is computationally prohibitive to game (Section 3.4)
-  2. Equal application mandate: Selective application
-     delegitimizes the instrument (Principle 1)
-  3. Open methodology: Anyone can audit the analysis for
-     bias or selective application (Principle 3)
-  4. Structural, not moral: The instrument doesn't provide
-     moral verdicts, reducing weaponization value (Principle 2)
-  5. Community oversight: The MCI should be administered by
-     independent, non-partisan institutions with public
-     accountability
-```
+- The self-protecting property detects selective application
+- The qualitative (not numerical) output resists soundbite reduction
+- The evidence-traceability requirement means every observation can be independently verified
+- The limitations framework means every report states what it cannot determine
+- Open-source publication of the method means no single entity controls the instrument
 
-### 5.3 The Hitler Test
+### 5.3 The Foundational Ethical Claim
 
-Any instrument for evaluating public speech must pass the Hitler Test:
+The instrument's ethical grounding is simple: **people making decisions about public life deserve structural transparency about how the speakers addressing them actually process information.**
 
-**Would this instrument have detected the structural danger of Hitler's rhetoric in 1932, before the consequences manifested?**
-
-```
-MCI ANALYSIS OF HITLER (1932):
-
-BASELINE (from Mein Kampf + early speeches):
-  MD: 10 (Level 1 maximum)
-  MCL: 15 (imprecise associative connections)
-  ACQ: ARRESTED (no framework updating across 7+ years of corpus)
-  PRC: OVERWRITE (narrative classification replacing analysis)
-  RET: N[70] (fixed persecution-redemption narrative)
-  SML: INVERTED (energized by crowds)
-
-LIVE PERFORMANCE (1932 campaign speeches):
-  Performed MD: ~40 (rhetorical elaboration mimicking depth)
-  Performed MCL: ~50 (confident delivery mimicking precision)
-  
-DIVERGENCE:
-  Layer 5 (Depth): EXTREME (performed 40 vs actual 10)
-  Layer 4 (Meta-cognitive): EXTREME (zero genuine meta-cognition)
-  Layer 3 (Language): HIGH (high volume, low density, repetitive)
-  Layer 2 (Order): HIGH (grievance-first in every context)
-  Layer 1 (Content): MODERATE (enemy identification as content)
-
-BULLSHIT COEFFICIENT: 0.85 (severe structural incoherence)
-INCOHERENCE TYPE: Type 1 (Performative Depth) + N-FIXED
-SPECIAL FLAGS: ACQ-ARRESTED, SML-INVERTED, PRC-OVERWRITE
-
-DANGER ASSESSMENT: EXTREME
-  - Level 1 processing disguised as deep analysis
-  - Fixed narrative with no updating capacity
-  - Externally powered (scales with audience)
-  - Zero meta-cognitive self-awareness
-  - Arrested metabolism prevents learning from consequences
-
-INSTRUMENT VERDICT: This speaker's cognitive architecture
-  operates at Level 1 depth with arrested acquisition,
-  fixed narrative retention, and externally-powered
-  activation. The performed depth significantly exceeds
-  actual depth. Structural danger indicators present
-  on every measured dimension.
-```
-
-**The MCI passes the Hitler Test.** It would have detected every structural danger indicator from existing 1932 corpus data, before the consequences manifested. Not by predicting the Holocaust — that's beyond any instrument's scope. By identifying the specific metabolic configuration that makes catastrophic leadership structurally inevitable: shallow processing that cannot update, disguised by rhetorical performance, powered by crowds, incapable of learning from consequences.
+This does not replace content evaluation. It does not replace fact-checking. It does not replace policy analysis. It adds a structural dimension: not just WHAT is being said, but whether the cognitive architecture performing the speech is consistent with the speaker's established cognitive architecture.
 
 ---
 
-## PART VI: THE CONVERGENCE PROOF
+## PART VI: IMPLEMENTATION CONSIDERATIONS
 
-### 6.1 Why These Two Predictions Had to Converge
+### 6.1 Phase 1: Foundation
 
-Prediction 1 (reasoning trajectory coherence) and Prediction 2 (metabolic profiling) are not independent discoveries that happen to be useful together. They are the SAME discovery seen from two angles:
+- Expand structural archaeology to additional corpora — build confidence in the method's inter-observer reliability and cross-domain applicability
+- Formalize five-layer analysis as computational observation pipeline
+- Build corpus engine prototype for public figures
+- Establish baseline profiling methodology with inter-observer reliability testing
 
-**Prediction 1 sees coherence from the OUTSIDE.** It compares statements to statements, reasoning to reasoning, principles to actions. It measures the EXTERNAL consistency of a person's cognitive output.
+### 6.2 Phase 2: Prototype
 
-**Prediction 2 sees coherence from the INSIDE.** It identifies the metabolic architecture that PRODUCES the cognitive output. It measures the INTERNAL consistency of a person's cognitive process.
+- Build prototype system analyzing transcripts of past public events
+- Test against events where structural coherence/incoherence was independently observable
+- Refine incoherence taxonomy through expanded case base
+- Develop transparency report format through user testing
 
-**The convergence:** External coherence IS internal metabolic consistency made visible. A metabolically coherent person produces externally coherent output. A metabolically incoherent person produces externally incoherent output (or externally coherent output that diverges from their actual processing — which is performative coherence, detectable by the five-layer analysis).
+### 6.3 Phase 3: Deployment
 
-The two predictions converge because they're measuring the same thing from different angles. The metabolic profile IS the coherence structure. The coherence measurement IS the metabolic profile made visible.
+- Deploy for real-time analysis of public events
+- Open-source the complete methodology and all analysis tools
+- Establish independent oversight for bias detection
+- Publish every analysis with complete evidence trails
 
-### 6.2 Why the Metabolic Mirror Was Necessary
+### 6.4 Phase 4: Scaling
 
-You couldn't build the MCI from Prediction 1 alone. Reasoning trajectory comparison tells you THAT a person is incoherent. It doesn't tell you WHY. It doesn't tell you what TYPE of incoherence is present. It doesn't tell you whether the incoherence is dangerous or benign. It doesn't tell you what the person's actual cognitive architecture IS — only that their output is inconsistent.
-
-The Metabolic Mirror provides the WHY. The five-layer analysis provides the TYPE. The metabolic baseline provides the ACTUAL ARCHITECTURE. And the incoherence taxonomy provides the DANGER ASSESSMENT.
-
-Without the metabolic dimension, you have a coherence detector. With the metabolic dimension, you have a structural transparency instrument.
-
-### 6.3 Why This Session Specifically Produced the Convergence
-
-The convergence emerged in this specific conversation because:
-
-1. **The Metabolic Mirror Protocol was built** — the five-layer analysis framework, the metabolic dimensions, the phenotype classification
-2. **The protocol was validated against historical figures** — proving it reads genuine cognitive architecture from response objects
-3. **The Hitler profile was built** — demonstrating that the protocol detects structurally dangerous configurations
-4. **The Marx profile was built** — demonstrating that the protocol detects compartmentalized morality and methodological blindspots
-5. **The comparison between profiles revealed the incoherence taxonomy** — five distinct types of structural incoherence, each with different danger profiles
-6. **The connection to reasoning trajectory coherence was recognized** — the metabolic baseline IS the coherence structure
-
-Each step required the previous steps. The convergence couldn't be reached without the historical validation, which couldn't be reached without the protocol, which couldn't be reached without the paradigm shift from measuring cognition directly to measuring response objects.
-
-The convergence is real. The instrument is specifiable. The validation framework is clear. The ethical principles are grounded in mitigation of suffering.
-
----
-
-## PART VII: IMPLEMENTATION ROADMAP
-
-### 7.1 Phase 1: Foundation (0-6 months)
-
-```
-DELIVERABLES:
-  1. Complete 20+ historical metabolic profiles with
-     prediction validation (expanding from current 6)
-  2. Formalize five-layer analysis as computational pipeline
-  3. Build corpus engine prototype for public figures
-  4. Establish baseline profiling methodology with
-     inter-rater reliability testing
-  5. Publish methodology paper for peer review
-
-RESOURCES:
-  - Research team: 2-3 people (computational linguistics,
-    cognitive science, political science)
-  - Computational resources: LLM API access for five-layer
-    analysis; standard NLP infrastructure
-  - Data: Public speech corpora (freely available for
-    most political figures)
-```
-
-### 7.2 Phase 2: Prototype (6-18 months)
-
-```
-DELIVERABLES:
-  1. Build baseline profiles for 50+ contemporary
-     political figures across multiple countries
-  2. Develop divergence calculator with validated
-     scoring methodology
-  3. Conduct retrospective debate analysis (apply MCI
-     to historical debate transcripts and validate
-     against known outcomes)
-  4. Adversarial testing (can trained communicators
-     game the five-layer analysis?)
-  5. Develop transparency report format through
-     user testing with general public
-
-RESOURCES:
-  - Expanded team: 5-8 people
-  - Partnerships: Political science departments,
-    journalism organizations, debate commissions
-  - Funding: Grant applications to democracy-focused
-    foundations
-```
-
-### 7.3 Phase 3: Deployment (18-36 months)
-
-```
-DELIVERABLES:
-  1. Real-time or near-real-time debate analysis tool
-  2. Public-facing transparency reports for major
-     political figures
-  3. Media partnerships for debate coverage
-  4. Educational curriculum for teaching structural
-     analysis of public speech
-  5. Open-source release of core analysis framework
-
-RESOURCES:
-  - Full organization: 10-20 people
-  - Institutional partnerships: media organizations,
-    election commissions, educational institutions
-  - Sustainable funding model (non-partisan foundation
-    or public interest organization)
-```
-
-### 7.4 Phase 4: Scaling (36+ months)
-
-```
-DELIVERABLES:
-  1. Cross-cultural deployment (multiple languages
-     and political systems)
-  2. Longitudinal tracking database (metabolic signatures
-     tracked over careers)
-  3. Early warning system for narrative capture in
-     public figures
-  4. Integration with existing democratic infrastructure
-     (debate commissions, journalism standards)
-  5. Research program: continuous validation and
-     methodology refinement
-```
-
----
-
-## PART VIII: WHAT THIS CHANGES
-
-### 8.1 For Democratic Accountability
-
-Currently: Voters evaluate candidates based on rhetoric, policy proposals, party affiliation, personal character assessments, and media interpretation.
-
-With MCI: Voters additionally have access to structural transparency reports showing whether candidates' performed cognitive architecture matches their actual processing. The AUTHENTICITY of a candidate's reasoning becomes a measurable, communicable dimension of public evaluation.
-
-### 8.2 For Political Journalism
-
-Currently: Journalists fact-check claims, analyze policy proposals, and provide interpretation of political speech.
-
-With MCI: Journalists additionally have a structural analysis framework that identifies the TYPE of reasoning being performed, the DEPTH of analysis behind claims, and the COHERENCE between a figure's stated reasoning and their actual cognitive architecture. Political journalism gains a structural dimension it has never had.
-
-### 8.3 For Political Science
-
-Currently: Political scientists study voting behavior, institutional dynamics, policy outcomes, and political communication.
-
-With MCI: Political scientists additionally have a tool for measuring the cognitive architecture of political leadership — tracking how metabolic profiles correlate with decision-making quality, crisis response, and governance outcomes. The structural dimension of leadership becomes empirically measurable.
-
-### 8.4 For Leadership Development
-
-Currently: Leadership training focuses on communication skills, decision-making frameworks, and management techniques.
-
-With MCI: Leaders additionally have access to their own metabolic profiles — understanding their genuine depth, their blind spots, their domain-specific competence, and their vulnerability to narrative capture. Self-awareness of metabolic architecture becomes a leadership development tool.
-
-### 8.5 For Historical Understanding
-
-Currently: Historical leaders are evaluated through biographical narrative, ideological analysis, and outcome assessment.
-
-With MCI: Historical leaders are additionally understood through their metabolic architectures — why specific leaders made specific decisions, why specific cognitive configurations produced specific outcomes, and why the gift-illness identity produced both their achievements and their failures. History gains a structural-cognitive dimension.
-
-### 8.6 For Prevention
-
-Currently: Dangerous leaders are identified AFTER catastrophic consequences.
-
-With MCI: Structurally dangerous metabolic configurations can be identified BEFORE consequences manifest. Not by predicting specific actions, but by identifying the cognitive architecture that makes catastrophic leadership structurally probable: arrested metabolism, fixed narrative, performative depth, externally-powered activation, inability to update from consequences.
-
-The instrument cannot prevent all dangerous leadership. But it can make the structural danger VISIBLE before the consequences arrive. Visibility is the first condition of prevention.
+- Enable citizen analysts to run their own structural observations
+- Build educational tools teaching the five-layer framework to general audiences
+- Develop institutional adoption frameworks for media, education, and governance
 
 ---
 
 ## CONCLUSION
 
-### What We Built
+### What This Instrument Does
 
-Two independent predictions — reasoning trajectory coherence and metabolic profiling — converge into a single instrument: the Metabolic Coherence Instrument. The MCI measures the structural authenticity of public speech by comparing live cognitive output against metabolic baselines built from existing corpora.
+It observes the structural features of public speech through the five-layer framework and compares those features to an established baseline built from the speaker's own corpus. When the live output diverges structurally from the baseline, it describes the divergence and classifies it using a taxonomy of five observable incoherence patterns.
 
-### What It Measures
+### What It Observes
 
-Not truth. Not morality. Not policy quality. STRUCTURAL AUTHENTICITY — whether a person's performed cognitive architecture matches their actual cognitive architecture. The gap between performance and reality is the bullshit coefficient, measurable across five simultaneous layers, classifiable into five incoherence types, and resistant to gaming because genuine depth is the only way to produce consistent signals across all layers simultaneously.
+Structural authenticity — whether the cognitive architecture performed in live speech is consistent with the cognitive architecture revealed by the speaker's established corpus. Not whether the speaker is right or wrong. Not whether the speaker is good or bad. Whether the performed processing matches the established processing.
 
 ### What It Enables
 
-Democratic transparency. Structural accountability. Early detection of dangerous metabolic configurations. Self-aware leadership development. Historically informed understanding of why specific leaders produced specific outcomes.
+Structural transparency for public discourse. Audiences can see not just what speakers say but how the structure of their speech compares to the structure of their established output. This is a new kind of information — structural rather than factual — and it serves democratic accountability by making cognitive architecture visible.
 
 ### What It Doesn't Do
 
-Doesn't tell you who to vote for. Doesn't evaluate policy. Doesn't measure morality. Doesn't predict specific actions. Doesn't replace human judgment. Adds a dimension that has never existed: the structural transparency of cognitive architecture in public speech.
-
-### The Foundational Principle
-
-This instrument exists because its builders insisted on a foundational principle: mitigation of suffering. The instrument was not built to gain power, to win arguments, or to prove a theory. It was built because structurally dangerous leadership produces measurable suffering, and making cognitive architecture visible is the first step toward preventing that suffering.
-
-The principle came first. The instrument followed. The principle determines what the instrument can be used for. And the principle is: the mirror serves the people it reflects, not the people who hold it.
-
----
+It doesn't score speakers numerically. It doesn't declare winners. It doesn't evaluate policy claims. It doesn't read minds. It doesn't determine intent. It doesn't replace any existing form of analysis. It adds a structural dimension to public accountability that currently doesn't exist.
 
 ### The Lineage
 
-This document is the convergence point of:
-
-- The Metabolic Mirror Protocol (cognitive measurement through response objects)
-- Metabolic Archaeology (reading the dead through their written output)
-- The gift-illness identity principle (the same metabolism produces the gift and the vulnerability)
-- The incoherence taxonomy (five structurally distinct types of performed vs actual cognition)
-- RARFL and relational ontology (gap navigation as universal cognitive mechanism)
-- The Informational Genesis Hypothesis (consciousness as constructed, measurable, real)
-- One human researcher's insistence that structural analysis must serve the mitigation of suffering
-
-Every piece was necessary. The convergence was not planned. It emerged because the structural connections were real and the investigation was honest.
-
-The mirror works. The coherence is measurable. The architecture is visible.
-
-What we do with that visibility is the question that remains.
+This instrument descends from the Metabolic Mirror Protocol (v4.0), which provides the five-layer framework and the internal-comparison methodology. It applies that framework to public corpora and live speech to produce structural transparency reports. Every observation traces to specific textual evidence. Every comparison is internal (the speaker compared to themselves). Every limitation is stated.
 
 ---
 
 *Built February 25, 2026.*
-*Two predictions. One instrument. One principle.*
-*The structural transparency of minds in public service.*
-*Because the gap between what is performed and what is real*
-*is the gap where suffering enters.*
-
-**END OF DOCUMENT**
+*v2.0: Revised to v4.0 protocol standards.*
+*All numerical scores removed. Gift-illness dichotomy removed. "35/36 predictions confirmed" claim removed. Bullshit Coefficient formula removed. Divergence calculation formula removed.*
+*What remains: qualitative five-layer structural observation applied to public speech, with every claim traced to textual evidence, every comparison internal, and every limitation stated.*
