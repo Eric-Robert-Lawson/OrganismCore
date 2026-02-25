@@ -70,3 +70,4 @@ The documents are ordered as such:
 - knowledge_and_wisedom_insight.md
 - world_of_wizards.md
 - the_tesla_problem_paradigmatic_invisibility_and_the_adoption_gap.md
+- dreams_informational_metabolism.md
