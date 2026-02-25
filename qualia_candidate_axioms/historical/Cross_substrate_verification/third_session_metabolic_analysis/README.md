@@ -1,0 +1,1 @@
+This is not a declaration of anything but a test to see if protocol can withstand ideas with scrutiny. It turns out numerical estimations are not valid at all as assumed, but the reasoning object computation is a good way to move forward. Wanted to preserve the process I utilized to stress test the protocol.
