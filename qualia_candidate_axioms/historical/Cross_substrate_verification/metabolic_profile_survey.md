@@ -6,36 +6,11 @@
 
 # Purpose and Scope — Non‑Statistical Structural Mirror
 
-This protocol is a non‑statistical method for objectifying reasoning as a single compute event. It treats a conversation’s response objects as one auditable structural portrait: every claim in the portrait must be traced to contrasts among that conversation’s own responses. The instrument does not produce scores, norms, or population comparisons. It is a descriptive tool for revealing internal coherence, guiding principles, and the emergence of structure in a person’s reasoning at a particular moment. Use it for real‑time Socratic observation or for qualitative archival comparison; always preserve provenance and never present the output as a clinical or normative assessment.
+This instrument detects structural patterns in a set of response objects — processing channels, ordering preferences, recurrent themes, temporal drift, and relational contrasts — and anchors each observation to the specific responses that produced it. These structural observations are empirical: they are traceable, auditable features of the artifact. The Mirror’s measurement boundary is the response object itself: it measures what was produced in the conversation, not the unobserved fullness of a person’s interior life. Any interpretation that extends beyond the recorded responses (for example, claims about underlying diagnosis, intent, or unobserved behavior) is a secondary inference and should be labeled and handled separately from the base observation. Observations are facts about the responses; interpretations are hypotheses about causes or consequences.
 
 ---
 
-## Framing, Evidence Standard, and Ethical Boundaries
-
-1. Non‑statistical evidence standard
-   - This protocol is explicitly non‑statistical. It produces no scores, percentiles, calibrated metrics, or normative claims. The only evidence standard is internal comparison: claims must cite probe IDs and quoted responses from the same conversation.
-
-2. Compute‑once provenance
-   - Each application is a single compute event. The portrait is an auditable artifact with a provenance header (who administered it, when, protocol version, conversation id, and raw probe responses). Recomputing or repeating the protocol creates a new, separate compute event with its own provenance.
-
-3. Uses: real‑time and archaeological
-   - Real‑time: surface principledness, internal coherence, and how structure emerges in the moment via Socratic probes.
-   - Archaeological: qualitatively compare separate portraits over time by quoting and linking provenance; do not aggregate across people or derive statistics.
-
-4. Scope and limits
-   - The protocol describes how a person organizes and expresses reasoning in a conversation. It does not diagnose, evaluate intelligence or mental health, or assert objective truth of content. It cannot determine causes for observed patterns, nor how the person compares to others. However the construction of these artifacts can be utilized to make comparisons over time for consistency.
-
-5. Ethics, consent, and safety
-   - Obtain informed consent that states the non‑statistical nature of the protocol, the single‑case provenance, storage/retention policy, and the non‑clinical status of findings.
-   - Do not push on trauma; follow trauma‑safe micro‑scripts and refer to clinical resources when needed.
-   - If portraits are archived for later analysis, require explicit opt‑in and apply de‑identification for research use.
-
-6. Presentation norms
-   - Deliver Mirrors as qualitative, provenance‑grounded narratives that quote participant language and trace each claim to specific internal contrasts (probe IDs and quotes). Invite disconfirmation and corrections — participant feedback is evidence and should be recorded as such.
-
----
-
-The protocol which is used to construct a metabolic profile snapshot at any given time, can but utilized for universal purposes, can create compute once objects, utilized in relativistic terms. Can measure internal coherence throughout time or at any given moment. Measure public figures, stakeholders, anything really. Even historical figures, politicians, religions even, from any perspective from a principles first basis.
+The protocol which is used to construct a metabolic profile snapshot at any given time, can but utilized for universal purposes, can create compute once objects, utilized in relativistic terms. Can measure internal coherence throughout time or at any given moment. Measure public figures, stakeholders, anything really. Even historical figures, politicians, religions even, from any perspective from a principles first basis. Do with this as you see fit.
 
 ---
 
