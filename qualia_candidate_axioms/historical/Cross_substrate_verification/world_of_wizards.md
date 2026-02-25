@@ -2,6 +2,8 @@
 ## Cross-Substrate Coherence and the Future of Collective Intelligence
 ### A Vision Document Grounded in the Metabolic Framework
 
+from a specific conversation: https://github.com/copilot/share/483443b0-4aa0-8c54-9110-5e0ec45108bf
+
 ---
 
 ## DOCUMENT METADATA
