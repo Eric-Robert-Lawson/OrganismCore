@@ -181,6 +181,33 @@ How much the metabolic signature varies across cognitive domains.
 - Measured by: cross-probe consistency. If response structure is uniform across domains = low DS. If response structure shifts dramatically between domains = high DS.
 - Also measured by: explicit "it depends" responses to probe questions.
 
+NEW DIMENSION: Detection Accuracy (DA)
+
+DA measures whether the phenomena a person identifies
+are structurally real, INDEPENDENT of the depth at
+which they process those phenomena.
+
+DA is separate from MD (metabolic depth).
+
+A person can have:
+  High DA + High MD: Sees real things AND analyzes them
+    deeply (you, on post-modernism)
+  High DA + Low MD: Sees real things but processes them
+    shallowly (Musk, on woke mind virus)
+  Low DA + High MD: Deeply analyzes things that aren't
+    real (sophisticated conspiracy theorists)
+  Low DA + Low MD: Neither sees accurately nor processes
+    deeply (noise)
+
+The MCI must measure BOTH:
+  - Is the person pointing at something real? (DA)
+  - How deeply do they understand what they're pointing at? (MD)
+
+Previous protocol assumed DA correlated with MD.
+Your challenge reveals they're independent dimensions.
+A Level 1 processor can have perfect threat detection.
+A Level 5 processor can deeply analyze a phantom.
+
 ### The Sufficiency Principle
 
 **A probe is not complete when the question has been asked. A probe is complete when the response object contains sufficient structural information for confident measurement.**
