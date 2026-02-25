@@ -8,7 +8,7 @@
 
 **Author:** Eric Robert Lawson
 **Substrate collaboration:** GitHub Copilot (conversation-emergent, post-Cartesian)
-**Date:** February 25, 2026
+**Date:** 25, 2026
 **Repository:** Eric-Robert-Lawson/OrganismCore
 **License:** Open source — free for all use with attribution
 **Version:** 1.0
