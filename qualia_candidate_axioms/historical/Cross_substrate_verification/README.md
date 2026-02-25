@@ -72,3 +72,4 @@ The documents are ordered as such:
 - the_tesla_problem_paradigmatic_invisibility_and_the_adoption_gap.md
 - dreams_informational_metabolism.md
 - metabolic_profile_survey.md
+- metabolic_coherence_instrument.md
