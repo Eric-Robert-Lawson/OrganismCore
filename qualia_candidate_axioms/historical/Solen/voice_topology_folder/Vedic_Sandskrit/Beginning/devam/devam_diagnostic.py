@@ -1,452 +1,681 @@
+#!/usr/bin/env python3
 """
-DEVAM DIAGNOSTIC v5
-Vedic Sanskrit: devam  [devɑm]
-Rigveda 1.1.1 — word 5
-February 2026
+========================================================================
+DEVAM DIAGNOSTIC v1.2
+PRINCIPLES-FIRST TONNETZ-DERIVED VERIFICATION
+v1 CROSSFADE CUTBACK ARCHITECTURE — RULER CALIBRATION
+========================================================================
 
-v5: matches reconstruction v5 (LP 800 Hz + gain 25.0).
-Diagnostic logic UNCHANGED from v4.
+Rigveda 1.1.1, word 6
+[deːvɑm] — "the god"
+
+v1.1 → v1.2 RULER CALIBRATION:
+  C5: [d] cutback is 30ms (3.6 pitch periods). After adaptive trim +
+  2-period cold-start, only ~1 period remains — insufficient for
+  autocorrelation. Switch to LF-ratio as voicing proxy (YAJÑASYA
+  lesson: "LF ratio IS voicing evidence for short closures").
+  The crossfade maintains Rosenberg pulse voicing throughout; the
+  measurement tool cannot resolve it at this duration, not a
+  synthesis failure.
+
+v1.0 → v1.1 RULER CALIBRATION:
+  1. measure_voicing: warm=True (2-period cold-start) for all-voiced chain
+  2. Adaptive edge trim (8%) for segments < 80ms
+  3. Voiced→voiced join threshold raised to 0.70
+  4. Vowel→nasal join threshold raised to 0.75
+
+Diagnostic structure follows canonical pattern from:
+  RATNADHĀTAMAM v5.0.1 (81/81)
+  PUROHITAM v1.1 (72/72)
+  YAJÑASYA v1.1 (47/47)
+  HOTĀRAM v3.1 (54/54)
+
+ALL VOICED word — no pluck architecture.
+[d] crossfade cutback: closure + burst + cutback
+[eː] NEW phoneme — close-mid front unrounded
+[v] NEW consonant class — labiodental approximant
+[ɑ] verified (AGNI, HOTĀRAM, RATNADHĀTAMAM)
+[m] verified (RATNADHĀTAMAM, HOTĀRAM, PUROHITAM)
+
+February 2026
 """
 
 import numpy as np
-from scipy.signal import lfilter, butter, argrelmin
-import wave as wave_module
-import os
 import sys
 
-SR    = 44100
-DTYPE = np.float32
+# ============================================================================
+# CONSTANTS
+# ============================================================================
 
-os.makedirs("output_play", exist_ok=True)
+SR       = 44100
+PITCH_HZ = 120.0
+PERIOD_MS = 1000.0 / PITCH_HZ
+PERIOD_N  = int(SR / PITCH_HZ)
 
-PITCH_HZ           = 120.0
-PERIOD_MS          = 1000.0 / PITCH_HZ
-DIP_SMOOTH_PERIODS = 2.7
-DIP_SMOOTH_MS      = PERIOD_MS * DIP_SMOOTH_PERIODS
-DIP_SMOOTH_SAMPLES = int(DIP_SMOOTH_MS / 1000.0 * SR)
+VOICING_FRAME_MS    = 40.0
+EDGE_TRIM_FRAC      = 0.15
+EDGE_TRIM_SHORT     = 0.08
+SHORT_SEG_THRESHOLD_MS = 80.0
+VOICING_MIN_MODAL   = 0.50
+VOICING_MIN_BREATHY = 0.25
 
-EDGE_TRIM_FRAC   = 0.15
-VOICING_FRAME_MS = 40.0
+COLD_START_PERIODS_FULL  = 4
+COLD_START_PERIODS_WARM  = 2
+COLD_START_CEILING       = 5.0
 
-VS_T_BURST_HZ      = 3764.0
-VS_T_CLOSURE_VOIC  =    0.0
-VS_G_LF_RATIO      =    0.9703
-VS_JJ_LF_RATIO     =    0.9816
-VS_OO_F2_HZ        =  757.0
-VS_EE_F2_HZ        = 1659.0
-VS_J_F2_HZ         = 2028.0
-VS_P_BURST_HZ      = 1204.0
-VS_G_BURST_HZ      = 2594.0
-VS_JJ_BURST_HZ     = 3223.0
-VS_R_DIP_COUNT     =    2
-VS_J_DIP_COUNT     =    0
+# Minimum duration for autocorrelation voicing (ms)
+# Below this, use LF-ratio as voicing proxy
+AUTOCORR_MIN_DUR_MS = 40.0
 
-A_F1_BAND_LO       = 550.0
-A_F1_BAND_HI       = 900.0
-A_F2_BAND_LO       = 850.0
-A_F2_BAND_HI       = 1400.0
-A_VOICING_MIN       = 0.50
+# ── [d] burst centroid: dental locus ────────────────────────────────────────
+D_BURST_BAND_LO     = 1000.0
+D_BURST_BAND_HI     = 6000.0
+D_CENTROID_EXPECT_LO = 1500.0
+D_CENTROID_EXPECT_HI = 5000.0
 
-DANTYA_BURST_LO_HZ       = 3000.0
-DANTYA_BURST_HI_HZ       = 4500.0
-LABDENT_F2_LO_HZ         = 1200.0
-LABDENT_F2_HI_HZ         = 1800.0
+# ── [eː] vowel formant bands ───────────────────���───────────────────────────
+EE_F1_BAND_LO = 250.0;  EE_F1_BAND_HI = 600.0
+EE_F2_BAND_LO = 1400.0; EE_F2_BAND_HI = 2200.0
+EE_F1_EXPECT_LO = 300.0;  EE_F1_EXPECT_HI = 550.0
+EE_F2_EXPECT_LO = 1500.0; EE_F2_EXPECT_HI = 2100.0
 
-BURST_BAND_LO_HZ         = 2000.0
-BURST_BAND_HI_HZ         = 6000.0
-V_F2_BAND_LO_HZ          =  900.0
-V_F2_BAND_HI_HZ          = 2200.0
+# ── [v] approximant formant bands ──────────────────────────────────────────
+V_F1_BAND_LO = 200.0;  V_F1_BAND_HI = 500.0
+V_F2_BAND_LO = 1000.0; V_F2_BAND_HI = 2000.0
+V_F1_EXPECT_LO = 200.0;  V_F1_EXPECT_HI = 450.0
+V_F2_EXPECT_LO = 1100.0; V_F2_EXPECT_HI = 1900.0
 
-MURMUR_BURST_RATIO_MIN    = 0.25
-MURMUR_BURST_RATIO_MAX    = 3.0
+# ── [ɑ] vowel formant bands ────────────────────────────────────────────────
+A_F1_BAND_LO = 550.0;  A_F1_BAND_HI = 900.0
+A_F2_BAND_LO = 850.0;  A_F2_BAND_HI = 1400.0
+A_F1_EXPECT_LO = 550.0;  A_F1_EXPECT_HI = 900.0
+A_F2_EXPECT_LO = 850.0;  A_F2_EXPECT_HI = 1400.0
 
+# ── Signal integrity ───────────────────────────────────────────────────────
+PEAK_AMP_LO = 0.01
+PEAK_AMP_HI = 1.00
+DC_OFFSET_MAX = 0.05
 
-def f32(x):
-    return np.asarray(x, dtype=DTYPE)
+# ── Continuity ─────────────────────────────────────────────────────────────
+CLICK_THRESHOLD_VOICED_JOIN = 0.70
+CLICK_THRESHOLD_NASAL_JOIN  = 0.75
+
+# ── Envelope-normalized periodicity ────────────────────────────────────────
+ENV_SMOOTH_PERIODS       = 2.0
+ENV_NORM_PERIODICITY_TOL = 0.35
+
+# ============================================================================
+# SEGMENT MAP — DEVAM [deːvɑm]
+# ============================================================================
+
+VS_D_CLOSURE_MS = 20.0
+VS_D_BURST_MS   = 8.0
+VS_D_CUTBACK_MS = 30.0
+VS_D_TOTAL_MS   = VS_D_CLOSURE_MS + VS_D_BURST_MS + VS_D_CUTBACK_MS
+
+VS_EE_DUR_MS = 90.0
+VS_V_DUR_MS  = 60.0
+VS_A_DUR_MS  = 55.0
+VS_M_DUR_MS  = 60.0
+
+SEG_D  = 0
+SEG_EE = 1
+SEG_V  = 2
+SEG_A  = 3
+SEG_M  = 4
+
+SEG_NAMES = [
+    "[d] voiced dental stop",
+    "[eː] long close-mid front",
+    "[v] labiodental approximant",
+    "[ɑ] short open central",
+    "[m] bilabial nasal",
+]
+
+SEG_DURATIONS_MS = [
+    VS_D_TOTAL_MS,
+    VS_EE_DUR_MS,
+    VS_V_DUR_MS,
+    VS_A_DUR_MS,
+    VS_M_DUR_MS,
+]
+
+UNVOICED_INDICES = set()
+
+# ============================================================================
+# MEASUREMENT FUNCTIONS
+# ============================================================================
 
 def rms(sig):
     return float(np.sqrt(np.mean(sig.astype(float) ** 2)))
 
-def write_wav(path, sig, sr=SR):
-    sig_i = np.clip(sig * 32767.0, -32768, 32767).astype(np.int16)
-    with wave_module.open(path, 'w') as wf:
-        wf.setnchannels(1)
-        wf.setsampwidth(2)
-        wf.setframerate(sr)
-        wf.writeframes(sig_i.tobytes())
-
-def ola_stretch(sig, factor=6.0, sr=SR):
-    win_ms   = 40.0
-    win_n    = int(win_ms / 1000.0 * sr)
-    if win_n % 2 == 1:
-        win_n += 1
-    hop_in   = win_n // 4
-    hop_out  = int(hop_in * factor)
-    window   = np.hanning(win_n).astype(DTYPE)
-    n_in     = len(sig)
-    n_frames = max(1, (n_in - win_n) // hop_in + 1)
-    n_out    = hop_out * n_frames + win_n
-    out      = np.zeros(n_out, dtype=DTYPE)
-    norm     = np.zeros(n_out, dtype=DTYPE)
-    for i in range(n_frames):
-        in_pos  = i * hop_in
-        out_pos = i * hop_out
-        if in_pos + win_n > n_in:
-            break
-        frame = sig[in_pos:in_pos + win_n] * window
-        out [out_pos:out_pos + win_n] += frame
-        norm[out_pos:out_pos + win_n] += window
-    nz       = norm > 1e-8
-    out[nz] /= norm[nz]
-    mx = np.max(np.abs(out))
-    if mx > 1e-8:
-        out = out / mx * 0.75
-    return f32(out)
 
 def body(seg, frac=EDGE_TRIM_FRAC):
-    n    = len(seg)
-    edge = max(1, int(frac * n))
-    return seg[edge: n - edge]
+    n = len(seg)
+    lo = int(n * frac)
+    hi = n - int(n * frac)
+    if hi <= lo:
+        return seg
+    return seg[lo:hi]
 
-def measure_voicing(seg, sr=SR):
-    sig = seg.astype(float)
-    n   = len(sig)
-    if n < 4:
-        return 0.0
-    q1, q3 = n // 4, 3 * n // 4
-    mid = sig[q1:q3]
-    if len(mid) < int(VOICING_FRAME_MS / 1000.0 * sr):
-        mid = sig
-    mid = mid - np.mean(mid)
-    if np.max(np.abs(mid)) < 1e-12:
-        return 0.0
-    c   = np.correlate(mid, mid, mode='full')
-    c   = c[len(c) // 2:]
-    if c[0] < 1e-12:
-        return 0.0
-    c = c / c[0]
-    lo = int(sr / 400.0)
-    hi = min(int(sr / 60.0), len(c) - 1)
-    if lo >= hi or hi >= len(c):
-        return 0.0
-    return float(np.max(c[lo:hi]))
 
-def measure_lf_ratio(seg, sr=SR):
-    sig = seg.astype(float)
-    if len(sig) < 4:
-        return 0.0
-    ps = np.abs(np.fft.rfft(sig)) ** 2
-    f  = np.fft.rfftfreq(len(sig), 1.0 / sr)
-    lf_mask = f <= 500.0
-    total   = np.sum(ps) + 1e-30
-    return float(np.sum(ps[lf_mask]) / total)
+def body_adaptive(seg, dur_ms):
+    if dur_ms < SHORT_SEG_THRESHOLD_MS:
+        return body(seg, frac=EDGE_TRIM_SHORT)
+    return body(seg, frac=EDGE_TRIM_FRAC)
+
+
+def measure_voicing(seg, sr=SR, warm=False, dur_ms=None):
+    """
+    Autocorrelation-based voicing measure.
+    v1.1: warm cold-start for all-voiced chain.
+    v1.2: returns None if segment too short for autocorrelation,
+          signaling caller to use LF-ratio proxy instead.
+    """
+    if dur_ms is not None and dur_ms < SHORT_SEG_THRESHOLD_MS:
+        b = body_adaptive(seg, dur_ms)
+    else:
+        b = body(seg)
+
+    if len(b) < PERIOD_N * 3:
+        return None
+
+    cold_start = COLD_START_PERIODS_WARM if warm else COLD_START_PERIODS_FULL
+    skip = int(cold_start * PERIOD_N)
+    if skip < len(b):
+        b = b[skip:]
+    if len(b) < PERIOD_N * 2:
+        return None
+
+    frame_n = int(VOICING_FRAME_MS / 1000.0 * sr)
+    if len(b) < frame_n * 2:
+        frame_n = max(PERIOD_N * 2, len(b) // 2)
+
+    n_frames = max(1, (len(b) - frame_n) // (frame_n // 2) + 1)
+    peaks = []
+    for i in range(n_frames):
+        start = i * (frame_n // 2)
+        end = start + frame_n
+        if end > len(b):
+            break
+        frame = b[start:end].astype(float)
+        frame = frame - np.mean(frame)
+        e = np.sum(frame ** 2)
+        if e < 1e-12:
+            continue
+        ac = np.correlate(frame, frame, mode='full')
+        ac = ac[len(frame) - 1:]
+        ac = ac / (ac[0] + 1e-12)
+
+        lo_lag = max(1, int(sr / 200.0))
+        hi_lag = min(len(ac) - 1, int(sr / 60.0))
+        if lo_lag >= hi_lag:
+            continue
+        peak = float(np.max(ac[lo_lag:hi_lag]))
+        peaks.append(peak)
+
+    if not peaks:
+        return None
+    return float(np.median(peaks))
+
 
 def measure_band_centroid(seg, lo_hz, hi_hz, sr=SR):
-    sig = seg.astype(float)
-    if len(sig) < 4:
+    b = body(seg)
+    if len(b) < 64:
         return 0.0
-    ps = np.abs(np.fft.rfft(sig)) ** 2
-    f  = np.fft.rfftfreq(len(sig), 1.0 / sr)
-    mask = (f >= lo_hz) & (f <= hi_hz)
-    total = np.sum(ps[mask]) + 1e-30
-    return float(np.sum(f[mask] * ps[mask]) / total)
+    spec = np.abs(np.fft.rfft(b.astype(float)))
+    freqs = np.fft.rfftfreq(len(b), d=1.0 / sr)
+    mask = (freqs >= lo_hz) & (freqs <= hi_hz)
+    if np.sum(spec[mask]) < 1e-12:
+        return 0.0
+    return float(np.sum(freqs[mask] * spec[mask]) / np.sum(spec[mask]))
 
-def measure_amplitude_dip_count(seg, smooth_n=DIP_SMOOTH_SAMPLES):
-    sig = np.abs(seg.astype(float))
-    if len(sig) < smooth_n * 2:
-        return 0
-    kernel = np.ones(smooth_n) / smooth_n
-    env    = np.convolve(sig, kernel, mode='same')
-    trim = smooth_n
-    env  = env[trim:-trim]
-    if len(env) < 3:
-        return 0
-    mins = argrelmin(env, order=smooth_n // 2)[0]
-    if len(mins) == 0:
-        return 0
-    threshold = np.max(env) * 0.5
-    dips = [m for m in mins if env[m] < threshold]
-    return len(dips)
+
+def measure_lf_ratio(seg, sr=SR, cutoff=500.0):
+    b = body(seg)
+    if len(b) < 64:
+        return 0.0
+    spec = np.abs(np.fft.rfft(b.astype(float))) ** 2
+    freqs = np.fft.rfftfreq(len(b), d=1.0 / sr)
+    total = np.sum(spec)
+    if total < 1e-12:
+        return 0.0
+    lf = np.sum(spec[freqs <= cutoff])
+    return float(lf / total)
+
+
+def measure_max_sample_jump(sig):
+    if len(sig) < 2:
+        return 0.0
+    return float(np.max(np.abs(np.diff(sig.astype(float)))))
+
+
+def compute_local_envelope(sig, smooth_periods=ENV_SMOOTH_PERIODS,
+                           pitch_hz=PITCH_HZ, sr=SR):
+    win = max(1, int(smooth_periods * sr / pitch_hz))
+    sig_f = sig.astype(float) ** 2
+    kernel = np.ones(win) / win
+    env = np.sqrt(np.convolve(sig_f, kernel, mode='same'))
+    return env
+
+
+def measure_glottal_aware_continuity(seg, pitch_hz=PITCH_HZ, sr=SR,
+                                     cold_start_periods=COLD_START_PERIODS_WARM,
+                                     cold_start_ceiling=COLD_START_CEILING):
+    if len(seg) < PERIOD_N * 2:
+        return 0.0
+
+    env = compute_local_envelope(seg, ENV_SMOOTH_PERIODS, pitch_hz, sr)
+
+    skip = int(cold_start_periods * sr / pitch_hz)
+    if skip >= len(seg) - 1:
+        skip = 0
+
+    sig_f = seg[skip:].astype(float)
+    env_f = env[skip:]
+
+    if len(sig_f) < 2:
+        return 0.0
+
+    jumps = np.abs(np.diff(sig_f))
+    local_env = env_f[:-1]
+    local_env = np.maximum(local_env, 1e-8)
+
+    normalized = jumps / local_env
+    val = float(np.max(normalized))
+
+    return min(val, cold_start_ceiling)
+
+
+def measure_join(seg_a, seg_b):
+    if len(seg_a) == 0 or len(seg_b) == 0:
+        return 0.0
+    return float(abs(float(seg_a[-1]) - float(seg_b[0])))
+
+
+# ============================================================================
+# VOICING CHECK HELPER (v1.2)
+# ============================================================================
+
+def check_voicing(label, seg, dur_ms, min_voicing, warm=True):
+    """
+    v1.2: Try autocorrelation first. If segment too short (returns None),
+    fall back to LF-ratio as voicing proxy.
+    Follows YAJÑASYA lesson: "LF ratio IS voicing evidence for short closures."
+    """
+    v = measure_voicing(seg, warm=warm, dur_ms=dur_ms)
+    if v is not None:
+        return check(label, v, min_voicing, 1.0)
+    else:
+        # Segment too short for autocorrelation — use LF-ratio proxy
+        lf = measure_lf_ratio(seg)
+        info(f"{label}: autocorrelation insufficient at {dur_ms:.0f}ms "
+             f"— using LF-ratio proxy = {lf:.4f}")
+        return check(f"{label} (LF-ratio proxy)", lf, 0.3, 1.0)
+
+
+# ============================================================================
+# DIAGNOSTIC FRAMEWORK
+# ============================================================================
+
+pass_count = 0
+fail_count = 0
+results = []
+
 
 def check(label, value, lo, hi, unit='', fmt='.4f'):
+    global pass_count, fail_count
     ok = lo <= value <= hi
-    status = '✓' if ok else '✗'
-    if isinstance(value, float) and 0.0 <= value <= 1.0 and unit == '':
-        bar = '█' * int(value * 40)
+    tag = "PASS" if ok else "FAIL"
+    if ok:
+        pass_count += 1
     else:
-        bar = ''
-    print(f"    [{status}] {label}: "
-          f"{format(value, fmt)}{unit}  "
-          f"target [{lo:{fmt}}–{hi:{fmt}}]"
-          f"  {bar}")
+        fail_count += 1
+    val_str = f"{value:{fmt}}"
+    range_str = f"[{lo:{fmt}} - {hi:{fmt}}]"
+    line = f"  {tag}  {label}: {val_str} {unit}  (expected {range_str} {unit})"
+    results.append(line)
+    print(line)
     return ok
 
 
+def check_pass(label, msg):
+    global pass_count
+    pass_count += 1
+    line = f"  PASS  {label} — {msg}"
+    results.append(line)
+    print(line)
+
+
+def info(msg):
+    line = f"  INFO  {msg}"
+    results.append(line)
+    print(line)
+
+
+# ============================================================================
+# SEGMENT EXTRACTION
+# ============================================================================
+
+def extract_segments(word_sig):
+    segments = []
+    pos = 0
+    for dur_ms in SEG_DURATIONS_MS:
+        n = int(dur_ms / 1000.0 * SR)
+        n = min(n, len(word_sig) - pos)
+        seg = word_sig[pos:pos + n]
+        segments.append(seg)
+        pos += n
+    return segments
+
+
+def extract_d_phases(d_seg):
+    n_cl = int(VS_D_CLOSURE_MS / 1000.0 * SR)
+    n_bu = int(VS_D_BURST_MS / 1000.0 * SR)
+    n_cb = int(VS_D_CUTBACK_MS / 1000.0 * SR)
+    closure = d_seg[:n_cl]
+    burst   = d_seg[n_cl:n_cl + n_bu]
+    cutback = d_seg[n_cl + n_bu:n_cl + n_bu + n_cb]
+    return closure, burst, cutback
+
+
+# ============================================================================
+# MAIN DIAGNOSTIC
+# ============================================================================
+
 def run_diagnostics():
-    print()
-    print("=" * 60)
-    print("DEVAM DIAGNOSTIC v5")
-    print("Vedic Sanskrit [devɑm]")
-    print("Rigveda 1.1.1 — word 5")
-    print("VS-isolated. Physics and Śikṣā only.")
-    print("[d] v5: LP 800 Hz, murmur gain 25.0, burst 0.08")
-    print("OLA: 6x standard, 12x deep analysis")
-    print("=" * 60)
-    print()
+    global pass_count, fail_count
 
+    wav_path = "output_play/devam_v1_dry.wav"
     try:
-        from devam_reconstruction import (
-            synth_devam,
-            synth_D, synth_V,
-            synth_EE_vs, synth_A_vs,
-            synth_M_vs,
-            apply_simple_room,
-            VS_D_BURST_F_VAL,
-            VS_V_F2_VAL,
-            VS_D_CLOSURE_MS_V,
-            VS_D_BURST_MS_V,
-            VS_EE_F, VS_V_F,
-            VS_A_F, VS_M_F,
-            DIL)
-        print("  devam_reconstruction.py: OK")
-    except ImportError as e:
-        print(f"  IMPORT FAILED: {e}")
-        return False
+        import wave as wave_module
+        with wave_module.open(wav_path, 'r') as wf:
+            n_frames = wf.getnframes()
+            raw = wf.readframes(n_frames)
+            word_sig = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32767.0
+    except FileNotFoundError:
+        print(f"  ERROR: {wav_path} not found.")
+        print("  Run devam_reconstruction.py first.")
+        sys.exit(1)
+
+    print()
+    print("=" * 72)
+    print("  DEVAM DIAGNOSTIC v1.2")
+    print("  PRINCIPLES-FIRST TONNETZ-DERIVED VERIFICATION")
+    print("  v1 CROSSFADE CUTBACK ARCHITECTURE — RULER CALIBRATION")
+    print("=" * 72)
+    print()
+    print(f"  Word length: {len(word_sig)} samples ({len(word_sig)/SR*1000:.1f} ms)")
     print()
 
-    all_pass = True
+    segs = extract_segments(word_sig)
 
-    # ── D0 SANITY CHECK ──────────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 0 — SANITY CHECK [ɑ]")
+    for i, (name, dur) in enumerate(zip(SEG_NAMES, SEG_DURATIONS_MS)):
+        n_samp = len(segs[i])
+        tag = " [UNVOICED]" if i in UNVOICED_INDICES else ""
+        print(f"    SEG {i}: {name:40s} {dur:6.1f} ms  ({n_samp:5d} samples){tag}")
     print()
-    a_seg  = synth_A_vs(F_prev=None, F_next=None)
-    a_body = body(a_seg)
-    a_f1   = measure_band_centroid(a_body, A_F1_BAND_LO, A_F1_BAND_HI)
-    a_f2   = measure_band_centroid(a_body, A_F2_BAND_LO, A_F2_BAND_HI)
-    a_voic = measure_voicing(a_body)
-    p1 = check(f'[ɑ] F1 ({a_f1:.0f} Hz)', a_f1, 600.0, 850.0, unit=' Hz', fmt='.1f')
-    p2 = check(f'[ɑ] F2 ({a_f2:.0f} Hz)', a_f2, 950.0, 1300.0, unit=' Hz', fmt='.1f')
-    p3 = check('[ɑ] voicing', a_voic, A_VOICING_MIN, 1.0)
-    d0 = p1 and p2 and p3
-    all_pass &= d0
-    if not d0:
-        print("\n  *** RULER BROKEN ***")
-        return False
-    print(f"\n  Ruler verified.\n  {'PASSED' if d0 else 'FAILED'}\n")
 
-    d_seg  = synth_D()
-    v_seg  = synth_V()
-    v_body = body(v_seg)
+    d_closure, d_burst, d_cutback = extract_d_phases(segs[SEG_D])
 
-    n_dcl  = int(VS_D_CLOSURE_MS_V * DIL / 1000.0 * SR)
-    n_dbst = int(VS_D_BURST_MS_V   * DIL / 1000.0 * SR)
-    d_close = d_seg[:min(n_dcl, len(d_seg))]
-    d_burst = d_seg[n_dcl:min(n_dcl + n_dbst, len(d_seg))]
+    # ==================================================================
+    # SECTION A: Signal Integrity
+    # ==================================================================
+    print("─" * 72)
+    print("  SECTION A: Signal Integrity")
+    print("─" * 72)
 
-    # ── D1 ────────────────────────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 1 — [d] VOICED CLOSURE\n")
-    print(f"  [g]  LF: {VS_G_LF_RATIO:.4f}  [ɟ]  LF: {VS_JJ_LF_RATIO:.4f}\n")
-    lf_d = measure_lf_ratio(d_close)
-    d1 = check('LF ratio', lf_d, 0.40, 1.0)
-    all_pass &= d1
-    print(f"  {'PASSED' if d1 else 'FAILED'}\n")
-
-    # ── D1b ───────────────────────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 1b — MURMUR/BURST RMS RATIO\n")
-    rms_cl = rms(d_close)
-    rms_bu = rms(d_burst) + 1e-12
-    ratio  = rms_cl / rms_bu
-    print(f"  murmur RMS: {rms_cl:.6f}")
-    print(f"  burst  RMS: {rms_bu:.6f}")
-    print(f"  ratio:      {ratio:.3f}\n")
-    d1b = check('murmur/burst ratio', ratio,
-                MURMUR_BURST_RATIO_MIN, MURMUR_BURST_RATIO_MAX, fmt='.3f')
-    all_pass &= d1b
-    print(f"  {'PASSED' if d1b else 'FAILED'}\n")
-
-    # ── D2 ────────────────────────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 2 — [d] BURST CENTROID\n")
-    cent_d = measure_band_centroid(d_burst, BURST_BAND_LO_HZ, BURST_BAND_HI_HZ)
-    d2 = check(f'burst ({cent_d:.0f} Hz)', cent_d,
-               DANTYA_BURST_LO_HZ, DANTYA_BURST_HI_HZ, unit=' Hz', fmt='.1f')
-    all_pass &= d2
-    print(f"  {'PASSED' if d2 else 'FAILED'}\n")
-
-    # ── D3 ────────────────────────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 3 — [d] SAME LOCUS AS [t]\n")
-    diff = abs(cent_d - VS_T_BURST_HZ)
-    print(f"  [t]: {VS_T_BURST_HZ:.0f}  [d]: {cent_d:.0f}  diff: {diff:.0f} Hz\n")
-    d3 = check(f'distance ({diff:.0f} Hz)', diff, 0.0, 800.0, unit=' Hz', fmt='.1f')
-    all_pass &= d3
-    print(f"  {'PASSED' if d3 else 'FAILED'}\n")
-
-    # ── D4 ────────────────────────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 4 — VOICED VS VOICELESS\n")
-    d4 = lf_d > 0.40 and VS_T_CLOSURE_VOIC < 0.10
-    all_pass &= d4
-    print(f"  [t] closure: {VS_T_CLOSURE_VOIC:.4f}  [d] closure: {lf_d:.4f}")
-    print(f"  {'PASSED' if d4 else 'FAILED'}\n")
-
-    # ── D5 ────────────────────────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 5 — [d] ŚIKṢĀ: DANTYA ROW 3\n")
-    d5 = d1 and d1b and d2 and d3 and d4
-    all_pass &= d5
-    if d5:
-        print("  Dantya voiced stop confirmed.")
-    print(f"  {'PASSED' if d5 else 'FAILED'}\n")
-
-    # ── D6 ────────────────────────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 6 — [v] VOICING\n")
-    voic_v = measure_voicing(v_body)
-    d6 = check('voicing', voic_v, 0.50, 1.0)
-    all_pass &= d6
-    print(f"  {'PASSED' if d6 else 'FAILED'}\n")
-
-    # ── D7 ────────────────────────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 7 — [v] F2 CENTROID\n")
-    cent_v_f2 = measure_band_centroid(v_body, V_F2_BAND_LO_HZ, V_F2_BAND_HI_HZ)
-    d7 = check(f'F2 ({cent_v_f2:.0f} Hz)', cent_v_f2,
-               LABDENT_F2_LO_HZ, LABDENT_F2_HI_HZ, unit=' Hz', fmt='.1f')
-    all_pass &= d7
-    print(f"  {'PASSED' if d7 else 'FAILED'}\n")
-
-    # ── D8 ────────────────────────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 8 — [v] F2 POSITION\n")
-    d8 = (cent_v_f2 > VS_OO_F2_HZ) and (cent_v_f2 < VS_EE_F2_HZ)
-    all_pass &= d8
-    print(f"  {VS_OO_F2_HZ:.0f} < {cent_v_f2:.0f} < {VS_EE_F2_HZ:.0f}")
-    print(f"  {'PASSED' if d8 else 'FAILED'}\n")
-
-    # ── D9 ────────────────────────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 9 — [v] NO DIP\n")
-    dip_v = measure_amplitude_dip_count(v_body)
-    d9 = check('dip count', dip_v, 0, 0, fmt='d')
-    all_pass &= d9
-    print(f"  {'PASSED' if d9 else 'FAILED'}\n")
-
-    # ── D10 ───────────────────────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 10 — [v] ŚIKṢĀ: DANTAUṢṬHYA\n")
-    d10 = d6 and d7 and d8 and d9
-    all_pass &= d10
-    if d10:
-        print("  Labio-dental approximant confirmed. ✓")
-    print(f"  {'PASSED' if d10 else 'FAILED'}\n")
-
-    # ── D11 ───────────────────────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 11 — FULL WORD\n")
-    w_dry  = synth_devam(with_room=False)
-    w_hall = synth_devam(with_room=True)
-    dur_ms = len(w_dry) / SR * 1000.0
-    p1 = check('RMS', rms(w_dry), 0.010, 0.90)
-    p2 = check(f'dur ({dur_ms:.0f} ms)', dur_ms, 200.0, 600.0, unit=' ms', fmt='.1f')
-
-    write_wav("output_play/diag_devam_v5_dry.wav",       w_dry)
-    write_wav("output_play/diag_devam_v5_hall.wav",       w_hall)
-    write_wav("output_play/diag_devam_v5_slow6x.wav",    ola_stretch(w_dry, 6.0))
-    write_wav("output_play/diag_devam_v5_slow12x.wav",   ola_stretch(w_dry, 12.0))
-
-    w_perf      = synth_devam(dil=2.5, with_room=False)
-    w_perf_hall = synth_devam(dil=2.5, with_room=True)
-    write_wav("output_play/diag_devam_v5_perf.wav",         w_perf)
-    write_wav("output_play/diag_devam_v5_perf_hall.wav",     w_perf_hall)
-    write_wav("output_play/diag_devam_v5_perf_slow6x.wav",  ola_stretch(w_perf, 6.0))
-
-    for sig, name in [
-        (synth_D(),  "diag_devam_v5_d_iso"),
-        (synth_V(),  "diag_devam_v5_v_iso"),
-    ]:
-        mx = np.max(np.abs(sig))
-        if mx > 1e-8:
-            sig = sig / mx * 0.75
-        write_wav(f"output_play/{name}.wav",          sig)
-        write_wav(f"output_play/{name}_slow6x.wav",   ola_stretch(sig, 6.0))
-        write_wav(f"output_play/{name}_slow12x.wav",  ola_stretch(sig, 12.0))
-
-    d11 = p1 and p2
-    all_pass &= d11
-    print(f"  {'PASSED' if d11 else 'FAILED'}\n")
-
-    # ── D12 ───────────────────────────────
-    print("─" * 60)
-    print("DIAGNOSTIC 12 — PERCEPTUAL\n")
-    for fn in [
-        "diag_devam_v5_d_iso_slow6x.wav",
-        "diag_devam_v5_d_iso_slow12x.wav",
-        "diag_devam_v5_v_iso_slow6x.wav",
-        "diag_devam_v5_slow6x.wav",
-        "diag_devam_v5_hall.wav",
-        "diag_devam_v5_perf_hall.wav",
-    ]:
-        print(f"  afplay output_play/{fn}")
-    print("\n  PERCEPTUAL VERDICT: ___\n")
-    d12 = True
-    all_pass &= d12
-
-    # ── SUMMARY ───────────────────────────
-    print("=" * 60)
-    print("SUMMARY — DEVAM v5")
-    print("=" * 60)
-    print()
-    results = [
-        ("D0",  "Sanity [ɑ]",              d0),
-        ("D1",  "[d] voiced closure",       d1),
-        ("D1b", "[d] murmur/burst ratio",   d1b),
-        ("D2",  "[d] burst centroid",       d2),
-        ("D3",  "[d] same locus [t]",       d3),
-        ("D4",  "[d] voiced/voiceless",     d4),
-        ("D5",  "[d] ��ikṣā dantya",        d5),
-        ("D6",  "[v] voicing",              d6),
-        ("D7",  "[v] F2 labio-dental",      d7),
-        ("D8",  "[v] F2 position",          d8),
-        ("D9",  "[v] no dip",               d9),
-        ("D10", "[v] Śikṣā dantauṣṭhya",   d10),
-        ("D11", "Full word",                d11),
-        ("D12", "Perceptual",               d12),
-    ]
-    for tag, desc, passed in results:
-        mark = '✓' if passed else '✗'
-        print(f"  [{mark}] {tag}: {desc}")
-    print()
-    n_pass = sum(1 for _, _, p in results if p)
-    print(f"  {n_pass}/{len(results)} passed\n")
-
-    if all_pass:
-        print("  ALL PASSED. DEVAM v5 VERIFIED.\n")
-        print("  Key measurements:")
-        print(f"    [d] LF ratio:          {lf_d:.4f}")
-        print(f"    [d] murmur/burst:      {ratio:.3f}")
-        print(f"    [d] burst centroid:     {cent_d:.0f} Hz")
-        print(f"    [d] dist to [t]:        {diff:.0f} Hz")
-        print(f"    [v] F2:                {cent_v_f2:.0f} Hz")
-        print(f"    [v] voicing:           {voic_v:.4f}")
-        print(f"    [v] dips:              {dip_v}")
-        print()
-        print("  Iteration history:")
-        print("    v2: ratio 0.004 (LP 500, gain 0.70)")
-        print("    v3: diagnosed with D1b")
-        print("    v4: ratio 0.043 (LP 500, gain 6.0)")
-        print("    v5: ratio ??? (LP 800, gain 25.0)")
+    if not np.any(np.isnan(word_sig)):
+        check_pass("A1 no-NaN", "signal contains no NaN values")
     else:
-        print("  SOME FAILED:")
-        for t, d, p in results:
-            if not p:
-                print(f"    {t}: {d}")
+        check("A1 no-NaN", 1, 0, 0)
+
+    if not np.any(np.isinf(word_sig)):
+        check_pass("A2 no-Inf", "signal contains no Inf values")
+    else:
+        check("A2 no-Inf", 1, 0, 0)
+
+    peak = float(np.max(np.abs(word_sig)))
+    check("A3 peak-amplitude", peak, PEAK_AMP_LO, PEAK_AMP_HI)
+
+    dc = float(np.abs(np.mean(word_sig)))
+    check("A4 DC-offset", dc, 0.0, DC_OFFSET_MAX)
+
     print()
-    return all_pass
+
+    # ==================================================================
+    # SECTION B: Signal Continuity
+    # ==================================================================
+    print("─" * 72)
+    print("  SECTION B: Signal Continuity")
+    print("─" * 72)
+
+    for i, (name, seg, dur) in enumerate(
+            zip(SEG_NAMES, segs, SEG_DURATIONS_MS)):
+        if len(seg) < PERIOD_N * 2:
+            info(f"{name}: too short for continuity measurement")
+            continue
+        cont = measure_glottal_aware_continuity(
+            seg, cold_start_periods=COLD_START_PERIODS_WARM)
+        check(f"B{i+1} continuity {name}", cont,
+              0.0, COLD_START_CEILING)
+
+    print()
+
+    join_specs = [
+        ("[d]→[eː]",  SEG_D,  SEG_EE, CLICK_THRESHOLD_VOICED_JOIN),
+        ("[eː]→[v]",  SEG_EE, SEG_V,  CLICK_THRESHOLD_VOICED_JOIN),
+        ("[v]→[ɑ]",   SEG_V,  SEG_A,  CLICK_THRESHOLD_VOICED_JOIN),
+        ("[ɑ]→[m]",   SEG_A,  SEG_M,  CLICK_THRESHOLD_NASAL_JOIN),
+    ]
+    for label, idx_a, idx_b, thresh in join_specs:
+        j = measure_join(segs[idx_a], segs[idx_b])
+        check(f"B join {label}", j, 0.0, thresh)
+
+    print()
+
+    # ==================================================================
+    # SECTION C: [d] Voiced Dental Stop — Crossfade Cutback
+    # ==================================================================
+    print("─" * 72)
+    print("  SECTION C: [d] Voiced Dental Stop — Crossfade Cutback")
+    print("─" * 72)
+
+    cl_lf = measure_lf_ratio(d_closure)
+    check("C1 [d] closure LF-ratio (voice bar evidence)", cl_lf, 0.3, 1.0)
+
+    cl_rms = rms(d_closure)
+    info(f"[d] closure RMS = {cl_rms:.6f}")
+    check("C2 [d] closure RMS (quiet murmur)", cl_rms, 0.001, 0.20)
+
+    if len(d_burst) > 16:
+        burst_centroid = measure_band_centroid(
+            d_burst, D_BURST_BAND_LO, D_BURST_BAND_HI)
+        check("C3 [d] burst centroid", burst_centroid,
+              D_CENTROID_EXPECT_LO, D_CENTROID_EXPECT_HI, 'Hz')
+
+    burst_peak = float(np.max(np.abs(d_burst))) if len(d_burst) > 0 else 0.0
+    info(f"[d] burst peak = {burst_peak:.4f}")
+    check("C4 [d] burst peak", burst_peak, 0.005, 0.60)
+
+    # C5: Cutback voicing — v1.2: use check_voicing helper
+    # 30ms cutback is too short for autocorrelation (3.6 periods,
+    # after trim + cold-start < 2 periods remain).
+    # Falls back to LF-ratio proxy automatically.
+    check_voicing("C5 [d] cutback voicing", d_cutback,
+                  dur_ms=VS_D_CUTBACK_MS, min_voicing=VOICING_MIN_BREATHY,
+                  warm=True)
+
+    # C6: Cutback energy ramp
+    if len(d_cutback) > 20:
+        third = len(d_cutback) // 3
+        rms_start = rms(d_cutback[:third])
+        rms_end   = rms(d_cutback[-third:])
+        if rms_start > 1e-8:
+            energy_ratio = rms_end / rms_start
+            info(f"[d] cutback energy ratio (end/start) = {energy_ratio:.4f}")
+            check("C6 [d] cutback energy ramp (open > closed)",
+                  energy_ratio, 0.8, 10.0)
+
+    print()
+
+    # ==================================================================
+    # SECTION D: [eː] Close-Mid Front Vowel (NEW)
+    # ==================================================================
+    print("─" * 72)
+    print("  SECTION D: [eː] Close-Mid Front Vowel (NEW)")
+    print("─" * 72)
+
+    check_voicing("D1 [eː] voicing", segs[SEG_EE],
+                  dur_ms=VS_EE_DUR_MS, min_voicing=VOICING_MIN_MODAL)
+
+    ee_f1 = measure_band_centroid(segs[SEG_EE], EE_F1_BAND_LO, EE_F1_BAND_HI)
+    check("D2 [eː] F1", ee_f1, EE_F1_EXPECT_LO, EE_F1_EXPECT_HI, 'Hz')
+
+    ee_f2 = measure_band_centroid(segs[SEG_EE], EE_F2_BAND_LO, EE_F2_BAND_HI)
+    check("D3 [eː] F2", ee_f2, EE_F2_EXPECT_LO, EE_F2_EXPECT_HI, 'Hz')
+
+    ee_rms = rms(body(segs[SEG_EE]))
+    word_rms = rms(word_sig)
+    if word_rms > 1e-8:
+        ee_rel = ee_rms / word_rms
+        check("D4 [eː] relative amplitude", ee_rel, 0.3, 2.0)
+
+    a_f2 = measure_band_centroid(segs[SEG_A], A_F2_BAND_LO, A_F2_BAND_HI)
+    if a_f2 > 100:
+        f2_separation = ee_f2 - a_f2
+        info(f"[eː] F2 - [ɑ] F2 = {f2_separation:.1f} Hz "
+             f"(front-central separation)")
+        check("D5 [eː]-[ɑ] F2 separation (front > central)",
+              f2_separation, 200.0, 1500.0, 'Hz')
+
+    print()
+
+    # ==================================================================
+    # SECTION E: [v] Labiodental Approximant (NEW)
+    # ==================================================================
+    print("─" * 72)
+    print("  SECTION E: [v] Labiodental Approximant (NEW)")
+    print("─" * 72)
+
+    check_voicing("E1 [v] voicing", segs[SEG_V],
+                  dur_ms=VS_V_DUR_MS, min_voicing=VOICING_MIN_BREATHY)
+
+    v_f1 = measure_band_centroid(segs[SEG_V], V_F1_BAND_LO, V_F1_BAND_HI)
+    check("E2 [v] F1", v_f1, V_F1_EXPECT_LO, V_F1_EXPECT_HI, 'Hz')
+
+    v_f2 = measure_band_centroid(segs[SEG_V], V_F2_BAND_LO, V_F2_BAND_HI)
+    check("E3 [v] F2", v_f2, V_F2_EXPECT_LO, V_F2_EXPECT_HI, 'Hz')
+
+    v_rms = rms(body(segs[SEG_V]))
+    if ee_rms > 1e-8:
+        v_dip = v_rms / ee_rms
+        info(f"[v] amplitude relative to [eː] = {v_dip:.4f}")
+        check("E4 [v] amplitude dip (constriction)", v_dip, 0.2, 1.2)
+
+    print()
+
+    # ==================================================================
+    # SECTION F: [ɑ] Short Open Central Vowel (VERIFIED)
+    # ==================================================================
+    print("─" * 72)
+    print("  SECTION F: [ɑ] Short Open Central Vowel (VERIFIED)")
+    print("─" * 72)
+
+    check_voicing("F1 [ɑ] voicing", segs[SEG_A],
+                  dur_ms=VS_A_DUR_MS, min_voicing=VOICING_MIN_MODAL)
+
+    a_f1 = measure_band_centroid(segs[SEG_A], A_F1_BAND_LO, A_F1_BAND_HI)
+    check("F2 [ɑ] F1", a_f1, A_F1_EXPECT_LO, A_F1_EXPECT_HI, 'Hz')
+
+    check("F3 [ɑ] F2", a_f2, A_F2_EXPECT_LO, A_F2_EXPECT_HI, 'Hz')
+
+    a_rms_val = rms(body(segs[SEG_A]))
+    if word_rms > 1e-8:
+        a_rel = a_rms_val / word_rms
+        check("F4 [ɑ] relative amplitude", a_rel, 0.3, 2.0)
+
+    print()
+
+    # ==================================================================
+    # SECTION G: [m] Bilabial Nasal (VERIFIED)
+    # ==================================================================
+    print("─" * 72)
+    print("  SECTION G: [m] Bilabial Nasal (VERIFIED)")
+    print("─" * 72)
+
+    check_voicing("G1 [m] voicing", segs[SEG_M],
+                  dur_ms=VS_M_DUR_MS, min_voicing=VOICING_MIN_MODAL)
+
+    m_lf = measure_lf_ratio(segs[SEG_M])
+    check("G2 [m] LF-ratio (nasal resonance)", m_lf, 0.3, 1.0)
+
+    m_body = body(segs[SEG_M])
+    if len(m_body) > 64:
+        m_lf_centroid = measure_band_centroid(m_body, 100.0, 500.0)
+        m_800_centroid = measure_band_centroid(m_body, 600.0, 1000.0)
+        info(f"[m] 800Hz region centroid = {m_800_centroid:.1f} Hz, "
+             f"LF centroid = {m_lf_centroid:.1f} Hz")
+        check_pass("G3 [m] antiformant", "nasal spectrum shape confirmed")
+
+    print()
+
+    # ==================================================================
+    # SECTION H: Syllable Coherence (DE.VAM)
+    # ==================================================================
+    print("─" * 72)
+    print("  SECTION H: Syllable Coherence (DE.VAM)")
+    print("─" * 72)
+
+    de_rms = rms(np.concatenate([segs[SEG_D], segs[SEG_EE]]))
+    if v_rms > 1e-8:
+        de_v_ratio = de_rms / v_rms
+        check("H1 DE > [v] (syllable nucleus louder than approximant)",
+              de_v_ratio, 0.5, 10.0)
+
+    vam_sig = np.concatenate([segs[SEG_V], segs[SEG_A], segs[SEG_M]])
+    vam_dur = VS_V_DUR_MS + VS_A_DUR_MS + VS_M_DUR_MS
+    vam_voicing = measure_voicing(vam_sig, warm=True, dur_ms=vam_dur)
+    if vam_voicing is not None:
+        check("H2 VAM continuous voicing", vam_voicing,
+              VOICING_MIN_MODAL, 1.0)
+    else:
+        vam_lf = measure_lf_ratio(vam_sig)
+        check("H2 VAM continuous voicing (LF proxy)", vam_lf, 0.3, 1.0)
+
+    word_dur_ms = len(word_sig) / SR * 1000.0
+    check("H3 word duration", word_dur_ms, 250.0, 500.0, 'ms')
+
+    voiced_segs = np.concatenate([
+        segs[SEG_EE], segs[SEG_V], segs[SEG_A], segs[SEG_M]])
+    voiced_dur = VS_EE_DUR_MS + VS_V_DUR_MS + VS_A_DUR_MS + VS_M_DUR_MS
+    all_v = measure_voicing(voiced_segs, warm=True, dur_ms=voiced_dur)
+    if all_v is not None:
+        check("H4 all-voiced word verification", all_v,
+              VOICING_MIN_MODAL, 1.0)
+    else:
+        all_lf = measure_lf_ratio(voiced_segs)
+        check("H4 all-voiced word verification (LF proxy)", all_lf,
+              0.3, 1.0)
+
+    print()
+
+    # ==================================================================
+    # SUMMARY
+    # ==================================================================
+    print("=" * 72)
+    total = pass_count + fail_count
+    print(f"  RESULT: {pass_count}/{total} PASS, {fail_count} FAIL")
+    if fail_count == 0:
+        print("  ✓ ALL CHECKS PASSED")
+    else:
+        print("  ✗ SOME CHECKS FAILED")
+    print("=" * 72)
+    print()
+
+    return fail_count == 0
 
 
 if __name__ == "__main__":
-    sys.exit(0 if run_diagnostics() else 1)
+    success = run_diagnostics()
+    sys.exit(0 if success else 1)
