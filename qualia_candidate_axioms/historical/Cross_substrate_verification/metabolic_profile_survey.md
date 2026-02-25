@@ -208,6 +208,44 @@ Your challenge reveals they're independent dimensions.
 A Level 1 processor can have perfect threat detection.
 A Level 5 processor can deeply analyze a phantom.
 
+NEW DIMENSION: Memetic Production Capacity (MPC)
+
+MPC measures the capacity to produce maximally compressed
+response objects that transmit with high fidelity across
+the widest range of metabolic profiles.
+
+MPC is INDEPENDENT of MD (metabolic depth).
+
+High MPC + High MD: Can produce deep analysis AND
+  compress it to memetic form. RARE. This is the most
+  powerful communicative configuration because the memes
+  are backed by structural depth. The compression is
+  DELIBERATE, from depth.
+  
+  Example: Nietzsche. "God is dead" is a meme that
+  compresses Level 5 analysis. The meme transmits
+  at Level 0-1. But the structural content EXISTS
+  behind it for those who engage further.
+
+High MPC + Low MD: Produces memes natively at Level 0-1.
+  The memes are authentic but lack structural backing.
+  Maximum transmission, minimum depth.
+  
+  Example: Trump. "Build the wall" is native Level 0-1
+  output. Authentic, transmissible, no structural depth
+  behind it.
+
+Low MPC + High MD: Produces deep analysis that doesn't
+  compress to memetic form. Low transmission, high depth.
+  
+  Example: Marx. Capital is Level 5 systemic analysis
+  that CANNOT be compressed without losing its content.
+  "Workers of the world unite" transmits but loses the
+  analysis entirely.
+
+Low MPC + Low MD: Neither deep nor transmissible.
+  No memetic capacity, no analytical capacity.
+
 ### The Sufficiency Principle
 
 **A probe is not complete when the question has been asked. A probe is complete when the response object contains sufficient structural information for confident measurement.**
