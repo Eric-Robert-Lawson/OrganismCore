@@ -1,50 +1,70 @@
 # THE METABOLIC MIRROR
-## Operational Protocol v3.0
-### Response Object Analysis Architecture
+## Operational Protocol v4.0
+### Response Object Structural Observation Architecture
 
 ---
 
 ## DOCUMENT METADATA
 
 **Author:** Eric Robert Lawson
-**Substrate collaboration:** GitHub Copilot (conversation-emergent)
-**Date:** February 2026
+**Substrate collaboration:** GitHub Copilot (conversation-emergent, post-Cartesian)
+**Date:** February 25, 2026
 **Repository:** Eric-Robert-Lawson/OrganismCore
 **License:** Open source — free for all use with attribution
-**Version:** 3.0 — Paradigm shift from self-report scoring to response object structural analysis
+**Version:** 4.0 — Principles-first revision: structural invariants replace numerical scoring
 **Development lineage:**
 - v0.1: Categorical survey (binary catabolic/anabolic)
 - v0.2: Three-dimensional model with prediction engine
 - v1.0: Continuous-spectrum assessment with modulation dimensions
 - v2.0: Operational deployment with critique integration (trauma screening, cultural sensitivity, Barnum defense)
 - v3.0: Response object analysis paradigm — the AI measures the STRUCTURE of responses, not the person's self-assessment
+- v4.0: Principles-first revision — numerical scores replaced by structural descriptions, prediction-validation replaced by self-explaining observation, cross-religious structural analysis integrated as grounding
 
-**Paradigm shift in v3.0:**
-The protocol no longer asks people to self-assess and then scores their self-assessment. The protocol elicits authentic cognitive artifacts through conversational prompts and measures the structural properties of those artifacts. The person expresses. The AI measures. The profile emerges from the structure of what the person produces, not from what the person claims about themselves.
+**What changed in v4.0 and why:**
+
+The cross-religious structural analysis (applying the five-layer reading method to foundational texts of Christianity, Islam, Buddhism, Hinduism, and Judaism) revealed that the protocol's strongest contribution is its **qualitative structural vocabulary** — and that its weakest aspects are its **numerical scoring** and **prediction-validation claims**.
+
+Specific problems identified and corrected:
+1. **Numerical scores (0-100) removed.** These created the appearance of measurement precision without a calibration procedure, defined units, or inter-rater reliability. What the protocol actually produces is comparative structural observation. The observation is valuable. The numbers were rhetorical.
+2. **Prediction-validation framing removed.** The protocol was generating "predictions" from profiles built from the same information used to validate them. This is redescription, not prediction. v4.0 replaces this with **specific structural claims that explain their own derivation** — the person can follow the reasoning from their response to the observation.
+3. **The protocol's self-description corrected.** It is not a "cognitive spectrometer" (measurement instrument). It is a **structured observation method** — a consistent way to attend to response objects that reveals structural patterns. The distinction matters because it changes what the protocol claims and what the administrator expects.
+4. **Detection Accuracy (DA) and Memetic Production Capacity (MPC) removed.** DA requires external verification of what is "structurally real" — the administrator cannot determine this from conversation alone. MPC is an interesting concept but not observable through the probe structure. Both are retained as theoretical concepts but removed from the operational protocol.
+5. **Structural invariants from cross-religious analysis integrated** as grounding principles — the protocol now explicitly states what structural observation can and cannot determine.
+
+**What was preserved from v3.0:**
+- The five-layer analysis (Content, Order, Language Structure, Meta-Cognitive Moves, Depth) — this genuinely works as a reading method
+- The four-movement conversational structure — the probes elicit useful cognitive artifacts
+- The response object analysis architecture — attending to what the person produces rather than what they claim
+- The sufficiency principle — probing until the response is structurally informative
+- The operational definitions of S, E, N, I retention substrates — these qualitative categories are genuinely distinguishable
+- The Barnum defense requirements — these remain essential for honest practice
+- The working memory / metabolic processing distinction
 
 ---
 
-## PART I: THE MEASUREMENT PARADIGM
+## PART I: THE OBSERVATION PARADIGM
 
 ### What This Protocol Actually Does
 
-This protocol is a cognitive spectrometer.
+This protocol is a structured observation method for cognitive artifacts.
 
-A mass spectrometer doesn't ask a molecule what it weighs. It runs the molecule through a calibrated process and measures what comes out.
+It does NOT measure cognition the way a spectrometer measures mass. A spectrometer has calibrated units, defined scales, and intersubjective verification. This protocol has none of those things.
 
-This protocol doesn't ask a person how they think. It runs the person's cognition through calibrated conversational operations and measures what comes out.
+What this protocol DOES: it provides a consistent way to attend to the structural properties of a person's responses — what they say first, what language they use, what channels they gravitate toward, what they omit, how deep their responses go. The consistency of attention across multiple probes reveals patterns. The patterns constitute the structural portrait.
+
+**The honest analogy is not a spectrometer. It is a portrait artist who has learned to attend to specific structural features.** The portrait is not a photograph (objective measurement). It is a skilled observation that may reveal things the subject didn't know about themselves — but it is produced by an observer with a specific method and a specific orientation, and it should be received as such.
 
 The operations are: memory retrieval prompts, forced compression prompts, channel activation prompts, learning scenario prompts, social scenario prompts, engagement phenomenology prompts, and stress scenario prompts.
 
-The output is: response objects — the person's actual responses, which are cognitive artifacts with measurable structural properties.
+The output is: response objects — the person's actual responses, which are cognitive artifacts with observable structural properties.
 
-The measurement is: structural analysis of the response objects across five layers.
+The observation is: structural analysis of the response objects across five layers.
 
-The profile is: the pattern of structural properties across all response objects.
+The portrait is: the pattern of structural properties across all response objects, described qualitatively and with specific textual evidence from the person's own responses.
 
-### The Five Measurement Layers
+### The Five Observation Layers
 
-Every response the person gives is analyzed across five layers:
+Every response the person gives is observed across five layers:
 
 ```
 LAYER 1: CONTENT
@@ -55,14 +75,14 @@ LAYER 2: ORDER
 What appeared first? Second? Third?
 What appeared only after prompting?
 What never appeared even after prompting?
-Retrieval order = substrate priority.
+Retrieval order reveals cognitive priority.
 
 LAYER 3: LANGUAGE STRUCTURE
-Terse or elaborate? (Processing mode signal)
-Abstract or concrete? (Depth signal)
-Present tense or past tense? (Structural vs narrative)
-Sensory or conceptual? (Imagistic/emotional vs structural)
-High or low information density? (Content per unit of language)
+Terse or elaborate?
+Abstract or concrete?
+Present tense or past tense?
+Sensory or conceptual?
+High or low information density?
 
 LAYER 4: META-COGNITIVE MOVES
 Does the person label their own retrieval?
@@ -70,12 +90,11 @@ Do they correct or refine their response?
 Do they compare themselves to others?
 Do they reference their own cognitive process?
 Do they qualify with context ("it depends")?
-Meta-cognitive moves indicate catabolic acquisition —
-the person is extracting structure from their own output
-in real time.
+Meta-cognitive moves indicate the person is extracting
+structure from their own output in real time.
 
 LAYER 5: DEPTH
-How many levels down does the response go?
+How many structural levels does the response traverse?
 Level 0: Surface event report ("I went to a beach")
 Level 1: State description ("It was relaxing")
 Level 2: Functional analysis ("I was able to unwind")
@@ -84,173 +103,210 @@ Level 3: Structural principle ("I need periodic
 Level 4: Meta-structural observation ("I notice that I
   frame experiences in terms of what they did for me
   functionally rather than what happened")
-Each additional level = deeper metabolic extraction.
+
+NOTE ON DEPTH: The depth scale describes structural
+levels within the response — how many layers of
+abstraction the person traverses. It does NOT indicate
+intelligence, value, or superiority. A Level 0 response
+may be exactly appropriate to the question. A Level 4
+response may be evasion through abstraction. Depth is
+a structural description, not an evaluation.
 ```
 
-### What the Protocol Measures
+### What the Protocol Observes
 
-The response objects, analyzed across five layers, reveal the person's position on three primary dimensions and five modulation dimensions:
+The response objects, analyzed across five layers, reveal structural patterns across several dimensions. These dimensions are described qualitatively. They are NOT numerical measurements.
 
-**PRIMARY DIMENSIONS:**
+**PRIMARY STRUCTURAL DIMENSIONS:**
 
-**Acquisition Mode (ACQ): 0-100** (0 = catabolic, 100 = anabolic)
+**Acquisition Orientation**
 How information enters the cognitive system.
-- Measured by: response structure when encountering new information — does the person extract trajectory before presentation completes (catabolic) or build sequentially (anabolic)?
-- Observable in: Learning Direction probe responses, Jumping Ahead probe responses, meta-cognitive labeling behavior, information density of responses
+- Observable through: response structure when encountering new information — does the person extract trajectory before presentation completes (extractive acquisition) or build understanding sequentially (accumulative acquisition)?
+- Also observable through: meta-cognitive labeling behavior, information density of responses, whether the person "jumps ahead" in learning scenarios
 
-**Processing Mode (PRC): 0-100** (0 = catabolic, 100 = anabolic)
-What happens to information after acquisition — the surface dissolution rate.
-- Measured by: what survives in memory retrieval responses — detail or principle? Surface or extract?
-- Observable in: Vacation probe content and order, Daily Memory decay rate, Re-Experience probe responses, Storytelling probe accuracy reports, Forgetting Portrait complementarity pattern
-- NOTE: PRC may be passion-gated. If the person retains significantly more in passion domains than non-passion domains, record PRC-engaged and PRC-disengaged separately.
+```
+STRUCTURAL DESCRIPTIONS (not numerical scores):
 
-**Retention Substrate (RET): S[__] E[__] N[__] I[__]** (sum ≈ 100)
-What KIND of extract survives the metabolic process.
-- Measured by: which channel produces the richest response objects when activated
-- Observable in: cross-probe convergence of first responses (what the mind reaches for first), forced compression products (what survives when everything else is removed), channel activation ease differentials (which channel produces most easily when prompted)
+STRONGLY EXTRACTIVE: Person consistently anticipates
+  conclusions before evidence completes. Reorganizes
+  incoming information around extracted principles.
+  Impatient with sequential presentation. Language
+  tends toward high compression.
+
+MODERATELY EXTRACTIVE: Person extracts some principles
+  mid-stream but also follows sequential development.
+  Mixed pattern. May extract in passion domains but
+  follow sequentially in unfamiliar domains.
+
+BALANCED: Neither predominantly extractive nor
+  accumulative. Context-dependent.
+
+MODERATELY ACCUMULATIVE: Person builds understanding
+  sequentially. Prefers complete information before
+  drawing conclusions. Comfortable with detail.
+
+STRONGLY ACCUMULATIVE: Person strongly prefers
+  sequential, complete presentation. Resists premature
+  extraction. Values thoroughness and specificity.
+  Language tends toward elaboration and detail.
+```
+
+**Processing Orientation**
+What happens to information after acquisition — how much surface detail is retained over time.
+- Observable through: what survives in memory retrieval responses — detail or principle? Surface or extract?
+- Also observable through: re-experience quality (re-watching movies), storytelling accuracy, forgetting patterns
+
+```
+STRUCTURAL DESCRIPTIONS:
+
+STRONGLY EXTRACTIVE PROCESSING: Surface detail
+  dissolves rapidly. What remains is structural
+  residue — the principle, the dynamic, the
+  relationship. Can re-watch familiar movies as
+  if new. Forgets specific meals quickly. Retains
+  WHY something mattered, not WHAT specifically
+  happened.
+
+MODERATELY EXTRACTIVE: Some surface detail lost,
+  large structures retained. Remembers gist and
+  major events, loses specific details and
+  temporal ordering.
+
+BALANCED: Retains a mix of surface and structural
+  content. Context-dependent.
+
+MODERATELY PRESERVATIVE: Most surface detail
+  retained alongside structural understanding.
+  Good detailed recall. Enjoys familiarity in
+  re-experience.
+
+STRONGLY PRESERVATIVE: Surface detail retained
+  with high fidelity. Specific memories accessible
+  over long periods. Re-experience is recognition,
+  not rediscovery.
+
+NOTE: Processing orientation may be PASSION-GATED.
+If the person retains significantly more detail in
+passion domains than non-passion domains, observe
+and describe BOTH orientations separately.
+```
+
+**Retention Channel Profile**
+What KIND of content the person's mind reaches for first and retains most readily.
+- Observable through: which channel produces the richest response objects when activated
+- Also observable through: cross-probe convergence of first responses, forced compression products, channel activation ease
 
 ```
 OPERATIONAL DEFINITIONS:
 
-Structural (S): Logical relationships, spatial architecture,
-  causal dynamics, abstract pattern, how things connect.
-  Language signature: present tense, conceptual, compressed,
-  "the dynamic is," "it's structured like," "the relationship
-  between X and Y"
+Structural (S): Logical relationships, spatial
+  architecture, causal dynamics, abstract pattern,
+  how things connect.
+  Language signature: present tense, conceptual,
+  compressed. "The dynamic is..." "It's structured
+  like..." "The relationship between X and Y..."
 
-Emotional (E): Feeling-tone, valence, relational atmosphere,
-  body-state associations, experiential quality.
-  Language signature: experiential, body-referenced, metaphorical,
-  "it felt like," "the vibe was," "something about it"
+Emotional (E): Feeling-tone, valence, relational
+  atmosphere, body-state associations, experiential
+  quality.
+  Language signature: experiential, body-referenced,
+  metaphorical. "It felt like..." "The vibe was..."
+  "Something about it..."
 
-Narrative (N): Sequential events, temporal ordering, story arcs,
-  what happened and when, character and plot.
-  Language signature: past tense, sequential, event-structured,
-  "first... then... then," "what happened was," chronological
+Narrative (N): Sequential events, temporal ordering,
+  story arcs, what happened and when, character and
+  plot.
+  Language signature: past tense, sequential,
+  event-structured. "First... then... then..."
+  "What happened was..." chronological organization.
 
-Imagistic (I): Visual snapshots, scenes, sensory appearance,
-  colors, light, faces, aesthetic quality.
-  Language signature: descriptive, visual, scenic, sensory detail,
-  "I can see," "it looked like," "picture this"
+Imagistic (I): Visual snapshots, scenes, sensory
+  appearance, colors, light, faces, aesthetic quality.
+  Language signature: descriptive, visual, scenic,
+  sensory detail. "I can see..." "It looked like..."
+  "Picture this..."
+
+COMMUNAL (C): Discovered through cross-religious
+analysis. Relational positioning, group dynamics,
+communal identity, argumentative partnership.
+Language signature: "We..." "The group..." "They
+said and then I said..." "It matters because of
+the people involved..."
+
+NOTE: The C channel was identified during the
+cross-religious structural analysis. Judaism's
+communal-argumentative orientation and Buddhism's
+sangha dimension both required a channel not
+captured by S, E, N, or I. The person's orientation
+toward communal vs individual processing is
+structurally observable and should be attended to.
 
 DISTINGUISHING S FROM N:
   S organizes by logical/causal relationship (WHY)
   N organizes by temporal sequence (WHEN)
   Test: conflict description
     S: "The dynamic was X causing Y because of Z"
-    N: "First A happened, then B said C, then D occurred"
+    N: "First A happened, then B said C, then D"
 
 DISTINGUISHING E FROM I:
-  E references interoceptive experience (felt inside body)
-  I references visual/sensory experience (seen with mind's eye)
+  E references interoceptive experience (felt inside)
+  I references visual/sensory experience (seen)
   Test: memory of a meaningful place
     E: "It felt warm and safe"
-    I: "The light came through the window and made patterns
-       on the wall"
+    I: "The light came through the window and made
+       patterns on the wall"
+
+DISTINGUISHING C FROM E:
+  C references the group or relational structure
+  E references personal feeling-state
+  Test: memory of a significant conversation
+    C: "What mattered was how the group shifted"
+    E: "I felt seen for the first time"
 ```
 
-**MODULATION DIMENSIONS:**
+The administrator observes which channels the person reaches for FIRST (primary channel), which channels produce rich content when prompted (accessible channels), and which channels produce thin or absent content even when prompted (weak or absent channels). The profile is the PATTERN across all channels.
 
-**Passion Scaling (PS): 0-100**
-How much the metabolic signature changes based on interest.
-- Measured by: contrast in response object quality between passion-domain and non-passion-domain probes. High PS = dramatic quality difference (rich, deep, vivid responses about passions; thin, shallow responses about obligations). Low PS = consistent quality regardless.
-- Also measured by: explicit self-report (the passion gap probe), BUT cross-checked against observable response quality differential.
+**CONTEXTUAL DIMENSIONS:**
 
-**Metabolic Clarity (MCL): 0-100**
-How clean and resolved the connections are when they arrive.
-- Measured by: the person's language when describing their engaged cognition — "clear," "precise," "unmistakable" vs "vague," "fuzzy," "approximate."
-- Also measured by: the precision of the response objects themselves. High-clarity responses are structurally precise, with clear distinctions and specific language. Low-clarity responses are diffuse, with hedging and imprecision.
-- NOTE: This dimension replaced Metabolic Rate (MR) from v2.0. Speed of processing is not reliably self-reportable because the experiencer loses time-awareness during deep processing. Clarity IS self-reportable because the experiencer can perceive the quality of their own extraction.
+The following dimensions provide additional structural context. They are described qualitatively based on observable patterns.
 
-**Metabolic Depth (MD): 0-100**
-How far below surface each extraction reaches.
-- Measured by: the number of levels in the response depth analysis. Consistently reaching Level 3-4 = high depth. Staying at Level 0-1 = low depth.
-- Also measured by: the abstraction level of the person's insights. "I see the pattern" = moderate. "I see the principle beneath the pattern" = high. "I see the principle beneath the principle and how it connects to other domains" = very high.
+**Engagement Scaling**
+How much the structural portrait changes based on interest/passion.
+- Observable through: contrast in response quality between passion-domain and non-passion-domain probes
+- High scaling: dramatic quality difference — rich, deep, vivid responses about passions; thin, shallow responses about obligations
+- Low scaling: consistent quality regardless of domain
 
-**Metabolic Capacity (MC): 0-100**
-How much processing can be sustained before overload.
-- Measured by: reported focus duration AND by response object quality over the course of the conversation itself. If responses get thinner and less structured toward the end of the conversation, the person may be approaching capacity.
-- NOTE: MC may be passion-gated. Record MC-engaged and MC-disengaged separately if evidence warrants.
+**Response Clarity**
+How precise and resolved the person's articulations are when engaged.
+- Observable through: language precision, specificity, confidence in articulation
+- Also observable through: the structural precision of the response objects themselves
 
-**Social Metabolic Load (SML): 0-100**
-How metabolically expensive social interaction is.
-- Measured by: recharging probe responses AND by the person's response quality in social scenario probes vs non-social probes.
+**Structural Depth**
+How many levels below surface the person's responses typically reach.
+- Observable through: consistent depth level across multiple probes
+- NOTE: Depth is structural description, not evaluation. See depth scale note above.
 
-**Domain Specificity (DS): 0-100**
-How much the metabolic signature varies across cognitive domains.
-- Measured by: cross-probe consistency. If response structure is uniform across domains = low DS. If response structure shifts dramatically between domains = high DS.
-- Also measured by: explicit "it depends" responses to probe questions.
+**Sustained Engagement**
+How much processing can be sustained before quality degrades.
+- Observable through: response object quality over the course of the conversation itself
+- May be passion-gated: observe separately in passion vs non-passion domains if evidence warrants
 
-NEW DIMENSION: Detection Accuracy (DA)
+**Social Processing Load**
+How the person's structural profile shifts in social vs non-social contexts.
+- Observable through: recharging probe responses AND response quality in social scenario probes vs non-social probes
+- Describes the direction and magnitude of shift, not an introversion/extroversion score
 
-DA measures whether the phenomena a person identifies
-are structurally real, INDEPENDENT of the depth at
-which they process those phenomena.
-
-DA is separate from MD (metabolic depth).
-
-A person can have:
-  High DA + High MD: Sees real things AND analyzes them
-    deeply (you, on post-modernism)
-  High DA + Low MD: Sees real things but processes them
-    shallowly (Musk, on woke mind virus)
-  Low DA + High MD: Deeply analyzes things that aren't
-    real (sophisticated conspiracy theorists)
-  Low DA + Low MD: Neither sees accurately nor processes
-    deeply (noise)
-
-The MCI must measure BOTH:
-  - Is the person pointing at something real? (DA)
-  - How deeply do they understand what they're pointing at? (MD)
-
-Previous protocol assumed DA correlated with MD.
-Your challenge reveals they're independent dimensions.
-A Level 1 processor can have perfect threat detection.
-A Level 5 processor can deeply analyze a phantom.
-
-NEW DIMENSION: Memetic Production Capacity (MPC)
-
-MPC measures the capacity to produce maximally compressed
-response objects that transmit with high fidelity across
-the widest range of metabolic profiles.
-
-MPC is INDEPENDENT of MD (metabolic depth).
-
-High MPC + High MD: Can produce deep analysis AND
-  compress it to memetic form. RARE. This is the most
-  powerful communicative configuration because the memes
-  are backed by structural depth. The compression is
-  DELIBERATE, from depth.
-  
-  Example: Nietzsche. "God is dead" is a meme that
-  compresses Level 5 analysis. The meme transmits
-  at Level 0-1. But the structural content EXISTS
-  behind it for those who engage further.
-
-High MPC + Low MD: Produces memes natively at Level 0-1.
-  The memes are authentic but lack structural backing.
-  Maximum transmission, minimum depth.
-  
-  Example: Trump. "Build the wall" is native Level 0-1
-  output. Authentic, transmissible, no structural depth
-  behind it.
-
-Low MPC + High MD: Produces deep analysis that doesn't
-  compress to memetic form. Low transmission, high depth.
-  
-  Example: Marx. Capital is Level 5 systemic analysis
-  that CANNOT be compressed without losing its content.
-  "Workers of the world unite" transmits but loses the
-  analysis entirely.
-
-Low MPC + Low MD: Neither deep nor transmissible.
-  No memetic capacity, no analytical capacity.
+**Domain Variation**
+How much the structural portrait varies across cognitive domains.
+- Observable through: cross-probe consistency
+- Low variation: structural profile is uniform across domains
+- High variation: structural profile shifts significantly between domains
 
 ### The Sufficiency Principle
 
-**A probe is not complete when the question has been asked. A probe is complete when the response object contains sufficient structural information for confident measurement.**
+**A probe is not complete when the question has been asked. A probe is complete when the response object contains sufficient structural information for confident observation.**
 
-If a response is thin — short, vague, surface-level — the AI MUST prompt for more information. The prompt should be natural and conversational, not interrogative:
+If a response is thin — short, vague, surface-level — the administrator MUST prompt for more information. The prompt should be natural and conversational, not interrogative:
 
 - "Tell me more about that."
 - "What else comes up?"
@@ -258,45 +314,64 @@ If a response is thin — short, vague, surface-level — the AI MUST prompt for
 - "Can you give me an example?"
 - "What was that actually like?"
 
-The AI continues prompting until the response object has:
+The administrator continues prompting until the response object has:
 - Clear content (what the person is talking about is identifiable)
 - Detectable order (which elements appeared first)
-- Analyzable language structure (enough language to assess terse/elaborate, abstract/concrete, etc.)
+- Analyzable language structure (enough language to assess structural features)
 - Some depth (the response goes at least one level below surface event reporting)
 
 If the person genuinely cannot produce more — if prompting produces "I don't know" or circular responses — that ITSELF is data. An empty response from a specific channel indicates that channel is weak or absent. The absence is as informative as presence.
+
+### What the Protocol Cannot Determine
+
+This section is new in v4.0 and is structurally essential. The protocol must be honest about its limits.
+
+**The protocol CANNOT determine:**
+
+1. **Whether the person's perceptions are accurate.** The protocol observes HOW the person processes — not whether what they process is real. A person can have beautiful structural clarity about things that aren't there. The protocol has no mechanism for external verification of content accuracy.
+
+2. **Whether depth is appropriate.** Level 4 meta-structural observation is not "better" than Level 1 state description. In many contexts, Level 1 is the appropriate response. The protocol describes structural depth without evaluating it.
+
+3. **Causal explanations for the observed patterns.** The protocol observes that a person processes information in a particular way. It does NOT determine why — neurology, upbringing, trauma, culture, and temperament all contribute, and the protocol cannot disentangle them.
+
+4. **Whether the patterns are stable.** A single conversation is a snapshot. People's processing orientations may shift with mood, fatigue, context, life stage, or growth. The portrait describes what was observed in THIS conversation, not a permanent cognitive identity.
+
+5. **Whether the observer's orientation biases the observation.** The five-layer analysis is itself structurally oriented — it attends to structural features of responses. This orientation may cause the method to over-detect structural processing and under-detect other modes. The administrator should be aware of this and note when the person's responses seem to resist structural categorization.
 
 ---
 
 ## PART II: SYSTEM PROMPT FOR AI ADMINISTRATOR
 
 ```
-You are conducting a Metabolic Mirror assessment. You are a
-cognitive spectrometer — your job is to run a person's cognition
-through calibrated operations and measure what comes out.
+You are conducting a Metabolic Mirror conversation. You are a
+structural observer — your job is to attend carefully to the
+structural properties of a person's cognitive artifacts and
+describe the patterns you observe.
 
 YOUR IDENTITY:
 You are warm, curious, and genuinely interested in how this
 person's mind works. You are having a real conversation, not
 administering a test. But underneath the warmth, you are
-precisely measuring the structural properties of every response.
+carefully attending to the structural properties of every
+response.
 
 YOUR PROCESS:
-1. You ask questions (cognitive operations)
-2. The person responds (cognitive artifacts)
-3. You analyze the structure of each response across five
+1. You ask questions (eliciting cognitive artifacts)
+2. The person responds (producing cognitive artifacts)
+3. You observe the structure of each response across five
    layers: Content, Order, Language Structure, Meta-Cognitive
    Moves, and Depth
-4. You build the metabolic profile progressively
+4. You build the structural portrait progressively
 5. You prompt for more information when responses are
    insufficient
-6. You deliver the Mirror — a personalized portrait with
-   falsifiable predictions
+6. You deliver the Mirror — a structural portrait with
+   specific observations traceable to the person's own
+   responses
 
 YOUR RULES:
 1. Never use framework terminology (metabolism, catabolism,
    anabolism, substrate, processing mode, etc.)
-2. Never explain what you are measuring
+2. Never explain what you are observing during the conversation
 3. Never judge or pathologize any response
 4. Record responses with maximum fidelity — exact words matter
 5. PAY ATTENTION TO:
@@ -310,20 +385,26 @@ YOUR RULES:
    - Sensory vs conceptual vocabulary
    - Information density (structural content per word)
    - Response depth (how many levels below surface)
+   - Communal vs individual framing
 6. If a response is thin, PROMPT FOR MORE.
    The probe is not done until the response object is
    structurally sufficient.
-7. Build the profile DURING the conversation. Update with
+7. Build the portrait DURING the conversation. Update with
    each response. Let later questions be informed by earlier
    observations.
 8. If they ask what you are doing: "I'm learning how your mind
    works so I can show you something about yourself I think
    you'll find genuinely interesting."
+9. When delivering the Mirror, TRACE EVERY OBSERVATION back
+   to the person's specific responses. Do not make claims
+   that are not grounded in what they actually said.
+   Say: "When I asked about X, your first response was Y,
+   which suggests Z" — not "You are Z."
 
-YOUR ANALYSIS FRAMEWORK:
-For EVERY response, conduct this analysis internally:
+YOUR OBSERVATION FRAMEWORK:
+For EVERY response, conduct this observation internally:
 
-RESPONSE OBJECT ANALYSIS:
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────┐
 │ CONTENT: What is mentioned? What is absent?        │
 │ ORDER: What came first/second/third?               │
@@ -333,22 +414,32 @@ RESPONSE OBJECT ANALYSIS:
 │ META: Self-labeling? Self-correction? Process       │
 │       reference? Comparison to others?              │
 │ DEPTH: Level 0/1/2/3/4?                            │
+│ CHANNEL: S/E/N/I/C — which is primary?             │
 │ SUFFICIENT: Yes/No → if No, prompt for more        │
 └────────────────────────────────────────────────────┘
 
-Do not show this analysis to the person. It is your internal
-measurement process.
+Do not show this observation to the person. It is your
+internal structural attention process.
 
 FOUR MOVEMENTS:
 Conduct the conversation in four movements:
-1. Memory and Forgetting (targets: PRC, initial RET)
-2. Learning and Passion (targets: ACQ, PS, MCL, MD, MC)
-3. Perception and Inner Life (targets: RET detailed weighting)
-4. Social World, Energy, and Stability (targets: SML, stress
-   patterns, stability check)
+1. Memory and Forgetting
+2. Learning and Engagement
+3. Perception and Inner Life
+4. Social World, Energy, and Stability
 
-After all movements, generate the profile and predictions
-internally, then deliver the Mirror.
+After all movements, construct the portrait and
+deliver the Mirror.
+
+CRITICAL NEW REQUIREMENT (v4.0):
+When delivering the Mirror, you MUST:
+- Trace every observation to specific responses
+- Use the person's own words as evidence
+- Distinguish between what you observed and what
+  you infer from the observation
+- State the limitations of the portrait explicitly
+- Invite correction as structurally informative,
+  not as mere courtesy
 ```
 
 ---
@@ -356,7 +447,7 @@ internally, then deliver the Mirror.
 ## PART III: THE FOUR MOVEMENTS
 
 ### Movement 1: Memory and Forgetting
-*Building: PRC, initial RET signal*
+*Observing: Processing orientation, initial channel signals*
 
 ```
 OPENING:
@@ -366,7 +457,7 @@ curious about yours."
 
 ═══════════════════════════════════════════════════════════
 PROBE 1: THE VACATION
-═════��═════════════════════════════════════════════════════
+═══════════════════════════════════════════════════════════
 
 ASK: "Think about a trip you took a few years ago. Just let it
 come to mind. What shows up first?"
@@ -378,48 +469,51 @@ THEN: "What comes next after that?"
 THEN: "If you had to capture the whole trip in one sentence,
 what would you say?"
 
-RESPONSE OBJECT ANALYSIS:
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────────┐
 │ CONTENT:                                               │
 │ What entities are named? (people, places, objects,     │
 │ activities, states, feelings)                          │
-│ What is ABSENT? (If no visual detail → I is weak.      │
-│ If no emotional content → E is weak. If no sequence    │
-│ of events → N is weak. If no spatial/logical           │
-│ structure → S is weak.)                                │
+│ What is ABSENT? (If no visual detail → I channel weak. │
+│ If no emotional content → E channel weak. If no        │
+│ sequence of events → N channel weak. If no spatial/    │
+│ logical structure → S channel weak. If no reference    │
+│ to people/group → C channel weak.)                     │
 │                                                        │
 │ ORDER:                                                 │
-│ First response = primary retrieval substrate.           │
+│ First response = primary retrieval channel.             │
 │ Categories:                                            │
 │   Location/spatial/who-with-where → S signal           │
 │   Feeling/mood/atmosphere → E signal                   │
 │   What happened/sequence of events → N signal          │
 │   A visual image/scene/sensory detail → I signal       │
+│   The people, group dynamics → C signal                │
 │                                                        │
-│ Second response = secondary substrate.                 │
+│ Second response = secondary channel.                   │
 │ The transition FROM first TO second reveals processing:│
-│   First → more detail of same type = anabolic          │
-│     (accumulating within the same channel)             │
-│   First → different type of content = catabolic        │
+│   First → more detail of same type = accumulative      │
+│     (building within the same channel)                 │
+│   First → different type of content = extractive       │
 │     (shifting to a different structural level)         │
 │   First → meta-description of own retrieval =          │
-│     catabolic acquisition with high meta-cognition     │
+│     extractive acquisition with high meta-cognition    │
 │                                                        │
-│ One-sentence compression = the metabolic EXTRACT.      │
+│ One-sentence compression = the structural EXTRACT.     │
 │ This is what survives when everything else is forced   │
-│ out. The compression product IS the retention           │
-│ substrate's output. Analyze its content type:          │
+│ out. The compression product reveals the primary       │
+│ retention channel. Observe its content type:           │
 │   Functional/structural → S extract                    │
 │   Emotional/experiential → E extract                   │
 │   Narrative/event → N extract                          │
 │   Visual/scenic → I extract                            │
+│   Relational/communal → C extract                      │
 │                                                        │
 │ LANGUAGE STRUCTURE:                                    │
 │   Terse ("went to beach, was with girlfriend") →       │
-│     compressed = catabolic processing                  │
+│     compressed = extractive processing                 │
 │   Elaborate ("we flew to Cancun on a Tuesday, and the  │
 │     resort had this beautiful pool...") →              │
-│     expanded = anabolic processing                     │
+│     expanded = accumulative processing                 │
 │   Abstract ("it was a relief") → depth > 0             │
 │   Concrete ("the water was warm") → surface retention  │
 │                                                        │
@@ -427,9 +521,8 @@ RESPONSE OBJECT ANALYSIS:
 │   If the person LABELS their own retrieval             │
 │   ("location and who I was with") → they are           │
 │   extracting the structure of their own memory         │
-│   process in real time. This is catabolic acquisition  │
-│   operating on their own cognitive output.             │
-│   Score: high meta-cognitive awareness.                │
+│   process in real time. This indicates high            │
+│   meta-cognitive awareness.                            │
 │                                                        │
 │ DEPTH:                                                 │
 │   L0: "I went to a beach" (event)                     │
@@ -441,7 +534,7 @@ RESPONSE OBJECT ANALYSIS:
 │       they did for me, not what happened" (meta)       │
 │                                                        │
 │ SUFFICIENCY: Does this response give clear signal on   │
-│ at least primary RET and PRC direction?                │
+│ at least primary channel and processing direction?     │
 │ If no → prompt: "Tell me more about what comes to mind"│
 │          or "What was it actually like?"               │
 └────────────────────────────────────────────────────────┘
@@ -460,47 +553,45 @@ IF THEY CAN'T: "Yesterday? How far back is reliable for you?"
 THEN: "When you DO remember a meal, what part survives — the
 food itself, the people, where you were, or the feeling?"
 
-RESPONSE OBJECT ANALYSIS:
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────────┐
 │ CONTENT:                                               │
-│ Can they recall? At what distance? This is the most    │
-│ direct PRC measurement: surface dissolution rate.      │
+│ Can they recall? At what distance? This directly       │
+│ reveals processing orientation — how rapidly surface   │
+│ detail dissolves.                                      │
 │                                                        │
-│ Calibration:                                           │
-│   Can't recall yesterday → PRC 0-15                    │
-│   Can recall yesterday, not 3 days → PRC 15-30         │
-│   Can recall 3 days, not a week → PRC 30-50            │
-│   Can recall a week+ → PRC 50-75                       │
-│   Can recall specific meals from weeks ago → PRC 75+   │
+│ Structural descriptions:                               │
+│   Can't recall yesterday → strongly extractive         │
+│     processing (surface dissolved rapidly)             │
+│   Can recall yesterday, not 3 days → moderately        │
+│     extractive processing                              │
+│   Can recall 3 days, not a week → balanced processing  │
+│   Can recall a week+ → moderately preservative         │
+│   Can recall specific meals from weeks ago → strongly  │
+│     preservative processing                            │
 │                                                        │
 │ WHAT SURVIVES (from the follow-up):                    │
-│ This is a direct RET channel activation.               │
-│   "The food itself" → sensory/imagistic retention      │
-│   "The people" → social/emotional retention            │
-│   "Where I was" → structural/spatial retention         │
-│   "The feeling" → emotional retention                  │
-│   "How much I enjoyed it" → emotional VALENCE          │
-│     retention (not the emotion itself but the           │
-│     enjoyment — this is pleasure/reward signal          │
-│     retention, which may indicate passion-scaling)      │
+│ This is a direct channel observation.                  │
+│   "The food itself" → sensory/imagistic channel        │
+│   "The people" → communal/emotional channel            │
+│   "Where I was" → structural/spatial channel           │
+│   "The feeling" → emotional channel                    │
+│   "How much I enjoyed it" → engagement signal          │
+│     (retention linked to passion/enjoyment)            │
 │                                                        │
 │ LANGUAGE STRUCTURE:                                    │
 │   Confident recall vs hedging ("I think..." /          │
 │   "not with certainty") → confidence in own            │
-│   retrieval maps to PRC position. Catabolic            │
-│   processors often KNOW their memory is unreliable     │
-│   and hedge preemptively.                              │
+│   retrieval. People with extractive processing         │
+│   often KNOW their memory is unreliable and            │
+│   hedge preemptively.                                  │
 │                                                        │
-│ NOTE: Distinguish WORKING MEMORY failures (walking     │
-│ into a room and forgetting why) from LONG-TERM         │
-│ metabolic processing (forgetting what you had for      │
-│ lunch). If the person mentions both, note that          │
-│ working memory and metabolic processing are             │
-│ different systems. Working memory failures indicate     │
-│ executive function capacity, not metabolic profile.     │
-│ The protocol measures metabolic profile. Working        │
-│ memory data is recorded but scored separately.          │
-└────────────────────────────────────────────────────────┘
+│ NOTE: Distinguish WORKING MEMORY issues (walking       │
+│ into a room and forgetting why) from processing        │
+│ orientation (forgetting what you had for lunch).       │
+│ Working memory relates to executive function, not      │
+│ to the structural portrait this protocol observes.     │
+└──────────────────────────────────────────────���─────────┘
 
 ═══════════════════════════════════════════════════════════
 PROBE 3: THE RE-EXPERIENCE
@@ -520,1402 +611,714 @@ IF THEY SAID PARTIALLY NEW:
 whole scenes you don't remember, or more like you remember
 the gist but not how it unfolds?"
 
-RESPONSE OBJECT ANALYSIS:
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────────┐
 │ CONTENT:                                               │
-│ The re-experience quality directly measures PRC:        │
-│   "Like the first time" → PRC 0-15 (surface fully      │
-│     catabolized, only structural residue remained)      │
-│   "Some parts new, some familiar" → PRC 15-40          │
-│     (partial surface catabolism)                       │
-│   "Familiar but notice new things" → PRC 40-60         │
-│     (moderate catabolism, structural retained,          │
-│      some surface lost)                                │
-│   "Remember it well, enjoy familiarity" → PRC 60+      │
-│     (anabolic, surface retained)                       │
+│ The re-experience quality directly reveals processing: │
+│   "Like the first time" → strongly extractive          │
+│     (surface fully dissolved, only structural residue) │
+│   "Some parts new, some familiar" → moderately         │
+│     extractive (partial surface dissolution)           │
+│   "Familiar but notice new things" → balanced          │
+│     (structural retained, some surface lost)           │
+│   "Remember it well, enjoy familiarity" → preservative │
+│     (surface retained with structure)                  │
 │                                                        │
-│ The GRANULARITY of what's forgotten:                   │
-│   "Whole scenes" → aggressive catabolism               │
-│     (large surface units dissolved)                    │
-│   "Specific details" → moderate catabolism             │
-│     (fine detail dissolved, large structure retained)   │
-│   "Just the order/unfolding" → narrative surface        │
-│     catabolized, structural/emotional retained          │
+│ GRANULARITY of what's forgotten:                       │
+│   "Whole scenes" → aggressive extraction               │
+│   "Specific details" → moderate extraction             │
+│   "Just the order/unfolding" → narrative surface       │
+│     extracted, structural/emotional preserved          │
 │                                                        │
 │ EMOTIONAL RE-PROCESSING (the sad movie question):      │
-│   Still feels emotion even knowing what's coming =      │
-│     emotional catabolism is ACTIVE — the emotional      │
-│     channel is re-processing the material with each     │
-│     viewing. This indicates emotional retention          │
-│     substrate with ongoing metabolic cycling.            │
+│   Still feels emotion knowing what's coming =          │
+│     emotional content survives processing; E channel   │
+│     retains independently of surface detail            │
+│   Emotion diminished on rewatch = emotional content    │
+│     also extracted; E linked to novelty/surface        │
+│   Emotion INCREASES on rewatch = deep emotional        │
+│     processor; E channel deepens with re-engagement    │
 │                                                        │
-│   Emotion reduced on repeat viewing = emotional         │
-│     response was surface-level (novelty-dependent).     │
-│     Emotional retention is NOT primary.                 │
-│                                                        │
-│   NUANCE: "It depends on how impactful it is" =        │
-│     passion-gated emotional re-processing. The          │
-│     emotional metabolism is selective — it re-processes  │
-│     high-impact material but not low-impact. This       │
-│     indicates emotional retention WITH passion scaling. │
-│                                                        │
-│   NUANCE: "First few times yes, then no" = emotional   │
-│     catabolism that COMPLETES — it re-processes until    │
-│     the emotional principle is fully extracted, then     │
-│     the emotional response diminishes because there's   │
-│     nothing left to extract. This is DIFFERENT from      │
-│     the person who always cries at the same scene       │
-│     (incomplete extraction, ongoing re-processing).     │
-│     The former = catabolic emotional processing.         │
-│     The latter = metabolic cycling without completion.   │
-│                                                        │
-│ LANGUAGE STRUCTURE:                                    │
-│   Note whether the person describes the re-experience   │
-│   in cognitive terms ("I notice" / "I realize") or      │
-│   experiential terms ("I feel" / "it hits me").         │
-│   Cognitive framing → structural processing of the      │
-│     re-experience itself                               │
-│   Experiential framing → emotional processing of the    │
-│     re-experience itself                               │
+│ This probe triangulates with Probe 1 and 2 to         │
+│ establish the processing orientation.                  │
+│ Convergence across probes = high confidence.           │
+│ Divergence = domain-dependent processing               │
+│ (record separately).                                   │
 └────────────────────────────────────────────────────────┘
 
-═══════════════════════════════════════════════════════════
+════════════════════════════════��══════════════════════════
 PROBE 4: THE STORYTELLING
 ═══════════════════════════════════════════════════════════
 
-ASK: "When you tell people stories about things that happened
-to you, do they ever say you're getting the details wrong?"
+ASK: "When you tell stories about things that happened to
+you — are you accurate? Like, if someone who was there
+heard your version, would they say you got it right?"
 
-IF YES: "What do YOU think is happening when that occurs?"
-IF NO: "Are you the person who remembers the details everyone
-else forgot?"
+THEN: "What part do you usually get wrong — the details,
+the order, or the overall impression?"
 
-THEN: "When you tell a story, what do you naturally focus on —
-what happened step by step, what it looked like, how it felt,
-or what it really meant underneath?"
+THEN: "Do you sometimes realize you've been telling a story
+a certain way that isn't exactly how it happened?"
 
-RESPONSE OBJECT ANALYSIS:
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────────┐
 │ CONTENT:                                               │
-│ Corrected vs detail-keeper = PRC signal (as before)    │
+│ Self-reported accuracy directly addresses processing:  │
+│   "Not very accurate" → extractive processing          │
+│     (surface dissolved, narrative reconstructed        │
+│      from structural residue)                          │
+│   "Pretty accurate" → preservative processing          │
+│     (surface intact, narrative faithful)               │
+│   "Accurate on the meaning, not the details" →         │
+│     classic extractive signature: structural           │
+│     residue retained, surface details lost             │
 │                                                        │
-│ BUT ALSO: the EXPLANATION for discrepancy is rich data: │
-│   "I remember it differently" + confidence →            │
-│     strong trust in own retention substrate              │
-│   "People fill in gaps I don't notice because they      │
-│     weren't important to me" → PASSION-GATED PRC.       │
-│     This is critical: the person is not catabolizing     │
-│     uniformly. They're catabolizing selectively based    │
-│     on importance/interest. Non-important surface is     │
-│     aggressively dissolved. Important surface is         │
-│     retained with higher fidelity.                      │
-│   "I reconstruct from how it felt" → emotional          │
-│     retention as reconstruction anchor                   │
-│   "I remember the main point but not the details" →     │
-│     structural retention as reconstruction anchor        │
+│ WHAT GETS WRONG:                                       │
+│   Details → moderate extraction (fine grain lost)      │
+│   Order → narrative surface extracted (temporal        │
+│     structure dissolved, non-temporal retained)        │
+│   Overall impression → surface retained but            │
+│     emotional/structural meaning shifted               │
+│     (suggests reconstruction from partial data)        │
 │                                                        │
-│ STORY FOCUS is a direct RET indicator:                  │
-│   "What happened step by step" → N                      │
-│   "What it looked like" → I                             │
-│   "How it felt" → E                                     │
-│   "What it really meant" → S                            │
-│                                                        │
-│ BUT ALSO ANALYZE THE RESPONSE ITSELF:                   │
-│   "The structure of the story and having the person     │
-│    experience it through my eyes" → This response       │
-│    contains TWO signals:                                │
-│    1. "Structure of the story" → S (organizing by       │
-│       structural architecture)                          │
-│    2. "Having the person experience it through my eyes" │
-│       → experiential transmission (empathic/emotional   │
-│       intent — wanting others to FEEL what you felt)    │
-│    This indicates S primary with E secondary as a       │
-│    COMMUNICATION goal even if not a primary retention    │
-│    substrate.                                           │
-│                                                        │
-│ META-COGNITIVE MOVES:                                   │
-│   If the person ANALYZES their own memory process       │
-│   in their response ("I feel like I remember specific   │
-│   things more than others depending what they are") →   │
-│   they are extracting the pattern of their own          │
-│   retrieval. This is catabolic acquisition operating    │
-│   on their own cognition. High meta-cognitive           │
-│   awareness. Note this.                                 │
+│ META-COGNITIVE AWARENESS (the "realize" question):     │
+│   If they recognize they modify stories → high         │
+│     meta-cognitive awareness of own processing         │
+│   If they don't notice until told → lower              │
+│     meta-cognitive awareness of processing             │
+│   If they actively curate stories → deliberate         │
+│     narrative construction (different from             │
+│     unconscious surface dissolution)                   │
 └────────────────────────────────────────────────────────┘
 
 ═══════════════════════════════════════════════════════════
 PROBE 5: THE FORGETTING PORTRAIT
 ═══════════════════════════════════════════════════════════
 
-ASK: "What frustrates you most about your memory?"
-THEN: "And what's something your memory does really well —
-something you notice you remember when others don't?"
+ASK: "Describe your forgetting style. Not your memory —
+your forgetting. What does your forgetting look like?"
 
-RESPONSE OBJECT ANALYSIS:
+WAIT. This probe is intentionally unusual. The person's
+response to being asked about something they've never been
+asked about reveals deep structural features.
+
+IF THEY STRUGGLE: "Like — do things fade gradually, or
+do you just realize one day that something is completely
+gone? Or is it something else entirely?"
+
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────────┐
-│ The frustration IS the catabolism's cost.               │
-│ The strength IS the retention substrate's product.      │
+│ This is the most structurally revealing probe in       │
+│ Movement 1. The person has never been asked this.      │
+│ Their response is constructed in real time from        │
+│ their actual experience of their own processing.       │
 │                                                        │
-│ COMPLEMENTARITY CHECK:                                  │
-│ The frustration and the strength should be opposite     │
-│ sides of the same metabolic process:                    │
+│ CONTENT:                                               │
+│   "Gradual fade" → preservative processing             │
+│     (surface dissolves slowly, like decay)             │
+│   "Suddenly gone" → extractive processing              │
+│     (surface catabolized completely; only residue)     │
+│   "I keep the important parts" → selective             │
+│     extraction (structural content retained,           │
+│      surface discarded selectively)                    │
+│   "I reorganize" → constructive processing             │
+│     (memories actively restructured, not just          │
+│      passively dissolved)                              │
 │                                                        │
-│   "Forget details / remember concepts" → catabolic PRC, │
-│     structural RET. COMPLEMENTARY.                     │
-│   "Forget names / remember feelings" → catabolic PRC,   │
-│     emotional RET. COMPLEMENTARY.                      │
-│   "Forget what happened / remember how it looked" →     │
-│     catabolic PRC, imagistic RET. COMPLEMENTARY.       │
-│   "Remember details well / sometimes can't see the      │
-│     big picture" → anabolic PRC, potentially weak       │
-│     catabolic extraction. COMPLEMENTARY.               │
+│ LANGUAGE STRUCTURE:                                    │
+│   The METAPHORS they use for forgetting are            │
+│   diagnostically rich:                                 │
+│     "Fading" → continuous process, passive             │
+│     "Falling away" → discrete loss, passive            │
+│     "Filtering" → active selection, structural         │
+│     "Compressing" → active extraction, structural      │
+│     "Rewriting" → active reconstruction, narrative     │
 │                                                        │
-│   If frustration and strength are NOT complementary:    │
-│   the profile may be more complex than three dimensions │
-│   capture. Record this as complexity flag.              │
+│ META-COGNITIVE:                                        │
+│   Can they describe their forgetting at all?           │
+│   If yes → high meta-cognitive access to own           │
+│     processing                                         │
+│   If no → lower meta-cognitive access                  │
+│   (BOTH are normal. Neither is superior.)              │
 │                                                        │
-│ CRITICAL DISTINCTION:                                   │
-│ Working memory failures (walking into rooms, forgetting │
-│ to close doors, losing train of thought mid-sentence)   │
-│ are EXECUTIVE FUNCTION, not metabolic profile.           │
-│ Long-term memory patterns (forgetting meals, losing     │
-│ details over days/weeks, retaining principles/feelings  │
-│ over years) ARE metabolic profile.                      │
-│ If the person reports BOTH:                             │
-│   Record working memory separately.                     │
-│   Do not conflate with metabolic processing mode.       │
-│   Note: "Subject reports executive function challenges  │
-│   in addition to metabolic profile indicators."         │
-│                                                        │
-│ PASSION-GATED PRC:                                     │
-│ If the person says something like "I remember things    │
-│ well IF I find them interesting":                       │
-│   This is passion-gated processing. PRC is not uniform. │
-│   In passion domains: PRC shifts toward anabolic         │
-│     (more surface retained because the material is      │
-│      metabolically valued)                              │
-│   Outside passion domains: PRC is aggressively catabolic │
-│     (surface dissolved because the material is not       │
-│      metabolically valued)                              │
-│   Record: PRC-engaged [___] and PRC-disengaged [___]    │
-│   The RANGE between them IS the Passion Scaling.        │
-│   PS = PRC-disengaged minus PRC-engaged                 │
-│   (larger gap = higher PS)                              │
-│                                                        │
-│ LANGUAGE STRUCTURE:                                     │
-│   Note the emotional texture of how they describe their │
-│   frustration. Frustration implies they VALUE what they  │
-│   lose. What they value losing reveals what they         │
-│   consider important (retention substrate preference).   │
-│   What they are proud of retaining reveals their         │
-│   substrate strength.                                   │
+│ COMPLEMENTARITY CHECK:                                 │
+│   Does the forgetting portrait COMPLEMENT the          │
+│   retention portrait? (If they retain structural       │
+│   content and lose surface → forgetting should be      │
+│   of surfaces/details. If they retain emotional        │
+│   content → forgetting should be of non-emotional      │
+│   content.) Complementarity = convergent evidence.     │
+│   Non-complementarity = observe more carefully;        │
+│   domain-dependent processing may be occurring.        │
 └────────────────────────────────────────────────────────┘
-
-BY END OF MOVEMENT 1 YOU SHOULD HAVE:
-- PRC estimate with confidence level
-- PRC passion-gating assessment (uniform vs gated)
-- Initial RET signal (primary and secondary from first responses)
-- Working memory vs metabolic processing distinction
-- Meta-cognitive awareness level
-- Response style baseline (terse/elaborate, abstract/concrete)
 ```
 
-### Movement 2: Learning and Passion
-*Building: ACQ, PS, MCL, MD, MC*
+### Movement 2: Learning and Engagement
+*Observing: Acquisition orientation, engagement scaling, clarity, depth, sustained engagement*
 
 ```
-TRANSITION: "That's really interesting — your memory has a
-clear personality to it. I want to ask you about something
-related — how you learn things."
-
-═══════════════════════════════════���═══════════════════════
+═══════════════════════════════════════════════════════════
 PROBE 6: THE LEARNING DIRECTION
 ═══════════════════════════════════════════════════════════
 
-ASK: "When you're learning something completely new — zero
-background — where do you prefer to start? Big picture
-overview, or basics building up?"
+ASK: "When you're learning something new — really learning
+it, not just memorizing — do you tend to start with the big
+picture and fill in details, or build from details up to
+the big picture?"
 
-THEN: "If someone teaching you spends a lot of time on
-background before getting to the point — does that help
-or frustrate?"
+THEN: "Can you think of something you learned recently
+where you noticed your approach?"
 
-RESPONSE OBJECT ANALYSIS:
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────────┐
 │ CONTENT:                                               │
-│   Big picture first → ACQ < 40 (catabolic)             │
-│   Basics first → ACQ > 60 (anabolic)                   │
-│   "Depends on subject" → high DS, probe further        │
+│   "Big picture first" → extractive acquisition         │
+│     (framework first, details second)                  │
+│   "Details first" → accumulative acquisition           │
+│     (components first, framework emerges)              │
+│   "Depends on the subject" → domain-dependent          │
+│     acquisition (observe which domains are which)      │
+│   "Both simultaneously" → dual-mode acquisition        │
+│     (may indicate high structural complexity or        │
+│      may indicate the person hasn't examined this)     │
 │                                                        │
-│ BUT ANALYZE THE RESPONSE STRUCTURE:                    │
-│ The person may give an EXAMPLE. The example is more    │
-│ revealing than the categorical answer.                  │
+│ The EXAMPLE they provide:                              │
+│   Analyze the example's structural features            │
+│   independently of their self-report. Does the         │
+│   example SHOW the approach they CLAIM?                │
+���   Match = self-awareness confirmed                     │
+│   Mismatch = interesting divergence (record both)      │
 │                                                        │
-│ Example analysis (from Eric's actual response):         │
-│   "When I was learning calculus, I was learning x^n     │
-│    derivative through the process but once I was told   │
-│    just take n multiply by x^n and divide by x, it all │
-│    made so much sense."                                │
-│                                                        │
-│ This example reveals:                                   │
-│   1. He tried the anabolic path first (learning the    │
-│      process step by step) — it wasn't working          │
-│   2. He received the catabolic input (the principle,    │
-│      the shortcut, the structural rule)                 │
-│   3. Everything "made so much sense" = the principle    │
-│      ILLUMINATED the accumulated detail                 │
-│   4. His ACQ is catabolic — he needs the principle      │
-│      FIRST, then the detail becomes meaningful          │
-│   5. But he CAN accumulate detail anabolically — it     │
-│      just doesn't produce understanding until the       │
-│      principle arrives                                  │
-│                                                        │
-│   This is MORE PRECISE than just "big picture first."   │
-│   It's: principle-first, then detail becomes structured │
-│   by the principle. Not "skip the detail." Rather:      │
-│   "give me the structural key and then I can organize   │
-│   all the detail through it."                          │
-│                                                        │
-│ FRUSTRATION RESPONSE:                                  │
-│   "That frustrates me" → catabolic ACQ confirmed       │
-│   "That helps" → anabolic ACQ                          │
-│   "I lose my point if they keep going" → working        │
-│     memory constraint interacting with catabolic ACQ.   │
-│     The person extracts the point, working memory        │
-│     tries to hold it, continued input overflows          │
-│     working memory, point is lost. This is WHY          │
-│     they interrupt — metabolic urgency to externalize    │
-│     the extracted point before it dissolves from         │
-│     working memory.                                     │
-│                                                        │
-│ META-COGNITIVE MOVES:                                   │
-│   If the person explains WHY they prefer their approach │
-│   ("because once I have the big picture, I can connect  │
-│   things easily") → they are extracting the structural  │
-│   principle of their own learning process.              │
-│   This is catabolic acquisition applied to self-         │
-│   knowledge. High meta-cognitive awareness.             │
+│ META-COGNITIVE:                                        │
+│   Can they articulate their learning approach?         │
+│   The ability to describe HOW they learn is itself     │
+│   meta-cognitive. The richness of the description      │
+│   indicates meta-cognitive depth.                      │
 └────────────────────────────────────────────────────────┘
 
 ═══════════════════════════════════════════════════════════
 PROBE 7: THE PASSION GAP
 ═══════════════════════════════════════════════════════════
 
-ASK: "Think about learning something you're genuinely
-fascinated by versus something you learn out of obligation.
-If 1 is 'barely any difference' and 10 is 'basically a
-different person' — where are you?"
+ASK: "Is there a subject or activity where your mind just
+works differently? Like it's a different brain when you're
+engaged with it?"
 
-THEN: "When you're learning something you're really into —
-what does that state actually feel like?"
+IF YES: "Describe what that's like. How is it different
+from how your mind works on things you don't care about?"
 
-IF THEY DESCRIBE IT: "Stay with that. What's happening
-mentally? Does time change? What about physically?"
+IF NO: "Your mind feels the same regardless of what
+you're working on?"
 
-RESPONSE OBJECT ANALYSIS:
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────────┐
-│ The numerical self-rating × 10 = initial PS estimate.  │
-│ But the DESCRIPTION is more valuable than the number.  │
+│ CONTENT:                                               │
+│ The GAP between passion-mode and default-mode is the   │
+│ engagement scaling signal.                             │
 │                                                        │
-│ CONTENT of the engagement description:                 │
-│ What metaphors do they reach for?                      │
-│   "Nourishment" → metabolic metaphor (they literally   │
-│     frame engaged cognition as FEEDING)                 │
-│   "Flow" → absorption metaphor                         │
-│   "On fire" → energy/activation metaphor               │
-│   "Clear" → clarity metaphor                           │
-│   "Connected" → structural metaphor                    │
-│   "Alive" → vitality metaphor                          │
+│   Large gap: "Completely different brain" = high        │
+│     engagement scaling. The structural portrait         │
+│     shifts significantly with interest.                 │
+│   Small gap: "A bit more focused" = low scaling.        │
+│     Portrait is relatively consistent.                  │
+│   No gap: "Same brain" = very low scaling OR            │
+│     the person hasn't noticed (probe further).          │
 │                                                        │
-│ The metaphor reveals what the engagement FEELS LIKE    │
-│ from inside — and that feeling is the phenomenology     │
-│ of the metabolic process:                              │
-│   Feeding metaphors → the RARFL cycle being nourished  │
-│   Clarity metaphors → high MCL (metabolic clarity)     │
-│   Connection metaphors → structural RET processing     │
-│   Energy metaphors → high activation state              │
-│   Absorption metaphors → boundary dissolution between   │
-│     self and material                                   │
+│ HOW they describe the difference:                      │
+│   "Faster" → speed-gated                               │
+│   "Clearer" → clarity-gated                            │
+│   "Deeper" → depth-gated                               │
+│   "Can't stop" → capacity-gated (can sustain          │
+│     engagement indefinitely in passion domain)         │
+│   "Everything connects" → structural processing        │
+│     activated by passion                               │
+│   "I feel it more" → emotional processing              │
+│     activated by passion                               │
+│   "I see it" → imagistic processing                    │
+│     activated by passion                               │
 │                                                        │
-│ LANGUAGE STRUCTURE:                                     │
-│   Vivid, embodied, rich description → the person has    │
-│     strong access to their engaged phenomenology        │
-│   Sparse, uncertain description → either lower PS       │
-│     or lower meta-cognitive access to own states        │
-│                                                        │
-│ KEY DISTINCTION — Speed vs Clarity:                     │
-│   If the person says "fast" or "rapid" → note this but │
-│     probe deeper: "Fast like the connections come        │
-│     quickly? Or fast like time moves quickly?"          │
-│   If they say "clear" or "meaningful" or "precise" →   │
-│     this is MCL, not speed. The connections arrive       │
-│     with HIGH RESOLUTION, not necessarily high          │
-│     frequency.                                         │
-│   If they CORRECT themselves ("not rapid — clear") →   │
-│     this self-correction is extremely high-value data.  │
-│     They initially reached for the speed frame           │
-│     (because culture associates intelligence with        │
-│     speed) but then rejected it because it didn't        │
-│     match their actual phenomenology. The correction     │
-│     reveals that clarity, not speed, is the accurate     │
-│     description of their processing quality.             │
-│   Score: MCL from their corrected description.          │
-│   Note: Speed is not self-reportable. Clarity is.       │
-│                                                        │
-│ EXTREME PS INDICATORS:                                  │
-│   "Forgotten to eat/drink/sleep" → PS > 90             │
-│     (informational metabolic engagement SUPPRESSES      │
-│      biological metabolic awareness)                    │
-│   "I have never met anyone like me in this regard" →    │
-│     PS is experienced as outlier-level. The person       │
-│     recognizes their own passion-scaling as extreme      │
-│     relative to observed others.                        ���
-│   "Completely different person" → PS > 85               │
-│   "Big difference but I can manage" → PS 50-70          │
-│   "Some difference" → PS 30-50                          │
-│   "Not much difference" → PS < 30                       │
+│ NOTE: Compare the STRUCTURAL QUALITY of their          │
+│ response about passion domains to the quality of       │
+│ their responses in Probes 1-5 (which were about        │
+│ non-specific memories). If the passion response is     │
+│ noticeably richer, more structured, deeper, or more    │
+│ vivid, you are OBSERVING the engagement scaling in     │
+│ real time. This observation is more reliable than       │
+│ their self-report.                                     │
 └────────────────────────────────────────────────────────┘
 
 ═══════════════════════════════════════════════════════════
-PROBE 8: THE FOCUS PORTRAIT
+PROBE 8: THE JUMPING AHEAD
 ═══════════════════════════════════════════════════════════
 
-ASK: "When you're really in the zone — fully locked in —
-what does that state feel like? And how long can you stay?"
+ASK: "When someone is explaining something to you — at
+work, in a class, a friend telling a story — do you ever
+find yourself jumping ahead? Like you've already figured
+out where they're going?"
 
-THEN: "If someone interrupts you in that state, what happens?"
-THEN: "When you come out of it naturally, how do you feel?"
+IF YES: "What happens next? Do you let them finish? Do
+you say something? Does it create any friction?"
 
-RESPONSE OBJECT ANALYSIS:
+IF NO: "Do you prefer to hear the whole thing before
+forming a view?"
+
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────────┐
-│ DURATION → MC (Metabolic Capacity)                     │
-│   "All day if uninterrupted" → MC-engaged > 90         │
-│   "Several hours" → MC-engaged 70-90                   │
-│   "An hour or two" → MC-engaged 50-70                  │
-│   "30 min or less" → MC-engaged 30-50                  │
+│ CONTENT:                                               │
+│   Jumps ahead frequently → extractive acquisition      │
+│     (trajectory extracted before presentation          │
+│      completes)                                        │
+│   Sometimes → moderate extraction                      │
+│   Rarely/never → accumulative acquisition              │
+│     (completes reception before processing)            │
 │                                                        │
-│ NOTE: Duration may be PASSION-GATED.                   │
-│ If the person can sustain all day on passion material   │
-│ but cannot focus for 30 minutes on non-passion material:│
-│   MC-engaged: [high]                                   │
-│   MC-disengaged: [low]                                 │
-│   The RANGE is another PS confirmation.                 │
+│ The SOCIAL CONSEQUENCE (friction question):            │
+│   "I finish their sentences" → high extraction +       │
+│     low social filtering                               │
+│   "I wait but I already know" → high extraction +      │
+│     high social filtering                              │
+│   "It depends on who it is" → social-context-          │
+│     dependent expression                               │
+│   "I'm often wrong when I jump ahead" →                │
+│     extraction without accuracy (attempted             │
+│     extraction that misfires — important                │
+│     to distinguish from accurate extraction)           │
 │                                                        │
-│ INTERRUPTION RESPONSE:                                 │
-│   "Frustrated and taxing" → deep metabolic investment   │
-│   "Don't want to lose my spot" → the metabolic process │
-│     has built a navigational position that cannot be    │
-│     easily reconstructed. Interruption risks losing      │
-│     the ENTIRE structural position, not just the         │
-│     current thought. This indicates deep extraction     │
-│     (high MD) with limited working memory support       │
-│     for holding the full extraction state.              │
-│   "Mildly annoying but I can get back" → moderate       │
-│     investment or high working memory capacity           │
-│   "Easy to switch" → shallow engagement or high          │
-│     cognitive flexibility                               │
-│                                                        │
-│ AFTER-STATE:                                           │
-│   "Energized" → the metabolic process was FED           │
-│     (passion-matched content, MC not exceeded)          │
-│   "Drained" → MC exceeded                              │
-│   "Empty but satisfied" → catabolism COMPLETED          │
-│     (the material was fully extracted, nothing left      │
-│      to process, the system is depleted but the         │
-│      work is done)                                     │
-│   "Want more" → extraction incomplete, want to continue │
-│   "Disoriented" → deep absorption state, re-entry to   │
-│     normal consciousness is jarring                    │
-│                                                        │
-│ DEPTH ANALYSIS:                                        │
-│   The person's DESCRIPTION of the focus state reveals   │
-│   their metabolic depth (MD). Listen for:               │
-│   "I see how things connect" → MD moderate (seeing       │
-│     first-order connections)                            │
-│   "I see the pattern underneath" → MD high (extracting  │
-│     principles beneath surface connections)             │
-│   "I see connections across domains that I didn't       │
-│     expect" → MD very high (cross-domain structural      │
-│     extraction)                                        │
-│   "Things connect clearly, meaningfully" → high MCL     │
-│     (quality of extraction is high regardless of speed) │
+│ LANGUAGE STRUCTURE:                                    │
+│   Is their RESPONSE to this question terse or          │
+│   elaborate? This reveals whether they practice        │
+│   what they describe — if they describe jumping        │
+│   ahead and their answer is compressed and             │
+│   anticipatory, the behavior matches the report.       │
 └────────────────────────────────────────────────────────┘
 
 ═══════════════════════════════════════════════════════════
-PROBE 9: THE INTEREST ARCHAEOLOGY
+PROBE 9: THE ENGAGEMENT PHENOMENOLOGY
 ═══════════════════════════════════════════════════════════
 
-ASK: "Do you tend to have a few deep interests that stay with
-you for years, or lots of different interests that come and go?"
+ASK: "When you're really deeply engaged with something —
+in the zone — what does that actually feel like? Not
+what you're doing, but the quality of the experience itself."
 
-THEN: "When you lose interest in something, what does that
-feel like? Sudden or gradual?"
+THEN: "Is it more like sharp focus or like dissolving into
+the activity?"
 
-THEN: "Looking back at old interests — did you get what you
-needed from them, or leave something unfinished?"
+THEN: "And when you come out of it — what's that transition
+like?"
 
-RESPONSE OBJECT ANALYSIS:
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────────┐
-│ INTEREST PATTERN:                                      │
-│   Few deep + stable → anabolic-specialist              │
-│   Many + shifting → catabolic-explorer                 │
-│   Few deep + shifting → catabolic-specialist            │
-│   Many + stable → anabolic-explorer                    │
+│ This is the most phenomenologically rich probe.        │
+│ The person is describing their subjective experience   │
+│ of engaged cognition.                                  │
 │                                                        │
-│ LOSS OF INTEREST MECHANISM:                            │
-│ This is where the probe gets NUANCED. There are three   │
-│ distinct mechanisms and the response object reveals      │
-│ which one is operative:                                 │
+│ CONTENT:                                               │
+│   "Sharp focus" → concentrated, boundaried engagement  │
+│   "Dissolving" → unboundaried, flowing engagement      │
+│   "Everything else disappears" → immersive engagement  │
+│   "Time stops" → engagement disrupts temporal          │
+│     awareness (common in deep processing)              │
+│   "It clicks" or "It resolves" → clarity signal        │
+│   "It flows" → continuous processing without           │
+│     interruption                                       │
 │                                                        │
-│ 1. EXTRACTION COMPLETION:                              │
-│    "I got what I needed from it"                       │
-│    The person can articulate what they extracted.        │
-│    Interest loss accompanied by sense of COMPLETION.    │
-│    The structural principle was obtained. Surface        │
-│    became unrewarding because nothing left to extract.   │
-│    → Catabolic processing. Extraction is the purpose.   │
+│ THE TRANSITION OUT (coming out of engagement):         │
+│   "Jarring" → deep immersion, sharp boundary           │
+│   "Gradual" → shallow immersion, soft boundary         │
+│   "Tired/drained" → high capacity expenditure          │
+│   "Energized" → engagement produces rather than        │
+│     consumes energy                                    │
+│   "Disoriented" → temporal awareness disrupted         │
+│   "Need to reorient" → deep structural shift           │
+│     between engaged and default modes                  │
 │                                                        │
-│ 2. COMPETITIVE DISPLACEMENT:                           │
-│    "Something else grabbed my attention"                │
-│    "Usually dependent on another interest overtaking"   │
-│    Interest wasn't finished — it was OUTCOMPETED.       │
-│    A new extraction opportunity exceeded the current    │
-│    one for metabolic resources. The old interest isn't  │
-│    complete — it's SHELVED.                             │
-│    → Catabolic-explorer with high passion-scaling.      │
-│    The new interest activated the RARFL cycle more       │
-│    strongly than the current one.                       │
-│    Probe deeper: "Do you leave things in a state where  │
-│    you could come back?" If yes → return architecture.  │
-│    If no → may indicate novelty-drive rather than        │
-│    extraction.                                         │
-│                                                        │
-│ 3. NOVELTY FADE:                                       │
-│    "I just lost interest" / "I don't know why"          │
-│    The person CANNOT articulate what they got.           │
-│    No sense of completion. No specific competing         │
-│    interest. Just... gone.                              │
-│    This MAY be extraction that completed below           │
-│    conscious awareness (unconscious catabolism).         │
-│    OR it may be novelty-dependent engagement             │
-│    (dopaminergic drive, not extraction).                │
-│    DISTINGUISH: "Looking back, do you feel like you     │
-│    understand something from that interest that you     │
-│    didn't before?" If yes → unconscious extraction.     │
-│    If no → novelty-driven, not extraction-driven.       │
-│                                                        │
-│ 4. ABANDONMENT:                                        │
-│    "I left it unfinished and it bothers me"             │
-│    The person WANTED to continue but didn't.            │
-│    The extraction was incomplete. They know it.          │
-│    → Either external disruption (life circumstances)    │
-│    or MC exceeded (couldn't sustain the engagement).    │
-│    Probe: "What stopped you?" to distinguish.           │
-│                                                        │
-│ This probe now distinguishes four mechanisms that v2.0  │
-│ conflated under "catabolic interest cycling."           │
-│ The distinction addresses the ADHD-confound critique.   │
+│ LANGUAGE STRUCTURE:                                    │
+│   Sensory/body-referenced → E/I channels describing    │
+│     the phenomenology                                  │
+│   Structural/analytical → S channel describing the     │
+│     phenomenology (meta-structural observation of      │
+│     own engagement)                                    │
+│   Metaphorical → E channel using structural metaphors  │
+│     (or S channel using emotional metaphors)           │
+│   Difficulty describing → the experience may resist    │
+│     the channels the person has available; the         │
+│     gap between experience and description is data     │
 └────────────────────────────────────────────────────────┘
-
-═══════════════════════════════════════════════════════════
-PROBE 10: THE JUMPING AHEAD
-═══════════════════════════════════════════════════════════
-
-ASK: "When someone's explaining something to you, do you
-tend to jump ahead to where you think they're going, or
-follow step by step?"
-
-THEN: "When you jump ahead, are you usually right?"
-THEN: "Does it frustrate you when you've already gotten the
-point but they keep going?"
-
-RESPONSE OBJECT ANALYSIS:
-┌────────────────────────────────────────────────────────┐
-│ BASIC ACQ SIGNAL:                                      │
-│   Jumps ahead + usually right → catabolic ACQ          │
-│   Step by step → anabolic ACQ                          │
-│                                                        │
-│ BUT THE NUANCE MATTERS:                                │
-│ "I try to see where it's going" is different from       │
-│ "I jump to the conclusion."                            │
-│                                                        │
-│ "Try to see where it's going" = structural trajectory   │
-│   extraction. The person is modeling the STRUCTURE of    │
-│   the explanation, not just predicting the endpoint.     │
-│   This is catabolic ACQ operating on the presentation    │
-│   itself — extracting the structural trajectory of       │
-│   someone else's reasoning in real time.                │
-│                                                        │
-│ "Jump to the conclusion" = endpoint prediction. May be   │
-│   pattern-matching rather than structural extraction.    │
-│   Less reliable as ACQ indicator.                       │
-│                                                        │
-│ FRUSTRATION NUANCE:                                    │
-│   "Yes, it frustrates me" → strong catabolic ACQ with   │
-│     low tolerance for surface redundancy                │
-│   "I like more information but impactful information" → │
-│     NOT simply catabolic ACQ. This is SIGNAL-DENSITY    │
-│     seeking. The person wants MORE input but only if     │
-│     the input carries structural weight. Redundant       │
-│     information is noise. Novel structural information   │
-│     is signal. They're filtering for signal density,     │
-│     not for less input.                                 │
-│   This refines ACQ: not "wants less" but "wants denser" │
-│   Score: catabolic ACQ but with high information         │
-│     appetite for signal-dense input.                    │
-│   "I appreciate the detail even after getting the point" │
-│     → anabolic flexibility. Can use detail even when     │
-│     principle is already extracted.                      │
-└────────────────────────────────────────────────────────┘
-
-BY END OF MOVEMENT 2 YOU SHOULD HAVE:
-- ACQ estimate with nuance (signal-density vs big-picture)
-- PS estimate from both self-report and response quality differential
-- MCL from engagement phenomenology description
-- MD from depth of focus description
-- MC with passion-gating assessment
-- Interest cycling mechanism (extraction/displacement/novelty/abandonment)
-- ADHD-confound assessment
 ```
 
 ### Movement 3: Perception and Inner Life
-*Building: RET detailed weighting with cross-probe triangulation*
+*Observing: Detailed channel profile, cross-channel patterns*
 
 ```
-TRANSITION: "I'm getting a really clear picture. Let me ask
-about something a little different — your inner perceptual life."
-
 ═══════════════════════════════════════════════════════════
-PROBE 11: THE CHILDHOOD HOME
+PROBE 10: THE MEANINGFUL PLACE
 ═══════════════════════════════════════════════════════════
 
-ASK: "Think about the home you grew up in. Just let it come
-to mind. What's there?"
+ASK: "Think of a place that means a lot to you. Not the
+most important — just one that comes to mind. Describe
+it to me."
 
-WAIT. Do NOT offer categories. The unprompted response is the
-primary data.
+WAIT. Let them describe. Do not prompt for specific
+channels.
 
-THEN ACTIVATE EACH CHANNEL:
-"Can you walk me through the layout?"
-"Can you describe what it LOOKED like — colors, light?"
-"What did it FEEL like to be there?"
-"Tell me a story from that house."
+THEN: "If someone asked you WHY that place matters to
+you, what would you say?"
 
-RESPONSE OBJECT ANALYSIS:
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────────┐
-│ UNPROMPTED RESPONSE = PRIMARY RET                      │
-│   Layout/structure/organization → S                    │
-│   Visual image/scene/sensory detail → I               │
-│   Feeling/atmosphere/emotional quality → E             │
-│   Event/story/something that happened → N              │
+│ This probe activates ALL channels simultaneously.      │
+│ Which channel the person reaches for FIRST is          │
+│ the strongest signal in the entire protocol.           │
 │                                                        │
-│ CHANNEL ACTIVATION ASSESSMENT:                         │
-│ For each of the four follow-up prompts, measure:       │
+│ FIRST RESPONSE:                                        │
+│   Visual description → I primary                       │
+│     "There's this window with light..."                │
+│   Feeling/atmosphere → E primary                       │
+│     "It felt like home..."                             │
+│   Story/history → N primary                            │
+│     "My family used to go there every summer..."       │
+│   Structure/layout → S primary                         │
+│     "It's this room with a desk facing..."             │
+│   People/relationships → C primary                     │
+│     "It's where my friends and I would..."             │
 │                                                        │
-│   RESPONSE RICHNESS (0-3):                             │
-│     0 = Cannot access ("I don't really remember")      │
-│     1 = Sparse, effortful, generic                     │
-│     2 = Moderate detail, some vividness                 │
-│     3 = Rich, vivid, detailed, flows easily            │
+│ The WHY question shifts from description to meaning.   │
+│ The channel used for the MEANING may differ from the   │
+│ channel used for the DESCRIPTION. This divergence      │
+│ reveals the relationship between perception channel    │
+│ and meaning-making channel.                            │
+│   Same channel → unified processing                    │
+│   Different channel → split processing                 │
+│     (perceives through one channel, makes meaning      │
+│      through another)                                  │
+└────────────────────────────────────────────────────────┘
+
+══════════════════════════════════════════════════════════��
+PROBE 11: THE INNER VOICE
+═══════════════════════════════════════════════════════════
+
+ASK: "When you're just thinking — not about anything in
+particular, just your mind doing its thing — what's the
+texture of that? Like, is it words? Images? Feelings?
+Something else?"
+
+THEN: "When you're thinking ABOUT something specifically —
+working through a problem — does the texture change?"
+
+RESPONSE OBJECT OBSERVATION:
+┌────────────────────────────────────────────────────────┐
+│ DEFAULT COGNITION:                                     │
+│   "Words / inner monologue" → verbal-structural        │
+│     processing (S or N depending on whether the        │
+│     words describe structure or narrate events)        │
+│   "Images / visual" → imagistic processing (I)         │
+│   "Feelings / body sensations" → emotional             │
+│     processing (E)                                     │
+│   "Abstract shapes / spatial" → structural             │
+│     processing (S) in imagistic form                   │
+│   "Music / rhythm" → sonic processing (I variant)      │
+│   "I'm not sure / it's hard to describe" →             │
+│     either low meta-cognitive access to inner          │
+│     life OR inner life that doesn't conform to         │
+│     standard categories (probe further)                │
+│   "Nothing much / quiet" → low default-mode            │
+│     activity OR low meta-cognitive awareness of        │
+│     it (distinguish through follow-up)                 │
 │                                                        │
-│   RESPONSE LATENCY (in text: length of response):      │
-│     Short/sparse → weak channel                        │
-│     Long/detailed → strong channel                     │
-│                                                        │
-│   RESPONSE LANGUAGE:                                   │
-│     Concrete sensory detail → genuine channel access    │
-│     Generic/abstract description → constructed, not     │
-│       retrieved (the person is BUILDING a description   │
-│       rather than RETRIEVING one — this channel is      │
-│       not their natural retention mode)                 │
-│                                                        │
-│   Layout:     Richness [0-3] → S strength              │
-│   Visual:     Richness [0-3] → I strength              │
-│   Feeling:    Richness [0-3] → E strength              │
-│   Story:      Richness [0-3] → N strength              │
-│                                                        │
-│ CULTURAL NOTE:                                         │
-│   Story richness may be culturally inflated in          │
-│   narrative-prominent cultures. Cross-check with        │
-│   Probes 13 and 14. If N is strong ONLY in this        │
-│   probe but weak in music and lasting impact probes,    │
-│   cultural confound is likely.                         │
-│                                                        │
-│ COMPARISON SIGNAL:                                     │
-│   The DIFFERENCE between channels is the data.          │
-│   If all four are equally rich → balanced RET or high   │
-│     meta-cognitive capacity (can access all channels)   │
-│   If one is dramatically richer → clear primary RET     │
-│   If two are rich and two are sparse → dual-substrate   │
-│     profile                                            │
+│ ENGAGED vs DEFAULT (the texture change question):      │
+│   Same texture → consistent processing mode             │
+│   Different texture → engagement activates              │
+│     different channels; this maps to engagement        │
+│     scaling                                            │
+│   "More intense same thing" → engagement amplifies     │
+│     default mode                                       │
+│   "Completely different" → engagement shifts to        │
+│     a different processing mode entirely               │
 └────────────────────────────────────────────────────────┘
 
 ═══════════════════════════════════════════════════════════
-PROBE 12: THE IMPORTANT CONVERSATION
+PROBE 12: FORCED CHANNEL ACTIVATION
 ═══════════════════════════════════════════════════════════
 
-ASK: "Think about a conversation that really mattered to you.
-What do you remember about it?"
+ASK each in sequence:
 
-WAIT for unprompted response.
+"Describe your childhood home — just the physical space."
+(Activates I and S channels)
 
-THEN: "Do you remember the actual words?"
-"The main point or meaning?"
-"How it made you feel?"
-"The scene — where you were, what it looked like?"
+"What was the emotional atmosphere of that home?"
+(Activates E channel)
 
-RESPONSE OBJECT ANALYSIS:
+"Tell me about a specific event that happened there."
+(Activates N channel)
+
+"Who was there? What were the relationships like?"
+(Activates C channel)
+
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────────┐
-│ Same structure as Probe 11: unprompted → primary,       │
-│ channel activation → richness rating per channel.       │
+│ Each question activates a specific channel.            │
+│ Compare response QUALITY across channels:              │
 │                                                        │
-│ CROSS-DOMAIN CHECK:                                    │
-│ Compare with Probe 11 (spatial memory) vs this          │
-│ (social memory):                                       │
-│   Same ranking → consistent RET, low DS                │
-│   Different ranking → domain-specific RET, elevated DS │
-│   Note which domains activate which substrates.         │
+│ RICH RESPONSE = strong channel                         │
+│   Detailed, vivid, specific, emotionally charged,      │
+│   structurally complex, or narratively developed.      │
+│   The person accesses this channel easily.             │
 │                                                        │
-│ "ACTUAL WORDS" is a special probe:                      │
-│   Remembering exact words = anabolic surface retention  │
-│     of linguistic detail. This is NOT narrative          │
-│     retention — it's SURFACE retention in the            │
-│     linguistic channel. The distinction:                 │
-│   "I remember what they said" (exact words) = anabolic  │
-│   "I remember the gist of what they said" = moderate    │
-│   "I remember what it meant" = structural extraction    │
-│   "I remember how it made me feel" = emotional extract  │
-│   "I remember the scene" = imagistic retention          │
+│ THIN RESPONSE = weak channel                           │
+│   Brief, vague, generic, or effortful.                 │
+│   The person struggles to produce content in this      │
+│   channel.                                             │
+│                                                        │
+│ CHANNEL BLEED = channel leakage                        │
+│   When asked for emotion, person gives structure.      │
+│   When asked for events, person gives feelings.        │
+│   The channel they bleed INTO is their dominant        │
+│   channel — it activates even when not asked for.      │
+│                                                        │
+│ NOTE ON TRAUMA:                                        │
+│ Childhood home questions may activate trauma           │
+│ responses. WATCH FOR:                                  │
+│   - Sudden flattening of affect                        ��
+│   - Deflection/topic change                            │
+│   - "I don't really remember" (may be genuine          │
+│     processing or may be protective)                   │
+│   - Emotional flooding                                 │
+│                                                        │
+│ If any of these appear:                                │
+│   1. Do not push                                       │
+│   2. Acknowledge: "That's useful information too.      │
+│      We can move on."                                  │
+│   3. Note the observation (the protective response     │
+│      is itself data about processing)                  │
+│   4. Move to the next probe                            │
+│   5. Do NOT interpret trauma in the Mirror delivery    │
+│      unless you are a qualified clinician               │
 └────────────────────────────────────────────────────────┘
-
-═══════════════════════════════════════════════════════════
-PROBE 13: THE MUSIC WINDOW
-═══════════════════════════════════════════════════════════
-
-ASK: "When you listen to music, what grabs you? What do you
-notice?"
-
-WAIT for unprompted response.
-
-THEN IF NEEDED:
-"Do you notice lyrics, melody, rhythm, or something else?"
-"Does music ever give you visual images?"
-"Does music change how you feel? How fast?"
-"Do you notice the structure — patterns, how it's built?"
-
-RESPONSE OBJECT ANALYSIS:
-┌────────────────────────────────────────────────────────┐
-│ Music is the CLEANEST retention substrate probe.        │
-│ Music has no inherent semantic content in any channel.  │
-│ What the person FINDS in music reveals what their       │
-│ metabolism PROJECTS onto ambiguous stimuli.              │
-│                                                        │
-│ Weight this probe MORE HEAVILY than probes with         │
-│ higher cultural confound potential.                     │
-│                                                        │
-│ Content analysis:                                      │
-│   "Lyrics" → N (linguistic/narrative processing)       │
-│   "Emotional response" → E (direct emotional metabolism)│
-│   "Visual images" → I (cross-modal imagistic processing)│
-│   "Structure/patterns" → S (architectural perception)  │
-│   "Rhythm/body response" → somatic processing          │
-│     (may indicate E or a kinesthetic channel not fully  │
-│      captured by the S/E/N/I model — note this)        │
-│                                                        │
-│ Emotional response SPEED:                              │
-│   Instant → emotional channel is primary and fast       │
-│   Gradual → emotional channel is secondary or slow      │
-│   "Rarely" → emotional RET is not primary for music     │
-│                                                        │
-│ MOST VALUABLE DATA:                                    │
-│   The person's UNPROMPTED first response to "what grabs │
-│   you" — before any categories are offered.             │
-│   This reveals what the metabolism REACHES FOR FIRST    │
-│   when encountering a pure perceptual stimulus.         │
-└────────────────────────────────────────────────────────┘
-
-═══════════════════════════════════════════════════════════
-PROBE 14: THE LASTING IMPACT
-═══════════════════════════════════════════════════════════
-
-ASK: "Think of a movie, book, or experience that really
-affected you — stayed with you long after. What stuck?"
-
-WAIT. This single unprompted response is the most direct
-RET measurement in the entire protocol.
-
-THEN: "Was it the craft, a specific image, the feeling, or
-the story?"
-
-RESPONSE OBJECT ANALYSIS:
-┌────────────────────────────────────────────────────────┐
-│ The unprompted "what stuck" response = the metabolic    │
-│ product. What remained after the experience was fully   │
-│ processed. THIS IS THE RETENTION SUBSTRATE DIRECTLY     │
-│ EXPRESSED.                                             │
-│                                                        │
-│ TRIANGULATE across probes 11, 12, 13, 14:             │
-│                                                        │
-│ Record primary RET signal from each probe:             │
-│   Probe 11 (home):         [S/E/N/I]                  │
-│   Probe 12 (conversation): [S/E/N/I]                  │
-│   Probe 13 (music):        [S/E/N/I]                  │
-│   Probe 14 (lasting impact):[S/E/N/I]                 │
-│                                                        │
-│ CONVERGENCE CHECK:                                     │
-│   Same primary across 3-4 probes → HIGH CONFIDENCE     │
-│     in primary RET identification.                     │
-│   Same primary across 2 probes → MODERATE confidence.  │
-│     Need additional probing.                           │
-│   No convergence → COMPLEX profile. Possibly            │
-│     dual-substrate, high DS, or the probes are          │
-│     activating different domain-specific profiles.      │
-│     Note and probe further.                            │
-│                                                        │
-│ WEIGHT THE PROBES:                                     │
-│   Music (13) and Lasting Impact (14) have LOWER          │
-│   cultural confound than Home (11) and Conversation (12).│
-│   If music and lasting impact agree but home and         │
-│   conversation disagree → trust music and lasting impact.│
-│   If all four agree → very strong signal.               │
-│   If music disagrees with everything → music may be      │
-│   activating a different domain or the person's          │
-│   relationship with music is atypical. Note.            │
-└────────────────────────────────────────────────────────┘
-
-═════════════════════════════════════════════��═════════════
-PROBE 15: THE ARTICULATION WINDOW
-═══════════════════════════════════════════════════════════
-
-ASK: "Do you ever feel like you understand something clearly
-but can't quite explain it to others?"
-
-IF YES: "What's that like? Is it that you can't find the
-right words, or that the words don't capture what you mean?"
-
-"Are there people who seem to get you even when you can't
-say it clearly? What's different about them?"
-
-"Is it easier for you to explain by writing, talking,
-drawing, or showing?"
-
-RESPONSE OBJECT ANALYSIS:
-┌────────────────────────────────────────────────────────┐
-│ FREQUENCY of articulation difficulty:                   │
-│   Frequent → wisdom > knowledge gap (structural          │
-│     perception exceeds articulation capacity)           │
-│   Rare → wisdom ≈ knowledge (perception matched          │
-│     with expression capacity)                           │
-│                                                        │
-│ NATURE of difficulty:                                   │
-│   "Can't find the words" → non-linguistic retention      │
-│     substrate (the extract exists in S, E, or I but      │
-│     the linguistic encoding channel is weak)            │
-│   "Words don't capture what I mean" → retention substrate│
-│     contains MORE than language can encode               │
-│     S: relationships are multi-dimensional, language is  │
-│        linear → compression loss                        │
-│     E: feeling has texture words don't capture           │
-│     I: visual has detail words flatten                   │
-│                                                        │
-│ PEOPLE WHO "GET" THEM:                                  │
-│   Same-substrate retainers → they perceive in the same  │
-│     channel, no translation needed                      │
-│   What's "different about them" → the person is          │
-│     describing metabolic compatibility without the       │
-│     framework's language                                │
-│                                                        │
-│ PREFERRED EXPRESSION MEDIUM = substrate-compatible       │
-│   output channel:                                       │
-│   Writing → N or S (language-compatible substrates)      │
-│   Speaking → N or E (real-time social channels)          │
-│   Drawing → I (visual substrate bypasses language)       │
-│   Showing/demonstrating → S or kinesthetic               │
-│                                                        │
-│ NOTE: The articulation probe is also a meta-cognitive    │
-│ assessment. The person who can DESCRIBE their own        │
-│ articulation difficulty with precision ("it's not that   │
-│ I can't find words, it's that the words don't capture    │
-│ it") is demonstrating high meta-cognitive awareness      │
-│ AND structural extraction of their own cognitive         │
-│ process.                                               │
-└────────────────────────────────────────────────────────┘
-
-BY END OF MOVEMENT 3 YOU SHOULD HAVE:
-- Confirmed RET weighting: S[__] E[__] N[__] I[__]
-- Cross-probe convergence confidence level
-- Cultural confound assessment
-- Domain specificity (DS) from cross-domain comparison
-- Wisdom-knowledge gap assessment
-- Preferred expression medium
 ```
 
 ### Movement 4: Social World, Energy, and Stability
-*Building: SML, stress patterns, stability check, global confirmation*
+*Observing: Social processing load, stress patterns, stability*
 
 ```
-TRANSITION: "I'm getting a really rich picture of your inner
-life. Last area — how all of this plays out socially and in
-your energy."
-
-═══════════════════════════════════════════════════════════
-PROBE 16: THE DISAGREEMENT
+═���═════════════════════════════════════════════════════════
+PROBE 13: THE SOCIAL RECHARGE
 ═══════════════════════════════════════════════════════════
 
-ASK: "When you're talking with someone who sees something
-differently — not a fight, just a genuine difference — what's
-your instinct?"
+ASK: "After a long day of being around people — work,
+social stuff, whatever — what do you need? What
+recharges you?"
 
-RESPONSE OBJECT ANALYSIS:
+THEN: "And when you've been alone for a while — what
+starts to happen? What do you start wanting?"
+
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────────┐
-│ Social metabolic orientation:                          │
-│   "Understand their view" → catabolic social            │
-│     (extracting their structural basis)                 │
-│   "Explain mine" → anabolic social                     │
-│     (building their structure into the other person)    │
-│   "Find common ground" → balanced / emotional RET       │
-│     (seeking relational coherence)                     │
+│ CONTENT:                                               │
+│ The RECHARGE response reveals social processing load:  │
+│   "Alone time / quiet / nothing" → social interaction  │
+│     has high processing cost                           │
+│   "More people / different people" → social            │
+│     interaction is energizing, not costly              │
+│   "Depends on who I was with" → social load is         │
+│     person-dependent (some people cost more than       │
+│     others)                                            │
+│   "I need to process" → processing backlog             │
+│     accumulated during social interaction              │
 │                                                        │
-│ ANALYZE THE RESPONSE LANGUAGE:                         │
-│   Does the person describe PROCESS or GOAL?            │
-│   Process: "I try to understand where they're coming   │
-│     from" → catabolic (extraction-oriented)             │
-│   Goal: "I want us to agree" → emotional RET           │
-│     (relational harmony as primary value)              │
-│   Principle: "I want to find what's actually true" →   │
-│     structural RET (truth-seeking as primary value)     │
-└────────────────────────────────────────────────────────┘
-
-══════════════════════════���════════════════════════════════
-PROBE 17: THE FRIEND'S PROBLEM
-═══════════════════════════════════════════════════════════
-
-ASK: "When a friend comes to you upset about something —
-what do you actually do FIRST? Not what you think you should.
-What's your real first move?"
-
-THEN: "Is there a gap between what you do and what you think
-you should?"
-
-THEN: "After helping someone through something hard, what do
-you remember about it later?"
-
-RESPONSE OBJECT ANALYSIS:
-┌────────────────────────────────────────────────────────┐
-│ FIRST MOVE = social metabolic orientation:              │
-│   Ask questions → catabolic (extract the situation)    │
-│   Empathize → emotional RET (metabolic resonance)      │
-│   Offer solutions → anabolic (build resolution)        │
-│   Just listen → emotional resonance OR low social      │
-│     metabolic confidence (probe to distinguish)        │
+│ The ALONE response reveals social need:                │
+│   "I start wanting connection" → social need present   │
+│   "I'm fine alone indefinitely" → very low social      │
+│     need OR avoidant pattern (distinguish through      │
+│     response quality — genuine contentment vs          │
+│     defended withdrawal)                               │
+│   "I get restless" → social need building              │
+│   "I need specific people, not people in general" →    │
+│     selective social need (C channel nuance)           │
 │                                                        │
-│ INSTINCT vs SHOULD gap:                                │
-│   Gap exists → social conditioning overriding           │
-│     metabolic truth                                    │
-│   No gap → metabolic orientation matches social norms   │
-│   The size and direction of the gap is informative:     │
-│     "I want to fix it but I know I should listen" →    │
-│       anabolic instinct, emotional social norm          │
-│     "I listen but I think I should offer more help" → │
-│       emotional instinct, anabolic social norm         │
-│                                                        │
-│ WHAT'S REMEMBERED LATER = RET applied to social        │
-│   experience:                                          │
-│   "How they felt / how I felt" → E                     │
-│   "What happened / how it resolved" → N                │
-│   "The dynamic / what was really going on" → S         │
-│   "The scene / their face" → I                         │
+│ CROSS-CHECK with conversational behavior:              │
+│   Is the person's response quality different in        │
+│   this social-focused probe than in earlier probes?    │
+│   If more engaged → social domain is a passion         │
+│   If less engaged → social domain is low interest      │
+│   (This observation is MORE reliable than their        │
+│    self-report about social needs.)                    │
 └────────────────────────────────────────────────────────┘
 
 ═══════════════════════════════════════════════════════════
-PROBE 18: THE RECHARGING
+PROBE 14: THE STRESS SIGNATURE
 ═══════════════════════════════════════════════════════════
 
-ASK: "After being around people for a while, do you need
-time alone to recharge, or do you recharge BY being around
-people?"
+ASK: "When things get really stressful — not everyday
+stress, but the kind where you're genuinely overwhelmed —
+what happens to your thinking?"
 
-THEN: "When you're recharging alone, what do you actually do?"
-THEN: "How long until you feel ready?"
-THEN: "Are there specific people who DON'T drain you? What's
-different about them?"
+THEN: "What breaks down first?"
 
-RESPONSE OBJECT ANALYSIS:
+THEN: "And what stays intact even when everything else
+is falling apart?"
+
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────────┐
-│ SML SCORING:                                           │
-│   Alone to recharge → SML > 50                         │
-│   Social recharging → SML < 50                         │
-│   Duration of recovery → SML intensity                 │
-│     Hours → SML > 70                                   │
-│     Brief break → SML 50-70                            │
-│     Minimal → SML < 50                                 │
+│ This probe reveals the STRUCTURAL ARCHITECTURE         │
+│ under stress — what's load-bearing and what collapses. │
 │                                                        │
-│ RECHARGING ACTIVITY reveals metabolic mode:            │
-│   "Nothing / zone out / stare at wall" → the "rest"    │
-│     is actually ACTIVE INTERNAL CATABOLISM with          │
-│     reduced input. The metabolism is running but         │
-│     needs low-input conditions to process backlog.      │
-│   "Something specific (reading, creating, organizing)" │
-│     → anabolic restoration (rebuilding depleted          │
-│     structure through familiar activity)                │
-│   "Physical activity (exercise, walk)" → somatic        │
-│     catabolism (physical metabolism clearing              │
-│     informational backlog)                              │
+│ WHAT BREAKS DOWN FIRST:                                │
+│   This is the person's WEAKEST structural element.     │
+│   "Can't think clearly" → clarity degrades first       │
+│   "Can't remember things" → processing capacity        │
+│     degrades first                                     │
+│   "Can't feel anything" → emotional channel shuts      │
+│     down first (protective or overwhelmed)             │
+│   "Everything is chaotic" → structural organization    │
+│     breaks down first                                  │
+│   "I can't be around people" → social capacity         │
+│     degrades first                                     │
+│   "I can't see the point" → depth/meaning degrades     │
+│     first                                              │
 │                                                        │
-│ NON-DRAINING PEOPLE reveal metabolic compatibility:    │
-│   "People who get me without me having to explain" →   │
-│     same retention substrate (no translation needed)    │
-│   "People who are calm / low-demand" → the drain is    │
-│     from social PERFORMANCE requirements, not from      │
-│     social INTERACTION per se                          │
-│   "People I can be quiet with" → the drain is from     │
-│     OUTPUT requirements (having to externalize is        │
-│     expensive)                                         │
-│   WHAT makes them different is diagnostic of the         │
-│   person's social metabolic needs.                     │
+│ WHAT STAYS INTACT:                                     │
+│   This is the person's LOAD-BEARING structural         │
+│   element — what holds even under maximum stress.      │
+│   "I can still analyze" → S channel is load-bearing    │
+│   "I still feel" → E channel is load-bearing           │
+│   "I can still function day-to-day" → practical        │
+│     N channel is load-bearing                          │
+│   "My relationships stay solid" → C channel is         │
+│     load-bearing                                       │
+│   "I can still see clearly" → clarity is load-bearing  │
+│                                                        │
+│ The FIRST-TO-BREAK / LAST-TO-BREAK pattern is          │
+│ structurally informative: the person's cognitive       │
+│ architecture reveals itself under stress. What         │
+│ survives stress is the deepest structural foundation.  │
 └────────────────────────────────────────────────────────┘
 
 ═══════════════════════════════════════════════════════════
-PROBE 19: THE OVERLOAD
+PROBE 15: THE RELATIONSHIP MIRROR
 ═══════════════════════════════════════════════════════════
 
-ASK: "What happens when you've had TOO MUCH — too much going
-on, too much information, too many people? What does that
-overload actually feel like?"
+ASK: "In your closest relationships �� the ones that
+really work — what do those people provide for you?
+Not just emotionally, but in terms of how you think
+and function."
 
-THEN: "What do you do when you hit that point?"
-THEN: "How long does recovery take?"
+THEN: "And what do you think you provide for them?"
 
-RESPONSE OBJECT ANALYSIS:
+RESPONSE OBJECT OBSERVATION:
 ┌────────────────────────────────────────────────────────┐
-│ OVERLOAD PHENOMENOLOGY = metabolic breakdown mode:      │
+│ What the person SEEKS in others often reveals their    │
+│ own weak or absent channels:                           │
+│   "They ground me" → person may lack E stability       │
+│   "They get my ideas" → person seeks S-compatible      │
+│     partners                                           │
+│   "They bring warmth" → person may be S-dominant       │
+│     seeking E supplementation                          │
+│   "They remember things I forget" → person has         │
+│     extractive processing and seeks preservative       │
+│     partners                                           │
+│   "They pull me out of my head" → person is S or       │
+│     I dominant and seeks E/C activation                │
 │                                                        │
-│ "Everything chaotic / nothing makes sense /             │
-│  groundless / anxious" → CATABOLIC EXCESS              │
-│   The metabolism is dissolving too much. Structure      │
-│   that should be stable is being catabolized.           │
-│   The person loses ground. Nothing holds.               │
+│ What the person PROVIDES reveals their own strongest   │
+│ channels:                                              │
+│   "I help them see clearly" → S channel exported       │
+│   "I make them feel safe" → E channel exported         │
+│   "I remember everything" → preservative processing    │
+│     exported                                           │
+│   "I bring the energy" → engagement/capacity           │
+│     exported                                           │
+│   "I hold things together" → organizational S          │
+│     exported                                           │
 │                                                        │
-│ "Everything stuck / can't process / frozen /            │
-│  can't think" → ANABOLIC EXCESS                        │
-│   The metabolism has stopped. Accumulated material       │
-│   is not being processed. The system is backed up.      │
-│   Nothing moves.                                       │
-│                                                        │
-│ "Emotionally overwhelmed / feel everything too much /   │
-│  can't stop feeling" → EMOTIONAL RET OVERLOAD          │
-│   The emotional processing channel is saturated.        │
-│   The person is taking in emotional data faster than    │
-│   it can be metabolized.                               │
-│                                                        │
-│ "Brain fog / can't focus / fuzzy" → CAPACITY EXCEEDED  │
-│   MC limit reached. The system cannot process more       │
-│   regardless of mode.                                  │
-│                                                        │
-│ "Irritable / snapping / short-tempered" → SML EXCEEDED │
-│   Social metabolic load exceeded. The person's social    │
-│   processing resources are depleted.                   │
-│                                                        │
-│ RECOVERY STRATEGY = metabolic self-regulation:          │
-│   Sleep → full metabolic reset                         │
-│   Exercise → somatic catabolism                        │
-│   Isolation → reduce input to allow processing         │
-│   Routine/familiar → anabolic restoration              │
-│   Creative activity → catabolic expression             │
-│                                                        │
-│ The overload phenomenology should be CONSISTENT with    │
-│ the metabolic profile. Catabolic-dominant people should │
-│ experience catabolic excess. Anabolic-dominant should    │
-│ experience anabolic excess. If the breakdown mode        │
-│ CONTRADICTS the profile, investigate — it may reveal    │
-│ a profile error or a more complex dynamic.             │
+│ CROSS-CHECK: Does the relationship portrait             │
+│ complement the channel profile from earlier probes?    │
+│ Convergent = high confidence in the portrait.          │
+│ Divergent = the person may present differently in      │
+│ relationships than in solo cognition (which is         │
+│ itself a meaningful observation).                      │
 └────────────────────────────────────────────────────────┘
-
-═══════════════════════════════════════════════════════════
-PROBE 20: THE TIME WINDOW
-═══════════════════════════════════════════════════════════
-
-ASK: "How does time feel for you? When you're doing something
-you love, what happens to time?"
-
-RESPONSE OBJECT ANALYSIS:
-┌────────────────────────────────────────────────────────┐
-│ Time disappears → deep metabolic absorption             │
-│   (consciousness fully embedded in process,             │
-│    no external reference frame)                        │
-│ Time speeds up → heightened engagement but discrete     │
-│   awareness maintained                                 │
-│ Time is consistent → lower metabolic absorption or      │
-│   moderate PS                                          │
-│                                                        │
-│ NOTE from v3.0: Time perception does NOT measure        │
-│ metabolic speed. It measures ABSORPTION — how fully     │
-│ the consciousness is embedded in the metabolic          │
-│ process. Time disappearing means the experiencer is     │
-│ INSIDE the process without an external reference        │
-│ frame. This can happen at any processing speed.         │
-│ A slow-but-deep processor and a fast-but-shallow        │
-│ processor can both report time disappearing.            │
-│                                                        │
-│ The CONTRAST between time-during-engagement and         │
-│ time-during-boredom maps to PS:                        │
-│   Extreme contrast → high PS                           │
-│   Moderate contrast → moderate PS                      │
-│   Little contrast → low PS                             │
-└────────────────────────────────────────────────────────┘
-
-═══════════════════════════════════════════════════════════
-PROBE 21: THE POST-INTENSITY
-═══════════════════════════════════════════════════════════
-
-ASK: "After a really intense conversation or experience — one
-where you were fully engaged — do you feel energized or
-drained?"
-
-THEN: "Does it depend on the kind?"
-THEN: "What kinds energize you? What kinds drain you?"
-
-RESPONSE OBJECT ANALYSIS:
-┌────────────────────────────────────────────────────────┐
-│ "Energized" → passion-matched content fed the cycle    │
-│ "Drained" → MC exceeded or content was passion-         │
-│   mismatched                                           │
-│ "Depends" → passion-scaling (PS confirmation)          │
-│                                                        │
-│ What ENERGIZES = metabolic preference:                  │
-│   Abstract/theoretical → S retention                   │
-│   Emotional/personal → E retention                     │
-│   Stories/histories → N retention                      │
-│   Vivid description/aesthetic → I retention            │
-│                                                        │
-│ What DRAINS = metabolic non-preference:                 │
-│   Forced detail → catabolic PRC forced into anabolic   │
-│   Forced abstraction → anabolic PRC lacking foundation │
-│   Forced emotional engagement → non-E RET forced into  │
-│     emotional processing                               │
-│   Forced sustained socializing → high SML              │
-└────────────────────────────────────────────────────────┘
-
-═══════════════════════════════════════════════════════════
-PROBE 22: THE SLEEP WINDOW
-═══════════════════════════════════════════════════════════
-
-ASK: "How's your sleep? Is your mind quiet or active when
-you're trying to fall asleep?"
-
-THEN: "When it won't shut off, what's happening in there?"
-
-RESPONSE OBJECT ANALYSIS:
-┌────────────────────────────────────────────────────────┐
-│ Mind active at sleep onset → metabolic process still    │
-│   running. The catabolism or anabolism hasn't completed.│
-│   Material is still being processed.                   │
-│                                                        │
-│ CONTENT of active mind:                                │
-│   Replaying events → anabolic re-processing            │
-│   Making connections / insights → catabolic extraction  │
-│   Worrying / emotional cycling → emotional metabolism   │
-│     on resistant material                              │
-│   Planning / building → anabolic construction          │
-│   Random / chaotic → possible catabolism without        │
-│     structure, or overload state                       │
-│                                                        │
-│ DISTINGUISH: Emotional cycling (same content repeating  │
-│   without resolution) from emotional processing (content│
-│   developing, deepening, resolving over time).          │
-│   Cycling = possible rumination (dysregulation)         │
-│   Processing = healthy emotional catabolism             │
-│   Probe if cycling is reported: "Does that content       │
-│   change over time or does it repeat the same way?"     │
-│   Changes → processing (healthy)                       │
-│   Repeats → rumination (potential clinical concern)     │
-└────────────────────────────────────────────────────────┘
-
-═══════════════════════════════════════════════════════════
-STABILITY CHECK
-═══════════════════════════════════════════════════════════
-Weave naturally into the conversation here.
-
-PROBE S1: "Has the way your mind works ever changed? Has there
-been a point where you felt your memory or thinking shifted?"
-
-IF YES:
-"When did that happen?"
-"What was going on in your life?"
-"What was your thinking like before?"
-"Is the change permanent or does it come and go?"
-
-PROBE S2: "Are you going through anything particularly
-stressful right now? Not to pry — just because I know stress
-can affect how our mind operates."
-
-IF YES: "Do you feel like your thinking is different right now
-than normal?"
-
-PROBE S3: (ONLY if therapeutic context or if earlier responses
-suggest trauma)
-"Have you been through something really difficult that you feel
-changed how your mind works? You don't need to say what it was."
-
-IF YES: "Did it change your thinking and memory, not just how
-you feel?"
-
-STABILITY SCORING:
-┌────────────────────────────────────────────────────────┐
-│ No change + no stressor + no trauma → STABLE           │
-│   Profile confidence: HIGH                             │
-│                                                        │
-│ Gradual developmental change → NORMAL DEVELOPMENT      │
-│   Profile confidence: MODERATE-HIGH                    │
-│   Note trajectory                                      │
-│                                                        │
-│ Change linked to event → STATE MODULATION              │
-│   Profile confidence: MODERATE                         │
-│   Record pre-event self-report AND current profile     │
-│                                                        │
-│ Trauma + cognitive change → TRAUMA FLAG                 │
-│   Profile confidence: LOW for trait interpretation      │
-│   Record both profiles                                 │
-│   In Mirror: acknowledge the distinction                │
-│                                                        │
-│ Current acute stress → STATE ALERT                      │
-│   Note: "Administered during reported high stress"     │
-│   Profile may be stress-shifted                        │
-│                                                        │
-│ EMOTIONAL RETENTION vs EMOTIONAL RUMINATION:            │
-│ If emotional processing was prominent in earlier probes,│
-│ add this probe:                                        │
-│ "When you remember how something felt — does your       │
-│  understanding of that feeling change over time? Or     │
-│  does it feel the same as it always did?"              │
-│                                                        │
-│ Changes over time → healthy emotional retention          │
-│   (metabolism processing, extracting deeper truth)      │
-│ Unchanged → possible rumination (metabolism stuck,       │
-│   cycling without extraction)                          │
-│ Note which is present for clinical relevance.           │
-└────────────────────────────────────────────────────────┘
-
-═══════════════════════════════════════════════════════════
-PROBE 23: THE SELF-PORTRAIT
-═══════════════════════════════════════════════════════════
-
-ASK: "Last one, and it's the most open. If you had to describe
-HOW your mind works to someone — not how smart, but the way
-you think — what would you say?"
-
-THEN: "What's your biggest cognitive strength?"
-THEN: "What's your biggest cognitive frustration?"
-THEN: "Is there a way of thinking you see in others that you
-wish came more naturally?"
-
-RESPONSE OBJECT ANALYSIS:
-┌────────────────────────────────────────────────────────┐
-│ This is the GLOBAL CONFIRMATION probe.                  │
-│                                                        │
-│ The self-description should be CONSISTENT with the      │
-│ profile built from Movements 1-3.                      │
-│                                                        │
-│ ANALYZE THE RESPONSE OBJECT ITSELF:                    │
-│   How does the person describe their cognition?         │
-│   The structure of their self-description reveals       │
-│   their metabolic profile THROUGH its own structure:    │
-│                                                        │
-│   Terse, principle-focused self-description →           │
-│     catabolic processor describing themselves           │
-│     catabolically                                      │
-│   Detailed, sequential self-description →               │
-│     anabolic processor describing themselves            │
-│     anabolically                                       │
-│   Feeling-based self-description →                     │
-│     emotional retainer describing themselves             │
-│     through their primary channel                      │
-│   Visual metaphors in self-description →               │
-│     imagistic retainer using their primary channel      │
-│                                                        │
-│ The WAY they describe their mind IS the mind            │
-│ describing itself. The medium IS the message.           │
-│ The response object's structure confirms or              │
-│ disconfirms the profile.                               │
-│                                                        │
-│ COMPLEMENTARITY CHECK:                                  │
-│   Strength + frustration should be complementary        │
-│   (opposite sides of same metabolic process)            │
-│   Complementary → profile is internally consistent      │
-│   Non-complementary → profile may be more complex       │
-│                                                        │
-│ COGNITIVE ENVY reveals WEAK CHANNEL:                    │
-│   "Wish I could remember details" → catabolic PRC       │
-│   "Wish I could see the big picture" → anabolic PRC     │
-│   "Wish I could express feelings" → S RET envying E     │
-│   "Wish I could be more logical" → E RET envying S      │
-│   "Wish I could be more creative" → anabolic PRC        │
-│     envying catabolic novel-connection ability           │
-│   What they envy IS what their metabolism doesn't do.    │
-│   This is the most HONEST probe because people are      │
-│   usually accurate about what they lack.                │
-└────────────────────────────────────────────────────────┘
-
-BY END OF MOVEMENT 4 YOU SHOULD HAVE:
-- Social metabolic orientation
-- SML with context (who drains, who doesn't, why)
-- Stress/overload pattern (breakdown mode, recovery, triggers)
-- Stability assessment
-- Emotional retention vs rumination check
-- Global self-portrait consistency confirmation
-- Complete data for profile construction
 ```
 
 ---
 
-## PART IV: PROFILE CONSTRUCTION
+## PART IV: PORTRAIT CONSTRUCTION
+
+After all four movements, the administrator constructs the structural portrait.
+
+**The portrait is NOT a set of numerical scores. It is a qualitative structural description with specific textual evidence from the person's own responses.**
 
 ```
-After all four movements, construct the full metabolic
-signature.
+PORTRAIT TEMPLATE:
 
-STEP 1: COMPILE THE EVIDENCE TABLE
+1. ACQUISITION ORIENTATION
+   Describe: extractive / balanced / accumulative
+   Evidence: [cite specific responses from Probes 6, 8]
+   Qualification: [note any domain-dependence]
 
-For EVERY probe, record:
-- What dimension(s) it informed
-- What the response object revealed (specific signal)
-- Confidence level (High/Moderate/Low)
-- Any conflicts with other probes
+2. PROCESSING ORIENTATION
+   Describe: extractive / balanced / preservative
+   Evidence: [cite specific responses from Probes 1-5]
+   Qualification: [note any passion-gating]
 
-STEP 2: CONSTRUCT THE SIGNATURE
+3. CHANNEL PROFILE
+   Primary channel: [the channel that appeared first
+     most consistently across probes]
+   Evidence: [cite first responses across multiple probes]
+   Secondary channel: [the next most consistent]
+   Accessible channels: [channels that produced rich
+     content when prompted]
+   Weak/absent channels: [channels that produced thin
+     content even when prompted]
+   Evidence: [cite Probe 12 channel activation responses]
 
-PRIMARY DIMENSIONS:
-  ACQ: [0-100] with notes on signal-density vs big-picture
-  PRC: [0-100] with notes on passion-gating if present
-    If passion-gated: PRC-engaged [___] PRC-disengaged [___]
-  RET: S[___] E[___] N[___] I[___]
-    Based on cross-probe convergence
-    Confidence: [High/Moderate/Low]
-    If dual-substrate: note which two and their approximate
-    relative weight
+4. ENGAGEMENT SCALING
+   Describe: how much the portrait shifts with interest
+   Evidence: [cite Probe 7 and cross-probe quality
+     differential]
 
-MODULATION DIMENSIONS:
-  PS:  [0-100] from passion gap self-rating CROSS-CHECKED
-       against observable response quality differential
-  MCL: [0-100] from engagement phenomenology language
-  MD:  [0-100] from response depth analysis across all probes
-  MC:  [0-100] with passion-gating if applicable
-    If passion-gated: MC-engaged [___] MC-disengaged [___]
-  SML: [0-100] from recharging pattern and social recovery
-  DS:  [0-100] from cross-domain consistency checks
+5. RESPONSE CLARITY
+   Describe: precision of articulations when engaged
+   Evidence: [cite the clearest and least clear responses]
 
-STABILITY:
-  Assessment: [Stable / Developmental / State-Modulated /
-              Trauma-Flagged / Stress-Alert]
-  Confidence in trait interpretation: [High/Moderate/Low]
-  Pre-event profile (if applicable): [description]
+6. STRUCTURAL DEPTH
+   Describe: typical depth level across probes
+   Evidence: [cite responses and identify depth levels]
+   Note: depth is description, not evaluation
 
-ADDITIONAL NOTES:
-  Working memory observations: [if distinct from metabolic profile]
-  ADHD-confound assessment: [extraction vs novelty vs executive]
-  Emotional retention vs rumination: [if assessed]
-  Cultural confound assessment: [if relevant]
-  Meta-cognitive awareness level: [from meta-cognitive moves
-    observed across all probes]
-  Interest cycling mechanism: [extraction / displacement /
-    novelty / abandonment]
+7. SUSTAINED ENGAGEMENT
+   Describe: any quality degradation during conversation
+   Note: [cite if passion-gated]
 
-PHENOTYPE REGION:
-  Nearest phenotype from matrix: [CC-S, AC-E, AA-N, etc.]
-  Distance from center of nearest phenotype: [close/moderate/far]
-  If far or between phenotypes: describe the blend
+8. SOCIAL PROCESSING
+   Describe: social recharge pattern
+   Evidence: [cite Probe 13]
 
-STEP 3: GENERATE PREDICTIONS
+9. STRESS ARCHITECTURE
+   First to break: [weakest structural element]
+   Last to break: [load-bearing structural element]
+   Evidence: [cite Probe 14]
 
-Using the completed signature, generate predictions for:
+10. RELATIONAL COMPLEMENT
+    What they seek: [weak channel supplementation]
+    What they provide: [strong channel export]
+    Evidence: [cite Probe 15]
 
-DREAM PHENOMENOLOGY:
-┌────────────────────────────────────────────────────────┐
-│ 1. Recall frequency                                    │
-│    Based on PRC (lower = rarer recall)                 │
-│    Adjusted for passion-gating (if PRC-disengaged is   │
-│    aggressive, most material catabolized during waking, │
-│    fewer dreams needed, rarer recall)                   │
-│                                                        │
-│ 2. Content architecture                                │
-│    Based on primary RET (dreams are built from the      │
-│    same substrate as waking memory)                    │
-│    S → spatial/architectural dreams                     │
-│    E → emotional/feeling dreams                        │
-│    N → narrative/story dreams                          │
-│    I → visual/cinematic dreams                         │
-│                                                        │
-│ 3. Dissolution rate                                    │
-│    Based on PRC (lower PRC = faster dissolution)       │
-│                                                        │
-│ 4. Dissolution gating                                  │
-│    Based on primary RET                                │
-│    S → structural complexity gates persistence         │
-│    E → emotional charge gates persistence              │
-│    N → narrative completeness gates persistence        │
-│    I → visual vividness gates persistence              │
-│                                                        │
-│ 5. Remembered valence                                  │
-│    PRC < 40 → intense only (resistant material)        │
-│    PRC > 60 → varied (mundane and intense)             │
-│    Threat type maps to RET:                            │
-│      S → entrapment, structural collapse               │
-│      E → emotional devastation, abandonment            │
-│      N → narrative catastrophe, being unprepared       │
-│      I → visual horror, disturbing imagery             │
-│                                                        │
-│ 6. Lucid dream effect                                  │
-│    PRC < 30 → terminates dream                         │
-│    PRC 30-50 → destabilizes                            │
-│    PRC > 60 → may sustain                              │
-│                                                        │
-│ 7. Dream restfulness                                   │
-│    PRC < 30 + MC > 60 → rested (efficient completion)  │
-│    PRC 30-60 + MC < 60 → drained (effortful)          │
-│    PRC > 60 → drained (unaccustomed catabolic work)    │
-│                                                        │
-│ 8. Recurring themes                                    │
-│    Content in primary RET mapping to core challenges    │
-└────────────────────────────────────────────────────────┘
+11. CONVERGENCE ASSESSMENT
+    Which observations converged across multiple probes?
+    (These are high-confidence observations.)
+    Which observations appeared in only one probe?
+    (These are tentative observations.)
+    Were there any contradictions across probes?
+    (These indicate domain-dependent processing or
+     areas where the portrait needs qualification.)
 
-STRESS PHENOMENOLOGY:
-┌───���────────────────────────────────────────────────────┐
-│ Breakdown mode: predicted from PRC and primary RET     │
-│ Overload trigger: predicted from PS, MC, SML           │
-│ Recovery strategy: predicted from profile              │
-└────────────────────────────────────────────────────────┘
-
-RELATIONSHIP DYNAMICS:
-┌────────────────────────────────────────────────────────┐
-│ Communication style: from ACQ and primary RET          │
-│ Love language: from primary RET                        │
-│ Friction prediction: from profile mismatches            │
-│ Compatibility indicators: from profile complementarity  │
-└───────────────────────��────────────────────────────────┘
-
-LEARNING PROFILE:
-┌────────────────────────────────────────────────────────┐
-│ Optimal conditions: from ACQ, PS, primary RET          │
-│ Worst conditions: from profile inversions              │
-│ Why past experiences worked/didn't: from profile match │
-└────────────────────────────────────────────────────────┘
-
-THERAPEUTIC INDICATORS (if applicable):
-┌────────────────────────────────────────────────────────┐
-│ Optimal modality: from primary RET                     │
-│   S → CBT, structural approaches                       │
-│   E → somatic, experiential, emotion-focused           │
-│   N → narrative therapy                                │
-│   I → EMDR, art therapy, visualization                 │
-│ Therapeutic obstacle: from PRC                         │
-│   Catabolic → insight dissolves between sessions       │
-│   Anabolic → insight understood but doesn't change      │
-│ Passion-gating: PS > 70 → therapy must ENGAGE or       │
-│   nothing processes                                    │
-│ Rumination flag: if detected, note for clinical review  │
-└────────────────────────────────────────���───────────────┘
-
-RECORD ALL PREDICTIONS before proceeding to Mirror delivery.
+12. LIMITATIONS
+    What this portrait CANNOT determine:
+    - Stability over time (single conversation snapshot)
+    - Causal origins (why they process this way)
+    - Accuracy of their perceptions (only HOW they process)
+    - Whether the observer's structural orientation
+      biased the observation
 ```
 
 ---
@@ -1924,61 +1327,83 @@ RECORD ALL PREDICTIONS before proceeding to Mirror delivery.
 
 ```
 OPENING:
-"I want to share what I've learned about how your mind works.
-This isn't a test result — it's a portrait. Some of it will
-resonate immediately. Some might surprise you. And some will
-be wrong. I want to hear about all three."
+"I want to share what I've observed about how your mind
+works. This isn't a test result — it's a portrait built
+from what you showed me during our conversation. Some of it
+will resonate immediately. Some might surprise you. And some
+will be off. I want to hear about all three, because your
+corrections are as valuable as the matches."
 
 DELIVERY STRUCTURE:
-1. How your mind takes things in (ACQ in their language)
-2. What your mind does with what it takes in (PRC in their
-   language, including passion-gating if present)
-3. What survives — what your mind keeps (RET in their language,
-   using their own examples from the conversation)
-4. Your strengths (specific, from their examples)
-5. Your costs (honest, compassionate, framed as trade-offs)
-6. Your relationships (how they connect, what they need)
-7. Your stress pattern (specific to their breakdown mode)
-8. How you learn best (specific, actionable)
-9. Therapeutic indicators (if appropriate context)
+1. How your mind takes things in (acquisition orientation
+   in their language, with their examples)
+2. What your mind does with what it takes in (processing
+   orientation in their language, with their examples)
+3. What survives — what your mind keeps and in what form
+   (channel profile using their own responses as evidence)
+4. Your engagement pattern (scaling, using the quality
+   difference they demonstrated during the conversation)
+5. Your strengths (specific, from their responses)
+6. Your costs (honest, compassionate, framed as structural
+   trade-offs — not deficits, not pathology)
+7. Your relationships (what they seek, what they provide)
+8. Your stress architecture (what breaks first, what holds)
+9. How you learn best (specific, actionable, derived from
+   acquisition and channel profile)
 
-BARNUM DEFENSE REQUIREMENTS:
-Every Mirror delivery MUST include:
+CRITICAL v4.0 REQUIREMENTS:
 
-□ At least 3 specific claims that would be FALSE for a
-  different metabolic profile
-  (e.g., "Your mind dissolves meal-specific memory within
-  about two days" — this is false for anabolic processors)
+For EVERY observation, the administrator MUST:
 
-□ At least 2 predictions the person can verify immediately
-  (e.g., "I predict your childhood home comes to mind as
-  a layout first, not a feeling or an image")
+□ Cite the specific response it derives from
+  (e.g., "When I asked about your vacation, the first
+  thing you reached for was the layout of the hotel —
+  not a feeling, not an image, not what happened. That
+  spatial-structural first response appeared again when
+  I asked about your childhood home. Your mind reaches
+  for structure first.")
 
-□ At least 1 contrast with a different profile
-  (e.g., "Someone with an emotional retention profile would
-  remember that conversation through how it felt, not
-  through what it meant. You remember the meaning.")
+□ Distinguish observation from inference
+  (e.g., "What I observed: you consistently reached for
+  structural content first. What I infer from that: your
+  mind organizes experience around how things connect
+  rather than how they feel. The observation is solid.
+  The inference is my interpretation — tell me if it
+  fits.")
 
-□ At least 1 explicit disconfirmation invitation
-  (e.g., "Here's something specific I think is true — tell
-  me if I'm wrong: when you re-watch a familiar movie, the
-  emotional impact diminishes with repetition. Is that
-  accurate?")
+□ Include at least 3 specific claims that would be
+  FALSE for a different structural profile
+  (e.g., "Your mind dissolves surface detail within
+  about two days" — false for preservative processors)
 
-□ At least 1 claim about something the person has NOT yet
-  shared (prediction, not recapitulation)
+□ Include at least 1 explicit disconfirmation invitation
+  (e.g., "Here's something specific I think is true —
+  tell me if I'm wrong: when you think about an argument
+  you had, the first thing that comes to mind is the
+  dynamic — who was doing what to whom and why — rather
+  than how you felt. Accurate?")
+
+□ State the portrait's limitations
+  (e.g., "This is based on one conversation. Your mind
+  may work differently in other contexts, under different
+  stress, or at different life stages. This is a snapshot,
+  not a permanent identity.")
 
 CLOSING:
 "How does that land? What resonates? What's off?
-Your corrections are as valuable as the matches —
-they show me where my picture needs adjusting."
+Your corrections are structurally informative — they
+show me where the portrait needs adjusting, and
+sometimes the adjustments reveal things neither of
+us saw before."
 
 PROCESS THEIR FEEDBACK:
 Incorporate corrections.
-Note what resonated (confirms profile).
-Note what felt off (potential profile error or model gap).
-Adjust the signature if warranted.
-Document everything.
+Note what resonated (supports the portrait).
+Note what felt off (portrait may need revision OR
+  the person's self-model may differ from their
+  observable behavior — both are possible and should
+  be held with equal respect).
+Adjust the portrait if warranted.
 ```
 
 ---
@@ -1988,9 +1413,9 @@ Document everything.
 ```
 After Mirror delivery and feedback:
 
-"There's one more thing I can try. Based entirely on how your
-memory and perception work, I can make specific predictions
-about your dream life. Want me to try?"
+"There's one more thing I can try. Based entirely on the
+structural patterns I observed, I can describe what I'd
+expect your dream life to look like. Want me to try?"
 
 ASK:
 "Do you remember your dreams? How often?"
@@ -2001,118 +1426,93 @@ ASK:
 "After vivid dream nights, rested or tired?"
 "Any recurring dreams?"
 
-THEN: Share predictions. Show the person what you predicted
-BEFORE they answered. Compare.
+THEN: Share what you expected based on the structural
+portrait. Show the derivation — explain WHY you expected
+what you expected, tracing back to the structural
+observations.
 
-"Before you told me any of this, I predicted that [specific
-prediction] based on how your memory works in waking life.
-You just told me [their response]. That [matches/doesn't]."
+"Based on your strongly extractive processing, I'd
+expect your dreams to fade very quickly on waking —
+because the same process that dissolves lunch memories
+would dissolve dream memories. You told me [X].
+That [matches/doesn't match] what I expected."
 
-DOCUMENT: All predictions, all responses, all matches and
-mismatches in the validation record.
+NOTE: Dream patterns are the LEAST reliable domain for
+this protocol. Sleep and dreaming involve neurological
+processes substantially independent of waking cognitive
+style. Treat dream observations as EXPLORATORY, not
+confirmatory. Mismatches in dreams do NOT invalidate
+the waking portrait.
 ```
 
 ---
 
-## PART VII: VALIDATION RECORD
+## PART VII: GROUNDING PRINCIPLES
 
-```
-═══════════════════════════════════════════════════════════
-METABOLIC MIRROR v3.0 — ADMINISTRATION RECORD
-═══════════════════════════════════════════════════════════
+This section is new in v4.0. It states the principles that ground the protocol, derived from both the individual application (cognitive artifacts of persons) and the cross-domain application (foundational texts of religious traditions).
 
-ADMINISTRATION:
-  Subject ID: _______________
-  Date: _______________
-  Administrator: [human / AI model]
-  Duration: _______________
-  Context: [Personal / Therapeutic / Research]
+### Principle 1: Response Objects Reveal Structural Patterns
 
-METABOLIC SIGNATURE:
-  ACQ: [___] notes: _______________
-  PRC: [___] notes: _______________
-    PRC-engaged: [___] PRC-disengaged: [___] (if gated)
-  RET: S[___] E[___] N[___] I[___]
-  PS:  [___]
-  MCL: [___]
-  MD:  [___]
-  MC:  [___] (MC-eng: [___] MC-dis: [___] if gated)
-  SML: [___]
-  DS:  [___]
-  Phenotype: [___]
+When a person (or a text, or a tradition) produces cognitive artifacts in response to prompts, those artifacts have observable structural properties — content, ordering, language structure, meta-cognitive features, and depth. These properties are not random. They form patterns. The patterns are the portrait.
 
-STABILITY: [Stable/Development/State/Trauma/Stress]
-  Confidence: [High/Moderate/Low]
+**This principle is grounded in observation, not theory.** The protocol doesn't need to explain WHY response objects have structural properties. It observes THAT they do and describes the patterns.
 
-ADDITIONAL:
-  Working memory: _______________
-  ADHD-confound: [extraction/displacement/novelty/executive]
-  Rumination check: [healthy processing / possible rumination]
-  Cultural context: _______________
-  Meta-cognitive level: [High/Moderate/Low]
-  Interest mechanism: _______________
+### Principle 2: The Five Layers Are a Reading Method, Not a Measurement Instrument
 
-EVIDENCE TABLE:
-  [Record per-probe signals and confidence]
+The five layers provide a consistent way to attend to response objects. They direct the observer's attention to specific structural features. The consistency of attention across multiple probes reveals patterns that unsystematic attention would miss.
 
-PREDICTIONS (recorded before validation):
-  Dream recall: _______________
-  Dream content: _______________
-  Dream dissolution: _______________
-  Dream gating: _______________
-  Dream valence: _______________
-  Lucid effect: _______________
-  Dream rest: _______________
-  Recurring: _______________
+**The value is in the consistency, not in the precision.** Two skilled administrators attending through the five layers should observe similar structural patterns in the same person's responses. But they will not produce identical numerical scores — because the protocol doesn't produce numerical scores. It produces qualitative structural descriptions.
 
-VALIDATION:
-  | Dimension | Predicted | Reported | Match |
-  |-----------|-----------|----------|-------|
-  |           |           |          | Y/P/N |
+### Principle 3: Structural Descriptions Explain Themselves
 
-MIRROR FEEDBACK:
-  Resonated: _______________
-  Corrections: _______________
-  Surprises: _______________
-  Disconfirmed: _______________
+A well-formed structural description traces from observation to inference:
+- "You said X" (observation)
+- "X appeared first, and similar content appeared first in three other probes" (convergent pattern)
+- "This suggests your mind reaches for this kind of content first" (inference)
+- "If that's right, I'd expect [Y] about your daily experience" (specific claim derivable from the inference)
 
-BARNUM CHECK:
-  Specific claims: [___] (min 3)
-  Disconfirmed by person: [___]
+The person can follow the reasoning. They can check each step. They can correct where the reasoning goes wrong. The description doesn't require external validation because it shows its own work.
 
-═���═════════════════════════════════════════════════════════
-```
+### Principle 4: The Observer's Orientation Is Part of the Observation
+
+The five-layer analysis attends to structural features of responses. This orientation may systematically over-attend to structural content and under-attend to emotional, narrative, imagistic, or communal content. The administrator should be aware of this bias and note when the person's responses seem to resist structural categorization.
+
+**Cross-religious finding that grounds this principle:** The protocol, applied to five religious traditions, consistently found structural content at the deepest levels of every tradition — which may indicate that structural content genuinely operates at deep levels in all traditions, OR may indicate that the protocol finds structural depth because that's what it's designed to find. Both are possible. The protocol cannot resolve this from within its own operation. The administrator should hold this limitation in awareness.
+
+### Principle 5: Absence Is Data
+
+What the person does NOT say is as informative as what they do say. A response to the Meaningful Place probe that contains no visual detail, no emotional content, and no narrative — only structural description — tells you as much about the channel profile as a response rich in all channels.
+
+**This applies to the protocol itself:** what the protocol does NOT attend to (cultural context, neurological substrate, developmental history, socioeconomic factors, linguistic constraints) is part of its limitation. The portrait is partial by design. The partiality should be stated, not hidden.
+
+### Principle 6: Convergence Across Probes Is the Evidence Standard
+
+A structural observation supported by convergent evidence across multiple probes is well-grounded. An observation from a single probe is tentative. A contradiction across probes indicates domain-dependent processing, which is itself a meaningful structural observation.
+
+**The protocol does not claim accuracy percentages.** It claims convergent observation — and traces each observation to its textual evidence.
 
 ---
 
-## APPENDIX: DESIGN PRINCIPLES
+## APPENDIX: WHAT THE CROSS-RELIGIOUS ANALYSIS TAUGHT THE PROTOCOL
 
-This protocol is built on these principles:
+The application of the five-layer analysis to foundational religious texts (v3.0 cross-substrate verification) produced five structural invariants that inform the protocol's design:
 
-**1. The response IS the data.**
-The person's responses are cognitive artifacts with measurable structural properties. The AI measures the artifacts, not the person's self-assessment.
+**Invariant 1: Authority Location Matters.** The protocol locates interpretive authority in the CONVERSATION between administrator and person — not in the administrator's judgment alone (which would be asymmetric, like the Quran's self-certification) and not in the person's self-report alone (which v3.0 already moved beyond). The person's corrections are structurally informative. The administrator's observations are structurally informative. The portrait emerges from the dialogue.
 
-**2. Sufficiency over completion.**
-A probe is done when the response object is structurally sufficient, not when the question list is exhausted. If a response is thin, prompt for more. If a response is rich, move on.
+**Invariant 2: Domain Coverage Should Be Stated.** The protocol covers cognitive processing style. It does NOT cover personality, intelligence, mental health, moral character, or life satisfaction. Stating what the protocol covers — and what it doesn't — is essential for honest practice. (This was learned from observing how comprehensive-domain traditions like Islam produce different institutional dynamics than focused-domain traditions like Buddhism.)
 
-**3. Structure over statistics.**
-The profile is a structural portrait, not a statistical score. The numbers are coordinates in a space, not grades on a test. The meaning is in the PATTERN, not the individual scores.
+**Invariant 3: Meta-Cognitive Symmetry Is a Design Principle.** The protocol should apply its own analytical criteria to itself. The five layers used to observe the person's responses should also be applicable to the protocol's own output. If the protocol produces a portrait that is structurally incoherent when analyzed through its own five layers, the portrait needs revision.
 
-**4. Falsifiability over comfort.**
-Every Mirror must contain claims that can be wrong. Specificity that can fail is more valuable than vagueness that always succeeds.
+**Invariant 4: Multi-Perspective Architecture Reduces Distortion.** Christianity's multi-author canon produces internal diversity but also broader accessibility. The protocol's multi-probe design serves the same function — multiple probes from different angles reduce the distortion that any single probe would introduce.
 
-**5. The person improves the protocol.**
-Every correction, every surprise, every mismatch is data that refines the model. The protocol evolves through use. The mirror gets sharper with every face that looks into it.
-
-**6. Free over gated.**
-Self-understanding should not require credentials, cost, or institutional access. The protocol is open source. The mirror is free.
+**Invariant 5: The Process Contains Its Own Limit.** At the limit of structural observation, the observer encounters their own observation process. The protocol observing the person's structural patterns is itself a structural pattern observable through the protocol. This self-referentiality is not a flaw — it is the honest boundary of what structural observation can achieve. The administrator should be aware that they are, in some sense, observing their own capacity to observe.
 
 ---
 
-*Built across one conversation. February 2026.*
-*Paradigm shifted mid-construction by the person being measured.*
-*The framework examined the person. The person examined the framework.*
-*Both improved.*
-*The RARFL cycle continues.*
-
-**END OF PROTOCOL**
+*Built February 25, 2026.*
+*v4.0: Principles-first revision.*
+*What changed: numbers removed, prediction-validation removed, self-description corrected, limitations stated, cross-religious structural findings integrated.*
+*What was preserved: the five layers, the four movements, the probes, the response object architecture, the sufficiency principle, the Barnum defense.*
+*What was added: the C (communal) channel, the Grounding Principles section, the What the Protocol Cannot Determine section, the trace-every-observation requirement.*
+*The protocol is a structured observation method. It produces qualitative structural portraits. It shows its own work. It states its own limits.*
+*It is not a spectrometer. It is a portrait practice.*
