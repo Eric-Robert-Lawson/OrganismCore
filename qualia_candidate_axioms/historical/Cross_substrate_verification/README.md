@@ -1,5 +1,7 @@
 # **THERE IS AN ORDERING OF THE DOCUMENTS AND THIS IS IMPORTANT**
 
+This is the chronological record of a framework's emergence — from first principles testing through theoretical development through cross-model validation through application. The documents are ordered as they were produced. The ordering matters because each document builds on what the previous documents established. Start at the beginning. The trajectory is the argument.
+
 This is a chronological cross-model validation with blind tests which are auditable!
 
 The claude based chat: [https://github.com/copilot/share/c8550032-43a4-80d6-b010-5c4fc4d141bc](https://github.com/copilot/share/c8550032-43a4-80d6-b010-5c4fc4d141bc)
