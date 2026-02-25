@@ -15,6 +15,21 @@
 
 ---
 
+## PREFATORY NOTE TO THE READER
+
+**This document is a reasoning trajectory, not a position paper.**
+
+It traces a line of analysis that begins with a mechanistic distinction (Parts I-IV), gathers etymological and historical evidence (Parts V-IX), encounters a critical correction of its own framing (Part X), and arrives at a conclusion that could not have been reached without the full trajectory (Part XI).
+
+**Specifically:** The historical analysis in Part IX presents a framing — institutional suppression of a cognitive capacity — that Part X explicitly corrects and deepens. The corrected framing (metabolic coherence maintenance rather than deliberate power suppression) is the actual conclusion. A reader who forms their judgment during Part IX will carry a less accurate, less nuanced, and less interesting version of the analysis than the document actually contains.
+
+**This document is not anti-religious.** It analyzes how a specific linguistic and conceptual distinction was shaped by specific historical and institutional dynamics. The correction in Part X explicitly acknowledges that religious traditions serve essential navigational functions — providing existential coherence that empirical methods do not address — and that the institutional dynamics described in Part IX were not malicious but metabolic. The conclusion in Part XI argues that faith and empiricism are complementary and mutually necessary.
+
+**The document applies its own framework to itself.** It builds a structure (Parts I-IX), tests and corrects that structure (Part X), and identifies the recursive pattern that makes the correction necessary (Part XI). This self-application is deliberate. The reader is invited to experience the same process: build understanding through the early sections, allow the correction to metabolize the incomplete framing, and arrive at the integrated conclusion.
+
+**Please read to the end before evaluating the argument.** The trajectory is the argument. The conclusion cannot be excerpted from the middle.
+
+---
 ## EXECUTIVE SUMMARY
 
 ### The Discovery
