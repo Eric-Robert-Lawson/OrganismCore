@@ -66,3 +66,4 @@ The documents are ordered as such:
 - memory_as_informational_metabolism.md
 - memory_metabolism_clinical_utility.md
 - knowledge_and_wisedom_insight.md
+- world_of_wizards.md
