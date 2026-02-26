@@ -10,4 +10,5 @@
 - complete_communication_vector_taxonomy.md
 - note_from_the_session.md
 - the_cleaner_wrasse.md
+- convergent_olfactory_self_model_reasoning_object.md
 - msr_priming_falsifiable_tests_reasoning_object.md
