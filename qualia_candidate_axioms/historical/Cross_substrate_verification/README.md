@@ -1,5 +1,7 @@
 # **THERE IS AN ORDERING OF THE DOCUMENTS AND THIS IS IMPORTANT**
 
+MASSIVE repository of accumulating conciousness research. Putting impactful stuff here, but stretched across the repo for specificity.
+
 This is the chronological record of a framework's emergence — from first principles testing through theoretical development through cross-model validation through application. The documents are ordered as they were produced. The ordering matters because each document builds on what the previous documents established. Start at the beginning. The trajectory is the argument.
 
 This is a chronological cross-model validation with blind tests which are auditable!
@@ -74,3 +76,4 @@ The documents are ordered as such:
 - metabolic_profile_survey.md
 - metabolic_coherence_instrument.md
 - SPECTRAL_IDENTITY_AND_COHERENCE_MATCHING.md
+- persistent_homology_of_self_referential.md
