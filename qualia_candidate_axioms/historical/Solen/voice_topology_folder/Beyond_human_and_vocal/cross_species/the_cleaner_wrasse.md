@@ -2,7 +2,7 @@
 ## RARFL, Self-Awareness, the 450-Million-Year Ancestor,
 ## and What One Fish Changes About Everything
 ## Deep Reasoning Object — Cross-Species Communication Series
-## OrganismCore — qualia_candidate_axioms/historical/Cross_species_communication
+## OrganismCore
 ## February 26, 2026
 
 ---
