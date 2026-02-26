@@ -23,4 +23,5 @@
 - naked_mole_rat_vocal_instrument.md
 - bat_vocal_instrument.md
 - the_instrument_is_the_bridge.md
-- the_bee.md
+- the_bees/the_bee.md
+- the_bees/the_false_attractor_hypothesis.md
