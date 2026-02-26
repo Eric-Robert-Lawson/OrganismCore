@@ -1,7 +1,7 @@
 # THE TRIAD CONVERGENCE
 ## Scale-Invariant Structure of Gap Navigation
 ## Reasoning Artifact — Document 64
-## OrganismCore — qualia_candidate_axioms/historical/Cross_substrate_verification
+## OrganismCore
 ## February 26, 2026
 
 ---
