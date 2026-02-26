@@ -35,3 +35,4 @@
 - the_bear/the_navigator_and_the_structure.md
 - the_dark_archive.md
 - the_pod_problem.md
+- the_substrate_channel.md
