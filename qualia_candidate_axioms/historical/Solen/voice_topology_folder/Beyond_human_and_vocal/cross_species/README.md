@@ -31,3 +31,5 @@
 - the_bees/hive_beacon_measurement.md
 - monarch_butterfly.md
 - the_invisible_channel_sea_turtles.md
+- the_bear/bear_hive_beacon_convergence.md
+- the_bear/the_navigator_and_the_structure.md
