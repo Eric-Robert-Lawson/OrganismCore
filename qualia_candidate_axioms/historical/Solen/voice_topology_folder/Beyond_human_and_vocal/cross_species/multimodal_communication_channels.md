@@ -2,7 +2,7 @@
 ## Social Complexity, Channel Topology, and the Scope of
 ## Cross-Species Communication
 ## Reasoning Artifact — Cross-Species Communication Series
-## OrganismCore — qualia_candidate_axioms/historical/Cross_species_communication
+## OrganismCore — qualia_candidate_axioms/historical/Solen/voice_topology_folder/Beyond_human_and_vocal/cross_species/
 ## February 26, 2026
 
 ---
