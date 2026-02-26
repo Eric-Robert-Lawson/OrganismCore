@@ -14,3 +14,4 @@
 - msr_priming_falsifiable_tests_reasoning_object.md
 - survival_pressure_axis.md
 - raven_vocal_instrument.md
+- humpback_whale_vocal_instrument.md
