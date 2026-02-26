@@ -27,3 +27,4 @@
 - the_bees/the_false_attractor_hypothesis.md
 - the_bees/bee_quantum_layer.md
 - attractor_pollution_generalized.md
+- the_measurement_instrument.md
