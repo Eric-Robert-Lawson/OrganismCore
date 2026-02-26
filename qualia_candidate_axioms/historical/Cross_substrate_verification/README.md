@@ -73,3 +73,4 @@ The documents are ordered as such:
 - dreams_informational_metabolism.md
 - metabolic_profile_survey.md
 - metabolic_coherence_instrument.md
+- SPECTRAL_IDENTITY_AND_COHERENCE_MATCHING.md
