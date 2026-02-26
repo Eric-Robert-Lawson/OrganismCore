@@ -1,6 +1,6 @@
 # **THERE IS AN ORDERING OF THE DOCUMENTS AND THIS IS IMPORTANT**
 
-MASSIVE repository of accumulating conciousness research. Putting impactful stuff here, but stretched across the repo for specificity.
+MASSIVE repository of accumulating conciousness research. Putting impactful stuff here, but stretched across the repo for specificity. The project is chronological and captures reasoning objectified. The files are chronological.
 
 This is the chronological record of a framework's emergence — from first principles testing through theoretical development through cross-model validation through application. The documents are ordered as they were produced. The ordering matters because each document builds on what the previous documents established. Start at the beginning. The trajectory is the argument.
 
