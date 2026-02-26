@@ -29,3 +29,5 @@
 - attractor_pollution_generalized.md
 - the_measurement_instrument.md
 - the_bees/hive_beacon_measurement.md
+- monarch_butterfly.md
+- the_invisible_channel_sea_turtles.md
