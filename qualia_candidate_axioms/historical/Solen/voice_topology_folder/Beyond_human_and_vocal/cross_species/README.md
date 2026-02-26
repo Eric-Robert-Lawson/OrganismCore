@@ -21,3 +21,4 @@
 - acoustic_socialization_threshold.md
 - prarie_dog_reasoning_object.md
 - naked_mole_rat_vocal_instrument.md
+- bat_vocal_instrument.md
