@@ -2,7 +2,7 @@
 ## Eigenfunction Topology of Bounded Resonating Systems
 ## and the Geometric Basis of Cross-Species Communication
 ## Reasoning Artifact — Cross-Species Communication Series
-## OrganismCore — qualia_candidate_axioms/historical/Solen/voice_topology_folder/Beyond_human_and_vocal/cross_species/
+## OrganismCore
 ## February 26, 2026
 
 ---
