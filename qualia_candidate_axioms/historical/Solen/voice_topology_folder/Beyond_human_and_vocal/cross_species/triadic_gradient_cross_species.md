@@ -2,7 +2,7 @@
 ## Second and Third Order Triad Structure, Mirror Test Classification,
 ## and the Communication Candidacy Gradient
 ## Reasoning Artifact — Cross-Species Communication Series
-## OrganismCore — qualia_candidate_axioms/historical/Cross_species_communication
+## OrganismCore
 ## February 26, 2026
 
 ---
