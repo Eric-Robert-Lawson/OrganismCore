@@ -1,76 +1,68 @@
 """
-AGNI RECONSTRUCTION v1
-Vedic Sanskrit: agni  [ɑgni]
-Rigveda 1.1.1 — word 1
+================================================================
+AGNI v5 — Principles-First Reconstruction
+Rigveda 1.1.1, word 1
+[ɑgni] — "O fire"
+
+ARCHITECTURE:
+  ALL VOICED — no pluck, no closing tail / opening head.
+  Voiced stops are NOT plucks (Pluck Artifact Part VI).
+
+  [g] uses crossfade cutback architecture (from DEVAM v13):
+    v1 BROKEN architecture:
+      LP-filtered murmur / random noise burst / independent VOT
+      Three independent sources. Two phase resets.
+      The burst is np.random.randn() — stochastic noise
+      spliced between periodic signals. Click artifact.
+      This is the architecture DEVAM proved wrong in v1-v4.
+
+    v5 CORRECT architecture:
+      ONE continuous Rosenberg source for entire [g].
+      Phase 1: Voice bar — source through low resonator (200 Hz)
+      Phase 2: Burst — source through burst-locus formants + transient
+      Phase 3: Cutback — equal-power crossfade closed→open tract
+      Continuous voicing. No phase resets. One instrument.
+
+  v5 FIXES (cumulative):
+    v2: crossfade cutback replaces noise burst
+    v3: word-boundary laryngeal onset/offset envelopes
+    v4: amplitude hierarchy ([g] 0.45 vs vowels 0.70-0.72)
+    v5: continuous voicing source through all [g] phases
+
+  [ɑ] short open back unrounded — kaṇṭhya (VERIFIED)
+  [n] voiced alveolar nasal — dantya (VERIFIED)
+  [i] short close front unrounded — tālavya (VERIFIED)
+
+  Coarticulation: each vowel/sonorant receives F_prev/F_next
+  for formant blending at boundaries.
+
+  Infrastructure: canonical from HOTĀRAM v9
+    - rosenberg_pulse: differentiated Rosenberg glottal source
+    - apply_formants: parallel IIR resonators, b = [1.0 - r]
+    - iir_notch: antiformant for nasals
+    - norm_to_peak: amplitude normalization
+    - Word-level norm_to_peak(0.75)
+
+  ARTIFACT REVIEW:
+    Pluck Artifact:           NOT APPLICABLE — all voiced
+    Observer Position:        NOT APPLICABLE — no voiceless segments
+    Origin Artifact:          NOT APPLICABLE — no [h]
+    Crossfade Cutback (v13): APPLIED — [g] canonical
+
+  Ancestors:
+    AGNI v1 (phoneme parameters, infrastructure)
+    DEVAM v1 (crossfade cutback architecture for voiced stops)
+    HOTĀRAM v9 (canonical infrastructure)
+    ṚG (original [g] verification)
+
+  PERFORMANCE:
+    dil=1.0  — diagnostic speed (measurement)
+    dil=2.5  — performance speed (listening)
+    OLA 6×   — standard slow analysis
+    OLA 12×  — deep slow analysis
+
 February 2026
-
-PHONEMES:
-  [ɑ]  short open back unrounded    — NEW
-  [g]  voiced velar stop            — VS-verified (ṚG)
-  [n]  voiced alveolar nasal        — NEW (first VS nasal)
-  [i]  short close front unrounded  — NEW
-
-SYLLABLE STRUCTURE:
-  AG — [ɑg] — closed syllable, heavy
-  NI — [ni] — open syllable, light
-
-SYNTHESIS ENGINE: voice_physics_vs.py architecture.
-VS-specific. No imports from any other
-language reconstruction project.
-
-ALL PARAMETERS derived from:
-  1. Physics of the vocal tract
-  2. Śikṣā treatise classification
-  3. Vedic orthographic record
-  4. Comparative Indo-European evidence
-  5. Acoustic measurement of living
-     cognate languages and reciters
-
-ŚIKṢĀ CLASSIFICATION:
-  [ɑ] — kaṇṭhya   (guttural/velar)
-         The maximally open vocal tract.
-         Śikṣā places the open vowel [a]
-         in the velar class because the
-         constriction, such as it is,
-         is at the posterior of the
-         vocal tract. High F1 — wide jaw.
-  [g] — kaṇṭhya   — verified ṚG
-  [n] — dantya    (dental/alveolar)
-         Tongue tip at alveolar ridge.
-         Nasal side branch open.
-         Antiresonance at ~800 Hz.
-  [i] — tālavya   (palatal)
-         Tongue body raised toward
-         the hard palate. High F2.
-         Low F1 — close jaw.
-
-NEW ARCHITECTURE:
-  [n]: nasal murmur with antiresonance.
-       iir_notch() at ~800 Hz models
-       the acoustic zero from the
-       nasal side branch.
-       This is the first VS nasal.
-       The antiresonance is the
-       diagnostic signature of the
-       nasal class.
-
-COARTICULATION:
-  [ɑ] → [g]: open back vowel into
-             velar closure.
-             F2 rises toward velar locus.
-  [g] → [n]: velar burst into alveolar
-             nasal. F2 drops from ~2500 Hz
-             to nasal murmur position.
-             First [gn] cluster in VS.
-  [n] → [i]: nasal release into close
-             front vowel. F2 rises sharply
-             from nasal murmur to ~2200 Hz.
-
-PERFORMANCE PARAMETERS:
-  pitch_hz:     120.0  (Vedic recitation)
-  dil:          1.0    (diagnostic)
-  rt60:         1.5    (temple courtyard)
-  direct_ratio: 0.55
+================================================================
 """
 
 import numpy as np
@@ -91,7 +83,14 @@ NEUTRAL_ALVEOLAR_F3_HZ = 2700.0
 # Calculated from tube acoustics.
 # Language-independent physics constant.
 
-# ── ŚIKṢĀ REFERENCES — VS-internal ───────────���───────
+# Laryngeal offset: the glottis closes gradually
+# at end of phonation. ~15-25ms for the vocal folds
+# to stop vibrating. Models the natural decay of
+# voicing at word boundary.
+WORD_FINAL_FADE_MS = 20.0
+
+
+# ── ŚIKṢĀ REFERENCES — VS-internal ───────────────────
 
 KANTHHYA_BURST_LO_HZ   = 1800.0
 KANTHHYA_BURST_HI_HZ   = 3200.0
@@ -101,14 +100,10 @@ KANTHHYA_BURST_HI_HZ   = 3200.0
 DANTYA_ANTI_F_HZ       = 800.0
 # Dantya (dental/alveolar) nasal antiresonance.
 # Alveolar nasal zero ~800 Hz.
-# Derived from Śikṣā dantya classification
-# and tube acoustics of the nasal side branch.
 
 TALAVYA_F2_LO_HZ       = 1900.0
 TALAVYA_F2_HI_HZ       = 2500.0
 # Tālavya (palatal) F2 range.
-# Tongue body raised to hard palate.
-# High F2 — front constriction.
 
 
 # ── PHONEME PARAMETERS ────────────────────────────────
@@ -128,19 +123,63 @@ VS_A_COART_OFF = 0.12
 
 # [g] — voiced velar stop — ग
 # Śikṣā: kaṇṭhya
-# VS-verified in ṚG.
-# Parameters confirmed: LF 0.9703,
-# burst centroid 2577 Hz.
-VS_G_F           = [300.0, 1900.0, 2500.0, 3200.0]
-VS_G_B           = [120.0,  200.0,  280.0,  350.0]
-VS_G_GAINS       = [ 14.0,    6.0,    1.5,    0.4]
-VS_G_CLOSURE_MS  = 30.0
-VS_G_BURST_F     = 2500.0
-VS_G_BURST_BW    = 1200.0
-VS_G_BURST_MS    = 8.0
-VS_G_VOT_MS      = 10.0
-VS_G_MURMUR_GAIN = 0.70
-VS_G_BURST_GAIN  = 0.30
+# v5: continuous voicing, crossfade cutback.
+#
+# TONGUE TOPOLOGY:
+#   The tongue body is the largest oral articulator.
+#   When it presses against the velum, the cavity
+#   BEHIND the constriction (pharynx + larynx) is
+#   at its maximum length. This means:
+#     - Voice bar resonance is low (~200 Hz)
+#     - Burst centroid is mid-range (~2500 Hz)
+#     - Burst is inherently diffuse (large release area)
+#     - Release is slow (large mass, large area)
+#
+# AMPLITUDE HIERARCHY (v4):
+#   The tongue body seals against the velum.
+#   The oral tract is CLOSED. Sound must radiate
+#   through the flesh of the throat and cheeks.
+#   This attenuates by 20-30 dB relative to
+#   open-tract vowel radiation.
+#
+#   Hierarchy:
+#     [ɑ] open vowel:     0.72  (full tract resonance)
+#     [i] close vowel:    0.70  (full tract resonance)
+#     [n] nasal:          0.60  (nasal bypass — reduced)
+#     [g] cutback end:    ~0.55 (opening toward vowel)
+#     [g] cutback start:  ~0.20 (still mostly closed)
+#     [g] burst:          0.08  (brief transient)
+#     [g] voice bar:      0.12  (sealed tract — very quiet)
+#
+VS_G_CLOSURE_MS   = 30.0       # voice bar duration
+VS_G_BURST_MS     = 10.0       # velar burst — longer than dental (8ms)
+                                # because tongue body releases slowly
+VS_G_CUTBACK_MS   = 25.0       # crossfade: closed → open tract
+
+VS_G_VOICEBAR_F   = 200.0      # voice bar: lower than dental (250)
+                                # because velar back cavity is longest
+VS_G_VOICEBAR_BW  = 100.0      # wider BW than dental — more damped
+VS_G_VOICEBAR_G   = 10.0
+VS_G_MURMUR_PEAK  = 0.12       # sealed tract — very quiet
+
+VS_G_BURST_PEAK   = 0.08       # lower than dental (0.15) —
+                                # large tongue body, less pressure
+VS_G_BURST_F      = [1200.0, 2500.0, 3800.0, 5000.0]
+                                # velar burst formants — lower centroid
+VS_G_BURST_B      = [ 500.0,  700.0,  900.0, 1100.0]
+                                # wider bandwidths — more diffuse
+VS_G_BURST_G      = [   3.0,   10.0,    4.0,    1.0]
+                                # F2 region dominant (velar locus ~2500)
+VS_G_BURST_DECAY  = 120.0      # slower decay than dental (170)
+
+# Closed tract voicing during cutback
+VS_G_CLOSED_F     = [200.0,  700.0, 2000.0, 3000.0]
+VS_G_CLOSED_B     = [150.0,  250.0,  350.0,  400.0]
+VS_G_CLOSED_G     = [  8.0,    2.5,    0.6,    0.2]
+VS_G_CLOSED_PEAK  = 0.20       # closed tract quiet
+VS_G_OPEN_PEAK    = 0.55       # below vowel level
+VS_G_CUTBACK_PEAK = 0.40       # average of transition
+VS_G_FINAL_NORM   = 0.45       # well below vowels
 
 # [n] — voiced alveolar nasal — न
 # Śikṣā: dantya
@@ -149,7 +188,6 @@ VS_G_BURST_GAIN  = 0.30
 # Antiresonance (zero) at ~800 Hz —
 # the nasal side branch absorbs
 # energy at this frequency.
-# This is the dantya nasal marker.
 VS_N_F       = [250.0,  900.0, 2000.0, 3000.0]
 VS_N_B       = [100.0,  200.0,  300.0,  350.0]
 VS_N_GAINS   = [  8.0,    2.5,    0.5,    0.2]
@@ -174,6 +212,8 @@ VS_I_COART_OFF = 0.12
 PITCH_HZ = 120.0
 DIL      = 1.0
 
+VS_G_TOTAL_MS = VS_G_CLOSURE_MS + VS_G_BURST_MS + VS_G_CUTBACK_MS
+
 
 # ── UTILITIES ─────────────────────────────────────────
 
@@ -193,6 +233,7 @@ def write_wav(path, sig, sr=SR):
         wf.setsampwidth(2)
         wf.setframerate(sr)
         wf.writeframes(sig_i.tobytes())
+    print(f"  Wrote {path}")
 
 def safe_bp(lo, hi, sr=SR):
     nyq = sr / 2.0
@@ -208,7 +249,8 @@ def safe_lp(fc, sr=SR):
     fc  = min(fc, nyq - 20.0)
     return butter(2, fc / nyq, btype='low')
 
-def ola_stretch(sig, factor=4.0, sr=SR):
+def ola_stretch(sig, factor=6.0, sr=SR):
+    """OLA time-stretch. VS standard: 6× analysis, 12× deep."""
     win_ms  = 40.0
     win_n   = int(win_ms / 1000.0 * sr)
     if win_n % 2 == 1:
@@ -240,12 +282,10 @@ def ola_stretch(sig, factor=4.0, sr=SR):
 
 def rosenberg_pulse(n_samples, pitch_hz,
                     oq=0.65, sr=SR):
-    """
-    Rosenberg glottal pulse model.
-    oq: open quotient — 0.65 male voice.
-    Differentiated for formant filtering.
-    """
+    """Differentiated Rosenberg glottal pulse train."""
     period = int(sr / pitch_hz)
+    if period < 1:
+        period = 1
     pulse  = np.zeros(period, dtype=float)
     t1     = int(period * oq * 0.6)
     t2     = int(period * oq)
@@ -264,34 +304,23 @@ def rosenberg_pulse(n_samples, pitch_hz,
 
 def apply_formants(src, freqs, bws, gains,
                    sr=SR):
-    """
-    IIR resonator bank — four formants.
-    """
+    """Parallel IIR resonator bank — canonical from HOTĀRAM v9."""
     out = np.zeros(len(src), dtype=float)
     nyq = sr / 2.0
-    for f0, bw, g in zip(freqs, bws, gains):
-        if f0 <= 0 or f0 >= nyq:
-            continue
-        r    = np.exp(-np.pi * bw / sr)
-        cosf = 2.0 * np.cos(
-            2.0 * np.pi * f0 / sr)
-        a    = [1.0, -r * cosf, r * r]
-        b_   = [1.0 - r]
-        res  = lfilter(b_, a,
-                       src.astype(float))
-        out += res * g
+    for f, bw, g in zip(freqs, bws, gains):
+        if f > 0 and f < nyq:
+            r    = np.exp(-np.pi * bw / sr)
+            cosf = 2.0 * np.cos(
+                2.0 * np.pi * f / sr)
+            a    = [1.0, -r * cosf, r * r]
+            b_   = [1.0 - r]
+            res  = lfilter(b_, a,
+                           src.astype(float))
+            out += res * g
     return f32(out)
 
 def iir_notch(sig, fc, bw=200.0, sr=SR):
-    """
-    IIR notch filter.
-    Models the acoustic zero (antiresonance)
-    produced by the nasal side branch.
-    fc: centre frequency of the zero.
-    bw: bandwidth of the notch.
-    The notch depth confirms the nasal
-    side branch is acoustically active.
-    """
+    """IIR notch filter — antiformant for nasals."""
     nyq  = sr / 2.0
     fc   = min(max(fc, 20.0), nyq - 20.0)
     w0   = 2.0 * np.pi * fc / sr
@@ -304,40 +333,84 @@ def iir_notch(sig, fc, bw=200.0, sr=SR):
     return f32(lfilter(b_n, a_n,
                        sig.astype(float)))
 
+def norm_to_peak(sig, target_peak):
+    """Normalize signal to target peak amplitude."""
+    mx = np.max(np.abs(sig))
+    if mx > 1e-12:
+        return f32(sig * (target_peak / mx))
+    return f32(sig)
+
+def apply_vowel_envelope(sig, word_initial=False,
+                         word_final=False,
+                         fade_ms=WORD_FINAL_FADE_MS,
+                         sr=SR):
+    """
+    Laryngeal onset/offset envelope for vowels.
+
+    Physics:
+      Word-initial: glottis opens gradually (~20ms).
+        Vocal folds begin vibrating from rest.
+      Word-final: glottis closes gradually (~20ms).
+        Vocal folds stop vibrating.
+      Word-medial: no envelope (voicing continuous).
+
+    This is NOT a closing tail (that's for
+    vowel→voiceless transitions in the Pluck
+    architecture). This is the laryngeal
+    onset/offset gesture.
+    """
+    n = len(sig)
+    env = np.ones(n, dtype=float)
+    fade_n = int(fade_ms / 1000.0 * sr)
+    fade_n = min(fade_n, n // 3)
+
+    if word_initial and fade_n > 0:
+        env[:fade_n] = np.linspace(
+            0.0, 1.0, fade_n)
+
+    if word_final and fade_n > 0:
+        env[-fade_n:] = np.linspace(
+            1.0, 0.0, fade_n)
+
+    return f32(sig * env)
+
 
 # ── PHONEME SYNTHESISERS ──────────────────────────────
 
 def synth_A(F_prev=None, F_next=None,
             pitch_hz=PITCH_HZ,
-            dil=DIL, sr=SR):
+            dil=DIL,
+            word_initial=False,
+            word_final=False,
+            sr=SR):
     """
     [ɑ] — short open back unrounded.
     Śikṣā: kaṇṭhya.
-    Sanskrit phonological default.
-    High F1. Mid-back F2.
+    Maximally open vocal tract.
     """
     n_ms  = VS_A_DUR_MS * dil
     n     = int(n_ms / 1000.0 * sr)
     src   = rosenberg_pulse(n, pitch_hz,
                             oq=0.65, sr=sr)
-    on_n  = int(VS_A_COART_ON * n)
-    off_n = int(VS_A_COART_OFF * n)
 
     f_mean = list(VS_A_F)
-    if F_prev is not None and on_n > 0:
+    if F_prev is not None:
         for k in range(min(len(F_prev),
                            len(VS_A_F))):
-            f_mean[k] = (F_prev[k] * 0.12
-                         + VS_A_F[k] * 0.88)
-    if F_next is not None and off_n > 0:
+            f_mean[k] = (F_prev[k] * VS_A_COART_ON
+                         + VS_A_F[k] * (1.0 - VS_A_COART_ON))
+    if F_next is not None:
         for k in range(min(len(F_next),
                            len(VS_A_F))):
-            f_mean[k] = (f_mean[k] * 0.88
-                         + F_next[k] * 0.12)
+            f_mean[k] = (f_mean[k] * (1.0 - VS_A_COART_OFF)
+                         + F_next[k] * VS_A_COART_OFF)
 
     out = apply_formants(src, f_mean,
                          VS_A_B, VS_A_GAINS,
                          sr=sr)
+    out = apply_vowel_envelope(
+        out, word_initial=word_initial,
+        word_final=word_final, sr=sr)
     mx  = np.max(np.abs(out))
     if mx > 1e-8:
         out = out / mx * 0.72
@@ -348,55 +421,134 @@ def synth_G(F_prev=None, F_next=None,
             pitch_hz=PITCH_HZ,
             dil=DIL, sr=SR):
     """
-    [g] — voiced velar stop.
+    [g] — voiced velar stop — v5 continuous voicing
+    crossfade cutback.
     Śikṣā: kaṇṭhya.
-    VS-verified in ṚG.
-    Three-phase: closure / burst / VOT.
+
+    v1 BROKEN: LP filter murmur + random noise burst + VOT.
+    v5 CORRECT: one continuous Rosenberg source, three
+    filter phases, crossfade cutback.
+
+    ONE continuous glottal source for the entire [g].
+    The vocal folds vibrate continuously through
+    closure, burst, and cutback. The tongue moves.
+    The larynx does not stop. One instrument.
+
+    Phase 1 (closure):  source → voice bar filter (200 Hz)
+    Phase 2 (burst):    source → burst-locus formants + transient
+    Phase 3 (cutback):  source → crossfade closed→open filters
+
+    The source is sliced from one continuous pulse train.
+    No phase resets. No discontinuities.
     """
-    n_closure = int(
-        VS_G_CLOSURE_MS * dil / 1000.0 * sr)
-    n_burst   = int(
-        VS_G_BURST_MS   * dil / 1000.0 * sr)
-    n_vot     = int(
-        VS_G_VOT_MS     * dil / 1000.0 * sr)
+    n_closure = int(VS_G_CLOSURE_MS * dil / 1000.0 * sr)
+    n_burst   = int(VS_G_BURST_MS * dil / 1000.0 * sr)
+    n_cutback = int(VS_G_CUTBACK_MS * dil / 1000.0 * sr)
+    n_total   = n_closure + n_burst + n_cutback
 
-    src_cl = rosenberg_pulse(
-        n_closure, pitch_hz, sr=sr)
-    b_lp, a_lp = safe_lp(800.0, sr)
-    if b_lp is not None:
-        murmur = lfilter(b_lp, a_lp,
-                         src_cl.astype(float))
+    f_next = F_next if F_next is not None else VS_N_F
+
+    # ── ONE continuous glottal source ─────────────────
+    src_all = rosenberg_pulse(
+        n_total, pitch_hz, oq=0.65, sr=sr)
+
+    # Slice the continuous source into phase windows
+    src_closure = src_all[:n_closure]
+    src_burst   = src_all[n_closure:n_closure + n_burst]
+    src_cutback = src_all[n_closure + n_burst:]
+
+    # ── Phase 1: Voice bar (closure) ──────────────────
+    # Tongue body sealed against velum.
+    # Only the voice bar resonance escapes (~200 Hz).
+    # This is the quietest part of the word.
+    if n_closure > 0:
+        murmur = apply_formants(
+            src_closure,
+            [VS_G_VOICEBAR_F],
+            [VS_G_VOICEBAR_BW],
+            [VS_G_VOICEBAR_G],
+            sr=sr)
+        # Gentle onset ramp
+        env_cl = np.ones(n_closure, dtype=float)
+        ramp_n = max(1, int(0.2 * n_closure))
+        env_cl[:ramp_n] = np.linspace(
+            0.5, 1.0, ramp_n)
+        murmur = f32(murmur * env_cl)
+        closure = norm_to_peak(murmur,
+                               VS_G_MURMUR_PEAK)
     else:
-        murmur = src_cl.astype(float)
-    murmur = f32(murmur * VS_G_MURMUR_GAIN)
+        closure = np.array([], dtype=DTYPE)
 
-    noise  = np.random.randn(n_burst)
-    b_bp, a_bp = safe_bp(
-        VS_G_BURST_F - VS_G_BURST_BW / 2,
-        VS_G_BURST_F + VS_G_BURST_BW / 2,
-        sr)
-    if b_bp is not None:
-        burst = lfilter(b_bp, a_bp, noise)
+    # ── Phase 2: Burst (velar release) ────────────────
+    # The tongue body begins to release.
+    # The voicing is PRESENT during the burst —
+    # this is a voiced stop. The burst rides ON TOP
+    # of the continuous glottal oscillation.
+    # The burst is SOFTER and MORE DIFFUSE than dental:
+    #   - Large release area → less pressure buildup
+    #   - Lower centroid (2500 Hz vs 3500 Hz)
+    #   - Slower decay (cavity rings longer)
+    if n_burst > 0:
+        burst_n = max(n_burst, 16)
+
+        # Voiced component: source through burst-locus filter
+        voiced_burst = apply_formants(
+            src_burst[:burst_n],
+            VS_G_BURST_F, VS_G_BURST_B,
+            VS_G_BURST_G, sr=sr)
+
+        # Transient component: brief pressure release
+        spike = np.zeros(burst_n, dtype=float)
+        spike[0:4] = [0.6, 0.4, 0.2, 0.1]
+        t_b = np.arange(burst_n) / sr
+        spike_env = np.exp(-t_b * VS_G_BURST_DECAY)
+        transient = f32(spike * spike_env)
+
+        # Mix: voiced voicing + brief transient
+        # The voicing is primary. The transient rides on it.
+        burst_raw = (voiced_burst * 0.6
+                     + transient * 0.4)
+        burst = norm_to_peak(f32(burst_raw),
+                             VS_G_BURST_PEAK)
     else:
-        burst = noise
-    burst = f32(burst * VS_G_BURST_GAIN)
+        burst = np.array([], dtype=DTYPE)
 
-    if n_vot > 0:
-        src_vot = rosenberg_pulse(
-            n_vot, pitch_hz, sr=sr)
-        f_vot   = (F_next if F_next is not None
-                   else VS_G_F)
-        vot     = apply_formants(
-            src_vot, f_vot,
-            VS_G_B, VS_G_GAINS, sr=sr)
-        vot     = f32(vot * 0.10)
+    # ── Phase 3: Crossfade cutback ────────────────────
+    # Equal-power crossfade: closed (quiet) → open (loud).
+    # SAME continuous source, two different filters.
+    # The amplitude RISES through this phase.
+    if n_cutback > 0:
+        closed = apply_formants(
+            src_cutback, VS_G_CLOSED_F,
+            VS_G_CLOSED_B, VS_G_CLOSED_G,
+            sr=sr)
+        closed = norm_to_peak(closed,
+                              VS_G_CLOSED_PEAK)
+
+        open_f = list(f_next)
+        open_b = [130.0, 160.0, 220.0, 280.0]
+        open_g = [14.0, 6.0, 1.5, 0.4]
+        opened = apply_formants(
+            src_cutback, open_f, open_b,
+            open_g, sr=sr)
+        opened = norm_to_peak(opened,
+                              VS_G_OPEN_PEAK)
+
+        # Equal-power crossfade: cos (closed → 0)
+        #                        sin (open → 1)
+        t_xf = np.linspace(0.0, np.pi / 2.0,
+                           n_cutback)
+        xf_out = (closed * np.cos(t_xf).astype(DTYPE)
+                  + opened * np.sin(t_xf).astype(DTYPE))
+        cutback = norm_to_peak(f32(xf_out),
+                               VS_G_CUTBACK_PEAK)
     else:
-        vot = np.array([], dtype=DTYPE)
+        cutback = np.array([], dtype=DTYPE)
 
-    out = np.concatenate([murmur, burst, vot])
+    out = np.concatenate([closure, burst, cutback])
     mx  = np.max(np.abs(out))
     if mx > 1e-8:
-        out = out / mx * 0.65
+        out = out / mx * VS_G_FINAL_NORM
     return f32(out)
 
 
@@ -409,77 +561,82 @@ def synth_N(F_prev=None, F_next=None,
     First VS nasal.
     Sustained voiced murmur with
     antiresonance at ~800 Hz.
-    The antiresonance is the acoustic
-    consequence of the nasal side
-    branch — the velum is lowered,
-    allowing airflow through the nasal
-    cavity, which creates a zero in
-    the transfer function.
     """
     n_ms  = VS_N_DUR_MS * dil
     n     = int(n_ms / 1000.0 * sr)
     src   = rosenberg_pulse(n, pitch_hz,
                             oq=0.65, sr=sr)
-    on_n  = int(VS_N_COART_ON * n)
-    off_n = int(VS_N_COART_OFF * n)
 
     f_mean = list(VS_N_F)
-    if F_prev is not None and on_n > 0:
+    if F_prev is not None:
         for k in range(min(len(F_prev),
                            len(VS_N_F))):
-            f_mean[k] = (F_prev[k] * 0.15
-                         + VS_N_F[k] * 0.85)
-    if F_next is not None and off_n > 0:
+            f_mean[k] = (F_prev[k] * VS_N_COART_ON
+                         + VS_N_F[k] * (1.0 - VS_N_COART_ON))
+    if F_next is not None:
         for k in range(min(len(F_next),
                            len(VS_N_F))):
-            f_mean[k] = (f_mean[k] * 0.85
-                         + F_next[k] * 0.15)
+            f_mean[k] = (f_mean[k] * (1.0 - VS_N_COART_OFF)
+                         + F_next[k] * VS_N_COART_OFF)
+
+    # Gentle onset/offset envelope
+    env = np.ones(n, dtype=DTYPE)
+    n_tr = min(int(0.020 * sr), n // 4)
+    if n_tr > 0 and n_tr < n:
+        env[:n_tr]  = np.linspace(
+            0.3, 1.0, n_tr).astype(DTYPE)
+        env[-n_tr:] = np.linspace(
+            1.0, 0.3, n_tr).astype(DTYPE)
+    src = f32(src * env)
 
     out = apply_formants(src, f_mean,
                          VS_N_B, VS_N_GAINS,
                          sr=sr)
-    # Apply antiresonance — the nasal zero
-    out = iir_notch(out,
-                    VS_N_ANTI_F,
+    out = iir_notch(out, VS_N_ANTI_F,
                     VS_N_ANTI_BW, sr=sr)
     mx  = np.max(np.abs(out))
     if mx > 1e-8:
-        out = out / mx * 0.40
+        out = out / mx * 0.60
     return f32(out)
 
 
 def synth_I(F_prev=None, F_next=None,
             pitch_hz=PITCH_HZ,
-            dil=DIL, sr=SR):
+            dil=DIL,
+            word_initial=False,
+            word_final=False,
+            sr=SR):
     """
     [i] — short close front unrounded.
     Śikṣā: tālavya.
-    Low F1 — close jaw.
-    High F2 — tongue body to hard palate.
-    Front corner of the VS vowel triangle.
+    Close jaw, high F2.
+
+    v3: word_final=True applies offset fade
+    to prevent abrupt cutoff at end of word.
     """
     n_ms  = VS_I_DUR_MS * dil
     n     = int(n_ms / 1000.0 * sr)
     src   = rosenberg_pulse(n, pitch_hz,
                             oq=0.65, sr=sr)
-    on_n  = int(VS_I_COART_ON * n)
-    off_n = int(VS_I_COART_OFF * n)
 
     f_mean = list(VS_I_F)
-    if F_prev is not None and on_n > 0:
+    if F_prev is not None:
         for k in range(min(len(F_prev),
                            len(VS_I_F))):
-            f_mean[k] = (F_prev[k] * 0.12
-                         + VS_I_F[k] * 0.88)
-    if F_next is not None and off_n > 0:
+            f_mean[k] = (F_prev[k] * VS_I_COART_ON
+                         + VS_I_F[k] * (1.0 - VS_I_COART_ON))
+    if F_next is not None:
         for k in range(min(len(F_next),
                            len(VS_I_F))):
-            f_mean[k] = (f_mean[k] * 0.88
-                         + F_next[k] * 0.12)
+            f_mean[k] = (f_mean[k] * (1.0 - VS_I_COART_OFF)
+                         + F_next[k] * VS_I_COART_OFF)
 
     out = apply_formants(src, f_mean,
                          VS_I_B, VS_I_GAINS,
                          sr=sr)
+    out = apply_vowel_envelope(
+        out, word_initial=word_initial,
+        word_final=word_final, sr=sr)
     mx  = np.max(np.abs(out))
     if mx > 1e-8:
         out = out / mx * 0.70
@@ -494,8 +651,7 @@ def apply_simple_room(sig, rt60=1.5,
     """
     Schroeder reverb approximation.
     rt60 = 1.5 s — temple courtyard.
-    VS default. Outdoor ritual or
-    open stone space.
+    VS default.
     """
     n_rev = int(rt60 * sr)
     ir    = np.zeros(n_rev, dtype=float)
@@ -528,36 +684,45 @@ def synth_agni(pitch_hz=PITCH_HZ,
     """
     AGNI [ɑgni]
     Rigveda 1.1.1, word 1.
-    The fire priest. The invocation.
+    "O fire."
 
     Syllable structure: AG — NI
 
     Coarticulation chain:
-      A:  word-initial, F_prev=None
-          coarticulates toward VS_G_F
-      G:  coarticulates from VS_A_F
-          coarticulates toward VS_N_F
-      N:  coarticulates from VS_G_F
-          coarticulates toward VS_I_F
-      I:  coarticulates from VS_N_F
-          word-final, F_next=None
+      A:  word-initial (onset fade), F_prev=None
+          F_next=VS_G_CLOSED_F
+      G:  F_prev=VS_A_F, F_next=VS_N_F
+      N:  F_prev=VS_G_CLOSED_F, F_next=VS_I_F
+      I:  F_prev=VS_N_F, word-final (offset fade)
+
+    Amplitude hierarchy:
+      [ɑ] 0.72  — vowel (loudest)
+      [g] 0.45  — stop (quietest, continuous voicing)
+      [n] 0.60  — nasal (medium)
+      [i] 0.70  — vowel (with final fade)
     """
     a_seg = synth_A(F_prev=None,
-                    F_next=VS_G_F,
+                    F_next=VS_G_CLOSED_F,
                     pitch_hz=pitch_hz,
-                    dil=dil, sr=sr)
+                    dil=dil,
+                    word_initial=True,
+                    word_final=False,
+                    sr=sr)
     g_seg = synth_G(F_prev=VS_A_F,
                     F_next=VS_N_F,
                     pitch_hz=pitch_hz,
                     dil=dil, sr=sr)
-    n_seg = synth_N(F_prev=VS_G_F,
+    n_seg = synth_N(F_prev=VS_G_CLOSED_F,
                     F_next=VS_I_F,
                     pitch_hz=pitch_hz,
                     dil=dil, sr=sr)
     i_seg = synth_I(F_prev=VS_N_F,
                     F_next=None,
                     pitch_hz=pitch_hz,
-                    dil=dil, sr=sr)
+                    dil=dil,
+                    word_initial=False,
+                    word_final=True,
+                    sr=sr)
 
     word = np.concatenate(
         [a_seg, g_seg, n_seg, i_seg])
@@ -577,25 +742,59 @@ def synth_agni(pitch_hz=PITCH_HZ,
 # ── MAIN ──────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("Synthesising AGNI [ɑgni]...")
+    print("=" * 60)
+    print("  AGNI [ɑgni] v5")
+    print("  Crossfade Cutback [g]")
+    print("  Continuous Voicing Source")
+    print("  Word Boundary Envelopes")
+    print("  Amplitude Hierarchy")
+    print("=" * 60)
+    print()
 
-    dry  = synth_agni(with_room=False)
-    hall = synth_agni(with_room=True)
-    slow = ola_stretch(dry, 4.0)
+    # ── Diagnostic speed (dil=1.0) ────────────────────
+    print("  Diagnostic (dil=1.0):")
+    dry = synth_agni(dil=1.0, with_room=False)
+    write_wav("output_play/agni_dry.wav", dry)
 
-    write_wav("output_play/agni_dry.wav",  dry)
-    write_wav("output_play/agni_hall.wav", hall)
-    write_wav("output_play/agni_slow.wav", slow)
+    slow6  = ola_stretch(dry, factor=6.0)
+    slow12 = ola_stretch(dry, factor=12.0)
+    write_wav("output_play/agni_slow6x.wav",  slow6)
+    write_wav("output_play/agni_slow12x.wav", slow12)
 
-    # Isolated phonemes for triangle check
-    a_iso = synth_A(F_prev=None, F_next=None)
-    i_iso = synth_I(F_prev=None, F_next=None)
+    dur_diag = len(dry) / SR * 1000.0
+    print(f"    Duration: {dur_diag:.1f} ms")
+    print()
+
+    # ── Performance speed (dil=2.5) ───────────────────
+    print("  Performance (dil=2.5):")
+    perf_dry  = synth_agni(dil=2.5, with_room=False)
+    perf_hall = synth_agni(dil=2.5, with_room=True)
+    write_wav("output_play/agni_perf.wav",      perf_dry)
+    write_wav("output_play/agni_perf_hall.wav",  perf_hall)
+
+    perf_slow6  = ola_stretch(perf_dry, factor=6.0)
+    perf_slow12 = ola_stretch(perf_dry, factor=12.0)
+    write_wav("output_play/agni_perf_slow6x.wav",  perf_slow6)
+    write_wav("output_play/agni_perf_slow12x.wav", perf_slow12)
+
+    dur_perf = len(perf_dry) / SR * 1000.0
+    print(f"    Duration: {dur_perf:.1f} ms")
+    print()
+
+    # ── Isolated phonemes (dil=1.0) ───────────────────
+    print("  Isolated phonemes:")
+    a_iso = synth_A(F_prev=None, F_next=None,
+                    word_initial=True, word_final=True)
+    g_iso = synth_G(F_prev=None, F_next=None)
     n_iso = synth_N(F_prev=None, F_next=None)
+    i_iso = synth_I(F_prev=None, F_next=None,
+                    word_initial=True, word_final=True)
 
     for sig, name in [
         (a_iso, "agni_a_isolated"),
-        (i_iso, "agni_i_isolated"),
+        (g_iso, "agni_g_isolated"),
         (n_iso, "agni_n_isolated"),
+        (i_iso, "agni_i_isolated"),
     ]:
         mx = np.max(np.abs(sig))
         if mx > 1e-8:
@@ -603,18 +802,38 @@ if __name__ == "__main__":
         write_wav(
             f"output_play/{name}.wav", sig)
         write_wav(
-            f"output_play/{name}_slow.wav",
-            ola_stretch(sig, 4.0))
+            f"output_play/{name}_slow6x.wav",
+            ola_stretch(sig, factor=6.0))
+        write_wav(
+            f"output_play/{name}_slow12x.wav",
+            ola_stretch(sig, factor=12.0))
 
-    print("Written:")
-    print("  output_play/agni_dry.wav")
-    print("  output_play/agni_hall.wav")
-    print("  output_play/agni_slow.wav")
-    print("  output_play/agni_a_isolated.wav")
-    print("  output_play/agni_a_isolated_slow.wav")
-    print("  output_play/agni_i_isolated.wav")
-    print("  output_play/agni_i_isolated_slow.wav")
-    print("  output_play/agni_n_isolated.wav")
-    print("  output_play/agni_n_isolated_slow.wav")
+    # ── Summary ───────────────────────────────────────
     print()
-    print("Run agni_diagnostic.py to verify.")
+    print("  " + "─" * 50)
+    print(f"  Segments: [ɑ]={VS_A_DUR_MS}ms "
+          f"[g]={VS_G_TOTAL_MS}ms "
+          f"[n]={VS_N_DUR_MS}ms "
+          f"[i]={VS_I_DUR_MS}ms")
+    print(f"  Diagnostic (dil=1.0): {dur_diag:.1f} ms")
+    print(f"  Performance (dil=2.5): {dur_perf:.1f} ms")
+    print()
+    print("  v5 architecture:")
+    print("    [g] crossfade cutback (DEVAM v13 canonical)")
+    print("    [g] ONE continuous Rosenberg source")
+    print("    [g] voiced burst (source + transient)")
+    print("    [g] amplitude 0.45 (vowels 0.70-0.72)")
+    print("    [ɑ] word-initial onset fade (20ms)")
+    print("    [i] word-final offset fade (20ms)")
+    print("    OLA 6×/12× standard")
+    print()
+    print("  v1 bugs FIXED:")
+    print("    ✗ LP filter murmur → ✓ voice bar resonator")
+    print("    ✗ np.random.randn burst → ✓ voiced burst")
+    print("    ✗ three independent sources → ✓ one continuous")
+    print("    ✗ phase resets at boundaries → ✓ no resets")
+    print("    ✗ [g] at 0.65 (too loud) → ✓ [g] at 0.45")
+    print("    ✗ [i] abrupt cutoff → ✓ offset fade")
+    print("    ✗ OLA 4× → ✓ OLA 6×/12×")
+    print()
+    print("  Run agni_diagnostic.py to verify.")
