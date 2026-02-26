@@ -2,7 +2,7 @@
 ## Current Empirical State, Framework Connections,
 ## and Open Predictions as of February 2026
 ## Reasoning Artifact — Cross-Species Communication Series
-## OrganismCore — qualia_candidate_axioms/historical/Cross_species_communication
+## OrganismCore
 ## February 26, 2026
 
 ---
