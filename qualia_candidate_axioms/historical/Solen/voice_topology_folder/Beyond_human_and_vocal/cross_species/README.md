@@ -25,3 +25,4 @@
 - the_instrument_is_the_bridge.md
 - the_bees/the_bee.md
 - the_bees/the_false_attractor_hypothesis.md
+- the_bees/bee_quantum_layer.md
