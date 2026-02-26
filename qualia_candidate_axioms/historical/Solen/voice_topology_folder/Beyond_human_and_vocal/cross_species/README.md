@@ -15,3 +15,5 @@
 - survival_pressure_axis.md
 - raven_vocal_instrument.md
 - humpback_whale_vocal_instrument.md
+- the_waiting_landscape.md
+- deeper_survey_the_unexpected_findings.md
