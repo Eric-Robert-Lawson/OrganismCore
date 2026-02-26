@@ -3,7 +3,7 @@
 ## A Reasoning Artifact on the Conditions for
 ## Spectral Geometry Mapping Across Species
 ## Version 1.0 — February 2026
-## OrganismCore — qualia_candidate_axioms
+## OrganismCore
 
 ---
 
