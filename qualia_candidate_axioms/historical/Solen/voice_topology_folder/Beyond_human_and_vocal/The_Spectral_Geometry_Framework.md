@@ -7,6 +7,12 @@
 
 ---
 
+## **IMPORTANT NOTE**
+
+This document is not considering the other frameworks tested for conciousness that converge with this, such as IGH and ship of theseus conclusions. This is only a part of a bigger project.
+
+---
+
 ## ARTIFACT STATUS
 
 ```
