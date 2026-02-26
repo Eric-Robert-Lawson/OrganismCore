@@ -8,3 +8,4 @@
 - cross_species_communication_research_pt1.md
 - multimodal_communication_channels.md
 - complete_communication_vector_taxonomy.md
+- note_from_the_session.md
