@@ -14,6 +14,10 @@ second claude session [https://github.com/copilot/share/883510a2-42a0-8cd6-a041-
 
 third claude session (phonetics and cross session) [https://github.com/copilot/share/483443b0-4aa0-8c54-9110-5e0ec45108bf](https://github.com/copilot/share/483443b0-4aa0-8c54-9110-5e0ec45108bf)
 
+places of interest:
+
+[beyond human and vocal folder (Spectral Geometry links with conciousness)](https://github.com/Eric-Robert-Lawson/OrganismCore/tree/main/qualia_candidate_axioms/historical/Solen/voice_topology_folder/Beyond_human_and_vocal)
+
 The documents are ordered as such:
 - cross_substrate_consciousness_verification_v1.md
 - metamorphosis_convergence_analysis.md
