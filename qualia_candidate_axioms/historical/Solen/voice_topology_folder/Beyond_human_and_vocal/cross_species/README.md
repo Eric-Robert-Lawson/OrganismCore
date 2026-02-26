@@ -12,3 +12,4 @@
 - the_cleaner_wrasse.md
 - convergent_olfactory_self_model_reasoning_object.md
 - msr_priming_falsifiable_tests_reasoning_object.md
+- survival_pressure_axis.md
