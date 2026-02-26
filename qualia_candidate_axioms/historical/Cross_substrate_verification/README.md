@@ -85,3 +85,4 @@ The documents are ordered as such:
 - persistent_homology_of_self_referential.md
 - The_Spectral_Geometry_Framework.md
 - Document_63.md
+- the_triad_convergence.md
