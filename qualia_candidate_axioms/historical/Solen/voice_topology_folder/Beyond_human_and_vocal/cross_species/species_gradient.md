@@ -1143,6 +1143,14 @@ produce recognition across substrates.
 
 ---
 
+**ADDITIONAL NOTE**
+
+Slobodchikoff's finding that prairie dog alarm calls encode predator species, color, size, shape, AND speed simultaneously in a single sub-second vocalization. Five-dimensional referential encoding in a compressed acoustic burst.
+
+Prairie dogs don't have vocal learning or cultural transmission of their call repertoire (as far as current research shows). They'd fall in the gradient between Tier 2 and Tier 4 — high referential density without the accumulated navigation that vocal learning provides. But they represent an interesting edge case: if their calls DO show eigenfunction structure despite lacking vocal learning, that would pressure the gradient criterion in a specific and informative direction. It would suggest that natural selection alone — without cultural navigation — can find eigenfunction positions, at least in species with sufficient referential pressure.
+
+---
+
 ## VERSION HISTORY
 
 ```
