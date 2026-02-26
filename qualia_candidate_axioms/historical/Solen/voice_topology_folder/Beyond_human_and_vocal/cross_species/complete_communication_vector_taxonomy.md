@@ -1854,6 +1854,407 @@ FRAMEWORK POSITION:
 
 ---
 
+### VECTOR 11: BIOELECTRIC FIELD
+### (Passive Electromagnetic Emission
+### from Metabolic Activity)
+
+```
+PHYSICAL BASIS:
+  Every organism with membrane-
+  bounded cells generates a weak,
+  ambient electromagnetic field
+  as a byproduct of ongoing
+  metabolic activity:
+  - Ion channel activity across
+    cell membranes (continuous)
+  - Action potential propagation
+    through neural and muscular
+    tissue
+  - Cardiac electrical activity
+    (heart rhythm produces a
+    measurable dipole field
+    extending beyond the body)
+  - Muscle activation patterns
+    (contraction generates local
+    electromagnetic gradients)
+  - Autonomic nervous system
+    fluctuations tied to arousal,
+    fear, calm, focused attention
+  
+  These fields extend passively
+  into the surrounding medium
+  (air or water) without any
+  deliberate signal production
+  by the organism.
+  
+  THIS IS NOT A SIGNAL CHANNEL
+  IN THE CLASSICAL SENSE.
+  
+  No sender actively produces
+  a designed signal.
+  The sender simply exists.
+  The field is a byproduct of
+  being alive.
+  
+  But receivers with sufficient
+  electroreceptor sensitivity
+  can extract information from
+  that field — including
+  information about the sender's
+  internal physiological state.
+
+CRITICAL DISTINCTION FROM
+VECTOR 7 (ELECTRIC FIELD):
+  Vector 7 (Bioelectric Signal)
+  describes ACTIVE production
+  of electric organ discharges
+  (EODs) by specialized fish —
+  a designed, intentional signal
+  in the electric medium.
+  
+  Vector 11 (Bioelectric Field)
+  describes PASSIVE emission by
+  ALL organisms as a metabolic
+  byproduct — not designed,
+  not directed, not intentional.
+  
+  Vector 7: Active, designed,
+    species-specific, structured.
+  Vector 11: Passive, ambient,
+    universal, state-reflecting.
+  
+  They are physically related
+  (both involve electromagnetic
+  fields in the 0.1 Hz - 1 kHz
+  range for biological sources)
+  but functionally and analytically
+  distinct.
+
+BIOLOGICAL SENDERS:
+  ALL organisms with cells.
+  The field strength scales with:
+  - Body mass (larger body =
+    stronger field at a distance)
+  - Metabolic rate (higher arousal
+    = more ion channel activity
+    = stronger field modulation)
+  - Muscle mass and activation
+    (active muscle = stronger
+    local field)
+  
+  Human bioelectric field:
+  - Heart generates ~50 picotesla
+    magnetic field (measurable
+    by MEG at several meters)
+  - Neural activity generates
+    fields measurable at the
+    scalp (EEG) and beyond
+  - Emotional and arousal states
+    modulate the field signature
+    measurably
+
+BIOLOGICAL RECEIVERS:
+  
+  ELECTRORECEPTIVE FISH
+  (active receivers):
+    Sharks, rays (ampullae of
+      Lorenzini): detect DC and
+      low-frequency fields down to
+      5 nanovolts/cm — among the
+      most sensitive biological
+      sensors known. Evolved
+      for prey detection but
+      necessarily receive the
+      bioelectric field of any
+      organism within range,
+      including humans.
+    Weakly electric fish (tuberous
+      and ampullary receptors):
+      detect both active EODs
+      (Vector 7) and passive
+      bioelectric fields. Can
+      distinguish individual
+      identity from passive
+      field signatures.
+    Platypus (bill electroreceptors):
+      detects muscle contractions
+      of prey via passive field.
+    Some salamanders and
+      amphibians.
+  
+  PLANTS (2025 confirmation):
+    Five-year investigation
+    (arXiv 2506.04132, 2025)
+    confirms that plants generate
+    action potentials in response
+    to the bioelectric field of
+    nearby organisms.
+    
+    CRITICAL FINDING:
+    Machine learning systems
+    trained on plant bioelectric
+    signals can accurately
+    distinguish HUMAN EMOTIONAL
+    STATES from the plant's
+    electrical response pattern.
+    
+    The plant is not detecting
+    acoustic signals.
+    Not detecting chemical signals.
+    Not detecting visual signals.
+    
+    It is detecting the ambient
+    bioelectric field of the
+    nearby human and differentiating
+    that field based on the human's
+    internal physiological state.
+    
+    This is the most unexpected
+    receiver type in the taxonomy.
+    Plants have been monitoring
+    the bioelectric field of
+    nearby organisms — including
+    humans — without any framework
+    to describe it until now.
+  
+  BEES (partial confirmation):
+    Bees detect the electric fields
+    of flowers to assess recent
+    visitation (floral charge
+    depletes after bee landing).
+    This is detection of a
+    passively generated field
+    rather than a designed signal.
+    The same receptor capacity
+    may extend to detection of
+    nearby animal bioelectric
+    fields, though this has not
+    been directly tested.
+
+EIGENFUNCTION STRUCTURE:
+  UNKNOWN — AND STRUCTURALLY
+  DIFFERENT FROM OTHER CHANNELS.
+  
+  For all other channels in this
+  taxonomy, eigenfunction structure
+  arises from the bounded anatomy
+  or physical medium of the SENDER.
+  
+  For the bioelectric field channel,
+  the sender has no anatomy
+  specifically evolved for this
+  channel. The "signal" is a
+  metabolic byproduct.
+  
+  HOWEVER:
+  The physiological states that
+  modulate the field are themselves
+  organized:
+  - Fear: specific pattern of
+    autonomic activation, heart
+    rate elevation, muscle
+    tension increase.
+  - Calm: opposite pattern.
+  - Focused attention: specific
+    neural firing pattern.
+  - High arousal: characteristic
+    field modulation.
+  
+  These states are not continuous
+  — they cluster around functional
+  attractors (stable physiological
+  configurations).
+  
+  IF those attractor states produce
+  distinguishable field signatures —
+  and the plant evidence confirms
+  they do, at least for human
+  emotional states — then there
+  is RECEIVER-SIDE eigenfunction
+  structure in this channel:
+  
+  The receiver's electroreceptor
+  space is tuned to respond to
+  field patterns that correspond
+  to ecologically relevant sender
+  states (prey vs. non-prey,
+  calm vs. alarmed, near vs.
+  far).
+  
+  This is similar in structure
+  to the chemical channel
+  (receiver-side eigenfunction
+  bounding) — but the information
+  is richer than chemical identity
+  signals because it encodes
+  DYNAMIC STATE, not just
+  categorical identity.
+
+CROSS-SPECIES TRACTABILITY:
+  ASYMMETRIC AND INVOLUNTARY.
+  
+  THIS IS THE KEY PROPERTY
+  THAT DISTINGUISHES VECTOR 11
+  FROM ALL OTHER VECTORS:
+  
+  The human sender transmits on
+  this channel continuously and
+  involuntarily, simply by being
+  present and alive.
+  
+  There is no "production" step
+  to manage. There is only
+  STATE MANAGEMENT.
+  
+  For cross-species communication
+  with electroreceptive species:
+  
+  The sender's physiological
+  state IS the signal.
+  
+  A nervous researcher with
+  elevated heart rate, tense
+  musculature, and heightened
+  arousal is transmitting:
+  "large, metabolically active,
+  aroused entity — possible
+  threat" on Vector 11
+  before producing a single
+  acoustic signal on Vector 1.
+  
+  A calm researcher with slow
+  heart rate, relaxed musculature,
+  and low autonomic arousal
+  is transmitting:
+  "large entity — low arousal —
+  non-threatening metabolic
+  signature."
+  
+  THE CONDITION 3 PREREQUISITE
+  FOR ELECTRORECEPTIVE SPECIES
+  IS THEREFORE BIOELECTRIC,
+  NOT JUST BEHAVIORAL.
+  
+  The animal has already received
+  information about the sender's
+  internal state through Vector 11
+  before any designed signal
+  arrives through Vectors 1-10.
+  
+  PRACTICAL IMPLICATIONS:
+  1. Approach protocols for sharks,
+     rays, and weakly electric fish
+     must include physiological
+     preparation — genuine calm,
+     not performed calm.
+  2. Biofeedback training for
+     field researchers targeting
+     electroreceptive species.
+  3. Heart rate monitoring during
+     approach as a quality control
+     measure for Vector 11 signal.
+  
+  FOR PLANTS:
+  The tractability inversion is
+  complete — the plant detects
+  the human, not the reverse.
+  This has potential applications
+  in plant bioelectric monitoring
+  as an ambient state sensor in
+  research environments.
+
+GAP NAVIGATION SIGNAL CAPACITY:
+  LOW FOR PROPOSITIONAL CONTENT.
+  HIGH FOR STATE TRANSMISSION.
+  
+  The bioelectric field cannot
+  carry "go north, food is there."
+  It can carry:
+  "this entity is calm / alarmed /
+  focused / fearful."
+  
+  This is the same functional
+  category as the tactile channel
+  (Vector 6) — relational and
+  state-level signaling, not
+  propositional content.
+  
+  BUT: state transmission on
+  Vector 11 precedes and
+  contextualizes all other
+  channel communication.
+  
+  It is the pre-signal signal.
+  The channel that is already
+  running before the conversation
+  begins.
+  
+  For electroreceptive species,
+  the state transmitted on
+  Vector 11 may determine whether
+  Condition 3 attribution is even
+  possible — whether the animal
+  classifies the approaching
+  entity as "threat" or "unknown
+  entity worth investigating."
+  
+  In this sense, Vector 11 has
+  GATING FUNCTION for all other
+  channels with electroreceptive
+  target species.
+
+FRAMEWORK POSITION:
+  Not a communication channel
+  target in the designed-signal
+  sense.
+  
+  A PREREQUISITE CHANNEL for
+  all cross-species communication
+  with electroreceptive species.
+  
+  A PASSIVE PRESENCE CHANNEL
+  that is always active,
+  always transmitting, and
+  cannot be turned off —
+  only managed through
+  physiological state control.
+  
+  ADDED TO TAXONOMY:
+  February 26, 2026 — added
+  following discovery of the
+  2025 plant bioelectric
+  finding (arXiv 2506.04132)
+  and synthesis of implications
+  for the cross-species
+  communication program.
+  
+  This vector was absent from
+  the original taxonomy (v1.0)
+  because the plant finding
+  was not yet integrated into
+  the framework. It represents
+  a genuine gap in the original
+  taxonomy — a channel that
+  was operating throughout
+  the biosphere, including
+  in interactions with humans,
+  without being named.
+  
+  The original taxonomy stated:
+  "If a channel is absent, it
+  was either unknown at time of
+  writing or determined to reduce
+  to a named channel at a deeper
+  level of analysis."
+  
+  This channel was effectively
+  unknown at the level of
+  synthesis required to name it
+  in the framework. It has now
+  been named.
+
+---
+
 ## PART III: VECTORS AT THE
 ## BOUNDARY
 
