@@ -39,3 +39,8 @@
 - the_electric_tonnetz.md
 - the_universal_tonnetz.md
 - the_session_artifact.md
+
+
+Session links:
+
+[https://github.com/copilot/share/c0544220-0284-8c74-9153-dc07c0d328fe](https://github.com/copilot/share/c0544220-0284-8c74-9153-dc07c0d328fe)
