@@ -1996,3 +1996,306 @@ Drafted by:
   OrganismCore
   February 27, 2026
 ```
+
+---
+
+## AMENDMENT 2
+## EVIDENCE CHAIN UPDATE AND
+## VALUE CLARIFICATION
+## February 27, 2026
+## Filed after completion of
+## EUMODIC analysis phase and
+## full program review
+
+---
+
+### AMENDMENT METADATA
+
+```
+Amendment number:  2
+Protocol version:  1.1 → 1.2
+Amendment date:    February 27, 2026
+
+Filed:
+  After EUMODIC analysis phase
+  completed (seven scripts,
+  six reasoning artifacts).
+  Prior to any experimental
+  data collection.
+  Prior to IACUC submission.
+  Prior to facility identification.
+
+Reason summary:
+  Two additions only:
+  1. Clarification of primary
+     observational result value
+     — r=-0.886 confirmed as
+     correct; r=-0.775 discrepancy
+     explained.
+  2. Complete evidence chain
+     added as Part XI — current
+     state of all three vectors
+     as of February 27, 2026.
+
+Effect on hypotheses:
+  None. Unchanged.
+
+Effect on primary analysis:
+  None. Unchanged.
+
+Effect on sample size:
+  None. Unchanged.
+
+Effect on blinding:
+  None. Unchanged.
+```
+
+---
+
+### SECTION 1: VALUE CLARIFICATION
+
+```
+The pre-registration correctly
+states the primary observational
+result as:
+
+  Spearman r = -0.886
+  p = 0.019
+  N = 16,161 wildtype animals
+  6 IMPC centers
+
+This is confirmed as the correct
+final value from IMPC Documents
+1 and 2 (proportion-corrected,
+CCP-IMG as Toronto representative,
+C57BL/6N strict wildtype only).
+
+A second value appears in EUMODIC
+analysis documents and EUMODIC
+README:
+
+  Spearman r = -0.775
+  p = 0.0408
+  N = 7 centers
+
+These are not the same analysis.
+The r = -0.775 result is from
+an earlier uncorrected analysis
+using raw time-in-periphery
+(seconds, not proportion) across
+a different center configuration.
+It was cited in EUMODIC documents
+written during the EUMODIC analysis
+phase as a shorthand reference.
+
+The correct value for all
+downstream citations is:
+  r = -0.886, p = 0.019, N = 6
+
+The r = -0.775 value is documented
+here for transparency so that the
+discrepancy between documents is
+explained rather than hidden.
+
+Both values point in the same
+direction and both are significant.
+The -0.886 value is the confirmed
+final result.
+```
+
+---
+
+### SECTION 2: COMPLETE EVIDENCE
+### CHAIN AS OF
+### FEBRUARY 27, 2026
+
+This section documents the full
+observational and theoretical
+foundation of this experiment
+as it stands on the date of
+this amendment. It will be
+updated in future amendments
+if material new results arrive
+before the experiment begins.
+
+**IMPC VECTOR — OBSERVATIONAL:**
+
+```
+DR23 primary result (confirmed):
+  Spearman r = -0.886
+  p = 0.019
+  N = 6 centers
+  N animals = 16,161 wildtype
+  Strain: C57BL/6N (100%)
+  Measure: thigmotaxis proportion
+  Procedure: IMPC_OFD_001
+  Direction: higher ELF →
+    less thigmotaxis (anxiolytic)
+  Fragility: 4/6 LOO significant
+  Status: SIGNIFICANT ✅
+
+DR23 multi-procedure extension:
+  Fear conditioning (N=5 centers):
+    Context freezing: r=+0.616
+    p=0.269, ns
+    Between-center variance
+    dominated by TCP/CCP-IMG
+    protocol split
+  PPI global (N=7 centers):
+    r=-0.180, p=0.699, ns
+    Monotonic rise ELF 31→67
+    then collapse at BCM (ELF 94)
+    Possible non-linear pattern
+    not statistically confirmed
+  TCP/CCP-IMG split confirmed
+    across all three procedures
+    (same building, same strain,
+    different protocol parameters)
+  Status: CONSISTENT WITH
+    PRIMARY ✅ (protocol
+    heterogeneity limits
+    secondary analyses)
+
+MRC Harwell homozygote:
+  77.0% at ELF 59
+  Falls within <1pp of expected
+  gradient value
+  N = 14,111 homozygotes
+  Status: DIRECTIONALLY
+    CORROBORATING ✅
+```
+
+**IMPC VECTOR — EUMODIC:**
+
+```
+EUMODIC primary (pre-registered):
+  Periphery permanence time
+  Spearman r = -0.200
+  p = 0.747, N = 5 centers
+  Status: NULL ⚠️
+  Reason: floor effect confirmed
+    (all centers 75-86% periphery,
+    128s range out of 1200s total)
+  Duration confound: RULED OUT
+    (whole arena time = 1200s
+    at all five centers, P98)
+
+EUMODIC reanalysis (sensitive
+measures, pre-registered in
+doc3 before script ran):
+  4/5 centers predicted direction
+  on latency and centre distance
+  Status: PARTIAL ✅
+
+HMGU temporal shift:
+  EUMODIC peri time:   906.4s
+  DR23 peri time:     1842.6s
+  Change: -50.8%
+  ICS change:   +4.8%
+  MRC change:  -17.3%
+  HMGU change 3-10x larger
+    than stable centers
+  Back-calc HMGU ELF
+    (EUMODIC period): ~19
+    (from latency: 22.8,
+     from ctr distance: 14.9,
+     mean valid: 18.9)
+  DR23 ELF: 65
+  Implied delta: +46 units
+  Counterfactual latency r:
+    actual +0.200 →
+    corrected +0.600
+  Physical cause candidate:
+    GMCII completed 2017,
+    same campus, 6-year
+    interval, 7.7 ELF
+    units/year implied
+  Status: HYPOTHESIS PENDING
+    GMC CONFIRMATION ⏳
+    Email sent: Feb 27, 2026
+```
+
+**MONARCH VECTOR:**
+
+```
+Primary Rayleigh test:
+  p = 0.000517
+  Mean bearing: 218.9° SW
+  Predicted: SW (FM corridor)
+  Species: Danaus plexippus
+  EM channel: FM 88-108 MHz
+  Independent of IMPC vector
+    in species, frequency,
+    behavior, and dataset
+  Status: SIGNIFICANT ✅
+
+Recovery data analysis:
+  Status: PENDING Monarch
+    Watch response ⏳
+  Follow-up: March 14, 2026
+    if no response
+```
+
+**SEA TURTLE VECTOR:**
+
+```
+Pre-registration: COMPLETE ✅
+  GitHub: Eric-Robert-Lawson/
+  OrganismCore
+  Filed: February 27, 2026
+
+Two analyses pre-registered:
+  Analysis A: AM false attractor
+    in NOAA STSSN stranding data
+  Analysis B: Cable corridor
+    cohort spread in FWC
+    individual nesting records
+
+Data requests filed:
+  NOAA SEFSC STSSN:
+    stssn@noaa.gov
+    Filed: February 27, 2026
+  FWC Marine Turtle Management:
+    mtp@myfwc.com
+    Filed: February 27, 2026
+
+Status: AWAITING DATA ⏳
+```
+
+**PUBLISHED MECHANISM:**
+
+```
+ELF → hypothalamic oxidative
+stress → anxiety → thigmotaxis:
+  Springer Environmental Science
+  and Pollution Research, 2017
+  ScienceDirect, 2018
+  Confirmed in controlled
+  laboratory exposures in rodents
+  Status: MECHANISTIC SUPPORT ✅
+
+AM band compass disruption:
+  Engels et al. 2014, PLOS ONE
+  530-1700 kHz within confirmed
+  disruption window for
+  magnetite-based compass
+  Status: MECHANISTIC SUPPORT ✅
+
+Loggerhead magnetic address
+imprinting:
+  UNC Chapel Hill, 2025
+  Hatchlings retain specific
+  magnetic field signatures
+  as natal address coordinates
+  Status: MECHANISTIC SUPPORT ✅
+```
+
+**THIS EXPERIMENT:**
+
+```
+Status: PRE-REGISTERED ⏳
+IACUC: not yet submitted ☐
+Facility: not yet identified ☐
+PI sponsor: not yet identified ☐
+Timeline target: Q2-Q4 2026
+```
