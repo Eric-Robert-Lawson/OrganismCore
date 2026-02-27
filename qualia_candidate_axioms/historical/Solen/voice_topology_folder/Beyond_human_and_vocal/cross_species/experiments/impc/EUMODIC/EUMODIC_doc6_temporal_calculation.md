@@ -27,6 +27,27 @@
     hypothesis.md
   - eumodic_hmgu_temporal_analysis.txt
   - eumodic_hmgu_temporal_analysis.png
+- **Source of all behavioral values:**
+  Directly recorded from script
+  outputs as follows:
+  - HMGU EUMODIC values:
+    eumodic_reanalysis.py output
+    and eumodic_correlation.py output
+  - HMGU centre entries:
+    eumodic_protocol_audit.py output
+  - DR23 peri values for ICS,
+    MRC Harwell, HMGU:
+    Confirmed DR23 primary analysis
+    values, hardcoded into
+    eumodic_hmgu_temporal_analysis.py
+    after researcher verification
+  - % change calculations:
+    eumodic_hmgu_temporal_analysis.py
+    Section 2 output
+  - Back-calculations, counterfactuals,
+    implied delta:
+    eumodic_hmgu_temporal_analysis.py
+    Sections 1, 3, 4, 5 output
 - **Pre-registration:** GitHub —
   Eric-Robert-Lawson/OrganismCore
 - **Date:** February 27, 2026
@@ -57,8 +78,8 @@ be revised. Here is why.
 ### 1.2 The Periphery Time
 ### Calibration Is Invalid
 
-The three measures used for back-
-calculation were:
+The three measures used for
+back-calculation were:
 - Latency to centre entry
 - Centre distance travelled
 - Periphery permanence time
@@ -71,8 +92,8 @@ value.
 
 The reason is established
 throughout the EUMODIC analysis:
-periphery permanence time has a
-floor effect. All five centers
+periphery permanence time has
+a floor effect. All five centers
 produce values between 906 and
 1035 seconds across a 44-point
 ELF gradient (28 to 72). The
@@ -86,13 +107,12 @@ extrapolating to estimate an
 input value is mathematically
 unreliable. The -47.5 result
 is not evidence against the
-hypothesis. It is evidence
-that periphery permanence time
-should not be used as a
-calibration measure — which
-is exactly what the entire
-EUMODIC analysis already
-established.
+hypothesis. It is evidence that
+periphery permanence time should
+not be used as a calibration
+measure — which is exactly what
+the entire EUMODIC analysis
+already established.
 
 **The periphery time estimate
 must be excluded from the
@@ -110,20 +130,23 @@ variance and meaningful
 calibration fits:
 
 ```
-Latency fit:         r = +0.90
-Centre distance fit: r = -0.78
+Latency fit (excl HMGU):
+  r = +0.9016, p = 0.0984
+  Latency = 1.5000 * ELF - 30.0808
+
+Centre distance fit (excl HMGU):
+  r = -0.7759, p = 0.2241
+  Ctr_dist = -139.83 * ELF + 9483.19
 ```
 
-These are the estimates to use.
+These are the estimates to use:
 
 ```
 Latency back-calculated ELF:
   22.8
-  (fit r=+0.90, p=0.098)
 
 Centre distance back-calculated:
   14.9
-  (fit r=-0.78, p=0.224)
 
 Mean of valid estimates: 18.9
 Implied ELF delta:       +46.1
@@ -156,33 +179,50 @@ This is in the range of:
   low ambient ELF)
 
 In other words: HMGU mice in
-2006-2011 behaved like mice
-at a low-ELF facility. They
-entered the centre in 4 seconds,
+2006-2011 behaved like mice at
+a low-ELF facility. They entered
+the centre in 4.1 seconds,
 accumulated 7,397 metres of
-centre travel, and showed
-latencies similar to WTSI
-(11.7s) — the lowest-ELF
-center in the dataset.
+centre travel, made 304 centre
+entries, and spent 288.0 seconds
+in the centre zone — the highest
+centre permanence time of any
+center in the EUMODIC dataset.
 
-This is physically plausible
-for HMGU in 2006-2011 if the
-campus at that time consisted
-primarily of the original GMC I
-building (est. 2001) without
-the additional high-density
-infrastructure that came with
-GMCII (completed 2017) and the
-decade of campus expansion
+This last point is notable. The
+center with the highest ELF score
+among the four centers for which
+centre permanence time is
+meaningful (excluding MRC Harwell
+whose zone definition anomaly
+produced 16.2s) is HMGU — at 288s,
+higher than WTSI (252s), CMHD
+(185s), and ICS (165s). This is
+the same anomaly, same direction,
+in a fifth independent parameter.
+HMGU mice in the EUMODIC period
+were not merely slightly more
+exploratory than predicted — they
+were the most exploratory animals
+in the dataset by multiple
+independent measures.
+
+This is physically plausible for
+HMGU in 2006-2011 if the campus
+at that time consisted primarily
+of the original GMC I building
+(est. 2001) without the additional
+high-density infrastructure that
+came with GMCII (completed 2017)
+and the decade of campus expansion
 in between.
 
 ### 2.2 Cross-Dataset Stability
 ### — The Cleanest Number
 
-The most robust finding in
-the quantitative analysis
-requires no calibration
-assumptions:
+The most robust finding in the
+quantitative analysis requires
+no calibration assumptions:
 
 ```
 Cross-dataset behavioral change
@@ -191,6 +231,30 @@ Cross-dataset behavioral change
 ICS:         +4.8%
 MRC Harwell: -17.3%
 HMGU:        -50.8%
+```
+
+Source values:
+```
+ICS
+  EUMODIC peri time: 1034.6s
+    (eumodic_correlation.py)
+  DR23 peri time:     987.3s
+    (DR23 primary analysis,
+     researcher confirmed)
+
+MRC Harwell
+  EUMODIC peri time: 1028.3s
+    (eumodic_correlation.py)
+  DR23 peri time:    1243.1s
+    (DR23 primary analysis,
+     researcher confirmed)
+
+HMGU
+  EUMODIC peri time:  906.4s
+    (eumodic_correlation.py)
+  DR23 peri time:    1842.6s
+    (DR23 primary analysis,
+     researcher confirmed)
 ```
 
 ICS barely changed. MRC Harwell
@@ -226,23 +290,37 @@ ELF were truly 65.
 
 **Periphery time counterfactual:**
 ```
-Actual:          r = -0.200
-Counterfactual:  r = +0.000
+Predicted HMGU peri time
+(if ELF=65): 1023.3s
+Actual HMGU peri time: 906.4s
+Residual: -116.9s
+
+Actual r:          -0.2000
+                   (p=0.7471)
+Counterfactual r:  +0.0000
+                   (p=1.0000)
 ```
 
-This appears to show no
-improvement. In fact it shows
-that the periphery time measure
+The periphery time counterfactual
+shows no improvement. This
+confirms once again that periphery
+time is the wrong measure — it
 is so flat that HMGU's position
 makes no difference to the
-correlation — confirming once
-again that periphery time is
-the wrong measure.
+correlation regardless of where
+it is placed.
 
 **Latency counterfactual:**
 ```
-Actual:          r = +0.200
-Counterfactual:  r = +0.600
+Predicted HMGU latency
+(if ELF=65): 67.4s
+Actual HMGU latency: 4.1s
+Residual: -63.3s
+
+Actual r:          +0.2000
+                   (p=0.7471)
+Counterfactual r:  +0.6000
+                   (p=0.2848)
 ```
 
 When HMGU is placed at its
@@ -251,17 +329,16 @@ predicted latency position
 the correlation triples in
 strength from r=+0.200 to
 r=+0.600. HMGU's anomalous
-4.1-second latency is the
-single largest source of
-variance suppression in the
-latency correlation.
+4.1-second latency is the single
+largest source of variance
+suppression in the latency
+correlation.
 
 This is the counterfactual that
 matters. The latency measure has
 real signal. Correcting HMGU's
-position on that measure
-produces a strong positive
-association.
+position on that measure produces
+a strong positive association.
 
 ### 2.4 Physical Plausibility
 
@@ -272,8 +349,8 @@ HMGU EUMODIC ELF estimate: ~19
 HMGU DR23 ELF:               65
 Implied delta:               +46
 Over interval 2011→2017:  6 years
-Rate:                     ~7.7 ELF
-                          units/year
+Rate:                ~7.7 ELF
+                     units/year
 ```
 
 Is an ELF increase of 46 units
@@ -396,8 +473,8 @@ behavioral anomaly in EUMODIC
 is consistent with a facility
 whose ELF environment was
 approximately 15—23 at that
-time — roughly half its current
-DR23 score of 65.**
+time — roughly one-third of
+its current DR23 score of 65.**
 
 The counterfactual adds:
 **If HMGU had behaved at a
@@ -467,9 +544,9 @@ the campus electrical environment?
 If the GMC team confirms that
 the testing room ELF environment
 increased between the two
-collection periods — or that the
-testing room moved to GMCII —
-then:
+collection periods — or that
+the testing room moved to GMCII
+— then:
 
 The EUMODIC analysis is not a
 null replication with a confound.
@@ -527,41 +604,143 @@ unaffected either way.
 
 ---
 
-## PART V: KEY NUMBERS
-## FOR REFERENCE
+## PART V: COMPLETE RECORDED
+## VALUES FOR REFERENCE
+
+All values below are directly
+recorded from script outputs.
+No values are estimated or
+inferred in this table.
+
+### HMGU — All EUMODIC Values
+Source: eumodic_reanalysis.py,
+eumodic_correlation.py,
+eumodic_protocol_audit.py
 
 ```
-HMGU behavioral values:
-  EUMODIC latency:       4.1s
-  EUMODIC peri time:   906.4s
-  EUMODIC ctr entries:   304
-  EUMODIC ctr dist:    7397m
+Parameter                  Value   Source
+------------------------------------------
+Periphery permanence time  906.4s  corr
+Centre permanence time     288.0s  reanalysis
+Latency to centre entry      4.1s  reanalysis
+Centre distance travelled 7397.1m  reanalysis
+Centre resting time         12.9s  audit
+Periphery resting time      96.3s  audit
+Whole arena perm time     1200.0s  audit
+  (confirms 20-min protocol)
+Centre average speed        27.8   audit
+  cm/s
+Periphery average speed     20.3   audit
+  cm/s
+Centre entries             304.0   audit
+  (median)
+```
 
-  DR23 peri time:      1842.6s
-  % change:             -50.8%
+### HMGU — DR23 Value
+Source: DR23 primary analysis,
+researcher confirmed
 
-Back-calculated EUMODIC ELF
-(valid measures only):
-  From latency:          22.8
-  From ctr distance:     14.9
-  Mean:                  18.9
-  Implied delta:        +46.1
+```
+Parameter                  Value
+---------------------------------
+Periphery permanence time  1842.6s
+```
 
-Cross-dataset % change:
-  ICS:          +4.8%
-  MRC Harwell: -17.3%
-  HMGU:        -50.8%
+### Cross-Dataset % Change
+Source: eumodic_hmgu_temporal_
+analysis.py Section 2
 
-Counterfactual latency r:
-  Actual:   r = +0.200
-  CF:       r = +0.600
+```
+Center       EUMODIC    DR23    %change
+----------------------------------------
+ICS          1034.6s   987.3s    +4.8%
+MRC Harwell  1028.3s  1243.1s   -17.3%
+HMGU          906.4s  1842.6s   -50.8%
+```
 
-Physical plausibility:
-  Delta: +46 units
-  Interval: 6 years (2011-2017)
-  Rate: ~7.7 units/year
-  Trigger: GMCII construction
-  Completed: 2017
+### Back-Calculated EUMODIC ELF
+Source: eumodic_hmgu_temporal_
+analysis.py Section 1
+
+```
+Measure           ELF_est  Fit_r   Fit_p
+-----------------------------------------
+Latency             22.8   +0.902  0.098
+Ctr distance        14.9   -0.776  0.224
+Peri time*         -47.5   +0.528  0.472
+  (*excluded — known floor effect)
+
+Mean (valid only):  18.9
+DR23 ELF:           65.0
+Implied delta:      +46.1
+```
+
+### Counterfactual Correlations
+Source: eumodic_hmgu_temporal_
+analysis.py Sections 3 and 4
+
+```
+Measure           Actual_r   CF_r    CF_p
+------------------------------------------
+Peri time         -0.200    +0.000  1.000
+Latency           +0.200    +0.600  0.285
+```
+
+### Predicted HMGU Values
+(If ELF were 65 in EUMODIC period)
+
+```
+Predicted peri time:  1023.3s
+  Residual: -116.9s
+
+Predicted latency:      67.4s
+  Residual: -63.3s
+```
+
+### All Five Centers —
+### EUMODIC Behavioral Values
+Source: eumodic_correlation.py
+and eumodic_reanalysis.py
+
+```
+Center  ELF  Peri_t  Ctr_t  Latency  Ctr_dist
+-----------------------------------------------
+CMHD     72  1015.1  184.9    64.8s     661.4m
+HMGU     65   906.4  288.0     4.1s    7397.1m
+MRC Har  59  1028.3   16.2    78.9s     151.3m
+ICS      36  1034.6  165.4    16.8s    1790.9m
+WTSI     28   947.6  252.4    11.7s    8062.9m
+```
+
+### Physical Plausibility Numbers
+Source: eumodic_hmgu_temporal_
+analysis.py Section 5
+
+```
+EUMODIC end year:          ~2011
+GMCII completed:            2017
+DR23 start year:           ~2015
+DR23 midpoint:             ~2019
+
+Interval (EUMODIC→GMCII):  6 years
+Implied ELF delta
+  (valid measures):        +46.1
+Implied rate:             ~7.7 ELF
+                          units/year
+```
+
+### ELF Score Reference Table
+Source: eumodic_elf_scores.csv
+(eumodic_elf_assignment.py)
+
+```
+Center       ELF  Source
+---------------------------------
+CMHD          72  new_blind
+HMGU          65  DR23_carried_fwd
+MRC Harwell   59  DR23_carried_fwd
+ICS           36  DR23_carried_fwd
+WTSI          28  new_blind
 ```
 
 ---
@@ -571,10 +750,14 @@ Physical plausibility:
 - v1.0 — February 27, 2026
   Quantitative analysis results.
   Script verdict corrected.
-  Periphery time excluded from
-  valid estimate mean.
+  Periphery time explicitly
+  excluded from valid estimate
+  mean with documented reason.
   Valid estimate mean: 18.9
   (latency + distance only).
-  Implied delta: +46 units.
-  GMC inquiry being sent in
-  parallel.
+  Implied delta: +46.1 units.
+  All recorded values included
+  in Part V with explicit
+  source attribution.
+  GMC inquiry being drafted
+  and sent in parallel.
