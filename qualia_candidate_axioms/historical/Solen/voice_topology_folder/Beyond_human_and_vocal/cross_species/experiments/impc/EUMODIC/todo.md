@@ -320,3 +320,37 @@ Local logs (not in repo):
   All EUMODIC scripts complete.
   Six reasoning artifacts committed.
   Three immediate actions pending.
+
+---
+
+# GMC OUTREACH LOG
+
+## February 27, 2026 — Attempt 1
+
+Primary: info@mouseclinic.de
+  Status: Sent — delivery
+  status to be confirmed
+
+CC: martin.hrabe-de-angelis
+    @helmholtz-munich.de
+  Status: BOUNCED
+  Error: 550 5.4.1 recipient
+  address rejected / access
+  denied
+  Action: CC address incorrect
+  or protected. Primary address
+  unaffected.
+
+## Next action
+
+If info@mouseclinic.de
+confirmed delivered:
+  Wait for response.
+  Follow-up March 14 if none.
+
+If info@mouseclinic.de
+also failed:
+  Use GMC website contact form:
+  mouseclinic.de/contact
+  OR
+  Try: gmc@helmholtz-munich.de
