@@ -44,3 +44,9 @@
 Session links:
 
 [https://github.com/copilot/share/c0544220-0284-8c74-9153-dc07c0d328fe](https://github.com/copilot/share/c0544220-0284-8c74-9153-dc07c0d328fe)
+
+
+#**INSANELY IMPORTANT FOLDER FOR COHERENCE SENSORY UNDERSTANDING**
+qualia_candidate_axioms/historical/Cross_substrate_verification/sensory_coherence
+
+Session: https://github.com/copilot/share/c8341320-43a4-80d4-b043-4e0ee09148ad
