@@ -66,46 +66,11 @@ relationship_to_prior_work:
     is the third test of that
     unified claim.
 
-registration_target:
-  Open Science Framework (OSF)
-  Pre-registration prior to
-  data access.
-  All analyses specified before
-  any stranding coordinates,
-  individual turtle nesting
-  records, or satellite tracking
-  data are accessed.
-
-pre_registration_deadline:
-  This document must be lodged
-  on OSF before any data are
-  received from:
-    — NOAA SEFSC STSSN database
-    — FWC Marine Turtle Management
-      Program
-    — Movebank public tracking
-      datasets (if individual
-      trajectory analysis is
-      included)
-
-  The data requests have been
-  filed. This pre-registration
-  must be timestamped before
-  any data is received.
+This is pre-registration, not using OSF for now since github repo is most likely a better trajectory to audit anyhow.
 
 author:
   Eric Robert Lawson
   OrganismCore
-
-status:
-  DRAFT — ready for OSF submission.
-  Filed in OrganismCore GitHub
-  repository prior to OSF
-  submission. GitHub commit
-  timestamp constitutes a
-  cryptographic record of
-  pre-specification prior to
-  data access.
 
 github_record:
   Repository: Eric-Robert-Lawson/
@@ -120,10 +85,6 @@ github_record:
     em_navigation.md
   Commit hash: to be recorded
     upon upload.
-  This hash is the pre-
-    registration timestamp
-    of record pending OSF
-    submission.
 ```
 
 ---
@@ -1375,20 +1336,6 @@ It means either:
 ## PART VII: DATA MANAGEMENT
 
 ```
-DATA RECEIPT:
-  All data received from NOAA
-  STSSN and FWC will be stored
-  in a secure local directory
-  and backed up to a private
-  OSF component before any
-  analysis begins.
-
-  The date of data receipt will
-  be recorded. No analysis will
-  be run before the OSF pre-
-  registration is timestamped
-  and the data receipt date
-  is logged.
 
 PRE-SPECIFIED EXCLUSION CRITERIA:
   ANALYSIS A:
@@ -1570,21 +1517,6 @@ Date drafted:      February 27, 2026
 Drafted by:        Eric Robert Lawson
                    OrganismCore
 
-GitHub record:
-  Commit hash to be recorded
-  upon upload.
-  This hash is the pre-
-  registration timestamp
-  of record pending OSF
-  submission.
-
-OSF pre-registration:
-  To be submitted immediately
-  upon upload of this document
-  to the OrganismCore repository.
-  OSF registration ID to be
-  added here upon submission.
-
 Data requests filed:
   NOAA SEFSC STSSN:
     stssn@noaa.gov
@@ -1657,3 +1589,443 @@ Acknowledgment:
 *that we specified what we*
 *were looking for*
 *before we looked.*
+
+---
+
+## AMENDMENT 1
+## REGISTRATION STATUS UPDATE
+## AND SERIES STATE RECORD
+## February 27, 2026
+## Filed same day as original
+## document, after data requests
+## were sent and EUMODIC analysis
+## phase was completed
+
+---
+
+### AMENDMENT METADATA
+
+```
+Amendment number:  1
+Protocol version:  1.0 → 1.1
+Amendment date:    February 27, 2026
+
+Filed:
+  After data requests sent to
+  NOAA SEFSC (stssn@noaa.gov)
+  and FWC (mtp@myfwc.com).
+  Before any data received.
+  Before any analysis run.
+
+Reason summary:
+  Two updates only:
+
+  1. Registration status:
+     The data requests have been
+     filed as of February 27, 2026.
+     The GitHub commit timestamp
+     on this document is the
+     pre-registration record of
+     authority. OSF submission
+     is designated as optional
+     follow-up, not a blocking
+     requirement. This is
+     consistent with the position
+     taken across the full
+     OrganismCore series.
+
+  2. Series state record:
+     The EUMODIC analysis phase
+     was completed February 27,
+     2026 — after this document
+     was drafted but before it
+     was finalized. The completed
+     series state is recorded
+     here so the pre-registration
+     reflects the full evidential
+     context at the time of
+     filing.
+
+Effect on hypotheses:
+  None. A1, A0, A2, A3,
+  B1, B0, B2, B3, C1:
+  all unchanged.
+
+Effect on primary analyses:
+  None. Unchanged.
+
+Effect on methods:
+  None. Unchanged.
+
+Effect on sensitivity analyses:
+  None. Unchanged.
+```
+
+---
+
+### SECTION 1: REGISTRATION
+### STATUS — UPDATED
+
+```
+ORIGINAL registration_target
+(lines 69-94 of v1.0):
+
+  Open Science Framework (OSF)
+  Pre-registration prior to
+  data access.
+  This document must be lodged
+  on OSF before any data are
+  received.
+
+AMENDED registration_target:
+
+  Primary registration:
+    GitHub cryptographic commit
+    timestamp. Repository:
+    Eric-Robert-Lawson/OrganismCore.
+    The commit hash of this document
+    is the pre-registration timestamp
+    of record. It is immutable,
+    publicly auditable, and
+    cryptographically verified.
+    It predates data receipt from
+    NOAA SEFSC and FWC.
+
+  Secondary registration:
+    OSF submission is designated
+    as optional follow-up prior
+    to journal submission, not
+    a blocking requirement before
+    analysis. The GitHub record
+    provides equivalent or stronger
+    pre-registration assurance:
+    it preserves the full reasoning
+    trajectory — not just a static
+    hypothesis snapshot — in
+    sequential timestamped commits.
+
+  Pre-registration constraint
+  unchanged:
+    No analysis will be run on
+    any data received from NOAA
+    SEFSC STSSN, FWC Marine Turtle
+    Management Program, or Movebank
+    until this document is committed
+    to the repository. This
+    constraint is met by the
+    commit timestamp of this file.
+
+DATA REQUEST STATUS:
+  NOAA SEFSC STSSN:
+    Email: stssn@noaa.gov
+    Filed: February 27, 2026
+    Status: sent, awaiting response
+
+  FWC Marine Turtle Management:
+    Email: mtp@myfwc.com
+    Filed: February 27, 2026
+    Status: sent, awaiting response
+
+  Movebank:
+    Not yet queried.
+    Will be accessed only after
+    primary data requests are
+    fulfilled and this pre-
+    registration commit is
+    confirmed in repository.
+```
+
+---
+
+### SECTION 2: SERIES STATE
+### RECORD AS OF
+### FEBRUARY 27, 2026
+
+This section records the complete
+state of the OrganismCore EM
+coherence series at the moment
+this pre-registration is filed.
+It updates the relationship_to_
+prior_work block in the original
+registration metadata.
+
+```
+OC-OBS-001 — MONARCH BUTTERFLY
+  Status: PRIMARY RESULT COMPLETE
+  Species: Danaus plexippus
+  EM channel: FM broadcast
+    (88-108 MHz)
+  Behavior: migration bearing
+    deviation toward false attractor
+
+  Rayleigh test:
+    p = 0.000517
+    Mean bearing: 218.9° SW
+    Predicted direction: SW
+      (FM broadcast corridor)
+  V-test: significant
+
+  Recovery data analysis:
+    Individual bearing correlation
+    with FM density.
+    Status: PENDING Monarch Watch
+    response. Follow-up: March 14,
+    2026 if no response.
+
+  Pre-registration: GitHub
+    Eric-Robert-Lawson/OrganismCore
+
+  Status: SIGNIFICANT ✅
+
+OC-EXP-001 — IMPC FARADAY CAGE
+  Status: PRE-REGISTERED,
+  NOT YET INITIATED
+  Species: Mus musculus (C57BL/6N)
+  EM channel: ELF (50-60 Hz)
+  Behavior: thigmotaxis in
+    open field test
+
+  Design: Faraday cage vs sham
+    enclosure, 20-minute OFD,
+    N=80 per condition.
+  Amendment 1 filed: sham
+    enclosure control added.
+  Amendment 2 filed: evidence
+    chain updated, r value
+    clarified.
+
+  IACUC: not yet submitted
+  Facility: not yet identified
+  PI sponsor: not yet identified
+  Timeline target: Q2-Q4 2026
+
+  Status: PRE-REGISTERED ⏳
+
+OC-OBS-003 (IMPC DR23) —
+OBSERVATIONAL FOUNDATION
+
+  This is the observational
+  foundation referenced in this
+  pre-registration at lines 49-56.
+  The values are confirmed correct
+  in the repository.
+
+  Species: Mus musculus (C57BL/6N)
+  EM channel: ELF (50-60 Hz)
+  Behavior: thigmotaxis proportion
+    in open field test
+  Data: IMPC DR23, CC-BY 4.0
+
+  Primary result (confirmed):
+    Spearman r = -0.886
+    p = 0.019
+    N = 6 centers
+    N animals = 16,161 wildtype
+    Strain: 100% C57BL/6N
+    Measure: proportion of test
+      time in periphery zone
+      (proportion-corrected)
+
+  Multi-procedure extension:
+    Fear conditioning: ns
+      (protocol heterogeneity
+      dominates between-center
+      variance)
+    PPI global: ns
+      (monotonic rise ELF 31→67,
+      collapse at BCM ELF 94 —
+      possible non-linear pattern
+      not statistically confirmed)
+
+  Status: SIGNIFICANT ✅
+
+OC-OBS-004 (EUMODIC) —
+INDEPENDENT REPLICATION ATTEMPT
+
+  COMPLETED February 27, 2026.
+  Seven scripts. Six reasoning
+  artifacts. Full audit trail.
+
+  Species: Mus musculus (C57BL/6N)
+  EM channel: ELF (50-60 Hz)
+  Behavior: thigmotaxis in
+    EUMODIC open field
+    (ESLIM_007_001)
+  Data: IMPC SOLR API, EUMODIC
+    procedure, CC-BY 4.0
+  N centers: 5
+  Collection period: 2006-2011
+
+  Pre-registered primary
+  (periphery permanence time):
+    Spearman r = -0.200
+    p = 0.747
+    Status: NULL ⚠️
+    Reason: floor effect confirmed
+      (all centers 75-86% periphery,
+      128s range out of 1200s;
+      duration identical at all
+      centers — 1200s confirmed
+      by whole arena permanence
+      time, P98)
+
+  Reanalysis on sensitive measures
+  (pre-registered in doc3 before
+  script ran):
+    4/5 centers predicted direction
+    on latency and centre distance
+    Status: PARTIAL ✅
+
+  HMGU temporal shift hypothesis:
+    HMGU EUMODIC peri time: 906.4s
+    HMGU DR23 peri time:   1842.6s
+    Change: -50.8%
+    ICS change:   +4.8% (stable)
+    MRC change:  -17.3% (stable)
+    HMGU change 3-10x larger
+      than all stable centers
+
+    Back-calculated HMGU ELF
+    (EUMODIC period): ~19
+    (latency: 22.8,
+     ctr distance: 14.9,
+     mean valid: 18.9)
+    DR23 ELF: 65
+    Implied delta: +46 units
+
+    Counterfactual latency r:
+      actual +0.200 →
+      corrected +0.600
+
+    Candidate physical cause:
+      GMCII completed 2017, same
+      campus, 6-year interval,
+      7.7 ELF units/year implied
+      rate — physically plausible
+      for major new lab building
+
+    Status: HYPOTHESIS PENDING
+      GMC CONFIRMATION ⏳
+      Email sent: Feb 27, 2026
+      Follow-up: March 14, 2026
+
+  Status: PARTIAL WITH IDENTIFIED
+    HYPOTHESIS ✅⚠️
+
+OC-OBS-002 (THIS DOCUMENT) —
+SEA TURTLE AM + CABLE
+
+  Status: PRE-REGISTERED ⏳
+  Data requests: FILED Feb 27, 2026
+  Data: NOT YET RECEIVED
+  Analysis: NOT YET RUN
+```
+
+---
+
+### SECTION 3: POSITION OF THIS
+### ANALYSIS IN THE SERIES
+
+```
+At the time of this pre-
+registration filing, the series
+has:
+
+  Two significant observational
+  results:
+    DR23 (r=-0.886, p=0.019)
+    Monarch (p=0.000517)
+
+  One partial result:
+    EUMODIC (4/5 centers
+    predicted direction;
+    HMGU temporal hypothesis
+    pending confirmation)
+
+  One pre-registered causal
+  experiment:
+    OC-EXP-001 (Faraday cage)
+    not yet initiated
+
+  One pre-registered observational
+  analysis:
+    OC-OBS-002 (this document)
+    awaiting data
+
+This analysis — if A1 or B1
+produces a significant result —
+adds a third independent
+significant result from a third
+species at a third EM frequency
+in a third behavioral system.
+
+The three channels tested in
+the full series are:
+
+  ELF (50-60 Hz):
+    IMPC DR23, EUMODIC, Faraday
+    cage. Species: Mus musculus.
+    Behavior: spatial anxiety /
+    thigmotaxis.
+
+  FM (88-108 MHz):
+    Monarch butterfly.
+    Behavior: migration bearing
+    deviation.
+
+  AM (530-1700 kHz):
+    Sea turtle (this analysis).
+    Behavior: stranding location
+    bearing, natal homing spread.
+
+Three frequencies. Three species.
+Three behavioral systems. One
+theoretical claim: EM coherence
+relative to the organism's self-
+model is the relevant variable,
+not EM magnitude.
+
+If all three produce significant
+results, the convergence is the
+primary evidence for the unified
+claim. No single analysis is
+definitive. The convergence is.
+
+This is why this pre-registration
+was filed on the same day that
+the EUMODIC phase was closed and
+the Faraday cage amendments were
+filed. The full program is moving
+forward in parallel.
+```
+
+---
+
+### VERSION
+
+```
+Protocol version:  1.0 → 1.1
+Amendment number:  1
+Amendment date:    February 27,
+                   2026
+
+Drafted by:        Eric Robert
+                   Lawson
+                   OrganismCore
+
+All hypotheses, methods,
+sensitivity analyses, outcome
+interpretations, data management
+procedures, and ethical statement
+in v1.0 are unchanged.
+
+This amendment adds only:
+  1. Updated registration status
+     (GitHub as primary record,
+     OSF as optional follow-up)
+  2. Complete series state record
+     as of February 27, 2026
+  3. Explicit statement of this
+     analysis's position in the
+     convergent evidence structure
+```
