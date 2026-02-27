@@ -4,6 +4,8 @@
 ## What We Are Not Measuring and Why
 ## February 26, 2026
 
+**Amendment 1** starting at line 1799.
+
 ---
 
 ## ARTIFACT METADATA
@@ -1793,3 +1795,917 @@ v1.0 — February 26, 2026
 
 *But starting today, the channel*
 *can be watched.*
+
+---
+
+## AMENDMENT v1.0
+## February 27, 2026
+## Scope Clarification, Second
+## Disruption Channel, Data
+## Access Strategy, and Path
+## Forward With or Without
+## Full Data Access
+
+---
+
+### AMENDMENT METADATA
+
+```
+filed_by: Eric Robert Lawson
+date: February 27, 2026
+reason: Three clarifications
+  required before building the
+  analysis pipeline:
+
+  1. The AM broadcast transmitter
+     angle was not addressed in
+     the original document. It is
+     a second, independent disruption
+     channel distinct from submarine
+     cable address corruption. Both
+     channels must be characterized.
+
+  2. Data access dependencies were
+     identified but not stratified
+     by access difficulty or fallback
+     path. A two-track strategy
+     (full access / minimum viable
+     dataset) is required.
+
+  3. Geographic scope was Florida-
+     focused. The analysis will
+     be built for the full Atlantic
+     and Gulf coast from the start,
+     with Florida as the primary
+     validation region.
+
+relationship_to_original:
+  This amendment appends to and
+  extends the original document.
+  It does not supersede any finding
+  in the original. All findings
+  in Parts I-VII remain as written.
+```
+
+---
+
+### SECTION 8: THE SECOND
+### DISRUPTION CHANNEL —
+### AM BROADCAST TRANSMITTERS
+
+The original document focused
+on submarine cables as the
+mechanism of sea turtle magnetic
+disruption. This reflects the
+most recently confirmed mechanism
+(UNC 2025) and the most precisely
+calculable effect (address
+corruption during frenzy swim).
+
+There is a second, independent
+disruption channel that the
+original document did not address.
+
+**The AM broadcast false attractor.**
+
+---
+
+#### Two channels, two mechanisms,
+#### two different disruption points
+#### in the turtle life cycle
+
+```
+CHANNEL 1: SUBMARINE CABLES
+  Mechanism: Static (DC) or
+    low-frequency (AC at 50/60 Hz)
+    magnetic field anomaly
+    superimposed on ambient field
+    during hatchling frenzy swim.
+  Disruption point: Address writing.
+    The corruption occurs at the
+    moment the address is encoded —
+    immediately post-emergence,
+    during the offshore frenzy swim.
+  Effect: Corrupted natal address.
+    Adult returns to wrong location
+    20-30 years later. Nesting site
+    displaced 50-80 km coastwise
+    in direction of Earth's
+    magnetic gradient.
+  Detection window: Decades delayed.
+    Only observable in adult nesting
+    scatter data for cohorts born
+    near cable corridors.
+  Mechanism confirmed: February 2025
+    (UNC hatchling conditioning study).
+  Frequency band: DC to 60 Hz
+    (cable field is static or
+    power-frequency AC).
+
+CHANNEL 2: AM BROADCAST
+  Mechanism: Oscillating radiofrequency
+    field in the kHz-MHz range
+    disrupting the radical pair
+    or magnetite-based magnetic
+    compass during active navigation.
+  Disruption point: Compass use.
+    The disruption occurs whenever
+    the turtle is navigating in
+    an area of strong AM broadcast
+    exposure — during offshore
+    migration, during the return
+    migration to nesting beaches,
+    or during nearshore navigation
+    on approach to nesting sites.
+  Effect: False attractor bearing.
+    The AM field is not uniform —
+    it is stronger in the direction
+    of the nearest high-power AM
+    transmitters. The compass is
+    pulled toward the strongest
+    AM source rather than toward
+    the geomagnetic target.
+    The turtle navigates toward
+    the false attractor.
+  Detection window: Immediate.
+    Observable as stranding events,
+    nesting site anomalies, and
+    offshore tracking deviations
+    in the direction of the AM
+    false attractor bearing.
+  Mechanism: RF disruption of
+    magnetite-based compass. Less
+    directly confirmed in turtles
+    than in birds but consistent
+    with the Engels/Mouritsen
+    framework at the kHz-MHz
+    frequency range where urban
+    electrosmog is densest and
+    where turtle magnetoreception
+    sensitivity is predicted.
+  Frequency band: 530-1700 kHz
+    (AM broadcast band). This is
+    directly within the 50 kHz-5 MHz
+    range confirmed as disruptive
+    by Engels et al. (2014) for
+    avian compasses — the same
+    frequency range, not an
+    extrapolation from it.
+```
+
+---
+
+#### Why the AM channel is
+#### potentially stronger evidence
+#### than the cable channel
+
+The cable channel produces an
+effect that is temporally
+displaced by 20-30 years.
+Causation is difficult to
+establish because the corrupting
+event and the observable outcome
+are separated by decades.
+
+The AM channel produces an
+effect that is immediate and
+directional. A sea turtle
+navigating toward an AM false
+attractor bearing will:
+
+```
+1. Strand on a beach in the
+   direction of the false attractor
+   rather than the direction
+   of geomagnetic target.
+
+2. Show offshore track deviations
+   (in satellite-tagged turtles)
+   consistent with the AM false
+   attractor bearing at their
+   location.
+
+3. Show nesting site anomalies
+   in which nesting beaches cluster
+   on coastlines that are in the
+   direction of the strongest
+   AM transmitter clusters from
+   the offshore approach corridor.
+```
+
+The NOAA sea turtle stranding
+database is the equivalent of
+the Monarch Watch tagging database
+for this analysis. Every stranding
+is a geographic outcome — the
+turtle ended up there. The AM
+false attractor at the stranding
+location predicts the direction
+the turtle came from.
+
+**The pipeline for the AM
+channel is structurally identical
+to the monarch FM pipeline:**
+
+```
+MONARCH FM PIPELINE:
+  Input 1: FCC FM transmitter
+    coordinates and power output
+    (from LMS database)
+  Input 2: Monarch tagging
+    coordinates (from GBIF/
+    Monarch Watch)
+  Computation: FM false attractor
+    bearing at each tagging location
+  Test: Does bearing deviation in
+    recovered monarchs align with
+    FM false attractor bearing?
+
+SEA TURTLE AM PIPELINE:
+  Input 1: FCC AM transmitter
+    coordinates and power output
+    (from same LMS database,
+    different service code filter)
+  Input 2: Sea turtle stranding
+    coordinates (from NOAA/
+    SEATURTLE.ORG database)
+  Computation: AM false attractor
+    bearing at each stranding
+    location
+  Test: Does stranding direction
+    align with AM false attractor
+    bearing at the stranding site?
+```
+
+The FMFieldDensity class from
+the monarch pipeline becomes
+an AMFieldDensity class with
+one parameter change:
+frequency_band = (530, 1700)
+instead of (87.5, 108.0).
+
+Everything else is identical.
+
+---
+
+#### The AM-cable interaction
+
+In the most exposed locations —
+nesting beaches adjacent to
+cable landing corridors AND
+within the coverage radius of
+high-power AM transmitters —
+both channels are simultaneously
+active.
+
+```
+CHANNEL 1 (cable) acts during:
+  Hatchling frenzy swim.
+  Corrupts address at writing.
+
+CHANNEL 2 (AM) acts during:
+  Adult offshore migration.
+  Corrupts compass at reading
+  and during navigation.
+
+COMBINED EFFECT:
+  Hatchling address is written
+  in a corrupted field.
+  Adult compass is disrupted
+  during the return navigation.
+  The adult is navigating with
+  a corrupted map AND a
+  disrupted compass
+  simultaneously.
+
+  This is not additive.
+  It may be multiplicative.
+  The two errors do not cancel —
+  they do not point in the same
+  direction and have no reason
+  to compensate each other.
+```
+
+The locations where both
+channels overlap are the
+highest-priority sites for
+the combined analysis.
+These are: nesting beaches
+within 1 km of a cable landing
+corridor AND within 200 km of
+a high-power AM transmitter
+cluster. On the Florida Atlantic
+coast, this describes several
+beach segments in Palm Beach,
+Broward, and Miami-Dade counties.
+
+---
+
+### SECTION 9: DATA ACCESS
+### STRATEGY — FULL AND
+### MINIMUM VIABLE
+
+The analysis has two parallel
+tracks depending on what data
+can be obtained.
+
+---
+
+#### Track A: Full data access
+
+**Dataset 1: FCC LMS AM transmitter
+database**
+
+```
+Source: fcc.gov/media/
+  media-bureau-public-databases
+  Current_LMS_Dump.zip
+  (same file used for FM analysis)
+Access: PUBLIC. Already in hand.
+Service codes to filter:
+  AM, AX (AM auxiliary)
+Frequency range: 530-1700 kHz
+Fields needed:
+  callsign, frequency_khz,
+  tx_lat, tx_lon,
+  power_output_w,
+  haat_m (height above average
+  terrain — proxy for ERP)
+Expected station count:
+  ~4,500 AM stations nationally
+  ~800-1,200 in Atlantic/Gulf
+  coastal states
+Cost: $0. Build time: 1 evening.
+Status: AVAILABLE NOW.
+```
+
+**Dataset 2: NOAA sea turtle
+stranding database**
+
+```
+Source: NOAA Fisheries
+  Southeast Fisheries Science
+  Center (SEFSC)
+  seaturtle.org (STSSN —
+  Sea Turtle Stranding and
+  Salvage Network)
+Access: RESEARCH REQUEST REQUIRED.
+  Contact: NOAA SEFSC
+  stssn@noaa.gov
+  or seaturtle.org database
+  access request form.
+Fields needed:
+  species, strand_date,
+  strand_lat, strand_lon,
+  condition (alive/dead),
+  cause (if known),
+  state, county
+Coverage: 1980-present.
+  ~50,000+ strandings recorded.
+Expected response time:
+  2-6 weeks for research request.
+Cost: $0 for research access.
+Status: REQUEST NEEDED.
+```
+
+**Dataset 3: FWC individual
+turtle nesting records**
+
+```
+Source: Florida Fish and Wildlife
+  Conservation Commission
+  Marine Turtle Management Program
+  mtp@myfwc.com
+Access: RESEARCH REQUEST REQUIRED.
+  Requires description of research
+  purpose, data security plan,
+  and agreement not to publish
+  individual GPS coordinates
+  of nesting sites (standard
+  protection for sea turtle data).
+Fields needed:
+  turtle_id (anonymized),
+  nest_date, nest_lat, nest_lon,
+  species, beach_segment_code,
+  first_record_date (to identify
+  likely natal cohort)
+Coverage: ~1980-present.
+  Florida beaches.
+  Individual turtle records with
+  multi-year nesting histories.
+Expected response time:
+  4-8 weeks.
+Cost: $0 for research access.
+Status: REQUEST NEEDED.
+```
+
+**Dataset 4: TeleGeography
+submarine cable GIS data**
+
+```
+Source: submarinecablemap.com
+  TeleGeography public cable map.
+Access: PUBLIC. Downloadable
+  as KML/GeoJSON from the
+  interactive map interface.
+  Full dataset also available
+  via TeleGeography research
+  licensing (nominal fee).
+Fields needed:
+  cable_name, installation_year,
+  cable_type (HVDC/HVAC/fiber),
+  capacity_mw (for power cables),
+  landing_station_name,
+  landing_lat, landing_lon
+Note: Fiber optic cables carry
+  negligible magnetic field.
+  Filter to power cables only
+  for the cable corridor analysis.
+  Identify using capacity_mw > 0.
+Expected build time: 1 day.
+Cost: $0 for public KML.
+Status: AVAILABLE NOW.
+```
+
+---
+
+#### Track B: Minimum viable
+#### dataset — no data requests
+#### required
+
+If full data access is delayed
+or denied, the following analysis
+is executable immediately using
+only public data:
+
+**Step 1: AM station table**
+
+Build from FCC LMS (already
+available). This takes one
+evening. Output: am_stations_clean.csv.
+
+This is identical to the FM
+station table build, already
+documented in the monarch series.
+Cost: $0. Time: tonight.
+
+**Step 2: Cable landing station
+table**
+
+Build from TeleGeography public
+KML download. The interactive
+map at submarinecablemap.com
+allows manual identification
+of all cable landing stations
+on the Florida Atlantic coast.
+Approximately 15-20 stations
+are identifiable from the
+public interface.
+
+For a minimum viable analysis,
+the landing station coordinates
+can be manually extracted from
+the public map and entered
+into a CSV. Precision is
+sufficient for a 1-2 km
+corridor analysis.
+Cost: $0. Time: 2-3 hours.
+
+**Step 3: GBIF sea turtle
+occurrence data**
+
+```
+The Global Biodiversity Information
+Facility (GBIF) hosts sea turtle
+occurrence records from multiple
+sources including museum specimens,
+stranding reports, and nesting
+surveys. These are presence records,
+not the structured stranding
+database, but they provide
+geographic coordinates.
+
+Search: gbif.org/species/
+  Caretta caretta (loggerhead)
+  United States
+  Coordinate: present
+  Year: 1990-present
+
+Expected records: 10,000-50,000
+  (coverage varies by region
+  and year)
+
+Limitation: GBIF sea turtle
+  records are not structured
+  stranding data. They do not
+  include condition, cause, or
+  direction of travel. They
+  provide location only.
+
+For the AM false attractor
+analysis (does stranding location
+cluster in the direction of the
+AM false attractor bearing?):
+location is sufficient for a
+preliminary test. The AM false
+attractor bearing can be computed
+at each GBIF occurrence coordinate
+and compared to the expected
+geomagnetic orientation target.
+
+Cost: $0. Time: 1 hour download.
+Status: AVAILABLE NOW.
+```
+
+**Step 4: Satellite tracking
+data (public archives)**
+
+```
+The Movebank data repository
+(movebank.org) hosts publicly
+available sea turtle satellite
+tracking datasets. Several
+loggerhead tracking studies
+have been deposited with
+public access.
+
+Search: movebank.org
+  Species: Caretta caretta
+  Access: Public
+
+Tracking data provides offshore
+trajectories — the turtle's
+actual path. This is more
+informative than stranding
+location alone for testing the
+AM false attractor bearing
+prediction: does the turtle's
+track deviate in the direction
+of the AM false attractor at
+its position along the track?
+
+Several publicly available
+Florida loggerhead tracking
+datasets exist from the 2000s
+and 2010s.
+
+Cost: $0. Time: 1-2 hours
+  to identify and download
+  relevant studies.
+Status: AVAILABLE NOW.
+```
+
+---
+
+#### Decision tree: which track
+#### to run when
+
+```
+RIGHT NOW (no requests needed):
+  — Build AM station table
+    from FCC LMS (1 evening)
+  — Build cable landing station
+    table from TeleGeography
+    public KML (2-3 hours)
+  — Download GBIF Caretta caretta
+    occurrence records (1 hour)
+  — Identify public Movebank
+    tracking datasets (1-2 hours)
+  — Run AM false attractor
+    computation on GBIF occurrence
+    coordinates (1 day)
+  — Produce preliminary AM false
+    attractor opposition map
+    (equivalent of Panel A for
+    monarchs, but for sea turtles)
+  — This is the minimum viable
+    demonstration of the pipeline.
+    It produces a publishable
+    descriptive result regardless
+    of whether full data access
+    is ever obtained.
+
+AFTER REQUESTS ARE FILED
+(2-8 weeks):
+  — NOAA stranding data arrives:
+    replace GBIF occurrence records
+    with structured stranding data.
+    Re-run AM false attractor
+    analysis with cause-coded
+    strandings (test whether
+    "unknown cause" strandings
+    show higher AM opposition
+    than "known cause" strandings).
+  — FWC nesting data arrives:
+    run turtle_cohort_analysis.py
+    (cable channel, Tier 1).
+  — Combined analysis: turtles
+    at high-AM-opposition AND
+    near-cable-corridor sites
+    as the highest-priority cohort.
+
+IF FULL ACCESS IS DENIED:
+  — GBIF + Movebank + AM station
+    table = sufficient for a
+    preliminary peer-reviewed
+    paper characterizing the AM
+    false attractor landscape
+    across US sea turtle habitat.
+  — This is the equivalent of
+    Document 4 in the monarch
+    series: first empirical
+    characterization of the AM
+    electromagnetic landscape
+    across sea turtle range.
+  — It is a publishable result
+    that stands on its own and
+    motivates the data request
+    for the primary test.
+  — Pre-register the primary
+    test on OSF before filing
+    data requests. This prevents
+    any concern about the analysis
+    being designed after seeing
+    the data.
+```
+
+---
+
+### SECTION 10: GEOGRAPHIC SCOPE
+
+The original document was
+Florida-focused. The analysis
+will be built for the full
+Atlantic and Gulf coast.
+
+**The scope rationale:**
+
+```
+FLORIDA:
+  Primary validation region.
+  Highest loggerhead nesting
+  density in the continental US.
+  Best-documented nesting database.
+  Cable landing infrastructure
+  concentrated in SE Florida
+  (Palm Beach to Monroe county).
+  AM market density: high
+  (Miami, Fort Lauderdale,
+  West Palm Beach, Tampa,
+  Jacksonville).
+  Status: PRIMARY ANALYSIS REGION.
+
+GEORGIA / SOUTH CAROLINA:
+  Second-highest loggerhead
+  nesting density on US coast.
+  Jekyll Island, Cumberland Island,
+  Cape Romain NWR: major nesting
+  sites.
+  Cable landing infrastructure:
+  limited on this stretch.
+  AM market density: moderate
+  (Savannah, Charleston).
+  Status: SECONDARY REGION.
+  High value as a partial
+  control: lower cable density
+  than SE Florida but comparable
+  AM exposure. Enables cable
+  effect isolation.
+
+NORTH CAROLINA:
+  Cape Hatteras region: important
+  nesting and stranding site.
+  AM market density: moderate.
+  Cable proximity: the Mid-Atlantic
+  cable systems have approaches
+  near Virginia Beach, north
+  of the primary NC nesting range.
+  Status: SECONDARY REGION.
+  Cape Hatteras has a specific
+  role: the Point creates a
+  convergence zone for both
+  turtles and AM signal propagation
+  from the Boston-Washington
+  corridor. Worth analyzing
+  specifically.
+
+GULF COAST (FL panhandle,
+AL, MS, LA, TX):
+  Lower nesting density than
+  Atlantic coast. Different
+  AM market structure.
+  Cable landing: Gulf of Mexico
+  cable systems are primarily
+  oil and gas infrastructure,
+  different from the Atlantic
+  telecoms cables.
+  Status: TERTIARY REGION.
+  Include in AM false attractor
+  mapping. Lower priority for
+  cable corridor analysis given
+  different cable type and
+  lower nesting density.
+```
+
+**The scope implementation:**
+
+All pipeline scripts will be
+built with a geographic bounding
+box parameter rather than
+hardcoded to Florida. The default
+bounding box for the primary
+analysis:
+
+```
+ATLANTIC_GULF_COAST = {
+  lat_min: 24.5,   # southern tip FL
+  lat_max: 37.0,   # Cape Hatteras NC
+  lon_min: -97.5,  # TX Gulf coast
+  lon_max: -74.5   # NJ (upper limit
+                   # of significant
+                   # loggerhead nesting)
+}
+```
+
+Florida-specific analysis uses:
+
+```
+FLORIDA_PRIMARY = {
+  lat_min: 24.5,
+  lat_max: 30.8,
+  lon_min: -87.6,
+  lon_max: -79.8
+}
+```
+
+---
+
+### SECTION 11: IMMEDIATE
+### NEXT STEPS
+
+In priority order, executable
+without waiting for any data
+request:
+
+```
+STEP 1 (tonight):
+  Build am_stations_clean.csv
+  from FCC LMS database.
+  Script: build_am_station_table.py
+  (adaptation of build_fm_station_
+  table.py with service code
+  filter changed to AM/AX and
+  frequency range 530-1700 kHz)
+  Expected output: ~4,500 stations
+  nationally, ~800-1,200 in
+  Atlantic/Gulf coast states.
+
+STEP 2 (this week):
+  Build cable_landing_stations.csv
+  from TeleGeography public data.
+  Manual extraction from
+  submarinecablemap.com KML
+  for Florida Atlantic coast.
+  Identify power cables vs
+  fiber optic cables.
+  Power cables only: retain.
+  Fiber optic: note but flag
+  as negligible magnetic field.
+
+STEP 3 (this week):
+  Download GBIF Caretta caretta
+  occurrence records for
+  Atlantic and Gulf coast.
+  Filter: has coordinates,
+  1990-present, US records.
+  Save as turtle_occurrences_gbif.csv
+
+STEP 4 (this week):
+  Run AMFieldDensity computation
+  on GBIF occurrence coordinates.
+  Produce preliminary AM false
+  attractor opposition map.
+  This is Panel A of the sea
+  turtle equivalent of the
+  monarch map figures.
+
+STEP 5 (this week):
+  File data requests:
+  — NOAA SEFSC stranding database:
+    stssn@noaa.gov
+  — FWC Marine Turtle Management:
+    mtp@myfwc.com
+  File OSF pre-registration
+  before submitting requests.
+
+STEP 6 (when data arrives):
+  Replace GBIF records with
+  structured stranding data.
+  Run primary AM false attractor
+  opposition analysis.
+  Run cable cohort spread analysis.
+  Run combined channel analysis.
+```
+
+---
+
+### SECTION 12: CONNECTION TO
+### ORGANISM CORE FRAMEWORK
+
+This analysis is Document 10h
+in the Cross-Species Communication
+Series and the second species
+in the Attractor Pollution
+framework after the monarch
+butterfly analysis.
+
+The two analyses are related
+but independent:
+
+```
+MONARCH ANALYSIS:
+  Species: Danaus plexippus
+  Mechanism: FM false attractor
+    disrupting Cry1 cryptochrome
+    radical pair compass
+  Frequency band: 87.5-108 MHz
+  Dataset: Monarch Watch tagging
+    records (GBIF)
+  Primary test: V-test on
+    bearing deviation vs FM
+    false attractor bearing
+  Status: Pre-registered. Pending
+    Monarch Watch recovery data.
+
+SEA TURTLE ANALYSIS:
+  Species: Caretta caretta
+    (primary); potentially
+    Chelonia mydas (green),
+    Dermochelys coriacea
+    (leatherback) secondary
+  Mechanism A: AM false attractor
+    disrupting magnetite-based
+    compass during navigation
+  Mechanism B: Cable magnetic
+    anomaly corrupting natal
+    address during frenzy swim
+  Frequency band A: 530-1700 kHz
+  Frequency band B: DC to 60 Hz
+  Dataset A: NOAA stranding
+    database / GBIF occurrences
+  Dataset B: FWC individual
+    nesting records
+  Primary test A: AM false
+    attractor opposition analysis
+    on stranding locations
+  Primary test B: Cohort spread
+    comparison cable vs control
+    beach turtles
+  Status: Pipeline under
+    construction. Data requests
+    to be filed. Pre-registration
+    to be completed before
+    data requests.
+```
+
+The Engels 2014 / Mouritsen &
+Hore 2023 frequency resolution
+documented in Document 5 of
+the monarch series applies
+directly to the AM channel
+here: the AM broadcast band
+(530-1700 kHz) is fully within
+the confirmed disruption range
+(50 kHz-5 MHz from Engels 2014,
+extended to 116 MHz by Mouritsen
+& Hore 2023). There is no
+frequency gap challenge for
+the AM channel equivalent to
+the FM gap challenge for the
+monarch analysis. The AM band
+sits squarely in the middle
+of the confirmed disruption
+window. This makes the sea
+turtle AM channel mechanistically
+stronger than the monarch FM
+channel at this stage of
+evidence development.
+
+---
+
+```
+amendment_version: v1.0
+filed: February 27, 2026
+next_document: sea_turtle_am_
+  pipeline_build.md
+  (AM station table +
+   AMFieldDensity class +
+   GBIF occurrence merge +
+   preliminary opposition map)
+pre_registration_status:
+  TO BE FILED before data
+  requests are submitted.
+  OSF project to be created
+  as companion to monarch
+  OSF registration.
+```
