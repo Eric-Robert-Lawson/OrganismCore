@@ -1624,3 +1624,375 @@ Acknowledgment:
   and interpretations are the
   responsibility of the author.
 ```
+
+---
+
+## AMENDMENT 1
+## SHAM ENCLOSURE CONTROL
+## February 27, 2026
+## Filed prior to OSF registration
+## and prior to any data collection
+
+---
+
+### REASON FOR AMENDMENT
+
+```
+The original sham condition
+specified in Part III was:
+
+  Sham animals are removed from
+  their home cages, carried to
+  a holding room, placed in a
+  temporary cage for 30 minutes,
+  then returned to their original
+  home cage in the standard
+  facility room.
+
+This sham controls for:
+  — Handling stress
+  — Temporary displacement
+  — Acute novelty exposure
+
+It does NOT control for:
+
+  The Faraday enclosure itself
+  being a perceptibly novel
+  housing environment.
+
+If mice can detect — through
+any available sensory channel
+(visual, acoustic, olfactory,
+thermal) — that they are housed
+in a different kind of enclosure,
+then any increase in thigmotaxis
+in the Faraday group is
+uninterpretable.
+
+It could be caused by:
+  (a) Loss of EM reference
+      (the coherence hypothesis)
+  OR
+  (b) General novelty anxiety
+      from being in a perceptibly
+      different enclosure
+
+These two causes produce
+identical behavioral outcomes
+and are indistinguishable
+without a sham enclosure control.
+
+This confound was identified
+prior to OSF registration and
+prior to any data collection.
+This amendment corrects it.
+```
+
+---
+
+### CHANGE TO SHAM CONDITION
+
+```
+The original sham condition
+(handling and temporary
+displacement only) is REPLACED
+by a SHAM ENCLOSURE condition.
+
+SHAM ENCLOSURE SPECIFICATION:
+
+  The sham enclosure is physically
+  identical to the Faraday
+  enclosure in all respects
+  except electromagnetic shielding:
+
+    Material: identical outer
+      structure and dimensions
+    Ventilation: identical geometry
+      and mesh specification
+    Door: identical gasketed design
+    Grounding: identical ground
+      connection (connected but
+      no shielding layer)
+    Interior: identical layout,
+      same cage type, same
+      bedding, same light level
+    Cleaning: identical products
+      on identical schedule
+    Temperature: matched to
+      ±0.5°C of Faraday enclosure
+      interior — both monitored
+      continuously
+
+  THE ONLY DIFFERENCE:
+    Faraday enclosure: mu-metal
+      or silicon steel shielding
+      layer present.
+      EM field attenuated ≥20 dB.
+
+    Sham enclosure: no shielding
+      layer.
+      EM field present at ambient
+      facility level.
+
+WHAT THIS CONTROLS:
+
+  Animals in both groups are
+  housed inside an enclosure.
+  Both enclosures look, sound,
+  smell, and feel identical
+  to the animal.
+
+  The mice are blind to the
+  EM manipulation.
+
+  The only variable that differs
+  between the two groups is
+  the electromagnetic field
+  level inside the enclosure.
+
+  All enclosure novelty effects
+  are matched across groups.
+  Any difference in thigmotaxis
+  between groups is attributable
+  to the EM variable, not to
+  enclosure novelty.
+```
+
+---
+
+### UPDATED SAMPLE SIZE
+
+```
+ORIGINAL DESIGN:
+  Faraday group:  40
+  Sham group:     40
+  Total:          80
+
+AMENDED DESIGN:
+  Faraday enclosure group:  40
+  Sham enclosure group:     40
+  Total:                    80
+
+Sample size is unchanged.
+The sham enclosure group
+replaces the handling-only
+sham group on a 1:1 basis.
+
+Power calculation is unchanged:
+  Alpha = 0.05 (two-tailed)
+  Power = 0.90
+  Effect size d = 0.80
+  N = 40 per group
+```
+
+---
+
+### UPDATED BLINDING STATEMENT
+
+```
+ORIGINAL:
+  "The experimenter performing
+  the open field test should be
+  blind to group assignment
+  (Faraday vs sham) where
+  logistically feasible. Full
+  blinding is difficult given
+  the physical separation of
+  housing conditions."
+
+AMENDED:
+  Because both groups are housed
+  in physically identical
+  enclosures, full experimenter
+  blinding during behavioral
+  testing is now achievable.
+
+  The experimenter performing
+  the open field test MUST be
+  blind to group assignment
+  (Faraday enclosure vs sham
+  enclosure).
+
+  The enclosures are labeled
+  with codes only — no labels
+  indicating Faraday or sham
+  status visible to the
+  experimenter retrieving
+  animals for testing.
+
+  Code-breaking occurs only
+  after all behavioral data
+  are collected and the
+  analysis-ready dataset
+  is finalized.
+
+  This is a stronger blinding
+  condition than the original
+  protocol and is now feasible
+  because the enclosures are
+  perceptually identical.
+```
+
+---
+
+### UPDATED H6
+
+```
+ORIGINAL H6 (SHAM STABILITY):
+  Sham-transferred animals
+  (handled and temporarily
+  displaced but returned to
+  standard caging) will show
+  no significant change in
+  thigmotaxis proportion from
+  baseline across the 28-day
+  observation period.
+
+AMENDED H6 (SHAM ENCLOSURE
+STABILITY):
+  Animals housed in the sham
+  enclosure (identical structure,
+  no EM shielding) will show
+  no significant change in
+  thigmotaxis proportion from
+  baseline across the 28-day
+  observation period.
+
+  Rationale: if the sham
+  enclosure group shows a
+  thigmotaxis increase, the
+  enclosure itself — not the
+  EM manipulation — is driving
+  behavior, and the primary
+  analysis is uninterpretable.
+
+  If BOTH Faraday and sham
+  enclosure groups show
+  thigmotaxis increases:
+    Enclosure novelty is the
+    cause. EM variable is not
+    isolable in this design.
+    Experiment reported as
+    inconclusive on the EM
+    hypothesis. Redesign required.
+
+  If ONLY the Faraday group
+  shows a thigmotaxis increase:
+    Enclosure novelty is ruled
+    out. EM removal is the
+    isolable cause.
+    H1 supported.
+```
+
+---
+
+### VERIFICATION REQUIREMENT
+### ADDED
+
+```
+Before animals are placed in
+either enclosure, the following
+must be confirmed and documented:
+
+  1. ACOUSTIC VERIFICATION:
+     Sound level measurement
+     inside both enclosures
+     must confirm they are
+     within 3 dB of each other
+     at all frequencies from
+     20 Hz to 20 kHz.
+     Any acoustic difference
+     between enclosures must
+     be corrected before use.
+
+  2. OLFACTORY VERIFICATION:
+     Both enclosures must be
+     operated empty for minimum
+     14 days prior to animal
+     placement to allow off-
+     gassing of any construction
+     materials.
+     Air exchange rate inside
+     both enclosures measured
+     and matched to within 10%
+     of each other.
+
+  3. THERMAL VERIFICATION:
+     Temperature logged at 1-hour
+     intervals inside both
+     enclosures for minimum 7
+     days prior to animal
+     placement.
+     Both enclosures must remain
+     within ±0.5°C of each other
+     and within ±0.5°C of the
+     standard facility room
+     temperature throughout.
+
+  4. EM VERIFICATION:
+     Confirmed in original
+     protocol. Unchanged.
+     Faraday enclosure: ≤10%
+     of ambient field.
+     Sham enclosure: 95-105%
+     of ambient field (within
+     normal facility variation).
+
+  All verification measurements
+  will be reported in full
+  in any resulting publication.
+  Failure to meet any criterion
+  delays animal placement until
+  the criterion is met.
+  No exceptions.
+```
+
+---
+
+### AMENDMENT METADATA
+
+```
+Amendment number:  1
+Protocol version:  1.0 → 1.1
+Amendment date:    February 27, 2026
+
+Filed:
+  Prior to OSF registration.
+  Prior to any animal assignment.
+  Prior to enclosure construction.
+
+Reason summary:
+  Sham enclosure control required
+  to isolate EM variable from
+  enclosure novelty confound.
+  Identified prior to registration.
+  Corrected prior to registration.
+  Documented as amendment for
+  full transparency of protocol
+  development history.
+
+Effect on hypotheses:
+  H1, H2, H0: unchanged in
+    direction and operationalization.
+  H6: updated to reflect sham
+    enclosure rather than
+    handling-only sham.
+  All other hypotheses: unchanged.
+
+Effect on primary analysis:
+  Unchanged. Mann-Whitney U,
+  Day 14, Faraday vs sham
+  enclosure, alpha 0.05.
+
+Effect on sample size:
+  Unchanged. N=40 per group.
+
+Effect on blinding:
+  Strengthened. Full blinding
+  now achievable and required.
+
+Drafted by:
+  Eric Robert Lawson
+  OrganismCore
+  February 27, 2026
+```
