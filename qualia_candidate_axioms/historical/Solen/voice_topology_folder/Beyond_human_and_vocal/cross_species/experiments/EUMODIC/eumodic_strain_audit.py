@@ -1,23 +1,19 @@
 """
-EUMODIC Strain Audit
-====================
+EUMODIC Strain Audit — v2
+==========================
+Corrected for EUMODIC data structure:
+  - All records are controls
+    (biological_sample_group=control,
+     zygosity=homozygote)
+  - No wildtype string filtering needed
+  - All 10,026 records are eligible
+
 Determines strain rule per center
 BEFORE behavioral values are examined.
 
-Reads: eumodic_raw.csv
-Outputs:
-  - eumodic_strain_decision.csv
-  - eumodic_strain_audit.txt
-
-Decision rule (per EUMODIC_README.md
-pre-registration):
-  PRIMARY:   C57BL/6N strict
-  SECONDARY: All C57BL/6 aggregated
-             (only if C57BL/6N N < 8
-              for any center)
-
-Run AFTER eumodic_query.py.
-Run BEFORE eumodic_elf_assignment.py.
+Reads:  eumodic_raw.csv
+Writes: eumodic_strain_decision.csv
+        eumodic_strain_audit.txt
 
 OrganismCore — IMPC Series
 EUMODIC Replication Analysis
@@ -26,54 +22,55 @@ February 2026
 
 import pandas as pd
 
-# ─────────────────────────────────────────
+# ─────��───────────────────────────────────
 # CONFIG
-# ─────────────────────────────────────────
+# ───────────────────────────────────���─────
 
-IN_CSV          = "eumodic_raw.csv"
-OUT_DECISION    = "eumodic_strain_decision.csv"
-OUT_AUDIT       = "eumodic_strain_audit.txt"
+IN_CSV       = "eumodic_raw.csv"
+OUT_DECISION = "eumodic_strain_decision.csv"
+OUT_AUDIT    = "eumodic_strain_audit.txt"
 
-# Minimum N per center for
-# C57BL/6N strict to be viable
-MIN_N_STRICT    = 8
+MIN_N_STRICT = 8
 
-# C57BL/6N identifier strings
-# (check against strain inventory
-#  output from eumodic_query.py
-#  and add variants if needed)
+# C57BL/6N substrains — strict
 B6N_STRINGS = [
     "C57BL/6N",
-    "C57BL/6NJ",
-    "C57BL/6NCrl",
     "C57BL/6NTac",
-    "C57BL/6N Tac",
-    "C57BL/6N Crl",
+    "C57BL/6NTacDen",
+    "C57BL/6NTac-ICS-Denmark(ImportedLive)",
+    "C57BL/6NTac-ICS-USA(ImportedLive)",
+    "C57BL/6NCrl",
+    "C57BL/6NJ",
 ]
 
-# All C57BL/6 substrains
-# (aggregated secondary analysis)
-B6_ALL_STRINGS = [
-    "C57BL/6N",
-    "C57BL/6NJ",
-    "C57BL/6NCrl",
-    "C57BL/6NTac",
-    "C57BL/6N Tac",
-    "C57BL/6N Crl",
-    "C57BL/6J",
+# All C57BL/6 substrains — aggregated
+B6_ALL_STRINGS = B6N_STRINGS + [
     "C57BL/6",
-    "C57BL/6JOlaHsd",
-    "C57BL/6JCrl",
+    "C57BL/6J",
+    "C57BL/6JIco",
+    "C57BL/6Dnk",
+    "C57BL/6JTyr;C57BL/6N",
+    "C57BL/6JTyr;C57BL/6JIco",
+    "C57BL/6JTyr;C57BL/6",
+    "C57BL/6JTyr;C57BL/6;129S5",
+    "C57BL/6JIco;129P2",
+    "C57BL/6JIco;C57BL/6JTyr;129S5",
+    "B6J.129S2",
+    "B6J.129S2.B6N",
+    "B6J.B6N",
+    "B6N.129S2.B6J",
+    "B6N.B6J.129S2",
 ]
 
-# Wildtype zygosity strings
-WT_STRINGS = [
-    "wild type",
-    "wildtype",
-    "wild-type",
-    "wt",
-    "WT",
-    "control",
+# DR23 centers for overlap check
+DR23_CENTERS = [
+    "CCP",
+    "HMGU",
+    "ICS",
+    "IMG",
+    "MRC Harwell",
+    "TCP",
+    "WTSI",
 ]
 
 results = []
@@ -86,121 +83,79 @@ def log(s=""):
 # LOAD
 # ─────────────────────────────────────────
 
-log("=" * 52)
-log("EUMODIC STRAIN AUDIT")
-log("=" * 52)
+log("=" * 56)
+log("EUMODIC STRAIN AUDIT v2")
+log("=" * 56)
 log()
 
 df = pd.read_csv(IN_CSV, low_memory=False)
 log(f"Loaded: {IN_CSV}")
-log(f"  Rows:    {len(df):,}")
-log(f"  Columns: {len(df.columns)}")
+log(f"  Total rows:    {len(df):,}")
+log(f"  Columns:       {len(df.columns)}")
+log()
+log("NOTE: All records are controls")
+log("(biological_sample_group=control,")
+log(" zygosity=homozygote).")
+log("No wildtype string filtering applied.")
 log()
 
 # ─────────────────────────────────────────
-# IDENTIFY STRAIN COLUMN
+# STRAIN FLAGS
 # ─────────────────────────────────────────
 
-strain_col = None
-for candidate in [
-    "strain_name",
-    "strain_accession_id",
-]:
-    if candidate in df.columns:
-        strain_col = candidate
-        break
+df["is_b6n"] = (
+    df["strain_name"]
+    .str.strip()
+    .isin(B6N_STRINGS)
+)
 
-if not strain_col:
-    log("ERROR: No strain column found.")
-    log("Columns present:")
-    for c in df.columns:
-        log(f"  {c}")
-    exit(1)
-
-log(f"Strain column: {strain_col}")
-log()
-
-# ─────────────────────────────────────────
-# IDENTIFY ZYGOSITY COLUMN
-# ─────────────────────────────────────────
-
-zyg_col = None
-for candidate in [
-    "zygosity",
-    "biological_sample_group",
-]:
-    if candidate in df.columns:
-        zyg_col = candidate
-        break
-
-log(f"Zygosity/group column: {zyg_col}")
-log()
-
-# ─────────────────────────────────────────
-# FILTER: WILDTYPE CONTROLS
-# ─────────────────────────────────────────
-
-if zyg_col:
-    wt_mask = df[zyg_col].str.lower().isin(
-        [w.lower() for w in WT_STRINGS]
-    )
-    df_wt = df[wt_mask].copy()
-else:
-    log("WARNING: No zygosity column. "
-        "Using all records.")
-    df_wt = df.copy()
+df["is_b6all"] = (
+    df["strain_name"]
+    .str.strip()
+    .isin(B6_ALL_STRINGS)
+)
 
 log(
-    f"Wildtype / control records: "
-    f"{len(df_wt):,} / {len(df):,}"
+    f"Records flagged B6N strict: "
+    f"{df['is_b6n'].sum():,}"
+)
+log(
+    f"Records flagged B6 all:     "
+    f"{df['is_b6all'].sum():,}"
 )
 log()
 
 # ─────────────────────────────────────────
-# BUILD STRAIN FLAGS
-# ─────────────────────────────────────────
-
-df_wt["is_b6n"] = df_wt[
-    strain_col
-].str.strip().isin(B6N_STRINGS)
-
-df_wt["is_b6_all"] = df_wt[
-    strain_col
-].str.strip().isin(B6_ALL_STRINGS)
-
-# ─────────────���───────────────────────────
 # PER-CENTER AUDIT
 # ─────────────────────────────────────────
 
-log("=" * 52)
+log("=" * 56)
 log("PER-CENTER STRAIN COUNTS")
-log("=" * 52)
+log("=" * 56)
 log()
 
 centers = sorted(
-    df_wt["phenotyping_center"]
+    df["phenotyping_center"]
     .dropna().unique().tolist()
 )
 
-decision_rows = []
-
 log(
-    f"{'Center':<28} "
+    f"{'Center':<30} "
     f"{'N B6N':>7} "
     f"{'N B6all':>8} "
     f"{'N total':>8} "
-    f"{'Rule':>12}"
+    f"{'Rule':>14}"
 )
-log("-" * 68)
+log("-" * 72)
+
+decision_rows = []
 
 for center in centers:
-    cdf = df_wt[
-        df_wt["phenotyping_center"]
-        == center
+    cdf = df[
+        df["phenotyping_center"] == center
     ]
-
-    n_b6n   = cdf["is_b6n"].sum()
-    n_b6all = cdf["is_b6_all"].sum()
+    n_b6n   = int(cdf["is_b6n"].sum())
+    n_b6all = int(cdf["is_b6all"].sum())
     n_total = len(cdf)
 
     if n_b6n >= MIN_N_STRICT:
@@ -211,19 +166,19 @@ for center in centers:
         rule = "INSUFFICIENT"
 
     log(
-        f"{center:<28} "
+        f"{center:<30} "
         f"{n_b6n:>7,} "
         f"{n_b6all:>8,} "
         f"{n_total:>8,} "
-        f"{rule:>12}"
+        f"{rule:>14}"
     )
 
     decision_rows.append({
-        "center":        center,
-        "n_b6n_wt":      int(n_b6n),
-        "n_b6all_wt":    int(n_b6all),
-        "n_total_wt":    int(n_total),
-        "strain_rule":   rule,
+        "center":          center,
+        "n_b6n":           n_b6n,
+        "n_b6all":         n_b6all,
+        "n_total":         n_total,
+        "strain_rule":     rule,
         "min_n_threshold": MIN_N_STRICT,
     })
 
@@ -248,92 +203,75 @@ n_insuf = (
     == "INSUFFICIENT"
 ).sum()
 
-log("=" * 52)
+log("=" * 56)
 log("STRAIN DECISION SUMMARY")
-log("=" * 52)
+log("=" * 56)
 log()
-log(
-    f"Centers using STRICT_B6N:    "
-    f"{n_strict}"
-)
-log(
-    f"Centers using AGG_B6ALL:     "
-    f"{n_agg}"
-)
-log(
-    f"Centers INSUFFICIENT (both): "
-    f"{n_insuf}"
-)
+log(f"STRICT_B6N centers:    {n_strict}")
+log(f"AGG_B6ALL centers:     {n_agg}")
+log(f"INSUFFICIENT centers:  {n_insuf}")
 log()
-
-if n_agg > 0:
-    log("NOTE: AGG_B6ALL centers will be")
-    log("reported separately in primary")
-    log("analysis with strain rule flagged.")
-    log()
 
 if n_insuf > 0:
-    log("NOTE: INSUFFICIENT centers will")
-    log("be excluded from correlation.")
-    log("Listed below:")
     insuf = decision_df[
         decision_df["strain_rule"]
         == "INSUFFICIENT"
     ]["center"].tolist()
+    log("INSUFFICIENT centers (excluded):")
     for c in insuf:
         log(f"  {c}")
     log()
 
 # ─────────────────────────────────────────
-# OVERLAPPING CENTERS CHECK
+# OVERLAP WITH DR23
 # ─────────────────────────────────────────
 
-# Centers present in DR23 analysis
-DR23_CENTERS = [
-    "CCP",
-    "HMGU",
-    "ICS",
-    "IMG",
-    "MRC Harwell",
-    "TCP",
-    "WTSI",
-]
-
-log("=" * 52)
+log("=" * 56)
 log("OVERLAP WITH DR23 CENTERS")
-log("=" * 52)
+log("=" * 56)
 log()
 
-eumodic_centers = set(
-    decision_df["center"].tolist()
-)
-dr23_set = set(DR23_CENTERS)
-
-overlap = eumodic_centers & dr23_set
-new_centers = eumodic_centers - dr23_set
-dr23_missing = dr23_set - eumodic_centers
+eumodic_set = set(centers)
+dr23_set    = set(DR23_CENTERS)
+overlap     = eumodic_set & dr23_set
+new_only    = eumodic_set - dr23_set
+missing     = dr23_set - eumodic_set
 
 log(
-    f"Centers in both DR23 and EUMODIC: "
-    f"{len(overlap)}"
+    f"Centers in BOTH datasets "
+    f"({len(overlap)}):"
 )
 for c in sorted(overlap):
-    log(f"  {c}")
+    row = decision_df[
+        decision_df["center"] == c
+    ].iloc[0]
+    log(
+        f"  {c:<28} "
+        f"B6N={row['n_b6n']:,}  "
+        f"rule={row['strain_rule']}"
+    )
 log()
 
 log(
-    f"New centers (EUMODIC only): "
-    f"{len(new_centers)}"
+    f"EUMODIC-only centers "
+    f"({len(new_only)}):"
 )
-for c in sorted(new_centers):
-    log(f"  {c}")
+for c in sorted(new_only):
+    row = decision_df[
+        decision_df["center"] == c
+    ].iloc[0]
+    log(
+        f"  {c:<28} "
+        f"B6N={row['n_b6n']:,}  "
+        f"rule={row['strain_rule']}"
+    )
 log()
 
 log(
-    f"DR23 centers absent from EUMODIC: "
-    f"{len(dr23_missing)}"
+    f"DR23 centers absent from "
+    f"EUMODIC ({len(missing)}):"
 )
-for c in sorted(dr23_missing):
+for c in sorted(missing):
     log(f"  {c}")
 log()
 
@@ -344,32 +282,24 @@ log()
 decision_df.to_csv(
     OUT_DECISION, index=False
 )
-log(f"Strain decision saved: "
-    f"{OUT_DECISION}")
-log()
+log(f"Saved: {OUT_DECISION}")
 
 with open(OUT_AUDIT, "w") as f:
     f.write("\n".join(results))
-log(f"Audit log saved: {OUT_AUDIT}")
+log(f"Saved: {OUT_AUDIT}")
 log()
 
 # ─────────────────────────────────────────
-# NEXT STEP REMINDER
+# NEXT STEP
 # ─────────────────────────────────────────
 
-log("=" * 52)
+log("=" * 56)
 log("NEXT STEP")
-log("=" * 52)
+log("=" * 56)
 log()
-log("Run eumodic_elf_assignment.py")
+log("Post the center table output here.")
+log("ELF scores will be assigned to all")
+log("centers before behavioral medians")
+log("are computed.")
 log()
-log("ELF scores must be assigned to")
-log("all centers BEFORE behavioral")
-log("medians are computed.")
-log()
-log("For overlapping centers use the")
-log("same ELF score as DR23.")
-log("For new centers assign blind to")
-log("behavioral values.")
-log()
-log("=" * 52)
+log("=" * 56)
