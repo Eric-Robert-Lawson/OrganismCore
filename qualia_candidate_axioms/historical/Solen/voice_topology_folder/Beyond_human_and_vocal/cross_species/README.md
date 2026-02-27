@@ -37,3 +37,5 @@
 - the_pod_problem.md
 - the_substrate_channel.md
 - the_electric_tonnetz.md
+- the_universal_tonnetz.md
+- the_session_artifact.md
