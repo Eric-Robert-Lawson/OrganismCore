@@ -86,3 +86,4 @@ The documents are ordered as such:
 - The_Spectral_Geometry_Framework.md
 - Document_63.md
 - the_triad_convergence.md (combination of triadic convergence and triadic cross-species communication information)
+- sensory_coherence_as_gap_navigator.md
