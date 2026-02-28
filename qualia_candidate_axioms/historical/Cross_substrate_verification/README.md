@@ -12,7 +12,9 @@ The gemini based chat: [https://github.com/copilot/share/8a754320-0aa0-80f6-b903
 
 second claude session [https://github.com/copilot/share/883510a2-42a0-8cd6-a041-de0ee09940ff](https://github.com/copilot/share/883510a2-42a0-8cd6-a041-de0ee09940ff)
 
-third claude session (phonetics and cross session) [https://github.com/copilot/share/483443b0-4aa0-8c54-9110-5e0ec45108bf](https://github.com/copilot/share/483443b0-4aa0-8c54-9110-5e0ec45108bf)
+third session (phonetics and cross session) [https://github.com/copilot/share/483443b0-4aa0-8c54-9110-5e0ec45108bf](https://github.com/copilot/share/483443b0-4aa0-8c54-9110-5e0ec45108bf)
+
+fourth session: [https://github.com/copilot/share/c8341320-43a4-80d4-b043-4e0ee09148ad](https://github.com/copilot/share/c8341320-43a4-80d4-b043-4e0ee09148ad)
 
 ## **Places of Interest:**
 
