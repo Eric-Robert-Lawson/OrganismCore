@@ -9,4 +9,4 @@ The chronology kind of matters, but here is the key:
 - tinnitus/tinnitus_trial_protocol.md
 - universal_false_attractor_theraputics.md
 - genomic_eigenfunction_false_attractor_crispr.md
-- waddington_saddle_point_cancer_reversion.md
+- cancer/waddington_saddle_point_cancer_reversion.md
