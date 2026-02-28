@@ -4,6 +4,8 @@ OrganismCore — Document 75
 False Attractor Framework — Cancer Validation #4
 February 28, 2026
 
+LINK: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE176078
+
 CANCER TYPE: Breast Cancer (BRCA)
 DATA: GSE176078 — Wu et al. 2021, Nature Genetics
       PMID: 34493872
