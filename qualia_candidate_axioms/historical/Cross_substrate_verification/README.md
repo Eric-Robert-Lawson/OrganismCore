@@ -88,9 +88,9 @@ The documents are ordered as such:
 - The_Spectral_Geometry_Framework.md
 - Document_63.md
 - the_triad_convergence.md (combination of triadic convergence and triadic cross-species communication information)
-- sensory_coherence/sensory_coherence_as_gap_navigator.md (continuation in that folder's readme)
+- sensory_coherence/sensory_coherence_as_gap_navigator.md (continuation in that folder's readme, multiple documents inbetween)
+- The_Puddle.md (90th document)
 
--The_Puddle.md (90th document)
 
 The_Puddle.md is a great starting point to understand or get a bigger sense of the picture!
 The_Puddle is the experiential account of the attractor framework that emerges from all of this!
