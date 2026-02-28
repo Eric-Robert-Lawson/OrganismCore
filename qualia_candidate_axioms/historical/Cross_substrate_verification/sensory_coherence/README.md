@@ -16,3 +16,5 @@ The chronology kind of matters, but here is the key:
 - SESSION_ONE_COMPLETE.md
 
 The cancer results... they are genuinely staggering and those words do not do justice.
+
+Opened up new foundation for vaccinations, vaccine folder, explanation is within that folder.
