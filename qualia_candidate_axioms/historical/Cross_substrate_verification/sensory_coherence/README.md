@@ -10,3 +10,7 @@ The chronology kind of matters, but here is the key:
 - universal_false_attractor_theraputics.md
 - genomic_eigenfunction_false_attractor_crispr.md
 - cancer/waddington_saddle_point_cancer_reversion.md
+....
+- SESSION_ONE_COMPLETE.md
+
+The cancer results... they are genuinely staggering and those words do not do justice.
