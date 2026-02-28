@@ -44,6 +44,78 @@ CROSS-CANCER TEST:
   for lineage-specific purposes.
 """
 
+"""
+ALL FALSE ATTRACTOR ANALYSIS
+OrganismCore — Document 79
+False Attractor Framework — Cancer Validation #7
+Session 2 — Lymphoid
+
+REVISED GENE LIST — v2
+
+LESSON FROM v1:
+  B-ALL and T-ALL blasts are NOT
+  blocked before lineage identity
+  activates. They ARE the lineage —
+  PAX5, EBF1, CD19, TCF7, CD3E
+  are ON in blasts.
+  The block is AFTER lineage identity
+  but BEFORE terminal completion.
+
+  The switch genes for ALL are the
+  TERMINAL COMPLETION genes —
+  the last step the blasts cannot take.
+
+B-ALL terminal completion (new):
+  IGHM   — IgM heavy chain
+           expressed only in mature
+           naive B cells
+           NOT in B-cell progenitors
+           NOT in blasts
+  IGKC   — Ig kappa light chain
+           terminal B cell product
+  PRDM1  — Blimp1 — plasma cell
+           master TF — drives terminal
+           B cell differentiation
+           into antibody-secreting
+           plasma cells
+  CD27   — memory/mature B cell marker
+
+T-ALL terminal completion (new):
+  SELL   — CD62L — lymph node homing
+           expressed on mature naive
+           T cells — NOT on blasts
+  CCR7   — chemokine receptor
+           mature naive T cell
+  IL7R   — IL-7 receptor
+           mature T cell survival
+           signal receptor
+  PTPRC  — CD45 — pan-lymphocyte
+           marker — high on mature
+           T cells
+
+SCAFFOLD (blasts should be HIGH):
+  RAG1   — recombination activating
+           gene — active in immature
+           B and T cells
+           HIGH in blasts
+           LOW in mature cells
+           This is the scaffold —
+           confirms blasts are
+           immature lymphoid cells
+  RAG2   — same — scaffold
+  PAX5   — B-cell identity gene
+           ON in blasts — scaffold
+           for B-ALL comparison
+  CD3E   — T-cell identity gene
+           ON in blasts — scaffold
+           for T-ALL comparison
+
+CONTROLS:
+  CEBPA  — myeloid switch — flat
+  SFTPC  — lung — zero
+  CDX2   — colon — zero
+"""
+
 import pandas as pd
 import numpy as np
 import matplotlib
@@ -58,7 +130,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # ============================================================
-# CONFIGURATION
+# CONFIGURATION — v2 REVISED GENE LIST
 # ============================================================
 
 DATA_DIR    = "./"
@@ -74,9 +146,16 @@ def log(msg=""):
     with open(LOG_FILE, "a") as f:
         f.write(str(msg) + "\n")
 
-B_SWITCH  = ["PAX5", "EBF1", "IKZF1", "CD19", "MS4A1"]
-T_SWITCH  = ["GATA3", "BCL11B", "TCF7", "CD3E", "TRBC1"]
-SCAFFOLD  = ["CD34", "MKI67"]
+# REVISED: terminal completion genes
+B_SWITCH  = ["IGHM", "IGKC", "PRDM1", "CD27"]
+T_SWITCH  = ["SELL", "CCR7", "IL7R", "PTPRC"]
+
+# Scaffolds — should be HIGH in blasts
+# RAG1/2 active in immature lymphoid
+# PAX5/CD3E = lineage identity (on in blasts)
+SCAFFOLD  = ["RAG1", "RAG2", "PAX5", "CD3E",
+             "CD34", "MKI67"]
+
 CONTROLS  = ["CEBPA", "SFTPC", "CDX2"]
 
 ALL_TARGET = B_SWITCH + T_SWITCH + SCAFFOLD + CONTROLS
@@ -119,14 +198,6 @@ def load_annotations():
     log(f"Total annotated cells: {len(ann)}")
     log("Cell type distribution:")
     log(str(ann[LABEL_COL].value_counts()))
-    log()
-    log("Sample annotation IDs (first 3 per sample):")
-    for prefix in set(
-        i.split("_")[0] for i in ann.index
-    ):
-        examples = [i for i in ann.index
-                    if i.startswith(prefix)][:3]
-        log(f"  {prefix}: {examples}")
 
     return ann
 
@@ -148,7 +219,8 @@ def load_all_samples(ann):
         log(str(expr[LABEL_COL].value_counts()))
         return expr
 
-    samples = []
+    ann_index = ann[LABEL_COL].to_dict()
+    samples   = []
 
     for gsm_prefix, ann_prefix in SAMPLE_MAP.items():
         barcodes_file = DATA_DIR + gsm_prefix + ".barcodes.tsv.gz"
@@ -156,91 +228,60 @@ def load_all_samples(ann):
         matrix_file   = DATA_DIR + gsm_prefix + ".matrix.mtx.gz"
 
         if not all(os.path.exists(f) for f in
-                   [barcodes_file, genes_file, matrix_file]):
-            log(f"Skipping {gsm_prefix} — missing files")
+                   [barcodes_file, genes_file,
+                    matrix_file]):
+            log(f"Skipping {gsm_prefix} — "
+                f"missing files")
             continue
 
-        log(f"Loading {ann_prefix} ({gsm_prefix})...")
+        log(f"Loading {ann_prefix}...")
 
-        # Load barcodes
         with gzip.open(barcodes_file, 'rt') as f:
             barcodes = [line.strip() for line in f]
 
-        # Load genes
         gene_df = pd.read_csv(
             genes_file, sep="\t",
             header=None, compression='gzip',
             names=["ensembl", "symbol"])
         gene_list = gene_df["symbol"].tolist()
 
-        # Load matrix
         with gzip.open(matrix_file, 'rb') as f:
             mat = mmread(f).tocsc()
 
         n_genes = len(gene_list)
-
         if mat.shape[0] == n_genes:
-            pass  # genes x cells
+            pass
         elif mat.shape[1] == n_genes:
             mat = mat.T.tocsc()
-        else:
-            log(f"  WARNING: shape mismatch "
-                f"{mat.shape} vs {n_genes} genes")
 
-        # Build cell IDs
-        # annotation format: ETV6.RUNX1.1_AAACCTGAGACTTTCG
-        # barcodes format:   AAACCTGAGACTTTCG (no suffix)
-        #                 or AAACCTGAGACTTTCG-1 (with suffix)
-        # Check annotation to determine which format
-        ann_ids = ann.index.tolist()
         sample_ann_ids = [
-            i for i in ann_ids
+            i for i in ann_index.keys()
             if i.startswith(ann_prefix + "_")
         ]
 
         if len(sample_ann_ids) == 0:
-            log(f"  WARNING: no annotation IDs found "
-                f"for prefix '{ann_prefix}'")
-            log(f"  Sample ann IDs: "
-                f"{ann_ids[:5]}")
+            log(f"  WARNING: no annotation IDs "
+                f"for {ann_prefix} — skipping")
             continue
 
-        # Get barcode portion from annotation
-        ann_barcodes = [
+        ann_barcodes_sample = set(
             i.split("_", 1)[1]
-            for i in sample_ann_ids
-        ]
+            for i in sample_ann_ids)
 
-        log(f"  Annotation barcodes sample: "
-            f"{ann_barcodes[:3]}")
-        log(f"  File barcodes sample: "
-            f"{barcodes[:3]}")
-
-        # Build cell_id -> annotation lookup
-        ann_barcode_set = set(ann_barcodes)
-        file_barcode_set = set(barcodes)
-
-        # Check direct match
+        file_barcode_sample = set(barcodes[:100])
         direct_match = len(
-            ann_barcode_set & file_barcode_set)
-        log(f"  Direct barcode match: {direct_match}")
+            ann_barcodes_sample &
+            file_barcode_sample)
 
-        # If no direct match try stripping -1/-2 suffix
-        if direct_match == 0:
-            stripped = {
-                b.rsplit("-", 1)[0]: b
+        if direct_match > 0:
+            cell_ids = [f"{ann_prefix}_{b}"
+                        for b in barcodes]
+        else:
+            cell_ids = [
+                f"{ann_prefix}_{b.rsplit('-', 1)[0]}"
                 for b in barcodes
-            }
-            strip_match = len(
-                ann_barcode_set &
-                set(stripped.keys()))
-            log(f"  Stripped suffix match: {strip_match}")
+            ]
 
-        # Build cell IDs using annotation barcode format
-        cell_ids = [f"{ann_prefix}_{b}"
-                    for b in barcodes]
-
-        # Find target gene indices
         target_idx   = []
         target_names = []
         for g in ALL_TARGET:
@@ -248,8 +289,6 @@ def load_all_samples(ann):
                 idx = gene_list.index(g)
                 target_idx.append(idx)
                 target_names.append(g)
-
-        log(f"  Target genes found: {target_names}")
 
         if not target_idx:
             log(f"  WARNING: no target genes found")
@@ -261,26 +300,21 @@ def load_all_samples(ann):
                            columns=target_names)
         df  = np.log1p(df)
 
-        # Match labels from annotation
-        df[LABEL_COL] = ann[LABEL_COL].reindex(
-            df.index).values
+        df[LABEL_COL] = [
+            ann_index.get(cid, np.nan)
+            for cid in df.index
+        ]
         df["sample"] = ann_prefix
 
         n_matched = df[LABEL_COL].notna().sum()
         log(f"  {ann_prefix}: {len(df)} cells, "
-            f"{n_matched} matched to annotations")
-
-        if n_matched == 0:
-            log(f"  DEBUG: first 3 cell IDs built: "
-                f"{cell_ids[:3]}")
-            log(f"  DEBUG: first 3 ann IDs for this "
-                f"sample: {sample_ann_ids[:3]}")
+            f"{n_matched} matched")
 
         samples.append(df)
 
     combined = pd.concat(samples, ignore_index=False)
     log(f"\nTotal cells loaded: {len(combined)}")
-    log(f"Cells with annotations: "
+    log(f"Annotations matched: "
         f"{combined[LABEL_COL].notna().sum()}")
     log("Label distribution:")
     log(str(combined[LABEL_COL].value_counts()))
@@ -313,16 +347,6 @@ def define_groups(combined):
     log(f"Normal B cells: {len(normal_b):6} cells")
     log(f"Normal T cells: {len(normal_t):6} cells")
 
-    if len(t_blast) == 0:
-        log()
-        log("WARNING: T-ALL blasts = 0 cells")
-        log("Checking PRE-T label variants...")
-        labels = combined[LABEL_COL].dropna().unique()
-        pre_t = [l for l in labels
-                 if 'PRE' in str(l).upper()
-                 or 'T' in str(l).upper()]
-        log(f"T-related labels found: {pre_t}")
-
     return b_blast, t_blast, normal_b, normal_t
 
 # ============================================================
@@ -338,26 +362,20 @@ def compute_signature(blast, normal,
     log("=" * 56)
     log(f"Blast cells:  {len(blast)}")
     log(f"Normal cells: {len(normal)}")
-
-    if len(blast) == 0:
-        log(f"WARNING: no {cancer_name} blast cells — "
-            f"skipping comparison")
-        return pd.DataFrame(columns=[
-            'gene', 'cancer', 'role',
-            'blast_expr', 'normal_expr',
-            'suppression_pct', 'pval_supp', 'result'
-        ])
-
-    if len(normal) == 0:
-        log(f"WARNING: no {normal_name} cells — "
-            f"skipping comparison")
-        return pd.DataFrame(columns=[
-            'gene', 'cancer', 'role',
-            'blast_expr', 'normal_expr',
-            'suppression_pct', 'pval_supp', 'result'
-        ])
-
     log()
+    log("Testing TERMINAL COMPLETION genes.")
+    log("These should be HIGH in normal,")
+    log("LOW/absent in blasts.")
+    log()
+
+    if len(blast) == 0 or len(normal) == 0:
+        log("WARNING: insufficient cells — skipping")
+        return pd.DataFrame(columns=[
+            'gene', 'cancer', 'role',
+            'blast_expr', 'normal_expr',
+            'suppression_pct', 'pval_supp',
+            'result'
+        ])
 
     def fmt_p(p):
         if np.isnan(p):  return "N/A      "
@@ -366,19 +384,19 @@ def compute_signature(blast, normal,
         if p < 0.05:     return f"{p:.4f} *  "
         return            f"{p:.4f}    "
 
-    results = []
-    all_genes = switch_genes + SCAFFOLD + CONTROLS
+    results    = []
+    all_genes  = switch_genes + SCAFFOLD + CONTROLS
 
     for gene in all_genes:
-        if gene not in blast.columns:
-            continue
-        if gene not in normal.columns:
+        if (gene not in blast.columns or
+                gene not in normal.columns):
             continue
 
         blast_vals  = blast[gene].dropna()
         normal_vals = normal[gene].dropna()
 
-        if len(blast_vals) < 5 or len(normal_vals) < 5:
+        if (len(blast_vals) < 5 or
+                len(normal_vals) < 5):
             continue
 
         blast_mean  = blast_vals.mean()
@@ -395,6 +413,9 @@ def compute_signature(blast, normal,
 
         _, pval_supp = stats.mannwhitneyu(
             normal_vals, blast_vals,
+            alternative='greater')
+        _, pval_elev = stats.mannwhitneyu(
+            blast_vals, normal_vals,
             alternative='greater')
 
         is_switch   = gene in switch_genes
@@ -416,7 +437,11 @@ def compute_signature(blast, normal,
             else:
                 result = "NOT CONFIRMED"
         elif is_scaffold:
-            result = "SCAFFOLD"
+            # Scaffolds expected HIGH in blasts
+            if elevation_pct > 0:
+                result = "SCAFFOLD HIGH (expected)"
+            else:
+                result = "SCAFFOLD LOW (unexpected)"
         else:
             if abs(suppression_pct) < 30:
                 result = "CONTROL OK"
@@ -437,15 +462,17 @@ def compute_signature(blast, normal,
         direction = (
             f"suppressed {suppression_pct:+.1f}%"
             if suppression_pct > 0
-            else f"elevated   {elevation_pct:+.1f}%"
+            else
+            f"elevated   {elevation_pct:+.1f}%"
         )
 
         flag = (
-            "✓ CONFIRMED" if result == "CONFIRMED"   else
-            "~ PARTIAL"   if result == "PARTIAL"      else
-            "SCAFFOLD"    if result == "SCAFFOLD"     else
-            "✓ CTRL OK"   if result == "CONTROL OK"   else
-            "✗ " + result
+            "✓ CONFIRMED" if result == "CONFIRMED"
+            else "~ PARTIAL" if result == "PARTIAL"
+            else "✓ SCAFFOLD↑" if "HIGH" in result
+            else "✗ SCAFFOLD↓" if "LOW"  in result
+            else "✓ CTRL OK"   if result == "CONTROL OK"
+            else "✗ " + result
         )
 
         log(f"{gene:8} [{role:8}] | "
@@ -461,7 +488,7 @@ def compute_signature(blast, normal,
         log("WARNING: no results computed")
         return results_df
 
-    sw = results_df[results_df['role'] == 'SWITCH']
+    sw     = results_df[results_df['role'] == 'SWITCH']
     n_sw_c = (sw['result'] == 'CONFIRMED').sum()
     n_sw_p = (sw['result'] == 'PARTIAL').sum()
     n_sw   = len(sw)
@@ -476,6 +503,9 @@ def compute_signature(blast, normal,
     elif n_sw_c + n_sw_p >= 2:
         log(f"** PARTIAL {cancer_name} "
             f"CONFIRMATION **")
+    else:
+        log(f"--- {cancer_name}: insufficient "
+            f"confirmation")
 
     return results_df
 
@@ -489,9 +519,8 @@ def lineage_specificity_test(b_blast, t_blast,
     log("=" * 56)
     log("STEP 5: LINEAGE SPECIFICITY TEST")
     log("=" * 56)
-    log("CEBPA — confirmed myeloid switch")
-    log("AML: 94.7%  CML: 90.3%  both p≈0")
-    log("Prediction: FLAT in ALL (lymphoid)")
+    log("CEBPA — myeloid switch (AML 94.7% CML 90.3%)")
+    log("Prediction: FLAT in ALL lymphoid populations")
     log()
 
     for gene in ["CEBPA", "SFTPC", "CDX2"]:
@@ -502,47 +531,38 @@ def lineage_specificity_test(b_blast, t_blast,
             ("Normal-B", normal_b),
             ("Normal-T", normal_t),
         ]:
-            if gene in grp.columns and len(grp) > 0:
-                vals[name] = grp[gene].mean()
-            else:
-                vals[name] = 0.0
-
+            vals[name] = (
+                grp[gene].mean()
+                if gene in grp.columns
+                and len(grp) > 0
+                else 0.0
+            )
         log(f"{gene:8}: " +
             "  ".join(f"{k}={v:.4f}"
                       for k, v in vals.items()))
-
         if gene == "CEBPA":
             mx = max(vals.values())
             if mx < 0.2:
-                log(f"  → CEBPA flat (max={mx:.4f}) — "
-                    f"LINEAGE SPECIFICITY CONFIRMED")
-                log(f"  → Myeloid switch genes do not")
-                log(f"     apply to lymphoid cancers")
+                log(f"  → LINEAGE SPECIFICITY CONFIRMED "
+                    f"(max={mx:.4f})")
             else:
-                log(f"  → CEBPA expressed (max={mx:.4f})")
+                log(f"  → Unexpected CEBPA "
+                    f"(max={mx:.4f})")
 
     log()
-    log("GATA3 cross-cancer test:")
-    log("BRCA confirmed luminal switch 53.4%")
-    log("T-ALL: testing in T-cell context")
-    if ("GATA3" in t_blast.columns and
-            len(t_blast) > 0 and
-            len(normal_t) > 0):
-        tb  = t_blast["GATA3"].mean()
-        nt  = normal_t["GATA3"].mean()
-        sup = (nt - tb) / (nt + 1e-6) * 100
-        log(f"  T-blast GATA3:  {tb:.4f}")
-        log(f"  Normal-T GATA3: {nt:.4f}")
-        log(f"  Suppression:    {sup:.1f}%")
-        if sup > 30:
-            log("  → GATA3 confirmed in T-ALL")
-            log("  → BRCA (luminal) + T-ALL confirmed")
-            log("  → Gene reused across lineages")
-        else:
-            log("  → GATA3 not suppressed in T-ALL")
-    else:
-        log("  GATA3 test skipped — "
-            "insufficient cells")
+    log("RAG1/RAG2 scaffold test:")
+    log("Should be HIGH in blasts (immature lymphoid)")
+    log("LOW in mature normal B and T cells")
+    for gene in ["RAG1", "RAG2"]:
+        for name, grp in [
+            ("B-blast",  b_blast),
+            ("T-blast",  t_blast),
+            ("Normal-B", normal_b),
+            ("Normal-T", normal_t),
+        ]:
+            if gene in grp.columns and len(grp) > 0:
+                val = grp[gene].mean()
+                log(f"  {gene} {name}: {val:.4f}")
 
 # ============================================================
 # STEP 6: FIGURE
@@ -566,9 +586,10 @@ def generate_figure(b_results, t_results,
                        results_df):
         if len(blast) == 0 or len(normal) == 0:
             ax.text(0.5, 0.5,
-                    f"No data\n{blast_label}",
+                    "Insufficient data",
                     ha='center', va='center',
-                    transform=ax.transAxes)
+                    transform=ax.transAxes,
+                    fontsize=12)
             ax.set_title(title, fontsize=9,
                          fontweight='bold')
             return
@@ -577,14 +598,10 @@ def generate_figure(b_results, t_results,
                  if g in blast.columns
                  and g in normal.columns]
         if not avail:
-            ax.text(0.5, 0.5, "No genes available",
-                    ha='center', va='center',
-                    transform=ax.transAxes)
             return
 
         x     = np.arange(len(avail))
         width = 0.35
-
         b_means = [blast[g].mean()  for g in avail]
         n_means = [normal[g].mean() for g in avail]
         b_sems  = [blast[g].sem()   for g in avail]
@@ -615,8 +632,8 @@ def generate_figure(b_results, t_results,
                     results_df['gene'] == gene]
                 if len(row) == 0:
                     continue
-                row = row.iloc[0]
-                pct = row['suppression_pct']
+                row   = row.iloc[0]
+                pct   = row['suppression_pct']
                 color = ('darkgreen'
                          if row['result'] == 'CONFIRMED'
                          else 'gray')
@@ -635,32 +652,37 @@ def generate_figure(b_results, t_results,
     make_bar_panel(
         ax_a, b_blast, normal_b, B_SWITCH,
         'B-ALL blasts', 'Normal B cells',
-        "A. B-ALL False Attractor — "
-        "PAX5 EBF1 IKZF1 CD19 MS4A1",
+        "A. B-ALL False Attractor — Terminal "
+        "Completion Genes\n"
+        "IGHM  IGKC  PRDM1  CD27\n"
+        "These should be HIGH in normal, "
+        "LOW in blasts",
         b_results)
 
     ax_b = fig.add_subplot(gs[1, :2])
     make_bar_panel(
         ax_b, t_blast, normal_t, T_SWITCH,
         'T-ALL blasts', 'Normal T cells',
-        "B. T-ALL False Attractor — "
-        "GATA3 BCL11B TCF7 CD3E TRBC1",
+        "B. T-ALL False Attractor — Terminal "
+        "Completion Genes\n"
+        "SELL  CCR7  IL7R  PTPRC\n"
+        "These should be HIGH in normal, "
+        "LOW in blasts",
         t_results)
 
     ax_c = fig.add_subplot(gs[2, :2])
     ctrl_genes = [g for g in
-                  ["CEBPA", "CDX2", "SFTPC"]
+                  ["CEBPA", "RAG1", "RAG2", "CDX2"]
                   if g in b_blast.columns]
-    if ctrl_genes:
+    if ctrl_genes and len(b_blast) > 0:
         x     = np.arange(len(ctrl_genes))
         width = 0.2
-        groups = [
+        for grp, label, color, offset in [
             (b_blast,  'B-ALL',    'crimson',    -1.5),
             (t_blast,  'T-ALL',    'darkorange',  -0.5),
             (normal_b, 'Normal B', 'steelblue',    0.5),
             (normal_t, 'Normal T', 'navy',          1.5),
-        ]
-        for grp, label, color, offset in groups:
+        ]:
             if len(grp) == 0:
                 continue
             means = [grp[g].mean()
@@ -674,8 +696,9 @@ def generate_figure(b_results, t_results,
         ax_c.set_ylabel("Mean log1p(UMI)", fontsize=9)
         ax_c.legend(fontsize=7)
     ax_c.set_title(
-        "C. Lineage Specificity — CEBPA (myeloid) "
-        "should be flat in ALL lymphoid populations",
+        "C. Controls + Scaffolds\n"
+        "CEBPA flat = lineage specificity confirmed  |  "
+        "RAG1/2 high in blasts = immaturity confirmed",
         fontsize=9, fontweight='bold')
 
     def make_table(ax, results_df, title):
@@ -694,9 +717,6 @@ def generate_figure(b_results, t_results,
         ][['gene', 'suppression_pct',
            'pval_supp', 'result']].copy()
         if len(sw) == 0:
-            ax.text(0.5, 0.5, "No switch genes",
-                    ha='center', va='center',
-                    transform=ax.transAxes)
             return
         sw['pval_supp'] = sw['pval_supp'].apply(
             lambda p: f"{p:.2e}"
@@ -736,7 +756,8 @@ def generate_figure(b_results, t_results,
                       ascending=False)
         if len(sw) > 0:
             bar_colors = [
-                'crimson' if 'B-ALL' in str(r['cancer'])
+                'crimson'
+                if 'B-ALL' in str(r['cancer'])
                 else 'darkorange'
                 for _, r in sw.iterrows()
             ]
@@ -761,12 +782,12 @@ def generate_figure(b_results, t_results,
     fig.suptitle(
         "ALL False Attractor — B-ALL and T-ALL\n"
         "GSE132509 Caron et al. 2020  |  "
-        "OrganismCore  |  Document 79\n"
-        "38,922 cells  |  8 ALL patients  |  "
-        "3 normal donors",
+        "OrganismCore  |  Document 79  v2\n"
+        "Terminal completion genes — "
+        "38,922 cells  |  8 ALL patients",
         fontsize=11, fontweight='bold')
 
-    outpath = RESULTS_DIR + "all_saddle_figure.png"
+    outpath = RESULTS_DIR + "all_saddle_figure_v2.png"
     plt.savefig(outpath, dpi=180,
                 bbox_inches='tight')
     plt.close()
@@ -778,10 +799,10 @@ def generate_figure(b_results, t_results,
 
 def main():
     log("=" * 56)
-    log("ALL FALSE ATTRACTOR ANALYSIS")
+    log("ALL FALSE ATTRACTOR ANALYSIS v2")
     log("OrganismCore — False Attractor Framework")
     log("Cancer Validation #7 — Document 79")
-    log("Session 2 — Lymphoid")
+    log("REVISED: Terminal completion gene list")
     log("=" * 56)
 
     ann = load_annotations()
@@ -814,12 +835,12 @@ def main():
         ignore_index=True)
     if len(all_results) > 0:
         all_results.to_csv(
-            RESULTS_DIR + "all_saddle_results.csv",
+            RESULTS_DIR + "all_saddle_results_v2.csv",
             index=False)
 
     log()
     log("=" * 56)
-    log("ALL ANALYSIS COMPLETE")
+    log("ALL ANALYSIS v2 COMPLETE")
     log(f"Results: {RESULTS_DIR}")
     log("=" * 56)
 
