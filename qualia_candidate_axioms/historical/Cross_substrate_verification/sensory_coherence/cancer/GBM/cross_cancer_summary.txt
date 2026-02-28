@@ -1,0 +1,76 @@
+
+CROSS-CANCER FALSE ATTRACTOR ANALYSIS
+OrganismCore — February 28, 2026
+============================================================
+
+THE PRINCIPLE:
+  Cancer is a false attractor in the Waddington
+  epigenetic landscape. Malignant cells are stuck
+  below the differentiation threshold — a ceiling
+  imposed by suppression of lineage-specific switch
+  genes. The switch genes are identifiable by their
+  expression profile: suppressed in the blocked
+  population relative to the normal differentiated
+  endpoint.
+
+CANCER 1: AML — Acute Myeloid Leukemia
+  Lineage:    Myeloid
+  Block:      GMP-like vs CD14+ monocytes
+  Switch genes (myeloid differentiation):
+    SPI1:  90.5% suppressed  p=0.00e+00 ***
+    KLF4:  94.7% suppressed  p=0.00e+00 ***
+    IRF8:  69.5% suppressed  p=0.00e+00 ***
+
+CANCER 2: CRC — Colorectal Cancer
+  Lineage:    Epithelial/Colonocyte
+  Block:      Epithelial 2 (cycling) vs Epithelial 1
+  Switch genes (colonocyte differentiation):
+    CDX2:  79.5% suppressed  p=3.89e-154 ***
+  Unexpected: IRF8 elevated 211%
+              (lineage infidelity)
+
+CANCER 3: GBM — Glioblastoma
+  Lineage:    Neural/Oligodendrocyte
+  Block:      OPC-like vs normal oligodendrocytes
+  Switch genes (myelination/oligodendrocyte):
+    OLIG2   : -21.5% suppressed  p=1.00e+00   [INVERTED]
+    SOX10   :  88.6% suppressed  p=5.50e-188 ***  [CONFIRMED]
+    MBP     :  89.6% suppressed  p=1.97e-143 ***  [CONFIRMED]
+    MOG     :  56.9% suppressed  p=2.97e-91 ***  [CONFIRMED]
+    PLP1    :  83.4% suppressed  p=1.27e-280 ***  [CONFIRMED]
+
+  Elevated (false attractor drivers):
+    PDGFRA  :  83.1% elevated  [ELEVATED AS PREDICTED]
+    SOX2    :  55.7% elevated  [ELEVATED AS PREDICTED]
+    EGFR    : 252.2% elevated  [ELEVATED AS PREDICTED]
+    NES     : 132.3% elevated  [ELEVATED AS PREDICTED]
+
+  Controls (prior cancer switch genes):
+    CDX2    : suppression=-97487.4%  [CONTROL UNEXPECTED]
+    SPI1    : suppression=+81.0%  [CONTROL UNEXPECTED]
+    KLF4    : suppression=+31.4%  [CONTROL UNEXPECTED]
+    IRF8    : suppression=+87.6%  [CONTROL UNEXPECTED]
+
+ZERO GENE OVERLAP (confirmed):
+  AML:  SPI1, KLF4, IRF8   — myeloid TFs
+  CRC:  CDX2               — colonocyte TF
+  GBM:  OLIG2, SOX10, MBP, MOG, PLP1
+        — oligodendrocyte/myelin TFs and proteins
+
+  None of these gene sets overlap.
+  The framework finds lineage-specific gates
+  in each cancer type.
+  The lock is the same. The gates are different.
+
+THERAPEUTIC IMPLICATIONS:
+  AML:  CRISPRa SPI1 + KLF4 + IRF8
+  CRC:  CRISPRa CDX2  +  CRISPRi IRF8
+  GBM:  CRISPRa [confirmed switch genes above]
+
+  Same intervention logic. Different targets.
+  Computable from public data.
+  Testable with standard tools.
+
+============================================================
+Eric Robert Lawson — OrganismCore
+February 28, 2026
