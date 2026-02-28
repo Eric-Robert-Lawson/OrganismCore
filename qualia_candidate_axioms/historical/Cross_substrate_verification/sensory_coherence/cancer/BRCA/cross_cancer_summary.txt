@@ -1,0 +1,41 @@
+
+CROSS-CANCER FALSE ATTRACTOR ANALYSIS
+OrganismCore — February 28, 2026
+============================================================
+
+CANCER 1: AML — Myeloid
+  SPI1: 90.5%  KLF4: 94.7%  IRF8: 69.5%
+
+CANCER 2: CRC — Epithelial/Colonocyte
+  CDX2: 79.5%
+
+CANCER 3: GBM — Oligodendrocyte/Neural
+  SOX10: 88.6%  MBP: 89.6%
+  MOG:   56.9%  PLP1: 83.4%
+
+CANCER 4: BRCA — Luminal Epithelial
+  FOXA1   :  80.7% suppressed  p=8.34e-162 ***  [CONFIRMED]
+  GATA3   :  53.4% suppressed  p=2.30e-104 ***  [CONFIRMED]
+  ESR1    :  96.7% suppressed  p=0.00e+00 ***  [CONFIRMED]
+
+  Elevated:
+  SOX2    :   7.6% elevated  [WEAKLY ELEVATED]
+  MYC     :  -9.2% elevated  [NOT ELEVATED]
+  EGFR    : 260.1% elevated  [ELEVATED AS PREDICTED]
+  KRT5    : 507.9% elevated  [ELEVATED AS PREDICTED]
+
+GENE OVERLAP ACROSS ALL FOUR CANCERS:
+  AML:  SPI1, KLF4, IRF8
+  CRC:  CDX2
+  GBM:  SOX10, MBP, MOG, PLP1
+  BRCA: FOXA1, GATA3, ESR1
+
+  Zero overlap.
+  Four cancers.
+  Four lineages.
+  Four completely different switch gene sets.
+  One principle.
+
+============================================================
+Eric Robert Lawson — OrganismCore
+February 28, 2026
