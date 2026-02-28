@@ -1,0 +1,10 @@
+gene,is_candidate,ref_expr,saddle_expr,suppression_pct,overall_min_pos,n_ref,n_saddle,pval,result
+CEBPA,True,0.0595,0.088,-47.9,Early erythrocytes,7587,3796,1.0,NOT CONFIRMED
+SPI1,True,0.4835,0.0459,90.5,pDC,7587,3796,0.0,CONFIRMED
+KLF4,True,0.7297,0.0385,94.7,CD8+ naive T cells,7587,3796,0.0,CONFIRMED
+RUNX1,True,0.1779,0.4483,-152.1,Early erythrocytes,7587,3796,1.0,NOT CONFIRMED
+IRF8,True,0.1978,0.0603,69.5,Early erythrocytes,7587,3796,0.0,CONFIRMED
+MYC,False,0.0297,0.3222,-985.1,Mono,7587,3796,1.0,CONTROL OK
+CD34,False,0.0135,0.393,-2816.2,Plasma,7587,3796,1.0,CONTROL OK
+GATA1,False,0.009,0.0085,6.4,pDC,7587,3796,0.9999990507310403,CONTROL OK
+MPO,False,0.2803,0.9764,-248.3,CD8+ effector T cells,7587,3796,1.0,CONTROL OK
