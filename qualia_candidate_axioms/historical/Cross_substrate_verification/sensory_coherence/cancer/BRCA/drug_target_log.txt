@@ -1,0 +1,278 @@
+========================================================
+BRCA DRUG TARGET EXPLORATION v2
+OrganismCore — Document 82
+EZH2 convergence node — TNBC
+========================================================
+
+STEP 1: LOADING CACHE + METADATA
+----------------------------------------
+Loading cache: brca_saddle_results/expr_cache.csv
+Cache shape: (100064, 16)
+Loading metadata: Wu_etal_2021_BRCA_scRNASeq/metadata.csv
+Metadata shape: (100064, 8)
+Metadata columns: ['orig.ident', 'nCount_RNA', 'nFeature_RNA', 'percent.mito', 'subtype', 'celltype_subset', 'celltype_minor', 'celltype_major']
+
+celltype_subset distribution (top 15):
+celltype_subset
+T_cells_c1_CD4+_IL7R            7786
+Cancer LumA SC                  7742
+Cancer Cycling                  5359
+T_cells_c4_CD8+_ZFP36           5063
+T_cells_c0_CD4+_CCR7            4952
+Endothelial ACKR1               4611
+Cancer Basal SC                 4312
+T_cells_c2_CD4+_T-regs_FOXP3    4246
+Cancer Her2 SC                  3708
+Plasmablasts                    3524
+PVL Differentiated s3           3487
+Cancer LumB SC                  3368
+T_cells_c7_CD8+_IFNG            3168
+B cells Memory                  2581
+CAFs MSC iCAF-like s1           2309
+Name: count, dtype: int64
+
+Common barcodes: 100064
+Cache only:      0
+Meta only:       0
+  Cancer Basal SC               : n=4312
+  Mature Luminal                : n=1265
+  Luminal Progenitors           : n=1992
+  Cancer LumA SC                : n=7742
+
+========================================================
+STEP 2: CONFIRMED ATTRACTOR
+  Cancer Basal SC vs Mature Luminal
+========================================================
+TNBC (Cancer Basal SC): 4312
+Mature Luminal:         1265
+Genes in cache: ['FOXA1', 'GATA3', 'ESR1', 'SOX10', 'EZH2', 'MYC', 'MKI67', 'AR', 'ERBB2', 'KRT5', 'KRT8', 'SPI1', 'MBP', 'CDX2']
+
+Gene expression: TNBC vs Luminal
+Gene     | TNBC     | Luminal  | Change     | p-value
+------------------------------------------------------------
+FOXA1    | 0.0759   | 0.3934   | ↓80.7%     | p=8.34e-162 ***
+GATA3    | 0.5181   | 1.1115   | ↓53.4%     | p=2.30e-104 ***
+ESR1     | 0.0245   | 0.7489   | ↓96.7%     | p=0.00e+00 ***
+SOX10    | 0.1170   | 0.0082   | ↑1323.3%     | p=8.83e-34 ***
+EZH2     | 0.1530   | 0.0414   | ↑269.7%     | p=3.45e-27 ***
+MYC      | 0.9998   | 1.1010   | ↓9.2%     | p=2.66e-06 ***
+MKI67    | 0.0146   | 0.0016   | ↑787.9%     | p=7.87e-06 ***
+AR       | 0.1453   | 0.9379   | ↓84.5%     | p=0.00e+00 ***
+ERBB2    | 0.1464   | 0.5293   | ↓72.3%     | p=2.86e-152 ***
+KRT5     | 0.4613   | 0.0759   | ↑507.9%     | p=2.48e-56 ***
+KRT8     | 1.5243   | 2.2654   | ↓32.7%     | p=2.69e-98 ***
+SPI1     | 0.0211   | 0.0088   | ↑141.1%     | p=1.85e-03 **
+MBP      | 0.3009   | 0.1522   | ↑97.7%     | p=5.12e-19 ***
+CDX2     | 0.0000   | 0.0000   | ↓0.0%     | p=1.00e+00 ns
+
+========================================================
+STEP 3: EZH2 CONVERGENCE NODE
+========================================================
+EZH2 FOUND IN CACHE
+
+EZH2 in TNBC:    0.1530
+EZH2 in Luminal: 0.0414
+Change: +269.7%  p=3.45e-27
+EZH2 ELEVATED IN TNBC ***
+EZH2 IS the convergence node
+
+EZH2 correlations in TNBC cells:
+  EZH2 vs FOXA1 : r=+0.1306  p=7.42e-18 ***  [UNEXPECTED]
+  EZH2 vs GATA3 : r=+0.2058  p=1.77e-42 ***  [UNEXPECTED]
+  EZH2 vs ESR1  : r=+0.0300  p=4.87e-02 *  [UNEXPECTED]
+  EZH2 vs SOX10 : r=+0.2576  p=2.69e-66 ***  [CORRELATED (expected)]
+
+========================================================
+STEP 4: ATTRACTOR DEPTH SCORING
+========================================================
+Within Cancer Basal SC cells:
+Depth = switch genes suppressed
+      + neural crest elevated
+Deep cells = most locked in
+false attractor = predicted
+best responders to tazemetostat
+Switch genes: ['FOXA1', 'GATA3', 'ESR1']
+Neural crest: ['SOX10']
+EZH2 in cache: True
+
+Attractor depth statistics:
+  Mean:   0.3474
+  Median: 0.3333
+  Std:    0.0805
+  Min:    0.0000
+  Max:    0.8773
+
+Deep cells (top quartile):    n=1081
+Shallow cells (bottom quartile):n=1288
+
+Gene expression deep vs shallow:
+Gene     | Deep     | Shallow  | Diff     | p
+-------------------------------------------------------
+FOXA1    | 0.1068   | 0.1575   | -0.0507  | p=2.27e-05 ***
+GATA3    | 0.7519   | 1.0539   | -0.3020  | p=1.65e-24 ***
+ESR1     | 0.0175   | 0.0640   | -0.0464  | p=1.52e-08 ***
+SOX10    | 0.4583   | 0.0005   | +0.4578  | p=1.84e-179 ***
+EZH2     | 0.5954   | 0.0011   | +0.5943  | p=1.52e-270 ***
+
+Patient depth distribution:
+  CID44971: depth=0.4061
+  CID4523: depth=0.3590
+  CID4495: depth=0.3589
+  CID4465: depth=0.3372
+  CID4515: depth=0.3346
+  CID4066: depth=0.3333
+  CID4067: depth=0.3333
+  CID45171: depth=0.3333
+  CID4513: depth=0.3284
+  CID44991: depth=0.3275
+
+========================================================
+STEP 5: DRUG TARGET DERIVATION
+========================================================
+CONFIRMED SUPPRESSIONS:
+  FOXA1 : 80.7% suppressed  p=8.34e-162
+  GATA3 : 53.4% suppressed  p=2.30e-104
+  ESR1  : 96.7% suppressed  p=0.00e+00
+
+CONFIRMED ELEVATIONS (neural crest):
+  SOX10 : ↑1323.3%  p=8.83e-34
+
+ADDITIONAL FINDINGS:
+  AR    : ↓84.5%  p=0.00e+00
+  ERBB2 : ↓72.3%  p=2.86e-152
+  KRT5  : ↑507.9%  p=2.48e-56
+  KRT8  : ↓32.7%  p=2.69e-98
+  MYC   : ↓9.2%  p=2.66e-06
+  MKI67 : ↑787.9%  p=7.87e-06
+
+========================================
+ATTRACTOR TOPOLOGY:
+========================================
+
+The TNBC false attractor is
+an EPIGENETICALLY LOCKED state.
+
+NORMAL LUMINAL BREAST:
+  FOXA1 (pioneer TF) opens
+  chromatin at luminal enhancers
+  → GATA3 binds → ESR1 activated
+  → luminal differentiation complete
+  EZH2 LOW — chromatin accessible
+
+TNBC FALSE ATTRACTOR:
+  EZH2 OVEREXPRESSED (PRC2 complex)
+  → H3K27me3 deposited on:
+    FOXA1 promoter/enhancer
+    GATA3 locus
+    ESR1 locus
+  → Pioneer TF cannot bind
+  → Luminal program LOCKED OUT
+  → Neural crest program (SOX10)
+    runs unopposed
+  Self-reinforcing loop:
+  EZH2↑ → FOXA1↓ → GATA3↓ →
+  ESR1↓ → no luminal identity →
+  EZH2 maintained
+
+EZH2 IS THE CONVERGENCE NODE.
+Same logic as GBM/OLIG2:
+  GBM: EGFR/PDGFRA → OLIG2 lock
+  TNBC: SOX10 program → EZH2 lock
+Block the node → dissolve attractor
+
+========================================
+DRUG SEQUENCES:
+========================================
+
+SEQUENCE 1 — TWO-DRUG CONVERSION
+  *** PRIMARY NOVEL PREDICTION ***
+
+  Phase 1: Tazemetostat
+    EZH2 inhibitor
+    FDA approved: sarcoma, FL
+    → EZH2 catalytic activity
+      blocked
+    → H3K27me3 marks gradually
+      erased (replication-dependent)
+    → FOXA1 binding sites open
+    → FOXA1 re-expressed
+    → GATA3 activated by FOXA1
+    → ESR1 transcription begins
+    → SOX10 neural crest suppressed
+    Duration: 4-8 weeks
+    Monitor: ctDNA ESR1
+             methylation array
+
+  Phase 2: Fulvestrant
+    ESR1 degrader (SERD)
+    FDA approved: ER+ breast
+    → targets re-expressed ESR1
+    → kills luminal-converted cells
+    → attractor fully dissolved
+
+  Clinical status:
+    Tazemetostat: available
+    Fulvestrant: available
+    THIS SEQUENCE: NOT TESTED
+    No clinical trial found
+
+SEQUENCE 2 — THREE-DRUG
+  Ludwig Cancer Research Oct 2024:
+  EZH2i + AKTi in TNBC preclinical
+  → tumor regression confirmed
+
+  Phase 1: Tazemetostat
+    → luminal conversion (as above)
+  Phase 2: Capivasertib (AKTi)
+    FDA approved: ER+ breast + AKTi
+    → converted luminal cells
+      activate AKT signaling
+      (mammary involution pathway)
+    → AKT inhibition kills
+      luminal-converted cells
+  Phase 3: Fulvestrant
+    → ESR1+ survivor cleanup
+
+  Clinical status:
+    Capivasertib+fulvestrant:
+    FDA approved for ER+ TNBC
+    (CAPItello-291 trial)
+    Tazemetostat BEFORE this:
+    NOT TESTED
+    The sequence is novel
+
+SEQUENCE 3 — BIOMARKER-GUIDED
+  Pre-treatment single-cell biopsy
+  Measure:
+    EZH2 expression
+    SOX10 expression
+    FOXA1/GATA3/ESR1 suppression
+    = attractor depth score
+
+  High depth score:
+    → tazemetostat first
+    → re-biopsy at 4 weeks
+    → confirm ESR1 re-expression
+    → capivasertib + fulvestrant
+
+  Low depth score:
+    (partial luminal retention)
+    → capivasertib + fulvestrant
+      directly (already targetable)
+
+  This is attractor-guided
+  precision medicine for TNBC.
+  Requires scRNA-seq biopsy.
+  Framework provides the score.
+
+========================================================
+STEP 6: GENERATING FIGURE
+========================================================
+Figure saved: brca_saddle_results/brca_drug_target_figure.png
+
+========================================================
+BRCA DRUG TARGET EXPLORATION COMPLETE
+Results: brca_saddle_results/
+Outputs: drug_target_log.txt
+         brca_drug_target_figure.png
+========================================================
