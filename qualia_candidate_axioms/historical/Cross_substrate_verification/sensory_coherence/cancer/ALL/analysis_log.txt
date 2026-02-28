@@ -1,0 +1,119 @@
+========================================================
+ALL FALSE ATTRACTOR ANALYSIS
+OrganismCore — False Attractor Framework
+Cancer Validation #7 — Document 79
+Session 2 — Lymphoid
+========================================================
+========================================================
+STEP 1: LOADING ANNOTATIONS
+========================================================
+Total annotated cells: 38922
+Cell type distribution:
+celltype
+ETV6.RUNX1.2      5810
+HHD.2             4776
+Erythrocytes      4669
+T cells + NK      4641
+B cells + Mono    3814
+HHD.1             3166
+ETV6.RUNX1.4      3073
+PRE-T.1           2866
+ETV6.RUNX1.1      2589
+PRE-T.2           1979
+ETV6.RUNX1.3      1539
+Name: count, dtype: int64
+
+Sample annotation IDs (first 3 per sample):
+  PBMMC.1: ['PBMMC.1_AAACCTGAGTACGCCC-2', 'PBMMC.1_AAACCTGCAGACGCAA-1', 'PBMMC.1_AAACCTGGTGATGTCT-2']
+  PRE-T.2: ['PRE-T.2_AAACCTGAGAACAACT', 'PRE-T.2_AAACCTGCATTATCTC', 'PRE-T.2_AAACCTGGTTCTGTTT']
+  PBMMC.2: ['PBMMC.2_AAACCTGAGAAACGAG', 'PBMMC.2_AAACCTGCAAGGTTCT', 'PBMMC.2_AAACCTGTCATGTGGT']
+  ETV6.RUNX1.3: ['ETV6.RUNX1.3_AAACCTGCACAGCCCA', 'ETV6.RUNX1.3_AAACCTGCAGTGAGTG', 'ETV6.RUNX1.3_AAACCTGGTCCGAGTC']
+  PRE-T.1: ['PRE-T.1_AAACCTGAGAGCTGCA', 'PRE-T.1_AAACCTGAGTTATCGC', 'PRE-T.1_AAACCTGCAAGTAGTA']
+  HHD.1: ['HHD.1_AAACCTGAGCCAGAAC', 'HHD.1_AAACCTGAGTGTGGCA', 'HHD.1_AAACCTGCACGCATCG']
+  ETV6.RUNX1.1: ['ETV6.RUNX1.1_AAACCTGAGACTTTCG', 'ETV6.RUNX1.1_AAACCTGGTCTTCAAG', 'ETV6.RUNX1.1_AAACCTGGTGTTGAGG']
+  HHD.2: ['HHD.2_AAACCTGAGCTAGCCC', 'HHD.2_AAACCTGAGTAGCCGA', 'HHD.2_AAACCTGCAAGTAGTA']
+  PBMMC.3: ['PBMMC.3_AAACCTGAGGACAGCT', 'PBMMC.3_AAACCTGAGGTACTCT', 'PBMMC.3_AAACCTGCATCAGTCA']
+  ETV6.RUNX1.2: ['ETV6.RUNX1.2_AAACCTGAGCAGACTG', 'ETV6.RUNX1.2_AAACCTGAGCTGTCTA', 'ETV6.RUNX1.2_AAACCTGAGGAATCGC']
+  ETV6.RUNX1.4: ['ETV6.RUNX1.4_AAACCTGAGAGTGACC', 'ETV6.RUNX1.4_AAACCTGAGATCACGG', 'ETV6.RUNX1.4_AAACCTGAGTCTCGGC']
+========================================================
+STEP 2: LOADING EXPRESSION DATA
+========================================================
+Loading from cache...
+Cached shape: (39375, 17)
+Label distribution in cache:
+celltype
+B cells + Mono    898
+T cells + NK      628
+Erythrocytes       68
+HHD.1               6
+ETV6.RUNX1.1        1
+ETV6.RUNX1.4        1
+Name: count, dtype: int64
+========================================================
+STEP 3: DEFINE COMPARISON GROUPS
+========================================================
+B-ALL blasts:        8 cells
+T-ALL blasts:        0 cells
+Normal B cells:    898 cells
+Normal T cells:    628 cells
+
+WARNING: T-ALL blasts = 0 cells
+Checking PRE-T label variants...
+T-related labels found: ['T cells + NK', 'Erythrocytes', 'ETV6.RUNX1.1', 'ETV6.RUNX1.4']
+
+========================================================
+COMPARISON: B-ALL vs Normal B cells
+========================================================
+Blast cells:  8
+Normal cells: 898
+
+PAX5     [SWITCH  ] | Blast=0.0000 Normal=0.1819 | suppressed +100.0%               | p=0.0711     | ~ PARTIAL
+EBF1     [SWITCH  ] | Blast=0.4986 Normal=0.2432 | elevated   +105.0%               | p=0.9557     | ✗ INVERTED
+IKZF1    [SWITCH  ] | Blast=0.0866 Normal=0.2005 | suppressed +56.8%                | p=0.2090     | ~ PARTIAL
+CD19     [SWITCH  ] | Blast=0.0866 Normal=0.2447 | suppressed +64.6%                | p=0.1644     | ~ PARTIAL
+MS4A1    [SWITCH  ] | Blast=0.0000 Normal=0.1668 | suppressed +100.0%               | p=0.1175     | ~ PARTIAL
+CD34     [SCAFFOLD] | Blast=0.0866 Normal=0.0554 | elevated   +56.3%                | p=0.7350     | SCAFFOLD
+MKI67    [SCAFFOLD] | Blast=0.0000 Normal=0.3588 | suppressed +100.0%               | p=0.0348 *   | SCAFFOLD
+CEBPA    [CONTROL ] | Blast=0.0000 Normal=0.0426 | suppressed +100.0%               | p=0.2469     | ✗ CONTROL UNEXPECTED
+SFTPC    [CONTROL ] | Blast=0.0000 Normal=0.0000 | elevated   +0.0%                 | p=1.0000     | ✓ CTRL OK
+CDX2     [CONTROL ] | Blast=0.0000 Normal=0.0000 | elevated   +0.0%                 | p=1.0000     | ✓ CTRL OK
+
+Switch genes confirmed: 0/5
+Switch genes partial:   4/5
+** PARTIAL B-ALL CONFIRMATION **
+
+========================================================
+COMPARISON: T-ALL vs Normal T cells
+========================================================
+Blast cells:  0
+Normal cells: 628
+WARNING: no T-ALL blast cells — skipping comparison
+
+========================================================
+STEP 5: LINEAGE SPECIFICITY TEST
+========================================================
+CEBPA — confirmed myeloid switch
+AML: 94.7%  CML: 90.3%  both p≈0
+Prediction: FLAT in ALL (lymphoid)
+
+CEBPA   : B-blast=0.0000  T-blast=0.0000  Normal-B=0.0426  Normal-T=0.0022
+  → CEBPA flat (max=0.0426) — LINEAGE SPECIFICITY CONFIRMED
+  → Myeloid switch genes do not
+     apply to lymphoid cancers
+SFTPC   : B-blast=0.0000  T-blast=0.0000  Normal-B=0.0000  Normal-T=0.0000
+CDX2    : B-blast=0.0000  T-blast=0.0000  Normal-B=0.0000  Normal-T=0.0000
+
+GATA3 cross-cancer test:
+BRCA confirmed luminal switch 53.4%
+T-ALL: testing in T-cell context
+  GATA3 test skipped — insufficient cells
+
+========================================================
+STEP 6: GENERATING FIGURE
+========================================================
+Figure saved: ./all_saddle_results/all_saddle_figure.png
+
+========================================================
+ALL ANALYSIS COMPLETE
+Results: ./all_saddle_results/
+========================================================
