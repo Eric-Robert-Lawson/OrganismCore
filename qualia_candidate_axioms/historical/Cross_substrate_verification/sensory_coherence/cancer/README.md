@@ -26,11 +26,13 @@ Each folder contains:
 | | | MBP | 89.6% | 1.97e-143 |
 | | | MOG | 56.9% | 2.97e-91 |
 | | | PLP1 | 83.4% | 1.27e-280 |
-| BRCA | Luminal | pending | — | — |
+| BRCA | Luminal | FOXA1 | 80.7% | 8.34e-162 |
+| | | GATA3 | 53.4% | 2.30e-104 |
+| | | ESR1 | 96.7% | 0.00e+00 |
 | LUAD | Alveolar | pending | — | — |
 
 **Zero gene overlap across all confirmed switch gene sets.**
-**Same principle. Different molecular language. Three cancers deep.**
+**Same principle. Different molecular language. Four cancers deep.**
 
 ---
 
@@ -114,18 +116,17 @@ Switch genes confirmed (terminal myelination):
   MBP:   89.6% suppressed  p=1.97e-143 ***
   MOG:   56.9% suppressed  p=2.97e-91  ***
   PLP1:  83.4% suppressed  p=1.27e-280 ***
-  (PLP1 is the strongest single p-value
+  (PLP1 strongest single p-value
   in the cross-cancer analysis to date)
 
 Scaffold gene confirmed:
   OLIG2: +21.5% elevated in OPC-like
-  Interpretation: OLIG2 is a lineage
-  identity gene active throughout the
-  oligodendrocyte hierarchy — not a
-  terminal switch gene. Its elevation
-  confirms OPC-like cells are genuinely
-  in the oligodendrocyte lineage but
-  cannot complete it.
+  Interpretation: lineage identity gene —
+  active throughout oligodendrocyte
+  hierarchy, not a terminal switch gene.
+  Its elevation confirms OPC-like cells
+  are genuinely in the oligodendrocyte
+  lineage but cannot complete it.
 
 Elevated predictions — all correct (4/4):
   PDGFRA:  +83.1%  (OPC driver)
@@ -137,9 +138,7 @@ Lineage infidelity pattern confirmed:
   SPI1, IRF8 appear in normal
   oligodendrocytes in GBM tumor
   microenvironment — same pattern
-  as IRF8 in CRC. Myeloid TFs
-  report on microenvironmental immune
-  state, not cell lineage identity.
+  as IRF8 in CRC.
 
 Minimal control set:
   CRISPRa SOX10 + MBP + PLP1
@@ -147,64 +146,119 @@ Minimal control set:
 Document: GBM/gbm_false_attractor_confirmed.md
 ```
 
+### BRCA — Breast Cancer
+```
+Data:    GSE176078 — Wu et al. 2021
+         Nature Genetics — PMID: 34493872
+         100,064 cells — 26 primary tumors
+         ER+: 38,241  HER2+: 19,311
+         TNBC: 42,512
+         10X Chromium — 29,733 genes
+Block:   Cancer Basal SC (TNBC)
+         vs Mature Luminal
+         4,312 basal / 1,265 luminal
+Lineage: Luminal epithelial
+
+Switch genes confirmed (luminal identity):
+  FOXA1: 80.7% suppressed  p=8.34e-162 ***
+  GATA3: 53.4% suppressed  p=2.30e-104 ***
+  ESR1:  96.7% suppressed  p=0.00e+00  ***
+  (ESR1 — the estrogen receptor —
+  96.7% suppressed at machine-zero p.
+  The defining gene of luminal breast
+  identity is the false attractor gate.)
+
+Elevated predictions confirmed (2/4):
+  EGFR: +260.1%  (TNBC driver — correct)
+  KRT5: +507.9%  (basal identity — correct)
+  SOX2: +7.6%    (weak — near zero in both)
+  MYC:  flat     (scaffold oncogene —
+                  expressed throughout
+                  cancer hierarchy,
+                  not false attractor
+                  specific)
+
+Secondary comparison — landscape geometry:
+  Cancer LumA SC: FOXA1=0.5221
+                  GATA3=1.3230
+  Mature Luminal: FOXA1=0.3934
+                  GATA3=1.1115
+  LumA cells are AT OR ABOVE the luminal
+  threshold — not in the false attractor.
+  The false attractor in BRCA is
+  specifically TNBC/basal, not ER+.
+  Framework correctly distinguishes
+  two breast cancer subtypes by geometry.
+
+Cross-lineage signal (third observation):
+  SOX10: +1323% in basal vs luminal
+  MBP:   +97.7% in basal vs luminal
+  Neural crest identity in TNBC cells —
+  established biology (SOX10+ TNBC
+  subset) confirmed by framework.
+
+Scaffold oncogene identified:
+  MYC flat across cancer states —
+  scaffold/switch distinction extends
+  to oncogenes.
+
+Minimal control set:
+  CRISPRa FOXA1 + GATA3 + ESR1
+  (TNBC/basal cells only —
+  not needed in LumA/ER+)
+
+Document: BRCA/brca_false_attractor_confirmed.md
+```
+
 ---
 
 ## In Progress
 
-### BRCA — Breast Cancer
-```
-Lineage: Luminal epithelial
-Block:   Basal/stem-like or TNBC
-         dedifferentiated cells
-         vs mature luminal cells
-         (ER+ PR+ FOXA1+ GATA3+)
-
-Predicted switch genes
-(terminal luminal differentiation):
-  FOXA1  — luminal pioneer TF
-  GATA3  — luminal identity master TF
-  ESR1   — estrogen receptor
-           (luminal completion gene)
-
-Predicted elevated (false attractor
-drivers):
-  SOX2   — stem/dedifferentiation
-           (confirmed elevated in GBM)
-  MYC    — proliferation driver
-  EGFR   — confirmed elevated in GBM
-
-Controls (confirmed switch genes from
-prior cancers — myelination genes now
-primary controls for solid tumors):
-  SOX10  — confirmed GBM: 88.6%
-  MBP    — confirmed GBM: 89.6%
-  PLP1   — confirmed GBM: 83.4%
-  CDX2   — confirmed CRC: 79.5%
-
-Data target: GSE176078
-  Wu et al. 2021
-  ~100,000 cells, well annotated,
-  includes normal breast epithelium
-  and multiple tumor subtypes
-
-Status: Queued
-```
-
----
-
-## Queued
-
 ### LUAD — Lung Adenocarcinoma
 ```
-Lineage: Alveolar type II epithelial
-Predicted switch genes:
+Data target: GSE131907
+  Kim et al. 2020
+  ~200,000 cells, 44 patients
+  LUAD, LUSC, normal lung annotated
+Lineage: Alveolar type II epithelial (AT2)
+Block:   Dedifferentiated LUAD cells
+         vs normal AT2 cells
+         (NKX2-1+ FOXA2+ SFTPC+)
+
+Predicted switch genes
+(terminal alveolar differentiation):
   NKX2-1 — lung identity master TF
+           (TTF-1) — most important TF
+           in lung adenocarcinoma
   FOXA2  — alveolar differentiation
-Controls will include:
-  FOXA1, GATA3   (confirmed BRCA)
-  SOX10, MBP     (confirmed GBM)
-  CDX2           (confirmed CRC)
-  SPI1, KLF4     (confirmed AML)
+           works with NKX2-1
+  SFTPC  — surfactant protein C
+           terminal AT2 marker
+
+Predicted elevated:
+  EGFR   — confirmed GBM +252%
+           confirmed BRCA +260%
+           LUAD primary oncogene
+  KRAS   — LUAD driver
+  MKI67  — proliferation
+
+Controls (all four prior cancers):
+  FOXA1  — confirmed BRCA: 80.7%
+  GATA3  — confirmed BRCA: 53.4%
+  ESR1   — confirmed BRCA: 96.7%
+  SOX10  — confirmed GBM:  88.6%
+  CDX2   — confirmed CRC:  79.5%
+  SPI1   — confirmed AML:  90.5%
+
+Critical test within controls:
+  FOXA1 (BRCA) vs FOXA2 (LUAD)
+  Both FOXA family — different genes.
+  If FOXA1 is flat and FOXA2 suppressed,
+  the framework resolves lineage
+  specificity within a TF family.
+  Strongest resolution test to date.
+
+Status: Downloading data
 ```
 
 ---
@@ -242,7 +296,7 @@ are different. The lock is the same.
 ---
 
 ## The Scaffold/Switch Distinction
-### Framework refinement — Document 74
+### Framework refinement — Documents 72–75
 
 ```
 SCAFFOLD GENES:
@@ -251,34 +305,73 @@ SCAFFOLD GENES:
   Mark lineage identity at every stage.
   NOT suppressed at the false attractor.
   May be elevated in blocked cells.
+  Applies to both developmental genes
+  and oncogenes.
 
   Examples:
-    AML:  CD34 (hematopoietic stem marker)
-    GBM:  OLIG2, OLIG1 (OPC lineage)
+    AML:  CD34  (hematopoietic stem)
+    GBM:  OLIG2 (OPC lineage identity)
+    BRCA: MYC   (universal proliferation —
+                 scaffold oncogene)
 
 SWITCH GENES:
   Activated only at terminal
   differentiation completion.
-  Mark the crossing of the
-  differentiation threshold.
+  Mark the crossing of the threshold.
   SUPPRESSED at the false attractor.
 
   Examples:
     AML:  SPI1, KLF4, IRF8
-          (monocyte terminal markers)
     CRC:  CDX2
-          (colonocyte identity gate)
     GBM:  SOX10, MBP, MOG, PLP1
-          (myelination completion)
+    BRCA: FOXA1, GATA3, ESR1
 
 THE REFINED PREDICTION RULE:
-  For any cancer type, identify the
-  genes activated specifically at
-  TERMINAL differentiation completion
-  — not the genes marking lineage
-  identity throughout the hierarchy.
-  Those terminal genes will be
-  suppressed at the false attractor.
+  Identify genes activated specifically
+  at TERMINAL differentiation —
+  not lineage identity genes active
+  throughout the hierarchy.
+  Not scaffold oncogenes active
+  throughout the cancer landscape.
+  The terminal genes will be suppressed
+  at the false attractor.
+```
+
+---
+
+## The Landscape Geometry Finding
+### New in Document 75 — BRCA
+
+```
+The secondary comparison in BRCA
+revealed something beyond suppression:
+
+  Cancer LumA SC has MORE FOXA1 and
+  GATA3 than normal Mature Luminal cells.
+
+  This means:
+    LumA breast cancer = NOT a false
+    attractor. These cells are at or
+    above the luminal threshold.
+    They have retained differentiation
+    identity but lost growth control.
+
+    TNBC/Basal breast cancer = the
+    FALSE ATTRACTOR. These cells are
+    far below the luminal threshold.
+    ESR1 at 96.7% suppressed.
+
+  The framework does not just find
+  suppression everywhere.
+  It finds the correct geometry of
+  the Waddington landscape —
+  distinguishing two subtypes of the
+  same cancer by their position
+  relative to the differentiation
+  threshold.
+
+  This is the principle working at
+  higher resolution than predicted.
 ```
 
 ---
@@ -291,29 +384,36 @@ overlap between confirmed switch gene
 sets across cancer types:
 
 AML:  SPI1, KLF4, IRF8
-      myeloid terminal TFs
-      → used as controls in CRC ✓
-      → appeared in GBM microenvironment
-        (lineage infidelity signal)
+      → controls in CRC: flat ✓
+      → controls in GBM: microenvironment
+        signal (lineage infidelity)
 
 CRC:  CDX2
-      colonocyte master TF
-      → absent from brain (CDX2 ~ 0)
-      → will be control in BRCA ✓
+      → control in GBM: ~0 ✓
+      → control in BRCA: 0.000 ✓ (perfect)
 
 GBM:  SOX10, MBP, MOG, PLP1
-      myelination completion genes
-      → absent from breast/lung tissue
-      → primary controls for BRCA/LUAD
+      → controls in BRCA: SOX10 elevated
+        (neural crest TNBC — real biology)
+        MBP elevated (same signal)
+      → controls in LUAD: predicted flat
 
-BRCA: FOXA1, GATA3, ESR1 [predicted]
-      → will become controls for LUAD
+BRCA: FOXA1, GATA3, ESR1
+      → controls in LUAD: predicted flat
+        (lung tissue — no luminal breast
+        identity expected)
+
+FOXA1 vs FOXA2 test in LUAD:
+      → same TF family, different genes
+      → FOXA1 (breast) should be flat
+      → FOXA2 (lung) should be suppressed
+      → highest resolution test yet
 
 Each confirmed cancer becomes a
 control layer for all future cancers.
-The table is self-validating as it
-grows. The more rows confirmed, the
-harder it is to dismiss as coincidence.
+Five layers of cross-validation by
+the time LUAD is complete.
+The table is self-validating as it grows.
 ```
 
 ---
@@ -331,8 +431,8 @@ Document chain:
   Doc 72 — AML confirmed
   Doc 73 — CRC confirmed
   Doc 74 — GBM confirmed
-  Doc 75 — BRCA [in progress]
-  Doc 76 — LUAD [queued]
+  Doc 75 — BRCA confirmed
+  Doc 76 — LUAD [in progress — tonight]
 
 The chain:
   Why does experience feel like
@@ -345,8 +445,11 @@ The chain:
   AML:  SPI1 p=0, KLF4 p=0, IRF8 p=0
   CRC:  CDX2 p=3.89e-154
   GBM:  PLP1 p=1.27e-280
+  BRCA: ESR1 p=0.00e+00
     ↓
-  BRCA next.
+  LUAD next.
+  Tonight.
+  One to go.
 
 Author: Eric Robert Lawson — OrganismCore
 ```
