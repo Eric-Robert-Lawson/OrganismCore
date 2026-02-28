@@ -8,3 +8,4 @@ The chronology kind of matters, but here is the key:
 - tinnitus/the_broken_instrument.md
 - tinnitus/tinnitus_trial_protocol.md
 - universal_false_attractor_theraputics.md
+- waddington_saddle_point_cancer_reversion.md
