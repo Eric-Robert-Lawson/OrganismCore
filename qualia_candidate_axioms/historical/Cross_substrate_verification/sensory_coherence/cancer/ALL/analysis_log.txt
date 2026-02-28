@@ -1,0 +1,163 @@
+========================================================
+ALL FALSE ATTRACTOR ANALYSIS v2
+OrganismCore — False Attractor Framework
+Cancer Validation #7 — Document 79
+REVISED: Terminal completion gene list
+========================================================
+========================================================
+STEP 1: LOADING ANNOTATIONS
+========================================================
+Total annotated cells: 38922
+Cell type distribution:
+celltype
+ETV6.RUNX1.2      5810
+HHD.2             4776
+Erythrocytes      4669
+T cells + NK      4641
+B cells + Mono    3814
+HHD.1             3166
+ETV6.RUNX1.4      3073
+PRE-T.1           2866
+ETV6.RUNX1.1      2589
+PRE-T.2           1979
+ETV6.RUNX1.3      1539
+Name: count, dtype: int64
+========================================================
+STEP 2: LOADING EXPRESSION DATA
+========================================================
+Loading ETV6.RUNX1.1...
+  ETV6.RUNX1.1: 2776 cells, 2638 matched
+Loading ETV6.RUNX1.2...
+  ETV6.RUNX1.2: 6274 cells, 6200 matched
+Loading ETV6.RUNX1.3...
+  ETV6.RUNX1.3: 3862 cells, 3850 matched
+Loading ETV6.RUNX1.4...
+  ETV6.RUNX1.4: 5069 cells, 4956 matched
+Loading HHD.1...
+  HHD.1: 3728 cells, 3684 matched
+Loading HHD.2...
+  HHD.2: 5013 cells, 5011 matched
+Loading PRE-T.1...
+  PRE-T.1: 2959 cells, 2958 matched
+Loading PRE-T.2...
+  PRE-T.2: 2748 cells, 2728 matched
+Loading PBMMC.1...
+  PBMMC.1: 1612 cells, 1602 matched
+Loading PBMMC.2...
+  PBMMC.2: 3105 cells, 3096 matched
+Loading PBMMC.3...
+  PBMMC.3: 2229 cells, 2199 matched
+
+Total cells loaded: 39375
+Annotations matched: 38922
+Label distribution:
+celltype
+ETV6.RUNX1.2      5810
+HHD.2             4776
+Erythrocytes      4669
+T cells + NK      4641
+B cells + Mono    3814
+HHD.1             3166
+ETV6.RUNX1.4      3073
+PRE-T.1           2866
+ETV6.RUNX1.1      2589
+PRE-T.2           1979
+ETV6.RUNX1.3      1539
+Name: count, dtype: int64
+Cached: ./all_saddle_results/expr_cache.pkl
+========================================================
+STEP 3: DEFINE COMPARISON GROUPS
+========================================================
+B-ALL blasts:    20953 cells
+T-ALL blasts:     4845 cells
+Normal B cells:   3814 cells
+Normal T cells:   4641 cells
+
+========================================================
+COMPARISON: B-ALL vs Normal B cells
+========================================================
+Blast cells:  20953
+Normal cells: 3814
+
+Testing TERMINAL COMPLETION genes.
+These should be HIGH in normal,
+LOW/absent in blasts.
+
+IGHM     [SWITCH  ] | Blast=0.7670 Normal=1.0576 | suppressed +27.5%                | p=1.49e-25 *** | ~ PARTIAL
+IGKC     [SWITCH  ] | Blast=0.2583 Normal=1.5804 | suppressed +83.7%                | p=0.00e+00 *** | ✓ CONFIRMED
+PRDM1    [SWITCH  ] | Blast=0.0058 Normal=0.0243 | suppressed +76.0%                | p=2.01e-25 *** | ✓ CONFIRMED
+CD27     [SWITCH  ] | Blast=0.2583 Normal=0.1104 | elevated   +134.0%               | p=1.0000     | ✗ INVERTED
+RAG1     [SCAFFOLD] | Blast=0.1783 Normal=0.0240 | elevated   +642.2%               | p=1.0000     | ✓ SCAFFOLD↑
+RAG2     [SCAFFOLD] | Blast=0.0599 Normal=0.0647 | suppressed +7.5%                 | p=0.6163     | ✗ SCAFFOLD↓
+PAX5     [SCAFFOLD] | Blast=0.1909 Normal=0.1363 | elevated   +40.1%                | p=1.0000     | ✓ SCAFFOLD↑
+CD3E     [SCAFFOLD] | Blast=0.0129 Normal=0.0769 | suppressed +83.2%                | p=1.15e-165 *** | ✗ SCAFFOLD↓
+CD34     [SCAFFOLD] | Blast=0.1829 Normal=0.0580 | elevated   +215.2%               | p=1.0000     | ✓ SCAFFOLD↑
+MKI67    [SCAFFOLD] | Blast=0.1657 Normal=0.2374 | suppressed +30.2%                | p=3.31e-20 *** | ✗ SCAFFOLD↓
+CEBPA    [CONTROL ] | Blast=0.0033 Normal=0.0781 | suppressed +95.8%                | p=0.00e+00 *** | ✗ CONTROL UNEXPECTED
+SFTPC    [CONTROL ] | Blast=0.0000 Normal=0.0000 | elevated   +0.0%                 | p=1.0000     | ✓ CTRL OK
+CDX2     [CONTROL ] | Blast=0.0012 Normal=0.0002 | elevated   +552.3%               | p=0.9839     | ✗ CONTROL UNEXPECTED
+
+Switch genes confirmed: 2/4
+Switch genes partial:   1/4
+** PARTIAL B-ALL CONFIRMATION **
+
+========================================================
+COMPARISON: T-ALL vs Normal T cells
+========================================================
+Blast cells:  4845
+Normal cells: 4641
+
+Testing TERMINAL COMPLETION genes.
+These should be HIGH in normal,
+LOW/absent in blasts.
+
+SELL     [SWITCH  ] | Blast=0.5619 Normal=0.7732 | suppressed +27.3%                | p=7.12e-55 *** | ~ PARTIAL
+CCR7     [SWITCH  ] | Blast=0.0086 Normal=0.3287 | suppressed +97.4%                | p=0.00e+00 *** | ✓ CONFIRMED
+IL7R     [SWITCH  ] | Blast=0.2402 Normal=0.6021 | suppressed +60.1%                | p=2.68e-219 *** | ✓ CONFIRMED
+PTPRC    [SWITCH  ] | Blast=0.6227 Normal=0.6777 | suppressed +8.1%                 | p=1.57e-05 *** | ✗ NOT CONFIRMED
+RAG1     [SCAFFOLD] | Blast=0.0457 Normal=0.0098 | elevated   +365.3%               | p=1.0000     | ✓ SCAFFOLD↑
+RAG2     [SCAFFOLD] | Blast=0.0739 Normal=0.0052 | elevated   +1330.8%              | p=1.0000     | ✓ SCAFFOLD↑
+PAX5     [SCAFFOLD] | Blast=0.0003 Normal=0.0152 | suppressed +98.1%                | p=2.83e-23 *** | ✗ SCAFFOLD↓
+CD3E     [SCAFFOLD] | Blast=1.2815 Normal=0.7599 | elevated   +68.6%                | p=1.0000     | ✓ SCAFFOLD↑
+CD34     [SCAFFOLD] | Blast=0.0376 Normal=0.0144 | elevated   +161.6%               | p=1.0000     | ✓ SCAFFOLD↑
+MKI67    [SCAFFOLD] | Blast=0.4342 Normal=0.0273 | elevated   +1487.7%              | p=1.0000     | ✓ SCAFFOLD↑
+CEBPA    [CONTROL ] | Blast=0.0009 Normal=0.0022 | suppressed +56.7%                | p=0.0296 *   | ✗ CONTROL UNEXPECTED
+SFTPC    [CONTROL ] | Blast=0.0000 Normal=0.0000 | elevated   +0.0%                 | p=1.0000     | ✓ CTRL OK
+CDX2     [CONTROL ] | Blast=0.0000 Normal=0.0000 | elevated   +0.0%                 | p=1.0000     | ✓ CTRL OK
+
+Switch genes confirmed: 2/4
+Switch genes partial:   1/4
+** PARTIAL T-ALL CONFIRMATION **
+
+========================================================
+STEP 5: LINEAGE SPECIFICITY TEST
+========================================================
+CEBPA — myeloid switch (AML 94.7% CML 90.3%)
+Prediction: FLAT in ALL lymphoid populations
+
+CEBPA   : B-blast=0.0033  T-blast=0.0009  Normal-B=0.0781  Normal-T=0.0022
+  → LINEAGE SPECIFICITY CONFIRMED (max=0.0781)
+SFTPC   : B-blast=0.0000  T-blast=0.0000  Normal-B=0.0000  Normal-T=0.0000
+CDX2    : B-blast=0.0012  T-blast=0.0000  Normal-B=0.0002  Normal-T=0.0000
+
+RAG1/RAG2 scaffold test:
+Should be HIGH in blasts (immature lymphoid)
+LOW in mature normal B and T cells
+  RAG1 B-blast: 0.1783
+  RAG1 T-blast: 0.0457
+  RAG1 Normal-B: 0.0240
+  RAG1 Normal-T: 0.0098
+  RAG2 B-blast: 0.0599
+  RAG2 T-blast: 0.0739
+  RAG2 Normal-B: 0.0647
+  RAG2 Normal-T: 0.0052
+
+========================================================
+STEP 6: GENERATING FIGURE
+========================================================
+Figure saved: ./all_saddle_results/all_saddle_figure_v2.png
+
+========================================================
+ALL ANALYSIS v2 COMPLETE
+Results: ./all_saddle_results/
+========================================================
