@@ -1,0 +1,56 @@
+
+CROSS-CANCER FALSE ATTRACTOR ANALYSIS
+OrganismCore — February 28, 2026
+COMPLETE TABLE — FIVE CANCER TYPES
+============================================================
+
+CANCER 1: AML — Myeloid
+  SPI1: 90.5%  KLF4: 94.7%  IRF8: 69.5%
+  p = 0.00e+00 for all three
+
+CANCER 2: CRC — Epithelial/Colonocyte
+  CDX2: 79.5%  p=3.89e-154
+
+CANCER 3: GBM — Oligodendrocyte/Neural
+  SOX10: 88.6%  MBP: 89.6%
+  MOG:   56.9%  PLP1: 83.4%
+  PLP1 p=1.27e-280
+
+CANCER 4: BRCA — Luminal Epithelial
+  FOXA1: 80.7%  GATA3: 53.4%  ESR1: 96.7%
+  ESR1 p=0.00e+00
+
+CANCER 5: LUAD — Alveolar/AT2
+  NKX2-1  :  19.3% suppressed  p=9.09e-39 ***  [PARTIAL]
+  FOXA2   :  57.2% suppressed  p=1.10e-132 ***  [CONFIRMED]
+  SFTPC   :  95.7% suppressed  p=0.00e+00 ***  [CONFIRMED]
+  SFTPB   :  72.7% suppressed  p=0.00e+00 ***  [CONFIRMED]
+  SFTPA1  :  91.4% suppressed  p=0.00e+00 ***  [CONFIRMED]
+
+  FOXA RESOLUTION TEST:
+  FOXA1 (breast gate): -115.5%  [CONTROL UNEXPECTED]
+  FOXA2 (lung gate):   +57.2%  [CONFIRMED]
+
+COMPLETE GENE SETS — ZERO OVERLAP:
+  AML:  SPI1, KLF4, IRF8
+  CRC:  CDX2
+  GBM:  SOX10, MBP, MOG, PLP1
+  BRCA: FOXA1, GATA3, ESR1
+  LUAD: NKX2-1, FOXA2, SFTPC, SFTPB, SFTPA1
+
+  Zero overlap.
+  Five cancers.
+  Five lineages.
+  Five completely different switch gene sets.
+  One principle.
+  Table complete.
+
+FRAMEWORK:
+  Derived from a theory of tinnitus.
+  Confirmed in five cancer types.
+  In one session.
+  From public data.
+
+============================================================
+Eric Robert Lawson — OrganismCore
+February 28, 2026
