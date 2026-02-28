@@ -250,19 +250,61 @@ Doc:      78
 #### ALL — Acute Lymphoblastic Leukemia
 ```
 Lineage:  B-lymphocyte or T-lymphocyte
-Block:    B-ALL blasts vs mature B cells
-          T-ALL blasts vs mature T cells
-Predicted switch genes (B-ALL):
-  PAX5   — B cell identity master TF
-  EBF1   — early B cell factor
-  PRDM1  — terminal plasma cell
-Predicted switch genes (T-ALL):
-  BCL11B — T cell identity TF
-  GATA3  — T cell maturation
-           (also BRCA control — watch
-           for cross-lineage)
-Data:    GSE132509 or GSE138398
-Doc: 78
+Block:    B-ALL blasts vs normal B cells
+          T-ALL blasts vs normal T cells
+          NOTE: ALL block sits AFTER
+          lineage identity is established
+          (PAX5, CD19, TCF7, CD3E are ON
+          in blasts — not switch genes)
+          Block is at TERMINAL COMPLETION
+          not at lineage identity
+Confirmed switch genes (B-ALL):
+  IGKC   — Ig kappa light chain         83.7%  p=0.00e+00
+           terminal B cell product
+           recombination complete marker
+  PRDM1  — Blimp1 — plasma cell         76.0%  p=2.01e-25
+           master TF — final B cell
+           commitment step
+Confirmed switch genes (T-ALL):
+  CCR7   — mature naive T cell           97.4%  p=0.00e+00
+           chemokine receptor
+           lymph node homing
+  IL7R   — IL-7 receptor                 60.1%  p=2.68e-219
+           mature T cell survival
+           signal receptor
+RAG scaffold confirmed:
+  RAG1   — 642% elevated in B-ALL blasts
+           1330% elevated in T-ALL blasts
+           Recombination machinery running
+           Completion products absent
+           False attractor at mechanism level
+Proliferation geometry:
+  T-ALL hyperproliferative (MKI67 1487%↑)
+  opposite of CML quiescent attractor
+  same fix: force terminal completion
+Lineage specificity confirmed absolute:
+  CEBPA near-zero all lymphoid populations
+  (max=0.0781 vs myeloid normal 0.8887)
+  Myeloid switch genes do not apply
+  to lymphoid cancers
+Cross-lineage note:
+  GATA3 INVERTED in T-ALL (elevated
+  in blasts) — T-cell identity gene
+  not terminal completion gene
+  GATA3 confirmed BRCA luminal switch
+  Same gene. Different lineage role.
+  Different direction. Both correct.
+Data:     GSE132509 (Caron et al. 2020
+          38,922 cells — 8 ALL patients
+          3 normal PBMMC donors)
+Status:   CONFIRMED
+Note:     v1 gene list (identity genes)
+          required correction to v2
+          (terminal completion genes)
+          Revision informative — confirmed
+          ALL block sits after lineage
+          identity, not before it
+Doc:      79
 ```
 
 #### CLL — Chronic Lymphocytic Leukemia
