@@ -6,3 +6,5 @@ The chronology kind of matters, but here is the key:
 - tinnitus/P4_results.md
 - tinnitus/tinnitus_eigenfunction_mapping_and_therapy.md
 - tinnitus/the_broken_instrument.md
+- tinnitus/tinnitus_trial_protocol.md
+- universal_false_attractor_theraputics.md
