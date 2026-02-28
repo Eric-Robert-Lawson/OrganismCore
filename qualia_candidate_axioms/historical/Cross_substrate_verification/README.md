@@ -91,3 +91,4 @@ The documents are ordered as such:
 -The_Puddle.md (90th document)
 
 The_Puddle.md is a great starting point to understand or get a bigger sense of the picture!
+The_Puddle is the experiential account of the attractor framework that emerges from all of this!
