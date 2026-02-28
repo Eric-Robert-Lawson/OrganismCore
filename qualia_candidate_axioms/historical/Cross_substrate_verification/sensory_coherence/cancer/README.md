@@ -206,23 +206,45 @@ This is the full map.
 ---
 
 ### Session 2 — Hematopoietic Cancers
-
 #### CML — Chronic Myeloid Leukemia
 ```
 Lineage:  Myeloid (granulocyte)
-Block:    CML blast crisis cells
-          vs normal granulocytes
-Predicted switch genes:
-  CEBPA  — granulocyte master TF
-  CEBPE  — late granulocyte maturation
-  MPO    — myeloperoxidase (terminal)
-  ELANE  — neutrophil elastase
-Data:    GSE116256 (van Galen) or
-         GSE229799
-Note:    BCR-ABL drives the block.
-         Switch gene suppression
-         should still be identifiable.
-Doc: 77
+Block:    CML Primitive stem cells
+          vs committed myeloid (My)
+          cells — conservative
+          comparison (CD34+ enriched,
+          mature neutrophils excluded
+          by sort protocol — true
+          signal larger than reported)
+Confirmed switch genes:
+  CEBPA  — granulocyte master TF       90.3%  p=0.00e+00
+  CEBPE  — late granulocyte maturation 99.1%  p=1.14e-161
+  ELANE  — neutrophil elastase         97.7%  p=4.30e-205
+  CAMP   — terminal neutrophil peptide 88.6%  p=0.0112
+Cross-cancer myeloid confirmation:
+  SPI1   — confirmed AML + CML         70.9%  p=0.00e+00
+  IRF8   — confirmed AML + CML         93.7%  p=3.18e-30
+  KLF4   — AML-specific (not CML)      11.8%  ns
+             informative divergence
+Depth gradient confirmed:
+  Primitive → MPP2 → MPP1 → My/Ly → My
+  Monotonic increase all switch genes
+  Waddington geometry directly observed
+New finding:
+  CML stem cells are quiescent
+  (MKI67 suppressed 92.9% in Primitive)
+  False attractor is non-cycling —
+  explains imatinib persistence failure
+  Switch gene reactivation reaches
+  quiescent cells — BCR-ABL inhibition
+  does not
+  CSF3R suppressed 62.8% — self-
+  maintaining attractor mechanism
+Data:     GSE236233 (Warfvinge 2024
+          eLife — 9 patients, 20,395
+          cells, 33,538 genes)
+Status:   CONFIRMED
+Doc:      78
 ```
 
 #### ALL — Acute Lymphoblastic Leukemia
