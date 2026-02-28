@@ -1,0 +1,101 @@
+========================================================
+CLL FALSE ATTRACTOR ANALYSIS
+OrganismCore — False Attractor Framework
+Cancer Validation #8 — Document 80
+Survival attractor — mature B cells
+that fail to undergo apoptosis
+========================================================
+========================================================
+STEP 1: LOADING CLL DATA (GSE111014)
+========================================================
+Loading CLL from cache...
+Cached shape: (15007, 19)
+========================================================
+STEP 2: LOADING NORMAL B CELLS
+(GSE132509 PBMMC — ALL dataset cache)
+========================================================
+Loading ALL cache...
+ALL cache shape: (2744, 18)
+Normal B cells: 2744
+Target genes in normal B: 16/16
+========================================================
+STEP 3: ALIGNING GENE PANELS
+========================================================
+CLL genes:    16
+Normal genes: 16
+Shared:       16
+Shared target genes: 16
+Shared target list:  ['IGHD', 'BTG1', 'FCRL5', 'PRDM1', 'BCL2', 'MKI67', 'CD19', 'PAX5', 'RAG1', 'RAG2', 'IGKC', 'IGHM', 'CD27', 'CEBPA', 'SFTPC', 'CDX2']
+========================================================
+STEP 4: CLL FALSE ATTRACTOR ANALYSIS
+========================================================
+CLL cells:    15007
+Normal B:     2744
+
+Switch genes:  should be LOW in CLL, HIGH in normal B
+BCL2 scaffold: should be HIGH in CLL
+IGKC cross:    should be HIGH in CLL (mature B cells)
+
+IGHD     [SWITCH  ] | CLL=0.2382 Normal=0.1663 | elevated   +43.2%              | p_supp=1.0000     | ✗ INVERTED
+BTG1     [SWITCH  ] | CLL=1.2021 Normal=1.1166 | elevated   +7.7%               | p_supp=1.0000     | ✗ NOT CONFIRMED
+FCRL5    [SWITCH  ] | CLL=0.1618 Normal=0.0314 | elevated   +415.1%             | p_supp=1.0000     | ✗ INVERTED
+PRDM1    [SWITCH  ] | CLL=0.0084 Normal=0.0195 | suppressed +57.0%              | p_supp=8.20e-07 *** | ✓ CONFIRMED
+BCL2     [SCAFFOLD] | CLL=0.1579 Normal=0.0669 | elevated   +136.0%             | p_supp=1.0000     | ✓ BCL2↑
+MKI67    [SCAFFOLD] | CLL=0.0026 Normal=0.3094 | suppressed +99.1%              | p_supp=0.00e+00 *** | ↑ SCAFFOLD
+CD19     [SCAFFOLD] | CLL=0.1829 Normal=0.1721 | elevated   +6.2%               | p_supp=0.9994     | ↑ SCAFFOLD
+PAX5     [SCAFFOLD] | CLL=0.0572 Normal=0.1538 | suppressed +62.8%              | p_supp=4.57e-63 *** | ↑ SCAFFOLD
+RAG1     [SCAFFOLD] | CLL=0.0002 Normal=0.0273 | suppressed +99.3%              | p_supp=4.47e-112 *** | ↑ SCAFFOLD
+RAG2     [SCAFFOLD] | CLL=0.0000 Normal=0.0864 | suppressed +100.0%             | p_supp=0.00e+00 *** | ↑ SCAFFOLD
+IGKC     [CROSS   ] | CLL=2.4020 Normal=1.5025 | elevated   +59.9%              | p_supp=1.0000     | ↑ CLL>norm
+IGHM     [CROSS   ] | CLL=0.7943 Normal=0.9266 | suppressed +14.3%              | p_supp=1.11e-43 *** | ✗ CROSS: flat
+CD27     [CROSS   ] | CLL=0.6544 Normal=0.0714 | elevated   +816.9%             | p_supp=1.0000     | ↑ CLL>norm
+CEBPA    [CONTROL ] | CLL=0.0095 Normal=0.0813 | suppressed +88.3%              | p_supp=3.12e-166 *** | ✗ CONTROL UNEXPECTED
+SFTPC    [CONTROL ] | CLL=0.0000 Normal=0.0000 | elevated   +0.0%               | p_supp=1.0000     | ✓ CTRL OK
+CDX2     [CONTROL ] | CLL=0.0000 Normal=0.0000 | elevated   +4618.8%            | p_supp=0.6656     | ✗ CONTROL UNEXPECTED
+
+Switch genes confirmed: 1/4
+Switch genes partial:   0/4
+--- CLL: insufficient confirmation
+
+BCL2 SCAFFOLD:
+   gene  cll_expr  normal_expr  elevation_pct              result
+4  BCL2    0.1579       0.0669          136.0  SCAFFOLD CONFIRMED
+
+IGKC CROSS-CHECK:
+(Should be HIGH in CLL — mature B cells)
+    gene  cll_expr  normal_expr  elevation_pct               result
+10  IGKC     2.402       1.5025           59.9  CROSS: CLL > normal
+
+========================================================
+STEP 5: IBRUTINIB RESPONSE
+Day 0 vs Day 120+ — does treatment
+push cells toward normal B identity?
+========================================================
+Loading full matrix for all timepoints...
+Timepoint distribution:
+timepoint
+0      15007
+30     13908
+120     8357
+150     6041
+280     4703
+Name: count, dtype: int64
+
+Switch gene expression by timepoint:
+(Does ibrutinib restore normal B identity?)
+
+IGHD    : d0=0.238  d30=0.097  d120=0.095  d150=0.000  d280=0.124  
+BTG1    : d0=1.202  d30=1.010  d120=0.316  d150=0.453  d280=0.336  
+FCRL5   : d0=0.162  d30=0.060  d120=0.048  d150=0.001  d280=0.055  
+PRDM1   : d0=0.008  d30=0.012  d120=0.008  d150=0.024  d280=0.007  
+BCL2    : d0=0.158  d30=0.108  d120=0.063  d150=0.026  d280=0.086  
+
+========================================================
+STEP 6: GENERATING FIGURE
+========================================================
+Figure saved: /Users/ericlawson/cancer/CLL/cll_saddle_results/cll_saddle_figure.png
+
+========================================================
+CLL ANALYSIS COMPLETE
+Results: /Users/ericlawson/cancer/CLL/cll_saddle_results/
+========================================================
