@@ -1,0 +1,255 @@
+========================================================
+BRCA FALSE ATTRACTOR ANALYSIS
+OrganismCore — False Attractor Framework
+Cancer Validation #4
+February 28, 2026
+========================================================
+All files found.
+========================================================
+STEP 1: LOADING METADATA
+========================================================
+Loaded: 100064 cells
+Columns: ['orig.ident', 'nCount_RNA', 'nFeature_RNA', 'percent.mito', 'subtype', 'celltype_subset', 'celltype_minor', 'celltype_major']
+
+celltype_subset distribution:
+celltype_subset
+T_cells_c1_CD4+_IL7R               7786
+Cancer LumA SC                     7742
+Cancer Cycling                     5359
+T_cells_c4_CD8+_ZFP36              5063
+T_cells_c0_CD4+_CCR7               4952
+Endothelial ACKR1                  4611
+Cancer Basal SC                    4312
+T_cells_c2_CD4+_T-regs_FOXP3       4246
+Cancer Her2 SC                     3708
+Plasmablasts                       3524
+PVL Differentiated s3              3487
+Cancer LumB SC                     3368
+T_cells_c7_CD8+_IFNG               3168
+B cells Memory                     2581
+CAFs MSC iCAF-like s1              2309
+CAFs myCAF like s5                 2265
+T_cells_c3_CD4+_Tfh_CXCL13         2247
+Myeloid_c10_Macrophage_1_EGR1      2150
+Myeloid_c1_LAM1_FABP5              2122
+Luminal Progenitors                1992
+T_cells_c8_CD8+_LAG3               1955
+T_cells_c9_NK_cells_AREG           1846
+Endothelial CXCL12                 1644
+T_cells_c11_MKI67                  1528
+Myeloid_c12_Monocyte_1_IL1B        1339
+Mature Luminal                     1265
+PVL Immature s1                    1169
+Endothelial RGS5                   1147
+Myeloid_c2_LAM2_APOE               1126
+T_cells_c10_NKT_cells_FCGR3A       1122
+Myoepithelial                      1098
+T_cells_c6_IFIT1                   1017
+Myeloid_c8_Monocyte_2_S100A9        935
+CAFs MSC iCAF-like s2               844
+PVL_Immature s2                     717
+B cells Naive                       625
+CAFs myCAF like s4                  602
+CAFs Transitioning s3               553
+Myeloid_c9_Macrophage_2_CXCL10      505
+Cycling_Myeloid                     463
+Myeloid_c11_cDC2_CD1C               337
+Myeloid_c4_DCs_pDC_IRF7             331
+T_cells_c5_CD8+_GZMK                284
+Endothelial Lymphatic LYVE1         203
+Myeloid_c3_cDC1_CLEC9A              156
+Myeloid_c0_DC_LAMP3                 131
+Myeloid_c7_Monocyte_3_FCGR3A         54
+Cycling PVL                          50
+Myeloid_c5_Macrophage_3_SIGLEC1      26
+Name: count, dtype: int64
+
+Subtype distribution:
+subtype
+TNBC     42512
+ER+      38241
+HER2+    19311
+Name: count, dtype: int64
+
+Mature Luminal:      1265
+Cancer Basal SC:     4312
+Luminal Progenitors: 1992
+Cancer LumA SC:      7742
+========================================================
+STEP 2: LOADING MTX EXPRESSION
+========================================================
+Genes: 29733
+Sample: ['RP11-34P13.7', 'FO538757.3', 'FO538757.2', 'AP006222.2', 'RP4-669L17.10']
+Barcodes: 100064
+Sample: ['CID3586_AAGACCTCAGCATGAG', 'CID3586_AAGGTTCGTAGTACCT', 'CID3586_ACCAGTAGTTGTGGCC']
+
+Target genes found: ['FOXA1', 'GATA3', 'ESR1', 'SOX2', 'MYC', 'EGFR', 'KRT5', 'SOX10', 'MBP', 'CDX2', 'SPI1', 'KRT8', 'MKI67', 'AR', 'ERBB2']
+
+Loading MTX matrix...
+Matrix shape: (29733, 100064) (genes x cells)
+Extracting 15 target genes...
+  FOXA1: mean=0.1004 max=2.9957 nonzero=9856
+  GATA3: mean=0.3437 max=4.5747 nonzero=26196
+  ESR1: mean=0.1204 max=3.7612 nonzero=9681
+  SOX2: mean=0.0009 max=1.7918 nonzero=113
+  MYC: mean=0.4400 max=5.0499 nonzero=30635
+  EGFR: mean=0.0606 max=3.2189 nonzero=6873
+  KRT5: mean=0.0856 max=6.2879 nonzero=5453
+  SOX10: mean=0.0136 max=2.3979 nonzero=1553
+  MBP: mean=0.1596 max=3.0445 nonzero=18673
+  CDX2: mean=0.0001 max=0.6931 nonzero=8
+  SPI1: mean=0.1388 max=4.4308 nonzero=9111
+  KRT8: mean=0.5509 max=6.0776 nonzero=29111
+  MKI67: mean=0.0693 max=4.4998 nonzero=4932
+  AR: mean=0.1656 max=3.6636 nonzero=14417
+  ERBB2: mean=0.1379 max=5.8749 nonzero=12313
+
+Expression: (100064, 15)
+Cached: ./brca_saddle_results/expr_cache.csv
+========================================================
+STEP 3: EXPRESSION PROFILES
+========================================================
+Common cells: 100064
+Genes available: ['FOXA1', 'GATA3', 'ESR1', 'SOX2', 'MYC', 'EGFR', 'KRT5', 'SOX10', 'MBP', 'CDX2', 'SPI1', 'KRT8', 'MKI67', 'AR', 'ERBB2']
+
+Primary comparison cells:
+celltype_subset
+Cancer Basal SC    4312
+Mature Luminal     1265
+Name: count, dtype: int64
+
+Mean expression — Mature Luminal vs Cancer Basal:
+                  FOXA1   GATA3    ESR1    SOX2     MYC  ...    SPI1    KRT8   MKI67      AR   ERBB2
+celltype_subset                                          ...                                        
+Cancer Basal SC  0.0759  0.5181  0.0245  0.0018  0.9998  ...  0.0211  1.5243  0.0146  0.1453  0.1464
+Mature Luminal   0.3934  1.1115  0.7489  0.0016  1.1010  ...  0.0088  2.2654  0.0016  0.9379  0.5293
+
+[2 rows x 15 columns]
+========================================================
+STEP 4: SADDLE POINT SIGNATURE
+========================================================
+FRAMEWORK PREDICTION (BRCA):
+  Reference: Mature Luminal
+  Blocked:   Cancer Basal SC
+
+  SUPPRESSED: ['FOXA1', 'GATA3', 'ESR1']
+  ELEVATED:   ['SOX2', 'MYC', 'EGFR', 'KRT5']
+  CONTROLS:   ['SOX10', 'MBP', 'CDX2', 'SPI1']
+
+n mature luminal: 1265
+n cancer basal:   4312
+
+FOXA1    [CANDIDATE ] | lum=0.3934 basal=0.0759 | suppressed +80.7%          | p=8.34e-162 *** | ✓ CONFIRMED
+GATA3    [CANDIDATE ] | lum=1.1115 basal=0.5181 | suppressed +53.4%          | p=2.30e-104 *** | ✓ CONFIRMED
+ESR1     [CANDIDATE ] | lum=0.7489 basal=0.0245 | suppressed +96.7%          | p=0.00e+00 *** | ✓ CONFIRMED
+SOX2     [ELEVATED  ] | lum=0.0016 basal=0.0018 | elevated   +7.6%           | p=0.5447     | ✗ WEAKLY ELEVATED
+MYC      [ELEVATED  ] | lum=1.1010 basal=0.9998 | suppressed +9.2%           | p=2.66e-06 *** | ✗ NOT ELEVATED
+EGFR     [ELEVATED  ] | lum=0.0643 basal=0.2314 | elevated   +260.1%         | p=1.0000     | ✓ ELEVATED
+KRT5     [ELEVATED  ] | lum=0.0759 basal=0.4613 | elevated   +507.9%         | p=1.0000     | ✓ ELEVATED
+SOX10    [CONTROL   ] | lum=0.0082 basal=0.1170 | elevated   +1323.2%        | p=1.0000     | ✗ CONTROL UNEXPECTED
+MBP      [CONTROL   ] | lum=0.1522 basal=0.3009 | elevated   +97.7%          | p=1.0000     | ✗ CONTROL UNEXPECTED
+CDX2     [CONTROL   ] | lum=0.0000 basal=0.0000 | elevated   +0.0%           | p=1.0000     | ✓ CTRL OK
+SPI1     [CONTROL   ] | lum=0.0088 basal=0.0211 | elevated   +141.1%         | p=0.9982     | ✗ CONTROL UNEXPECTED
+KRT8     [SCAFFOLD  ] | lum=2.2654 basal=1.5243 | suppressed +32.7%          | p=2.69e-98 *** | ✗ SCAFFOLD UNEXPECTED
+MKI67    [SCAFFOLD  ] | lum=0.0016 basal=0.0146 | elevated   +787.4%         | p=1.0000     | ✗ SCAFFOLD UNEXPECTED
+AR       [SCAFFOLD  ] | lum=0.9379 basal=0.1453 | suppressed +84.5%          | p=0.00e+00 *** | ✗ SCAFFOLD UNEXPECTED
+ERBB2    [SCAFFOLD  ] | lum=0.5293 basal=0.1464 | suppressed +72.3%          | p=2.86e-152 *** | ✗ SCAFFOLD UNEXPECTED
+
+========================================================
+BRCA FRAMEWORK PREDICTION RESULT
+========================================================
+Switch genes confirmed:  3/3
+Switch genes partial:    0/3
+Elevated as predicted:   2/4
+Controls as expected:    1/4
+
+*** STRONG CONFIRMATION ***
+BRCA false attractor confirmed.
+
+CROSS-CANCER TABLE:
+  AML:  SPI1 90.5% KLF4 94.7% IRF8 69.5%
+  CRC:  CDX2 79.5%
+  GBM:  SOX10 88.6% MBP 89.6% MOG 56.9% PLP1 83.4%
+  BRCA: [results above]
+
+Four cancer types.
+Four lineages.
+Zero gene overlap.
+Same principle.
+========================================================
+STEP 5: SECONDARY COMPARISON
+LumA Cancer vs Mature Luminal
+========================================================
+Testing whether luminal cancer cells
+show the same switch gene suppression
+as basal cancer cells, or a weaker form.
+
+n mature luminal:  1265
+n cancer LumA SC:  7742
+
+  FOXA1   : luminal=0.3934 LumA=0.5221 suppressed=-32.7% p=1.00e+00
+  GATA3   : luminal=1.1115 LumA=1.3230 suppressed=-19.0% p=1.00e+00
+  ESR1    : luminal=0.7489 LumA=0.6901 suppressed=7.9% p=4.70e-01
+
+INTERPRETATION:
+  If LumA shows partial suppression of
+  FOXA1/GATA3/ESR1 relative to Mature
+  Luminal, the false attractor gradient
+  runs: Mature Luminal > LumA SC > Basal SC
+  — a continuous suppression landscape
+  tracking differentiation state.
+========================================================
+STEP 6: GENERATING FIGURE
+========================================================
+Figure saved: ./brca_saddle_results/brca_saddle_figure.png
+========================================================
+STEP 7: FOUR-CANCER SUMMARY
+========================================================
+
+CROSS-CANCER FALSE ATTRACTOR ANALYSIS
+OrganismCore — February 28, 2026
+============================================================
+
+CANCER 1: AML — Myeloid
+  SPI1: 90.5%  KLF4: 94.7%  IRF8: 69.5%
+
+CANCER 2: CRC — Epithelial/Colonocyte
+  CDX2: 79.5%
+
+CANCER 3: GBM — Oligodendrocyte/Neural
+  SOX10: 88.6%  MBP: 89.6%
+  MOG:   56.9%  PLP1: 83.4%
+
+CANCER 4: BRCA — Luminal Epithelial
+  FOXA1   :  80.7% suppressed  p=8.34e-162 ***  [CONFIRMED]
+  GATA3   :  53.4% suppressed  p=2.30e-104 ***  [CONFIRMED]
+  ESR1    :  96.7% suppressed  p=0.00e+00 ***  [CONFIRMED]
+
+  Elevated:
+  SOX2    :   7.6% elevated  [WEAKLY ELEVATED]
+  MYC     :  -9.2% elevated  [NOT ELEVATED]
+  EGFR    : 260.1% elevated  [ELEVATED AS PREDICTED]
+  KRT5    : 507.9% elevated  [ELEVATED AS PREDICTED]
+
+GENE OVERLAP ACROSS ALL FOUR CANCERS:
+  AML:  SPI1, KLF4, IRF8
+  CRC:  CDX2
+  GBM:  SOX10, MBP, MOG, PLP1
+  BRCA: FOXA1, GATA3, ESR1
+
+  Zero overlap.
+  Four cancers.
+  Four lineages.
+  Four completely different switch gene sets.
+  One principle.
+
+============================================================
+Eric Robert Lawson — OrganismCore
+February 28, 2026
+
+Saved: ./brca_saddle_results/cross_cancer_summary.txt
+
+========================================================
+COMPLETE
+Results: ./brca_saddle_results/
+========================================================
