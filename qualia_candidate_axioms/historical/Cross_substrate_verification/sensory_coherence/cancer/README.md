@@ -557,20 +557,134 @@ Status:   CONFIRMED + LITERATURE CHECK COMPLETE
 
 #### MDS — Myelodysplastic Syndrome
 ```
-Lineage:  Multi-lineage (erythroid,
-          myeloid, megakaryocyte)
-Block:    MDS progenitors vs normal
-          differentiated cells
-Predicted switch genes:
-  GATA1  — erythroid/megakaryocyte TF
-  KLF1   — erythroid terminal TF
-  HBB    — hemoglobin beta (terminal)
-Data:    GSE140559 or GSE145491
-Note:    Multi-lineage block means
-         multiple switch gene sets
-         may be suppressable
-         simultaneously.
-Doc: 81
+Lineage:  Myeloid (granulocytic)
+          CD34+ hematopoietic stem/progenitor cells
+          Bone marrow
+Block:    MDS HSPCs vs healthy donor HSPCs
+          Promyelocyte → Myelocyte transition
+          Block is DOWNSTREAM of AML in same lineage
+          AML: stuck before TF activation (Saddle 1)
+          MDS: stuck before effector execution (Saddle 3)
+          Cells have TFs present — cannot execute program
+
+Switch gene (confirmed):
+  ELANE  — neutrophil elastase
+           -42.8%  p=1.24e-03  CONFIRMED
+           depth r=-0.803  p=1.10e-19
+           Marks promyelocyte→myelocyte transition
+           Its loss = arrest at that stage
+           Same biology as ELANE-mutant congenital
+           neutropenia (independent lit confirmation)
+
+False attractor (confirmed):
+  CD34   — HSPC surface identity marker
+           +12.1%  depth r=+0.757  p=1.88e-16
+           Retained in stuck promyelocyte-like state
+
+Key structural findings:
+  CEBPE→ELANE circuit severed:
+    CEBPE elevated +135.3% (p=0.029)
+    ELANE suppressed -42.8%
+    r(CEBPE, ELANE) = 0.07 in MDS — statistical zero
+    CEBPE normally drives ELANE — connection broken
+    Not in any published MDS signature
+  AZU1 elevated +26.2% (p=2.78e-04):
+    AZU1 is promyelocyte-specific granule gene
+    AZU1 up + ELANE down = promyelocyte arrest
+    locates block with single-stage precision
+    Same AZU1/ELANE gene cluster (chr19p13.3)
+    confirmed in Blood 1999 chromatin paper
+  GFI1B elevated +152.5% (p=1.82e-04):
+    Erythroid/megakaryocyte TF aberrantly expressed
+    in granulocytic progenitors
+    Molecular basis of multilineage dysplasia
+    GFI1B recruits LSD1/CoREST to repress myeloid
+    differentiation genes — may be causal not marker
+  RCOR1 suppressed -61.3% (p=1.96e-03):
+    LSD1/CoREST scaffold reduced
+    Progenitor silencing complex disrupted
+    Progenitor genes (AZU1, GFI1B) cannot be silenced
+    Rcor1 knockout mice develop MDS-like phenotype
+    (Blood 2014 — exact match)
+  EZH2 -26.2% (p=7.3e-04) ASXL1 -25.0% (p=0.003):
+    Epigenetic LOSS not gain (contrast BRCA)
+    Loss of H3K27me3 maintenance
+
+Mutation subtypes:
+  SF3B1_MUT (n=28): depth 0.478 vs WT 0.536 p=0.008
+    Shallower on granulocytic ELANE/CD34 axis
+    SF3B1 MDS is erythroid-dominant (ring sideroblasts)
+    Wrong axis for SF3B1 — needs erythroid depth score
+    (ALAS2/HBA1/GATA1 panel)
+  SRSF2_MUT (n=8):  depth 0.429 (underpowered)
+  U2AF1_MUT (n=6):  depth 0.578 (underpowered)
+
+Drug predictions (geometry-derived):
+  1. LSD1 inhibitor (KDM1A/RCOR1 axis)
+       Geometry: RCOR1 suppressed, GFI1B elevated,
+                 LSD1/CoREST complex disrupted,
+                 ELANE locus inaccessible despite
+                 CEBPE presence
+       Literature: ✅ iadademstat (ORY-1001) Phase 1
+                   ACTIVE (NCT06502145) + azacitidine
+                   seclidemstat Phase I/II MD Anderson
+                   GSK2879552 Phase I/II (terminated)
+                   Same target — independent derivation
+  2. Splicing correction (SF3B1/U2AF1 mutants)
+       Geometry: splicing factor mutations break
+                 CEBPE→ELANE circuit at RNA level
+       Literature: ✅ H3B-8800 in trials for
+                   splicing-mutant MDS
+  3. HMA therapy mechanism clarified
+       Geometry: EZH2/ASXL1 loss + DNA methylation
+                 at ELANE locus — HMA demethylates
+                 → ELANE expressed → cells mature
+       Literature: ✅ azacitidine standard of care
+                   mechanism from geometry confirmed
+  4. MYC inhibition for proliferative control
+       Geometry: MYC +52.7% (p=0.021)
+                 proliferative drive at block point
+       Literature: ⚠️ MYC inhibitors in development
+                   not MDS-specific yet
+
+Novel predictions (not in literature):
+  1. ELANE expression at diagnosis predicts HMA
+     response — high suppression = more HMA benefit
+     Testable from existing clinical cohorts
+  2. CEBPE→ELANE r≈0 as MDS molecular signature
+     distinguishes MDS from normal granulopoiesis
+     Not in any published MDS gene panel
+  3. GFI1B:GFI1 ratio elevated in multilineage
+     vs single-lineage dysplasia
+     Testable from annotated clinical samples
+  4. SF3B1 MDS needs erythroid-axis depth score
+     (ALAS2/HBA1/GATA1) not ELANE/CD34 axis
+     Lineage-specific depth scoring framework
+
+Scripts:
+  mds_false_attractor.py    (Script 1 — discovery)
+  mds_false_attractor_2.py  (Script 2 — corrected)
+  Self-contained — GEO accession to figure
+
+Data:    GSE114922 (Dolatshad et al.)
+         82 MDS patients | 8 healthy controls
+         CD34+ HSPCs | bone marrow bulk RNA-seq
+         Mutation subtypes: SF3B1/SRSF2/U2AF1/ZRSR2
+
+Docs:    86a (Script 1 — discovery run)
+         86b (Script 2 — corrected framework +
+              reasoning artifact)
+         86c (Literature check — complete)
+         Protocol (OrganismCore_Cancer_Analysis_Protocol.md)
+
+Prior entry (Doc 81, GSE140559):
+         Superseded — wrong dataset (GSE145477 was
+         mouse aging data), predictions not tested.
+         This entry (Doc 86a/b/c) is the valid record.
+
+Status:  CONFIRMED + LITERATURE CHECK COMPLETE
+         Drug target (LSD1) in Phase 1 trials NOW
+         4 novel predictions stated and testable
 ```
 
 ---
