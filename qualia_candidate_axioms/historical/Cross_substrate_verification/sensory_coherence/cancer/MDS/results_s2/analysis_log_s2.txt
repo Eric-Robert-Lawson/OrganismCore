@@ -1,0 +1,233 @@
+======================================================================
+MDS FALSE ATTRACTOR — SCRIPT 2
+CORRECTED ATTRACTOR FRAMEWORK
+Built from Script 1 findings
+Doc: 86b | Date: 2026-03-01
+======================================================================
+
+  Script 1 wrong predictions:
+    SPI1/KLF4/IRF8 as switch genes — not confirmed
+    HOXA9/MEIS1/FLT3 as FA markers — not confirmed
+
+  Script 1 unexpected findings:
+    ELANE: -42.8%  r=-0.768  TRUE switch gene
+    CD34:  +12.1%  r=+0.696  TRUE FA marker
+    CEBPE: +135.3%  elevated — unexpected
+    EZH2/ASXL1 suppressed — epigenetic loss
+
+  Script 2 new predictions (before running):
+    GFI1 elevated — blocks ELANE despite CEBPE
+    GATA2 elevated — retained HSPC identity
+    CEBPB elevated — inflammatory GMP state
+    KDM1A dysregulated — LSD1 complex
+    CEBPE→ELANE correlation broken in MDS
+    S2 depth score stratifies better than S1
+
+
+=== STEP 0: DATA ACQUISITION ===
+=================================================================
+STEP 0: DATA ACQUISITION
+Reusing Script 1 downloads where possible
+=================================================================
+  Found: GSE114922_CPM_table.txt.gz (18.4 MB) — skipping download
+
+=== STEP 1: METADATA ===
+
+--- Sample metadata ---
+  Loaded from Script 1 cache: 131 samples
+
+=== STEP 2: LOAD CPM ===
+
+  Loading: GSE114922_CPM_table.txt.gz
+  Raw: 63769 genes x 90 samples
+  Target genes found  : 29/29
+  Final: (90, 29)
+
+=== STEP 3: MERGE AND CLASSIFY ===
+
+  Merging with metadata...
+  NORMAL: 8  MDS: 82  UNKNOWN: 0
+
+=== STEP 4: CEBPE → ELANE GAP ===
+
+======================================================================
+STEP 4: THE CEBPE → ELANE GAP
+Core hypothesis of Script 2
+CEBPE is elevated but ELANE is suppressed
+What sits between them?
+======================================================================
+
+  Normal: 8  MDS: 82
+
+  Gene       Role          Normal       MDS    Change          p-value  S2 Prediction
+  ----------------------------------------------------------------------------------
+  GFI1       GAP           0.2613    0.4324    +65.5%      p=0.1199  ns  TREND — GFI1 blocks ELANE
+  GFI1B      GAP          98.8527  249.6236   +152.5%    p=1.82e-04 ***  CONFIRMED — GFI1 paralog
+  RCOR1      LSD1         10.8470    4.1937    -61.3%    p=1.96e-03  **  NOT CONFIRMED — CoREST/LSD1 cofactor
+  ELANE      GRANULO     702.5027  401.8959    -42.8%    p=1.24e-03  **  CONFIRMED — confirmed Script 1
+  MPO        GRANULO       0.3166    0.1480    -53.3%      p=0.0582  ns  TREND — granulocyte effector
+  PRTN3      GRANULO      25.9469   23.1504    -10.8%      p=0.2110  ns  TREND — granulocyte effector
+  AZU1       GRANULO      57.2634   72.2437    +26.2%    p=2.78e-04 ***  NOT CONFIRMED — granulocyte effector
+  CTSG       GRANULO     231.1365  174.1728    -24.6%      p=0.0297   *  CONFIRMED — granulocyte effector
+  CEBPE      GRANULO       0.3928    0.9240   +135.3%      p=0.0285   *  CONFIRMED — confirmed Script 1
+  CEBPA      GRANULO       0.0238    0.0060    -74.6%      p=0.0653  ns  TREND — myeloid scaffold
+  KDM1A      LSD1         94.2413   98.6113     +4.6%      p=0.3105  ns  SEE DATA — LSD1
+  HDAC1      LSD1        172.9240  181.1506     +4.8%      p=0.1799  ns  SEE DATA — CoREST complex
+  HDAC2      LSD1        154.4482  169.3732     +9.7%      p=0.1585  ns  SEE DATA — CoREST complex
+  RCOR1      LSD1         10.8470    4.1937    -61.3%    p=1.96e-03  **  NOT CONFIRMED — CoREST/LSD1 cofactor
+
+=== STEP 5: FULL SADDLE POINT ===
+
+======================================================================
+STEP 5: FULL SADDLE POINT — ALL S2 GENES
+======================================================================
+
+  Gene       Panel         Normal       MDS    Change          p-value
+  ----------------------------------------------------------------------
+  ELANE      S1_CONF     702.5027  401.8959    -42.8%    p=1.24e-03  **
+  CD34       S1_CONF     340.5132  381.7405    +12.1%      p=0.3254  ns
+  CEBPE      S1_CONF       0.3928    0.9240   +135.3%      p=0.0285   *
+  EZH2       S1_CONF      81.3513   60.0245    -26.2%    p=7.32e-04 ***
+  ASXL1      S1_CONF      95.3708   71.4919    -25.0%    p=2.50e-03  **
+  MYC        S1_CONF     258.4389  394.7525    +52.7%      p=0.0209   *
+  ZRSR2      S1_CONF      68.6792  103.3487    +50.5%    p=6.90e-06 ***
+  GFI1       GAP           0.2613    0.4324    +65.5%      p=0.1199  ns
+  GFI1B      GAP          98.8527  249.6236   +152.5%    p=1.82e-04 ***
+  RCOR1      LSD1         10.8470    4.1937    -61.3%    p=1.96e-03  **
+  KDM1A      LSD1         94.2413   98.6113     +4.6%      p=0.3105  ns
+  HDAC1      LSD1        172.9240  181.1506     +4.8%      p=0.1799  ns
+  HDAC2      LSD1        154.4482  169.3732     +9.7%      p=0.1585  ns
+  GATA2      HSPC_ID     102.3419   84.5646    -17.4%      p=0.2151  ns
+  HOXA9      HSPC_ID      13.7605   12.8453     -6.7%      p=0.0723  ns
+  MEIS1      HSPC_ID     377.5807  387.4681     +2.6%      p=0.4474  ns
+  FLT3       HSPC_ID      86.0476   95.7957    +11.3%      p=0.4092  ns
+  CEBPB      INFLAM        0.0000    0.0000       N/A      p=1.0000  ns
+  CEBPD      INFLAM        4.5776    7.5913    +65.8%      p=0.2910  ns
+  IRF1       INFLAM      209.4770  211.0176     +0.7%      p=0.1326  ns
+  STAT3      INFLAM      194.8079  195.3886     +0.3%      p=0.4640  ns
+  MPO        GRANULO       0.3166    0.1480    -53.3%      p=0.0582  ns
+  PRTN3      GRANULO      25.9469   23.1504    -10.8%      p=0.2110  ns
+  AZU1       GRANULO      57.2634   72.2437    +26.2%    p=2.78e-04 ***
+  CTSG       GRANULO     231.1365  174.1728    -24.6%      p=0.0297   *
+  CEBPA      GRANULO       0.0238    0.0060    -74.6%      p=0.0653  ns
+  SF3B1      SPLICE      414.4740  375.1396     -9.5%      p=0.0610  ns
+  SRSF2      SPLICE      152.4823  136.0350    -10.8%      p=0.0496   *
+  U2AF1      SPLICE      383.9001  326.1563    -15.0%    p=5.42e-03  **
+
+=== STEP 6: REVISED DEPTH SCORE ===
+
+======================================================================
+STEP 6: REVISED DEPTH SCORE
+S1 score: AML gene panel
+S2 score: ELANE suppression + CD34 elevation
+Compare stratification
+======================================================================
+  Component 1: ELANE suppression (1 - norm(ELANE))
+  Component 2: CD34 elevation (norm(CD34))
+
+  S2 Depth statistics (82 MDS):
+    Mean   : 0.5511
+    Median : 0.5435
+    Std    : 0.1519
+    Min    : 0.0683
+    Max    : 0.9919
+
+  S2 Block depth by mutation subtype:
+    SF3B1_MUT (n= 28): 0.5164  vs  WT (n= 54): 0.5692  p=0.0202
+    SRSF2_MUT (n=  8): 0.4693  vs  WT (n= 74): 0.5600  p=0.6730
+    U2AF1_MUT (n=  6): 0.5526  vs  WT (n= 76): 0.5510  p=0.8690
+
+  S2 depth correlations (all S2 genes):
+  Gene              r  p-value
+  ----------------------------------
+  ELANE       -0.8032  p=1.10e-19
+  CD34        +0.7571  p=1.88e-16
+  CEBPB          +nan  p=nan
+  CTSG        -0.5826  p=9.38e-09
+  SF3B1       +0.3826  p=3.89e-04
+  STAT3       +0.3564  p=1.02e-03
+  ZRSR2       +0.3489  p=1.31e-03
+  HDAC1       +0.3401  p=1.77e-03
+  AZU1        -0.2748  p=1.25e-02
+  FLT3        +0.2611  p=1.78e-02
+  IRF1        +0.2466  p=2.55e-02
+  RCOR1       -0.2016  p=6.94e-02
+  MYC         -0.1972  p=7.58e-02
+  HOXA9       +0.1877  p=9.14e-02
+  MEIS1       +0.1694  p=1.28e-01
+
+=== STEP 7: HSPC IDENTITY + INFLAMMATORY GMP ===
+
+======================================================================
+STEP 7: HSPC IDENTITY vs INFLAMMATORY GMP
+Prediction: GATA2 elevated (retained HSPC ID)
+Prediction: CEBPB elevated (inflammatory state)
+======================================================================
+
+  HSPC IDENTITY GENES:
+  Gene          Normal       MDS    Change          p-value  Prediction
+  ----------------------------------------------------------------------
+  GATA2       102.3419   84.5646    -17.4%      p=0.7890  ns  ✗ predicted elevated
+  HOXA9        13.7605   12.8453     -6.7%      p=0.9297  ns  ✗ predicted elevated
+  MEIS1       377.5807  387.4681     +2.6%      p=0.4474  ns  ~ predicted elevated
+  FLT3         86.0476   95.7957    +11.3%      p=0.5962  ns  ~ predicted elevated
+  CD34        340.5132  381.7405    +12.1%      p=0.3254  ns  ~ predicted elevated
+
+  INFLAMMATORY GMP GENES:
+  Gene          Normal       MDS    Change          p-value  Prediction
+  ----------------------------------------------------------------------
+  CEBPB         0.0000    0.0000       N/A      p=1.0000  ns  ~ predicted elevated
+  CEBPD         4.5776    7.5913    +65.8%      p=0.7138  ns  ~ predicted elevated
+  IRF1        209.4770  211.0176     +0.7%      p=0.8705  ns  ~ predicted elevated
+  STAT3       194.8079  195.3886     +0.3%      p=0.5415  ns  ~ predicted elevated
+
+=== STEP 8: GFI1 ANALYSIS ===
+
+======================================================================
+STEP 8: GFI1 ANALYSIS
+Is GFI1 the block between CEBPE and ELANE?
+Prediction: GFI1 elevated AND correlates with ELANE suppression
+======================================================================
+
+  GFI1 vs ELANE correlation:
+    r = -0.0688  p = 5.39e-01
+    Prediction: negative (GFI1 represses ELANE)
+    Result: NOT CONFIRMED
+
+  GFI1 vs S2 depth:
+    r = +0.0557  p = 6.19e-01
+    Prediction: positive (higher GFI1 = deeper block)
+    Result: NOT CONFIRMED
+
+  CEBPE vs GFI1:
+    r = -0.0680  p = 5.44e-01
+    Positive = both elevated together
+    Negative = opposing programs
+
+  CEBPE vs ELANE:
+    r = +0.0699  p = 5.33e-01
+    Normal granulopoiesis: positive
+    MDS if connection broken: ~0 or negative
+    Result: DISCONNECTED
+
+=== STEP 9: S1 vs S2 COMPARISON ===
+
+======================================================================
+STEP 9: S1 vs S2 DEPTH SCORE COMPARISON
+Does the corrected score stratify better?
+======================================================================
+
+  S1 score (AML gene panel):
+    Mean=0.5535  Std=0.1482
+  S2 score (ELANE + CD34 axis):
+    Mean=0.5511  Std=0.1519
+
+  S1 vs S2 correlation: r=0.9535  p=2.00e-43
+  Scores are concordant — same biology
+
+  SF3B1 MUT vs WT — S1 score: MUT=0.5186  WT=0.5716  p=0.0103
+  SF3B1 MUT vs WT — S2 score: MUT=0.5164  WT=0.5692  p=0.0202
+
+=== STEP 10: FIGURE ===
+
+  Figure saved: ./mds_false_attractor/results_s2/mds_false_attractor_s2.png
