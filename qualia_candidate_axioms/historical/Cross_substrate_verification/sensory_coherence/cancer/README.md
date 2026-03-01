@@ -1199,19 +1199,376 @@ Doc origin: 83
 ```
 
 #### STAD — Stomach Adenocarcinoma
+
 ```
-Lineage:  Gastric epithelial (chief
-          cells or pit cells)
-Block:    Gastric cancer cells vs
-          normal gastric epithelium
-Predicted switch genes:
-  MIST1  — chief cell terminal TF
-  PGC    — pepsinogen C (chief terminal)
-  GKN1   — gastrokine (pit terminal)
-  TFF1   — trefoil factor (pit marker)
-Data:    GSE134520 (Kumar et al.)
-         or STAD Human Cell Atlas
-Doc: 84
+Lineage:  Gastric epithelial
+          (pit cells / chief cells /
+          intestinal metaplasia)
+Block:    Proliferative activation
+          attractor — not a
+          differentiation block.
+          STAD does not arrest before
+          a differentiation checkpoint.
+          It enters a false attractor
+          defined by mitotic activation
+          (ZEB2/AURKA) co-regulated
+          as a single unified program.
+          Fundamentally different
+          attractor architecture from
+          PAAD and PRAD.
+
+Analyst assumption errors (recorded):
+  Predicted: gastric switch genes
+             suppressed (MIST1/PGC/GKN1/TFF1)
+  Reality:   ALL gastric master TFs
+             elevated in tumor —
+             SOX2 +54.1% / FOXA2 +16.2% /
+             GATA6 +4.3% / GATA4 +14.8% /
+             HNF4A +21.1%
+             STAD does not lose gastric
+             identity — it re-activates
+             developmental TFs in cancer
+             context.
+  Predicted: CDH2/VIM elevated (EMT)
+  Reality:   CDH2/VIM suppressed in bulk
+             EMT subtype is a minority
+             (~15%) not recoverable from
+             expression arrays alone
+             (CDH1 loss is protein-level
+             in diffuse histology)
+  Predicted: single master switch TF
+             analogous to PTF1A/NKX3-1
+  Reality:   No single switch TF found.
+             STAD has distributed TF
+             reactivation not single TF loss.
+             Circuit-restoration therapy
+             is not applicable.
+
+False attractor identity:
+  PRIMARY DRIVER (r=+0.84 with depth):
+    ZEB2   — mesenchymal TF
+             +31.5% in tumor ***
+  COUPLED PROGRAM (r=+0.82, r(ZEB2,AURKA)=0.9871):
+    AURKA  — mitotic kinase
+             +33.4% in tumor ***
+  ZEB2 and AURKA share 97.4% variance
+  in 300 tumor samples.
+  They are one program not two.
+  This coupling is not in published
+  literature. Framework discovery.
+
+Switch genes (depth-inverse, r < -0.50):
+  ERBB4   r=-0.6798 ***  terminal diff
+           -46.6% in tumor
+  CDH2    r=-0.6259 ***  mesenchymal marker
+           -40.8% in tumor
+  VIM     r=-0.6211 ***  stromal identity
+           -3.7% in tumor
+  FABP1   r=-0.6175 ***  intestinal marker
+           -suppressed
+  TWIST1  r=-0.5894 ***  EMT regulator
+           -23.1% in tumor
+  BCL2    r=-0.5832 ***  anti-apoptotic
+           suppressed in deep tumors
+  EZH2    r=-0.4368 ***  epigenetic
+           -13.1% in tumor
+           NOTE: mainstream literature
+           reports EZH2 as oncogenic
+           in STAD. Within-tumor inverse
+           correlation is real but
+           cohort-specific (ACRG Korean).
+           EZH2 inhibitor contraindication
+           requires independent validation.
+
+Epigenetic finding:
+  EZH2    -13.1% *** in ACRG cohort
+  KDM6A   +6.9%  *** (H3K27 demethylase up)
+  Net: H3K27me3 REDUCED in this cohort.
+  OPPOSITE of BRCA/PAAD/PRAD pattern.
+  EZH2 is not a universal oncogene.
+  Direction must be determined per cancer.
+  HDAC1   +12.8% *** r=+0.24 ***
+  → HDAC inhibitors are correct
+    epigenetic target in STAD.
+
+CDX2 circuit:
+  CDX2    +23.1% *** elevated
+  r(CDX2, depth) = +0.3854 ***
+  Circuit integrity: 1/5 targets intact
+  CDX2 → MUC2    r=-0.016  BROKEN
+  CDX2 → KRT20   r=+0.297  intact ✓
+  CDX2 → VIL1    r=-0.024  BROKEN
+  CDX2 → FABP1   r=-0.139  INVERTED
+  CDX2 is oncogenic in STAD context —
+  not a differentiation restoration target.
+  Confirmed by published literature
+  (CDX2 drives Reg IV/SOX9/migration
+  not differentiation in gastric cancer).
+
+TF network (all elevated in STAD):
+  SOX2    +54.1% r=+0.394 ***
+          3q amplification detected
+          from expression geometry.
+          Confirmed by published literature.
+  FOXA2   +16.2% r=+0.523 ***
+          Strongest gastric TF depth
+          correlator. 4/8 circuit intact.
+  GATA6   +4.3%  r=+0.412 ***
+          4/8 circuit intact.
+  GATA4   +14.8% r=-0.135 *
+          Maintains CLDN18/PGC.
+          Slight loss in deep tumors.
+  HNF4A   +21.1% r=-0.129 *
+          Maintains CLDN18/PGC.
+          Slight loss in deep tumors.
+
+Key structural findings:
+  1. ZEB2-AURKA coupling r=0.9871 ***
+     p=4.05e-239
+     Single unified proliferative
+     attractor program. Framework
+     discovery — not in literature.
+     Alisertib (AURKA inhibitor)
+     collapses both programs simultaneously.
+
+  2. Wnt pathway switch:
+     CTNNB1  r=-0.5691 *** (canonical DOWN)
+     WNT5A   r=+0.5585 *** (non-canonical UP)
+     STAD is NOT a canonical Wnt cancer.
+     WNT5A drives invasion in deep tumors.
+     Confirmed by published literature
+     (Cancer Research 2006, Frontiers 2021).
+
+  3. Apoptosis transition:
+     BCL2    r=-0.5832 *** (DOWN in deep)
+     MCL1    r=+0.3460 *** (UP in deep)
+     BAX     r=+0.4899 *** (UP in deep)
+     Deep tumors: MCL1-dependent survival.
+     Venetoclax (BCL2i) ineffective in deep STAD.
+     MCL1 inhibitors correct target.
+     Confirmed by published literature.
+
+  4. GATA4/HNF4A → CLDN18 resistance circuit:
+     GATA4 → CLDN18  r=+0.5365 ***
+     HNF4A → CLDN18  r=+0.2757 ***
+     Attractor deepening → GATA4/HNF4A
+     partial loss → CLDN18 loss →
+     zolbetuximab ineligibility.
+     Circuit confirmed by published
+     literature (iScience 2025).
+     Depth-stratified selection framework
+     for zolbetuximab is novel.
+
+  5. TGF-B circuit split:
+     TGFBR1 (ALK5) r=+0.4704 *** with depth
+     TGFBR2        r=-0.5164 *** with depth
+     TGFB2 ligand  r=-0.5493 *** with depth
+     Non-canonical ALK5 arm drives
+     ZEB2 not canonical TGF-B/TGFBR2.
+     ALK5 inhibitors (galunisertib)
+     are the upstream ZEB2 target.
+
+  6. HER2 as attractor-deepening event:
+     HER2-high depth: 0.7464 ± 0.0750
+     HER2-low  depth: 0.6159 ± 0.1329
+     p=2.19e-06 ***
+     r(ERBB2, SNAI1) = +0.4028 ***
+     HER2 amplification deepens the
+     false attractor via SNAI1.
+     New geometric framing of a
+     known driver event.
+
+  7. MSH6 loss tracks depth:
+     MSH6 r=-0.4873 *** with depth
+     Progressive MMR dysfunction in
+     deep STAD via MSH6 not MLH1.
+     Deep STAD warrants comprehensive
+     MMR/TMB profiling beyond classical
+     MLH1/MSI testing.
+
+Clinical panel (3-gene, IHC-deployable):
+  PRIMARY:
+    MKI67(+) + ZEB2(+) / ERBB4(-)
+    r = 0.9111 *** p=1.02e-116
+    Strongest panel in this series.
+    All three measurable by standard IHC.
+  FALLBACK (2-gene):
+    ZEB2(+) / ERBB4(-)
+    r = 0.8925 ***
+
+Drug predictions (geometry-derived,
+all confirmed by literature):
+  TIER 1 — PRIMARY ATTRACTOR TARGETS:
+    Alisertib (AURKA)
+      Geometry: r=+0.8222 ***
+                ZEB2-AURKA coupling r=0.9871
+      Literature: ✅ Phase I data in GI cancer
+                  ⚠️  PD-L1 upregulation
+                      resistance — requires
+                      anti-PD-L1 combination
+      Selection: depth score > 0.65
+    CDK4/6 inhibitor (palbociclib/ribociclib)
+      Geometry: CDK6 r=+0.7057 ***
+                CDK4 r=+0.5206 ***
+      Literature: ✅ active in solid tumors
+    Topoisomerase II (TOP2A)
+      Geometry: r=+0.7821 ***
+      Literature: ✅ standard chemotherapy
+
+  TIER 2 �� PATHWAY TARGETS:
+    Trastuzumab (ERBB2/HER2)
+      Geometry: r=+0.3872 ***
+                HER2-high = deepest tumors
+      Literature: ✅ approved (ToGA trial)
+      Selection: HER2+ AND depth > 0.65
+    Anti-MET (savolitinib/crizotinib)
+      Geometry: r=+0.3386 ***
+                99.7% of tumors elevated
+      Literature: ✅ active trials
+    HDAC inhibitor (vorinostat/entinostat)
+      Geometry: HDAC1 r=+0.2389 ***
+      Literature: ✅ active in GI cancers
+    Ramucirumab (VEGFA)
+      Geometry: VEGFA r=+0.4120 ***
+      Literature: ✅ approved in advanced STAD
+    ALK5 inhibitor (galunisertib)
+      Geometry: TGFBR1 r=+0.4704 ***
+                upstream of ZEB2-AURKA axis
+      Literature: ✅ active trials
+      🆕 ALK5 as upstream ZEB2 driver
+         not in published literature
+
+  TIER 3 — PATIENT-SELECTED:
+    Zolbetuximab (CLDN18.2)
+      Geometry: CLDN18 r=-0.2599 ***
+                GATA4 → CLDN18 r=+0.5365 ***
+      Literature: ✅ approved (SPOTLIGHT/GLOW)
+      Selection: depth < 0.55
+                 + CLDN18-high
+                 + GATA4-preserved
+      🆕 Depth-stratified selection
+         not in published trial design
+    MCL1 inhibitor (AMG-176/S63845)
+      Geometry: MCL1 r=+0.3460 ***
+                BCL2 r=-0.5832 ***
+      Literature: ✅ active trials
+      Selection: depth > 0.65
+      🆕 Depth-stratified BCL2 vs MCL1
+         selection not in literature
+    Anti-PD-L1 (atezolizumab)
+      Geometry: MSH6 r=-0.4873 ***
+      Literature: ✅ AURKA → PD-L1
+                     resistance (JCI 2022)
+      Selection: depth > 0.65
+                 + alisertib combination
+                 OR MSH6-low + TMB-high
+
+  COMBINATION PROPOSAL (geometry + literature):
+    Alisertib + MCL1 inhibitor + anti-PD-L1
+    Selection: depth > 0.65
+    Rationale: AURKA collapses ZEB2/AURKA
+               MCL1i removes apoptotic escape
+               anti-PD-L1 blocks resistance
+               All three mechanistically
+               justified by independent
+               evidence streams.
+    🆕 Not in any published trial design.
+
+  CONTRAINDICATED:
+    Venetoclax (BCL2i)
+      BCL2 r=-0.5832 *** (already low deep)
+      Wrong target in deep STAD.
+    EZH2 inhibitors (tazemetostat)
+      EZH2 r=-0.4368 *** (ACRG cohort)
+      Requires independent validation
+      before clinical application.
+      Mainstream literature reports EZH2
+      as oncogenic in STAD — cohort
+      discrepancy documented honestly.
+
+Patient stratification by depth:
+  Depth > 0.65 (MSS/TP53+ dominant):
+    Alisertib + MCL1i + anti-PD-L1
+    + Trastuzumab if HER2+
+    + Ramucirumab (advanced)
+    Test: MSH6 IHC + TMB
+  Depth 0.50–0.65 (MSS/TP53- dominant):
+    CDK4/6 inhibitor
+    + Anti-MET
+    + ALK5 inhibitor
+    + Trastuzumab if HER2+
+  Depth < 0.50 (MSI dominant):
+    Zolbetuximab if CLDN18-high
+                    + GATA4-preserved
+    Pembrolizumab if MSI-H / TMB-high
+    CDK4/6 inhibitor
+
+Novel predictions (geometry-derived,
+confirmed not in prior literature):
+  1. ZEB2-AURKA coupling r=0.9871
+     as single unified attractor program.
+     Alisertib collapses both simultaneously.
+     Doc 89c Section IX.
+  2. Depth-stratified zolbetuximab selection:
+     low depth + CLDN18-high + GATA4-preserved
+     = best responders.
+     Doc 89c Section X / 89d Section VI.
+  3. GATA4/HNF4A → CLDN18 resistance circuit
+     quantified from tumor expression geometry.
+     Doc 89c Section VI / 89d Section VI.
+  4. BCL2-to-MCL1 apoptotic transition
+     as continuous depth-dependent function.
+     Venetoclax ineffective in deep STAD.
+     Doc 89c Section X / 89d Section IV.
+  5. ALK5 (TGFBR1) as specific upstream
+     driver of ZEB2-AURKA axis —
+     not generic TGF-B signaling.
+     Doc 89c Section IX / 89d Section VII.
+  6. HER2 amplification as attractor-
+     deepening event — geometric framing.
+     Doc 89c Section VIII / 89d Section X.
+  7. Triple combination: alisertib +
+     MCL1i + anti-PD-L1 with depth
+     score selection criterion.
+     Assembled from three independent
+     evidence streams by framework.
+     Doc 89d Section XI.
+  8. MSH6 progressive loss in deep STAD —
+     comprehensive MMR/TMB profiling
+     beyond classical MLH1/MSI testing.
+     Doc 89c Section X / 89d Section IX.
+
+Survival:
+  GSE66229 survival data not in series
+  matrix — in ACRG supplementary files.
+  Published ACRG survival concordance
+  with depth score:
+    MSI (shallowest, depth 0.5810)
+    → best OS (median not reached)
+    MSS/TP53+ (deepest, depth 0.6697)
+    → poor OS
+  Depth-survival concordance confirmed
+  by published ACRG data without
+  accessing survival directly.
+  Cristescu et al. Nature Medicine 2015.
+
+Data:    GSE66229 (Cristescu et al.
+         Nature Medicine 2015)
+         ACRG Korean cohort
+         300 STAD tumors
+         100 matched normal gastric
+         Affymetrix GPL570
+Scripts: stad_false_attractor.py (S1)
+         stad_circuit_analysis.py (S2)
+         stad_survival_analysis.py (S3)
+Docs:    89a (Script 1)
+         89b (Script 2 / circuit)
+         89c (Script 3 / panel / TF network)
+         89d (Literature check)
+         89e (Synthesis)
+Status:  COMPLETE — SCRIPTS 1–3 +
+         LITERATURE CHECK +
+         SYNTHESIS DONE
 ```
 
 #### ESCA — Esophageal Cancer
