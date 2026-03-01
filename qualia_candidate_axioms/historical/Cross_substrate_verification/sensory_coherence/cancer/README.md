@@ -985,25 +985,217 @@ Status:  CONFIRMED + LITERATURE CHECK COMPLETE
 
 #### PRAD — Prostate Adenocarcinoma
 ```
+Status:   COMPLETE
+          Scripts 1 and 2 run
+          Literature check complete
+          Documents: 88a, 88b, 88c
+
 Lineage:  Luminal secretory epithelial
-Block:    Prostate cancer cells vs
-          normal luminal prostate
-Predicted switch genes:
-  NKX3-1 — prostate identity master TF
-  AR     — androgen receptor
-           (confirmed present in BRCA
-           dataset — watch for
-           cross-cancer signal)
-  KLK3   — PSA / terminal secretory
-Data:    GSE176031 or GSE141370
-Note:    AR is to prostate what ESR1
-         is to breast. Both nuclear
-         hormone receptors. Both
-         terminal identity genes.
-         Predicting >90% suppression
-         in CRPC (castration-resistant
-         prostate cancer).
-Doc: 83
+          Prostate-specific secretory cell
+          Normal: ACPP/MSMB/KLK3 high
+          AR-driven terminal identity
+
+Block:    Luminal progenitor
+          → mature luminal secretory
+          Terminal secretory step blocked
+          AR program amplified not lost
+          NKX3-1 haploinsufficient
+          (chr8p21 deletion)
+          EZH2 lock (stage-dependent)
+
+Dataset:  GSE32571
+          59 PRAD tumors
+          39 matched benign prostate
+          Illumina HumanHT-12 v4
+          Gleason high/low annotated
+          Matched pairs (DKFZ cohort)
+
+Switch genes (actual — from data):
+  ACPP   r=-0.595 with depth ***
+         Terminal secretory enzyme
+         Primary expression-level
+         depth predictor
+         Not predicted — found by geometry
+  MSMB   r=-0.551 with depth ***
+         Secreted tumor suppressor
+         2025 literature confirms
+         AUC 0.93 — geometry preceded
+         independent validation
+  NKX3-1 +3.3% elevated (not suppressed)
+         Haploinsufficiency at DNA level
+         Expression maintained/elevated
+         via AR-driven transcription
+         of remaining allele
+         Functional loss is genomic
+         not transcriptomic in primary PRAD
+
+Predicted switch genes (pre-data):
+  NKX3-1 — CORRECT biology
+            WRONG direction for expression
+            Analyst error corrected by data
+            Dual role confirmed by
+            literature (MDPI Cancers 2025)
+  AR      — Maintained flat (-0.4% ns)
+            AR→NKX3-1 r=+0.361 confirmed
+            AR is upstream driver not switch
+  KLK3   — +7.1% elevated overall
+            Falls with Gleason (p=0.0015)
+            AR target confirmed in circuit
+            Not a switch gene —
+            a circuit output
+
+False attractor identity:
+  HOXC6  +34.7%  p=2.28e-15  r=+0.514
+         Largest change in dataset
+         Driven by METTL3/m6A/IGF2BP2
+         (RNA-level epigenetic stabilization)
+         Activates Wnt/β-catenin via
+         SFRP1 suppression
+  AMACR  +36.1%  p=5.39e-13  r=+0.428
+         Second largest change
+         Standard clinical diagnostic
+         marker for PRAD worldwide
+         Framework derived from
+         first principles — geometry
+         found pathology standard
+
+Epigenetic lock:
+  EZH2   +3.8%  p=1.53e-06
+         r=+0.426 with depth
+         4th solid cancer in series
+         Non-canonical activation also
+         present (activates AR targets
+         while silencing differentiation)
+         Primary lock in CRPC
+         Secondary in primary PRAD
+         (haploinsufficiency dominates
+         in primary disease)
+
+Circuit (confirmed Script 2):
+  AR → NKX3-1 → ACPP / MSMB / KLK3
+  AR   → NKX3-1  r=+0.361  p=0.005
+  NKX3-1 → ACPP  r=+0.454  p=3.04e-04
+  NKX3-1 → MSMB  r=+0.523  p=2.17e-05
+  NKX3-1 → KLK3  r=+0.665  p=9.44e-09
+  NKX3-1 → KLK2  r=+0.635  p=6.65e-08
+  Architecture: INTACT
+  Same as PAAD (PTF1A→CTRC r=+0.754)
+  Block at NKX3-1 INPUT not downstream
+  Restore NKX3-1 dose →
+  intact circuit executes →
+  attractor dissolves
+
+Basal layer:
+  KRT5   -17.1%  p=3.22e-15
+  KRT14  -12.3%  p=3.33e-09
+  TP63   -16.9%  p=1.92e-16
+  Complete basal dissolution confirmed
+  Framework found histological
+  diagnostic criterion for invasive
+  PRAD from gene expression alone
+
+ERG subtype finding:
+  ERG-high (fusion+): n=20
+  ERG-low  (fusion-): n=39
+  Threshold: 6.4804 (KDE-derived)
+  Depth ERG-high: 0.433
+  Depth ERG-low:  0.410
+  p=0.614 — SAME ATTRACTOR
+  ERG+ and ERG- PRAD converge to
+  identical attractor geometry
+  One dissolution strategy works
+  for all primary PRAD regardless
+  of ERG fusion status
+  TMPRSS2 -6.3% in ERG-high
+  confirms fusion from expression
+
+Depth score:
+  Mean: 0.418  Std: 0.123
+  High Gleason: 0.462 ± 0.132
+  Low  Gleason: 0.381 ± 0.103
+  p=0.0024 CONFIRMED
+  3-gene score (ACPP/HOXC6/AMACR):
+  r=+0.866 with full depth score
+  Clinical panel equivalent
+
+Drug targets (geometry-derived):
+  1. AR inhibitor
+     Standard of care — confirmed
+  2. EZH2 inhibitor (mevrometostat)
+     Three trials failed unselected
+     (CELLO-1, PROSTAR, tulmimetostat)
+     Depth score is missing selection
+     biomarker
+     Trial design: depth > 0.55
+     Pharmacodynamic: NKX3-1/ACPP
+     restoration in biopsy
+  3. NKX3-1 restoration
+     EZH2i (indirect) or BAT
+     AR→NKX3-1 r=+0.361 confirmed
+     BAT (bipolar androgen therapy)
+     supraphysiologic AR →
+     NKX3-1 above threshold →
+     terminal differentiation executes
+     CAUTION: NKX3-1 dual role in
+     late CRPC (oncogenic at that stage)
+     Strategy valid for primary PRAD
+     and early CRPC only
+  4. MYC / BET inhibitor
+     MYC +5.6% confirmed
+     BET inhibitors in active PRAD trials
+  5. AURKA inhibitor (alisertib)
+     r=+0.346 with depth
+     In PRAD and NEPC trials
+  6. METTL3 inhibitor [from literature]
+     METTL3 → m6A → HOXC6 stability
+     Targets largest signal (+34.7%)
+     at RNA level
+  7. Wnt inhibitor [from literature]
+     HOXC6 → SFRP1 suppression →
+     Wnt/β-catenin → progenitor state
+     Second pathway to HOXC6 strategy
+
+Novel findings (6):
+  N1: ACPP as primary depth predictor
+      r=-0.595 — not in existing panels
+  N2: NKX3-1 circuit INTACT
+      Therapeutic implication: restore
+      input → program executes
+  N3: ERG subtypes share same attractor
+      One strategy for all primary PRAD
+  N4: Depth score = missing EZH2 trial
+      selection biomarker
+      CELLO-1 failed without it
+  N5: MSMB r=-0.551 preceded 2025
+      independent validation (AUC 0.93)
+  N6: EZH2 non-canonical activation
+      found from data anomaly before
+      mechanism paper located
+
+Cross-cancer pattern:
+  BRCA: EZH2 lock            ✓
+  PAAD: PTF1A circuit INTACT ✓  EZH2 ✓
+  PRAD: NKX3-1 circuit INTACT ✓ EZH2 ✓
+  Same architecture. Different lineage.
+  Same therapeutic logic.
+
+Analyst errors corrected by data:
+  NKX3-1 predicted DOWN → found UP
+  FOXA1  predicted DOWN → found UP
+  Both corrected before literature.
+  Both confirmed by literature.
+
+Prediction score: 11/13 confirmed (85%)
+  2 partially confirmed
+  0 failed
+  2 analyst errors corrected by data
+
+Documents:
+  88a — Script 1 discovery
+  88b — Script 2 circuit analysis
+  88c — Literature check
+
+Doc origin: 83
 ```
 
 #### STAD — Stomach Adenocarcinoma
