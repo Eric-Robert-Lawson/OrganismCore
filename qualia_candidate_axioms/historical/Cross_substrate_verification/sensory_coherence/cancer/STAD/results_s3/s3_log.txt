@@ -1,0 +1,434 @@
+=================================================================
+STOMACH ADENOCARCINOMA
+SURVIVAL / PANEL / TF NETWORK — S3
+Dataset: GSE66229
+Framework: OrganismCore
+Doc: 89c-pre | Date: 2026-03-01
+=================================================================
+
+  OBJECTIVES:
+  1. Survival: depth vs OS
+  2. 3-gene clinical panel
+  3. Gastric TF network
+  4. MLH1 paradox
+  5. EMT subtype fix
+  6. ZEB2 circuit
+  7. Full depth survey
+
+=== STEP 0: LOAD DATA ===
+=================================================================
+STEP 0: LOAD DATA
+=================================================================
+  Gene matrix S1: (59, 400)
+  Meta: (400, 30)
+
+=== STEP 1: EXPAND GENES ===
+
+=================================================================
+STEP 1: EXPAND GENE MATRIX
+Gastric TFs + MLH1 + survival markers
+=================================================================
+  Already have: 59 genes
+  Need to find: 36 genes
+  Scanning matrix for new probes...
+  Probes found: 27
+  Added: ['WNT5A', 'BAX', 'CTNNB1', 'CDKN1A', 'MLH1', 'TGFB1', 'BCL2', 'FOXA2', 'PMS2', 'AXIN2', 'SOX2', 'TGFB2', 'NOTCH1', 'MCL1', 'CDX1', 'GATA4', 'HNF4A', 'VEGFA', 'GATA6', 'KRT20', 'TGFBR2', 'TGFBR1', 'APC', 'MSH6', 'JAG1', 'CLDN18', 'GKN1']
+  Total genes: 86
+  Still missing: ['MSH2', 'SOX17', 'KDR', 'FGFR1', 'CDKN2A', 'NOTCH2', 'BCL2L1', 'VEGFB', 'FOXA1']
+
+=== STEP 2: CLASSIFY + SURVIVAL ===
+
+=================================================================
+STEP 2: CLASSIFY + SURVIVAL DATA
+=================================================================
+  TUMOR  : 300
+  NORMAL : 100
+
+  Scanning metadata for survival...
+  Columns: ['title', 'geo_accession', 'status', 'submission_date', 'last_update_date', 'type', 'channel_count', 'source_name_ch1', 'organism_ch1', 'characteristics_ch1', 'molecule_ch1', 'extract_protocol_ch1', 'label_ch1', 'label_protocol_ch1', 'taxid_ch1', 'hyb_protocol', 'scan_protocol', 'description', 'data_processing', 'platform_id', 'contact_name', 'contact_department', 'contact_institute', 'contact_address', 'contact_city', 'contact_state', 'contact_zip/postal_code', 'contact_country', 'supplementary_file', 'data_row_count']
+  Characteristics columns: ['characteristics_ch1']
+  [characteristics_ch1] sample values:
+    tissue: Gastric tumor
+    tissue: Gastric tumor
+    tissue: Gastric tumor
+    tissue: normal gastric tissue
+    tissue: normal gastric tissue
+    tissue: normal gastric tissue
+    tissue: normal gastric tissue
+    tissue: normal gastric tissue
+
+  Survival time found: 0
+  Vital status found: 0
+  Subtype annotation: 0
+
+  No survival parsed.
+  Raw characteristics (first 5):
+  tissue: Gastric tumor
+  tissue: Gastric tumor
+  tissue: Gastric tumor
+  tissue: normal gastric tissue
+  tissue: normal gastric tissue
+
+  Tumors with survival: 0
+
+=== STEP 3: DEPTH SCORE ===
+
+=================================================================
+STEP 3: BUILD CORRECTED DEPTH SCORE
+=================================================================
+  Switch: ['FABP1', 'MUC2', 'ERBB4', 'ERBB3', 'TWIST1', 'CDH2', 'VIM', 'MUC5AC']
+  FA    : ['MKI67', 'ZEB2', 'CDX2', 'AURKA', 'TOP2A', 'SNAI1', 'HDAC1', 'MET']
+
+  Depth (n=300):
+    Mean  : 0.6509
+    Median: 0.6787
+    Std   : 0.1374
+
+=== STEP 4: SURVIVAL ANALYSIS ===
+
+=================================================================
+STEP 4: SURVIVAL ANALYSIS
+Kaplan-Meier by depth quartile
+Cox: depth vs overall survival
+=================================================================
+
+  Survival data not found in metadata.
+  GSE66229 survival data may be in
+  supplementary files not series matrix.
+
+  Attempting to use characteristics
+  for any available clinical data...
+
+  ALTERNATIVE: testing depth vs
+  proxy clinical markers in expression
+  (TP53, CCND1, KRAS) as surrogates.
+
+  Depth vs clinical proxy markers:
+  Gene              r  p-value  Interpretation
+  --------------------------------------------------
+  TP53        +0.1303  p=0.0240   *
+  CCND1       +0.3569  p=1.92e-10 ***
+  KRAS        +0.2153  p=1.71e-04 ***
+  MKI67       +0.7576  p=3.70e-57 ***
+  ERBB2       +0.3627  p=9.32e-11 ***
+  MET         +0.3386  p=1.76e-09 ***
+  AURKA       +0.8222  p=6.43e-75 ***
+  ZEB2        +0.8380  p=2.15e-80 ***
+
+=== STEP 5: 3-GENE PANEL ===
+
+=================================================================
+STEP 5: 3-GENE CLINICAL PANEL
+Predicted: ZEB2 + AURKA + ERBB4
+Target: r > 0.85 with full depth
+=================================================================
+
+  Predicted panel: ['ZEB2', 'AURKA', 'ERBB4']
+
+  ZEB2+AURKA+ERBB4 panel:
+    r with full depth = +0.8915
+    p=1.68e-104 ***
+    Target: r > 0.85
+    Result: PANEL VALID ✓
+
+  All 2-gene panel combinations:
+  Genes                            r  p-value
+  ---------------------------------------------
+  ZEB2(+) / ERBB4(-)         +0.8925  p=4.85e-105 ***
+  AURKA(+) / ERBB4(-)        +0.8861  p=1.61e-101 ***
+  ZEB2(+) / CDH2(-)          +0.8772  p=5.79e-97 ***
+  AURKA(+) / CDH2(-)         +0.8722  p=1.46e-94 ***
+  TOP2A(+) / ERBB4(-)        +0.8638  p=1.03e-90 ***
+  TOP2A(+) / CDH2(-)         +0.8606  p=2.47e-89 ***
+  MKI67(+) / ERBB4(-)        +0.8596  p=6.79e-89 ***
+  CDC20(+) / ERBB4(-)        +0.8482  p=2.98e-84 ***
+  MKI67(+) / CDH2(-)         +0.8459  p=2.33e-83 ***
+  CCNB1(+) / ERBB4(-)        +0.8436  p=1.83e-82 ***
+
+  Best 2-gene panel: ZEB2 + ERBB4
+  r = 0.8925
+
+  Top 3-gene panels:
+  Genes                                      r  p-value
+  ----------------------------------------------------
+  MKI67+ZEB2/ERBB4(-)                  +0.9111  p=1.02e-116 ***
+  AURKA+MKI67/ERBB4(-)                 +0.9096  p=1.15e-115 ***
+  TOP2A+ZEB2/CDH2(-)                   +0.9088  p=3.87e-115 ***
+  TOP2A+ZEB2/ERBB4(-)                  +0.9086  p=5.45e-115 ***
+  MKI67+ZEB2/CDH2(-)                   +0.9061  p=2.36e-113 ***
+  AURKA+TOP2A/CDH2(-)                  +0.9052  p=9.05e-113 ***
+  AURKA+TOP2A/ERBB4(-)                 +0.9050  p=1.21e-112 ***
+  AURKA+MKI67/CDH2(-)                  +0.9049  p=1.49e-112 ***
+  CDC20+ZEB2/ERBB4(-)                  +0.8988  p=9.98e-109 ***
+  CCNB1+ZEB2/ERBB4(-)                  +0.8958  p=5.91e-107 ***
+
+  Best 3-gene panel:
+    MKI67 + ZEB2 / ERBB4 (inverse)
+    r = 0.9111
+    p=1.02e-116 ***
+
+=== STEP 6: GASTRIC TF NETWORK ===
+
+=================================================================
+STEP 6: GASTRIC TF NETWORK
+SOX2/GATA4/GATA6/HNF4A/FOXA2
+Which TF tracks with depth?
+Find the actual switch TF
+=================================================================
+
+  TF expression T vs N:
+  TF            Normal     Tumor    Change    r(depth)  p
+  -----------------------------------------------------------------
+  SOX2          0.7080    1.0914    +54.1%     +0.3943  p=1.34e-12 ***
+  GATA4         1.0388    1.1920    +14.8%     -0.1348  p=0.0195   *
+  GATA6         0.7274    0.7589     +4.3%     +0.4115  p=1.09e-13 ***
+  HNF4A         0.7375    0.8930    +21.1%     -0.1287  p=0.0257   *
+  FOXA2         0.9738    1.1314    +16.2%     +0.5230  p=1.83e-22 ***
+  FOXA1      NOT FOUND
+  SOX17      NOT FOUND
+  CDX2          0.8686    1.0695    +23.1%     +0.3948  p=1.25e-12 ***
+  CDX1          1.3151    1.3936     +6.0%     +0.3081  p=5.10e-08 ***
+
+  TFs ranked by |r| with depth:
+  FOXA2    r=+0.5230 p=1.83e-22 ***  FA marker (UP = deeper)
+  GATA6    r=+0.4115 p=1.09e-13 ***  FA marker (UP = deeper)
+  CDX2     r=+0.3948 p=1.25e-12 ***  FA marker (UP = deeper)
+  SOX2     r=+0.3943 p=1.34e-12 ***  FA marker (UP = deeper)
+  CDX1     r=+0.3081 p=5.10e-08 ***  FA marker (UP = deeper)
+  GATA4    r=-0.1348 p=0.0195   *  weak/no relationship
+  HNF4A    r=-0.1287 p=0.0257   *  weak/no relationship
+
+  TF circuit integrity:
+
+  SOX2 → gastric targets:
+    MUC5AC     r=+0.1959 p=6.46e-04 ***  intact ✓
+    TFF1       r=+0.2135 p=1.94e-04 ***  intact ✓
+    GKN1       r=+0.0593 p=0.3060  ns  broken
+    GKN2       r=-0.0082 p=0.8870  ns  broken
+    ATP4A      r=+0.2516 p=1.03e-05 ***  intact ✓
+    PGC        r=-0.2453 p=1.73e-05 ***  inverted
+    OLFM4      r=+0.1150 p=0.0466   *  broken
+    CLDN18     r=-0.0647 p=0.2638  ns  broken
+  SOX2 circuit: 3/8 intact
+
+  GATA4 → gastric targets:
+    MUC5AC     r=-0.0195 p=0.7368  ns  broken
+    TFF1       r=-0.0369 p=0.5244  ns  broken
+    GKN1       r=-0.0103 p=0.8586  ns  broken
+    GKN2       r=+0.0524 p=0.3654  ns  broken
+    ATP4A      r=-0.0067 p=0.9085  ns  broken
+    PGC        r=+0.4070 p=2.13e-13 ***  intact ✓
+    OLFM4      r=+0.1244 p=0.0312   *  broken
+    CLDN18     r=+0.5365 p=9.25e-24 ***  intact ✓
+  GATA4 circuit: 2/8 intact
+
+  GATA6 → gastric targets:
+    MUC5AC     r=+0.3043 p=7.55e-08 ***  intact ✓
+    TFF1       r=+0.3283 p=5.70e-09 ***  intact ✓
+    GKN1       r=+0.2371 p=3.33e-05 ***  intact ✓
+    GKN2       r=-0.1359 p=0.0186   *  broken
+    ATP4A      r=+0.1430 p=0.0131   *  broken
+    PGC        r=-0.1061 p=0.0665  ns  broken
+    OLFM4      r=+0.2960 p=1.76e-07 ***  intact ✓
+    CLDN18     r=-0.0704 p=0.2241  ns  broken
+  GATA6 circuit: 4/8 intact
+
+  HNF4A → gastric targets:
+    MUC5AC     r=-0.2954 p=1.87e-07 ***  inverted
+    TFF1       r=+0.0005 p=0.9926  ns  broken
+    GKN1       r=-0.0033 p=0.9541  ns  broken
+    GKN2       r=-0.0640 p=0.2693  ns  broken
+    ATP4A      r=-0.2444 p=1.86e-05 ***  inverted
+    PGC        r=+0.4100 p=1.37e-13 ***  intact ✓
+    OLFM4      r=-0.0488 p=0.3999  ns  broken
+    CLDN18     r=+0.2757 p=1.24e-06 ***  intact ✓
+  HNF4A circuit: 2/8 intact
+
+  FOXA2 → gastric targets:
+    MUC5AC     r=+0.2343 p=4.15e-05 ***  intact ✓
+    TFF1       r=+0.3641 p=7.74e-11 ***  intact ✓
+    GKN1       r=+0.1441 p=0.0125   *  broken
+    GKN2       r=+0.0583 p=0.3146  ns  broken
+    ATP4A      r=+0.1673 p=3.66e-03  **  intact ✓
+    PGC        r=-0.1838 p=1.38e-03  **  inverted
+    OLFM4      r=+0.2508 p=1.10e-05 ***  intact ✓
+    CLDN18     r=+0.0548 p=0.3439  ns  broken
+  FOXA2 circuit: 4/8 intact
+
+=== STEP 7: MLH1 PARADOX ===
+
+=================================================================
+STEP 7: MLH1 PARADOX
+MLH1 r=+0.5664 with depth ***
+But MSI (MLH1-loss) = shallowest
+=================================================================
+
+  MLH1 normal: 1.3660
+  MLH1 tumor : 1.6248
+  Change: +18.9%
+  r(MLH1, depth) = +0.5959 p=3.21e-30 ***
+
+  MLH1 bimodal check:
+    KDE minima: 0
+
+=== STEP 8: EMT SUBTYPE FIX ===
+
+=================================================================
+STEP 8: EMT SUBTYPE RE-CLASSIFICATION
+Script 2 found only 1 EMT tumor
+Expected ~15% (45 tumors)
+Re-parameterizing classifier
+=================================================================
+
+  CDH1 threshold (20th pct): 1.7717
+  ZEB2 threshold (80th pct): 1.5786
+  CDH1-low + ZEB2-high: 6 (2.0%)
+  Expected EMT: ~15%
+
+  EMT subtype gene expression:
+  Gene             EMT   non-EMT    Change
+  ------------------------------------------
+  CDH1          1.5501    1.8051    -14.1%
+  CDH2          0.3360    0.4630    -27.4%
+  ZEB2          1.6364    1.4732    +11.1%
+  SNAI1         0.8336    0.8897     -6.3%
+  TWIST1        1.0753    1.0059     +6.9%
+  VIM           1.7937    1.8199     -1.4%
+  MKI67         1.0476    0.8533    +22.8%
+  AURKA         1.6101    1.4411    +11.7%
+  ERBB2         1.2964    1.3993     -7.4%
+  MET           1.5709    1.6541     -5.0%
+  CLDN18        0.8103    0.7745     +4.6%
+
+  Depth EMT: 0.7278 ± 0.0557
+  Depth non-EMT: 0.6494 ± 0.1382
+  p=0.0841  ns
+
+=== STEP 9: ZEB2 CIRCUIT ===
+
+=================================================================
+STEP 9: ZEB2 CIRCUIT
+r(ZEB2, depth) = +0.8226 ***
+Primary attractor marker in STAD
+TGF-B upstream driver
+=================================================================
+
+  ZEB2 normal: 1.1229
+  ZEB2 tumor : 1.4764
+  Change     : +31.5%
+
+  ZEB2 upstream (TGF-B pathway):
+  TGFB1      change=+14.2%  r(ZEB2)=-0.2265  p=7.57e-05 ***
+  TGFB2      change=-4.4%  r(ZEB2)=-0.5490  p=5.18e-25 ***
+  TGFBR1     change=+16.8%  r(ZEB2)=+0.4470  p=3.85e-16 ***
+  TGFBR2     change=-5.6%  r(ZEB2)=-0.5423  p=2.46e-24 ***
+
+  ZEB2 downstream correlations:
+  Gene              r  p-value
+  ------------------------------------
+  SNAI1       +0.3644  p=7.51e-11 ***
+  SNAI2       -0.4151  p=6.38e-14 ***
+  TWIST1      -0.4083  p=1.76e-13 ***
+  CDH1        +0.2940  p=2.15e-07 ***
+  CDH2        -0.4186  p=3.74e-14 ***
+  VIM         -0.4646  p=1.81e-17 ***
+  MMP2        -0.0111  p=0.8484  ns
+  MMP9        +0.1950  p=6.84e-04 ***
+  FN1         +0.1158  p=0.0451   *
+  AURKA       +0.9871  p=4.05e-239 ***
+  MKI67       +0.7260  p=2.18e-50 ***
+  TOP2A       +0.8181  p=1.37e-73 ***
+  EZH2        -0.4130  p=8.70e-14 ***
+  HDAC1       +0.1397  p=0.0154   *
+
+  ZEB2 bimodal check:
+    KDE minima: 2
+    Threshold: 0.7322
+    ZEB2-high: 299 (99.7%)
+
+=== STEP 10: FULL DEPTH SURVEY ===
+
+=================================================================
+STEP 10: FULL DEPTH CORRELATION SURVEY
+All genes vs corrected depth
+Discovery of novel signals
+=================================================================
+
+  All genes ranked by |r| with depth:
+  Total tested: 86
+
+  TOP 30 POSITIVE (high in deep tumors):
+  Gene                r  p-value
+  ------------------------------------
+  ZEB2          +0.8380  p=2.15e-80 ***
+  AURKA         +0.8222  p=6.43e-75 ***
+  TOP2A         +0.7821  p=3.54e-63 ***
+  MKI67         +0.7576  p=3.70e-57 ***
+  CDC20         +0.7547  p=1.71e-56 ***
+  CCNB1         +0.7383  p=6.80e-53 ***
+  CDK6          +0.7057  p=1.63e-46 ***
+  PCNA          +0.6688  p=2.93e-40 ***
+  PLK1          +0.6181  p=5.30e-33 ***
+  MLH1          +0.5959  p=3.21e-30 ***
+  TFF1          +0.5854  p=5.47e-29 ***
+  SNAI1         +0.5607  p=3.06e-26 ***
+  WNT5A         +0.5585  p=5.31e-26 ***
+  ZEB1          +0.5293  p=4.60e-23 ***
+  FOXA2         +0.5230  p=1.83e-22 ***
+  CDK4          +0.5206  p=3.07e-22 ***
+  BAX           +0.4899  p=1.62e-19 ***
+  TGFBR1        +0.4704  p=6.36e-18 ***
+  KDM6A         +0.4329  p=3.92e-15 ***
+  VEGFA         +0.4120  p=1.02e-13 ***
+  GATA6         +0.4115  p=1.09e-13 ***
+  CDX2          +0.3948  p=1.25e-12 ***
+  SOX2          +0.3943  p=1.34e-12 ***
+  KRT20         +0.3828  p=6.61e-12 ***
+  ERBB2         +0.3627  p=9.32e-11 ***
+  CCND1         +0.3569  p=1.92e-10 ***
+  MCL1          +0.3460  p=7.30e-10 ***
+  ATP4A         +0.3397  p=1.54e-09 ***
+  CDH1          +0.3390  p=1.68e-09 ***
+  MET           +0.3386  p=1.76e-09 ***
+
+  TOP 30 NEGATIVE (low in deep tumors):
+  Gene                r  p-value
+  ------------------------------------
+  ERBB4         -0.6798  p=5.10e-42 ***
+  CDH2          -0.6259  p=4.88e-34 ***
+  VIM           -0.6211  p=2.13e-33 ***
+  FABP1         -0.6175  p=6.27e-33 ***
+  TWIST1        -0.5894  p=1.87e-29 ***
+  BCL2          -0.5832  p=9.88e-29 ***
+  DNMT3A        -0.5784  p=3.52e-28 ***
+  CTNNB1        -0.5691  p=3.78e-27 ***
+  TGFB2         -0.5493  p=4.78e-25 ***
+  ERBB3         -0.5480  p=6.44e-25 ***
+  TGFBR2        -0.5164  p=7.61e-22 ***
+  MSH6          -0.4873  p=2.67e-19 ***
+  SNAI2         -0.4587  p=5.17e-17 ***
+  NCAM1         -0.4418  p=9.15e-16 ***
+  EZH2          -0.4368  p=2.08e-15 ***
+  GRB7          -0.4125  p=9.34e-14 ***
+  CD8A          -0.3047  p=7.26e-08 ***
+  BUB1B         -0.3003  p=1.15e-07 ***
+  FGFR2         -0.2978  p=1.47e-07 ***
+  PGC           -0.2784  p=9.59e-07 ***
+  TGFB1         -0.2530  p=9.15e-06 ***
+  ENO2          -0.1482  p=0.0102   *
+  GATA4         -0.1348  p=0.0195   *
+  HNF4A         -0.1287  p=0.0257   *
+  CLDN18        -0.1162  p=0.0444   *
+  MUC2          -0.1074  p=0.0632  ns
+  FOXP3         -0.0637  p=0.2717  ns
+  BMI1          -0.0513  p=0.3759  ns
+  GKN2          -0.0419  p=0.4702  ns
+  MMP2          -0.0317  p=0.5841  ns
+
+  Saved: full_depth_correlations.csv
+
+=== STEP 11: FIGURE ===
+
+--- Generating Script 3 figure ---
+
+  Figure saved: ./stad_false_attractor/results_s3/stad_survival_panel.png
