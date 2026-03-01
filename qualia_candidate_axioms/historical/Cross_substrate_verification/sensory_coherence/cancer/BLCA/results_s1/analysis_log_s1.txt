@@ -1,0 +1,438 @@
+=================================================================
+BLADDER CANCER
+FALSE ATTRACTOR ANALYSIS — SCRIPT 1
+Dataset: GSE13507
+Luminal + Basal BLCA
+Framework: OrganismCore
+Doc: 91a | Date: 2026-03-01
+=================================================================
+
+PREDICTIONS LOCKED BEFORE DATA:
+Switch: UPK1B/UPK2/UPK3A DOWN luminal
+        GATA3/FOXA1/CDH1 DOWN basal
+FA:     FGFR3/ERBB2/PPARG UP luminal
+        KRT5/KRT14/EGFR/TP63 UP basal
+Depth:  L-D1 r(FGFR3)>+0.50
+        B-D1 r(KRT5)>+0.60
+        B-D4 r(TP63)>+0.50 basal
+        B-D5 r(ZEB2,AURKA)=0.55-0.75
+Epigen: KDM6A DOWN in deep BLCA
+Drug:   erdafitinib(FGFR3) derived
+        venetoclax(BCL2) novel
+Panel:  FGFR3(+)/GATA3(+)/UPK2(-)
+        KRT5(+)/EGFR(+)/GATA3(-)
+
+=================================================================
+STEP 0: DATA ACQUISITION
+=================================================================
+  Downloading matrix: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE13nnn/GSE13507/matrix/GSE13507_series_matrix.txt.gz
+  Saved: ./blca_false_attractor/GSE13507_series_matrix.txt.gz (15,408,223 bytes)
+  Downloading soft: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE13nnn/GSE13507/soft/GSE13507_family.soft.gz
+  Saved: ./blca_false_attractor/GSE13507_family.soft.gz (67,221,816 bytes)
+  Downloading GPL6102: https://ftp.ncbi.nlm.nih.gov/geo/platforms/GPL6nnn/GPL6102/annot/GPL6102.annot.gz
+  Saved: ./blca_false_attractor/GPL6102.annot.gz (6,577,510 bytes)
+
+=================================================================
+BUILD PROBE MAP — GPL6102
+Reusing ESCA-validated logic
+col 2 = Gene symbol
+=================================================================
+  Header: ['ID', 'Gene title', 'Gene symbol', 'Gene ID', 'UniGene title', 'UniGene symbol']
+  ID col=0 Sym col=2
+  Lines scanned : 48702
+  Probes mapped : 182
+  Genes covered : 126
+  Genes found   : ['ALDH1A1', 'APC', 'ARID1A', 'AURKA', 'AXIN1', 'AXIN2', 'BAX', 'BCL2', 'BCL2L1', 'BIRC5', 'CA9', 'CCNB1', 'CCND1', 'CCNE1', 'CD274', 'CD4', 'CD44', 'CD68', 'CD8A', 'CDC20', 'CDH1', 'CDH2', 'CDK4', 'CDK6', 'CDKN1A', 'CDKN1B', 'CDKN2A', 'CDKN2B', 'CDX2', 'CLDN3', 'CLDN4', 'CLDN7', 'CTNNB1', 'DNMT3A', 'DSG1', 'DSG3', 'DUSP6', 'E2F1', 'E2F3', 'EGFR', 'ERBB2', 'ERBB3', 'EZH2', 'FGFR1', 'FGFR3', 'FN1', 'FOXA1', 'FOXA2', 'FOXP3', 'GATA3', 'HDAC1', 'HDAC2', 'HES1', 'HIF1A', 'HRAS', 'IVL', 'JAG1', 'KDM5C', 'KDM6A', 'KDR', 'KRAS', 'KRT10', 'KRT13', 'KRT14', 'KRT18', 'KRT19', 'KRT20', 'KRT4', 'KRT5', 'KRT7', 'KRT8', 'LGR5', 'MCL1', 'MCM2', 'MDM2', 'MET', 'MKI67', 'MLH1', 'MSH2', 'MSH6', 'MYC', 'MYCN', 'NKX2-1', 'NOTCH1', 'NOTCH2', 'NRAS', 'PCNA', 'PDCD1', 'PDGFRA', 'PIK3CA', 'PLK1', 'PPARG', 'PTEN', 'RB1', 'S100A8', 'S100A9', 'SMAD2', 'SMAD3', 'SNAI1', 'SNAI2', 'SOX2', 'SOX4', 'SPRR1A', 'SPRY1', 'SPRY2', 'TACSTD2', 'TCF7L2', 'TET2', 'TGFB1', 'TGFBR2', 'TOP2A', 'TP53', 'TP63', 'TP73', 'TSC1', 'TWIST1', 'UPK1A', 'UPK1B', 'UPK2', 'UPK3A', 'UPK3B', 'VEGFA', 'VIM', 'WNT5A', 'ZEB1', 'ZEB2']
+  Missing       : ['FGFR2', 'KRT6A', 'PVRL4', 'VEGFR1']
+
+=================================================================
+PARSE SERIES MATRIX
+  File: ./blca_false_attractor/GSE13507_series_matrix.txt.gz
+=================================================================
+  Sample IDs   : 256
+  Probes found : 130
+  Genes mapped : 125
+  Genes found  : ['ALDH1A1', 'APC', 'ARID1A', 'AURKA', 'AXIN1', 'AXIN2', 'BAX', 'BCL2', 'BCL2L1', 'BIRC5', 'CA9', 'CCNB1', 'CCND1', 'CCNE1', 'CD274', 'CD4', 'CD44', 'CD68', 'CD8A', 'CDC20', 'CDH1', 'CDH2', 'CDK4', 'CDK6', 'CDKN1A', 'CDKN1B', 'CDKN2A', 'CDKN2B', 'CDX2', 'CLDN3', 'CLDN4', 'CLDN7', 'CTNNB1', 'DNMT3A', 'DSG1', 'DSG3', 'DUSP6', 'E2F1', 'E2F3', 'EGFR', 'ERBB2', 'ERBB3', 'EZH2', 'FGFR1', 'FGFR3', 'FN1', 'FOXA1', 'FOXA2', 'FOXP3', 'GATA3', 'HDAC1', 'HDAC2', 'HES1', 'HIF1A', 'HRAS', 'IVL', 'JAG1', 'KDM5C', 'KDM6A', 'KDR', 'KRAS', 'KRT10', 'KRT13', 'KRT14', 'KRT18', 'KRT19', 'KRT20', 'KRT4', 'KRT5', 'KRT7', 'KRT8', 'LGR5', 'MCL1', 'MCM2', 'MDM2', 'MET', 'MKI67', 'MLH1', 'MSH2', 'MSH6', 'MYC', 'MYCN', 'NKX2-1', 'NOTCH1', 'NOTCH2', 'NRAS', 'PCNA', 'PDCD1', 'PDGFRA', 'PIK3CA', 'PLK1', 'PPARG', 'PTEN', 'RB1', 'S100A8', 'S100A9', 'SMAD2', 'SMAD3', 'SNAI1', 'SNAI2', 'SOX2', 'SOX4', 'SPRR1A', 'SPRY1', 'SPRY2', 'TACSTD2', 'TCF7L2', 'TET2', 'TGFB1', 'TGFBR2', 'TOP2A', 'TP53', 'TP63', 'TP73', 'TWIST1', 'UPK1A', 'UPK1B', 'UPK2', 'UPK3A', 'UPK3B', 'VEGFA', 'VIM', 'WNT5A', 'ZEB1', 'ZEB2']
+
+  Characteristics rows: 13
+    row 0: ['strain: C57BL/6', 'biological source: normal bladder mucosae', 'biological source: bladder mucosae surrounding cancer', 'biological source: primary bladder cancer']
+    row 1: ['SEX: M', 'SEX: F', 'genotype: Wild-type']
+    row 2: ['AGE: 67', 'AGE: 87', 'AGE: 60', 'AGE: 62']
+    row 3: ['invasiveness: non-muscle invasive', 'invasiveness: muscle invasive', 'cre-driver: Vav-CRE']
+    row 4: ['intravesical therapy: Yes', 'systemic chemo: No', 'systemic chemo: Yes', 'intravesical therapy: No']
+
+=================================================================
+CLASSIFY SAMPLES
+Normal / Tumor
+Subtype by expression: Luminal/Basal
+=================================================================
+  68 Unknown — trying characteristics...
+  Char row 0: biological source: normal bladder mucosae
+  Char row 1: genotype: wild-type
+  Char row 4: cell type: multipotent progenitor cells (mpps)
+
+  Primary classification:
+    Tumor: 246
+    Normal: 9
+    Unknown: 1
+
+  First 15 samples:
+    GSM340537    → Normal     Control C010
+    GSM340538    → Normal     Control C017
+    GSM340539    → Normal     Control C029
+    GSM340540    → Normal     Control C030
+    GSM340541    → Normal     Control C040
+    GSM340542    → Unknown    Vav-Control MPP RNA-seq 1
+    GSM340543    → Normal     Control C044
+    GSM340544    → Normal     Control C045
+    GSM340545    → Normal     Control C051
+    GSM340546    → Normal     Control C072
+    GSM340547    → Tumor      Surrounding BS017
+    GSM340548    → Tumor      Surrounding BS038
+    GSM340549    → Tumor      Surrounding BS039
+    GSM340550    → Tumor      Surrounding BS040
+    GSM340551    → Tumor      Surrounding BS041
+
+=================================================================
+SUBTYPE CLASSIFICATION
+Luminal vs Basal
+Primary markers: GATA3 / KRT5
+=================================================================
+  GATA3 present: True
+  KRT5  present: True
+  FOXA1 present: True
+
+  Luminal (GATA3-high/KRT5-low): n=123
+  Basal   (KRT5-high/GATA3-low): n=123
+  Normal  : 9
+
+  Separator validation:
+  GATA3 Luminal vs Basal: p=1.03e-10 ***
+  KRT5  Luminal vs Basal: p=6.53e-24 ***
+
+  Mean expression by subtype:
+  Gene        Normal   Luminal     Basal
+  GATA3      10.3956   11.5667   10.4595
+  KRT5        9.7044    8.9358   11.3104
+  KRT14       7.1178    7.5907    8.0033
+  FOXA1      11.9589   12.6706   11.9359
+  FGFR3      11.7900   12.9208   12.6798
+  EGFR        7.9533    8.1616    8.1524
+  TP63       11.2944   11.2120   11.0630
+  UPK2       10.6944   11.9210   10.0520
+
+  Final group counts:
+    Basal: 123
+    Luminal: 123
+    Normal: 9
+    Unknown: 1
+
+=================================================================
+GROUP SUMMARY
+=================================================================
+  Normal      : 9
+  Luminal     : 123
+  Basal       : 123
+
+=================================================================
+FOLD CHANGE ANALYSIS
+vs Normal urothelium
+=================================================================
+
+  Normal n=9
+  Luminal n=123
+  Basal n=123
+
+  LUMINAL vs NORMAL:
+  Gene            Normal   Luminal       FC%  p-value
+  ------------------------------------------------------------
+  UPK1B          11.9722   11.6329     -2.8%  p=0.2316  ns  switch-DOWN
+  UPK2           10.6944   11.9210    +11.5%  p=0.0534  ns  switch-DOWN
+  UPK3A          10.6889   10.2441     -4.2%  p=0.2668  ns  switch-DOWN
+  CLDN3           8.3178    9.0925     +9.3%  p=0.0636  ns  switch-DOWN
+  FGFR3          11.7900   12.9208     +9.6%  p=7.53e-03  **  FA-UP
+  ERBB2           7.8067    8.1890     +4.9%  p=1.31e-03  **  FA-UP
+  CCND1          13.2622   13.4543     +1.4%  p=0.2727  ns  FA-UP
+  GATA3          10.3956   11.5667    +11.3%  p=1.31e-03  **  FA-UP
+  FOXA1          11.9589   12.6706     +6.0%  p=0.4729  ns  FA-UP
+  PPARG          10.5656   11.7485    +11.2%  p=5.04e-05 ***  FA-UP
+  CDH1            7.8167    7.9567     +1.8%  p=0.4869  ns  FA-UP
+  KRT20           8.5244   10.5109    +23.3%  p=4.15e-03  **  FA-UP
+  EZH2            7.4089    8.3473    +12.7%  p=1.27e-04 ***  epigenetic
+  HDAC1          12.6300   13.0035     +3.0%  p=9.19e-03  **  epigenetic
+  KDM6A           9.6111    9.4698     -1.5%  p=0.3960  ns  epigenetic
+  NOTCH1         11.6867   10.9947     -5.9%  p=8.49e-03  **  CC-5
+  CDX2            7.4822    7.9545     +6.3%  p=0.0171   *  CC-4
+  TP63           11.2944   11.2120     -0.7%  p=0.4062  ns  CC-1
+  TACSTD2         7.1378    7.2497     +1.6%  p=0.1089  ns  drug-sacituzumab
+  CD274           7.0978    7.0704     -0.4%  p=0.1011  ns  checkpoint
+
+  BASAL vs NORMAL:
+  Gene            Normal     Basal       FC%  p-value
+  ------------------------------------------------------------
+  GATA3          10.3956   10.4595     +0.6%  p=0.6812  ns  switch-DOWN
+  FOXA1          11.9589   11.9359     -0.2%  p=0.3986  ns  switch-DOWN
+  CDH1            7.8167    7.8523     +0.5%  p=0.8425  ns  switch-DOWN
+  KRT5            9.7044   11.3104    +16.5%  p=2.57e-03  **  FA-UP
+  KRT14           7.1178    8.0033    +12.4%  p=0.0146   *  FA-UP
+  EGFR            7.9533    8.1524     +2.5%  p=0.1728  ns  FA-UP
+  MYC             9.8600   10.3558     +5.0%  p=0.2298  ns  FA-UP
+  CD44           12.4300   11.9582     -3.8%  p=0.0738  ns  FA-UP
+  VIM            13.6933   11.8486    -13.5%  p=1.14e-03  **  FA-UP
+  ZEB1            7.6333    7.3561     -3.6%  p=8.83e-03  **  FA-UP
+  TP63           11.2944   11.0630     -2.0%  p=0.5245  ns  CC-1-UP
+  S100A8          9.2022   10.9854    +19.4%  p=0.0545  ns  FA-UP
+  SNAI1           7.8122    7.8458     +0.4%  p=0.9892  ns  EMT
+  SNAI2           9.1733    8.4740     -7.6%  p=0.0152   *  EMT
+  TWIST1          8.4244    7.9521     -5.6%  p=0.0224   *  EMT
+  EZH2            7.4089    8.1764    +10.4%  p=2.18e-04 ***  epigenetic
+  HDAC1          12.6300   12.9257     +2.3%  p=0.0144   *  epigenetic
+  KDM6A           9.6111    9.2685     -3.6%  p=0.0775  ns  epigenetic
+  ZEB2           10.5844    8.8358    -16.5%  p=1.37e-03  **  EMT/ZEB
+  AURKA           7.8811    9.4098    +19.4%  p=1.09e-04 ***  mitotic
+  TACSTD2         7.1378    7.1798     +0.6%  p=0.5420  ns  drug-sacituzumab
+  CD274           7.0978    7.0930     -0.1%  p=0.2227  ns  checkpoint
+  BCL2            9.0689    7.8980    -12.9%  p=1.32e-05 ***  drug-venetoclax
+  NOTCH1         11.6867   11.4667     -1.9%  p=0.2144  ns  CC-5
+  CDX2            7.4822    7.6006     +1.6%  p=0.6004  ns  CC-4
+
+=================================================================
+DEPTH SCORES
+=================================================================
+  Luminal depth:
+  Luminal (n=123): mean=0.5108 std=0.1603 sw=['UPK1B', 'UPK2', 'UPK3A', 'CLDN3'] fa=['FGFR3', 'ERBB2', 'CCND1', 'GATA3', 'FOXA1', 'PPARG']
+  Basal depth:
+  Basal (n=123): mean=0.4012 std=0.1430 sw=['GATA3', 'FOXA1', 'CDH1'] fa=['KRT5', 'KRT14', 'EGFR', 'MYC', 'CD44', 'VIM']
+
+=================================================================
+DEPTH CORRELATIONS — LUMINAL
+=================================================================
+
+  TOP 15 POSITIVE (UP in deep LUMINAL):
+  Gene                r  p-value
+  ----------------------------------------
+  CCND1         +0.7019  p=1.51e-19 ***
+  FGFR3         +0.6974  p=3.19e-19 ***
+  SMAD3         +0.5357  p=1.71e-10 ***
+  KRT19         +0.4801  p=1.91e-08 ***
+  TP63          +0.4676  p=4.95e-08 ***
+  JAG1          +0.4621  p=7.42e-08 ***
+  HRAS          +0.3937  p=6.62e-06 ***
+  SOX2          +0.3870  p=9.77e-06 ***
+  NOTCH1        +0.3859  p=1.05e-05 ***
+  CA9           +0.3663  p=3.10e-05 ***
+  IVL           +0.3461  p=8.80e-05 ***
+  SMAD2         +0.3379  p=1.33e-04 ***
+  AXIN1         +0.3356  p=1.48e-04 ***
+  GATA3         +0.3355  p=1.48e-04 ***
+  TGFB1         +0.3258  p=2.36e-04 ***
+
+  TOP 15 NEGATIVE (DOWN in deep LUMINAL):
+  Gene                r  p-value
+  ----------------------------------------
+  CDKN2B        -0.5749  p=3.56e-12 ***
+  CLDN3         -0.5552  p=2.66e-11 ***
+  UPK3A         -0.5207  p=6.66e-10 ***
+  CDKN2A        -0.4902  p=8.66e-09 ***
+  UPK1B         -0.4553  p=1.21e-07 ***
+  ALDH1A1       -0.4512  p=1.63e-07 ***
+  PCNA          -0.4482  p=2.01e-07 ***
+  VIM           -0.4445  p=2.60e-07 ***
+  NOTCH2        -0.4202  p=1.31e-06 ***
+  MSH6          -0.4076  p=2.89e-06 ***
+  UPK2          -0.3936  p=6.66e-06 ***
+  MSH2          -0.3771  p=1.72e-05 ***
+  CDKN1B        -0.3731  p=2.13e-05 ***
+  BCL2          -0.3724  p=2.22e-05 ***
+  UPK1A         -0.3712  p=2.37e-05 ***
+
+=================================================================
+DEPTH CORRELATIONS — BASAL
+=================================================================
+
+  TOP 15 POSITIVE (UP in deep BASAL):
+  Gene                r  p-value
+  ----------------------------------------
+  TWIST1        +0.7424  p=8.70e-23 ***
+  CDK6          +0.5863  p=1.04e-12 ***
+  FN1           +0.5666  p=8.43e-12 ***
+  ZEB2          +0.5608  p=1.52e-11 ***
+  SNAI1         +0.5549  p=2.74e-11 ***
+  VIM           +0.5274  p=3.67e-10 ***
+  KRT14         +0.5043  p=2.73e-09 ***
+  MYC           +0.4994  p=4.10e-09 ***
+  CDH2          +0.4965  p=5.19e-09 ***
+  ZEB1          +0.4610  p=8.03e-08 ***
+  S100A8        +0.4592  p=9.19e-08 ***
+  MCL1          +0.4564  p=1.12e-07 ***
+  DSG3          +0.4487  p=1.94e-07 ***
+  FGFR1         +0.4304  p=6.73e-07 ***
+  ALDH1A1       +0.3518  p=6.59e-05 ***
+
+  TOP 15 NEGATIVE (DOWN in deep BASAL):
+  Gene                r  p-value
+  ----------------------------------------
+  GATA3         -0.8819  p=2.54e-41 ***
+  FOXA1         -0.8411  p=4.41e-34 ***
+  PPARG         -0.7928  p=8.57e-28 ***
+  KRT8          -0.7156  p=1.41e-20 ***
+  ERBB3         -0.7144  p=1.74e-20 ***
+  KRT19         -0.6756  p=1.02e-17 ***
+  KRT7          -0.6752  p=1.09e-17 ***
+  HES1          -0.6712  p=1.98e-17 ***
+  FGFR3         -0.6442  p=9.09e-16 ***
+  KRT13         -0.6218  p=1.65e-14 ***
+  UPK2          -0.5992  p=2.46e-13 ***
+  CLDN7         -0.5655  p=9.44e-12 ***
+  SMAD3         -0.5579  p=2.04e-11 ***
+  UPK1B         -0.5540  p=2.98e-11 ***
+  TP63          -0.5450  p=7.16e-11 ***
+
+=================================================================
+PREDICTION TESTS
+=================================================================
+
+  Pred     Gene       Subtype           r  p-value        Threshold  Result
+  ------------------------------------------------------------------------
+  L-D1     FGFR3      Luminal     +0.6974  p=3.19e-19 ***        ≥0.5  ✓
+  L-D2     PPARG      Luminal     +0.1516    p=0.0942  ns        ≥0.4  ✗
+  L-D3     UPK2       Luminal     -0.3936  p=6.66e-06 ***        ≤0.0  ✓
+  L-D4     CDKN1A     Luminal     +0.1116    p=0.2193  ns       ≤-0.4  ✗
+  B-D1     KRT5       Basal       -0.2197    p=0.0146   *        ≥0.6  ✗
+  B-D2     EGFR       Basal       +0.2844  p=1.43e-03  **        ≥0.4  ✗
+  B-D3     GATA3      Basal       -0.8819  p=2.54e-41 ***       ≤-0.5  ✓
+  B-D4     TP63       Basal       -0.5450  p=7.16e-11 ***        ≥0.5  ✗
+  EP-1     EZH2       Luminal     -0.0981    p=0.2806  ns        ≥0.3  ✗
+  EP-2     HDAC1      Luminal     +0.0843    p=0.3538  ns        ≥0.3  ✗
+  EP-4     KDM6A      Luminal     +0.1294    p=0.1538  ns       ≤-0.4  ✗
+  W-1      APC        Luminal     +0.2636  p=3.22e-03  **       ≤-0.3  ✗
+  W-2      AXIN2      Luminal     -0.2307    p=0.0103   *        ≥0.0  ✗
+  CC-1-L   TP63       Luminal     +0.4676  p=4.95e-08 ***       ≥-0.1  ✓
+  CC-3     KDM6A      Basal       -0.2419  p=7.02e-03  **       ≤-0.4  ✗
+
+  L-D5: FGFR3+CCND1 combined vs FGFR3 alone
+  r(FGFR3)        = +0.6974
+  r(FGFR3+CCND1)  = +0.7466
+  L-D5 CONFIRMED ✓
+
+  EP-3: EZH2+HDAC1 combined vs individual
+  r(EZH2)          = -0.0981
+  r(HDAC1)         = +0.0843
+  r(EZH2+HDAC1)    = -0.0250
+  EP-3 NOT CONFIRMED ✗
+
+  B-D5: ZEB2-AURKA coupling in basal BLCA
+  STAD reference: r=+0.9871
+  EAC reference:  r=+0.4675
+  Prediction:     r=0.55–0.75
+  r(ZEB2,AURKA) basal = -0.4289  p=7.44e-07 ***
+  B-D5 NOT CONFIRMED ✗
+
+  CC-4: CDX2 in BLCA (predicted absent/flat)
+  Luminal: CDX2 mean=7.9545 r=-0.2001  p=0.0265   *
+  Basal: CDX2 mean=7.6006 r=-0.1718  p=0.0574  ns
+
+  CC-5: NOTCH1 in BLCA (predicted UP — epithelial rule)
+  Luminal: NOTCH1 mean=10.9947
+  Basal: NOTCH1 mean=11.4667
+
+=================================================================
+CLINICAL PANEL DERIVATION
+3-gene IHC-deployable panels
+Predicted before data:
+  LUMINAL: FGFR3(+)/GATA3(+)/UPK2(-)
+  BASAL:   KRT5(+)/EGFR(+)/GATA3(-)
+=================================================================
+
+  LUMINAL PANEL DERIVATION:
+  Top positive (IHC elevated):
+  Gene              r  p-value
+  CCND1       +0.7019  p=1.51e-19 ***
+  FGFR3       +0.6974  p=3.19e-19 ***
+  SMAD3       +0.5357  p=1.71e-10 ***
+  KRT19       +0.4801  p=1.91e-08 ***
+  TP63        +0.4676  p=4.95e-08 ***
+  Top negative (IHC suppressed):
+
+  PREDICTED PANEL: [('FGFR3', '+'), ('GATA3', '+'), ('UPK2', '-')]
+  Available: [('FGFR3', '+'), ('GATA3', '+'), ('UPK2', '-')]
+  Panel r with depth = +0.8110  p=6.05e-30 ***
+
+  DATA-DRIVEN PANEL:
+  Top 3 positive: ['CCND1', 'FGFR3', 'SMAD3']
+  Top 3 negative: []
+  Data panel r = +0.7466  p=3.69e-23 ***
+
+  BASAL PANEL DERIVATION:
+  Top positive (IHC elevated):
+  Gene              r  p-value
+  TWIST1      +0.7424  p=8.70e-23 ***
+  CDK6        +0.5863  p=1.04e-12 ***
+  FN1         +0.5666  p=8.43e-12 ***
+  ZEB2        +0.5608  p=1.52e-11 ***
+  SNAI1       +0.5549  p=2.74e-11 ***
+  Top negative (IHC suppressed):
+
+  PREDICTED PANEL: [('KRT5', '+'), ('EGFR', '+'), ('GATA3', '-')]
+  Available: [('KRT5', '+'), ('EGFR', '+'), ('GATA3', '-')]
+  Panel r with depth = +0.6605  p=9.48e-17 ***
+
+  DATA-DRIVEN PANEL:
+  Top 3 positive: ['TWIST1', 'CDK6', 'FN1']
+  Top 3 negative: []
+  Data panel r = +0.7744  p=8.13e-26 ***
+
+=================================================================
+ZEB2-AURKA CROSS-CANCER TEST
+STAD r=+0.9871 | EAC r=+0.4675
+Basal BLCA prediction: r=0.55-0.75
+=================================================================
+  Normal (n=9): r(ZEB2,AURKA)=-0.2274  p=0.5562  ns
+  Luminal (n=123): r(ZEB2,AURKA)=-0.3588  p=4.60e-05 ***
+  Basal (n=123): r(ZEB2,AURKA)=-0.4289  p=7.44e-07 ***
+
+=================================================================
+PARSE SURVIVAL — SOFT FILE
+  File: ./blca_false_attractor/GSE13507_family.soft.gz
+=================================================================
+  Sample records: 256
+  Characteristic keys:
+    'age': 8-weeks
+    'biological source': normal bladder mucosae
+    'cancer specific survival': survival
+    'cell type': Multipotent Progenitor Cells (MPPs)
+    'cre-driver': Vav-CRE
+    'genotype': Wild-type
+    'grade': low
+    'indexes': CGTCGCT
+    'intravesical therapy': Yes
+    'invasiveness': non-muscle invasive
+    'overall survival': death
+    'progression': No
+    'recurrence': Yes
+    'sex': M
+    'stage': T1N0M0
+    'strain': C57BL/6
+    'survival month': 18.17
+    'systemic chemo': No
+
+  OS time found  : 165
+  OS event found : 0
+  Time range: 1.0–137.0
+  Mapped: time=165 event=0
+
+=================================================================
+SURVIVAL ANALYSIS — LUMINAL
+=================================================================
+  n=123, valid survival=0
+  Insufficient survival data
+
+=================================================================
+SURVIVAL ANALYSIS — BASAL
+=================================================================
+  n=123, valid survival=0
+  Insufficient survival data
+
+--- Generating Script 1 figure ---
+
+  Figure saved: ./blca_false_attractor/results_s1/blca_gse13507_s1.png

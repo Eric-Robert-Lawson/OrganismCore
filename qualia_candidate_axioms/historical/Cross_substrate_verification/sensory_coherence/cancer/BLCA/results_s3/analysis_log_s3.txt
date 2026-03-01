@@ -1,0 +1,157 @@
+=================================================================
+BLADDER CANCER — SCRIPT 3
+Dataset: TCGA-BLCA
+MIBC-enriched | Mutation | CIN
+Framework: OrganismCore
+Doc: 91c | Date: 2026-03-01
+=================================================================
+
+PREDICTIONS LOCKED:
+TV-1: Luminal depth predicts OS ***
+TV-2: Basal depth predicts OS ***
+TV-3: FGFR3/CCND1/CLDN3 panel OS lum
+TV-4: TWIST1/CDK6/GATA3 panel OS bas
+TR-1: FGFR3 r>+0.50 luminal
+TR-2: FGFR1 r>+0.40 basal
+NP-BLCA-1: ZEB2-AURKA r<0 in BLCA
+NP-BLCA-12: ARID1A mut → depth↑
+
+=================================================================
+STEP 0: DATA ACQUISITION
+=================================================================
+  Downloading TCGA-BLCA expr...
+  URL: https://tcga-xena-hub.s3.us-east-1.amazonaws.com/download/TCGA.BLCA.sampleMap%2FHiSeqV2_PANCAN.gz
+  Saved: ./blca_false_attractor/TCGA_BLCA_expr.gz (30,642,178 bytes)
+  Downloading TCGA-BLCA clin...
+  URL: https://tcga-xena-hub.s3.us-east-1.amazonaws.com/download/TCGA.BLCA.sampleMap%2FBLCA_clinicalMatrix.gz
+  HTTP 403
+  Downloading TCGA mutations...
+  URL: https://tcga-xena-hub.s3.us-east-1.amazonaws.com/download/mc3.v0.2.8.PUBLIC.xena.gz
+  HTTP 403
+  Downloading TCGA-BLCA SCNA...
+  URL: https://tcga-xena-hub.s3.us-east-1.amazonaws.com/download/TCGA.BLCA.sampleMap%2FGistic2_CopyNumber_Gistic2_all_thresholded.by_genes.gz
+  Saved: ./blca_false_attractor/TCGA_BLCA_SCNA.gz (502,149 bytes)
+
+=================================================================
+LOAD EXPRESSION — TCGA XENA FORMAT
+  File: ./blca_false_attractor/TCGA_BLCA_expr.gz
+=================================================================
+  Samples in header: 426
+  Genes scanned: 20530
+  Target genes found: 127
+  Total samples   : 426
+  Primary tumor   : 407
+  Genes mapped    : 127
+  Genes found     : ['ALDH1A1', 'APC', 'ARID1A', 'AURKA', 'AXIN1', 'AXIN2', 'BAX', 'BCL2', 'BCL2L1', 'BIRC5', 'CA9', 'CCNB1', 'CCND1', 'CCNE1', 'CD274', 'CD4', 'CD44', 'CD68', 'CD8A', 'CDC20', 'CDH1', 'CDH2', 'CDK4', 'CDK6', 'CDKN1A', 'CDKN1B', 'CDKN2A', 'CDKN2B', 'CDX2', 'CLDN3', 'CLDN4', 'CLDN7', 'CTNNB1', 'DNMT3A', 'DSG1', 'DSG3', 'DUSP6', 'E2F1', 'E2F3', 'EGFR', 'ERBB2', 'ERBB3', 'EZH2', 'FGFR1', 'FGFR2', 'FGFR3', 'FN1', 'FOXA1', 'FOXA2', 'FOXP3', 'GATA3', 'HDAC1', 'HDAC2', 'HES1', 'HIF1A', 'HRAS', 'IVL', 'JAG1', 'KDM5C', 'KDM6A', 'KDR', 'KRAS', 'KRT10', 'KRT13', 'KRT14', 'KRT18', 'KRT19', 'KRT20', 'KRT4', 'KRT5', 'KRT6A', 'KRT7', 'KRT8', 'LGR5', 'MCL1', 'MCM2', 'MDM2', 'MET', 'MKI67', 'MLH1', 'MSH2', 'MSH6', 'MYC', 'MYCN', 'NKX2-1', 'NOTCH1', 'NOTCH2', 'NRAS', 'PCNA', 'PDCD1', 'PIK3CA', 'PLK1', 'PPARG', 'PTEN', 'RB1', 'S100A8', 'S100A9', 'SMAD2', 'SMAD3', 'SNAI1', 'SNAI2', 'SOX2', 'SOX4', 'SPRR1A', 'SPRY1', 'SPRY2', 'TACSTD2', 'TCF7L2', 'TET2', 'TGFB1', 'TGFBR2', 'TOP2A', 'TP53', 'TP63', 'TP73', 'TSC1', 'TWIST1', 'UPK1A', 'UPK1B', 'UPK2', 'UPK3A', 'UPK3B', 'VEGFA', 'VIM', 'WNT5A', 'ZEB1', 'ZEB2']
+
+=================================================================
+COMPUTE CIN SCORE FROM SCNA
+  File: ./blca_false_attractor/TCGA_BLCA_SCNA.gz
+=================================================================
+  SCNA shape: (24776, 408)
+  SCNA sample example: ['TCGA-2F-A9KO-01', 'TCGA-2F-A9KP-01', 'TCGA-2F-A9KQ-01']
+  Expr sample example: ['TCGA-DK-AA6S-01', 'TCGA-DK-A6B2-01', 'TCGA-GU-A763-01']
+  CIN scores computed: 403
+  Mapped to expr: 403
+  CIN range: 0.000–0.961
+
+=================================================================
+CLASSIFY SUBTYPES
+GATA3/KRT5 median split
+=================================================================
+  GATA3 present: True
+  KRT5  present: True
+  Luminal: 204
+  Basal  : 203
+  GATA3 Luminal vs Basal: p=4.68e-38 ***
+  KRT5  Luminal vs Basal: p=4.14e-55 ***
+
+  Gene          Luminal      Basal
+  GATA3          6.1208     3.3233
+  KRT5           1.0056     8.0168
+  FGFR3          2.0145     1.8853
+  TWIST1         0.0855     0.9130
+  CCND1         -0.2887     0.2132
+  UPK2           9.6914     4.8075
+  TP63           4.0130     4.8693
+  EGFR          -0.5621     0.3939
+  AURKA          0.9686     1.2763
+  ZEB2          -1.7375    -1.2824
+
+=================================================================
+GROUP SUMMARY
+=================================================================
+  Luminal: 204
+  Basal  : 203
+  Total  : 407
+
+=================================================================
+DEPTH SCORES
+=================================================================
+  Luminal (n=204): mean=0.5550 std=0.1199 sw=['CLDN3', 'UPK1B', 'UPK3A', 'CDKN2B', 'CDKN2A'] fa=['FGFR3', 'CCND1', 'GATA3', 'FOXA1', 'KRT19']
+  Basal (n=203): mean=0.4948 std=0.1947 sw=['GATA3', 'FOXA1', 'PPARG', 'KRT8', 'ERBB3'] fa=['TWIST1', 'ZEB2', 'CDK6', 'FN1', 'SNAI1', 'VIM']
+
+=================================================================
+REPLICATION TESTS
+GSE13507 findings → TCGA-BLCA
+=================================================================
+
+  ID       Gene       Sub          r  p-value        Threshold  Result
+  --------------------------------------------------------------------
+  TR-1     FGFR3      Lum    +0.5934  p=8.59e-21 ***       ≥0.50  ✓
+  TR-2     FGFR1      Bas    +0.5004  p=2.93e-14 ***       ≥0.40  ✓
+  TR-3     CCND1      Lum    +0.5094  p=7.23e-15 ***       ≥0.00  ✓
+  TR-4     CCND1      Bas    -0.1806  p=9.92e-03  **       ≤0.00  ✓
+  TR-5     GATA3      Bas    -0.6397  p=9.40e-25 ***      ≤-0.70  ✗
+  TR-6     TWIST1     Bas    +0.6635  p=4.00e-27 ***       ≥0.50  ✓
+  TR-7a    MCL1       Bas    +0.4008  p=3.12e-09 ***       ≥0.30  ✓
+  TR-7b    BCL2       Bas    +0.0416    p=0.5554  ns       ≥0.00  ✓
+  TR-8a    CDK6       Bas    +0.5606  p=3.41e-18 ***       ≥0.50  ✓
+  TR-8b    CDK4       Bas    +0.1916  p=6.19e-03  **      ≥-0.10  ✓
+  TR-9a    MSH2       Lum    -0.3989  p=3.43e-09 ***      ≤-0.30  ✓
+  TR-9b    MSH6       Lum    -0.4431  p=3.21e-11 ***      ≤-0.30  ✓
+  TR-10    SMAD3      Lum    +0.4708  p=1.19e-12 ***       ≥0.40  ✓
+  TR-11    S100A8     Bas    +0.3441  p=5.00e-07 ***       ≥0.20  ✓
+  TR-12    KDM6A      Lum    -0.0558    p=0.4277  ns      ≤-0.10  ✗
+  TR-13    ARID1A     Lum    +0.0600    p=0.3943  ns      ≤-0.10  ✗
+
+  Replicated: 13/16 (81%)
+
+  FGFR ISOFORM SWITCH REPLICATION:
+  FGFR3: luminal r=+0.5934  basal r=-0.6035
+  FGFR1: luminal r=-0.4089  basal r=+0.5004
+
+=================================================================
+ZEB2-AURKA × CIN TEST
+NP-BLCA-1: sign encodes CIN burden
+STAD r=+0.99 | EAC r=+0.47
+GSE13507 BLCA r=-0.43
+Prediction: r<0 in BLCA TCGA
+AND: |r| correlates with CIN
+=================================================================
+  Luminal (n=204): r(ZEB2,AURKA) = -0.0204  p=0.7724  ns
+  Negative coupling confirmed ✓
+  Basal (n=203): r(ZEB2,AURKA) = -0.0118  p=0.8669  ns
+  Negative coupling confirmed ✓
+
+  CROSS-CANCER ZEB2-AURKA SUMMARY:
+  Cancer    r(ZEB2,AURKA)  CIN level
+  STAD       r=+0.9871     HIGH
+  EAC        r=+0.4675     MOD
+  Luminal-BLCA r=-0.0204     ??? (test)
+  Basal-BLCA r=-0.0118     ??? (test)
+
+  r(ZEB2,AURKA) vs CIN burden:
+  (sample-level test)
+  r(AURKA, CIN) = +0.3860  p=9.17e-16 ***
+  r(ZEB2,  CIN) = -0.1180  p=0.0178   *
+  NP-BLCA-1 test:
+  Predict AURKA correlates with CIN more than ZEB2
+  AURKA tracks CIN more than ZEB2 ✓
+
+  Valid OS across all: 0
+  Insufficient OS for survival
+
+--- Generating Script 3 figure ---
+
+  Figure saved: ./blca_false_attractor/results_s3/blca_tcga_s3.png

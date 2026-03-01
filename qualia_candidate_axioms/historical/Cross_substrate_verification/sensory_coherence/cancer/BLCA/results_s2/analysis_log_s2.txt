@@ -1,0 +1,309 @@
+=================================================================
+BLADDER CANCER — SCRIPT 2
+Dataset: GSE13507
+Fixes: Event parser + Updated panels
+New: Survival + Biology validation
+Framework: OrganismCore
+Doc: 91b | Date: 2026-03-01
+=================================================================
+
+PREDICTIONS LOCKED:
+SV-1: Luminal depth predicts OS
+SV-2: Basal depth predicts OS
+SV-3: FGFR3/CCND1/CLDN3 panel OS lum
+SV-4: TWIST1/CDK6/GATA3 panel OS bas
+SV-5: Basal depth predicts CSS
+S2-B1: FGFR3>FGFR1 in luminal
+S2-B2: FGFR1>FGFR3 in basal
+S2-B3: MCL1>BCL2 in basal depth
+S2-B4: CDK6>CDK4 in basal depth
+S2-B5: MSH2/MSH6 r<-0.35 luminal
+S2-B6: SMAD3 r>+0.45 luminal
+S2-B7: KRT20+CDX2 correlated luminal
+  Using GPL: ./blca_false_attractor/GPL6102.annot.gz
+  Probes: 182  Genes: 126
+
+=================================================================
+PARSE SERIES MATRIX
+=================================================================
+  Samples: 256  Probes: 130
+  Genes: 125
+  Group counts:
+    Basal: 123
+    Luminal: 123
+    Normal: 9
+    Unknown: 1
+
+=================================================================
+GROUP SUMMARY
+=================================================================
+  Normal      : 9
+  Luminal     : 123
+  Basal       : 123
+
+=================================================================
+PARSE SURVIVAL — FIXED EVENT PARSER
+'overall survival': death → 1
+'overall survival': survival → 0
+'cancer specific survival': same
+=================================================================
+  Sample records: 256
+  OS  time  : 165
+  OS  event : 165
+  CSS event : 165
+  Stage     : 165
+  Grade     : 165
+  Invasiveness: 165
+  OS time range: 1.0–137.0 mo
+  OS events: 69 deaths, 96 alive
+
+  Valid OS (time+event): 165
+
+  Stage breakdown:
+    T1N0M0: 80
+    TaN0M0: 23
+    T2N0M0: 22
+    T3bN0M0: 6
+    T3aN0M0: 4
+    T4N0M0: 4
+    T3N1M0: 3
+    T2aN0M0: 3
+    T3N0M0: 3
+    T2N1M1: 2
+    T2N2M0: 2
+    T4aN0M0: 2
+    T3bN2M0: 1
+    T4N2M1: 1
+    T4N1M1: 1
+    T2N1M0: 1
+    T2bN0M0: 1
+    T3aN2M1: 1
+    TaN3M1: 1
+    T4N0M1: 1
+    T4N1M0: 1
+    T3NxM0: 1
+    T4N2M0: 1
+
+  Grade breakdown:
+    low: 105
+    high: 60
+
+  Invasiveness breakdown:
+    non-muscle invasive: 103
+    muscle invasive: 62
+
+=================================================================
+DEPTH SCORES — UPDATED S2 PANELS
+=================================================================
+  Luminal depth (S2 panel):
+  Luminal (n=123): mean=0.5409 std=0.1823
+  Basal depth (S2 panel):
+  Basal (n=123): mean=0.3443 std=0.2074
+
+=================================================================
+S2 BIOLOGY TESTS
+=================================================================
+
+  S2-B1/B2: FGFR ISOFORM SWITCH
+  Prediction: FGFR3>FGFR1 luminal
+              FGFR1>FGFR3 basal
+  Gene      Luminal r    Basal r  Pred
+  FGFR3       +0.7755    -0.7647
+  FGFR1       -0.0599    +0.5648
+  FGFR3: luminal r=+0.7755  basal r=-0.7647
+  FGFR1: luminal r=-0.0599  basal r=+0.5648
+  S2-B1 CONFIRMED ✓ (FGFR3 r=+0.7755 > FGFR1 r=-0.0599 in luminal)
+  S2-B2 NOT CONFIRMED ✗
+
+  S2-B3: MCL1 vs BCL2 in BASAL
+  Prediction: MCL1 r > BCL2 r
+  MCL1     r=+0.5104  p=1.64e-09 ***
+  BCL2     r=+0.4353  p=4.86e-07 ***
+  BCL2L1   r=-0.1129  p=0.2138  ns
+  BAX      r=-0.0785  p=0.3883  ns
+  S2-B3 CONFIRMED ✓ (MCL1 r=+0.5104 > BCL2 r=+0.4353)
+
+  S2-B4: CDK6 vs CDK4 in BASAL
+  Prediction: CDK6 r > CDK4 r
+  CDK6     r=+0.6479  p=5.49e-16 ***
+  CDK4     r=-0.0565  p=0.5348  ns
+  CCND1    r=-0.6003  p=2.16e-13 ***
+  CCNE1    r=-0.1150  p=0.2053  ns
+  CCNB1    r=-0.2552  p=4.39e-03  **
+  S2-B4 CONFIRMED ✓ (CDK6 r=+0.6479 > CDK4 r=-0.0565)
+
+  S2-B5: MMR LOSS IN DEEP LUMINAL
+  Prediction: MSH2/MSH6 r<-0.35
+  MSH2     r=-0.4288  p=7.49e-07 ***  ✓
+  MSH6     r=-0.5211  p=6.46e-10 ***  ✓
+  MLH1     r=-0.2561  p=4.24e-03  **  ✗
+  MSH2     r=-0.4288  p=7.49e-07 ***  ✓
+
+  S2-B6: SMAD3/TGF-B IN DEEP LUMINAL
+  Prediction: SMAD3 r>+0.45
+  SMAD3    r=+0.5970  p=3.15e-13 ***  ✓
+  SMAD2    r=+0.2900  p=1.14e-03  **  ✗
+  TGFB1    r=+0.3352  p=1.50e-04 ***  trend
+  TGFBR2   r=-0.2716  p=2.38e-03  **  ✗
+
+  S2-B7: KRT20+CDX2 INTESTINAL AXIS
+  Cross-cancer: BLCA-EAC connection
+  KRT20    r=-0.3215  p=2.88e-04 ***
+  CDX2     r=-0.2804  p=1.68e-03  **
+  FOXA2    r=+0.1113  p=0.2205  ns
+  KRT7     r=+0.2870  p=1.29e-03  **
+  KRT8     r=+0.2609  p=3.56e-03  **
+
+  r(KRT20,CDX2) in luminal: +0.2840  p=1.46e-03  **
+  S2-B7 NOT CONFIRMED ✗
+
+  S2-B8: BASAL vs LUMINAL FC
+  Correct comparator for subtypes
+  Gene           Luminal     Basal       FC%  p-value
+  ----------------------------------------------------------
+  KRT5            8.9358   11.3104    +26.6%  p=6.53e-24 ***
+  KRT14           7.5907    8.0033     +5.4%  p=0.2798  ns
+  TWIST1          7.7413    7.9521     +2.7%  p=0.1592  ns
+  ZEB2            8.4046    8.8358     +5.1%  p=0.0355   *
+  VIM            11.4200   11.8486     +3.8%  p=0.0154   *
+  SNAI1           7.6985    7.8458     +1.9%  p=0.0375   *
+  CDK6            8.5929    9.2298     +7.4%  p=9.48e-07 ***
+  MYC             9.7104   10.3558     +6.6%  p=1.84e-04 ***
+  GATA3          11.5667   10.4595     -9.6%  p=1.03e-10 ***
+  FOXA1          12.6706   11.9359     -5.8%  p=1.90e-05 ***
+  PPARG          11.7485   10.9504     -6.8%  p=1.24e-09 ***
+  FGFR3          12.9208   12.6798     -1.9%  p=0.3505  ns
+  CCND1          13.4543   13.8909     +3.2%  p=0.0127   *
+  UPK2           11.9210   10.0520    -15.7%  p=2.93e-16 ***
+  ERBB2           8.1890    7.9345     -3.1%  p=4.35e-07 ***
+  ERBB3          11.2363   10.4222     -7.2%  p=3.76e-12 ***
+  KRT8           13.3595   12.9158     -3.3%  p=0.0718  ns
+  KRT19          15.1957   14.8599     -2.2%  p=0.3976  ns
+  TP63           11.2120   11.0630     -1.3%  p=0.7778  ns
+  EGFR            8.1616    8.1524     -0.1%  p=0.7984  ns
+  AURKA           9.7220    9.4098     -3.2%  p=0.0536  ns
+  MCL1            8.7134    8.8310     +1.3%  p=0.2020  ns
+  BCL2            7.7947    7.8980     +1.3%  p=0.1985  ns
+  EZH2            8.3473    8.1764     -2.0%  p=0.0933  ns
+  HDAC1          13.0035   12.9257     -0.6%  p=0.9307  ns
+  KDM6A           9.4698    9.2685     -2.1%  p=0.0100   *
+  SMAD3          11.6771   11.8415     +1.4%  p=0.0582  ns
+  NOTCH1         10.9947   11.4667     +4.3%  p=1.04e-04 ***
+
+=================================================================
+EPIGENETIC DEPTH TESTS
+EZH2+HDAC1 in BLCA (vs ESCA)
+=================================================================
+
+  LUMINAL:
+  EZH2     r=-0.2456  p=6.18e-03  **
+  HDAC1    r=+0.0351  p=0.7002  ns
+  KDM6A    r=+0.1475  p=0.1034  ns
+  ARID1A   r=-0.2356  p=8.72e-03  **
+  TET2     r=+0.0572  p=0.5294  ns
+  DNMT3A   r=+0.1487  p=0.1006  ns
+
+  EZH2+HDAC1 combined (LUMINAL):
+  r(EZH2)       = -0.2456
+  r(HDAC1)      = +0.0351
+  r(combined)   = -0.1655
+  Combined ≤ individual ✗
+
+  BASAL:
+  EZH2     r=-0.2437  p=6.60e-03  **
+  HDAC1    r=-0.3874  p=9.55e-06 ***
+  KDM6A    r=-0.1670  p=0.0648  ns
+  ARID1A   r=+0.0965  p=0.2884  ns
+  TET2     r=+0.1354  p=0.1353  ns
+  DNMT3A   r=-0.1072  p=0.2380  ns
+
+  EZH2+HDAC1 combined (BASAL):
+  r(EZH2)       = -0.2437
+  r(HDAC1)      = -0.3874
+  r(combined)   = -0.3667
+  Combined ≤ individual ✗
+
+=================================================================
+SURVIVAL — LUMINAL
+=================================================================
+  n=123
+  Valid OS : 86
+  Valid CSS: 86
+  OS range: 1.0–129.9 mo
+  Events: 38 / 86
+
+  Depth vs OS (median split):
+  Deep (n=43): mean=43.7 mo
+  Shallow (n=43): mean=45.4 mo
+  Log-rank: p=0.7314  ns
+  Depth does not predict OS ✗
+
+  Individual gene OS tests:
+  Gene          n_hi  n_lo  p-value
+  ---------------------------------------------
+  CDH2            44    42  p=0.0348   *
+  FOXA2           45    41  p=0.0300   *
+  KRT20           43    43  p=0.0166   *
+  NKX2-1          43    43  p=8.68e-03  **
+  S100A8          43    43  p=0.0197   *
+  SMAD3           43    43  p=0.0338   *
+  SNAI1           43    43  p=0.0321   *
+
+  Panel test: [('FGFR3', '+'), ('CCND1', '+'), ('CLDN3', '-')]
+  Available: [('FGFR3', '+'), ('CCND1', '+'), ('CLDN3', '-')]
+  Panel log-rank: p=0.7787  ns
+  Panel-high (n=43): mean=44.2 mo
+  Panel-low  (n=43): mean=44.8 mo
+  Panel does not predict OS ✗
+
+  CSS depth log-rank: p=0.5669  ns
+
+=================================================================
+SURVIVAL — BASAL
+=================================================================
+  n=123
+  Valid OS : 79
+  Valid CSS: 79
+  OS range: 2.1–137.0 mo
+  Events: 31 / 79
+
+  Depth vs OS (median split):
+  Deep (n=40): mean=39.3 mo
+  Shallow (n=39): mean=66.2 mo
+  Log-rank: p=0.1946  ns
+  Depth does not predict OS ✗
+
+  Individual gene OS tests:
+  Gene          n_hi  n_lo  p-value
+  ---------------------------------------------
+  AURKA           40    39  p=0.0106   *
+  CCNB1           40    39  p=0.0142   *
+  CD274           40    39  p=0.0300   *
+  CD4             40    39  p=0.0284   *
+  CDC20           40    39  p=4.31e-03  **
+  CDKN1B          40    39  p=0.0355   *
+  CDKN2B          40    39  p=0.0329   *
+  E2F1            40    39  p=4.75e-03  **
+  EZH2            40    39  p=0.0233   *
+  KDR             40    39  p=7.37e-03  **
+  KRT4            41    38  p=0.0191   *
+  MCM2            40    39  p=0.0235   *
+  MKI67           40    39  p=5.91e-03  **
+  PIK3CA          40    39  p=0.0160   *
+  S100A8          40    39  p=5.90e-04 ***
+  SNAI1           40    39  p=0.0317   *
+  TOP2A           40    39  p=4.97e-03  **
+  VEGFA           40    39  p=0.0497   *
+
+  Panel test: [('TWIST1', '+'), ('CDK6', '+'), ('GATA3', '-')]
+  Available: [('TWIST1', '+'), ('CDK6', '+'), ('GATA3', '-')]
+  Panel log-rank: p=0.4476  ns
+  Panel-high (n=40): mean=40.9 mo
+  Panel-low  (n=39): mean=64.6 mo
+  Panel does not predict OS ✗
+
+  CSS depth log-rank: p=1.91e-03  **
+
+--- Generating Script 2 figure ---
+
+  Figure saved: ./blca_false_attractor/results_s2/blca_gse13507_s2.png
