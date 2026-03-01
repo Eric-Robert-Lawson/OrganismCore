@@ -1,0 +1,265 @@
+=================================================================
+PROSTATE ADENOCARCINOMA
+FALSE ATTRACTOR ANALYSIS — SCRIPT 1
+Dataset: GSE32571
+Framework: OrganismCore
+Doc: 88a | Date: 2026-03-01
+=================================================================
+
+  PREDICTIONS LOCKED:
+  Switch: NKX3-1/FOXA1/KLK3/ACPP DOWN
+  FA:     ERG/EZH2/MKI67/HOXC6 UP
+  EZH2:   ELEVATED (4th solid cancer)
+  MYC:    ELEVATED
+  Gleason: high = deeper block
+  ERG:    bimodal (fusion+ vs fusion-)
+
+
+=== STEP 0: DATA ===
+=================================================================
+STEP 0: DATA ACQUISITION
+Dataset: GSE32571
+  59 PRAD tumors
+  39 matched benign prostate
+  Illumina HumanHT-12 microarray
+=================================================================
+  Found: GSE32571_non_normalized.txt.gz (39.8 MB) — reusing
+
+=== STEP 1: METADATA ===
+
+--- Fetching metadata ---
+  Loaded cache: 98 samples
+
+=== STEP 2: LOAD + NORMALIZE ===
+
+  Loading: GSE32571_non_normalized.txt.gz
+  Raw shape: (48652, 196)
+  Col sample: ['DKFZ_01', 'DKFZ_01.Detection.Pval', 'DKFZ_02', 'DKFZ_02.Detection.Pval']
+  Expression cols: 98
+  Pval cols      : 98
+  After detection filter: 38741 probes
+  log2 transformed
+  Quantile normalizing...
+  Normalized shape: (38741, 98)
+
+=== STEP 3: PROBE MAPPING ===
+
+--- Probe mapping (fast local) ---
+  Hard-coded map hits: 12/75
+  Trying GEO annotation table...
+  GEO brief: 0 probes
+  Total after GEO: 12
+  Trying annotation CSV...
+  Annot lines: 48137
+  Annot CSV: 31253
+  Total after CSV: 24161
+
+  Final probe→gene hits: 24161
+  Genes after dedup: 17155
+  Sample genes: ['EEF1A1', 'TPT1', 'RPS27', 'UBA52', 'LAIR1', 'ACTA2', 'MYH11', 'SLC7A5P2', 'RPS25', 'RPL41']
+
+  Target genes found: 61/64
+  Missing: ['ZEB1', 'MYCN', 'BUB1B']
+
+=== STEP 4: MERGE + CLASSIFY ===
+
+--- Merging with metadata ---
+  Meta IDs (first 5): ['DKFZ_01', 'DKFZ_02', 'DKFZ_03', 'DKFZ_04', 'DKFZ_05']
+  Expr cols (first 5): ['DKFZ_01', 'DKFZ_02', 'DKFZ_03', 'DKFZ_04', 'DKFZ_05']
+  TUMOR  : 59
+  NORMAL : 39
+  UNKNOWN: 0
+
+  Gleason distribution (tumor):
+    low: 32
+    high: 27
+
+=== STEP 5: SADDLE POINT ===
+
+=================================================================
+STEP 5: SADDLE POINT ANALYSIS
+PRAD TUMOR vs BENIGN PROSTATE
+=================================================================
+  TUMOR  : 59
+  NORMAL : 39
+
+  PREDICTIONS (locked before data):
+  Switch: NKX3-1/FOXA1/KLK3/ACPP DOWN
+  FA:     ERG/EZH2/MKI67/HOXC6 UP
+  Scaffold: MYC/AR elevated
+
+  Gene         Role         Normal     Tumor    Change          p-value
+  --------------------------------------------------------------------
+  NKX3-1       AR           9.7243   10.0470     +3.3%      p=0.0103   *
+  FOXA1        AR          11.7508   12.5018     +6.4%    p=2.21e-10 ***
+  KLK3         AR           8.8824    9.5126     +7.1%    p=2.38e-03  **
+  ACPP         SWITCH      13.2014   12.5171     -5.2%    p=1.49e-07 ***
+  KLK2         AR          11.2979   11.3073     +0.1%      p=0.4523  ns
+  MSMB         SWITCH      13.4236   12.2939     -8.4%    p=4.97e-08 ***
+  ERG          ERG          6.1651    6.3781     +3.5%    p=1.23e-07 ***
+  MKI67        PROG         6.0302    6.0953     +1.1%    p=8.47e-03  **
+  EZH2         EPIGEN       6.1602    6.3920     +3.8%    p=1.53e-06 ***
+  HOXC6        FA           7.2144    9.7163    +34.7%    p=2.28e-15 ***
+  AMACR        FA           7.0217    9.5538    +36.1%    p=5.39e-13 ***
+  EED          EPIGEN       6.2301    6.1546     -1.2%    p=2.22e-03  **
+  SUZ12        EPIGEN      10.3939   10.3420     -0.5%      p=0.3172  ns
+  KDM6A        EPIGEN       6.9875    6.9920     +0.1%      p=0.1919  ns
+  DNMT3A       EPIGEN       6.4369    6.2858     -2.3%    p=2.96e-06 ***
+  BMI1         EPIGEN       9.0669    8.7339     -3.7%    p=5.31e-05 ***
+  JARID2       EPIGEN       7.8296    7.9230     +1.2%      p=0.0147   *
+  AR           AR           7.9614    7.9268     -0.4%      p=0.4124  ns
+  TMPRSS2      AR          12.1690   12.3943     +1.9%      p=0.0660  ns
+  FKBP5        AR           9.4920    9.5329     +0.4%      p=0.1618  ns
+  STEAP2       AR          10.8460   11.2812     +4.0%    p=9.70e-04 ***
+  MYC          SCAFFOLD     8.5782    9.0543     +5.6%    p=2.22e-04 ***
+  CCND1        SCAFFOLD    12.0584   11.6529     -3.4%    p=3.02e-07 ***
+  CDK4         SCAFFOLD     8.6258    8.9635     +3.9%    p=2.54e-06 ***
+  CDK6         SCAFFOLD     7.4075    7.4607     +0.7%      p=0.1690  ns
+  RB1          SCAFFOLD     6.2941    6.3828     +1.4%      p=0.1381  ns
+  PTEN         SCAFFOLD    11.1489   10.5031     -5.8%    p=4.41e-09 ***
+  TP53         SCAFFOLD     6.5056    6.7555     +3.8%    p=1.27e-03  **
+  KRT8         LUMINAL      9.5813   10.0382     +4.8%    p=1.96e-06 ***
+  KRT18        LUMINAL      6.2097    6.4503     +3.9%    p=4.43e-04 ***
+  KRT19        LUMINAL     10.4240    9.4905     -9.0%    p=6.08e-08 ***
+  CDH1         LUMINAL     11.4603   11.9612     +4.4%    p=8.78e-07 ***
+  EPCAM        LUMINAL     10.7848   12.1831    +13.0%    p=3.28e-16 ***
+  HOXB13       LUMINAL      7.8715    8.3452     +6.0%    p=8.25e-06 ***
+  GATA2        LUMINAL      8.1178    8.6197     +6.2%    p=2.77e-05 ***
+  GATA3        LUMINAL      6.8551    6.3241     -7.7%    p=5.76e-12 ***
+  KRT5         BASAL        8.3378    6.9135    -17.1%    p=3.22e-15 ***
+  KRT14        BASAL        7.7996    6.8426    -12.3%    p=3.33e-09 ***
+  TP63         BASAL        8.5355    7.0899    -16.9%    p=1.92e-16 ***
+  CD44         BASAL       10.7789   10.4575     -3.0%      p=0.0114   *
+  ITGA6        BASAL        6.4451    6.4395     -0.1%      p=0.4509  ns
+  NGFR         BASAL        6.1655    6.1114     -0.9%      p=0.0414   *
+  VIM          EMT         10.9235   10.5674     -3.3%    p=3.28e-03  **
+  CDH2         EMT          7.7007    6.9743     -9.4%    p=9.95e-08 ***
+  SNAI1        EMT          5.9262    5.8966     -0.5%      p=0.0759  ns
+  SNAI2        EMT          7.8553    7.0058    -10.8%    p=3.43e-10 ***
+  TWIST1       EMT          6.8395    7.4480     +8.9%    p=6.79e-10 ***
+  FN1          EMT          5.8751    5.8989     +0.4%      p=0.2651  ns
+  ETV1         ERG          5.8828    5.9137     +0.5%      p=0.2783  ns
+  ETV4         ERG          6.4781    6.5034     +0.4%    p=2.60e-05 ***
+  ETV5         ERG          8.3063    7.6875     -7.4%    p=8.90e-09 ***
+  SPDEF        ERG         10.2335   11.1153     +8.6%    p=5.37e-11 ***
+  CHGA         NE           7.0877    7.0817     -0.1%    p=1.80e-03  **
+  SYP          NE           6.1331    6.3382     +3.3%    p=1.01e-04 ***
+  ENO2         NE           8.2130    7.5283     -8.3%    p=5.29e-10 ***
+  NCAM1        NE           6.9565    6.4603     -7.1%    p=3.76e-10 ***
+  AURKA        PROG         6.6801    7.0552     +5.6%    p=1.92e-07 ***
+  SOX2         NE           6.4002    6.2245     -2.7%    p=1.45e-05 ***
+  PCNA         PROG         8.2535    8.1787     -0.9%      p=0.2783  ns
+  TOP2A        PROG         6.5040    7.0320     +8.1%    p=2.25e-06 ***
+  PLK1         PROG         6.4576    6.4969     +0.6%      p=0.4138  ns
+
+  Saved: saddle_results.csv
+
+=== STEP 6: DEPTH SCORING ===
+
+=================================================================
+STEP 6: BLOCK DEPTH SCORING
+Score = switch suppression + FA elevation
+=================================================================
+  Component 1: switch suppression ['NKX3-1', 'FOXA1', 'KLK3', 'ACPP', 'KLK2', 'MSMB']
+  Component 2: FA elevation ['ERG', 'MKI67', 'EZH2', 'HOXC6', 'AMACR']
+
+  Block depth (59 tumors):
+    Mean  : 0.4180
+    Median: 0.4055
+    Std   : 0.1231
+    Min   : 0.1394
+    Max   : 0.7596
+
+  Depth by Gleason:
+    high   (n= 27): 0.4616 ± 0.1320
+    low    (n= 32): 0.3812 ± 0.1033
+
+  High > Low Gleason depth: p=0.0024
+  Prediction: high Gleason = deeper
+  Result: CONFIRMED
+
+  Depth correlations (top 20):
+  Gene                r  p-value  Role
+  ------------------------------------------
+  ACPP          -0.5951  p=6.67e-07  SWITCH
+  MSMB          -0.5510  p=6.12e-06  SWITCH
+  HOXC6         +0.5136  p=3.19e-05  FA
+  KRT18         +0.4955  p=6.61e-05  LUMINAL
+  AMACR         +0.4276  p=7.31e-04  FA
+  EZH2          +0.4260  p=7.68e-04  EPIGEN
+  NKX3-1        -0.4062  p=1.41e-03  AR
+  KRT14         -0.3655  p=4.41e-03  
+  RB1           +0.3484  p=6.85e-03  SCAFFOLD
+  AURKA         +0.3460  p=7.27e-03  
+  CDH2          +0.3365  p=9.16e-03  
+  TWIST1        +0.3276  p=1.13e-02  
+  SPDEF         -0.3236  p=1.24e-02  
+  KLK2          -0.3230  p=1.26e-02  AR
+  TOP2A         +0.2931  p=2.43e-02  
+  FKBP5         -0.2922  p=2.47e-02  AR
+  GATA2         +0.2912  p=2.52e-02  LUMINAL
+  CD44          -0.2838  p=2.94e-02  
+  NGFR          -0.2723  p=3.69e-02  
+  KRT8          -0.2710  p=3.79e-02  LUMINAL
+
+=== STEP 7: ERG ANALYSIS ===
+
+=================================================================
+STEP 7: ERG ANALYSIS
+Prediction: bimodal ERG in tumors
+Fusion+ = ERG high / Fusion- = low
+=================================================================
+
+  ERG normal: 6.1651 ± 0.1189
+  ERG tumor:  6.3781 ± 0.2068
+  ERG range:  5.9267 — 6.7889
+
+  KDE local minima: 1
+  Bimodal threshold: 6.4804
+  ERG-high (fusion+?): 20
+  ERG-low  (fusion-?): 39
+  Prediction: CONFIRMED
+
+  Key genes by ERG status:
+  Gene           ERG-high    ERG-low    Change
+  ----------------------------------------------
+  NKX3-1          10.0788    10.0307     +0.5%
+  FOXA1           12.3838    12.5623     -1.4%
+  KLK3             9.2834     9.6302     -3.6%
+  AR               7.8915     7.9449     -0.7%
+  TMPRSS2         11.8654    12.6655     -6.3%
+  MYC              8.9426     9.1116     -1.9%
+  EZH2             6.3409     6.4182     -1.2%
+  MKI67            6.0770     6.1046     -0.5%
+
+=== STEP 8: AR AXIS ===
+
+=================================================================
+STEP 8: AR AXIS ANALYSIS
+AR maintained/elevated predicted
+KLK3/PSA lower in high Gleason
+=================================================================
+
+  Gene          Normal     Tumor    Change
+  ----------------------------------------
+  AR            7.9614    7.9268     -0.4%
+  KLK3          8.8824    9.5126     +7.1%
+  KLK2         11.2979   11.3073     +0.1%
+  TMPRSS2      12.1690   12.3943     +1.9%
+  FKBP5         9.4920    9.5329     +0.4%
+  STEAP2       10.8460   11.2812     +4.0%
+  NKX3-1        9.7243   10.0470     +3.3%
+  FOXA1        11.7508   12.5018     +6.4%
+
+  KLK3/PSA by Gleason:
+    high: 8.9827 ± 1.3983 (n=27)
+    low: 9.9598 ± 0.7310 (n=32)
+  Low > High KLK3: p=0.0015
+  Prediction: KLK3 lower in high Gleason
+  Result: CONFIRMED
+
+=== STEP 9: FIGURE ===
+
+--- Generating figure ---
+
+  Figure saved: ./prad_false_attractor/results/prad_false_attractor.png
