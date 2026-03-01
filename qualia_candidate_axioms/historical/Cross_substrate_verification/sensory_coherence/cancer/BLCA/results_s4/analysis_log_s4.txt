@@ -1,0 +1,272 @@
+=================================================================
+BLADDER CANCER — SCRIPT 4
+Dataset: TCGA-BLCA PanCan Atlas 2018
+Clinical: cBioPortal (confirmed)
+Framework: OrganismCore
+Doc: 91d | Date: 2026-03-01
+=================================================================
+
+PREDICTIONS LOCKED:
+TV-1: Luminal depth predicts OS
+TV-2: Basal depth predicts OS
+TV-3: FGFR3/CCND1/CLDN3 panel OS
+TV-4: TWIST1/CDK6/GATA3 panel OS
+TV-5: Basal depth predicts DSS
+TV-6: r(AURKA, aneuploidy) > 0
+TV-7: r(ZEB2,  aneuploidy) < 0
+TV-8: r(lum depth, MSI) > 0
+TV-9: Our subtypes match Robertson
+TV-10: Luminal FGA > Basal FGA
+
+=================================================================
+LOAD EXPRESSION
+  File: ./blca_false_attractor/TCGA_BLCA_expr.gz
+=================================================================
+  Primary tumor samples: 407
+  Genes loaded: 127
+
+=================================================================
+LOAD CLINICAL — cBioPortal
+  File: ./blca_false_attractor/TCGA_BLCA_clinical_cbio.tsv
+=================================================================
+  Shape: (411, 62)
+  Columns: ['SAMPLE_ID', 'ANEUPLOIDY_SCORE', 'CANCER_TYPE', 'CANCER_TYPE_DETAILED', 'FRACTION_GENOME_ALTERED', 'GRADE', 'MSI_SCORE_MANTIS', 'MSI_SENSOR_SCORE', 'MUTATION_COUNT', 'ONCOTREE_CODE']
+  Sample IDs example: ['TCGA-2F-A9KO-01', 'TCGA-2F-A9KP-01', 'TCGA-2F-A9KQ-01']
+  Expr IDs example: ['TCGA-DK-AA6S-01', 'TCGA-DK-A6B2-01', 'TCGA-GU-A763-01']
+  Direct match: 406
+
+  Survival columns:
+    SOMATIC_STATUS: ['Matched', 'Matched', 'Matched']
+    TISSUE_PROSPECTIVE_COLLECTION_INDICATOR: ['No', 'Yes', 'Yes']
+    TISSUE_RETROSPECTIVE_COLLECTION_INDICATOR: ['Yes', 'No', 'No']
+    DAYS_TO_INITIAL_PATHOLOGIC_DIAGNOSIS: [0, 0, 0]
+    DSS_MONTHS: [166.0255778, 15.68201992, 32.77772298]
+    DSS_STATUS: ['0:ALIVE OR DEAD TUMOR FREE', '0:ALIVE OR DEAD TUMOR FREE', '0:ALIVE OR DEAD TUMOR FREE']
+    OS_MONTHS: [166.0255778, 15.68201992, 32.77772298]
+    OS_STATUS: ['0:LIVING', '0:LIVING', '0:LIVING']
+    PERSON_NEOPLASM_CANCER_STATUS: ['With Tumor', 'With Tumor', 'With Tumor']
+    PFS_MONTHS: [17.72035375, 8.810862347, 9.961534668]
+    PFS_STATUS: ['1:PROGRESSION', '1:PROGRESSION', '1:PROGRESSION']
+    DFS_MONTHS: [17.72035375, 58.91442286, 11.3094651]
+    DFS_STATUS: ['1:Recurred/Progressed', '0:DiseaseFree', '0:DiseaseFree']
+
+  Extra columns available:
+    ANEUPLOIDY_SCORE: [8.0, 21.0, 1.0]
+    FRACTION_GENOME_ALTERED: [0.3712, 0.3748, 0.0374]
+    MSI_SCORE_MANTIS: [0.3274, 0.3143, 0.3114]
+    MSI_SENSOR_SCORE: [0.0, 0.16, 0.0]
+    MUTATION_COUNT: [528.0, 171.0, 58.0]
+    TMB_NONSYNONYMOUS: [17.63333333, 5.733333333, 1.933333333]
+    SUBTYPE: ['BLCA', 'BLCA', 'BLCA']
+    AJCC_PATHOLOGIC_TUMOR_STAGE: ['STAGE III', 'STAGE IV', 'STAGE III']
+    PATH_T_STAGE: ['T3B', 'T3', 'T4']
+    PATH_N_STAGE: ['N0', 'N1', 'N0']
+
+  Aligned rows: 407
+  OS_MONTHS non-null: 405
+
+=================================================================
+PARSE SURVIVAL VECTORS
+=================================================================
+  OS: n=404 events=177 range=0.5–166.0 mo
+  DSS: n=391 events=121 range=0.5–166.0 mo
+  PFS: n=405 events=174 range=0.5–163.3 mo
+
+  Aneuploidy: 396 valid
+  FGA:        401 valid
+  MSI Mantis: 406 valid
+  MSI Sensor: 406 valid
+  Mut count:  404 valid
+
+  Published subtypes: ['BLCA']
+
+=================================================================
+GROUP SUMMARY
+=================================================================
+  Luminal: 204
+  Basal  : 203
+
+=================================================================
+DEPTH SCORES
+=================================================================
+  Luminal n=204 mean=0.5550 std=0.1199
+  Basal n=203 mean=0.4948 std=0.1947
+
+=================================================================
+SURVIVAL ANALYSIS
+=================================================================
+
+  === LUMINAL ===
+
+  Luminal — OS:
+  n valid = 201
+  Events = 78/201
+  Time: 0.6–142.8 mo
+  Deep   (n=101): mean=28.1 mo
+  Shallow(n=100): mean=25.9 mo
+  Log-rank depth: p=0.1188  ns
+  NOT CONFIRMED ✗
+
+  Panel ['FGFR3', 'CCND1', 'CLDN3']:
+  High (n=101): mean=27.6
+  Low  (n=100): mean=26.5
+  Panel log-rank: p=0.9967  ns
+  NOT CONFIRMED ✗
+
+  Individual genes p<0.05:
+  E2F3         p=0.0157   *  ↑=better
+  FOXA1        p=0.0407   *  ↑=better
+  MLH1         p=9.52e-03  **  ↑=better
+  PPARG        p=4.75e-03  **  ↑=better
+  SPRR1A       p=6.10e-03  **  ↑=better
+  TCF7L2       p=0.0227   *  ↑=better
+  VEGFA        p=0.0193   *  ↑=better
+
+  Luminal — DSS:
+  n valid = 194
+  Events = 48/194
+  Time: 0.6–142.8 mo
+  Deep   (n=97): mean=28.6 mo
+  Shallow(n=97): mean=26.3 mo
+  Log-rank depth: p=0.1393  ns
+  NOT CONFIRMED ✗
+
+  === BASAL ===
+
+  Basal — OS:
+  n valid = 203
+  Events = 99/203
+  Time: 0.5–166.0 mo
+  Deep   (n=102): mean=27.2 mo
+  Shallow(n=101): mean=26.0 mo
+  Log-rank depth: p=0.2388  ns
+  NOT CONFIRMED ✗
+
+  Panel ['TWIST1', 'CDK6', 'GATA3']:
+  High (n=102): mean=26.2
+  Low  (n=101): mean=27.0
+  Panel log-rank: p=0.0378   *
+  CONFIRMED ✓
+
+  Individual genes p<0.05:
+  ALDH1A1      p=0.0391   *  ↑=better
+  CDH2         p=0.0346   *  ↑=better
+  CDK6         p=0.0317   *  ↑=worse
+  DSG1         p=2.02e-03  **  ↑=worse
+  DSG3         p=0.0196   *  ↑=worse
+  EGFR         p=0.0201   *  ↑=worse
+  KRT4         p=0.0359   *  ↑=worse
+  KRT8         p=0.0324   *  ↑=better
+  SOX2         p=5.56e-03  **  ↑=worse
+  TGFB1        p=0.0381   *  ↑=worse
+  UPK3A        p=0.0447   *  ↑=better
+  WNT5A        p=0.0257   *  ↑=worse
+
+  Basal — DSS:
+  n valid = 197
+  Events = 73/197
+  Time: 0.5–166.0 mo
+  Deep   (n=99): mean=28.7 mo
+  Shallow(n=98): mean=25.3 mo
+  Log-rank depth: p=0.8470  ns
+  NOT CONFIRMED ✗
+
+  Basal — PFS:
+  n valid = 203
+  Events = 98/203
+  Time: 0.5–163.3 mo
+  Deep   (n=102): mean=22.3 mo
+  Shallow(n=101): mean=23.1 mo
+  Log-rank depth: p=0.5512  ns
+  NOT CONFIRMED ✗
+
+=================================================================
+SURVIVAL PREDICTION SUMMARY
+=================================================================
+  TV-1: Luminal OS — p=0.1188  ns  NOT CONFIRMED ✗
+  TV-2: Basal OS — p=0.2388  ns  NOT CONFIRMED ✗
+  TV-5: Basal DSS — p=0.8470  ns  NOT CONFIRMED ✗
+  TV-3: Luminal panel — p=0.9967  ns  NOT CONFIRMED ✗
+  TV-4: Basal panel — p=0.0378   *  CONFIRMED ✓
+
+=================================================================
+CIN / MSI TESTS
+TV-6 through TV-10
+=================================================================
+
+  TV-6: r(AURKA, ANEUPLOIDY) > 0
+  Prediction: AURKA tracks CIN
+  r(AURKA, ANEUPLOIDY) = +0.2845  p=8.31e-09 ***
+  TV-6 CONFIRMED ✓
+  r(AURKA, FGA) = +0.2608  p=1.18e-07 ***
+
+  TV-7: r(ZEB2, ANEUPLOIDY) < 0
+  Prediction: ZEB2 anti-tracks CIN
+  r(ZEB2, ANEUPLOIDY) = +0.0550  p=0.2746  ns
+  TV-7 NOT CONFIRMED ✗
+
+  All genes vs ANEUPLOIDY_SCORE:
+  (top 10 positive and negative)
+
+  TOP 10 POSITIVE (UP with CIN):
+  E2F1         r=+0.3391  p=4.12e-12 ***
+  MCM2         r=+0.3084  p=3.59e-10 ***
+  MSH2         r=+0.2988  p=1.31e-09 ***
+  TOP2A        r=+0.2972  p=1.62e-09 ***
+  AURKA        r=+0.2845  p=8.31e-09 ***
+  PCNA         r=+0.2718  p=3.91e-08 ***
+  CCNE1        r=+0.2690  p=5.42e-08 ***
+  MSH6         r=+0.2568  p=2.21e-07 ***
+  CDKN2B       r=+0.2403  p=1.31e-06 ***
+  CDC20        r=+0.2350  p=2.26e-06 ***
+
+  TOP 10 NEGATIVE (DOWN with CIN):
+  SMAD3        r=-0.2744  p=2.86e-08 ***
+  TP53         r=-0.2168  p=1.35e-05 ***
+  SPRY2        r=-0.1784  p=3.62e-04 ***
+  TET2         r=-0.1767  p=4.12e-04 ***
+  KRT5         r=-0.1684  p=7.69e-04 ***
+  DUSP6        r=-0.1679  p=7.95e-04 ***
+  WNT5A        r=-0.1647  p=1.01e-03  **
+  TGFB1        r=-0.1572  p=1.70e-03  **
+  CDKN1A       r=-0.1524  p=2.36e-03  **
+  HRAS         r=-0.1502  p=2.72e-03  **
+
+  TV-8: r(luminal depth, MSI) > 0
+  Prediction: deep luminal = MSI-high
+  r(luminal_depth, MSI_SCORE_MANTIS) = +0.0034  p=0.9615  ns
+  r(luminal_depth, MSI_SENSOR_SCORE) = +0.0513  p=0.4677  ns
+
+  MSH2/MSH6 vs MSI scores:
+  r(MSH2, MANTIS) = +0.0446  p=0.3703  ns
+  r(MSH2, SENSOR) = +0.0821  p=0.0984  ns
+  r(MSH6, MANTIS) = +0.0231  p=0.6427  ns
+  r(MSH6, SENSOR) = +0.1009  p=0.0422   *
+  r(MLH1, MANTIS) = -0.1679  p=6.84e-04 ***
+  r(MLH1, SENSOR) = -0.1122  p=0.0238   *
+
+  TV-9: SUBTYPE COMPARISON
+  Our GATA3/KRT5 vs Robertson
+  Published subtypes: ['BLCA']
+
+  Cross-tabulation:
+              Our                  Published
+col_0    BLCA  nan
+row_0             
+Basal     199    4
+Luminal   199    5
+
+  TV-10: FGA LUMINAL vs BASAL
+  Prediction: luminal higher CIN
+  Luminal FGA mean = 0.342
+  Basal   FGA mean = 0.260
+  MWU: p=8.75e-06 ***
+  TV-10 CONFIRMED ✓ (luminal > basal FGA)
+
+  ANEUPLOIDY vs DEPTH:
+  r(aneuploidy, luminal_depth) = -0.1683  p=0.0169   *
+  r(aneuploidy, basal_depth) = +0.1017  p=0.1572  ns
+
+--- Generating Script 4 figure ---
+
+  Figure saved: ./blca_false_attractor/results_s4/blca_tcga_s4.png
