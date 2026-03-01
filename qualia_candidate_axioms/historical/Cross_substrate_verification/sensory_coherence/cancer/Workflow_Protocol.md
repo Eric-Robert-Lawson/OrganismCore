@@ -6,6 +6,31 @@
 
 ---
 
+## **Important**
+
+Wrong predictions in this framework
+   are not framework failures.
+   They are analyst assumption errors
+   that the data corrects.
+
+   When a prediction does not match:
+     1. The framework is not wrong.
+     2. An assumption in the prediction
+        was wrong.
+     3. The data contains the correct answer.
+     4. Read the data to find the assumption
+        that needs revision.
+
+   The framework's job is to return
+   what the data actually shows.
+   It does this correctly every time.
+   The analyst's job is to make correct
+   predictions before seeing the data.
+   When the analyst is wrong, the framework
+   reveals why.
+   
+---
+
 ## METADATA
 
 ```
