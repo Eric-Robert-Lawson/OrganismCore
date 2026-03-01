@@ -1,0 +1,40 @@
+=================================================================
+ESOPHAGEAL SQUAMOUS CELL CARCINOMA
+FALSE ATTRACTOR ANALYSIS — SCRIPT 1
+Dataset: GSE53625
+  179 ESCC + 179 matched normal
+  Agilent microarray
+Framework: OrganismCore
+Doc: 90a | Date: 2026-03-01
+=================================================================
+
+PREDICTIONS LOCKED 2026-03-01:
+Switch DOWN: NOTCH1/KRT1/KRT10/SPRR1A/LORICRIN
+FA UP      : SOX2/TP63/KRT5/KRT14/EGFR/CCND1
+Epigenetic : EZH2 UP (gain-of-function)
+Cross      : ZEB2-AURKA r<0.50 in ESCC
+             (vs r=0.9871 in STAD)
+
+NOTE: Scope change from original plan.
+  TCGA Xena Hub unreachable.
+  Using GSE53625 (ESCC-only).
+  EAC analysis deferred to Script 1b.
+
+=================================================================
+STEP 0: DATA ACQUISITION
+  Dataset: GSE53625
+=================================================================
+  Downloading: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE53nnn/GSE53625/matrix/GSE53625_series_matrix.txt.gz
+  Saved: ./esca_false_attractor/GSE53625_series_matrix.txt.gz (108,091,054 bytes)
+
+=================================================================
+STEP 1: PARSE GEO SERIES MATRIX
+  File: ./esca_false_attractor/GSE53625_series_matrix.txt.gz
+=================================================================
+  Sample IDs found: 358
+  Data rows: 1
+  Columns (samples): 358
+  Column examples: ['GSM1296956', 'GSM1296957', 'GSM1296958']
+  Probes parsed: 0
+  ERROR: No probes parsed
+  FATAL: Could not parse matrix

@@ -1,0 +1,446 @@
+=================================================================
+ESOPHAGEAL CANCER
+FALSE ATTRACTOR ANALYSIS — SCRIPT 1
+Dataset: GSE26886
+Framework: OrganismCore
+Doc: 90a | Date: 2026-03-01
+=================================================================
+
+DATASET RATIONALE:
+  Selected after systematic discovery
+  GSE26886: ESCC+EAC+Normal+Barrett
+  GPL570 Affymetrix — standard probes
+  GSE72094: REJECTED — confirmed LUAD
+  GSE53625: DEFERRED — numeric probes
+            GPL18109 annotation 404
+
+PREDICTIONS LOCKED 2026-03-01:
+ESCC switch DOWN: NOTCH1/KRT1/KRT10/SPRR1A/IVL
+ESCC FA UP      : SOX2/TP63/KRT5/EGFR/CCND1
+EAC  switch DOWN: NOTCH1/CDH1/MUC6/MUC5AC
+EAC  FA UP      : CDX2/ERBB2/ZEB1/AURKA
+Cross: EAC deeper than ESCC
+Cross: ZEB2-AURKA r>0.80 EAC / r<0.50 ESCC
+Cross: CDX2 circuit broken in EAC
+Cross: SOX2 ESCC > EAC
+Cross: Barrett intermediate depth
+
+=================================================================
+STEP 0: DATA ACQUISITION
+=================================================================
+  Already present: ./esca_false_attractor/GSE26886_series_matrix.txt.gz (18,281,882 bytes)
+
+=================================================================
+STEP 1: PARSE SERIES MATRIX
+  File: ./esca_false_attractor/GSE26886_series_matrix.txt.gz
+=================================================================
+  Sample IDs   : 69
+  Sample titles: 69
+  Probes found : 76
+  Header cols  : 69
+
+  Title examples:
+    Barrett's esophagus_01
+    Barrett's esophagus_02
+    Barrett's esophagus_03
+    Barrett's esophagus_04
+    Barrett's esophagus_05
+    Barrett's esophagus_06
+    Barrett's esophagus_07
+    Barrett's esophagus_08
+
+  Raw matrix (probes x samples): (76, 69)
+  Genes mapped : 76
+  Genes found  : ['APC', 'AXIN2', 'BAX', 'BCL2', 'CCNB1', 'CCND1', 'CCNE1', 'CD274', 'CD8A', 'CDC20', 'CDH1', 'CDH2', 'CDK4', 'CDKN1A', 'CDKN2A', 'CDX2', 'CLDN18', 'CTNNB1', 'DSG1', 'DSG3', 'EGFR', 'ERBB2', 'ERBB3', 'EZH2', 'FGFR1', 'FGFR2', 'FN1', 'FOXP3', 'GKN1', 'HDAC1', 'HES1', 'HIF1A', 'IVL', 'KDM6A', 'KDR', 'KRT1', 'KRT10', 'KRT13', 'KRT20', 'KRT4', 'KRT5', 'LDHA', 'MCL1', 'MDM2', 'MKI67', 'MLH1', 'MSH6', 'MUC2', 'MUC5AC', 'MUC5B', 'MYC', 'NOTCH1', 'PCNA', 'PDCD1', 'PGC', 'PIK3CA', 'PLK1', 'RB1', 'SNAI1', 'SNAI2', 'SOX2', 'SPRR1A', 'TET2', 'TFF1', 'TFF3', 'TGFB1', 'TGFBR2', 'TOP2A', 'TP53', 'TP63', 'TWIST1', 'VEGFA', 'VIM', 'WNT5A', 'ZEB1', 'ZEB2']
+
+=================================================================
+STEP 2: CLASSIFY SAMPLES
+Barrett / EAC / Normal / ESCC
+=================================================================
+
+  Group counts:
+    EAC: 21
+    Barrett: 20
+    Normal: 19
+    ESCC: 9
+
+  First 10 samples classified:
+    GSM661721    → Barrett    Barrett's esophagus_01
+    GSM661722    → Barrett    Barrett's esophagus_02
+    GSM661723    → Barrett    Barrett's esophagus_03
+    GSM661724    → Barrett    Barrett's esophagus_04
+    GSM661725    → Barrett    Barrett's esophagus_05
+    GSM661726    → Barrett    Barrett's esophagus_06
+    GSM661727    → Barrett    Barrett's esophagus_07
+    GSM661728    → Barrett    Barrett's esophagus_08
+    GSM661729    → Barrett    Barrett's esophagus_09
+    GSM661730    → Barrett    Barrett's esophagus_10
+
+=================================================================
+GROUP SUMMARY
+=================================================================
+  Normal      : 19 samples
+  Barrett     : 20 samples
+  EAC         : 21 samples
+  ESCC        : 9 samples
+
+=================================================================
+STEP 3: SADDLE POINT ANALYSIS
+=================================================================
+
+  === ESCC SADDLE POINT ===
+  T=9 | N=19
+
+  Gene            Normal     Tumor   Change  Supp-p         Elev-p      [Pred] Result
+  -------------------------------------------------------------------------------------
+  NOTCH1         -2.6037    0.4523  +117.4%    p=0.9987  ns  p=1.58e-03  **  [DOWN] INVERTED  ✗
+  KRT1           -0.2436   -0.3526   -44.7%    p=0.2942  ns    p=0.7225  ns  [DOWN] flat      ~
+  KRT10           0.1305    0.5608  +329.9%    p=0.9947  ns  p=6.06e-03  **  [DOWN] INVERTED  ✗
+  SPRR1A         -0.0958    0.0442  +146.1%    p=1.0000  ns  p=5.09e-05 ***  [DOWN] INVERTED  ✗
+  LORICRIN     NOT IN MATRIX
+  KRT4            0.1256    0.6020  +379.1%    p=0.9617  ns    p=0.0426   *  [DOWN] INVERTED  ✗
+  KRT13          -0.0058    0.2643      N/A    p=0.9997  ns  p=4.11e-04 ***  [DOWN] INVERTED  ✗
+  IVL             7.9162    2.9402   -62.9%  p=6.93e-04 ***    p=0.9994  ns  [DOWN] CONFIRMED ✓
+  DSG1           -0.1239    0.5455  +540.3%    p=0.9930  ns  p=7.97e-03  **  [DOWN] INVERTED  ✗
+  SOX2            0.9716    1.2178   +25.3%    p=0.5000  ns    p=0.5196  ns  [UP] flat      ~
+  TP63           -0.4416   -0.3505   +20.6%    p=0.6347  ns    p=0.3839  ns  [UP] flat      ~
+  KRT5            2.9718    2.4365   -18.0%    p=0.1508  ns    p=0.8604  ns  [UP] flat      ~
+  KRT14        NOT IN MATRIX
+  EGFR            0.3446    1.6014  +364.8%    p=0.9990  ns  p=1.14e-03  **  [UP] CONFIRMED ✓
+  CCND1           0.5110    0.0390   -92.4%    p=0.2775  ns    p=0.7387  ns  [UP] flat      ~
+  FGFR1          -1.3181   -0.6277   +52.4%    p=0.9994  ns  p=6.93e-04 ***  [UP] CONFIRMED ✓
+  MYC            -0.5747    1.4157  +346.3%    p=1.0000  ns  p=3.38e-05 ***  [UP] CONFIRMED ✓
+
+  ESCC: 4 confirmed / 6 inverted
+
+  === EAC SADDLE POINT ===
+  T=21 | N=19
+
+  Gene            Normal     Tumor   Change  Supp-p         Elev-p      [Pred] Result
+  -------------------------------------------------------------------------------------
+  NOTCH1         -2.6037    1.8393  +170.6%    p=1.0000  ns  p=3.12e-07 ***  [DOWN] INVERTED  ✗
+  CDH1            0.1759   -0.8043  -557.2%  p=6.34e-04 ***    p=0.9994  ns  [DOWN] CONFIRMED ✓
+  MUC6         NOT IN MATRIX
+  MUC5AC         -0.0191    0.2236 +1273.0%    p=0.9282  ns    p=0.0756  ns  [DOWN] flat      ~
+  TFF1           -0.0325    0.6591 +2127.0%    p=1.0000  ns  p=5.73e-06 ***  [DOWN] INVERTED  ✗
+  GKN1           -0.0104    0.0060  +157.7%    p=0.5963  ns    p=0.4142  ns  [DOWN] flat      ~
+  CDX2           -1.2821    0.4612  +136.0%    p=0.9995  ns  p=5.77e-04 ***  [UP] CONFIRMED ✓
+  ERBB2           0.6271    0.4221   -32.7%    p=0.0878  ns    p=0.9164  ns  [UP] flat      ~
+  ZEB1            2.2970   -1.6873  -173.5%  p=4.76e-08 ***    p=1.0000  ns  [UP] INVERTED  ✗
+  AURKA        NOT IN MATRIX
+  MUC2            0.0681    0.0354   -48.0%    p=0.2848  ns    p=0.7244  ns  [UP] flat      ~
+  KRT20          -0.4332    0.2898  +166.9%    p=0.9849  ns    p=0.0162   *  [UP] CONFIRMED ✓
+  TFF3            0.3121   -0.8594  -375.4%  p=3.97e-03  **    p=0.9963  ns  [UP] INVERTED  ✗
+  VEGFA          -0.5305    0.1756  +133.1%    p=0.9966  ns  p=3.67e-03  **  [UP] CONFIRMED ✓
+
+  EAC: 4 confirmed / 4 inverted
+
+=================================================================
+STEP 4: EXTENDED GENE SURVEY
+All target genes across all groups
+=================================================================
+  Gene               Normal      Barrett          EAC         ESCC
+  ------------------------------------------------------------
+  NOTCH1            -2.6037      -0.3742       1.8393       0.4523
+  FGFR1             -1.3181       0.3373       2.2162      -0.6277
+  PGC               -2.6294      -0.3073       0.8980       0.3582
+  AXIN2             -1.1160       1.1418       1.0356      -0.4500
+  TET2              -1.1444      -0.7259       0.9925      -0.6389
+  CTNNB1            -1.2343       0.1073       0.8494       1.5793
+  SNAI1             -0.5250      -1.0712       1.5169       1.5761
+  CDKN2A            -0.3367       0.2361       1.4741       0.4020
+  APC               -1.3785       0.4435       0.3914       1.0657
+  CDX2              -1.2821      -0.1450       0.4612       1.9027
+  MYC               -0.5747      -0.4731       1.0890       1.4157
+  TOP2A             -0.6482      -0.2878       0.8156      -0.0998
+  TP63              -0.4416      -0.3222       1.0175      -0.3505
+  FGFR2             -1.0626       0.3998       0.3514      -1.0399
+  ERBB3             -0.5492       0.1598       0.7276       0.5936
+  TGFBR2            -0.7770       0.6777       0.4842      -0.7886
+  FOXP3              0.2642       0.0351       1.5027       3.2099
+  SPRR1A            -0.0958       0.2483       0.9953       0.0442
+  SNAI2              0.7598       0.6721       1.8201       1.1449
+  DSG1              -0.1239       0.1059       0.7647       0.5455
+  CLDN18            -0.3778       0.1915       0.3607       0.2419
+  KRT20             -0.4332      -0.5793       0.2898       0.3244
+  VEGFA             -0.5305      -0.0934       0.1756      -0.2448
+  TFF1              -0.0325       0.4037       0.6591       0.4655
+  CDC20              0.0155      -0.3940       0.7001       0.3720
+  ZEB2              -0.3970       0.9683       0.1962      -2.6966
+  PCNA              -0.0660      -0.1252       0.4934       0.7410
+  MSH6              -0.1365       0.0737       0.3928       0.6762
+  VIM               -0.0817       1.5208       0.3880      -0.7087
+  PLK1               0.3729      -0.0089       0.8132       0.1530
+  KRT1              -0.2436       0.6547       0.1736      -0.3526
+  RB1                0.2457      -1.4653       0.6401       1.1770
+  HDAC1             -0.1536       0.0143       0.1406       0.2305
+  MKI67              0.1786      -0.6881       0.4508       0.7123
+  MUC5AC            -0.0191       0.0230       0.2236       2.3847
+  TGFB1             -0.0039       0.8587       0.1517       0.3267
+  CD274              0.1118       0.0287       0.2145       0.2302
+  PDCD1             -0.0045       0.0076       0.0742       0.0227
+  KRT13             -0.0058       0.0238       0.0438       0.2643
+  KDR               -0.0374       0.6141       0.0114      -1.1929
+  MDM2               0.1339      -0.0228       0.1529       0.9625
+  GKN1              -0.0104       0.0163       0.0060       0.0176
+  PIK3CA            -0.0084       0.0079      -0.0064       0.0208
+  CD8A               0.5942       0.1833       0.5766      -0.0690
+  MUC2               0.0681       0.0408       0.0354       0.0427
+  HES1               0.1755      -0.5238       0.1097       0.3616
+  KRT4               0.1256       0.3640      -0.0143       0.6020
+  FN1                0.0585       0.1938      -0.1084      -0.6197
+  KRT10              0.1305      -0.0778      -0.0473       0.5608
+  ERBB2              0.6271      -0.2446       0.4221      -1.2069
+  MCL1               0.1628      -0.5441      -0.0491       0.1541
+  HIF1A              0.1387      -0.3742      -0.1668       0.5291
+  TP53              -0.0195       0.0034      -0.3745       0.1289
+  CDK4               0.2757      -0.3665      -0.0923      -0.2096
+  CCNB1              0.2416      -0.4404      -0.1269      -0.0138
+  DSG3               0.6197      -0.9648       0.2079       0.9831
+  CDH2               0.4960       2.1194      -0.0043      -0.0557
+  BAX                0.4953       0.3492      -0.0380      -0.0280
+  MLH1               0.3361       0.3927      -0.2232      -0.7377
+  CDKN1A             0.0301      -0.1087      -0.5320       0.1211
+  SOX2               0.9716       0.1827       0.3800       1.2178
+  LDHA               0.1996      -0.6861      -0.3923      -0.1058
+  KDM6A              0.3840      -1.0319      -0.2417       0.6534
+  BCL2               0.5786       0.1304      -0.2452       1.1287
+  EZH2               0.6698      -1.2481      -0.2668      -0.4547
+  CDH1               0.1759       0.7419      -0.8043      -2.3882
+  CCND1              0.5110      -0.2839      -0.5071       0.0390
+  TFF3               0.3121       0.0193      -0.8594       1.2933
+  EGFR               0.3446      -0.2618      -0.8823       1.6014
+  CCNE1              1.3397      -0.5074      -0.1617       0.1196
+  WNT5A              2.0026      -0.4509      -1.4690       0.0867
+  ZEB1               2.2970      -1.0843      -1.6873       0.9714
+  TWIST1             4.6768       0.2915      -0.1150       1.4462
+  MUC5B              2.3593      -0.9086      -4.9693       0.4587
+  IVL                7.9162       1.6223      -1.2223       2.9402
+  KRT5               2.9718      -5.0526      -7.0888       2.4365
+
+=================================================================
+STEP 5+6: DEPTH SCORES AND CORRELATIONS
+=================================================================
+
+  Depth score: ESCC (n=9)
+    Mean=0.5309 Std=0.2976 Min=0.1880 Max=1.0000
+
+  Depth correlations: ESCC
+
+  TOP 15 POSITIVE (UP in deep ESCC):
+  Gene                r  p-value
+  -----------------------------------
+  VIM           +0.6634  p=0.0514  ns
+  KRT5          +0.6528  p=0.0567  ns
+  TET2          +0.6285  p=0.0698  ns
+  CLDN18        +0.6262  p=0.0712  ns
+  EGFR          +0.6195  p=0.0752  ns
+  CDK4          +0.5682  p=0.1105  ns
+  SPRR1A        +0.4658  p=0.2063  ns
+  TP63          +0.4472  p=0.2274  ns
+  SNAI1         +0.4339  p=0.2432  ns
+  TGFBR2        +0.3867  p=0.3040  ns
+  DSG3          +0.3781  p=0.3157  ns
+  MYC           +0.3588  p=0.3430  ns
+  TWIST1        +0.3586  p=0.3433  ns
+  KRT10         +0.3540  p=0.3500  ns
+  DSG1          +0.3255  p=0.3928  ns
+
+  TOP 15 NEGATIVE (DOWN in deep ESCC):
+  Gene                r  p-value
+  -----------------------------------
+  CDKN1A        -0.8391  p=4.68e-03  **
+  VEGFA         -0.7414  p=0.0222   *
+  IVL           -0.7201  p=0.0287   *
+  CDH2          -0.6109  p=0.0805  ns
+  KRT20         -0.5860  p=0.0973  ns
+  RB1           -0.5848  p=0.0981  ns
+  MKI67         -0.5516  p=0.1237  ns
+  KDR           -0.5458  p=0.1285  ns
+  PLK1          -0.5365  p=0.1364  ns
+  HIF1A         -0.4978  p=0.1726  ns
+  GKN1          -0.4855  p=0.1852  ns
+  PIK3CA        -0.4697  p=0.2021  ns
+  PDCD1         -0.4680  p=0.2039  ns
+  TP53          -0.4657  p=0.2064  ns
+  MDM2          -0.4650  p=0.2072  ns
+
+  Depth score: EAC (n=21)
+    Mean=0.5160 Std=0.1616 Min=0.1981 Max=0.8817
+
+  Depth correlations: EAC
+
+  TOP 15 POSITIVE (UP in deep EAC):
+  Gene                r  p-value
+  -----------------------------------
+  KRT20         +0.6271  p=2.34e-03  **
+  CDC20         +0.6113  p=3.24e-03  **
+  HDAC1         +0.5621  p=8.00e-03  **
+  PCNA          +0.5392  p=0.0117   *
+  SPRR1A        +0.5314  p=0.0132   *
+  EZH2          +0.4851  p=0.0258   *
+  VEGFA         +0.4566  p=0.0375   *
+  CLDN18        +0.4457  p=0.0429   *
+  FOXP3         +0.4266  p=0.0538  ns
+  TFF3          +0.3971  p=0.0747  ns
+  AXIN2         +0.3964  p=0.0752  ns
+  CCNB1         +0.3894  p=0.0810  ns
+  TET2          +0.3795  p=0.0897  ns
+  TP63          +0.3725  p=0.0963  ns
+  TGFBR2        +0.3610  p=0.1079  ns
+
+  TOP 15 NEGATIVE (DOWN in deep EAC):
+  Gene                r  p-value
+  -----------------------------------
+  APC           -0.6260  p=2.40e-03  **
+  CTNNB1        -0.5582  p=8.54e-03  **
+  MUC5B         -0.5115  p=0.0178   *
+  KRT5          -0.4784  p=0.0283   *
+  MCL1          -0.4232  p=0.0559  ns
+  PGC           -0.4199  p=0.0581  ns
+  CDH1          -0.3958  p=0.0757  ns
+  TGFB1         -0.3871  p=0.0830  ns
+  FGFR2         -0.3207  p=0.1564  ns
+  CCND1         -0.3178  p=0.1603  ns
+  FN1           -0.3171  p=0.1613  ns
+  KDM6A         -0.2902  p=0.2019  ns
+  PDCD1         -0.2662  p=0.2436  ns
+  NOTCH1        -0.2650  p=0.2458  ns
+  TFF1          -0.2632  p=0.2490  ns
+
+  Depth score: Barrett (n=20)
+    Mean=0.5892 Std=0.1981 Min=0.1054 Max=0.8416
+
+  Depth score: Normal (n=19)
+    Mean=0.4918 Std=0.1353 Min=0.2712 Max=0.8535
+
+=================================================================
+CROSS-SUBTYPE DEPTH COMPARISON
+Prediction: EAC deeper than ESCC
+=================================================================
+
+  ESCC depth: 0.5309 ± 0.2976
+  EAC  depth: 0.5160 ± 0.1616
+  EAC vs ESCC: p=0.7173  ns
+  PREDICTION NOT CONFIRMED: ESCC deeper or equal
+
+=================================================================
+CROSS-CANCER PREDICTION TESTS
+=================================================================
+
+=================================================================
+STEP 7: ZEB2-AURKA COUPLING TEST
+STAD reference: r=+0.9871 ***
+Prediction:
+  EAC : r > 0.80 (columnar origin)
+  ESCC: r < 0.50 (squamous origin)
+=================================================================
+  ESCC: ZEB2/AURKA missing
+  EAC: ZEB2/AURKA missing
+
+=================================================================
+STEP 8: CDX2 CIRCUIT TEST (EAC)
+STAD: 1/5 targets intact — broken
+Prediction: circuit broken in EAC
+=================================================================
+  CDX2 mean in EAC  : 0.4612
+  CDX2 mean in Normal: -1.2821
+
+  CDX2 → target correlations (EAC):
+  Target            r  p-value        Status
+  --------------------------------------------------
+  MUC2        +0.1003    p=0.6653  ns  broken
+  KRT20       +0.5458    p=0.0105   *  intact ✓
+  TFF3        +0.2067    p=0.3686  ns  broken
+  MUC5B       +0.1431    p=0.5360  ns  broken
+  CLDN18      +0.1261    p=0.5859  ns  broken
+
+  CDX2 circuit: 1/5 intact
+  PREDICTION CONFIRMED: circuit broken ✓
+
+=================================================================
+STEP 9: SOX2 SUBTYPE COMPARISON
+Prediction: SOX2 high ESCC / low EAC
+=================================================================
+
+  Gene           Normal       ESCC        EAC  ESCC vs EAC
+  -------------------------------------------------------
+  SOX2           0.9716     1.2178     0.3800  p=0.1746  ns
+  TP63          -0.4416    -0.3505     1.0175  p=0.1606  ns
+  KRT5           2.9718     2.4365    -7.0888  p=3.82e-05 ***
+  KRT14             nan        nan        nan  p=N/A   
+  CDX2          -1.2821     1.9027     0.4612  p=8.67e-03  **
+  MUC2           0.0681     0.0427     0.0354  p=0.0417   *
+  ERBB2          0.6271    -1.2069     0.4221  p=4.36e-03  **
+  EGFR           0.3446     1.6014    -0.8823  p=1.20e-04 ***
+
+  SOX2 ESCC > EAC: p=0.0873  ns
+  PREDICTION NOT CONFIRMED ✗
+
+=================================================================
+STEP 10: BARRETT'S PROGRESSION
+Normal → Barrett's → EAC
+Prediction: depth increases
+=================================================================
+
+  Group             n  depth_mean  depth_std
+  ---------------------------------------------
+  Normal           19      0.4918     0.1353
+  Barrett's        20      0.5892     0.1981
+  EAC              21      0.5160     0.1616
+
+  Barrett > Normal : p=0.0395   *
+  EAC > Barrett    : p=0.9186  ns
+  EAC > Normal     : p=0.2848  ns
+
+=================================================================
+STEP 11: DRUG TARGET DERIVATION
+From depth correlations
+Stated BEFORE literature check
+=================================================================
+
+  ESCC DRUG TARGETS (depth-correlated):
+  Gene              r  Drug
+  -------------------------------------------------------
+  VEGFA       -0.7414  Bevacizumab/Ramucirumab
+  EGFR        +0.6195  Cetuximab/Erlotinib/Afatinib
+  CDK4        +0.5682  Palbociclib/Ribociclib
+  KDR         -0.5458  Ramucirumab
+  HIF1A       -0.4978  PT2977/Belzutifan
+  PIK3CA      -0.4697  Alpelisib/Idelalisib
+  FGFR2       -0.4193  Erdafitinib/Futibatinib
+  NOTCH1      -0.4168  Gamma-secretase inhibitor
+  FGFR1       -0.3673  Erdafitinib/Futibatinib
+  TOP2A       -0.3599  Anthracyclines/TopoII
+  MYC         +0.3588  BET inhibitor (indirect)
+  BCL2        +0.3180  Venetoclax
+  HDAC1       -0.2793  Vorinostat/Entinostat
+  MCL1        +0.1626  AMG-176/S63845
+  EZH2        +0.1553  Tazemetostat
+  ERBB2       +0.1397  Trastuzumab/Lapatinib
+  CCND1       +0.1332  CDK4/6i (via CCND1)
+
+  EAC DRUG TARGETS (depth-correlated):
+  Gene              r  Drug
+  -------------------------------------------------------
+  HDAC1       +0.5621  Vorinostat/Entinostat
+  EZH2        +0.4851  Tazemetostat
+  VEGFA       +0.4566  Bevacizumab/Ramucirumab
+  MCL1        -0.4232  AMG-176/S63845
+  FGFR2       -0.3207  Erdafitinib/Futibatinib
+  CCND1       -0.3178  CDK4/6i (via CCND1)
+  TOP2A       +0.3015  Anthracyclines/TopoII
+  HIF1A       +0.2904  PT2977/Belzutifan
+  NOTCH1      -0.2650  Gamma-secretase inhibitor
+  FGFR1       +0.2371  Erdafitinib/Futibatinib
+  CDK4        -0.1932  Palbociclib/Ribociclib
+  KDR         +0.0965  Ramucirumab
+  ERBB2       +0.0780  Trastuzumab/Lapatinib
+  MYC         -0.0354  BET inhibitor (indirect)
+  BCL2        +0.0317  Venetoclax
+  PIK3CA      -0.0272  Alpelisib/Idelalisib
+  EGFR        +0.0171  Cetuximab/Erlotinib/Afatinib
+
+--- Generating figure ---
+
+  Figure saved: ./esca_false_attractor/results/esca_gse26886_s1.png
