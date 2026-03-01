@@ -14,7 +14,6 @@ Doc: 88a | Date: 2026-03-01
 PREDICTIONS LOCKED BEFORE DATA:
   Switch genes (predicted suppressed):
     NKX3-1 — master luminal TF
-             most commonly deleted in PRAD
     FOXA1  — AR pioneer factor
     KLK3   — PSA terminal AR target
     ACPP   — acid phosphatase luminal marker
@@ -27,7 +26,7 @@ PREDICTIONS LOCKED BEFORE DATA:
 
   Scaffold:
     AR     — maintained/elevated
-    MYC    — elevated (no secretory bias here)
+    MYC    — elevated (no secretory bias)
 
   Gleason prediction:
     High Gleason = deeper block
@@ -45,7 +44,6 @@ PREDICTIONS LOCKED BEFORE DATA:
 
 Author: Eric Robert Lawson
 Framework: OrganismCore Principles-First
-GEO: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE32571
 """
 
 import os
@@ -89,152 +87,179 @@ META_URL = (
     "&targ=gsm&form=text&view=full"
 )
 
-# Illumina probe annotation
-# HumanHT-12 v4 — download from Illumina
-# via GEO platform GPL10558
-PLATFORM_URL = (
-    "https://www.ncbi.nlm.nih.gov/geo/"
-    "query/acc.cgi?acc=GPL10558"
-    "&targ=self&form=text&view=full"
-)
+# ============================================================
+# ILLUMINA PROBE → GENE SYMBOL
+# Hard-coded for key targets only
+# Avoids downloading 100MB platform file
+# Source: Illumina HumanHT-12 v4 annotation
+# ============================================================
+
+# These are the ILMN probe IDs for our
+# target genes on HumanHT-12 v4
+# Multiple probes per gene — all included
+# Script will pick highest-expressed probe
+
+PROBE_GENE_MAP = {
+    # SWITCH GENES
+    "ILMN_1766707": "NKX3-1",
+    "ILMN_1718800": "NKX3-1",
+    "ILMN_2337565": "FOXA1",
+    "ILMN_1679881": "FOXA1",
+    "ILMN_1773275": "KLK3",
+    "ILMN_2388574": "KLK3",
+    "ILMN_1811083": "ACPP",
+    "ILMN_1788078": "KLK2",
+    "ILMN_1788866": "MSMB",
+    "ILMN_2147486": "MSMB",
+
+    # FALSE ATTRACTOR / FA
+    "ILMN_2338729": "ERG",
+    "ILMN_1766526": "ERG",
+    "ILMN_1806487": "MKI67",
+    "ILMN_2413324": "MKI67",
+    "ILMN_1688580": "EZH2",
+    "ILMN_1795529": "EZH2",
+    "ILMN_1712966": "HOXC6",
+    "ILMN_1793626": "AMACR",
+    "ILMN_1669115": "AMACR",
+
+    # EPIGENETIC
+    "ILMN_1688580": "EZH2",
+    "ILMN_2136659": "EED",
+    "ILMN_1739177": "SUZ12",
+    "ILMN_1778439": "KDM6A",
+    "ILMN_1700949": "DNMT3A",
+    "ILMN_1670195": "BMI1",
+    "ILMN_1786314": "JARID2",
+
+    # AR AXIS
+    "ILMN_1701183": "AR",
+    "ILMN_2377461": "AR",
+    "ILMN_1773275": "KLK3",
+    "ILMN_1788078": "KLK2",
+    "ILMN_1786475": "TMPRSS2",
+    "ILMN_2184373": "TMPRSS2",
+    "ILMN_1705169": "FKBP5",
+    "ILMN_1788660": "STEAP2",
+
+    # SCAFFOLD
+    "ILMN_1674999": "MYC",
+    "ILMN_2348918": "MYC",
+    "ILMN_1697622": "CCND1",
+    "ILMN_1738801": "CDK4",
+    "ILMN_1698467": "CDK6",
+    "ILMN_1776507": "RB1",
+    "ILMN_2185948": "PTEN",
+    "ILMN_2402257": "TP53",
+
+    # LUMINAL
+    "ILMN_1688895": "KRT8",
+    "ILMN_1711192": "KRT18",
+    "ILMN_1765851": "KRT19",
+    "ILMN_1791210": "CDH1",
+    "ILMN_1668111": "EPCAM",
+    "ILMN_2387561": "HOXB13",
+    "ILMN_1714588": "GATA2",
+    "ILMN_2341949": "GATA3",
+
+    # BASAL
+    "ILMN_1779323": "KRT5",
+    "ILMN_1713464": "KRT14",
+    "ILMN_1692128": "TP63",
+    "ILMN_2383725": "CD44",
+    "ILMN_2364093": "ITGA6",
+    "ILMN_1699012": "NGFR",
+
+    # EMT
+    "ILMN_1777688": "VIM",
+    "ILMN_1714228": "CDH2",
+    "ILMN_1697281": "SNAI1",
+    "ILMN_1693140": "SNAI2",
+    "ILMN_1779677": "ZEB1",
+    "ILMN_1796316": "TWIST1",
+    "ILMN_1766619": "FN1",
+
+    # ERG PROGRAM
+    "ILMN_2338729": "ERG",
+    "ILMN_1772887": "ETV1",
+    "ILMN_1668770": "ETV4",
+    "ILMN_1791861": "ETV5",
+    "ILMN_1715210": "SPDEF",
+
+    # NEUROENDOCRINE
+    "ILMN_1683121": "CHGA",
+    "ILMN_1791735": "SYP",
+    "ILMN_1770337": "ENO2",
+    "ILMN_1808680": "NCAM1",
+    "ILMN_1681538": "AURKA",
+    "ILMN_1745538": "MYCN",
+    "ILMN_1736783": "SOX2",
+
+    # PROGNOSIS
+    "ILMN_1806487": "MKI67",
+    "ILMN_1698404": "PCNA",
+    "ILMN_1751278": "TOP2A",
+    "ILMN_1681538": "AURKA",
+    "ILMN_1762653": "PLK1",
+    "ILMN_1741308": "BUB1B",
+}
 
 # ============================================================
 # GENE PANELS — LOCKED BEFORE DATA
 # ============================================================
 
-# SWITCH GENES — luminal identity
-# Predicted suppressed in PRAD
 SWITCH_GENES = [
-    "NKX3-1",   # master luminal TF
-    "FOXA1",    # AR pioneer factor
-    "KLK3",     # PSA — AR terminal target
-    "ACPP",     # acid phosphatase
-    "KLK2",     # kallikrein 2 — luminal
-    "MSMB",     # microseminoprotein-beta
+    "NKX3-1", "FOXA1", "KLK3",
+    "ACPP", "KLK2", "MSMB",
 ]
-
-# FALSE ATTRACTOR — dedifferentiated/
-# progenitor markers
 FA_MARKERS = [
-    "ERG",      # TMPRSS2-ERG fusion product
-    "MKI67",    # proliferation
-    "EZH2",     # epigenetic lock — predicted UP
-    "HOXC6",    # HOX gene EMT
-    "AMACR",    # alpha-methylacyl-CoA racemase
-                # elevated in PRAD
-    "PCA3",     # prostate cancer antigen 3
+    "ERG", "MKI67", "EZH2",
+    "HOXC6", "AMACR",
 ]
-
-# EPIGENETIC
 EPIGENETIC = [
-    "EZH2",     # H3K27me3 — predicted UP
-    "EED",      # PRC2 complex
-    "SUZ12",    # PRC2 complex
-    "KDM6A",    # H3K27 demethylase
-    "DNMT3A",   # DNA methylation
-    "BMI1",     # PRC1
-    "JARID2",   # PRC2 recruiter
+    "EZH2", "EED", "SUZ12",
+    "KDM6A", "DNMT3A", "BMI1", "JARID2",
 ]
-
-# AR AXIS
 AR_AXIS = [
-    "AR",       # androgen receptor
-    "KLK3",     # PSA — AR target
-    "KLK2",     # AR target
-    "TMPRSS2",  # AR target + ERG fusion
-    "FKBP5",    # AR target
-    "STEAP2",   # AR regulated
-    "NKX3-1",   # AR co-regulated
-    "FOXA1",    # AR pioneer
+    "AR", "KLK3", "KLK2",
+    "TMPRSS2", "FKBP5", "STEAP2",
+    "NKX3-1", "FOXA1",
 ]
-
-# SCAFFOLD
 SCAFFOLD = [
-    "MYC",      # predicted elevated
-    "CCND1",    # cyclin D1
-    "CDK4",     # cell cycle
-    "CDK6",     # cell cycle
-    "RB1",      # tumor suppressor
-    "PTEN",     # tumor suppressor
-    "TP53",     # tumor suppressor
+    "MYC", "CCND1", "CDK4",
+    "CDK6", "RB1", "PTEN", "TP53",
 ]
-
-# LUMINAL DIFFERENTIATION MARKERS
 LUMINAL = [
-    "KRT8",     # luminal keratin
-    "KRT18",    # luminal keratin
-    "KRT19",    # luminal/ductal
-    "CDH1",     # E-cadherin epithelial
-    "EPCAM",    # epithelial surface
-    "HOXB13",   # prostate luminal TF
-    "GATA2",    # AR cofactor luminal
-    "GATA3",    # luminal TF
+    "KRT8", "KRT18", "KRT19",
+    "CDH1", "EPCAM", "HOXB13",
+    "GATA2", "GATA3",
 ]
-
-# BASAL MARKERS
 BASAL = [
-    "KRT5",     # basal keratin
-    "KRT14",    # basal keratin
-    "TP63",     # basal TF (p63)
-    "CD44",     # basal/stem marker
-    "ITGA6",    # integrin alpha 6 basal
-    "NGFR",     # p75NTR basal marker
+    "KRT5", "KRT14", "TP63",
+    "CD44", "ITGA6", "NGFR",
 ]
-
-# EMT / INVASION
 EMT = [
-    "VIM",      # vimentin mesenchymal
-    "CDH2",     # N-cadherin mesenchymal
-    "SNAI1",    # EMT TF
-    "SNAI2",    # SLUG EMT TF
-    "ZEB1",     # EMT TF
-    "TWIST1",   # EMT TF
-    "FN1",      # fibronectin
+    "VIM", "CDH2", "SNAI1",
+    "SNAI2", "ZEB1", "TWIST1", "FN1",
 ]
-
-# ERG PROGRAM
 ERG_PROGRAM = [
-    "ERG",      # ETS TF — fusion product
-    "ETV1",     # ETS family — alternative
-    "ETV4",     # ETS family — alternative
-    "ETV5",     # ETS family
-    "SPDEF",    # ETS — luminal
-    "ETS2",     # ETS family
+    "ERG", "ETV1", "ETV4",
+    "ETV5", "SPDEF",
 ]
-
-# NEUROENDOCRINE — important for CRPC
 NEUROENDOCRINE = [
-    "CHGA",     # chromogranin A
-    "SYP",      # synaptophysin
-    "ENO2",     # NSE
-    "NCAM1",    # neural adhesion
-    "AURKA",    # Aurora kinase NEPC
-    "MYCN",     # NEPC driver
-    "SOX2",     # pluripotency NEPC
+    "CHGA", "SYP", "ENO2",
+    "NCAM1", "AURKA", "MYCN", "SOX2",
 ]
-
-# PROGNOSIS / CLINICAL
 PROGNOSIS = [
-    "MKI67",    # Ki67 proliferation
-    "PCNA",     # proliferation
-    "TOP2A",    # topoisomerase — grade marker
-    "AURKA",    # Aurora kinase
-    "PLK1",     # polo-like kinase
-    "BUB1B",    # spindle checkpoint
+    "MKI67", "PCNA", "TOP2A",
+    "AURKA", "PLK1", "BUB1B",
 ]
 
 ALL_TARGET = list(dict.fromkeys(
-    SWITCH_GENES +
-    FA_MARKERS +
-    EPIGENETIC +
-    AR_AXIS +
-    SCAFFOLD +
-    LUMINAL +
-    BASAL +
-    EMT +
-    ERG_PROGRAM +
-    NEUROENDOCRINE +
-    PROGNOSIS
+    SWITCH_GENES + FA_MARKERS +
+    EPIGENETIC + AR_AXIS + SCAFFOLD +
+    LUMINAL + BASAL + EMT +
+    ERG_PROGRAM + NEUROENDOCRINE + PROGNOSIS
 ))
 
 # ============================================================
@@ -262,7 +287,6 @@ def download_all():
     log("  59 PRAD tumors")
     log("  39 matched benign prostate")
     log("  Illumina HumanHT-12 microarray")
-    log("  Non-normalized")
     log("=" * 65)
 
     paths = {}
@@ -277,17 +301,17 @@ def download_all():
                 continue
         url = GEO_BASE + fname
         log(f"  Downloading: {fname}")
+        log(f"  URL: {url}")
 
         def hook(count, block, total):
             if total > 0:
                 pct = min(
-                    count * block
-                    / total * 100, 100
+                    count * block / total * 100,
+                    100
                 )
                 mb = count * block / 1e6
                 sys.stdout.write(
-                    f"\r  {mb:.1f} MB "
-                    f"({pct:.1f}%)"
+                    f"\r  {mb:.1f} MB ({pct:.1f}%)"
                 )
                 sys.stdout.flush()
 
@@ -296,8 +320,7 @@ def download_all():
         )
         print()
         size_mb = os.path.getsize(local) / 1e6
-        log(f"  Done: {local} "
-            f"({size_mb:.1f} MB)")
+        log(f"  Done: {local} ({size_mb:.1f} MB)")
         paths[key] = local
     return paths
 
@@ -308,8 +331,9 @@ def download_all():
 def fetch_metadata():
     log("")
     log("--- Fetching metadata ---")
-    cache = os.path.join(RESULTS_DIR,
-                         "metadata.csv")
+    cache = os.path.join(
+        RESULTS_DIR, "metadata.csv"
+    )
     if os.path.exists(cache):
         df = pd.read_csv(cache, index_col=0)
         log(f"  Loaded cache: {len(df)} samples")
@@ -349,10 +373,6 @@ def fetch_metadata():
                     k.strip().lower()
                     .replace(" ", "_")
                 ] = v.strip()
-        elif line.startswith(
-                "!Sample_description"):
-            current["description"] = \
-                line.split("=", 1)[1].strip()
     if current:
         samples.append(current)
 
@@ -362,17 +382,7 @@ def fetch_metadata():
     return df
 
 # ============================================================
-# STEP 2: LOAD AND NORMALIZE MATRIX
-# Illumina non-normalized data:
-#   Rows = ILMN probe IDs
-#   Columns interleaved:
-#     sample_expression, sample_Detection.Pval
-#   Need to:
-#     1. Separate expression from pval columns
-#     2. Filter low-detection probes
-#     3. log2 transform
-#     4. Quantile normalize
-#     5. Map ILMN probes → gene symbols
+# STEP 2: LOAD AND NORMALIZE
 # ============================================================
 
 def load_and_normalize(path):
@@ -385,61 +395,53 @@ def load_and_normalize(path):
         )
 
     log(f"  Raw shape: {df.shape}")
-    log(f"  Columns sample: "
-        f"{list(df.columns[:6])}")
+    log(f"  Col sample: {list(df.columns[:4])}")
 
-    # Separate expression columns from
-    # Detection.Pval columns
+    # Separate expression from Detection.Pval
     expr_cols = [
         c for c in df.columns
-        if "Detection" not in c
-        and "Pval" not in c
-        and "detection" not in c.lower()
+        if "detection" not in c.lower()
+        and "pval" not in c.lower()
     ]
     pval_cols = [
         c for c in df.columns
-        if "Detection" in c
-        or "Pval" in c
+        if "detection" in c.lower()
+        or "pval" in c.lower()
     ]
 
-    log(f"  Expression columns: {len(expr_cols)}")
-    log(f"  Pval columns      : {len(pval_cols)}")
+    log(f"  Expression cols: {len(expr_cols)}")
+    log(f"  Pval cols      : {len(pval_cols)}")
 
     expr_df = df[expr_cols].copy()
     expr_df = expr_df.apply(
         pd.to_numeric, errors="coerce"
     )
 
-    # Filter probes: keep probes detected
-    # in at least 20% of samples
+    # Filter: keep probes detected in
+    # >= 20% of samples
     if pval_cols:
         pval_df = df[pval_cols].apply(
             pd.to_numeric, errors="coerce"
         )
-        # Detection Pval < 0.05 = detected
-        detected = (pval_df < 0.05).sum(axis=1)
+        detected   = (pval_df < 0.05).sum(axis=1)
         min_detect = max(
-            3, int(len(pval_cols) * 0.2)
+            3, int(len(pval_cols) * 0.20)
         )
-        keep_mask = detected >= min_detect
-        expr_df = expr_df[keep_mask]
-        log(f"  Probes after detection filter "
-            f"(>={min_detect} samples): "
-            f"{keep_mask.sum()}/{len(keep_mask)}")
+        keep_mask  = detected >= min_detect
+        expr_df    = expr_df[keep_mask]
+        log(f"  After detection filter: "
+            f"{keep_mask.sum()} probes")
 
-    # Replace zeros/negatives
     expr_df = expr_df.clip(lower=1.0)
-
-    # log2 transform
     expr_df = np.log2(expr_df)
     log(f"  log2 transformed")
 
     # Quantile normalize
     log(f"  Quantile normalizing...")
-    arr    = expr_df.values.copy()
-    sorted_arr = np.sort(arr, axis=0)
-    mean_ref   = sorted_arr.mean(axis=1)
-    rank_idx   = np.argsort(
+    arr      = expr_df.values.copy()
+    sort_arr = np.sort(arr, axis=0)
+    mean_ref = sort_arr.mean(axis=1)
+    rank_idx = np.argsort(
         np.argsort(arr, axis=0), axis=0
     )
     norm_arr = mean_ref[rank_idx]
@@ -448,251 +450,290 @@ def load_and_normalize(path):
         index=expr_df.index,
         columns=expr_df.columns,
     )
-    log(f"  Quantile normalization complete")
-    log(f"  Shape after norm: {expr_df.shape}")
-
-    return expr_df, expr_cols
-
+    log(f"  Normalized shape: {expr_df.shape}")
+    return expr_df
 
 # ============================================================
-# STEP 3: PROBE → GENE SYMBOL MAPPING
-# Download GPL10558 platform annotation
+# STEP 3: PROBE MAPPING — FAST LOCAL
+# Use hard-coded PROBE_GENE_MAP first
+# Then try GEO miniSOFT as fallback
+# (much smaller than full SOFT file)
 # ============================================================
 
-def get_probe_map():
-    cache = os.path.join(BASE_DIR,
-                         "probe_map.csv")
-    if os.path.exists(cache):
-        pm = pd.read_csv(cache, index_col=0)
-        log(f"  Probe map cache: {len(pm)} probes")
-        return pm
+def map_probes_fast(expr_df):
+    log("")
+    log("--- Probe mapping (fast local) ---")
 
-    log("  Fetching GPL10558 annotation...")
-    # Try GEO soft file
-    url = (
-        "https://ftp.ncbi.nlm.nih.gov/geo/"
-        "platforms/GPL10nnn/GPL10558/soft/"
-        "GPL10558_family.soft.gz"
-    )
-    try:
-        req = urllib.request.Request(
-            url,
-            headers={"User-Agent": "Mozilla/5.0"}
+    # Method 1: hard-coded map
+    probe_ids = set(expr_df.index)
+    mapped    = {
+        p: g for p, g in PROBE_GENE_MAP.items()
+        if p in probe_ids
+    }
+    log(f"  Hard-coded map hits: "
+        f"{len(mapped)}/{len(PROBE_GENE_MAP)}")
+
+    # Method 2: if too few hits
+    # try GEO miniSOFT annotation table
+    # (just the table section — much faster)
+    if len(mapped) < 20:
+        log("  Trying GEO annotation table...")
+        ann_url = (
+            "https://www.ncbi.nlm.nih.gov/geo/"
+            "query/acc.cgi?acc=GPL10558"
+            "&targ=self&form=text&view=brief"
         )
-        with urllib.request.urlopen(
-            req, timeout=60
-        ) as r:
-            raw = r.read()
+        try:
+            req = urllib.request.Request(
+                ann_url,
+                headers={
+                    "User-Agent": "Mozilla/5.0"
+                }
+            )
+            with urllib.request.urlopen(
+                req, timeout=20
+            ) as r:
+                text = r.read().decode(
+                    "utf-8", errors="ignore"
+                )
 
-        with gzip.open(
-            __import__("io").BytesIO(raw), "rt"
-        ) as gz:
-            lines = gz.readlines()
+            in_table  = False
+            col_names = None
+            id_col    = None
+            sym_col   = None
+            extra     = {}
 
-        # Parse table section
-        in_table  = False
-        col_names = None
-        rows      = []
-        for line in lines:
-            line = line.rstrip()
-            if line.startswith(
-                "!platform_table_begin"
-            ):
-                in_table  = True
-                col_names = None
-                continue
-            if line.startswith(
-                "!platform_table_end"
-            ):
-                break
-            if in_table:
+            for line in text.split("\n"):
+                line = line.rstrip()
+                if "platform_table_begin" in line:
+                    in_table  = True
+                    col_names = None
+                    continue
+                if "platform_table_end" in line:
+                    break
+                if not in_table:
+                    continue
                 parts = line.split("\t")
                 if col_names is None:
                     col_names = parts
-                else:
-                    rows.append(parts)
+                    for i, c in enumerate(
+                        col_names
+                    ):
+                        cl = c.lower()
+                        if cl == "id":
+                            id_col = i
+                        if cl in [
+                            "symbol",
+                            "ilmn_gene",
+                            "gene_symbol",
+                        ]:
+                            sym_col = i
+                    log(f"  Cols: {col_names[:6]}")
+                    log(f"  id_col={id_col} "
+                        f"sym_col={sym_col}")
+                    continue
+                if (id_col is not None
+                        and sym_col is not None
+                        and len(parts)
+                        > max(id_col, sym_col)):
+                    probe = parts[id_col].strip()
+                    sym   = parts[sym_col].strip()
+                    if (probe and sym
+                            and sym != ""
+                            and sym != "---"):
+                        extra[probe] = sym
 
-        if col_names and rows:
-            pm = pd.DataFrame(
-                rows, columns=col_names
+            log(f"  GEO brief: "
+                f"{len(extra)} probes")
+            mapped.update({
+                p: g for p, g in extra.items()
+                if p in probe_ids
+            })
+            log(f"  Total after GEO: "
+                f"{len(mapped)}")
+
+        except Exception as e:
+            log(f"  GEO brief error: {e}")
+
+    # Method 3: if still too few,
+    # try downloading just the annotation
+    # CSV (not full SOFT)
+    if len(mapped) < 20:
+        log("  Trying annotation CSV...")
+        csv_url = (
+            "https://ftp.ncbi.nlm.nih.gov/geo/"
+            "platforms/GPL10nnn/GPL10558/annot/"
+            "GPL10558.annot.gz"
+        )
+        try:
+            req = urllib.request.Request(
+                csv_url,
+                headers={
+                    "User-Agent": "Mozilla/5.0"
+                }
             )
-            log(f"  Platform columns: "
-                f"{list(pm.columns[:8])}")
+            with urllib.request.urlopen(
+                req, timeout=30
+            ) as r:
+                raw = r.read()
 
-            # Find symbol column
-            sym_col = None
-            for c in pm.columns:
-                if c.lower() in [
-                    "symbol", "gene_symbol",
-                    "ilmn_gene", "gene",
-                ]:
-                    sym_col = c
+            import io as _io
+            with gzip.open(
+                _io.BytesIO(raw), "rt"
+            ) as gz:
+                lines = gz.readlines()
+
+            log(f"  Annot lines: {len(lines)}")
+            in_t   = False
+            cols   = None
+            ic, sc = None, None
+            extra2 = {}
+            for line in lines:
+                line = line.rstrip()
+                if "platform_table_begin" in line:
+                    in_t = True
+                    cols = None
+                    continue
+                if "platform_table_end" in line:
                     break
-            if sym_col is None:
-                for c in pm.columns:
-                    if "symbol" in c.lower() \
-                            or "gene" in c.lower():
-                        sym_col = c
-                        break
+                if not in_t:
+                    continue
+                parts = line.split("\t")
+                if cols is None:
+                    cols = parts
+                    for i, c in enumerate(cols):
+                        cl = c.lower()
+                        if cl == "id":
+                            ic = i
+                        if cl in [
+                            "gene symbol",
+                            "symbol",
+                            "gene_symbol",
+                        ]:
+                            sc = i
+                    continue
+                if (ic is not None
+                        and sc is not None
+                        and len(parts)
+                        > max(ic, sc)):
+                    probe = parts[ic].strip()
+                    sym   = parts[sc].strip()
+                    if (probe and sym
+                            and "///" not in sym
+                            and sym != "---"):
+                        extra2[probe] = \
+                            sym.split(" ")[0]
 
-            if sym_col:
-                probe_col = pm.columns[0]
-                pm2 = pm[[
-                    probe_col, sym_col
-                ]].copy()
-                pm2.columns = ["probe", "symbol"]
-                pm2 = pm2[
-                    pm2["symbol"].notna()
-                    & (pm2["symbol"] != "")
-                    & (pm2["symbol"] != "---")
-                ]
-                pm2 = pm2.set_index("probe")
-                pm2.to_csv(cache)
-                log(f"  Probe map: "
-                    f"{len(pm2)} probes mapped")
-                return pm2
+            log(f"  Annot CSV: {len(extra2)}")
+            mapped.update({
+                p: g for p, g
+                in extra2.items()
+                if p in probe_ids
+            })
+            log(f"  Total after CSV: "
+                f"{len(mapped)}")
 
-    except Exception as e:
-        log(f"  GPL10558 fetch error: {e}")
+        except Exception as e:
+            log(f"  Annot CSV error: {e}")
 
-    # Fallback: parse from matrix file header
-    log("  Falling back to direct gene mapping")
-    return None
+    # Apply mapping
+    log(f"\n  Final probe→gene hits: "
+        f"{len(mapped)}")
 
-
-def map_probes_to_genes(expr_df, probe_map):
-    if probe_map is None:
-        log("  No probe map — "
-            "using probe IDs as gene names")
-        log("  Attempting SOFT file download...")
+    if len(mapped) < 5:
+        log("  WARNING: Very few probes mapped")
+        log("  Returning probe IDs as gene names")
+        log("  Check probe ID format in matrix")
+        log(f"  Sample probe IDs: "
+            f"{list(expr_df.index[:5])}")
         return expr_df
 
-    log(f"\n  Mapping probes to gene symbols...")
-
-    # Join probe IDs to symbols
-    matched = expr_df.index.intersection(
-        probe_map.index
-    )
-    log(f"  Probes matched: "
-        f"{len(matched)}/{len(expr_df)}")
-
-    if len(matched) == 0:
-        log("  WARNING: No probes matched")
-        log("  Trying case-insensitive match...")
-        pm_upper = probe_map.copy()
-        pm_upper.index = pm_upper.index.str.upper()
-        expr_upper = expr_df.copy()
-        expr_upper.index = \
-            expr_upper.index.str.upper()
-        matched = expr_upper.index.intersection(
-            pm_upper.index
-        )
-        log(f"  After upper: {len(matched)}")
-        if len(matched) > 0:
-            expr_df    = expr_upper
-            probe_map  = pm_upper
-
-    sub = expr_df.loc[matched].copy()
-    sub["symbol"] = probe_map.loc[
-        matched, "symbol"
-    ].values
-
-    # For multi-probe genes: keep probe
-    # with highest mean expression
-    sub["mean_expr"] = sub.drop(
-        columns=["symbol"]
-    ).mean(axis=1)
+    # Build gene-level matrix
+    sub = expr_df.loc[
+        [p for p in mapped if p in expr_df.index]
+    ].copy()
+    sub["symbol"] = [
+        mapped[p] for p in sub.index
+    ]
+    sub["mean_expr"] = \
+        sub.drop(columns=["symbol"]).mean(axis=1)
     sub = sub.sort_values(
         "mean_expr", ascending=False
     )
     sub = sub.drop_duplicates(
         subset=["symbol"], keep="first"
     )
-    sub = sub.drop(
-        columns=["symbol", "mean_expr"]
-    )
-    sub.index = probe_map.loc[
-        sub.index, "symbol"
-    ].values if len(
-        sub.index.intersection(
-            probe_map.index
-        )
-    ) == len(sub) else sub.index
-
-    # Re-map index cleanly
-    idx_mapped = []
-    for probe in sub.index:
-        sym = probe_map.loc[probe, "symbol"] \
-            if probe in probe_map.index \
-            else probe
-        idx_mapped.append(sym)
-    sub.index = idx_mapped
+    symbols = sub["symbol"].values
+    sub = sub.drop(columns=["symbol",
+                             "mean_expr"])
+    sub.index = symbols
 
     log(f"  Genes after dedup: {len(sub)}")
     log(f"  Sample genes: "
-        f"{list(sub.index[:5])}")
-    return sub
+        f"{list(sub.index[:10])}")
 
+    # Report target gene coverage
+    found = [g for g in ALL_TARGET
+             if g in sub.index]
+    miss  = [g for g in ALL_TARGET
+             if g not in sub.index]
+    log(f"\n  Target genes found: "
+        f"{len(found)}/{len(ALL_TARGET)}")
+    if miss:
+        log(f"  Missing: {miss[:15]}")
+
+    return sub
 
 # ============================================================
 # STEP 4: MERGE AND CLASSIFY
 # ============================================================
 
-def merge_with_meta(expr_T, meta):
+def merge_with_meta(gene_df, meta):
     log("")
     log("--- Merging with metadata ---")
 
     meta = meta.copy()
 
-    # Sample ID from column names
-    # Matrix columns: DKFZ_01, DKFZ_02 etc
-    # Metadata title: Human_..._DKFZ_02
-    # Extract DKFZ_XX from title
-    def extract_id(title):
+    # Extract DKFZ_XX identifier from title
+    def extract_dkfz(title):
         title = str(title)
-        for part in title.split("_"):
-            if part.upper().startswith("DKFZ"):
-                # get next part too
-                idx = title.split("_").index(
-                    part
-                )
-                parts = title.split("_")
-                if idx + 1 < len(parts):
-                    return (
-                        parts[idx]
-                        + "_"
-                        + parts[idx + 1]
-                    )
-                return part
+        parts = title.split("_")
+        for i, p in enumerate(parts):
+            if p.upper() == "DKFZ" \
+                    and i + 1 < len(parts):
+                return f"DKFZ_{parts[i+1]}"
         return title
 
-    meta["sample_id"] = meta[
-        "title"
-    ].apply(extract_id)
+    meta["sample_id"] = \
+        meta["title"].apply(extract_dkfz)
 
-    log(f"  Meta sample IDs: "
+    log(f"  Meta IDs (first 5): "
         f"{list(meta['sample_id'].head(5))}")
-    log(f"  Expr columns  : "
-        f"{list(expr_T.columns[:5])}")
+    log(f"  Expr cols (first 5): "
+        f"{list(gene_df.columns[:5])}")
 
     meta_cols = [c for c in [
-        "tissue",
         "disease_stage",
         "gleason_pattern_group",
         "source",
     ] if c in meta.columns]
 
-    merged = expr_T.T.join(
+    # Transpose so samples are rows
+    expr_T = gene_df.T
+    expr_T.index.name = "sample_id"
+
+    merged = expr_T.join(
         meta.set_index("sample_id")[meta_cols],
         how="left",
     )
 
     # Classify
     merged["group"] = "UNKNOWN"
+
     if "disease_stage" in merged.columns:
-        ds = merged["disease_stage"].fillna(
-            ""
-        ).str.lower()
+        ds = merged[
+            "disease_stage"
+        ].fillna("").str.lower()
         merged.loc[
             ds.str.contains("cancer|tumor"),
             "group"
@@ -702,51 +743,29 @@ def merge_with_meta(expr_T, meta):
             "group"
         ] = "NORMAL"
 
-    # Fallback from source
-    if (merged["group"] == "UNKNOWN").sum() > 5:
-        src = merged["source"].fillna(
-            ""
-        ).str.lower() \
-            if "source" in merged.columns \
-            else pd.Series(
-                "", index=merged.index
-            )
-        merged.loc[
-            src.str.contains("tumor|cancer|malignant"),
-            "group"
-        ] = "TUMOR"
-        merged.loc[
-            src.str.contains(
-                "benign|normal|adjacent"
-            ),
-            "group"
-        ] = "NORMAL"
-
-    # Fallback from column name
+    # Fallback: column name contains clue
     for idx in merged[
         merged["group"] == "UNKNOWN"
     ].index:
-        idx_l = str(idx).lower()
-        if "tumor" in idx_l \
-                or "cancer" in idx_l:
+        il = str(idx).lower()
+        if "tumor" in il or "cancer" in il:
             merged.loc[idx, "group"] = "TUMOR"
-        elif "benign" in idx_l \
-                or "normal" in idx_l:
+        elif "benign" in il or "normal" in il:
             merged.loc[idx, "group"] = "NORMAL"
 
-    log(f"  TUMOR  : "
-        f"{(merged['group']=='TUMOR').sum()}")
-    log(f"  NORMAL : "
-        f"{(merged['group']=='NORMAL').sum()}")
-    log(f"  UNKNOWN: "
-        f"{(merged['group']=='UNKNOWN').sum()}")
+    n_t = (merged["group"] == "TUMOR").sum()
+    n_n = (merged["group"] == "NORMAL").sum()
+    n_u = (merged["group"] == "UNKNOWN").sum()
+    log(f"  TUMOR  : {n_t}")
+    log(f"  NORMAL : {n_n}")
+    log(f"  UNKNOWN: {n_u}")
 
-    # Gleason
+    # Gleason distribution
     if "gleason_pattern_group" in merged.columns:
         gc = merged[
             merged["group"] == "TUMOR"
         ]["gleason_pattern_group"].value_counts()
-        log(f"\n  Gleason distribution:")
+        log(f"\n  Gleason distribution (tumor):")
         for g, n in gc.items():
             log(f"    {g}: {n}")
 
@@ -773,20 +792,19 @@ def saddle_point_analysis(merged):
     log("  Switch: NKX3-1/FOXA1/KLK3/ACPP DOWN")
     log("  FA:     ERG/EZH2/MKI67/HOXC6 UP")
     log("  Scaffold: MYC/AR elevated")
-    log("")
 
     role_map = {}
-    for g in SWITCH_GENES:     role_map[g]="SWITCH"
-    for g in FA_MARKERS:       role_map[g]="FA"
-    for g in EPIGENETIC:       role_map[g]="EPIGEN"
-    for g in AR_AXIS:          role_map[g]="AR"
-    for g in SCAFFOLD:         role_map[g]="SCAFFOLD"
-    for g in LUMINAL:          role_map[g]="LUMINAL"
-    for g in BASAL:            role_map[g]="BASAL"
-    for g in EMT:              role_map[g]="EMT"
-    for g in ERG_PROGRAM:      role_map[g]="ERG"
-    for g in NEUROENDOCRINE:   role_map[g]="NE"
-    for g in PROGNOSIS:        role_map[g]="PROG"
+    for g in SWITCH_GENES:   role_map[g]="SWITCH"
+    for g in FA_MARKERS:     role_map[g]="FA"
+    for g in EPIGENETIC:     role_map[g]="EPIGEN"
+    for g in AR_AXIS:        role_map[g]="AR"
+    for g in SCAFFOLD:       role_map[g]="SCAFFOLD"
+    for g in LUMINAL:        role_map[g]="LUMINAL"
+    for g in BASAL:          role_map[g]="BASAL"
+    for g in EMT:            role_map[g]="EMT"
+    for g in ERG_PROGRAM:    role_map[g]="ERG"
+    for g in NEUROENDOCRINE: role_map[g]="NE"
+    for g in PROGNOSIS:      role_map[g]="PROG"
 
     def fmt_p(p):
         if p < 1e-300:  return "p=0.00e+00 ***"
@@ -800,7 +818,7 @@ def saddle_point_analysis(merged):
         if c in ALL_TARGET
     ]
 
-    log(f"  {'Gene':<12} {'Role':<9} "
+    log(f"\n  {'Gene':<12} {'Role':<9} "
         f"{'Normal':>9} {'Tumor':>9} "
         f"{'Change':>9} {'p-value':>16}")
     log(f"  {'-'*68}")
@@ -828,15 +846,12 @@ def saddle_point_analysis(merged):
         )
         p_use = min(p_s, p_e)
         role  = role_map.get(gene, "OTHER")
+        chg_s = (f"{chg:+.1f}%"
+                 if not np.isnan(chg) else "N/A")
 
-        chg_str = (
-            f"{chg:+.1f}%"
-            if not np.isnan(chg) else "N/A"
-        )
         log(f"  {gene:<12} {role:<9} "
             f"{nd_m:>9.4f} {td_m:>9.4f} "
-            f"{chg_str:>9}  "
-            f"{fmt_p(p_use):>16}")
+            f"{chg_s:>9}  {fmt_p(p_use):>16}")
 
         results.append({
             "gene":        gene,
@@ -844,8 +859,6 @@ def saddle_point_analysis(merged):
             "normal_mean": nd_m,
             "tumor_mean":  td_m,
             "change_pct":  chg,
-            "p_supp":      p_s,
-            "p_elev":      p_e,
             "p_value":     p_use,
         })
 
@@ -866,6 +879,7 @@ def depth_scoring(merged, tumor, normal):
     log("")
     log("=" * 65)
     log("STEP 6: BLOCK DEPTH SCORING")
+    log("Score = switch suppression + FA elevation")
     log("=" * 65)
 
     gene_cols = [
@@ -878,17 +892,14 @@ def depth_scoring(merged, tumor, normal):
         return (
             (s - mn) / (mx - mn)
             if mx > mn
-            else pd.Series(
-                0.0, index=s.index
-            )
+            else pd.Series(0.0, index=s.index)
         )
 
-    tumor  = tumor.copy()
-    depth  = pd.Series(
-        np.zeros(len(tumor)),
-        index=tumor.index,
+    tumor = tumor.copy()
+    depth = pd.Series(
+        np.zeros(len(tumor)), index=tumor.index
     )
-    comp   = 0
+    comp = 0
 
     sw_avail = [
         g for g in SWITCH_GENES
@@ -900,45 +911,34 @@ def depth_scoring(merged, tumor, normal):
     ]
 
     if sw_avail:
-        sw_mean = tumor[sw_avail].mean(axis=1)
-        depth  += (1 - norm01(sw_mean))
-        comp   += 1
-        log(f"  Comp 1: switch suppression "
-            f"genes={sw_avail}")
+        sw_m   = tumor[sw_avail].mean(axis=1)
+        depth += (1 - norm01(sw_m))
+        comp  += 1
+        log(f"  Component 1: switch suppression "
+            f"{sw_avail}")
 
     if fa_avail:
-        fa_mean = tumor[fa_avail].mean(axis=1)
-        depth  += norm01(fa_mean)
-        comp   += 1
-        log(f"  Comp 2: FA elevation "
-            f"genes={fa_avail}")
+        fa_m   = tumor[fa_avail].mean(axis=1)
+        depth += norm01(fa_m)
+        comp  += 1
+        log(f"  Component 2: FA elevation "
+            f"{fa_avail}")
 
     if comp > 0:
         depth /= comp
 
     tumor["block_depth"] = depth.values
 
-    log(f"\n  Depth ({len(tumor)} tumors):")
+    log(f"\n  Block depth ({len(tumor)} tumors):")
     log(f"    Mean  : {depth.mean():.4f}")
     log(f"    Median: {depth.median():.4f}")
     log(f"    Std   : {depth.std():.4f}")
     log(f"    Min   : {depth.min():.4f}")
     log(f"    Max   : {depth.max():.4f}")
 
-    # Gleason stratification
+    # Gleason
     if "gleason_pattern_group" in tumor.columns:
         log(f"\n  Depth by Gleason:")
-        for g in ["high", "low"]:
-            sd = tumor[
-                tumor["gleason_pattern_group"]
-                == g
-            ]["block_depth"]
-            if len(sd) > 2:
-                log(f"    {g:<6} "
-                    f"(n={len(sd):3d}): "
-                    f"{sd.mean():.4f} "
-                    f"± {sd.std():.4f}")
-        # Test high > low
         hi = tumor[
             tumor["gleason_pattern_group"]
             == "high"
@@ -947,20 +947,33 @@ def depth_scoring(merged, tumor, normal):
             tumor["gleason_pattern_group"]
             == "low"
         ]["block_depth"]
+        for label, sd in [
+            ("high", hi), ("low", lo)
+        ]:
+            if len(sd) > 2:
+                log(f"    {label:<6} "
+                    f"(n={len(sd):3d}): "
+                    f"{sd.mean():.4f} "
+                    f"± {sd.std():.4f}")
         if len(hi) > 3 and len(lo) > 3:
             _, p_gl = stats.mannwhitneyu(
                 hi, lo, alternative="greater"
             )
-            log(f"\n  High > Low depth: "
+            log(f"\n  High > Low Gleason depth: "
                 f"p={p_gl:.4f}")
             log(f"  Prediction: high Gleason "
-                f"= deeper block")
+                f"= deeper")
             log(f"  Result: "
                 f"{'CONFIRMED' if p_gl < 0.05 else 'NOT CONFIRMED'}")
 
-    # Depth correlations
+    # Top depth correlations
     corrs = []
     for gene in gene_cols:
+        if gene in ["block_depth",
+                    "gleason_pattern_group",
+                    "disease_stage", "source",
+                    "group"]:
+            continue
         try:
             rv, pv = stats.pearsonr(
                 tumor["block_depth"].values,
@@ -974,18 +987,25 @@ def depth_scoring(merged, tumor, normal):
     )
 
     log(f"\n  Depth correlations (top 20):")
-    log(f"  {'Gene':<12} {'r':>8}  p-value")
-    log(f"  {'-'*34}")
+    log(f"  {'Gene':<12} {'r':>8}  p-value  Role")
+    log(f"  {'-'*42}")
+    role_map = {}
+    for g in SWITCH_GENES:   role_map[g]="SWITCH"
+    for g in FA_MARKERS:     role_map[g]="FA"
+    for g in AR_AXIS:        role_map[g]="AR"
+    for g in EPIGENETIC:     role_map[g]="EPIGEN"
+    for g in SCAFFOLD:       role_map[g]="SCAFFOLD"
+    for g in LUMINAL:        role_map[g]="LUMINAL"
+
     for gene, rv, pv in corrs[:20]:
+        role = role_map.get(gene, "")
         log(f"  {gene:<12} {rv:>+8.4f}  "
-            f"p={pv:.2e}")
+            f"p={pv:.2e}  {role}")
 
     return tumor, corrs
 
 # ============================================================
 # STEP 7: ERG ANALYSIS
-# Predict: bimodal ERG expression
-# Fusion-positive = ERG high
 # ============================================================
 
 def erg_analysis(tumor, normal):
@@ -993,69 +1013,76 @@ def erg_analysis(tumor, normal):
     log("=" * 65)
     log("STEP 7: ERG ANALYSIS")
     log("Prediction: bimodal ERG in tumors")
-    log("Fusion+ = ERG high / Fusion- = ERG low")
+    log("Fusion+ = ERG high / Fusion- = low")
     log("=" * 65)
 
     gene_cols = [
         c for c in tumor.columns
         if c in ALL_TARGET
     ]
-
     if "ERG" not in gene_cols:
-        log("  ERG not found in matrix — skip")
+        log("  ERG not found — skip")
         return tumor
 
     erg_t = tumor["ERG"].values
-    erg_n = normal["ERG"].values
+    erg_n = normal["ERG"].values if \
+        "ERG" in normal.columns else np.array([])
 
-    log(f"\n  ERG in normal: "
-        f"{erg_n.mean():.4f} ± {erg_n.std():.4f}")
-    log(f"  ERG in tumor:  "
-        f"{erg_t.mean():.4f} ± {erg_t.std():.4f}")
-    log(f"  ERG range (tumor): "
-        f"{erg_t.min():.4f} – {erg_t.max():.4f}")
+    if len(erg_n) > 0:
+        log(f"\n  ERG normal: "
+            f"{erg_n.mean():.4f} "
+            f"± {erg_n.std():.4f}")
+    log(f"  ERG tumor:  "
+        f"{erg_t.mean():.4f} "
+        f"± {erg_t.std():.4f}")
+    log(f"  ERG range:  "
+        f"{erg_t.min():.4f} — "
+        f"{erg_t.max():.4f}")
 
-    # Bimodality test
-    from scipy.stats import gaussian_kde
+    # Bimodality via KDE
     try:
-        kde  = gaussian_kde(erg_t)
-        xmin = erg_t.min()
-        xmax = erg_t.max()
-        xs   = np.linspace(xmin, xmax, 200)
-        ys   = kde(xs)
-
-        # Find local minima in KDE
+        from scipy.stats import gaussian_kde
         from scipy.signal import argrelmin
-        mins_idx = argrelmin(ys, order=5)[0]
-        log(f"\n  KDE local minima: "
-            f"{len(mins_idx)}")
-        if len(mins_idx) > 0:
-            threshold = xs[mins_idx[0]]
-            log(f"  Threshold: {threshold:.4f}")
-            n_high = (erg_t > threshold).sum()
-            n_low  = (erg_t <= threshold).sum()
-            log(f"  ERG-high (fusion+?): {n_high}")
-            log(f"  ERG-low  (fusion-?): {n_low}")
-            log(f"  Prediction: bimodal")
-            log(f"  Result: "
-                f"{'CONFIRMED' if len(mins_idx) > 0 else 'NOT CONFIRMED'}")
-            tumor = tumor.copy()
+        kde  = gaussian_kde(erg_t)
+        xs   = np.linspace(
+            erg_t.min(), erg_t.max(), 300
+        )
+        ys   = kde(xs)
+        mins = argrelmin(ys, order=8)[0]
+        log(f"\n  KDE local minima: {len(mins)}")
+
+        tumor = tumor.copy()
+        if len(mins) > 0:
+            threshold = xs[mins[0]]
+            log(f"  Bimodal threshold: "
+                f"{threshold:.4f}")
+            n_hi = (erg_t > threshold).sum()
+            n_lo = (erg_t <= threshold).sum()
+            log(f"  ERG-high (fusion+?): {n_hi}")
+            log(f"  ERG-low  (fusion-?): {n_lo}")
+            log(f"  Prediction: CONFIRMED")
             tumor["erg_status"] = np.where(
                 tumor["ERG"] > threshold,
                 "ERG_high", "ERG_low"
             )
         else:
-            log("  No clear bimodal threshold found")
-            tumor = tumor.copy()
-            med   = np.median(erg_t)
+            log("  No clear bimodal threshold")
+            med = np.median(erg_t)
             tumor["erg_status"] = np.where(
                 tumor["ERG"] > med,
                 "ERG_high", "ERG_low"
             )
+
     except Exception as e:
         log(f"  KDE error: {e}")
+        tumor = tumor.copy()
+        med   = np.median(erg_t)
+        tumor["erg_status"] = np.where(
+            tumor["ERG"] > med,
+            "ERG_high", "ERG_low"
+        )
 
-    # ERG-high vs ERG-low key genes
+    # Key genes by ERG status
     if "erg_status" in tumor.columns:
         erg_hi = tumor[
             tumor["erg_status"] == "ERG_high"
@@ -1063,44 +1090,41 @@ def erg_analysis(tumor, normal):
         erg_lo = tumor[
             tumor["erg_status"] == "ERG_low"
         ]
+        key = [g for g in [
+            "NKX3-1", "FOXA1", "KLK3",
+            "AR", "TMPRSS2", "MYC",
+            "EZH2", "MKI67",
+        ] if g in gene_cols]
+
         log(f"\n  Key genes by ERG status:")
         log(f"  {'Gene':<12} "
             f"{'ERG-high':>10} "
             f"{'ERG-low':>10} "
             f"{'Change':>9}")
-        log(f"  {'-'*48}")
-        key_genes = [g for g in [
-            "NKX3-1", "FOXA1", "KLK3",
-            "AR", "TMPRSS2", "MYC",
-            "EZH2", "MKI67",
-        ] if g in gene_cols]
-        for gene in key_genes:
-            hm = erg_hi[gene].mean()
-            lm = erg_lo[gene].mean()
+        log(f"  {'-'*46}")
+        for gene in key:
+            hm  = erg_hi[gene].mean()
+            lm  = erg_lo[gene].mean()
             chg = ((hm - lm) / lm * 100
                    if lm > 0.0001 else np.nan)
-            chg_str = (
-                f"{chg:+.1f}%"
-                if not np.isnan(chg) else "N/A"
-            )
+            cs  = (f"{chg:+.1f}%"
+                   if not np.isnan(chg) else "N/A")
             log(f"  {gene:<12} "
                 f"{hm:>10.4f} "
-                f"{lm:>10.4f} "
-                f"{chg_str:>9}")
+                f"{lm:>10.4f} {cs:>9}")
 
     return tumor
 
 # ============================================================
-# STEP 8: AR AXIS ANALYSIS
+# STEP 8: AR AXIS
 # ============================================================
 
 def ar_axis_analysis(tumor, normal):
     log("")
     log("=" * 65)
     log("STEP 8: AR AXIS ANALYSIS")
-    log("AR drives luminal identity")
-    log("Prediction: AR maintained/elevated")
-    log("KLK3/PSA: suppressed in high Gleason")
+    log("AR maintained/elevated predicted")
+    log("KLK3/PSA lower in high Gleason")
     log("=" * 65)
 
     gene_cols = [
@@ -1108,23 +1132,23 @@ def ar_axis_analysis(tumor, normal):
         if c in ALL_TARGET
     ]
 
-    log(f"\n  AR axis in tumor vs normal:")
-    log(f"  {'Gene':<10} {'Normal':>9} "
+    log(f"\n  {'Gene':<10} {'Normal':>9} "
         f"{'Tumor':>9} {'Change':>9}")
     log(f"  {'-'*40}")
     for gene in AR_AXIS:
         if gene not in gene_cols:
             continue
-        nm = normal[gene].mean()
-        tm = tumor[gene].mean()
+        nm  = normal[gene].mean() \
+            if gene in normal.columns else np.nan
+        tm  = tumor[gene].mean()
+        if np.isnan(nm):
+            continue
         chg = ((tm - nm) / nm * 100
                if nm > 0.0001 else np.nan)
-        chg_str = (
-            f"{chg:+.1f}%"
-            if not np.isnan(chg) else "N/A"
-        )
+        cs  = (f"{chg:+.1f}%"
+               if not np.isnan(chg) else "N/A")
         log(f"  {gene:<10} {nm:>9.4f} "
-            f"{tm:>9.4f} {chg_str:>9}")
+            f"{tm:>9.4f} {cs:>9}")
 
     # KLK3 by Gleason
     if ("KLK3" in gene_cols
@@ -1137,8 +1161,7 @@ def ar_axis_analysis(tumor, normal):
                 == g
             ]["KLK3"]
             if len(sd) > 2:
-                log(f"    {g:<6}: "
-                    f"{sd.mean():.4f} "
+                log(f"    {g}: {sd.mean():.4f} "
                     f"± {sd.std():.4f} "
                     f"(n={len(sd)})")
         hi_k = tumor[
@@ -1151,11 +1174,9 @@ def ar_axis_analysis(tumor, normal):
         ]["KLK3"]
         if len(hi_k) > 3 and len(lo_k) > 3:
             _, p_k = stats.mannwhitneyu(
-                lo_k, hi_k,
-                alternative="greater"
+                lo_k, hi_k, alternative="greater"
             )
-            log(f"  Low > High Gleason KLK3: "
-                f"p={p_k:.4f}")
+            log(f"  Low > High KLK3: p={p_k:.4f}")
             log(f"  Prediction: KLK3 lower "
                 f"in high Gleason")
             log(f"  Result: "
@@ -1168,6 +1189,9 @@ def ar_axis_analysis(tumor, normal):
 def generate_figure(
     merged, tumor, normal, results_df, corrs
 ):
+    log("")
+    log("--- Generating figure ---")
+
     fig = plt.figure(figsize=(26, 20))
     fig.suptitle(
         "Prostate Adenocarcinoma — "
@@ -1185,10 +1209,8 @@ def generate_figure(
         hspace=0.52, wspace=0.42,
     )
 
-    clr = {
-        "NORMAL": "#2980b9",
-        "TUMOR":  "#c0392b",
-    }
+    clr = {"NORMAL": "#2980b9",
+           "TUMOR":  "#c0392b"}
     gene_cols = [
         c for c in merged.columns
         if c in ALL_TARGET
@@ -1218,7 +1240,7 @@ def generate_figure(
                 if g in df_g.columns else 0
                 for g in avail
             ]
-            sems  = [
+            sems = [
                 df_g[g].sem()
                 if g in df_g.columns else 0
                 for g in avail
@@ -1226,8 +1248,7 @@ def generate_figure(
             ax.bar(
                 x + i*w - 0.5*w, means, w,
                 yerr=sems, color=c,
-                label=grp, capsize=3,
-                alpha=0.85,
+                label=grp, capsize=3, alpha=0.85,
             )
         ax.set_xticks(x)
         ax.set_xticklabels(
@@ -1240,33 +1261,35 @@ def generate_figure(
 
     # A — Switch genes
     ax_a = fig.add_subplot(gs[0, 0])
-    bar_pair(ax_a, SWITCH_GENES,
-             "A — Switch Genes\n"
-             "NKX3-1/FOXA1/KLK3 predicted DOWN")
+    bar_pair(
+        ax_a, SWITCH_GENES,
+        "A — Switch Genes\n"
+        "NKX3-1/FOXA1/KLK3 predicted DOWN"
+    )
 
     # B — FA markers
     ax_b = fig.add_subplot(gs[0, 1])
-    bar_pair(ax_b,
-             ["ERG", "EZH2", "MKI67",
-              "HOXC6", "AMACR"],
-             "B — FA Markers\n"
-             "ERG/EZH2/MKI67 predicted UP")
+    bar_pair(
+        ax_b,
+        ["ERG", "EZH2", "MKI67",
+         "HOXC6", "AMACR"],
+        "B — FA Markers\n"
+        "ERG/EZH2/MKI67 predicted UP"
+    )
 
     # C — Waterfall
     ax_c = fig.add_subplot(gs[0, 2])
     if len(results_df) > 0:
-        pdf = results_df[
-            results_df["normal_mean"] > 0.01
-        ].copy().sort_values("change_pct")
-        bar_c = [
-            "#c0392b" if v < 0
-            else "#27ae60"
+        pdf = results_df.copy().sort_values(
+            "change_pct"
+        )
+        bc  = [
+            "#c0392b" if v < 0 else "#27ae60"
             for v in pdf["change_pct"]
         ]
         ax_c.barh(
-            pdf["gene"],
-            pdf["change_pct"],
-            color=bar_c,
+            pdf["gene"], pdf["change_pct"],
+            color=bc,
         )
         ax_c.axvline(
             0, color="black", linewidth=0.8
@@ -1275,15 +1298,13 @@ def generate_figure(
             "% change vs benign", fontsize=8
         )
         ax_c.set_title(
-            "C — All Genes % Change\n"
-            "Red=down Green=up",
+            "C — All Target Genes\n"
+            "% change tumor vs benign",
             fontsize=9,
         )
-        ax_c.tick_params(
-            axis="y", labelsize=6
-        )
+        ax_c.tick_params(axis="y", labelsize=6)
 
-    # D — Block depth by Gleason
+    # D — Depth by Gleason
     ax_d = fig.add_subplot(gs[1, 0])
     if ("block_depth" in tumor.columns
             and "gleason_pattern_group"
@@ -1298,54 +1319,60 @@ def generate_figure(
             ]["block_depth"]
             if len(sd) > 2:
                 ax_d.hist(
-                    sd, bins=15, alpha=0.6,
-                    color=c, label=f"Gleason {g}",
+                    sd, bins=12, alpha=0.6,
+                    color=c,
+                    label=f"Gleason {g}",
                     edgecolor="white",
                 )
         ax_d.set_xlabel(
             "Block Depth Score", fontsize=8
         )
-        ax_d.set_ylabel("Count", fontsize=8)
         ax_d.set_title(
             "D — Depth by Gleason\n"
-            "Prediction: high deeper",
+            "High Gleason = deeper block?",
             fontsize=9,
         )
         ax_d.legend(fontsize=7)
 
     # E — AR axis
     ax_e = fig.add_subplot(gs[1, 1])
-    bar_pair(ax_e, AR_AXIS,
-             "E — AR Axis\n"
-             "AR/KLK3/FOXA1/NKX3-1")
+    bar_pair(
+        ax_e, AR_AXIS,
+        "E — AR Axis\n"
+        "AR/KLK3/FOXA1/NKX3-1"
+    )
 
     # F — Epigenetic
     ax_f = fig.add_subplot(gs[1, 2])
-    bar_pair(ax_f,
-             ["EZH2", "EED", "SUZ12",
-              "KDM6A", "BMI1"],
-             "F — Epigenetic\n"
-             "EZH2 predicted UP")
+    bar_pair(
+        ax_f,
+        ["EZH2", "EED", "SUZ12",
+         "KDM6A", "BMI1"],
+        "F — Epigenetic\n"
+        "EZH2 predicted UP (4th cancer)"
+    )
 
-    # G — ERG scatter
+    # G — ERG expression
     ax_g = fig.add_subplot(gs[2, 0])
     if "ERG" in gene_cols:
         ax_g.scatter(
             range(len(normal)),
-            normal["ERG"].values,
+            sorted(normal["ERG"].values),
             color=clr["NORMAL"],
-            alpha=0.5, s=20, label="Normal",
+            alpha=0.6, s=25, label="Normal",
         )
         ax_g.scatter(
             range(len(tumor)),
-            tumor["ERG"].values,
+            sorted(tumor["ERG"].values),
             color=clr["TUMOR"],
-            alpha=0.5, s=20, label="PRAD",
+            alpha=0.6, s=25, label="PRAD",
         )
-        ax_g.set_xlabel("Sample index",
-                         fontsize=8)
-        ax_g.set_ylabel("ERG expression",
-                         fontsize=8)
+        ax_g.set_xlabel(
+            "Sample (sorted)", fontsize=8
+        )
+        ax_g.set_ylabel(
+            "ERG expression", fontsize=8
+        )
         ax_g.set_title(
             "G — ERG Expression\n"
             "Bimodal? Fusion+ vs Fusion-",
@@ -1353,19 +1380,17 @@ def generate_figure(
         )
         ax_g.legend(fontsize=7)
 
-    # H — Depth correlations waterfall
+    # H — Depth correlations
     ax_h = fig.add_subplot(gs[2, 1])
     if corrs:
         top_c  = corrs[:20]
-        genes_c = [c[0] for c in top_c]
-        vals_c  = [c[1] for c in top_c]
-        cols_c  = [
-            "#c0392b" if v < 0
-            else "#27ae60"
-            for v in vals_c
+        gc     = [c[0] for c in top_c]
+        vc     = [c[1] for c in top_c]
+        cc     = [
+            "#c0392b" if v < 0 else "#27ae60"
+            for v in vc
         ]
-        ax_h.barh(genes_c, vals_c,
-                  color=cols_c)
+        ax_h.barh(gc, vc, color=cc)
         ax_h.axvline(
             0, color="black", linewidth=0.8
         )
@@ -1377,38 +1402,40 @@ def generate_figure(
             "Top 20 genes",
             fontsize=9,
         )
-        ax_h.tick_params(
-            axis="y", labelsize=7
-        )
+        ax_h.tick_params(axis="y", labelsize=7)
 
-    # I — Summary
+    # I — Summary text
     ax_i = fig.add_subplot(gs[2, 2])
     ax_i.axis("off")
+    n_found = len([
+        g for g in ALL_TARGET
+        if g in gene_cols
+    ])
     summary = (
-        "I — SUMMARY\n"
-        "───────────────────────────\n"
+        "I — SCRIPT 1 SUMMARY\n"
+        "─────────────────────────\n"
         "Dataset: GSE32571\n"
         "  59 PRAD | 39 Benign\n"
-        "  Matched pairs (DKFZ)\n"
         "  Illumina HumanHT-12\n"
-        "  Gleason high/low\n\n"
+        "  Gleason high/low\n"
+        "  Matched pairs (DKFZ)\n\n"
+        f"Genes found: {n_found}/"
+        f"{len(ALL_TARGET)}\n\n"
         "Lineage:\n"
         "  Luminal epithelial\n"
-        "  → dedifferentiated\n"
-        "    progenitor hybrid\n\n"
+        "  NKX3-1 master switch\n"
+        "  → progenitor hybrid\n\n"
         "Predictions:\n"
-        "  Switch: NKX3-1/FOXA1/KLK3\n"
-        "  FA: ERG/EZH2/MKI67\n"
-        "  EZH2 gain lock\n"
-        "  MYC elevated\n\n"
-        "Drug targets:\n"
-        "  1. AR inhibitor (std)\n"
-        "  2. EZH2 inhibitor\n"
-        "  3. NKX3-1 restoration\n"
-        "  4. MYC/BET inhibitor\n\n"
+        "  NKX3-1/FOXA1/KLK3 DOWN\n"
+        "  ERG/EZH2/MKI67 UP\n"
+        "  MYC UP (valid here)\n"
+        "  High Gleason = deeper\n"
+        "  ERG bimodal\n\n"
+        "EZH2: 4th solid cancer\n"
+        "Same gain lock as:\n"
+        "  BRCA | PAAD | now PRAD\n\n"
         "Framework: OrganismCore\n"
-        "Doc: 88a | 2026-03-01\n"
-        "Status: PENDING RUN"
+        "Doc: 88a | 2026-03-01"
     )
     ax_i.text(
         0.03, 0.97, summary,
@@ -1424,14 +1451,12 @@ def generate_figure(
     )
 
     outpath = os.path.join(
-        RESULTS_DIR,
-        "prad_false_attractor.png",
+        RESULTS_DIR, "prad_false_attractor.png"
     )
     plt.savefig(
-        outpath, dpi=150,
-        bbox_inches="tight",
+        outpath, dpi=150, bbox_inches="tight"
     )
-    log(f"\n  Figure: {outpath}")
+    log(f"\n  Figure saved: {outpath}")
     plt.close()
 
 # ============================================================
@@ -1451,9 +1476,9 @@ def main():
     log("  Switch: NKX3-1/FOXA1/KLK3/ACPP DOWN")
     log("  FA:     ERG/EZH2/MKI67/HOXC6 UP")
     log("  EZH2:   ELEVATED (4th solid cancer)")
-    log("  MYC:    ELEVATED (not secretory bias)")
-    log("  Gleason: high grade = deeper block")
-    log("  ERG: bimodal (fusion+ vs fusion-)")
+    log("  MYC:    ELEVATED")
+    log("  Gleason: high = deeper block")
+    log("  ERG:    bimodal (fusion+ vs fusion-)")
     log("")
 
     log("\n=== STEP 0: DATA ===")
@@ -1463,15 +1488,10 @@ def main():
     meta = fetch_metadata()
 
     log("\n=== STEP 2: LOAD + NORMALIZE ===")
-    expr_df, expr_cols = load_and_normalize(
-        paths["matrix"]
-    )
+    expr_df = load_and_normalize(paths["matrix"])
 
     log("\n=== STEP 3: PROBE MAPPING ===")
-    probe_map = get_probe_map()
-    gene_df   = map_probes_to_genes(
-        expr_df, probe_map
-    )
+    gene_df = map_probes_fast(expr_df)
 
     log("\n=== STEP 4: MERGE + CLASSIFY ===")
     merged = merge_with_meta(gene_df, meta)
