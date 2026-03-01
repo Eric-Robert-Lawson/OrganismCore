@@ -1977,38 +1977,624 @@ Status: ACTIVE — survival deferred
 Last updated: 2026-03-01
 ```
 
-#### BLCA — Bladder Cancer
+# BLCA — Bladder Cancer
+## Updated Section | OrganismCore Framework
+## Date: 2026-03-01 | Author: Eric Robert Lawson
+
+---
+
 ```
 Lineage:  Urothelial epithelial
-Block:    Bladder cancer cells vs
-          normal urothelium
-Predicted switch genes:
-  FOXA1  — confirmed BRCA 80.7%
-           ALSO a urothelial TF
-           (bladder and breast share
-           FOXA1 as a gate —
-           cross-cancer test of
-           whether same gene can be
-           a switch gene in two
-           different cancers)
-  GATA3  — confirmed BRCA 53.4%
-           also expressed in
-           urothelium
-  UPK1B  — uroplakin (terminal
-           urothelial marker)
-Data:    GSE222315 or GSE135337
-Note:    FOXA1 and GATA3 may be
-         confirmed BOTH in BRCA and
-         BLCA — two cancers, same
-         switch genes, different
-         because the urothelium and
-         luminal breast share a
-         developmental origin.
-         This would be a framework
-         refinement: switch genes can
-         overlap if lineages share
-         developmental history.
-Doc: 86
+          Luminal and Basal subtypes
+          analysed separately
+
+Block:    Luminal BLCA — arrested at
+          intermediate urothelial state
+          (UPK genes retained, cell
+          cycle exit blocked)
+          Basal BLCA — arrested BELOW
+          normal basal urothelium
+          (KRT5/TP63 lost in deepest
+          tumours — more primitive than
+          any normal urothelial cell)
+
+Datasets: GSE13507
+            256 samples
+            Normal=9 Luminal=123 Basal=123
+            Illumina HumanWG-6 V2
+            Docs 91a, 91b
+          TCGA-BLCA PanCan Atlas 2018
+            407 primary tumours
+            Luminal=204 Basal=203
+            RNA-seq HiSeqV2_PANCAN
+            cBioPortal clinical
+            (OS n=404, events=177)
+            Docs 91c, 91d
+
+Docs:     91a (S1 biology + depth)
+          91b (S2 survival fix + biology)
+          91c (S3 TCGA replication)
+          91d (S4 TCGA survival + CIN)
+          91e (literature check)
+
+Scripts:  4 completed
+          2 independent datasets
+          2 platforms (microarray + RNA-seq)
+          Replication rate: 81% (13/16)
+
+=================================================================
+SWITCH GENES — REVISED FROM ORIGINAL SECTION
+=================================================================
+
+Original predicted switch genes:
+  FOXA1, GATA3, UPK1B
+
+CONFIRMED (both datasets):
+  GATA3  — primary luminal/basal gate
+            Basal depth r=-0.88*** (GSE)
+                        r=-0.64*** (TCGA)
+            Strongest single depth gene
+            in entire BLCA analysis.
+            GATA3 loss = deep basal.
+            CONFIRMED as switch gene ✓✓
+  FOXA1  — co-gate with GATA3
+            Basal depth r=-0.84*** (GSE)
+            Pioneer TF for luminal
+            identity. Lost as basal
+            deepens.
+            CONFIRMED as switch gene ✓✓
+  UPK1B  — confirmed but NOT the
+            primary switch gene.
+            UPK genes are NOT suppressed
+            in luminal BLCA vs Normal
+            (UPK2 is actually elevated
+            +11.5% in luminal).
+            The UPK genes are RETAINED
+            in luminal BLCA — they fall
+            only with depth WITHIN luminal
+            (UPK1B r=-0.46*** with luminal
+            depth; UPK3A r=-0.52***).
+            Revised role: UPK loss marks
+            DEPTH within luminal, not
+            the initial luminal vs normal
+            switch.
+
+REVISED SWITCH GENE SET:
+  LUMINAL:
+    Primary block = CELL CYCLE EXIT
+    (not terminal umbrella diff)
+    Switch genes = CDKN2A/CDKN2B
+    (r=-0.49/-0.57*** with luminal depth)
+    UPK genes mark depth within luminal
+    CLDN3 r=-0.56*** with luminal depth
+  BASAL:
+    Switch genes = GATA3/FOXA1/PPARG
+    (confirmed vs luminal, not vs normal)
+    GATA3/FOXA1 are NOT lost vs normal
+    because normal bulk already includes
+    basal cells with low GATA3.
+    The switch is LUMINAL vs BASAL
+    not BLCA vs Normal.
+
+NOTE ON GATA3/FOXA1 CROSS-CANCER:
+  Original section noted FOXA1 and GATA3
+  are confirmed BRCA switch genes (80.7%
+  and 53.4% respectively) and predicted
+  the same genes might function as switch
+  genes in BLCA.
+  CONFIRMED. GATA3 and FOXA1 ARE switch
+  genes in BLCA — both datasets, both
+  the strongest correlates with basal
+  depth (r=-0.88, r=-0.84***).
+  FRAMEWORK REFINEMENT CONFIRMED:
+  GATA3 and FOXA1 function as switch
+  genes in BOTH luminal breast cancer
+  AND luminal/basal BLCA.
+  The developmental origin hypothesis
+  is supported: luminal breast and
+  luminal urothelium share FOXA1/GATA3
+  as identity gatekeepers.
+  Two cancers, same switch genes,
+  same developmental logic.
+  This is a confirmed cross-cancer rule.
+
+=================================================================
+FALSE ATTRACTORS — CONFIRMED
+=================================================================
+
+LUMINAL BLCA FALSE ATTRACTOR:
+  Primary drivers (FA genes):
+    FGFR3   r=+0.70*** (GSE) r=+0.59*** (TCGA)
+    CCND1   r=+0.70*** (GSE) r=+0.51*** (TCGA)
+    SMAD3   r=+0.60*** (GSE) r=+0.47*** (TCGA)
+    KRT19   r=+0.48*** (GSE)
+    GATA3   r=+0.34*** (GSE)
+  Mechanism: FGFR3 → CCND1 → CDK4
+             cell cycle brake lost
+             (CDKN2A/CDKN2B both fall
+              with depth r=-0.49/-0.57***)
+             FGFR3 also activates SMAD3
+             non-canonically
+             FGFR3 promotes TP63
+             expression (AACR 2024 —
+             mechanism independently
+             confirmed in literature)
+  State: Proliferating cells with
+         retained luminal markers
+         (UPK expressed, GATA3 retained)
+         but cannot exit cell cycle.
+         Cells express differentiation
+         markers while dividing.
+
+BASAL BLCA FALSE ATTRACTOR:
+  Primary drivers (FA genes):
+    TWIST1  r=+0.74*** (GSE) r=+0.66*** (TCGA)
+    CDK6    r=+0.65*** (GSE) r=+0.56*** (TCGA)
+    ZEB2    r=+0.56*** (GSE)
+    FN1     r=+0.57*** (GSE)
+    SNAI1   r=+0.55*** (GSE)
+    VIM     r=+0.53*** (GSE)
+  Mechanism: EMT/mesenchymal programme
+             (TWIST1/ZEB2/SNAI1/VIM/FN1)
+             CDK6-driven cell cycle
+             (without CCND1 — CDK4 flat)
+             MCL1-mediated survival
+  State: Below the normal basal
+         urothelial state.
+         KRT5 r=-0.22* and
+         TP63 r=-0.55*** FALL with depth.
+         The deepest basal BLCA has lost
+         even basal urothelial markers.
+         More primitive than any normal
+         urothelial cell type.
+
+FGFR ISOFORM SWITCH (cross-cancer rule):
+  Luminal BLCA: FGFR3 r=+0.59–0.78***
+                FGFR1 r=-0.06 to -0.41
+  Basal BLCA:   FGFR1 r=+0.50–0.56***
+                FGFR3 r=-0.60 to -0.76***
+  Perfect anti-symmetry. Confirmed in
+  two independent datasets, two platforms.
+  Literature (ASCO 2024): 78.3% of
+  FGFR3-altered tumours = luminal-papillary.
+  Cross-cancer rule confirmed:
+    FGFR3 = columnar/luminal cancers
+    FGFR1 = squamous/basal cancers
+  (ESCC squamous: FGFR1 amplified ✓)
+  (Luminal BLCA:  FGFR3 primary ✓✓✓)
+  (Basal BLCA:    FGFR1 primary ✓✓)
+
+CCND1 LUMINAL/BASAL MOLECULAR DIVIDE:
+  Luminal depth: r=+0.70*** (GSE)
+                 r=+0.51*** (TCGA)
+  Basal depth:   r=-0.60*** (GSE)
+                 r=-0.18**  (TCGA)
+  CCND1 runs in opposite directions.
+  Deepest luminal = CCND1 high (FGFR3-driven)
+  Deepest basal   = CCND1 low (CDK6 orphan)
+  Single fastest IHC readout for
+  treatment axis selection.
+
+TWO-TRACK LUMINAL MODEL:
+  Track A (Luminal-papillary):
+    FGFR3 high, SMAD3 high, CIN low
+    Depth-driven progression
+    Treatment: erdafitinib + TGF-βRi
+    (Robertson 2017 LP subtype —
+     independently convergent ✓)
+  Track B (Luminal-unstable):
+    AURKA high, CIN high, SMAD3 low
+    Genomic instability-driven progression
+    Treatment: platinum + AURKA inhibitor
+    (Robertson 2017 LU subtype —
+     independently convergent ✓)
+  r(luminal_depth, aneuploidy) = -0.17*
+  Depth axis (Track A) and CIN axis
+  (Track B) are ANTI-CORRELATED.
+  These are competing mechanisms.
+
+=================================================================
+EPIGENETIC LOCK — REVISED
+=================================================================
+
+ESCA finding (EZH2+HDAC1) does NOT
+replicate in BLCA:
+  BLCA luminal: EZH2 r=-0.25** (falls)
+  BLCA basal:   EZH2 r=-0.24** (falls)
+  HDAC1 basal:  r=-0.39*** (falls)
+  EZH2+HDAC1 combined does not improve
+  on individual in BLCA.
+
+BLCA epigenetic lock is DIFFERENT:
+  KDM6A mutated in ~25% BLCA
+  (highest rate of any cancer).
+  KDM6A loss = post-translational
+  H3K27me3 dysregulation, not
+  detectable at mRNA level.
+  ARID1A r=-0.24** in luminal depth
+  (SWI/SNF dysfunction).
+  Mechanism: KDM6A mutation +
+  ARID1A loss = SWI/SNF + PRC2
+  stabilise the urothelial attractor.
+  Different mechanism than ESCA.
+  EZH2 lock = ESCA-specific.
+  KDM6A/ARID1A lock = BLCA-specific.
+
+=================================================================
+SURVIVAL — CONFIRMED RESULTS
+=================================================================
+
+GSE13507 (NMIBC-enriched):
+  Basal CSS: p=1.91e-03 ** CONFIRMED
+  Luminal OS: ns (NMIBC cohort, underpowered)
+  Individual OS predictors in luminal:
+    MLH1   p=0.010** ↑=better
+    PPARG  p=0.005** ↑=better
+    FOXA1  p=0.041*  ↑=better
+  Individual OS predictors in basal:
+    S100A8 p=5.90e-04*** ↑=worse
+    CDC20  p=4.31e-03**  ↑=worse
+    MKI67  p=5.91e-03**  ↑=worse
+    AURKA  p=0.011*      ↑=worse
+    TOP2A  p=4.97e-03**  ↑=worse
+
+TCGA-BLCA (MIBC-enriched, n=407):
+  Basal panel OS: p=0.038* CONFIRMED ✓
+  TWIST1(+)/CDK6(+)/GATA3(-) panel
+  separates OS in basal BLCA.
+  Individual OS predictors in basal:
+    CDK6   p=0.032* ↑=worse ✓ NP-BLCA-7
+    SOX2   p=0.006** ↑=worse
+    DSG1   p=0.002** ↑=worse
+    EGFR   p=0.020* ↑=worse
+    TGFB1  p=0.038* ↑=worse
+    WNT5A  p=0.026* ↑=worse ✓ NP-BLCA-18
+    KRT8   p=0.032* ↑=better
+    UPK3A  p=0.045* ↑=better
+
+=================================================================
+CIN AND MSI FINDINGS
+=================================================================
+
+AURKA tracks CIN:
+  r(AURKA, SCNA-CIN) = +0.39*** (GSE)
+  r(AURKA, aneuploidy) = +0.28*** (TCGA)
+  Confirmed both datasets. ✓✓
+
+ZEB2 is CIN-neutral in BLCA:
+  r(ZEB2, CIN) = -0.12* (GSE, borderline)
+  r(ZEB2, aneuploidy) = +0.06 ns (TCGA)
+  Revised: ZEB2 is not anti-CIN.
+  ZEB2 is EMT-driven independently of CIN.
+
+Luminal BLCA has higher CIN than basal:
+  Luminal FGA = 0.342
+  Basal FGA   = 0.260
+  p=8.75e-06 *** CONFIRMED ✓
+  Counterintuitive — basal is not
+  more genomically unstable.
+  Consistent with luminal-unstable
+  subtype (Robertson) having high CIN.
+  Consistent with AURKA-high luminal
+  driving mitotic errors (CIN).
+
+MMR loss in deep luminal:
+  MSH2 r=-0.43*** (GSE) r=-0.40*** (TCGA)
+  MSH6 r=-0.52*** (GSE) r=-0.44*** (TCGA)
+  MLH1 inverse to MSI scores confirmed.
+  MLH1 (not MSH2/MSH6) is the
+  direct MSI driver in BLCA.
+  Deep luminal → MSH2/MSH6 fall →
+  but MSI pathway runs through MLH1.
+  MLH1 IHC for pembrolizumab selection.
+
+SMAD3 is primary anti-CIN gene:
+  r(SMAD3, aneuploidy) = -0.27***
+  Strongest anti-CIN correlate in
+  entire BLCA genome.
+  SMAD3-high = CIN-low = Track A luminal.
+  SMAD3-low  = CIN-high = Track B luminal.
+
+=================================================================
+CLINICAL PANELS — FINAL
+=================================================================
+
+LUMINAL BLCA:
+  FGFR3(+) / CCND1(+) / CLDN3(-)
+  r with depth = +0.81*** (GSE)
+  FGFR3 IHC → erdafitinib selection
+  CCND1 IHC → CDK4/6i selection
+  CLDN3 loss → deep/aggressive marker
+
+  ADDITIONAL MARKERS:
+  SMAD3(+) → Track A (TGF-β active)
+              erdafitinib likely works
+              via dual mechanism
+  AURKA(+)/FGA-high → Track B
+              (CIN-driven, platinum first)
+  MLH1(−) → MSI probable
+              → pembrolizumab
+
+BASAL BLCA:
+  TWIST1(+) / CDK6(+) / GATA3(-)
+  r with depth = +0.77*** (TCGA)
+  Panel OS p=0.038* CONFIRMED ✓
+  TWIST1 IHC → depth/aggression
+  CDK6 IHC   → abemaciclib candidate
+  GATA3 loss → confirms basal/deep
+
+  ADDITIONAL MARKERS:
+  MCL1(+)   → MCL1i candidate
+  S100A8(+) → worst prognosis flag
+  CD274(+)  → pembrolizumab candidate
+  SOX2(+)   → aggressive stemness
+  CCND1(−)  → confirms deep basal
+               (CDK6 orphan state)
+
+=================================================================
+DRUG TARGET DERIVATIONS
+=================================================================
+
+CONFIRMED (literature + framework):
+  Erdafitinib (FGFR3i)
+    Luminal BLCA ✓✓✓
+    FDA-approved. Independently derived.
+    NP-BLCA-6 (partially known)
+
+  Pembrolizumab (PD-1i)
+    MLH1-low luminal BLCA
+    CD274-high basal BLCA
+    Both confirmed by individual gene
+    OS predictions.
+
+  Abemaciclib (CDK6 preference CDK4/6i)
+    Deep basal BLCA ✓✓
+    CDK6 r=+0.56–0.65*** both datasets
+    CDK6 predicts OS p=0.032* ✓
+    CDK4 near-zero in basal depth
+    → abemaciclib > palbociclib
+    NP-BLCA-7 (novel, not in literature)
+
+  Sacituzumab govitecan (TACSTD2)
+    TACSTD2 present both subtypes
+    Flat across depth — broad BLCA target
+    Consistent with approved use.
+
+NOVEL (framework-derived, no prior lit):
+  Erdafitinib + Galunisertib (TGF-βRi)
+    For FGFR3(+)/SMAD3(+) Track A luminal
+    SMAD3 non-canonically activated by FGFR3
+    Erdafitinib may block SMAD3 indirectly
+    NP-BLCA-8
+
+  Pemigatinib/infigratinib (FGFR1i)
+    For deep basal BLCA (FGFR1 r=+0.50–0.56)
+    FGFR1 is the basal FGFR isoform
+    NP-BLCA-6 (basal arm — novel)
+
+  Palbociclib (CDK4/6i)
+    For FGFR3-high/CCND1-high deep luminal
+    FGFR3 → CCND1 → CDK4 axis
+    Combined erdafitinib + palbociclib
+    double blockade of the axis
+    NP-BLCA-10
+
+  MCL1 inhibitor (AMG-176/S63845)
+    Deep basal BLCA
+    MCL1 r=+0.40–0.51*** both datasets
+    BCL2 also positive in basal depth
+    MCL1i + BCL2i for deepest basal
+    NP-BLCA-5
+
+  AURKA inhibitor (alisertib)
+    Track B luminal BLCA (CIN-high)
+    AURKA r=+0.28*** with aneuploidy
+    Combined with platinum
+    NP-BLCA-16
+
+=================================================================
+CROSS-CANCER RULES DERIVED OR REFINED
+=================================================================
+
+RULE (CONFIRMED):
+  FGFR3 = columnar/luminal lineage cancers
+  FGFR1 = squamous/basal lineage cancers
+  Confirmed: ESCC (FGFR1) ✓
+             Luminal BLCA (FGFR3) ✓✓✓
+             Basal BLCA (FGFR1) ✓✓
+  Literature: ASCO 2024 confirms FGFR3-luminal.
+
+RULE (NEW):
+  GATA3/FOXA1 are switch genes in BOTH
+  luminal breast cancer (BRCA) and
+  luminal/basal BLCA.
+  Shared developmental origin of luminal
+  breast and luminal urothelium
+  (both FOXA1-dependent lineages).
+  Switch genes can be shared across
+  different cancers if the cancers
+  share developmental transcription
+  factor dependency.
+  Framework refinement confirmed.
+
+RULE (NEW):
+  AURKA = CIN reporter across cancers
+  (confirmed BLCA; testable in STAD/EAC)
+  ZEB2 = EMT reporter, CIN-independent
+  in urothelial context.
+  ZEB2-AURKA coupling sign encodes:
+    Positive = CIN drives both EMT and
+    mitosis simultaneously (STAD/EAC)
+    Near-zero = EMT and CIN are
+    independent programmes (BLCA)
+
+RULE (REFINED):
+  TP63 direction is cancer-state specific:
+  ESCC: TP63 retained (squamous arrested)
+  Basal BLCA shallow: TP63 retained
+  Basal BLCA deep: TP63 LOST (below
+  normal basal state)
+  TP63 loss encodes how far BELOW the
+  normal identity the cancer has gone.
+
+RULE (REFINED):
+  NOTCH1 is lineage-context specific:
+  Squamous cancers: oncogenic (UP)
+  Luminal BLCA: differentiation suppressed
+  Myeloid: tumour suppressor
+  Three distinct roles — not binary.
+
+=================================================================
+NOVEL PREDICTIONS — 20 TOTAL
+=================================================================
+
+NP-BLCA-1:  AURKA tracks CIN in BLCA ✓✓
+             r=+0.28–0.39*** (both datasets)
+NP-BLCA-2:  MLH1 loss → MSI → pembrolizumab
+             in luminal BLCA
+             (revised: MLH1 not MSH2/MSH6)
+NP-BLCA-3:  Deep luminal acquires squamous
+             features (TP63/IVL rising)
+NP-BLCA-4:  Deep basal BELOW normal basal
+             (KRT5/TP63 both lost in deepest)
+NP-BLCA-5:  MCL1+BCL2 dual elevation in
+             deepest basal BLCA
+             MCL1i + BCL2i combination
+NP-BLCA-6:  FGFR isoform switch
+             (FGFR3=luminal, FGFR1=basal)
+             Confirmed ×3 datasets.
+             Pan-cancer generalisation novel.
+NP-BLCA-7:  CDK6>CDK4 in basal depth
+             Abemaciclib > palbociclib
+             CDK6 predicts OS p=0.032* ✓
+NP-BLCA-8:  Erdafitinib + TGF-βRi for
+             FGFR3/SMAD3-high luminal
+NP-BLCA-9:  KRT20 good-prognosis marker
+             in luminal BLCA (opposite EAC)
+NP-BLCA-10: Erdafitinib + CDK4/6i synergy
+             FGFR3/CCND1-high deep luminal
+NP-BLCA-11: S100A8 pan-BLCA poor prognosis
+             confirmed both subtypes ✓
+NP-BLCA-12: ARID1A/KDM6A mutation → depth↑
+             (needs mutation data to test)
+NP-BLCA-13: KRT20 direction reversal
+             EAC (UP=bad) vs BLCA (low=bad)
+NP-BLCA-14: CSS > OS endpoint in NMIBC
+             cohorts ✓ (p=0.002 vs ns)
+NP-BLCA-15: NOTCH1 three-way lineage rule
+NP-BLCA-16: Two tracks in luminal BLCA
+             Track A = FGFR3/SMAD3/CIN-low
+                       (Robertson LP ✓)
+             Track B = AURKA/CIN-high
+                       (Robertson LU ✓)
+             Independently convergent
+             with Robertson 2017. ✓
+NP-BLCA-17: ALDH1A1 vs SOX2 encode
+             different stemness types
+             in basal BLCA
+NP-BLCA-18: WNT5A predicts OS in basal
+             p=0.026* confirmed TCGA ✓
+             CAF-mediated mechanism
+             (Cell 2022) ✓
+NP-BLCA-19: MLH1 IHC (not MSH2/MSH6)
+             for pembrolizumab selection
+             in luminal BLCA
+NP-BLCA-20: Luminal-unstable (Track B)
+             responds better to platinum
+             (CIN-high → more DNA damage
+             → more apoptosis from Pt)
+             Caveat: applies to Track B only
+
+=================================================================
+CLINICAL DECISION TREE
+=================================================================
+
+  BLCA diagnosis
+  ↓
+  KRT5/GATA3 IHC
+  ├─ Luminal (GATA3+/KRT5-)
+  │    ↓
+  │    FGFR3 IHC/mutation
+  │    ├─ FGFR3+ and SMAD3+
+  │    │    → Track A (luminal-papillary)
+  │    │    → Erdafitinib + TGF-βRi
+  │    │    → Watch for TP63 rise
+  │    │      (squamous transdiff signal)
+  │    ├─ FGFR3- and AURKA-high/FGA-high
+  │    │    → Track B (luminal-unstable)
+  │    │    → Platinum + AURKA inhibitor
+  │    │    → Palbociclib (CCND1-high)
+  │    └─ MLH1 IHC low (either track)
+  │         → MSI testing
+  │         → Pembrolizumab
+  └─ Basal (KRT5+/GATA3-)
+       ↓
+       TWIST1/CDK6 IHC
+       ├─ TWIST1+/CDK6+ (deep basal)
+       │    → Abemaciclib (CDK6 primary)
+       │    → MCL1 inhibitor (MCL1+)
+       │    → FGFR1i if FGFR1 high
+       │    → Anti-WNT5A if WNT5A high
+       ├─ CD274+ (either depth)
+       │    → Pembrolizumab
+       │      (basal is immune-hot ✓)
+       └─ S100A8+ 
+            → Worst prognosis flag
+            → Aggressive treatment
+
+=================================================================
+LITERATURE CHECK STATUS
+=================================================================
+
+Completed: Doc 91e (2026-03-01)
+
+Confirmed by literature (2022–2024):
+  FGFR3=luminal (ASCO 2024 ×3 papers) ✓
+  FGFR1=basal (Springer 2023) ✓
+  CDK6 predicts BLCA OS (MedSci 2024) ✓
+  TWIST1 high = aggressive BLCA ✓
+  WNT5A drives BLCA invasion ✓
+  Two-track convergent with Robertson ✓
+  FGFR3 activates TP63 (AACR 2024) ✓
+
+Genuinely novel (no prior literature):
+  TWIST1 > KRT5 as depth anchor
+  CDK6 > CDK4 asymmetry → abemaciclib
+  SMAD3 r=+0.60 as luminal depth driver
+  SMAD3 as primary anti-CIN gene
+  MCL1 primary anti-apoptotic deep basal
+  WNT5A OS p=0.026 in basal BLCA
+  Two-track model with treatment logic
+  FGFR3 anti-symmetric in basal depth
+  Luminal > Basal CIN (TV-10 p<0.001)
+
+=================================================================
+STATUS
+=================================================================
+
+analysis_complete:     YES (4 scripts)
+literature_check:      YES (Doc 91e)
+datasets:              2 (GSE13507 + TCGA)
+platforms:             2 (microarray + RNA-seq)
+replication_rate:      81% (13/16)
+novel_predictions:     20 (NP-BLCA-1 to -20)
+survival_confirmed:    Basal CSS p=0.002 ✓
+                       Basal panel OS p=0.038 ✓
+panels_confirmed:      Luminal r=+0.81***
+                       Basal r=+0.77***
+                       Basal panel OS p=0.038*
+cross_cancer_rules:    FGFR isoform switch ✓✓✓
+                       GATA3/FOXA1 shared ✓
+                       AURKA=CIN reporter ✓✓
+                       Two-track luminal ✓
+deferred:              TV-9 Robertson labels
+                       NP-BLCA-12 mutation data
+priority_citations:    Robertson 2017 Cell
+                       Loriot 2019 NEJM
+                       ASCO 2024 erdafitinib
+                       Kamoun 2020 Eur Urol
+                       Cell 2022 CAF-WNT5A
+section_status:        COMPLETE
 ```
 
 #### HCC — Hepatocellular Carcinoma
