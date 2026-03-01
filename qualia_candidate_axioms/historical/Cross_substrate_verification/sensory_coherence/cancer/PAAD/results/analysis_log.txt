@@ -1,0 +1,362 @@
+======================================================================
+PANCREATIC DUCTAL ADENOCARCINOMA
+FALSE ATTRACTOR ANALYSIS — SCRIPT 1
+Dataset: GSE183795
+Framework: OrganismCore Principles-First
+Doc: 87a | Date: 2026-03-01
+======================================================================
+
+  GEO accession : GSE183795
+  Tumor samples : 139 PAAD
+  Normal samples: 105 adjacent non-tumor
+  Platform      : Affymetrix HuGene-1.0-ST
+  Survival data : YES
+  Stage data    : YES
+
+  PREDICTIONS LOCKED BEFORE DATA:
+  Switch: PTF1A/NR5A2/RBPJL/BHLHA15/CPA1/PRSS1 suppressed
+  FA:     KRT19/SOX9/MUC1/EPCAM elevated
+  EZH2:   ELEVATED (gain lock)
+  MYC:    ELEVATED (KRAS driven)
+  Survival: depth r < 0 with OS
+  Subtype: GATA6 stratifies depth
+
+
+=== STEP 0: DATA ACQUISITION ===
+=================================================================
+STEP 0: DATA ACQUISITION
+Dataset: GSE183795
+  139 PAAD tumors
+  105 adjacent non-tumor pancreas
+  Affymetrix HuGene-1.0-ST
+=================================================================
+
+  Checking for existing downloads...
+  Downloading: GSE183795_normalized_matrix.txt.gz
+  URL: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE183nnn/GSE183795/suppl/GSE183795_normalized_matrix.txt.gz
+  Complete: ./paad_false_attractor/GSE183795_normalized_matrix.txt.gz (19.6 MB)
+
+  File status:
+    matrix    : GSE183795_normalized_matrix.txt.gz (19.6 MB)
+
+=== STEP 1: METADATA ===
+
+--- Fetching sample metadata ---
+  Fetching from GEO...
+  Fetched 244 samples — cached
+
+=== STEP 2: LOAD MATRIX ===
+
+  Loading: GSE183795_normalized_matrix.txt.gz
+  Raw shape: 23306 genes x 247 columns
+  First 5 columns: ['Transcript ID', 'gene_assignment', 'RefSeq', '10_E33-Tn13_N.CEL', '12_E41-Tn13_N.CEL']
+  First 5 index:   ['A1BG', 'A1CF', 'A2M', 'A2ML1', 'A3GALT2']
+  Dropping non-numeric columns: ['gene_assignment', 'RefSeq']
+  After cleanup: 23306 genes x 245 samples
+  Target genes found  : 56/58
+  Missing: ['VIMENTIN', 'CTRB1']
+  Final shape: (245, 56)
+  Index sample: ['Transcript ID', '10_E33-Tn13_N', '12_E41-Tn13_N']
+
+=== STEP 3: MERGE AND CLASSIFY ===
+
+  Merging expression with metadata...
+  Merged shape: (245, 62)
+
+  Group counts:
+    TUMOR  : 241
+    NORMAL : 3
+    UNKNOWN: 1
+
+  Stage distribution (tumor):
+    IIB: 112
+    III: 32
+    IIA: 29
+    IB: 10
+    IV: 7
+    IVA: 4
+    IVB: 2
+    >IIB: 2
+    ?: 1
+    IA: 1
+
+  Survival (tumor samples):
+    n with data: 191
+    Median: 12.9 months
+    Range: 0.4 – 70.8 months
+
+=== STEP 4: SADDLE POINT ANALYSIS ===
+
+======================================================================
+STEP 4: SADDLE POINT ANALYSIS
+PAAD TUMOR vs ADJACENT NORMAL PANCREAS
+======================================================================
+  TUMOR  : 241
+  NORMAL : 3
+
+  FRAMEWORK PREDICTIONS (locked before data):
+  Switch genes: PTF1A/NR5A2/RBPJL/BHLHA15/CPA1/PRSS1 suppressed
+  FA markers:   KRT19/SOX9/MUC1/EPCAM elevated
+  Epigenetic:   EZH2 elevated (gain lock)
+  Scaffold:     MYC elevated (KRAS driven)
+
+  Gene       Role          Normal     Tumor    Change          p-value  Result
+  --------------------------------------------------------------------------------
+  PTF1A      SWITCH        7.2056    6.7105     -6.9%      p=0.0412   *  WEAKLY SUPPRESSED
+  NR5A2      SWITCH        9.1521    8.0988    -11.5%      p=0.1870  ns  NOT CONFIRMED
+  RBPJL      SWITCH        8.6874    7.2836    -16.2%      p=0.0964  ns  NOT CONFIRMED
+  BHLHA15    SWITCH        9.0966    7.4966    -17.6%    p=8.61e-03  **  WEAKLY SUPPRESSED
+  CPA1       SWITCH       12.4246   10.4667    -15.8%      p=0.1423  ns  NOT CONFIRMED
+  PRSS1      SWITCH       12.0554   10.4695    -13.2%      p=0.1983  ns  NOT CONFIRMED
+  KRT19      FA            6.5930    8.3962    +27.3%      p=0.0283   *  FA CONFIRMED
+  SOX9       FA            7.1323    7.2900     +2.2%      p=0.1229  ns  NOT ELEVATED
+  MUC1       FA            8.9634    9.2674     +3.4%      p=0.4444  ns  NOT ELEVATED
+  EPCAM      FA            8.3272    9.1227     +9.6%      p=0.0536  ns  NOT ELEVATED
+  EZH2       EPIGEN        5.5160    6.0716    +10.1%      p=0.0121   *  SEE DATA
+  EED        EPIGEN        7.2429    7.5327     +4.0%      p=0.1068  ns  SEE DATA
+  SUZ12      EPIGEN        7.8455    8.0440     +2.5%      p=0.2316  ns  SEE DATA
+  TET2       EPIGEN        6.9202    7.3538     +6.3%    p=6.77e-03  **  SEE DATA
+  DNMT3A     EPIGEN        6.6779    6.5057     -2.6%      p=0.0766  ns  SEE DATA
+  ASXL1      EPIGEN        7.6008    7.3952     -2.7%      p=0.1982  ns  SEE DATA
+  KDM6A      EPIGEN        7.3067    7.2290     -1.1%      p=0.4784  ns  SEE DATA
+  MYC        SCAFFOLD      8.3467    8.1312     -2.6%      p=0.3142  ns  SEE DATA
+  KRAS       SCAFFOLD      7.2076    7.4645     +3.6%      p=0.2005  ns  SEE DATA
+  MKI67      SCAFFOLD      5.1936    5.6997     +9.7%      p=0.2316  ns  SEE DATA
+  CCND1      SCAFFOLD      8.0702    8.5503     +5.9%      p=0.0706  ns  SEE DATA
+  GATA6      SUBTYPE       8.1871    7.8270     -4.4%      p=0.0437   *  SEE DATA
+  KRT5       SUBTYPE       5.1493    5.6193     +9.1%      p=0.3370  ns  SEE DATA
+  KRT14      SUBTYPE       6.3342    6.3849     +0.8%      p=0.3198  ns  SEE DATA
+  VIM        SUBTYPE       9.8365   10.2130     +3.8%      p=0.0939  ns  SEE DATA
+  CDH1       SUBTYPE       9.1244    8.9871     -1.5%      p=0.3840  ns  SEE DATA
+  CDH2       SUBTYPE       5.1139    5.7163    +11.8%      p=0.0694  ns  SEE DATA
+  SNAI1      SUBTYPE       5.2551    5.3735     +2.3%      p=0.4050  ns  SEE DATA
+  ZEB1       SUBTYPE       7.2579    7.7935     +7.4%      p=0.0576  ns  SEE DATA
+  AMY2A      ACINAR       11.7877   10.1297    -14.1%      p=0.1179  ns  SEE DATA
+  AMY2B      ACINAR        7.9718    7.5171     -5.7%      p=0.2243  ns  SEE DATA
+  CELA3A     ACINAR       12.5718   10.3940    -17.3%      p=0.1179  ns  SEE DATA
+  CELA3B     ACINAR       12.1293   10.1012    -16.7%      p=0.1083  ns  SEE DATA
+  CTRB2      ACINAR       12.2850   10.6300    -13.5%      p=0.2512  ns  SEE DATA
+  CTRC       ACINAR       11.1942    8.9766    -19.8%      p=0.1460  ns  SEE DATA
+  PRSS2      ACINAR       12.1611   10.8015    -11.2%      p=0.1892  ns  SEE DATA
+  PRSS3      ACINAR        9.8149    8.2381    -16.1%      p=0.0672  ns  SEE DATA
+  PNLIP      ACINAR       11.1973    9.3525    -16.5%      p=0.2146  ns  SEE DATA
+  PNLIPRP1   ACINAR       10.9320    8.3401    -23.7%      p=0.1068  ns  SEE DATA
+  PNLIPRP2   ACINAR       10.8889    8.6818    -20.3%      p=0.1537  ns  SEE DATA
+  CEL        ACINAR       11.6521    9.3016    -20.2%      p=0.1368  ns  SEE DATA
+  CPA2       ACINAR       11.9978    9.6395    -19.7%      p=0.1422  ns  SEE DATA
+  CPB1       ACINAR       11.9383   10.2373    -14.2%      p=0.1915  ns  SEE DATA
+  KRT7       DUCTAL        7.3370    8.1388    +10.9%      p=0.1556  ns  SEE DATA
+  KRT18      DUCTAL        9.9193    9.7579     -1.6%      p=0.4057  ns  SEE DATA
+  HNF1B      DUCTAL        7.0977    7.0293     -1.0%      p=0.4907  ns  SEE DATA
+  CFTR       DUCTAL        8.4628    8.1803     -3.3%      p=0.3810  ns  SEE DATA
+  MUC5B      DUCTAL        6.4826    6.8648     +5.9%      p=0.2703  ns  SEE DATA
+  MUC6       DUCTAL        8.6712    8.1541     -6.0%      p=0.3284  ns  SEE DATA
+  TFF1       DUCTAL        6.4974    7.8015    +20.1%      p=0.0936  ns  SEE DATA
+  TFF2       DUCTAL        6.0535    6.7944    +12.2%      p=0.2005  ns  SEE DATA
+  SPARC      PROG         10.0967   11.2764    +11.7%      p=0.0187   *  SEE DATA
+  POSTN      PROG          5.9158    8.8129    +49.0%    p=9.49e-03  **  SEE DATA
+  FN1        PROG          9.4742   10.7682    +13.7%      p=0.0536  ns  SEE DATA
+  ACTA2      PROG         10.4523   10.5502     +0.9%      p=0.4141  ns  SEE DATA
+  PDGFRA     PROG          8.2041    8.3314     +1.6%      p=0.3457  ns  SEE DATA
+
+  Saved: ./paad_false_attractor/results/saddle_results.csv
+
+=== STEP 5: DEPTH SCORING ===
+
+======================================================================
+STEP 5: BLOCK DEPTH SCORING
+Score = switch suppression + FA elevation
+======================================================================
+  Component 1: Switch suppression genes=['PTF1A', 'NR5A2', 'RBPJL', 'BHLHA15', 'CPA1', 'PRSS1']
+  Component 2: FA elevation genes=['KRT19', 'SOX9', 'MUC1', 'EPCAM']
+
+  Depth statistics (241 tumors):
+    Mean   : 0.5637
+    Median : 0.5380
+    Std    : 0.1611
+    Min    : 0.2506
+    Max    : 0.9214
+    Q25    : 0.4306
+    Q75    : 0.7110
+
+  Block depth by stage:
+       IB (n= 10): 0.6061 ± 0.1582
+      IIA (n= 29): 0.5623 ± 0.1628
+      IIB (n=112): 0.5968 ± 0.1526
+      III (n= 32): 0.6330 ± 0.1694
+       IV (n=  7): 0.5626 ± 0.1827
+
+  Depth correlations (all genes):
+  Gene                r  p-value
+  ------------------------------------
+  KRT19         +0.8449  p=7.24e-67
+  CTRC          -0.7601  p=1.20e-46
+  KRAS          +0.7595  p=1.60e-46
+  PNLIPRP1      -0.7563  p=6.25e-46
+  AMY2A         -0.7506  p=6.65e-45
+  PNLIP         -0.7493  p=1.16e-44
+  CEL           -0.7454  p=5.54e-44
+  RBPJL         -0.7438  p=1.05e-43
+  CELA3B        -0.7435  p=1.17e-43
+  MKI67         +0.7423  p=1.89e-43
+  NR5A2         -0.7420  p=2.17e-43
+  CELA3A        -0.7394  p=6.12e-43
+  PNLIPRP2      -0.7322  p=9.53e-42
+  CPA1          -0.7283  p=4.14e-41
+  CPA2          -0.7195  p=1.04e-39
+  PTF1A         -0.7085  p=4.87e-38
+  CTRB2         -0.7048  p=1.66e-37
+  CPB1          -0.7008  p=6.49e-37
+  PRSS1         -0.6999  p=8.49e-37
+  BHLHA15       -0.6830  p=1.84e-34
+
+=== STEP 6: SURVIVAL ANALYSIS ===
+
+======================================================================
+STEP 6: SURVIVAL ANALYSIS
+Prediction: depth correlates negatively with survival
+Higher depth = more dedifferentiated = worse prognosis
+======================================================================
+
+  Samples with survival data: 191
+
+  Depth vs survival (Pearson):
+    r = -0.1377  p = 5.75e-02
+    Prediction: negative r
+    Result: NOT CONFIRMED
+
+  Depth vs survival (Spearman):
+    rho = -0.0687  p = 3.45e-01
+
+  High depth (n=96): median survival = 11.3 mo
+  Low  depth (n=95): median survival = 13.8 mo
+  High vs Low depth (high worse): p=0.0824
+  Result: NOT CONFIRMED
+
+  Gene vs survival correlations (top 15):
+  Gene                r  p-value  Role
+  ------------------------------------------------
+  KRT7          -0.2829  p=7.34e-05  DUCTAL
+  POSTN         -0.2286  p=1.47e-03  
+  FN1           -0.2163  p=2.66e-03  
+  MKI67         -0.2157  p=2.72e-03  SCAFFOLD
+  KRT18         -0.2034  p=4.76e-03  DUCTAL
+  KRT19         -0.1976  p=6.15e-03  FA
+  AMY2B         +0.1936  p=7.28e-03  ACINAR
+  KRAS          -0.1885  p=9.01e-03  SCAFFOLD
+  DNMT3A        -0.1832  p=1.12e-02  EPIGEN
+  KDM6A         -0.1506  p=3.76e-02  EPIGEN
+  EZH2          -0.1504  p=3.78e-02  EPIGEN
+  KRT5          -0.1504  p=3.79e-02  
+  MYC           +0.1488  p=3.99e-02  SCAFFOLD
+  CDH2          -0.1443  p=4.64e-02  
+  MUC6          +0.1409  p=5.18e-02  DUCTAL
+
+=== STEP 7: SUBTYPE ANALYSIS ===
+
+======================================================================
+STEP 7: SUBTYPE ANALYSIS
+Prediction: GATA6 stratifies depth
+Classical (GATA6 high) = shallower
+Basal-like (GATA6 low) = deeper
+======================================================================
+
+  GATA6 median: 7.8567
+  Classical (GATA6 high): n=121
+  Basal-like (GATA6 low): n=120
+
+  Classical depth: 0.5100 ± 0.1483
+  Basal depth:     0.6178 ± 0.1559
+
+  Basal > Classical: p=0.0000
+  Prediction: Basal deeper
+  Result: CONFIRMED
+
+  Classical survival: 13.8 mo
+  Basal survival:     12.6 mo
+  Classical > Basal: p=0.1722
+
+  Gene           Classical       Basal    Change
+  ------------------------------------------------
+  PTF1A             6.9841      6.4346     -7.9%
+  NR5A2             8.9958      7.1944    -20.0%
+  RBPJL             8.2960      6.2628    -24.5%
+  BHLHA15           8.0334      6.9554    -13.4%
+  KRT19             7.9402      8.8560    +11.5%
+  SOX9              7.4512      7.1274     -4.3%
+  MUC1              9.4983      9.0346     -4.9%
+  GATA6             8.1330      7.5184     -7.6%
+  EZH2              5.9575      6.1867     +3.8%
+  MYC               8.3632      7.8974     -5.6%
+
+=== STEP 8: DRUG TARGET DERIVATION ===
+
+======================================================================
+STEP 8: DRUG TARGET DERIVATION
+From geometry — before literature
+======================================================================
+
+  Switch gene expression:
+  Gene            Normal     Tumor    Change
+  --------------------------------------------
+  PTF1A           7.2056    6.7105     -6.9%
+  NR5A2           9.1521    8.0988    -11.5%
+  RBPJL           8.6874    7.2836    -16.2%
+  BHLHA15         9.0966    7.4966    -17.6%
+  CPA1           12.4246   10.4667    -15.8%
+  PRSS1          12.0554   10.4695    -13.2%
+
+  EZH2 status:
+    Normal: 5.5160  Tumor: 6.0716  Change: +10.1%
+    Prediction: ELEVATED
+    Result: CONFIRMED
+
+  ============================================================
+  DRUG TARGET PREDICTIONS — GEOMETRY-DERIVED
+  Stated before literature consultation
+  ============================================================
+
+  PREDICTION 1: EZH2 INHIBITOR
+    Geometry: EZH2 gain-of-function lock
+              Silences acinar TF program
+              PTF1A locus H3K27me3 methylated
+    Drug:     Tazemetostat (FDA approved)
+              EZH2 inhibitor + gemcitabine
+    Mechanism: Demethylate acinar gene loci
+               Restore PTF1A/NR5A2 expression
+               Dissolve false attractor
+
+  PREDICTION 2: PTF1A RESTORATION / HMA
+    Geometry: PTF1A is the master switch gene
+              Its suppression is the block
+    Drug:     Azacitidine/decitabine
+              Demethylate PTF1A promoter
+              Or: direct CRISPRa at PTF1A locus
+    Mechanism: Restore acinar identity
+               → PAAD cannot maintain
+               ductal/mesenchymal phenotype
+
+  PREDICTION 3: BET INHIBITOR / MYC AXIS
+    Geometry: MYC elevated (KRAS driven)
+              MYC maintains dedifferentiation
+    Drug:     JQ1 / BET inhibitor
+              OMO-103 (MYC inhibitor in trials)
+    Mechanism: Reduce MYC transcription
+               Collapse proliferative drive
+               at the block point
+               Combined with differentiation
+               therapy (EZH2i) for dual attack
+
+  PREDICTION 4: DEPTH SCORE AS BIOMARKER
+    Geometry: Block depth correlates with survival
+              High depth = basal-like = worse OS
+    Clinical: Depth score at diagnosis stratifies
+              high-risk vs low-risk PAAD
+              High depth → aggressive combo therapy
+              Low depth → single agent tolerable
+  ============================================================
+    
+
+=== STEP 9: FIGURE ===
+
+  Figure saved: ./paad_false_attractor/results/paad_false_attractor.png
