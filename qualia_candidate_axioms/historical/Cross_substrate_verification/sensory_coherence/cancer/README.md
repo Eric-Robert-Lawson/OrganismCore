@@ -1572,21 +1572,409 @@ Status:  COMPLETE — SCRIPTS 1–3 +
 ```
 
 #### ESCA — Esophageal Cancer
+
 ```
-Lineage:  Squamous or Barrett's
-          adenocarcinoma
-Block:    ESCC cells vs normal
-          esophageal squamous
-          OR Barrett's vs normal
-Predicted switch genes (squamous):
-  TP63   — squamous identity TF
-  KRT14  — basal squamous marker
-  IVL    — involucrin (terminal)
-Data:    GSE160269 or GSE188476
-Note:    TP63 was in the LUAD
-         extraction — watch for
-         cross-cancer signal.
-Doc: 85
+Lineage:   Two distinct subtypes
+           requiring separate analysis:
+           ESCC (squamous) and
+           EAC (Barrett's adenocarcinoma)
+
+=================================================
+ESCC — ESOPHAGEAL SQUAMOUS CELL CARCINOMA
+=================================================
+
+Attractor geometry (3 components):
+
+  1. EXECUTION BLOCK
+     IVL DOWN -62.9% *** (confirmed S1)
+     Terminal cornification blocked.
+     Cells cannot complete
+     suprabasal → granular → cornified.
+     CDKN2A lost in deep ESCC r=-0.79*
+     CDK4 elevated in deep ESCC r=+0.67*
+     Cell cycle checkpoint failure
+     prevents maturation arrest.
+
+  2. IDENTITY RETENTION
+     KRT10/KRT4/KRT13/DSG1/DSG3
+     all retained (squamous keratins).
+     NOTCH1 elevated +117.4% ***
+     (FA marker — ONCOGENIC in ESCC,
+      not tumor suppressor as in myeloid)
+     ZEB1 retained (squamous TF).
+     Cells are squamous — cannot
+     finish being squamous.
+
+  3. STABILISING MECHANISM
+     AXIN1 r=+0.86** S2 depth
+     (⚠️ DISCREPANT with literature —
+      lit says AXIN1 reduced in advanced
+      ESCC. n=9 limit. Needs replication.)
+     CDK4 r=+0.67* drives past CDKN2A.
+     VIM r=+0.74* partial EMT in deepest.
+
+Confirmed FA genes (UP in ESCC):
+  EGFR   +364.0% ***
+  FGFR1  +52.4%  ***  (intermediate depth
+                        marker — marks
+                        partially diff. cells,
+                        NOT deepest ESCC)
+  MYC    +78.2%  ***
+  NOTCH1 +117.4% ***  (oncogenic context)
+  KRT10  +208.9% ***
+  DSG1   +89.2%  ***
+
+Confirmed switch genes (DOWN in ESCC):
+  IVL    -62.9%  ***  (primary gate)
+
+Depth drivers (ESCC S2, n=9):
+  AXIN1  r=+0.86** (⚠️ needs replication)
+  VIM    r=+0.74*
+  CDK4   r=+0.67*
+  CDKN2A r=-0.79*  (lost in deep ESCC)
+  FGFR1  r=-0.83** (intermediate marker)
+  IVL    r=-0.80*
+
+Clinical panel (ESCC):
+  AXIN1(+) / VIM(+) / FGFR1(-)
+  r=+0.96*** with depth
+  ⚠️ AXIN1 direction needs replication
+  in larger ESCC cohort (GSE53625
+  or TCGA-ESCA) before clinical claim.
+
+Drug targets (ESCC, geometry-derived):
+  PRIMARY:
+    CDK4/6 inhibitor (palbociclib)
+    + EGFR/pan-ERBB inhibitor (afatinib)
+    EXACT MATCH: NCT05865132 active
+    Phase II trial — framework derived
+    this combination independently. ✓✓
+  SECONDARY:
+    FGFR1 inhibitor (erdafitinib)
+    for intermediate-depth ESCC.
+    NOT for deepest (pre-FGFR1 state).
+  AVOID:
+    Anti-VEGF — VEGFA suppressed
+    in deep ESCC (r=-0.52).
+  IMMUNOTHERAPY NOTE:
+    NOTCH1 elevated in deep ESCC.
+    NOTCH1 mutation predicts improved
+    OS with anti-PD1 (tislelizumab)
+    in RATIONALE-302 Phase III.
+    Deep ESCC (high NOTCH1 expression)
+    may be immunotherapy-responsive.
+    Novel prediction NP-ESCA-5.
+
+ESCC prediction errors (documented):
+  NOTCH1 predicted DOWN → actually UP
+  Lesson: NOTCH1 is oncogenic in
+  squamous/columnar epithelial cancers.
+  Do not transfer myeloid direction.
+
+=================================================
+EAC — ESOPHAGEAL ADENOCARCINOMA
+=================================================
+
+Attractor geometry (3 components):
+
+  1. EXECUTION BLOCK
+     CDH1 DOWN -557.0% *** (strongest signal)
+     ZEB1 DOWN -173.5% *** (squamous lost)
+     APC  DOWN r=-0.67*** (Wnt brake lost)
+     Cannot form normal epithelial
+     junctions (CDH1 gone).
+     Cannot revert to squamous (ZEB1 gone).
+     APC loss → post-translational
+     beta-catenin stabilisation despite
+     low CTNNB1 mRNA (bulk RNA paradox).
+
+  2. IDENTITY RETENTION
+     KRT20 r=+0.87*** PRIMARY ANCHOR
+     TFF1  +2127.3% *** strongest FA marker
+     CDX2  +136.1%  *** intestinal TF
+     NOTCH1 elevated (FA marker in EAC)
+     HDAC1 r=+0.56** epigenetic lock
+     EZH2  r=+0.49*  epigenetic lock
+     Cells are intestinal metaplastic.
+     Cannot revert squamous (ZEB1 gone).
+     Cannot complete differentiation
+     (CDH1/APC gone).
+
+  3. STABILISING MECHANISM
+     DUAL EPIGENETIC LOCK:
+       HDAC1 + EZH2 combined r=+0.63**
+       Outperforms either alone (S2-4 ✓)
+       H3K27me3 (EZH2) suppresses
+       normal differentiation program.
+       Deacetylation (HDAC1) suppresses
+       squamous reversion program.
+     AXIN2 r=+0.43 trending positive —
+     Wnt active in deep EAC despite
+     APC loss (feedback confirmed).
+     Wnt active = tankyrase inhibitor
+     target.
+
+CDX2 circuit gap confirmed:
+  CDX2 elevated +136% but only 1/5
+  canonical targets co-elevated.
+  CDX2 is uncoupled from its targets.
+  KRT20 (effector) tracks depth better
+  than CDX2 (TF) — same principle
+  as ELANE in MDS.
+  Generalises from STAD: universal
+  feature of intestinal metaplastic
+  cancers.
+
+Barrett's progression geometry
+(GSE13898 independent cohort n=118):
+  Normal  depth: 0.46
+  Barrett depth: 0.69  ← HIGHEST
+  EAC     depth: 0.58
+  ORDER: Normal < EAC < Barrett
+  KEY FINDING: Barrett's is MORE
+  deeply metaplastic than EAC on
+  the intestinal marker panel.
+  TFF1:  Barrett=13.70 > EAC=10.65
+  KRT20: Barrett=12.17 > EAC=9.13
+  CDX2:  Barrett=8.98  > EAC=7.68
+  Cancer transition = FORK not deepening.
+  EAC adds genomic instability ON TOP
+  of metaplasia, partially suppressing
+  the intestinal markers.
+  IMPLICATION: TFF1/KRT20 intensity
+  in Barrett's does NOT predict cancer
+  progression risk. CIN events (TP53
+  mutation, CDKN2A loss) are the
+  actual progression drivers.
+  This reframes Barrett's surveillance.
+
+Confirmed FA genes (UP in EAC):
+  TFF1   +2127.3% ***  (strongest signal)
+  CDX2   +136.1%  ***
+  KRT20  +75.0%   **   (primary depth anchor)
+  VEGFA  +68.5%   *
+  NOTCH1 +170.3%  ***  (FA marker in EAC)
+
+Confirmed switch genes (DOWN in EAC):
+  CDH1   -557.0%  ***  (primary gate)
+  ZEB1   -173.5%  ***  (squamous identity)
+  APC    r=-0.67*** in depth
+
+ZEB1 reinterpretation:
+  Predicted UP (EMT driver).
+  Found DOWN (squamous identity lost).
+  ZEB1 in esophageal context =
+  SQUAMOUS IDENTITY RETAINER,
+  not EMT driver.
+  Wrong prediction — correct revision.
+  Do not transfer EMT-context ZEB1
+  direction to squamous epithelium.
+
+ZEB2 in EAC (GSE13898, n=75):
+  ZEB2-AURKA r=+0.47*** (ZA-1 confirmed)
+  Weaker than STAD (r=+0.99).
+  ZEB2 in EAC = EMT integrating node:
+    VIM    r=+0.81*** mesenchymal
+    TWIST1 r=+0.73*** EMT TF
+    SNAI1  r=+0.72*** EMT TF
+    TGFBR2 r=+0.66*** TGF-β receptor
+    BCL2   r=+0.59*** survival/chemo-R
+    HIF1A  r=+0.59*** hypoxia
+    CTNNB1 r=+0.54*** beta-catenin
+    WNT5A  r=+0.54*** non-canonical Wnt
+  ZEB2-high EAC = EMT-competent,
+  BCL2-high, hypoxic, chemo-resistant
+  subtype. Novel prediction NP-ESCA-8.
+
+Cross-platform replication (GSE13898):
+  KRT20 r=+0.56*** ✓ (CP-2 confirmed)
+  TFF1 EAC>Normal *** ✓ (PG-3 confirmed)
+  CDH1 Normal>EAC *** ✓ (PG-4 confirmed)
+  CDX2 EAC>Normal *** ✓
+  HDAC1/EZH2: flat across groups —
+  these are WITHIN-EAC depth drivers
+  (stratify deep vs shallow EAC) not
+  across-cohort group markers.
+  KRT20 is both diagnostic AND
+  within-EAC depth stratifier.
+
+Clinical panel (EAC):
+  KRT20(+) / HDAC1(+) / APC(-)
+  r=+0.92*** with depth (GSE26886)
+  KRT20 replicated on Illumina ✓
+  OS survival test deferred to
+  TCGA-ESCA (GSE13898 has no OS data)
+
+Drug targets (EAC, geometry-derived):
+  PRIMARY NOVEL COMBINATION:
+    Tazemetostat (EZH2i)
+    + Entinostat/Vorinostat (HDACi)
+    Combined r=+0.63** confirms target
+    Synergy confirmed in lymphoma.
+    NOT tested in EAC — NOVEL. 🆕
+    KRT20-high/HDAC1-high patients
+    are the target population.
+  APPROVED MATCH:
+    Ramucirumab (anti-VEGFR2)
+    VEGFA r=+0.46* confirmed in EAC.
+    FDA-APPROVED for GEJ/EAC
+    (REGARD + RAINBOW trials). ✓✓
+    Framework derived approved drug
+    independently.
+  WNT TARGET (novel):
+    Tankyrase inhibitor (XAV939)
+    APC lost + AXIN2 trending up
+    = Wnt active in deep EAC.
+    Not yet in EAC clinical trials.
+  HER2:
+    Independent of depth (r=+0.08).
+    Test ALL EAC regardless of
+    depth score. Do not depth-stratify
+    HER2 testing.
+
+EAC prediction errors (documented):
+  TFF1 predicted DOWN → UP +2127%
+  Lesson: Metaplastic adenocarcinomas
+  OVEREXPRESS the target tissue markers.
+  EAC is stuck IN gastric-like state
+  — it overexpresses gastric markers.
+  ZEB1 predicted UP → DOWN -174%
+  Lesson: ZEB1 is squamous identity
+  retainer in esophageal context.
+  Loss marks columnar transition.
+
+=================================================
+CROSS-SUBTYPE FINDINGS
+=================================================
+
+Shared axis (ZEB1/TFF1):
+  Normal  : 0.13
+  Barrett : 0.63
+  EAC     : 0.70
+  ESCC    : 0.34
+  Axis partially separates groups.
+  Does not cleanly order all four
+  (Barrett ≈ EAC on this axis).
+
+ZEB2-AURKA coupling gradient:
+  STAD EAC:  r=+0.99 (CIN-dominant)
+  ESCA EAC:  r=+0.47 (EMT-dominant)
+  Normal:    r=-0.12 (no coupling)
+  Barrett:   r=+0.38 (intermediate)
+  Coupling rises with cancer progression
+  and correlates with CIN burden.
+  Novel cross-cancer prediction:
+  r(ZEB2,AURKA) predicts CIN burden
+  across cancer types. NP-ESCA-10.
+
+NOTCH1 rule (derived from ESCA):
+  In myeloid cancers: NOTCH1 suppressed
+  In squamous/columnar epithelial
+  cancers: NOTCH1 oncogenic (elevated)
+  Do not transfer direction across
+  lineage types.
+
+=================================================
+NOVEL PREDICTIONS (locked 2026-03-01)
+=================================================
+
+NP-ESCA-1: HDAC1+EZH2 dual inhibition
+  synergistic specifically in EAC.
+  Test: OE33/OE19 + tazemetostat
+  + entinostat combination index.
+
+NP-ESCA-2: KRT20 IHC intensity predicts
+  HDACi response in EAC.
+  Test: KRT20 H-score in EAC TMA
+  + HDACi trial response data.
+
+NP-ESCA-3: SPRR1A+TP63 squamous-hybrid
+  EAC molecular subtype.
+  Distinct biology/prognosis.
+  Test: IHC co-staining in EAC TMAs.
+
+NP-ESCA-4: ZEB1 primary squamous-columnar
+  separator in esophageal metaplasia.
+  More informative than SOX2.
+  Test: ZEB1 IHC in Barrett's/EAC TMAs.
+
+NP-ESCA-5: Deep ESCC (high NOTCH1) predicts
+  anti-PD1 response.
+  NOTCH1 expression surrogates for
+  NOTCH1 mutation status.
+  Test: TCGA-ESCA NOTCH1 expression
+  + mutation + depth score.
+
+NP-ESCA-6: KRT20/HDAC1/APC panel predicts
+  EAC overall survival.
+  Test: TCGA-ESCA survival analysis.
+  (DEFERRED — no OS in GSE13898)
+
+NP-ESCA-7: Barrett's TFF1/KRT20 intensity
+  does NOT predict EAC progression risk.
+  CIN markers (TP53/CDKN2A) do.
+  Test: Barrett's surveillance cohort
+  TFF1/KRT20 H-score vs 5-yr progression.
+
+NP-ESCA-8: ZEB2-high EAC = EMT-competent
+  BCL2-high chemo-resistant subtype.
+  Predicts shorter OS and shorter
+  response to FLOT/ECF chemotherapy.
+  Test: TCGA-ESCA ZEB2 + OS.
+
+NP-ESCA-9: ZEB2-AURKA coupling in Barrett's
+  biopsies predicts EAC progression
+  better than histological grade.
+  Test: Prospective Barrett's cohort.
+
+NP-ESCA-10: r(ZEB2,AURKA) correlates with
+  CIN burden across cancer types.
+  ESCC prediction: r > 0.70 when
+  tested on platform with AURKA.
+  Test: TCGA pan-cancer ZEB2-AURKA
+  vs aneuploidy scores.
+
+=================================================
+DATASETS USED
+=================================================
+
+GSE26886 (GPL570 Affymetrix HG-U133+2)
+  n=69: Normal=19, Barrett=20,
+        EAC=21, ESCC=9
+  Scripts 1 and 2 (Doc 90a, 90b)
+  Limitation: AURKA absent from GPL570
+
+GSE13898 (GPL6102 Illumina HWG-6 V2)
+  n=118: Normal=28, Barrett=15, EAC=75
+  Script 3 (Doc 90d)
+  No OS data in GEO (supplementary only)
+  AURKA present — ZEB2-AURKA tested
+
+Literature check: Doc 90c
+  2 exact drug matches confirmed
+  (ramucirumab, palbociclib+afatinib)
+  6 novel predictions confirmed as
+  unpublished
+
+Pending: TCGA-ESCA
+  Survival panel (SP-1 to SP-5)
+  NOTCH1 mutation + depth (NP-ESCA-5)
+  ZEB2 OS (NP-ESCA-8)
+  ZEB2-AURKA in ESCC (NP-ESCA-10)
+
+=================================================
+DOCUMENTS
+=================================================
+
+Doc 90a: Script 1 — GSE26886 S1
+Doc 90b: Script 2 — GSE26886 S2
+Doc 90c: Literature check
+Doc 90d: Script 3 — GSE13898
+Doc 90e: PENDING — TCGA-ESCA survival
+         OR final summary
+
+Status: ACTIVE — survival deferred
+Last updated: 2026-03-01
 ```
 
 #### BLCA — Bladder Cancer
