@@ -1,0 +1,267 @@
+=================================================================
+PROSTATE ADENOCARCINOMA
+FALSE ATTRACTOR — SCRIPT 2
+Circuit Analysis
+Doc: 88b | Date: 2026-03-01
+=================================================================
+
+=== STEP 0: GENE MATRIX ===
+=================================================================
+STEP 0: GENE MATRIX
+=================================================================
+  gene_matrix.csv not found.
+  Rebuilding from raw matrix...
+  (Add save step to Script 1 to
+   avoid this in future runs)
+
+  Loading raw matrix...
+  Raw shape: (48652, 196)
+  Quantile normalizing...
+  Normalized: (38741, 98)
+
+  Downloading annotation CSV...
+  Downloaded: 7.3 MB
+  Annotation cols: ['ID', 'Gene title', 'Gene symbol', 'Gene ID', 'UniGene title', 'UniGene symbol']
+  id_col=0 sym_col=2
+  Mapped probes: 24160
+  Genes: 17155
+  Saved: ./prad_false_attractor/results/gene_matrix.csv
+  (Script 1 should also save this)
+  Target genes: 61/61
+
+=== STEP 1: CLASSIFY ===
+
+--- Classifying samples ---
+  TUMOR  : 59
+  NORMAL : 39
+  Gleason: {'low': np.int64(32), 'high': np.int64(27)}
+
+=== STEP 2: DEPTH + ERG ===
+
+--- Building depth score ---
+  Switch genes: ['NKX3-1', 'FOXA1', 'KLK3', 'ACPP', 'KLK2', 'MSMB']
+  FA markers  : ['ERG', 'MKI67', 'EZH2', 'HOXC6', 'AMACR']
+  Depth mean : 0.4180
+  Depth std  : 0.1231
+  ERG threshold: 6.4804
+  ERG-high: 20
+  ERG-low : 39
+
+=== ANALYSIS 1: GAP ANALYSIS ===
+
+=================================================================
+ANALYSIS 1: GAP ANALYSIS
+Testing circuit connections
+=================================================================
+
+  KEY ARCHITECTURAL QUESTION:
+  NKX3-1→ACPP circuit:
+  INTACT (like PAAD PTF1A→CTRC r=+0.754)
+  OR BROKEN (like MDS CEBPE→ELANE r=+0.07)?
+
+  Connection                          r             p    Dir  Result
+  ------------------------------------------------------------------------
+  AR→FOXA1                      -0.0833  p=5.30e-01 ns  exp+  NOT CONFIRMED
+  AR→KLK3                       +0.2928  p=2.44e-02 *  exp+  CONFIRMED
+  AR→NKX3-1                     +0.3605  p=5.03e-03 **  exp+  CONFIRMED
+  AR→TMPRSS2                    +0.0882  p=5.07e-01 ns  exp+  NOT CONFIRMED
+  FOXA1→AR                      -0.0833  p=5.30e-01 ns  exp+  NOT CONFIRMED
+  FOXA1→AMACR                   +0.0682  p=6.08e-01 ns  exp+  NOT CONFIRMED
+  FOXA1→HOXC6                   +0.0981  p=4.60e-01 ns  exp+  NOT CONFIRMED
+  FOXA1→EZH2                    +0.0660  p=6.19e-01 ns  exp+  NOT CONFIRMED
+  EZH2→ACPP                     -0.1932  p=1.43e-01 ns  exp-  NOT CONFIRMED
+  EZH2→MSMB                     +0.0487  p=7.14e-01 ns  exp-  NOT CONFIRMED
+  EZH2→NKX3-1                   -0.0287  p=8.29e-01 ns  exp-  NOT CONFIRMED
+  EZH2→KLK3                     +0.3424  p=7.93e-03 **  exp-  WRONG DIR
+  NKX3-1→ACPP                   +0.4541  p=3.04e-04 ***  exp+  CONFIRMED
+  NKX3-1→MSMB                   +0.5226  p=2.17e-05 ***  exp+  CONFIRMED
+  NKX3-1→KLK3                   +0.6647  p=9.44e-09 ***  exp+  CONFIRMED
+  MYC→MKI67                     -0.0215  p=8.71e-01 ns  exp+  NOT CONFIRMED
+  MYC→CDK4                      +0.1721  p=1.92e-01 ns  exp+  NOT CONFIRMED
+  AURKA→MKI67                   +0.1004  p=4.49e-01 ns  exp+  NOT CONFIRMED
+  EZH2→TP63                     +0.0425  p=7.49e-01 ns  exp-  NOT CONFIRMED
+  EZH2→KRT5                     +0.0180  p=8.92e-01 ns  exp-  NOT CONFIRMED
+
+  CONFIRMED    : 5
+  NOT CONFIRMED: 15
+  MISSING      : 0
+
+  NKX3-1→ACPP: r=+0.4541
+  Architecture: INTACT
+  Like PAAD PTF1A→CTRC
+  Block at NKX3-1 INPUT
+
+=== ANALYSIS 2: ERG SUBTYPE ===
+
+=================================================================
+ANALYSIS 2: ERG SUBTYPE
+ERG-high vs ERG-low
+=================================================================
+  ERG-high: n=20
+  ERG-low : n=39
+
+  Depth by ERG:
+    ERG-high: 0.4327 ± 0.1516
+    ERG-low : 0.4104 ± 0.1071
+    p=0.6140 (similar)
+
+  Gene            ERG-hi    ERG-lo      Chg  p
+  --------------------------------------------------
+  ACPP           12.3758   12.5896    -1.7%  p=4.66e-01 ns
+  MSMB           12.1612   12.3620    -1.6%  p=6.14e-01 ns
+  HOXC6           9.6910    9.7293    -0.4%  p=7.92e-01 ns
+  AMACR           9.3521    9.6572    -3.2%  p=4.61e-01 ns
+  NKX3-1         10.0788   10.0307    +0.5%  p=6.31e-01 ns
+  FOXA1          12.3838   12.5623    -1.4%  p=1.22e-01 ns
+  KLK3            9.2834    9.6302    -3.6%  p=4.47e-01 ns
+  AR              7.8915    7.9449    -0.7%  p=6.60e-01 ns
+  TMPRSS2        11.8654   12.6655    -6.3%  p=3.24e-05 ***
+  MYC             8.9426    9.1116    -1.9%  p=2.52e-01 ns
+  EZH2            6.3409    6.4182    -1.2%  p=3.25e-01 ns
+  MKI67           6.0770    6.1046    -0.5%  p=4.86e-01 ns
+  TP63            6.9614    7.1557    -2.7%  p=2.52e-01 ns
+  KRT5            6.8204    6.9613    -2.0%  p=5.81e-01 ns
+  PTEN           10.2928   10.6109    -3.0%  p=1.74e-02 *
+
+  Gleason by ERG:
+    ERG_high: {'high': np.int64(10), 'low': np.int64(10)}
+    ERG_low: {'low': np.int64(22), 'high': np.int64(17)}
+
+=== ANALYSIS 3: 3-GENE SCORE ===
+
+=================================================================
+ANALYSIS 3: 3-GENE ATTRACTOR SCORE
+ACPP (switch) + HOXC6 + AMACR
+=================================================================
+  Available: ['ACPP', 'HOXC6', 'AMACR']
+
+  3-gene score:
+    Mean  : 0.4796
+    Median: 0.4854
+    Std   : 0.1302
+
+  3-gene vs block_depth:
+    r=+0.8664  p=7.81e-19
+    Agreement: STRONG
+
+  3-gene by Gleason:
+    High: 0.4970 ± 0.1551 (n=27)
+    Low : 0.4649 ± 0.1051 (n=32)
+    High > Low: p=0.1047  NOT CONFIRMED
+
+  3-gene by ERG:
+    ERG-high: 0.4796 ± 0.1680
+    ERG-low : 0.4796 ± 0.1085
+    p=0.9044
+
+=== ANALYSIS 4: NKX3-1 GAP ===
+
+=================================================================
+ANALYSIS 4: NKX3-1 FUNCTION GAP
+NKX3-1→terminal genes: INTACT or BROKEN?
+=================================================================
+
+  References:
+  PAAD: PTF1A→CTRC  r=+0.754  INTACT
+  MDS:  CEBPE→ELANE r=+0.07   BROKEN
+
+  NKX3-1 → target:
+  Target            r             p  Architecture
+  --------------------------------------------------
+  ACPP        +0.4541  p=3.04e-04 ***  INTACT
+  MSMB        +0.5226  p=2.17e-05 ***  INTACT
+  KLK3        +0.6647  p=9.44e-09 ***  INTACT
+  KLK2        +0.6349  p=6.65e-08 ***  INTACT
+  HOXB13      +0.2614  p=4.55e-02 *  PARTIAL
+
+  EZH2 → target:
+  Target            r             p  Role
+  --------------------------------------------------
+  ACPP        -0.1932  p=1.43e-01 ns  no relationship
+  MSMB        +0.0487  p=7.14e-01 ns  no relationship
+  KLK3        +0.3424  p=7.93e-03 **  EZH2 ACTIVATES
+  KLK2        +0.1423  p=2.82e-01 ns  no relationship
+  HOXB13      +0.2426  p=6.42e-02 ns  no relationship
+
+  ARCHITECTURE SUMMARY:
+    INTACT : 4
+    BROKEN : 0
+    PARTIAL: 1
+
+  VERDICT: INTACT
+  NKX3-1 present → terminal
+  differentiation follows
+  Block is at NKX3-1 INPUT
+  EZH2 inhibition → NKX3-1
+  derepressed → ACPP/MSMB execute
+
+=== ANALYSIS 5: FOXA1 CIRCUIT ===
+
+=================================================================
+ANALYSIS 5: FOXA1 CIRCUIT
+FOXA1 +6.4% in PRAD
+Driver of FA or AR consequence?
+=================================================================
+
+  Connection                  r             p  Result
+  ----------------------------------------------------------
+  AR→FOXA1              -0.0833  p=5.30e-01 ns  not connected
+  FOXA1→AMACR           +0.0682  p=6.08e-01 ns  not connected
+  FOXA1→HOXC6           +0.0981  p=4.60e-01 ns  not connected
+  FOXA1→EZH2            +0.0660  p=6.19e-01 ns  not connected
+  FOXA1→ACPP            +0.1681  p=2.03e-01 ns  not connected
+  FOXA1→KLK3            -0.0060  p=9.64e-01 ns  not connected
+  FOXA1→MYC             +0.3657  p=4.39e-03 **  CONNECTED +
+  FOXA1→MKI67           +0.1117  p=4.00e-01 ns  not connected
+  AR→AMACR              +0.0832  p=5.31e-01 ns  not connected
+  AR→HOXC6              -0.1065  p=4.22e-01 ns  not connected
+  AR→EZH2               +0.1259  p=3.42e-01 ns  not connected
+  AR→MYC                +0.0556  p=6.76e-01 ns  not connected
+
+  FOXA1 ROLE:
+  AR drives FOXA1: NO
+  FOXA1 elevated independently
+  FOXA1→AMACR: not connected
+  FOXA1 is AR consequence
+  not primary attractor driver
+
+=== ANALYSIS 6: CIRCUIT SUMMARY ===
+
+=================================================================
+ANALYSIS 6: COMPLETE CIRCUIT MAP
+=================================================================
+
+  CONFIRMED (5):
+  Connection                          r  p
+  --------------------------------------------------
+  AR→KLK3                    +0.2928  p=2.44e-02 *
+  AR→NKX3-1                  +0.3605  p=5.03e-03 **
+  NKX3-1→ACPP                    +0.4541  p=3.04e-04 ***
+  NKX3-1→MSMB                    +0.5226  p=2.17e-05 ***
+  NKX3-1→KLK3                    +0.6647  p=9.44e-09 ***
+
+  NOT CONFIRMED (15):
+  AR→FOXA1                   -0.0833  p=5.30e-01  (AR drives FOXA1)
+  AR→TMPRSS2                 +0.0882  p=5.07e-01  (AR drives TMPRSS2)
+  FOXA1→AR                      -0.0833  p=5.30e-01  (FOXA1 co-activates AR)
+  FOXA1→AMACR                   +0.0682  p=6.08e-01  (FOXA1 drives AMACR?)
+  FOXA1→HOXC6                   +0.0981  p=4.60e-01  (FOXA1 drives HOXC6?)
+  FOXA1→EZH2                    +0.0660  p=6.19e-01  (FOXA1 drives EZH2?)
+  EZH2→ACPP                    -0.1932  p=1.43e-01  (EZH2 silences ACPP)
+  EZH2→MSMB                    +0.0487  p=7.14e-01  (EZH2 silences MSMB)
+  EZH2→NKX3-1                  -0.0287  p=8.29e-01  (EZH2 silences NKX3-1)
+  EZH2→KLK3                    +0.3424  p=7.93e-03  (EZH2 silences KLK3)
+  MYC→MKI67                   -0.0215  p=8.71e-01  (MYC drives proliferation)
+  MYC→CDK4                    +0.1721  p=1.92e-01  (MYC drives CDK4)
+  AURKA→MKI67                   +0.1004  p=4.49e-01  (AURKA tracks proliferation)
+  EZH2→TP63                    +0.0425  p=7.49e-01  (EZH2 silences TP63?)
+  EZH2→KRT5                    +0.0180  p=8.92e-01  (EZH2 silences KRT5?)
+
+  NKX3-1 ARCHITECTURE: INTACT
+  FOXA1 ROLE: AR consequence / unclear
+
+=== FIGURE ===
+
+--- Generating figure ---
+
+  Figure: ./prad_false_attractor/results_s2/prad_s2_circuit.png
