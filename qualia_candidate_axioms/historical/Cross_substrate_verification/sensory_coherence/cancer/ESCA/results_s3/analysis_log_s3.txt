@@ -1,0 +1,196 @@
+=================================================================
+ESOPHAGEAL CANCER — SCRIPT 3 (v3)
+Dataset: GSE13898
+Framework: OrganismCore
+Doc: 90d | 2026-03-01
+=================================================================
+
+=================================================================
+STEP 0: DATA ACQUISITION
+=================================================================
+  Already present: ./esca_false_attractor/GSE13898_series_matrix.txt.gz (11,729,146 bytes)
+  Already present: ./esca_false_attractor/GPL6102.annot.gz (6,577,510 bytes)
+  Already present: ./esca_false_attractor/GSE13898_family.soft.gz (40,264,720 bytes)
+  Trying suppl: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE13nnn/GSE13898/suppl/GSE13898_clinical_data.txt.gz
+  HTTP 404
+  Trying suppl: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE13nnn/GSE13898/suppl/GSE13898_clinical_data.txt
+  HTTP 404
+  Trying suppl: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE13nnn/GSE13898/suppl/GSE13898%5Fclinical%5Fdata.txt.gz
+  HTTP 404
+
+=================================================================
+STEP 1: BUILD PROBE MAP (FIXED v3)
+Using 'Gene symbol' col not
+'UniGene symbol' col
+=================================================================
+  Header cols: ['ID', 'Gene title', 'Gene symbol', 'Gene ID', 'UniGene title', 'UniGene symbol', 'UniGene ID', 'Nucleotide Title']
+  ID col  : 0 (ID)
+  Sym col : 2 (Gene symbol)
+  Data lines scanned: 48702
+  Probes mapped     : 130
+  Genes covered     : 89
+  Genes found       : ['APC', 'AURKA', 'AXIN1', 'AXIN2', 'BAX', 'BCL2', 'BCL2L1', 'BIRC5', 'CCNA2', 'CCNB1', 'CCND1', 'CCNE1', 'CD274', 'CD8A', 'CDC20', 'CDH1', 'CDH2', 'CDK2', 'CDK4', 'CDK6', 'CDKN1A', 'CDKN2A', 'CDX2', 'CLDN18', 'CTNNB1', 'DNMT3A', 'DSG1', 'DSG3', 'EGFR', 'ERBB2', 'ERBB3', 'EZH2', 'FGFR1', 'FN1', 'FOXA2', 'FOXP3', 'GKN1', 'HDAC1', 'HDAC2', 'HES1', 'HIF1A', 'IVL', 'JAG1', 'KDM6A', 'KDR', 'KLF4', 'KRT10', 'KRT13', 'KRT14', 'KRT20', 'KRT4', 'KRT5', 'LDHA', 'LGR5', 'MCL1', 'MDM2', 'MET', 'MKI67', 'MLH1', 'MSH6', 'MUC5B', 'MYC', 'NOTCH1', 'PCNA', 'PDCD1', 'PGC', 'PIK3CA', 'PLK1', 'RB1', 'SNAI1', 'SNAI2', 'SOX2', 'SOX9', 'SPRR1A', 'TCF7L2', 'TET2', 'TFF1', 'TFF3', 'TGFB1', 'TGFBR2', 'TOP2A', 'TP53', 'TP63', 'TWIST1', 'VEGFA', 'VIM', 'WNT5A', 'ZEB1', 'ZEB2']
+  Missing targets   : ['FGFR2', 'MUC2', 'MUC5AC']
+
+=================================================================
+STEP 2: PARSE SERIES MATRIX
+  File: ./esca_false_attractor/GSE13898_series_matrix.txt.gz
+=================================================================
+  Sample IDs   : 118
+  Probes found : 130
+  Genes mapped : 89
+  Genes found  : ['APC', 'AURKA', 'AXIN1', 'AXIN2', 'BAX', 'BCL2', 'BCL2L1', 'BIRC5', 'CCNA2', 'CCNB1', 'CCND1', 'CCNE1', 'CD274', 'CD8A', 'CDC20', 'CDH1', 'CDH2', 'CDK2', 'CDK4', 'CDK6', 'CDKN1A', 'CDKN2A', 'CDX2', 'CLDN18', 'CTNNB1', 'DNMT3A', 'DSG1', 'DSG3', 'EGFR', 'ERBB2', 'ERBB3', 'EZH2', 'FGFR1', 'FN1', 'FOXA2', 'FOXP3', 'GKN1', 'HDAC1', 'HDAC2', 'HES1', 'HIF1A', 'IVL', 'JAG1', 'KDM6A', 'KDR', 'KLF4', 'KRT10', 'KRT13', 'KRT14', 'KRT20', 'KRT4', 'KRT5', 'LDHA', 'LGR5', 'MCL1', 'MDM2', 'MET', 'MKI67', 'MLH1', 'MSH6', 'MUC5B', 'MYC', 'NOTCH1', 'PCNA', 'PDCD1', 'PGC', 'PIK3CA', 'PLK1', 'RB1', 'SNAI1', 'SNAI2', 'SOX2', 'SOX9', 'SPRR1A', 'TCF7L2', 'TET2', 'TFF1', 'TFF3', 'TGFB1', 'TGFBR2', 'TOP2A', 'TP53', 'TP63', 'TWIST1', 'VEGFA', 'VIM', 'WNT5A', 'ZEB1', 'ZEB2']
+
+=================================================================
+STEP 3: CLASSIFY SAMPLES
+=================================================================
+
+  Group counts:
+    EAC: 75
+    Normal: 28
+    Barrett: 15
+
+=================================================================
+GROUP SUMMARY
+=================================================================
+  Normal      : 28
+  Barrett     : 15
+  EAC         : 75
+
+=================================================================
+STEP 4: SURVIVAL FROM SOFT FILE
+Extended clinical key search
+=================================================================
+  Sample records: 118
+  All characteristic keys:
+    'c0': Patient #44472
+    'pathology': normal
+
+  OS time  : 0
+  OS event : 0
+  NOTE: No survival data in soft
+  GSE13898 survival may be in
+  supplementary file only.
+
+  Pathology breakdown:
+    adenocarcinoma: 75
+    normal: 28
+    low grade displasia: 7
+    high grade displasia: 6
+    no grade displasia: 2
+
+=================================================================
+VALIDATION 1: SURVIVAL PANEL
+KRT20(+) / HDAC1(+) / APC(-)
+=================================================================
+  EAC n=75
+  Valid survival: 0
+  Insufficient survival data
+  Checking pathology:
+    adenocarcinoma: 75
+
+  NOTE: GSE13898 OS data not in
+  GEO soft/matrix files.
+  Supplementary table required.
+  Survival tests skipped.
+  Progression geometry and
+  ZEB2-AURKA tests proceed.
+
+=================================================================
+VALIDATION 2: ZEB2-AURKA COUPLING
+Pred ZA-2: r > 0.60 in EAC
+STAD reference: r=+0.9871
+=================================================================
+
+  EAC (n=75):
+  r(ZEB2,AURKA) = +0.4675  p=2.35e-05 ***
+  ZA-1 CONFIRMED ✓ (r>0, not >0.60)
+
+  Barrett (n=15):
+  r(ZEB2,AURKA) = +0.3837  p=0.1580  ns
+
+  Normal (n=28):
+  r(ZEB2,AURKA) = -0.1233  p=0.5321  ns
+
+=================================================================
+VALIDATION 3: PROGRESSION GEOMETRY
+Normal → Barrett → EAC
+=================================================================
+  Genes in matrix: ['APC', 'AURKA', 'AXIN1', 'AXIN2', 'BAX', 'BCL2', 'BCL2L1', 'BIRC5', 'CCNA2', 'CCNB1', 'CCND1', 'CCNE1', 'CD274', 'CD8A', 'CDC20', 'CDH1', 'CDH2', 'CDK2', 'CDK4', 'CDK6', 'CDKN1A', 'CDKN2A', 'CDX2', 'CLDN18', 'CTNNB1', 'DNMT3A', 'DSG1', 'DSG3', 'EGFR', 'ERBB2', 'ERBB3', 'EZH2', 'FGFR1', 'FN1', 'FOXA2', 'FOXP3', 'GKN1', 'HDAC1', 'HDAC2', 'HES1', 'HIF1A', 'IVL', 'JAG1', 'KDM6A', 'KDR', 'KLF4', 'KRT10', 'KRT13', 'KRT14', 'KRT20', 'KRT4', 'KRT5', 'LDHA', 'LGR5', 'MCL1', 'MDM2', 'MET', 'MKI67', 'MLH1', 'MSH6', 'MUC5B', 'MYC', 'NOTCH1', 'PCNA', 'PDCD1', 'PGC', 'PIK3CA', 'PLK1', 'RB1', 'SNAI1', 'SNAI2', 'SOX2', 'SOX9', 'SPRR1A', 'TCF7L2', 'TET2', 'TFF1', 'TFF3', 'TGFB1', 'TGFBR2', 'TOP2A', 'TP53', 'TP63', 'TWIST1', 'VEGFA', 'VIM', 'WNT5A', 'ZEB1', 'ZEB2']
+
+  Gene          Normal   Barrett       EAC  p(EAC vs N)    Pred  Conf
+  ------------------------------------------------------------------------
+  ZEB1          6.0404    6.0731    6.2137  p=4.79e-03  **  PG-2   ✗
+  TFF1          6.1809   13.7019   10.6483  p=3.03e-11 ***  PG-3   ✓
+  CDH1          7.2155    7.2345    6.8562  p=4.18e-04 ***  PG-4   ✓
+  EZH2          8.0929    7.5583    7.8810    p=0.6592  ns  PG-5   ✗
+  HDAC1        12.1864   12.1853   11.8161    p=1.0000  ns  PG-6   ✗
+  KRT20         6.0523   12.1651    9.1345  p=4.99e-11 ***  CP-2   ✓
+  APC           6.0724    6.1275    6.1657    p=0.1022  ns  CP-3   ✗
+  CDX2          6.0559    8.9751    7.6752  p=7.28e-10 ***  -      ✓
+  VEGFA         6.7383    6.5738    6.8986    p=0.0442   *  -      ✓
+  KRT5         13.3736    7.8270    8.8605  p=8.01e-08 ***  -      ✓
+  AURKA         8.3334    9.1585    9.1173  p=6.03e-03  **  -      ✓
+  ERBB2         7.4850    7.2957    7.3679    p=0.0125   *  -      ✗
+  AXIN2         7.1266    8.9043    8.2690  p=4.47e-03  **  -      ✓
+  MKI67         6.6746    6.7387    6.9141    p=0.0932  ns  -      ✓
+
+  Depth scores:
+  Normal (n=28): mean=0.4585 std=0.1397 sw=['CDH1', 'ZEB1', 'KRT5', 'APC', 'CTNNB1'] fa=['CDX2', 'TFF1', 'KRT20', 'VEGFA', 'NOTCH1', 'HDAC1', 'EZH2']
+  Barrett (n=15): mean=0.6901 std=0.1813 sw=['CDH1', 'ZEB1', 'KRT5', 'APC', 'CTNNB1'] fa=['CDX2', 'TFF1', 'KRT20', 'VEGFA', 'NOTCH1', 'HDAC1', 'EZH2']
+  EAC (n=75): mean=0.5762 std=0.1752 sw=['CDH1', 'ZEB1', 'KRT5', 'APC', 'CTNNB1'] fa=['CDX2', 'TFF1', 'KRT20', 'VEGFA', 'NOTCH1', 'HDAC1', 'EZH2']
+
+  Group order test (PG-1):
+  Group           n      mean  std
+  Normal         28    0.4585  0.1397
+  Barrett        15    0.6901  0.1813
+  EAC            75    0.5762  0.1752
+
+  EAC > Normal  : p=3.67e-04 ***
+  PG-1 CONFIRMED ✓
+  Barrett>Normal: p=1.28e-04 ***
+  EAC > Barrett : p=0.9888  ns
+
+=================================================================
+CROSS-PLATFORM VALIDATION
+GSE13898 vs GSE26886
+=================================================================
+
+  Gene           S3 r  p-value        Threshold  Result
+  ------------------------------------------------------------
+  KRT20       +0.5591  p=1.85e-07 ***  CP-2 ≥0.50  YES ✓
+  HDAC1       +0.1064    p=0.3637  ns       ≥0.30  NO  ✗
+  APC         -0.0527    p=0.6531  ns  CP-3 ≤-0.30  NO  ✗
+  EZH2        +0.0907    p=0.4388  ns       ≥0.30  NO  ✗
+  CDX2        +0.5171  p=2.04e-06 ***       ≥0.20  YES ✓
+  VEGFA       +0.0952    p=0.4168  ns       ≥0.20  NO  ✗
+  ZEB1        -0.1791    p=0.1243  ns      ≤-0.20  NO  ✗
+  CDH1        -0.0271    p=0.8176  ns      ≤-0.20  NO  ✗
+  MKI67       +0.1432    p=0.2203  ns       ≥0.30  NO  ✗
+  AURKA       +0.2838    p=0.0136   *       ≥0.20  YES ✓
+
+  Replicated: 3/10 (30%)
+  CP-1 NOT CONFIRMED
+
+=================================================================
+ZEB2-AURKA DEEP DIVE
+=================================================================
+  Genes in EAC: ['APC', 'AURKA', 'AXIN1', 'AXIN2', 'BAX', 'BCL2', 'BCL2L1', 'BIRC5', 'CCNA2', 'CCNB1', 'CCND1', 'CCNE1', 'CD274', 'CD8A', 'CDC20', 'CDH1', 'CDH2', 'CDK2', 'CDK4', 'CDK6', 'CDKN1A', 'CDKN2A', 'CDX2', 'CLDN18', 'CTNNB1', 'DNMT3A', 'DSG1', 'DSG3', 'EGFR', 'ERBB2', 'ERBB3', 'EZH2', 'FGFR1', 'FN1', 'FOXA2', 'FOXP3', 'GKN1', 'HDAC1', 'HDAC2', 'HES1', 'HIF1A', 'IVL', 'JAG1', 'KDM6A', 'KDR', 'KLF4', 'KRT10', 'KRT13', 'KRT14', 'KRT20', 'KRT4', 'KRT5', 'LDHA', 'LGR5', 'MCL1', 'MDM2', 'MET', 'MKI67', 'MLH1', 'MSH6', 'MUC5B', 'MYC', 'NOTCH1', 'PCNA', 'PDCD1', 'PGC', 'PIK3CA', 'PLK1', 'RB1', 'SNAI1', 'SNAI2', 'SOX2', 'SOX9', 'SPRR1A', 'TCF7L2', 'TET2', 'TFF1', 'TFF3', 'TGFB1', 'TGFBR2', 'TOP2A', 'TP53', 'TP63', 'TWIST1', 'VEGFA', 'VIM', 'WNT5A', 'ZEB1', 'ZEB2']
+
+  ZEB2 correlates in EAC (n=75):
+  ZEB2       r= +1.0000  p=0.00e+00 ***
+  VIM        r= +0.8141  p=6.74e-19 ***
+  TWIST1     r= +0.7319  p=8.72e-14 ***
+  SNAI1      r= +0.7193  p=3.61e-13 ***
+  TGFBR2     r= +0.6623  p=9.74e-11 ***
+  BCL2       r= +0.5945  p=1.87e-08 ***
+  HIF1A      r= +0.5884  p=2.83e-08 ***
+  FN1        r= +0.5702  p=9.32e-08 ***
+  KDR        r= +0.5417  p=5.21e-07 ***
+  CTNNB1     r= +0.5401  p=5.69e-07 ***
+  WNT5A      r= +0.5369  p=6.83e-07 ***
+  SNAI2      r= +0.5355  p=7.42e-07 ***
+
+--- Generating figure ---
+
+  Figure saved: ./esca_false_attractor/results_s3/esca_gse13898_s3.png
