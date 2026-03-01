@@ -1,0 +1,347 @@
+=================================================================
+STOMACH ADENOCARCINOMA
+CIRCUIT ANALYSIS — SCRIPT 2
+Dataset: GSE66229
+Framework: OrganismCore
+Doc: 89b | Date: 2026-03-01
+=================================================================
+
+  OBJECTIVES:
+  1. Find CLDN18/GKN1/KRT20 (missing)
+  2. Correct depth score
+  3. Classify ACRG subtypes
+  4. Test CDX2 circuit integrity
+  5. ERBB family circuit
+  6. EZH2 paradox
+  7. Drug target depth correlations
+
+=== STEP 0: LOAD S1 OUTPUTS ===
+=================================================================
+STEP 0: LOAD SCRIPT 1 OUTPUTS
+=================================================================
+  Gene matrix: (59, 400)
+  Genes: ['VIM', 'MMP2', 'CDH1', 'PCNA', 'BUB1B', 'ATP4A', 'MET', 'MYC', 'CDK6', 'CDC20']
+  Meta: (400, 30)
+
+=== STEP 1: EXPAND PROBES ===
+
+=================================================================
+STEP 1: EXPAND PROBE MAP
+Finding CLDN18 / GKN1 / KRT20
+=================================================================
+  Loading raw matrix for probe scan...
+  Looking for probes:
+  Target new probes: 24
+  Target new genes: ['CDH17', 'CLDN18', 'DNMT3B', 'EED', 'FOXA2', 'GATA4', 'GATA6', 'GKN1', 'HNF4A', 'KRT20', 'MLH1', 'MSH2', 'MSH6', 'PTEN', 'SOX17', 'SOX2', 'SUZ12', 'SYP']
+  Probes found in matrix: 11
+  Added: MLH1 (mean=1.5601)
+  Added: FOXA2 (mean=1.0920)
+  Added: SOX2 (mean=0.9956)
+  Added: CDH17 (mean=0.9559)
+  Added: GATA4 (mean=1.1537)
+  Added: HNF4A (mean=0.8541)
+  Added: GATA6 (mean=0.7510)
+  Added: KRT20 (mean=1.7226)
+  Added: MSH6 (mean=0.7174)
+  Added: CLDN18 (mean=0.7366)
+  Added: GKN1 (mean=0.2896)
+  Found: ['SOX2', 'GATA6', 'CLDN18', 'HNF4A', 'GATA4', 'CDH17', 'MLH1', 'MSH6', 'GKN1', 'KRT20', 'FOXA2']
+  Still missing: ['EED', 'SYP', 'DNMT3B', 'SUZ12', 'PTEN', 'SOX17', 'MSH2']
+  These probes are not in this array version
+  Gene matrix after expansion: 70 genes
+
+=== STEP 2: CLASSIFY ===
+
+=================================================================
+STEP 2: CLASSIFY TUMOR / NORMAL
+=================================================================
+  TUMOR  : 300
+  NORMAL : 100
+
+=== STEP 3: CORRECTED DEPTH ===
+
+=================================================================
+STEP 3: CORRECTED DEPTH SCORE
+Using data-derived switch/FA genes
+Script 1 score was inverted
+because switch genes were UP
+=================================================================
+
+  Switch genes (DOWN in STAD):
+    FABP1      N:1.4917 T:1.3732 -7.9%
+    MUC2       N:0.3611 T:0.3326 -7.9%
+    ERBB4      N:0.9023 T:0.4822 -46.6%
+    ERBB3      N:0.3006 T:0.0380 -87.4%
+    TWIST1     N:1.3098 T:1.0073 -23.1%
+    CDH2       N:0.7783 T:0.4604 -40.8%
+    VIM        N:1.8884 T:1.8193 -3.7%
+    GKN1       N:0.2494 T:0.3030 +21.5%
+    CLDN18     N:0.6207 T:0.7752 +24.9%
+    MUC5AC     N:0.7690 T:0.7649 -0.5%
+
+  FA markers (UP in STAD):
+    MKI67      N:0.5523 T:0.8572 +55.2%
+    ZEB2       N:1.1229 T:1.4764 +31.5%
+    CDX2       N:0.8686 T:1.0695 +23.1%
+    AURKA      N:1.0826 T:1.4445 +33.4%
+    TOP2A      N:1.1534 T:1.5693 +36.1%
+    SNAI1      N:0.8029 T:0.8885 +10.7%
+    HDAC1      N:1.0773 T:1.2147 +12.8%
+    MET        N:1.4866 T:1.6524 +11.2%
+
+  Corrected depth (300 tumors):
+    Mean  : 0.6237
+    Median: 0.6468
+    Std   : 0.1337
+    Min   : 0.0170
+    Max   : 0.8805
+
+  Corrected depth correlations (top 20):
+  Gene              r  p-value
+  ------------------------------------
+  ZEB2        +0.8226  p=4.81e-75 ***
+  AURKA       +0.8103  p=3.80e-71 ***
+  TOP2A       +0.7598  p=1.15e-57 ***
+  CDC20       +0.7382  p=7.17e-53 ***
+  MKI67       +0.7345  p=4.09e-52 ***
+  CCNB1       +0.7046  p=2.66e-46 ***
+  CDK6        +0.6762  p=1.91e-41 ***
+  VIM         -0.6691  p=2.66e-40 ***
+  ERBB4       -0.6639  p=1.69e-39 ***
+  PCNA        +0.6420  p=2.98e-36 ***
+  FABP1       -0.6411  p=3.98e-36 ***
+  CDH2        -0.6185  p=4.67e-33 ***
+  PLK1        +0.6017  p=6.23e-31 ***
+  SNAI1       +0.5790  p=3.02e-28 ***
+  TWIST1      -0.5707  p=2.56e-27 ***
+  DNMT3A      -0.5682  p=4.82e-27 ***
+  MLH1        +0.5664  p=7.42e-27 ***
+  TFF1        +0.5610  p=2.83e-26 ***
+  ZEB1        +0.5572  p=7.30e-26 ***
+  ERBB3       -0.5321  p=2.47e-23 ***
+
+=== STEP 4: ACRG SUBTYPES ===
+
+=================================================================
+STEP 4: ACRG MOLECULAR SUBTYPE
+Classification from expression
+MSS/TP53+ / MSS/EMT / MSI / MSS/TP53-
+=================================================================
+  EMT threshold: 0.4979
+  EMT candidates: 1
+  MSI threshold (top 25%): 0.8460
+  TP53 median: 0.7224
+
+  Subtype counts:
+    MSS_TP53pos    : 112 (37.3%)
+    MSS_TP53neg    : 112 (37.3%)
+    MSI            :  75 (25.0%)
+    MSS_EMT        :   1 (0.3%)
+  Expected: EMT~15% MSI~23% TP53+~36% TP53-~26%
+
+=== STEP 5: DEPTH BY SUBTYPE ===
+
+=================================================================
+STEP 5: DEPTH BY SUBTYPE
+=================================================================
+
+  Subtype             N     Mean   Median      Std
+  --------------------------------------------------
+  MSI                75   0.5810   0.6106   0.1221
+  MSS_EMT             1   0.5125   0.5125      nan
+  MSS_TP53neg       112   0.6073   0.6334   0.1507
+  MSS_TP53pos       112   0.6697   0.6767   0.1084
+
+  Pairwise depth comparisons:
+  MSI vs MSS_EMT: p=N/A
+  MSI vs MSS_TP53neg: p=0.0752  ns
+  MSI vs MSS_TP53pos: p=1.57e-07 ***
+  MSS_EMT vs MSS_TP53neg: p=N/A
+  MSS_EMT vs MSS_TP53pos: p=N/A
+  MSS_TP53neg vs MSS_TP53pos: p=2.37e-04 ***
+
+=== STEP 6: CDX2 CIRCUIT ===
+
+=================================================================
+STEP 6: CDX2 CIRCUIT INTEGRITY
+Is the CDX2 → intestinal program intact?
+CDX2 → MUC2/KRT20/VIL1/FABP1
+=================================================================
+
+  CDX2 expression in tumors:
+    Mean: 1.0695 ± 0.1836
+    Normal: 0.8686
+
+  CDX2 → target correlations (within tumors):
+  Target            r  p-value  Interpretation
+  -------------------------------------------------------
+  MUC2        -0.0159  p=0.7845  ns  no relationship
+  KRT20       +0.2966  p=1.66e-07 ***  INTACT ✓
+  VIL1        -0.0244  p=0.6733  ns  no relationship
+  FABP1       -0.1386  p=0.0163   *  INVERTED
+  CDH17       +0.1047  p=0.0701  ns  no relationship
+
+  CDX2 circuit verdict:
+    1/5 targets intact
+    VERDICT: CIRCUIT BROKEN
+    CDX2 alone insufficient
+
+=== STEP 7: ERBB CIRCUIT ===
+
+=================================================================
+STEP 7: ERBB FAMILY CIRCUIT
+ERBB2 UP / ERBB3 DOWN / ERBB4 DOWN
+=================================================================
+
+  ERBB family summary:
+  Gene        Normal     Tumor    Change
+  ----------------------------------------
+  ERBB2       1.2847    1.3972     +8.8%
+  ERBB3       0.3006    0.0380    -87.4%
+  ERBB4       0.9023    0.4822    -46.6%
+  EGFR        1.1052    1.0397     -5.9%
+  GRB7        0.8493    0.7897     -7.0%
+
+  ERBB2 within-tumor correlations:
+  Target            r  p-value
+  ------------------------------------
+  MKI67       +0.1951  p=6.81e-04 ***
+  CDK4        +0.0875  p=0.1307  ns
+  CDK6        +0.0777  p=0.1793  ns
+  AURKA       +0.2264  p=7.61e-05 ***
+  ZEB2        +0.2216  p=1.09e-04 ***
+  SNAI1       +0.4028  p=3.93e-13 ***
+  HDAC1       +0.1573  p=6.34e-03  **
+  MET         +0.1463  p=0.0112   *
+  CCND1       +0.1675  p=3.61e-03  **
+
+  ERBB2 distribution:
+    Range: 0.991 – 2.013
+    KDE minima: 2
+    Threshold : 1.7085
+    HER2-high : 18 (6.0%)
+    HER2-low  : 282
+
+    Depth by HER2:
+      HER2-high: 0.7464 ± 0.0750
+      HER2-low : 0.6159 ± 0.1329
+      p=2.19e-06 ***
+
+=== STEP 8: EZH2 PARADOX ===
+
+=================================================================
+STEP 8: EZH2 PARADOX
+EZH2 DOWN -13.1% overall
+r(EZH2, depth) = +0.3326 ***
+What is EZH2 doing within tumors?
+=================================================================
+
+  EZH2 normal: 1.2043
+  EZH2 tumor : 1.0469
+  Direction  : DOWN
+
+  H3K27 methylation balance:
+    EZH2       N:1.2043 T:1.0469 -13.1%
+    KDM6A      N:1.0114 T:1.0807 +6.9%
+
+  EZH2 within-tumor correlations:
+  depth_corrected     -0.4066  p=2.25e-13 ***
+  Gene                      r  p-value
+  ----------------------------------------
+  ZEB2                -0.4130  p=8.70e-14 ***
+  SNAI1               -0.2240  p=9.09e-05 ***
+  VIM                 +0.1848  p=1.30e-03  **
+  CDH1                -0.1262  p=0.0288   *
+  CDH2                +0.2980  p=1.44e-07 ***
+  TWIST1              +0.2892  p=3.44e-07 ***
+  MKI67               -0.4098  p=1.40e-13 ***
+  AURKA               -0.3942  p=1.37e-12 ***
+  CDX2                -0.1844  p=1.34e-03  **
+  HDAC1               -0.1136  p=0.0493   *
+  MYC                 -0.0211  p=0.7161  ns
+  TP53                -0.1471  p=0.0107   *
+
+  EZH2 expression by subtype:
+  Subtype             Mean    vs_normal
+  MSI               1.0373       -13.9%
+  MSS_EMT           1.1139        -7.5%
+  MSS_TP53neg       1.0641       -11.6%
+  MSS_TP53pos       1.0354       -14.0%
+
+=== STEP 9: CLDN18 ===
+
+=================================================================
+STEP 9: CLDN18 ANALYSIS
+zolbetuximab target
+Most stomach-specific gene
+=================================================================
+
+  CLDN18 normal: 0.6207
+  CLDN18 tumor : 0.7752
+  Change       : +24.9%
+  p=3.58e-15 ***
+
+  r(CLDN18, depth) = -0.2599 p=5.09e-06 ***
+  CLDN18 is a switch gene ✓
+  Lower CLDN18 = deeper block
+
+  CLDN18 bimodal check:
+    KDE minima: 0
+
+=== STEP 10: MET CIRCUIT ===
+
+=================================================================
+STEP 10: MET CIRCUIT
+MET +11.2% *** confirmed Script 1
+Second RTK drug target in STAD
+=================================================================
+
+  MET normal: 1.4866
+  MET tumor : 1.6524
+  Change    : +11.2%
+
+  MET correlations (within tumors):
+  Gene              r  p-value
+  ------------------------------------
+  ZEB2        +0.2072  p=3.02e-04 ***
+  MKI67       +0.1742  p=2.46e-03  **
+  AURKA       +0.2119  p=2.18e-04 ***
+  SNAI1       +0.2601  p=5.00e-06 ***
+  ERBB2       +0.1463  p=0.0112   *
+  CDK6        +0.1577  p=6.19e-03  **
+  MMP9        +0.0063  p=0.9138  ns
+  VIM         -0.1345  p=0.0198   *
+
+  r(MET, depth) = +0.3447 p=8.59e-10 ***
+
+  MET bimodal check:
+    KDE minima: 2
+    Threshold : 0.9656
+    MET-high  : 299 (99.7%)
+
+=== STEP 11: DRUG TARGETS ===
+
+=================================================================
+STEP 11: DRUG TARGET DEPTH SUMMARY
+=================================================================
+
+  Target     Drug                            Normal     Tumor    Change    r(depth)  p
+  ------------------------------------------------------------------------------------------
+  ERBB2      Trastuzumab                     1.2847    1.3972     +8.8%     +0.3872  p=3.61e-12 ***
+  MET        Anti-MET                        1.4866    1.6524    +11.2%     +0.3447  p=8.59e-10 ***
+  CDK4       CDK4/6i                         1.0348    1.2370    +19.5%     +0.5027  p=1.29e-20 ***
+  CDK6       CDK4/6i                         1.3746    1.6291    +18.5%     +0.6762  p=1.91e-41 ***
+  AURKA      Alisertib                       1.0826    1.4445    +33.4%     +0.8103  p=3.80e-71 ***
+  TOP2A      Chemo target                    1.1534    1.5693    +36.1%     +0.7598  p=1.15e-57 ***
+  HDAC1      HDAC inhibitor                  1.0773    1.2147    +12.8%     +0.2389  p=2.90e-05 ***
+  EZH2       EZH2i (DOWN — not target)       1.2043    1.0469    -13.1%     -0.4066  p=2.25e-13 ***
+  MKI67      Proliferation marker            0.5523    0.8572    +55.2%     +0.7345  p=4.09e-52 ***
+  ZEB2       TGF-β / anti-EMT                1.1229    1.4764    +31.5%     +0.8226  p=4.81e-75 ***
+  CDX2       Intestinal TF                   0.8686    1.0695    +23.1%     +0.3854  p=4.62e-12 ***
+  CLDN18     Zolbetuximab                    0.6207    0.7752    +24.9%     -0.2599  p=5.09e-06 ***
+
+=== STEP 12: FIGURE ===
+
+--- Generating Script 2 figure ---
+
+  Figure saved: ./stad_false_attractor/results_s2/stad_circuit_analysis.png
