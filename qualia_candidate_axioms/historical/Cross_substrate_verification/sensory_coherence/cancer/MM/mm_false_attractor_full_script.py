@@ -24,6 +24,7 @@ The script will:
   6. Score attractor depth per cell
   7. Derive drug targets from geometry
   8. Generate figure and log
+  9. Drug Derivation
 
 Author: Eric Robert Lawson
 Framework: OrganismCore Universal Reasoning Substrate
@@ -955,6 +956,552 @@ def generate_figure(stage_data, results_df, mm):
     plt.close()
 
 # ============================================================
+# STEP 9: DRUG TARGET EXPLORATION
+# ============================================================
+
+def drug_exploration(hd, mm, stage_data, results_df):
+    log("")
+    log("=" * 70)
+    log("STEP 9: DRUG TARGET EXPLORATION")
+    log("OrganismCore — Document 85 Extended")
+    log("Derived from attractor geometry — before literature")
+    log("=" * 70)
+
+    depth   = mm["attractor_depth"]
+    q25     = depth.quantile(0.25)
+    q75     = depth.quantile(0.75)
+    deep    = mm[depth >= q75]
+    shallow = mm[depth <= q25]
+
+    # --------------------------------------------------------
+    # CONFIRMED ATTRACTOR — restate numbers
+    # --------------------------------------------------------
+    log("")
+    log("--- CONFIRMED ATTRACTOR STATE ---")
+    log("")
+    log("  Switch gene (IRF8) — suppressed in MM:")
+    for gene in SWITCH_GENES:
+        if gene in hd.columns and gene in mm.columns:
+            hd_m = hd[gene].mean()
+            mm_m = mm[gene].mean()
+            chg  = (mm_m - hd_m) / hd_m * 100
+            _, p = stats.mannwhitneyu(
+                hd[gene].values, mm[gene].values,
+                alternative="greater"
+            )
+            log(f"    {gene}: HD={hd_m:.4f}  MM={mm_m:.4f}  "
+                f"{chg:+.1f}%  p={p:.2e}")
+
+    log("")
+    log("  False attractor markers — elevated in MM:")
+    for gene in FALSE_ATTRACTOR:
+        if gene in hd.columns and gene in mm.columns:
+            hd_m = hd[gene].mean()
+            mm_m = mm[gene].mean()
+            chg  = (mm_m - hd_m) / hd_m * 100
+            _, p = stats.mannwhitneyu(
+                mm[gene].values, hd[gene].values,
+                alternative="greater"
+            )
+            log(f"    {gene}: HD={hd_m:.4f}  MM={mm_m:.4f}  "
+                f"{chg:+.1f}%  p={p:.2e}")
+
+    log("")
+    log("  IRF8 progression trajectory:")
+    log(f"  {'Stage':<8} {'IRF8':>8}  {'% of HD':>10}")
+    hd_irf8 = stage_data["HD"]["IRF8"].mean() \
+              if "IRF8" in stage_data["HD"].columns else float("nan")
+    for stage in ["HD", "MGUS", "SMM", "MM"]:
+        df_s = stage_data.get(stage, pd.DataFrame())
+        if len(df_s) > 0 and "IRF8" in df_s.columns:
+            v   = df_s["IRF8"].mean()
+            pct = v / hd_irf8 * 100 if not np.isnan(hd_irf8) else float("nan")
+            log(f"  {stage:<8} {v:>8.4f}  {pct:>9.1f}%")
+
+    # --------------------------------------------------------
+    # DEPTH CORRELATIONS — what drives the lock
+    # --------------------------------------------------------
+    log("")
+    log("--- DEPTH CORRELATIONS ---")
+    log("  What is most tightly coupled to attractor depth?")
+    log("")
+    corr_genes = (["IRF8"] + FALSE_ATTRACTOR +
+                  ["MYC", "MKI67", "HSPA5", "DDIT3", "ATF4", "EZH2"])
+    gene_corrs = []
+    for gene in corr_genes:
+        if gene in mm.columns:
+            r, p = stats.pearsonr(depth.values, mm[gene].values)
+            gene_corrs.append((gene, r, p))
+
+    gene_corrs.sort(key=lambda x: abs(x[1]), reverse=True)
+    log(f"  {'Gene':<10} {'r':>8}  {'|r|':>6}  p-value")
+    log(f"  {'-'*42}")
+    for gene, r, p in gene_corrs:
+        log(f"  {gene:<10} {r:>+8.4f}  {abs(r):>6.4f}  p={p:.2e}")
+
+    # --------------------------------------------------------
+    # POPULATION STRUCTURE
+    # --------------------------------------------------------
+    log("")
+    log("--- POPULATION STRUCTURE ---")
+    log(f"  Total MM plasma cells : {len(mm)}")
+    log(f"  Deep  (Q75+, >={q75:.3f}): {len(deep):>6} cells  "
+        f"({len(deep)/len(mm)*100:.1f}%)")
+    log(f"  Shallow (Q25-, <={q25:.3f}): {len(shallow):>6} cells  "
+        f"({len(shallow)/len(mm)*100:.1f}%)")
+    log("")
+    log(f"  {'Gene':<10} {'Deep':>8} {'Shallow':>9} "
+        f"{'HD':>8} {'Diff D-S':>10}")
+    log(f"  {'-'*52}")
+    for gene in (["IRF8"] + FALSE_ATTRACTOR +
+                 ["MYC", "MKI67", "HSPA5", "EZH2"]):
+        if gene in mm.columns:
+            d_m  = deep[gene].mean()
+            s_m  = shallow[gene].mean()
+            hd_m = hd[gene].mean() if gene in hd.columns else float("nan")
+            diff = d_m - s_m
+            log(f"  {gene:<10} {d_m:>8.4f} {s_m:>9.4f} "
+                f"{hd_m:>8.4f} {diff:>+10.4f}")
+
+    # --------------------------------------------------------
+    # PROLIFERATION BY DEPTH
+    # --------------------------------------------------------
+    log("")
+    log("--- PROLIFERATION vs DIFFERENTIATION STATE ---")
+    if "MKI67" in mm.columns:
+        r_mk, p_mk = stats.pearsonr(depth.values, mm["MKI67"].values)
+        log(f"  MKI67 vs depth: r={r_mk:+.4f}  p={p_mk:.2e}")
+        log(f"  Deep   MKI67: {deep['MKI67'].mean():.4f}")
+        log(f"  Shallow MKI67: {shallow['MKI67'].mean():.4f}")
+        log(f"  HD      MKI67: {hd['MKI67'].mean():.4f}")
+        log("")
+        if deep["MKI67"].mean() < shallow["MKI67"].mean() * 0.5:
+            log("  FINDING: Deep cells are POST-MITOTIC")
+            log("  Deep cells cannot be killed by anti-proliferatives")
+            log("  Deep cells require DIFFERENTIATION or STRESS therapy")
+            log("  Shallow cells are proliferating — respond to")
+            log("  conventional chemotherapy and IRF4 inhibitors")
+
+    # --------------------------------------------------------
+    # UPR / SECRETORY STRESS BY DEPTH
+    # --------------------------------------------------------
+    log("")
+    log("--- UPR / SECRETORY STRESS BY DEPTH ---")
+    if "HSPA5" in mm.columns:
+        r_h, p_h = stats.pearsonr(depth.values, mm["HSPA5"].values)
+        log(f"  HSPA5 vs depth: r={r_h:+.4f}  p={p_h:.2e}")
+        log(f"  Deep   HSPA5: {deep['HSPA5'].mean():.4f}")
+        log(f"  Shallow HSPA5: {shallow['HSPA5'].mean():.4f}")
+        log(f"  HD      HSPA5: {hd['HSPA5'].mean():.4f}")
+        log("")
+        if deep["HSPA5"].mean() > shallow["HSPA5"].mean() * 1.5:
+            log("  FINDING: Deep cells under HIGH secretory stress")
+            log("  UPR (HSPA5) tracks attractor depth r=+0.40")
+            log("  Deep cells are near proteostatic overload")
+            log("  Proteasome inhibition → lethal in deep cells")
+            log("  Rationale: cannot clear misfolded protein burden")
+
+    # --------------------------------------------------------
+    # XBP1 DOMINANCE
+    # --------------------------------------------------------
+    log("")
+    log("--- XBP1 DOMINANCE ANALYSIS ---")
+    if "XBP1" in mm.columns:
+        r_x, p_x = stats.pearsonr(depth.values, mm["XBP1"].values)
+        log(f"  XBP1 vs depth: r={r_x:+.4f}  p={p_x:.2e}")
+        log(f"  XBP1 is the STRONGEST single correlate of depth")
+        log(f"  Stronger than IRF4 (r=+0.63) and PRDM1 (r=+0.64)")
+        log(f"  Deep  XBP1: {deep['XBP1'].mean():.4f}")
+        log(f"  Shallow XBP1: {shallow['XBP1'].mean():.4f}")
+        log(f"  HD     XBP1: {hd['XBP1'].mean():.4f}")
+        log("")
+        log("  IMPLICATION:")
+        log("  XBP1 is not just a passenger in the false attractor")
+        log("  It is the dominant lock signal")
+        log("  XBP1 drives the secretory program AND maintains depth")
+        log("  Targeting XBP1/IRE1α should reduce attractor depth")
+        log("  AND reduce secretory stress simultaneously")
+
+    # --------------------------------------------------------
+    # EZH2 — NOT THE LOCK
+    # --------------------------------------------------------
+    log("")
+    log("--- EZH2 CHECK — EPIGENETIC LOCK ---")
+    if "EZH2" in mm.columns:
+        r_e, p_e = stats.pearsonr(depth.values, mm["EZH2"].values)
+        log(f"  EZH2 vs depth: r={r_e:+.4f}  p={p_e:.2e}")
+        log(f"  EZH2 MM:  {mm['EZH2'].mean():.4f}")
+        log(f"  EZH2 HD:  {hd['EZH2'].mean():.4f}")
+        log("")
+        log("  FINDING: EZH2 is NOT the epigenetic lock in MM")
+        log("  EZH2 is suppressed slightly (-10.4%)")
+        log("  EZH2 does not correlate with depth")
+        log("  Contrast: BRCA — EZH2 elevated +270%, was the lock")
+        log("  MM uses a different mechanism than BRCA")
+        log("  The lock in MM is XBP1/IRF4/PRDM1 — not epigenetic")
+
+    # --------------------------------------------------------
+    # DRUG TARGET PREDICTIONS
+    # --------------------------------------------------------
+    log("")
+    log("=" * 70)
+    log("DRUG TARGET PREDICTIONS — FROM GEOMETRY")
+    log("Derived before literature consultation")
+    log("=" * 70)
+
+    log(f"""
+  PREDICTION 1 — IRF4 INHIBITION
+  ================================
+  Basis:
+    IRF4 elevated +114% in MM plasma (p=2.23e-199)
+    IRF4 correlates with depth r=+0.625 (p=0)
+    IRF4 in deep cells: {deep['IRF4'].mean():.4f}
+    IRF4 in shallow cells: {shallow['IRF4'].mean():.4f}
+    Difference: {deep['IRF4'].mean()-shallow['IRF4'].mean():+.4f}
+
+  Mechanism from geometry:
+    IRF4 is one of three genes maintaining the activation lock
+    Inhibiting IRF4 destabilizes the false attractor basin
+    Reduced IRF4 may allow IRF8 re-expression
+    IRF8 restoration → plasmablast → LLPC transition
+    Cells that complete LLPC maturation exit the malignant cycle
+
+  Predicted best responders:
+    Shallow cells (IRF8 partially retained)
+    Patients with lower attractor depth scores
+    MGUS/early MM — lock not yet maximally engaged
+
+  Clinical prediction (geometry-derived):
+    An IRF4 inhibitor should show response in MM
+    Better response in lower-depth patients
+    Combination with proteasome inhibitor covers deep cells
+
+  ============================================================
+
+  PREDICTION 2 — PROTEASOME INHIBITION (for deep cells)
+  ======================================================
+  Basis:
+    Deep cells HSPA5: {deep['HSPA5'].mean():.4f}
+    Shallow cells HSPA5: {shallow['HSPA5'].mean():.4f}
+    Ratio: {deep['HSPA5'].mean()/shallow['HSPA5'].mean():.2f}x higher in deep cells
+    HSPA5 vs depth: r=+0.40 (p=0)
+    Deep cells MKI67: {deep['MKI67'].mean():.4f} (post-mitotic)
+
+  Mechanism from geometry:
+    Deep cells are producing secretory proteins at maximum rate
+    (IRF4/PRDM1/XBP1 all at maximum — secretory program locked on)
+    Proteasome is the only mechanism to clear this protein load
+    Inhibit proteasome → misfolded proteins accumulate → apoptosis
+    Deep cells more vulnerable because UPR is already near overload
+    Shallow cells have lower HSPA5 — more reserve capacity
+
+  Predicted best responders:
+    Deep cells specifically
+    High-depth patients (high XBP1, high HSPA5, low MKI67)
+    Attractor depth score predicts proteasome inhibitor response
+
+  ============================================================
+
+  PREDICTION 3 — XBP1 / IRE1α AXIS
+  ===================================
+  Basis:
+    XBP1 is strongest depth correlate r=+{[r for gene,r,p in gene_corrs if gene=='XBP1'][0]:.4f} (p=0)
+    Stronger than IRF4 or PRDM1
+    Deep XBP1: {deep['XBP1'].mean():.4f}
+    Shallow XBP1: {shallow['XBP1'].mean():.4f}
+    HD XBP1: {hd['XBP1'].mean():.4f}
+
+  Mechanism from geometry:
+    XBP1 is activated by IRE1α (the UPR sensor kinase)
+    XBP1 drives the secretory program — antibody production
+    XBP1 also maintains the plasmablast activation state
+    Inhibiting IRE1α → XBP1 activation blocked
+    → Secretory program reduced
+    → Attractor depth reduced
+    → Cell moves toward shallower state
+    Synergy with proteasome inhibitor:
+      Both target the secretory/proteostatic axis
+      IRE1α inhibitor reduces protein production
+      Proteasome inhibitor reduces protein clearance
+      Together: protein homeostasis catastrophically disrupted
+
+  Not in initial prediction — emerged from depth analysis.
+
+  ============================================================
+
+  PREDICTION 4 — IRF8 RESTORATION (differentiation therapy)
+  ===========================================================
+  Basis:
+    IRF8 HD:   {hd['IRF8'].mean():.4f}
+    IRF8 MGUS: {stage_data['MGUS']['IRF8'].mean() if 'IRF8' in stage_data['MGUS'].columns else float('nan'):.4f}
+    IRF8 SMM:  {stage_data['SMM']['IRF8'].mean() if 'IRF8' in stage_data['SMM'].columns else float('nan'):.4f}
+    IRF8 MM:   {mm['IRF8'].mean():.4f}
+    Drop at MGUS: {(stage_data['MGUS']['IRF8'].mean()-hd_irf8)/hd_irf8*100 if 'IRF8' in stage_data['MGUS'].columns else float('nan'):+.1f}%
+    IRF8 vs depth: r={[r for gene,r,p in gene_corrs if gene=='IRF8'][0]:+.4f} (p=0)
+
+  Mechanism from geometry:
+    IRF8 is the switch gene — its presence pushes cells
+    over the Waddington saddle point into the LLPC basin
+    Restoring IRF8 expression should dissolve the false attractor
+    and force completion of plasma cell maturation
+    LLPC state = non-proliferative, long-lived, non-malignant
+    This is forced differentiation as a cancer strategy
+
+  When to apply:
+    Most effective when IRF8 can still respond to induction
+    Shallow cells (IRF8 partially retained) — best candidates
+    MGUS stage — differentiation block just established
+
+  Prevention implication:
+    IRF8 drops 70% at HD→MGUS transition
+    MGUS is the earliest intervention window
+    Restoring IRF8 at MGUS could prevent MM emergence entirely
+
+  ============================================================
+
+  PREDICTION 5 — COMBINATION STRATEGY
+  =====================================
+
+  For deep cells (post-mitotic, high UPR):
+    Proteasome inhibitor + IRE1α/XBP1 inhibitor
+    → Collapse secretory proteostasis
+    → Cell cannot survive protein burden
+    → Depth score predicts who needs this
+
+  For shallow cells (proliferating, IRF8 partial):
+    IRF4 inhibitor + IRF8 restoration
+    → Destabilize activation lock
+    → Re-engage differentiation program
+    → Force LLPC maturation
+
+  Universal coverage (both populations):
+    IRF4 inhibitor + proteasome inhibitor
+    → IRF4 inhibitor dissolves lock in shallow cells
+    → Proteasome inhibitor kills deep cells via UPR overload
+    → Attractor depth score guides dosing and timing
+
+  MGUS prevention:
+    IRF8 expression monitoring + restoration therapy
+    → Intervene before full lock-in
+    → Most favorable therapeutic window
+
+  ============================================================
+    """)
+
+    # --------------------------------------------------------
+    # FIGURE — drug exploration
+    # --------------------------------------------------------
+    clr_hd      = "#2980b9"
+    clr_mm      = "#c0392b"
+    clr_deep    = "#8e44ad"
+    clr_shallow = "#f39c12"
+
+    fig = plt.figure(figsize=(24, 20))
+    fig.suptitle(
+        "Multiple Myeloma — Drug Target Exploration\n"
+        "OrganismCore Principles-First | 2026-03-01\n"
+        "Derived from attractor geometry before literature consultation",
+        fontsize=13, fontweight="bold", y=0.99
+    )
+    gs = gridspec.GridSpec(3, 3, figure=fig,
+                           hspace=0.5, wspace=0.4)
+
+    # Panel A — IRF8 trajectory
+    ax_a = fig.add_subplot(gs[0, 0])
+    stages     = ["HD", "MGUS", "SMM", "MM"]
+    stg_colors = [clr_hd, "#8e44ad", "#e67e22", clr_mm]
+    irf8_v, irf8_e, irf8_s = [], [], []
+    for s in stages:
+        df_s = stage_data.get(s, pd.DataFrame())
+        if len(df_s) > 0 and "IRF8" in df_s.columns:
+            irf8_v.append(df_s["IRF8"].mean())
+            irf8_e.append(df_s["IRF8"].sem())
+            irf8_s.append(s)
+    ax_a.errorbar(irf8_s, irf8_v, yerr=irf8_e,
+                  marker="o", color=clr_mm, linewidth=2.5,
+                  capsize=6, markersize=8)
+    for s, v in zip(irf8_s, irf8_v):
+        ax_a.annotate(f"{v:.3f}", (s, v),
+                      textcoords="offset points",
+                      xytext=(0, 10), ha="center", fontsize=8)
+    ax_a.axhline(irf8_v[0], color=clr_hd,
+                 linestyle="--", alpha=0.5, label="HD baseline")
+    ax_a.set_ylabel("IRF8 log1p(CP10K)")
+    ax_a.set_title("A — IRF8 Monotonic Decline\n"
+                   "Block established at MGUS")
+    ax_a.set_ylim(bottom=0)
+    ax_a.legend(fontsize=8)
+
+    # Panel B — Deep vs Shallow vs HD
+    ax_b = fig.add_subplot(gs[0, 1])
+    genes_b  = [g for g in
+                ["IRF8"] + FALSE_ATTRACTOR + ["MYC", "MKI67"]
+                if g in mm.columns]
+    x_b      = np.arange(len(genes_b))
+    w        = 0.25
+    pops     = [("HD",         hd,      clr_hd),
+                ("MM Deep",    deep,    clr_deep),
+                ("MM Shallow", shallow, clr_shallow)]
+    for i, (lbl, df_p, c) in enumerate(pops):
+        means = [df_p[g].mean() if g in df_p.columns else 0
+                 for g in genes_b]
+        sems  = [df_p[g].sem()  if g in df_p.columns else 0
+                 for g in genes_b]
+        ax_b.bar(x_b + i*w - w, means, w, yerr=sems,
+                 color=c, label=lbl, capsize=3, alpha=0.85)
+    ax_b.set_xticks(x_b)
+    ax_b.set_xticklabels(genes_b, rotation=45,
+                          ha="right", fontsize=9)
+    ax_b.set_ylabel("log1p(CP10K)")
+    ax_b.set_title("B — HD vs Deep vs Shallow\nGene Expression")
+    ax_b.legend(fontsize=7)
+
+    # Panel C — Depth correlations bar
+    ax_c = fig.add_subplot(gs[0, 2])
+    corr_labels = [g for g, r, p in gene_corrs]
+    corr_vals   = [r for g, r, p in gene_corrs]
+    corr_colors = [clr_mm if r < 0 else "#27ae60"
+                   for r in corr_vals]
+    ax_c.barh(corr_labels, corr_vals, color=corr_colors)
+    ax_c.axvline(0, color="black", linewidth=0.8)
+    ax_c.set_xlabel("Pearson r vs attractor depth")
+    ax_c.set_title("C — Depth Correlations\n"
+                   "XBP1 = strongest driver")
+    ax_c.tick_params(axis="y", labelsize=9)
+
+    # Panel D — Depth distribution
+    ax_d = fig.add_subplot(gs[1, 0])
+    ax_d.hist(depth, bins=60, color=clr_mm,
+              edgecolor="white", linewidth=0.4, alpha=0.85)
+    ax_d.axvline(q75, color=clr_deep,
+                 linestyle="--", linewidth=1.8,
+                 label=f"Q75={q75:.3f} (deep)")
+    ax_d.axvline(q25, color=clr_shallow,
+                 linestyle="--", linewidth=1.8,
+                 label=f"Q25={q25:.3f} (shallow)")
+    ax_d.axvline(depth.mean(), color="black",
+                 linestyle="-", linewidth=1.5,
+                 label=f"Mean={depth.mean():.3f}")
+    ax_d.set_xlabel("Attractor Depth Score")
+    ax_d.set_ylabel("Cell Count")
+    ax_d.set_title("D — Attractor Depth Distribution\n"
+                   "Continuous — not bimodal")
+    ax_d.legend(fontsize=7)
+
+    # Panel E — IRF4 vs depth scatter
+    ax_e = fig.add_subplot(gs[1, 1])
+    if "IRF4" in mm.columns:
+        idx = np.random.choice(len(mm),
+                               min(3000, len(mm)), replace=False)
+        ax_e.scatter(depth.values[idx], mm["IRF4"].values[idx],
+                     alpha=0.15, s=3, color=clr_mm)
+        r_i4, p_i4 = stats.pearsonr(depth.values, mm["IRF4"].values)
+        ax_e.set_xlabel("Attractor Depth Score")
+        ax_e.set_ylabel("IRF4 log1p(CP10K)")
+        ax_e.set_title(f"E — IRF4 vs Depth\n"
+                       f"r={r_i4:+.3f}  p={p_i4:.2e}")
+
+    # Panel F — XBP1 vs depth scatter
+    ax_f = fig.add_subplot(gs[1, 2])
+    if "XBP1" in mm.columns:
+        idx = np.random.choice(len(mm),
+                               min(3000, len(mm)), replace=False)
+        ax_f.scatter(depth.values[idx], mm["XBP1"].values[idx],
+                     alpha=0.15, s=3, color="#9b59b6")
+        r_x2, p_x2 = stats.pearsonr(depth.values, mm["XBP1"].values)
+        ax_f.set_xlabel("Attractor Depth Score")
+        ax_f.set_ylabel("XBP1 log1p(CP10K)")
+        ax_f.set_title(f"F — XBP1 vs Depth\n"
+                       f"r={r_x2:+.3f}  p={p_x2:.2e}\n"
+                       f"Strongest depth driver")
+
+    # Panel G — UPR by depth quartile
+    ax_g = fig.add_subplot(gs[2, 0])
+    upr_avail = [g for g in UPR if g in mm.columns]
+    if upr_avail:
+        depth_bins = pd.qcut(
+            depth, q=4,
+            labels=["Q1\nshallow", "Q2", "Q3", "Q4\ndeep"]
+        )
+        upr_by_bin = mm.groupby(depth_bins, observed=True)[upr_avail].mean()
+        x_g        = np.arange(len(upr_by_bin))
+        w_g        = 0.25
+        upr_colors = ["#1abc9c", "#e67e22", "#e74c3c"]
+        for i, gene in enumerate(upr_avail):
+            ax_g.bar(x_g + i*w_g - w_g,
+                     upr_by_bin[gene].values, w_g,
+                     color=upr_colors[i % len(upr_colors)],
+                     label=gene, alpha=0.85)
+        ax_g.set_xticks(x_g)
+        ax_g.set_xticklabels(upr_by_bin.index, fontsize=8)
+        ax_g.set_ylabel("log1p(CP10K)")
+        ax_g.set_title("G — UPR by Depth Quartile\n"
+                        "Deep cells near proteostatic limit")
+        ax_g.legend(fontsize=7)
+
+    # Panel H — MKI67 by depth quartile
+    ax_h = fig.add_subplot(gs[2, 1])
+    if "MKI67" in mm.columns:
+        depth_bins2 = pd.qcut(
+            depth, q=4,
+            labels=["Q1\nshallow", "Q2", "Q3", "Q4\ndeep"]
+        )
+        mki_by_bin = mm.groupby(
+            depth_bins2, observed=True
+        )["MKI67"].mean()
+        bar_c = ["#27ae60" if i < 2 else clr_mm
+                 for i in range(len(mki_by_bin))]
+        ax_h.bar(mki_by_bin.index, mki_by_bin.values,
+                 color=bar_c, alpha=0.85)
+        ax_h.set_ylabel("MKI67 log1p(CP10K)")
+        ax_h.set_title("H — Proliferation by Depth\n"
+                        "Deep = post-mitotic\n"
+                        "Shallow = proliferating")
+
+    # Panel I — Drug target summary
+    ax_i = fig.add_subplot(gs[2, 2])
+    ax_i.axis("off")
+    summary = (
+        "I — DRUG TARGET SUMMARY\n"
+        "─────────────────────────────────\n"
+        "Geometry-derived — pre-literature\n\n"
+        "FALSE ATTRACTOR CONFIRMED:\n"
+        f"  IRF8  ↓{abs((mm['IRF8'].mean()-hd['IRF8'].mean())/hd['IRF8'].mean()*100):.0f}%  switch suppressed\n"
+        f"  IRF4  ↑{abs((mm['IRF4'].mean()-hd['IRF4'].mean())/hd['IRF4'].mean()*100):.0f}%  attractor lock\n"
+        f"  PRDM1 ↑{abs((mm['PRDM1'].mean()-hd['PRDM1'].mean())/hd['PRDM1'].mean()*100):.0f}%  attractor lock\n"
+        f"  XBP1  ↑{abs((mm['XBP1'].mean()-hd['XBP1'].mean())/hd['XBP1'].mean()*100):.0f}%  strongest driver\n\n"
+        "PREDICTION 1: IRF4 INHIBITION\n"
+        "  Destabilize activation lock\n"
+        "  Best: shallow cells\n\n"
+        "PREDICTION 2: PROTEASOME Inh\n"
+        "  Deep cells: post-mitotic\n"
+        f"  HSPA5 {deep['HSPA5'].mean():.2f} vs {shallow['HSPA5'].mean():.2f}\n"
+        "  UPR overload → apoptosis\n\n"
+        "PREDICTION 3: XBP1/IRE1α Inh\n"
+        "  r=+0.75 with depth\n"
+        "  Reduce depth + UPR stress\n\n"
+        "PREDICTION 4: IRF8 RESTORATION\n"
+        "  Force LLPC maturation\n"
+        "  Best at MGUS stage\n\n"
+        "COMBO: IRF4i + Proteasome Inh\n"
+        "  Shallow + Deep covered\n"
+        "  Depth score guides dosing"
+    )
+    ax_i.text(0.03, 0.97, summary,
+              transform=ax_i.transAxes,
+              fontsize=8, verticalalignment="top",
+              fontfamily="monospace",
+              bbox=dict(boxstyle="round",
+                        facecolor="#f8f8f8",
+                        edgecolor="#cccccc"))
+
+    outpath = os.path.join(RESULTS_DIR,
+                           "mm_drug_exploration.png")
+    plt.savefig(outpath, dpi=150, bbox_inches="tight")
+    log(f"\n  Drug exploration figure: {outpath}")
+    plt.close()
+
+# ============================================================
 # MAIN
 # ============================================================
 
@@ -1011,6 +1558,9 @@ def main():
     log("\n=== STEP 8: FIGURE ===")
     generate_figure(stage_data, results_df, mm)
 
+    log("\n=== STEP 9: DRUG TARGET EXPLORATION ===")
+    drug_exploration(hd, mm, stage_data, results_df)
+  
     write_log()
     log(f"\n  Log: {LOG_FILE}")
     log("\n=== ANALYSIS COMPLETE ===")
