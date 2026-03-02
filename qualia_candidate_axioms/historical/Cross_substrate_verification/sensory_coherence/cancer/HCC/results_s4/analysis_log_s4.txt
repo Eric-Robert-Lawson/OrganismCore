@@ -1,0 +1,210 @@
+=================================================================
+HEPATOCELLULAR CARCINOMA — SCRIPT 4
+Dataset: TCGA-LIHC (continued)
+Framework: OrganismCore
+Doc: 92d | Date: 2026-03-02
+=================================================================
+
+PREDICTIONS LOCKED 2026-03-02:
+S4-P1: CTNNB1-mutant better OS (HCC-P5)
+S4-P2: TP53-mutant worse OS
+S4-P3: CTNNB1-mutant shallower depth
+S4-P4: SMARCA4-hi worse OS
+S4-P5: TWIST1-hi worse OS
+S4-P6: CD274 rises with depth
+S4-P7: Depth independent of stage/grade/mutation (Cox)
+
+=================================================================
+LOADING EXPRESSION + SURVIVAL
+(from Script 3 files)
+=================================================================
+  Expression: (423, 59)
+  HCC: 371  Normal: 50
+  OS valid (HCC): 365 events=130
+  Stage (encoded): {}
+  Grade (encoded): {}
+
+=================================================================
+S4-1: GDC MAF DOWNLOAD
+=================================================================
+  Querying GDC Files API for TCGA-LIHC MAF...
+  GDC Files query: HTTP 200
+  Files found: 0
+  No MAF files found in GDC
+
+  Trying MAF fallback sources...
+  Trying UUID: 8f2dcc46-cdc0-4a07-ae53-b6c2f7b5ad9b
+  HTTP 404
+  Trying UUID: 1c8cfe5f-e52d-41ba-94da-f15ea1337c05
+  HTTP 404
+  Trying UUID: c48e7ede-5aaa-40b5-a9fc-88fa30adde89
+  HTTP 404
+
+  Trying cBioPortal bulk download...
+  Samples: 379
+  Total mutations: 0
+  cBioPortal returned 0 mutations
+  Manual download required:
+  https://portal.gdc.cancer.gov/
+  Project: TCGA-LIHC
+  File type: Masked Somatic Mutation
+  Save to: ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.maf.gz
+
+  MAF download failed.
+  Mutation analyses will be skipped.
+  Manual download:
+  https://portal.gdc.cancer.gov/
+  Project: TCGA-LIHC
+  Data type: Masked Somatic Mutation
+  Save to: ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.maf.gz
+
+=================================================================
+PARSE MAF / MUTATION FILE
+=================================================================
+  MAF file not found
+
+=================================================================
+DEPTH SCORE — SCRIPT 4
+=================================================================
+  Metabolic depth (V2):
+    Switch (16): ['CYP3A4', 'ALDOB', 'PCK1', 'G6PC', 'CYP2C9', 'TTR', 'IGF1', 'ARG1', 'APOE', 'RXRA', 'PPARA', 'FGF21', 'FABP1', 'ALB', 'APOB', 'HNF4A']
+    FA     (12): ['SOX4', 'PROM1', 'AFP', 'EPCAM', 'CDC20', 'BIRC5', 'TOP2A', 'MKI67', 'CCNB1', 'KRT19', 'EZH2', 'HDAC2']
+    mean=0.3334 std=0.1599 range=0.0069–0.8985
+
+  Metabolic genes in matrix: ['CYP3A4', 'ALDOB', 'PCK1', 'G6PC', 'CYP2C9', 'TTR', 'IGF1', 'ARG1', 'APOE', 'RXRA', 'PPARA', 'FGF21', 'FABP1', 'ALB', 'APOB', 'HNF4A']
+
+=================================================================
+S4-2/3: MUTATION SURVIVAL ANALYSIS
+S4-P1: CTNNB1-mut better OS (HCC-P5)
+S4-P2: TP53-mut worse OS
+=================================================================
+
+  Gene          n_mut     mut_OS      wt_OS         logrank  direction
+  --------------------------------------------------------------------
+
+  S4-P1: CTNNB1-mut better OS
+  STATUS: NOT TESTABLE (n_mut<5 or no mut data)
+  S4-P2: TP53-mut worse OS
+  STATUS: NOT TESTABLE (n_mut<5 or no mut data)
+
+=================================================================
+S4-4: CTNNB1 MUTATION vs DEPTH
+S4-P3: CTNNB1-mutant shallower
+=================================================================
+
+  Mutation vs depth (metabolic score):
+  Gene            n_mut    mut_depth     wt_depth  p
+  ----------------------------------------------------------
+
+=================================================================
+S4-5/6: SMARCA4 + TWIST1 SURVIVAL
+S4-P4: SMARCA4-hi worse OS
+S4-P5: TWIST1-hi worse OS
+=================================================================
+
+  Gene            r_depth            OS_p     hi_OS     lo_OS  dir
+  ----------------------------------------------------------------------
+  SMARCA4         +0.6071  p=0.4375  ns      25.8      27.6  ↑=worse
+  TWIST1          +0.4631  p=0.7519  ns      26.1      27.4  ↑=worse
+  CDK4            +0.6531  p=1.12e-03  **      23.4      30.0  ↑=worse
+  TGFB1           +0.4866  p=0.5723  ns      26.9      26.5  ↑=better
+  FGFR1           +0.3873  p=0.8230  ns      25.9      27.5  ↑=worse
+  SMAD3           +0.2149  p=0.5411  ns      25.6      27.8  ↑=worse
+  VIM             +0.3098  p=0.5812  ns      27.4      26.0  ↑=better
+  ZEB1            -0.1165  p=0.2088  ns      27.2      26.2  ↑=better
+  ZEB2            +0.1806  p=0.9839  ns      28.5      24.9  ↑=better
+  SNAI1           +0.1465  p=0.5424  ns      27.2      26.2  ↑=better
+  SNAI2           -0.2046  p=0.8083  ns      27.4      26.0  ↑=better
+
+  S4-P4: SMARCA4-hi worse OS
+  STATUS: DIRECTIONALLY ✓ (dir=✓ sig=✗ p=0.4375  ns)
+
+  S4-P5: TWIST1-hi worse OS
+  STATUS: DIRECTIONALLY ✓ (dir=✓ sig=✗ p=0.7519  ns)
+
+=================================================================
+S4-7: CHECKPOINT INHIBITOR HYPOTHESIS
+S4-P6: CD274 rises with depth
+Immune exhaustion in deep HCC
+=================================================================
+
+  Immune checkpoint genes vs depth:
+  Gene            r_depth          p_corr  interpretation
+  --------------------------------------------------------------
+  CD274           +0.0874  p=0.0929  ns  PD-L1 on tumour
+  PDCD1           +0.3934  p=3.48e-15 ***  PD-1 on T cells
+  CTLA4           +0.3710  p=1.50e-13 ***  CTLA-4 checkpoint
+  LAG3            +0.2733  p=8.90e-08 ***  LAG-3 checkpoint
+  TIGIT           +0.2950  p=6.98e-09 ***  TIGIT checkpoint
+  HAVCR2          +0.3851  p=1.47e-14 ***  TIM-3 checkpoint
+  CD8A            +0.2256  p=1.15e-05 ***  cytotoxic T cells
+  CD4             +0.1247  p=0.0162   *  
+  FOXP3           -0.1202  p=0.0206   *  regulatory T cells
+  GZMB            +0.1412  p=6.43e-03  **  CTL effector
+  PRF1            +0.0049  p=0.9248  ns  CTL effector
+  IFNG            +0.2442  p=1.93e-06 ***  Th1/CTL cytokine
+  CD68            +0.2170  p=2.48e-05 ***  macrophage
+  CD247           +0.1319  p=0.0110   *  
+
+  S4-P6: CD274 rises with depth
+  r(depth, CD274) = +0.0874
+  STATUS: NOT CONFIRMED ✗
+
+  Deep+CD274-hi vs Shallow+CD274-lo OS:
+  Groups:
+    Deep+CD274-hi        n=  84 OS=  26.3mo ev=32
+    Deep+CD274-lo        n=  96 OS=  26.1mo ev=45
+    Shallow+CD274-hi     n=  98 OS=  28.9mo ev=28
+    Shallow+CD274-lo     n=  87 OS=  25.3mo ev=25
+
+  Deep+CD274-hi vs Shallow+CD274-lo:
+  Logrank: p=0.2767  ns
+  Prediction: Deep+CD274-hi = worst OS AND best checkpoint responders
+
+  Composite immune exhaustion score vs depth:
+  Genes: ['CD8A', 'CD274', 'PDCD1', 'LAG3', 'TIGIT', 'HAVCR2']
+  r(depth, immune_score) = +0.3397  p=1.80e-11 ***
+
+=================================================================
+S4-6/8: FULL COX MULTIVARIATE
+S4-P7: Depth independent of stage/grade/mutation
+=================================================================
+  Stage valid: 0
+  Grade valid: 0
+  Age valid:   370
+  CTNNB1 mut:  0
+  TP53 mut:    0
+
+  Model 1: depth alone:
+  n=365
+               coef  exp(coef)         p
+covariate                               
+depth      0.308716   1.361676  0.000394
+
+  Model 2: depth + age:
+  n=365
+               coef  exp(coef)         p
+covariate                               
+depth      0.329272   1.389956  0.000145
+age        0.202647   1.224640  0.030196
+
+  Model 3 skipped: only 0 samples with stage
+
+  Model 4 skipped: only 0 samples with grade
+
+  Model 5 skipped: insufficient mutation data
+
+  Full model skipped: insufficient stage/grade data
+  Model 1 result:
+  depth HR=1.362 p=0.000394
+
+=================================================================
+S4-9: MUTATION × DEPTH INTERACTION
+Does depth stratify within mut groups?
+=================================================================
+
+--- Generating Script 4 figure ---
+
+  Figure saved: ./hcc_false_attractor/results_s4/hcc_tcga_s4.png
+
+  Scores: ./hcc_false_attractor/results_s4/depth_scores_s4.csv

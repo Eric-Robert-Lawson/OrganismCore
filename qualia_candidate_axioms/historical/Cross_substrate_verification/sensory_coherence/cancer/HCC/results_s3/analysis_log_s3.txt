@@ -1,0 +1,329 @@
+=================================================================
+HEPATOCELLULAR CARCINOMA — SCRIPT 3
+Dataset: TCGA-LIHC
+Framework: OrganismCore
+Doc: 92c | Date: 2026-03-02
+=================================================================
+
+PREDICTIONS LOCKED 2026-03-02:
+S3-P1: Metab score OS p<0.01 (TCGA)
+S3-P2: CTNNB1-mutant better OS (HCC-P5)
+S3-P3: TP53-mutant worse OS
+S3-P4: CTNNB1-mutant shallower depth
+S3-P5: iCluster C1 deepest
+S3-P6: CD8A falls with depth
+S3-P7: Depth indep of stage/grade (Cox)
+
+=================================================================
+STEP 0: DATA ACQUISITION
+=================================================================
+  Already present: ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.expr.tsv.gz (29,194,488 bytes)
+  Already present: ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.survival.tsv.gz (2,438 bytes)
+  Already present: ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.pheno.tsv.gz (31,027 bytes)
+  Already present: ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.mutations.tsv.gz (105 bytes)
+
+=================================================================
+PARSE EXPRESSION MATRIX
+  File: ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.expr.tsv.gz
+=================================================================
+  Samples: 423
+  IDs[0:3]: ['TCGA-FV-A495-01', 'TCGA-G3-A3CH-11', 'TCGA-CC-A3MB-01']
+  Rows read: 152
+  Genes matched: 152
+  Matrix shape: (423, 152)
+
+  Expression matrix: (423, 152)
+  Samples: 423
+  Genes: ['TGFBR2', 'SQLE', 'SMAD3', 'IGF2R', 'SMAD2', 'LDLR', 'BAX', 'FGFR1', 'FN1', 'IL6R']...
+
+  Sample type codes:
+    01: 371
+    11: 50
+    02: 2
+  Tumour (01): 371
+  Normal (11): 50
+
+  HCC samples: 371
+  Normal samples: 50
+  Genes in matrix: 152
+
+=================================================================
+PARSE SURVIVAL + CLINICAL (robust)
+=================================================================
+  Parsing: ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.survival.tsv.gz (2,438 bytes)
+  Headers: ['sample', 'os', 'os.time']
+  Col map: sample=0 os_t=2 os_e=1 stage=None grade=None
+  Rows matched: 373
+  Parsing: ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.pheno.tsv.gz (31,027 bytes)
+  Headers: ['sample', 'patientid', 'ablation_embolization_tx_adjuvant', 'afp_at_procurement', 'afp_norm_range_lower', 'afp_norm_range_upper', 'age', 'ajcc_metastasis_pathologic_pm', 'ajcc_nodes_pathologic_pn', 'ajcc_pathologic_tumor_stage', 'ajcc_staging_edition', 'ajcc_tumor_pathologic_pt']
+  Col map: sample=0 os_t=None os_e=42 stage=9 grade=28
+  Rows matched: 373
+
+  OS valid total: 367
+  OS events: 130
+
+  Stage: {np.str_('S'): 349}
+  Grade: {np.str_('G'): 368}
+  Gender: {np.str_('M'): 252, np.str_('F'): 121}
+  Age: mean=59.5 range=16–90
+
+  OS valid (HCC): 365
+  OS events: 130
+
+=================================================================
+PARSE MUTATIONS
+=================================================================
+  Mutation headers (first 8): ['HUGO_SYMBOL', 'TUMOR_SAMPLE_BARCODE', 'VARIANT_CLASSIFICATION']
+  gene_c=0 sample_c=1 effect_c=2
+
+  Total mutations parsed: 0
+
+  Mutation frequencies:
+
+=================================================================
+DEPTH SCORES — TCGA-LIHC
+=================================================================
+  HCC_DEPTH_V2 (metabolic):
+    Switch: ['CYP3A4', 'ALDOB', 'PCK1', 'G6PC', 'CYP2C9', 'TTR', 'IGF1', 'ARG1', 'APOE', 'RXRA', 'PPARA', 'FGF21', 'FABP1', 'ALB', 'APOB', 'HNF4A']
+    FA:     ['SOX4', 'PROM1', 'AFP', 'EPCAM', 'CDC20', 'BIRC5', 'TOP2A', 'MKI67', 'CCNB1', 'KRT19', 'EZH2', 'HDAC2']
+    n=371 mean=0.3334 std=0.1599 min=0.0069 max=0.8985
+
+  Pure metabolic score:
+    Genes: ['CYP3A4', 'ALDOB', 'PCK1', 'G6PC', 'CYP2C9', 'TTR', 'IGF1', 'ARG1', 'APOE', 'RXRA', 'PPARA', 'FGF21', 'FABP1', 'ALB', 'APOB', 'HNF4A']
+    mean=0.2024 std=0.1483
+
+=================================================================
+NORMAL vs HCC — TCGA-LIHC
+(replication of Script 1 findings)
+=================================================================
+  Gene             Normal        HCC      FC%  p-value
+  ----------------------------------------------------------
+  AFP              5.1850     6.9667    +34.4%  p=7.45e-03  **
+  HNF4A            8.9138     8.4080     -5.7%  p=2.93e-03  **
+  FOXA1            3.3850     3.0998     -8.4%  p=0.2240  ns
+  FOXA2            6.4498     6.1012     -5.4%  p=0.0133   *
+  ALB             18.8075    16.4051    -12.8%  p=4.16e-25 ***
+  CYP3A4          14.9310     9.0821    -39.2%  p=6.82e-18 ***
+  ALDOB           14.2839    11.5612    -19.1%  p=1.32e-19 ***
+  PCK1            12.4622     8.6660    -30.5%  p=2.01e-23 ***
+  G6PC            13.1675    11.3166    -14.1%  p=1.38e-10 ***
+  TTR             15.0425    12.5885    -16.3%  p=2.08e-17 ***
+  EZH2            -2.8859    -0.3078    +89.3%  p=8.63e-27 ***
+  HDAC2           -1.1358    -0.9532    +16.1%  p=0.0339   *
+  SOX4            -3.0610    -2.2871    +25.3%  p=3.71e-04 ***
+  EPCAM           -2.3295    -4.0509    -73.9%  p=7.53e-04 ***
+  GPC3             0.1562     5.1002  +3164.4%  p=2.22e-19 ***
+  MYC              0.6693    -0.8319   -224.3%  p=1.26e-10 ***
+  CTNNB1          -0.5550    -0.5227     +5.8%  p=0.4731  ns
+  TOP2A           -4.7427    -0.6013    +87.3%  p=1.34e-26 ***
+  MKI67           -4.0361    -0.7239    +82.1%  p=7.97e-25 ***
+  AURKA           -2.1791     0.5409   +124.8%  p=2.42e-26 ***
+
+=================================================================
+DEPTH CORRELATIONS — TCGA-LIHC HCC
+(Cross-cohort replication of Script 1)
+=================================================================
+
+  TOP 15 POSITIVE (FA genes):
+  CDK4         r=+0.5323  p=1.57e-28 ***
+  SMARCA4      r=+0.5238  p=1.57e-27 ***
+  TWIST1       r=+0.5016  p=4.92e-25 ***
+  SOX4         r=+0.4854  p=2.49e-23 ***
+  HDAC2        r=+0.4606  p=6.94e-21 ***
+  TGFB1        r=+0.4414  p=4.05e-19 ***
+  PLK1         r=+0.4206  p=2.45e-17 ***
+  CCNB1        r=+0.4120  p=1.23e-16 ***
+  BIRC5        r=+0.4084  p=2.39e-16 ***
+  CDC20        r=+0.4075  p=2.82e-16 ***
+  DNMT3A       r=+0.4039  p=5.46e-16 ***
+  FGFR1        r=+0.3981  p=1.53e-15 ***
+  IGF1R        r=+0.3930  p=3.75e-15 ***
+  MKI67        r=+0.3928  p=3.91e-15 ***
+  PROM1        r=+0.3897  p=6.64e-15 ***
+
+  TOP 15 NEGATIVE (switch genes):
+  ALDOB        r=-0.8187  p=6.41e-91 ***
+  TTR          r=-0.8038  p=3.16e-85 ***
+  G6PC         r=-0.7759  p=8.27e-76 ***
+  APOB         r=-0.7674  p=3.17e-73 ***
+  ALB          r=-0.7669  p=4.47e-73 ***
+  ARG1         r=-0.7532  p=4.08e-69 ***
+  PCK1         r=-0.7517  p=1.07e-68 ***
+  HNF4A        r=-0.7426  p=3.28e-66 ***
+  CYP2C9       r=-0.7364  p=1.38e-64 ***
+  PPARA        r=-0.6332  p=5.75e-43 ***
+  CYP7A1       r=-0.6229  p=3.04e-41 ***
+  CYP3A4       r=-0.6135  p=9.65e-40 ***
+  FABP1        r=-0.6101  p=3.33e-39 ***
+  KLB          r=-0.5797  p=1.08e-34 ***
+  FOXA2        r=-0.5478  p=1.96e-30 ***
+
+  KEY PREDICTION REPLICATIONS:
+  Gene         Role                   r  p-value    Pred  Result
+  --------------------------------------------------------------------
+  HNF4A        switch           -0.7426  p=3.28e-66 ***   <-0.30  ✓
+  CYP3A4       switch           -0.6135  p=9.65e-40 ***   <-0.50  ✓
+  ALDOB        switch           -0.8187  p=6.41e-91 ***   <-0.50  ✓
+  AFP          FA               +0.0994  p=0.0557  ns   >+0.40  ✗
+  EZH2         FA/epigenetic    +0.3548  p=1.92e-12 ***   >+0.40  ✗
+  HDAC2        FA/epigenetic    +0.4606  p=6.94e-21 ***   >+0.40  ✓
+  SOX4         FA/progenitor    +0.4854  p=2.49e-23 ***   >+0.40  ✓
+  EPCAM        FA/progenitor    +0.2826  p=3.07e-08 ***   >+0.30  ✗
+  TOP2A        FA/cell-cycle    +0.3540  p=2.14e-12 ***   >+0.40  ✗
+  MKI67        FA/cell-cycle    +0.3928  p=3.91e-15 ***   >+0.40  ✗
+  CD8A         immune           +0.1353  p=9.05e-03  **   <-0.10  ✗
+  SMAD3        TGF-B            +0.2327  p=5.89e-06 ***   >+0.10  ✓
+  GLUL         Wnt              -0.2026  p=8.48e-05 ***   >+0.10  ✗
+
+=================================================================
+S3-2: METABOLIC SCORE REPLICATION
+S3-P1: Metab score OS p<0.01
+=================================================================
+  Metabolic genes available: ['CYP3A4', 'ALDOB', 'PCK1', 'G6PC', 'CYP2C9', 'TTR', 'IGF1', 'ARG1', 'APOE', 'RXRA', 'PPARA', 'FGF21', 'FABP1', 'ALB', 'APOB', 'HNF4A']
+  n_valid OS: 365
+  Metabolic score OS: p=1.01e-04 ***
+  Deep=23.6mo  Shallow=29.8mo
+
+  S3-P1: Metab score OS p<0.01
+  STATUS: CONFIRMED ✓
+
+  Metab gene correlations (within TCGA HCC):
+  CYP3A4     r=-0.6135  p=9.65e-40 ***
+  ALDOB      r=-0.8187  p=6.41e-91 ***
+  PCK1       r=-0.7517  p=1.07e-68 ***
+  G6PC       r=-0.7759  p=8.27e-76 ***
+  CYP2C9     r=-0.7364  p=1.38e-64 ***
+  TTR        r=-0.8038  p=3.16e-85 ***
+  IGF1       r=-0.4095  p=1.98e-16 ***
+  ARG1       r=-0.7532  p=4.08e-69 ***
+  APOE       r=-0.5398  p=1.93e-29 ***
+  RXRA       r=-0.5376  p=3.55e-29 ***
+  PPARA      r=-0.6332  p=5.75e-43 ***
+  FGF21      r=-0.4858  p=2.28e-23 ***
+  FABP1      r=-0.6101  p=3.33e-39 ***
+  ALB        r=-0.7669  p=4.47e-73 ***
+  APOB       r=-0.7674  p=3.17e-73 ***
+  HNF4A      r=-0.7426  p=3.28e-66 ***
+
+  Tertile OS (metabolic score):
+  T1 shallow: n=121 OS mean=29.9mo
+  T2 mid: n=123 OS mean=30.0mo
+  T3 deep: n=121 OS mean=20.1mo
+  T3 vs T1: p=4.81e-06 ***
+
+=================================================================
+S3-3: CTNNB1 MUTATION SURVIVAL
+HCC-P5 DIRECT TEST
+S3-P2: CTNNB1-mutant better OS
+=================================================================
+  CTNNB1 mutant: n=0
+  CTNNB1 WT:     n=371
+  Insufficient mutant samples
+
+=================================================================
+S3-4: TP53 MUTATION SURVIVAL
+S3-P3: TP53-mutant worse OS
+=================================================================
+  TP53 mutant: n=0
+  TP53 WT:     n=371
+  Insufficient samples
+
+=================================================================
+S3-5: CTNNB1 MUTATION vs DEPTH
+S3-P4: CTNNB1-mutant shallower
+=================================================================
+  metab_score:
+    CTNNB1-mut: mean=nan
+    CTNNB1-WT:  mean=0.2024
+    MWU: p=N/A      (mut=deeper)
+  depth_v2:
+    CTNNB1-mut: mean=nan
+    CTNNB1-WT:  mean=0.3334
+    MWU: p=N/A      (mut=deeper)
+
+  S3-P4: CTNNB1-mutant shallower
+  STATUS: NOT CONFIRMED ✗
+
+  Mutation vs depth summary:
+  Gene          n_mut    mut_depth     wt_depth  p
+  -------------------------------------------------------
+
+=================================================================
+S3-6/S3-7: IMMUNE INFILTRATION vs DEPTH
+S3-P6: CD8A falls with depth
+=================================================================
+
+  Gene          r_depth  p-value       interpretation
+  ------------------------------------------------------------
+  CD8A          +0.1353  p=9.05e-03  **  ✗ not excluded
+  CD4           +0.0608  p=0.2429  ns  
+  FOXP3         -0.1721  p=8.75e-04 ***  
+  CD68          +0.2380  p=3.55e-06 ***  
+  ARG1          -0.7532  p=4.08e-69 ***  ARG1=hepatocyte/MDSC
+  CD274         +0.1718  p=8.91e-04 ***  PD-L1 pattern
+  PDCD1         +0.2547  p=6.65e-07 ***  
+  IL6           +0.0832  p=0.1094  ns  
+  IL6R          -0.4222  p=1.81e-17 ***  
+  STAT3         -0.0041  p=0.9367  ns  
+  TNF           +0.1843  p=3.58e-04 ***  
+  NFKB1         +0.1455  p=4.98e-03  **  
+  CD44          +0.2379  p=3.59e-06 ***  
+  CD274         +0.1718  p=8.91e-04 ***  PD-L1 pattern
+
+  S3-P6: CD8A falls with depth
+  r(depth, CD8A) = +0.1353
+  STATUS: NOT CONFIRMED ✗
+
+=================================================================
+S3-7: COX MULTIVARIATE REGRESSION
+S3-P7: Depth independent of stage/grade
+=================================================================
+  Stage numeric: (array([], dtype=float64), array([], dtype=int64))
+  Grade numeric: (array([], dtype=float64), array([], dtype=int64))
+  n_valid for Cox: 365
+
+  Model 1: depth alone
+                 coef  exp(coef)         p
+covariate                                 
+depth_metab  0.253544   1.288584  0.000227
+
+  Model 2: depth + stage + grade
+  Error: division by zero
+
+  Model 3: depth + stage + grade + mutations + age
+  Error: division by zero
+
+=================================================================
+CROSS-COHORT DEPTH COMPARISON
+GSE14520 (Script 1) vs TCGA-LIHC (Script 3)
+=================================================================
+  TCGA-LIHC metabolic score OS: p=1.01e-04 ***
+  Deep=23.6mo  Shallow=29.8mo
+  GSE14520 Script 1 OS: p=3.80e-04 ***
+  GSE14520 Script 2 metab OS: p=1.78e-05 ***
+  Replication: ✓
+
+=================================================================
+SMAD3 CROSS-CANCER REPLICATION
+Confirmed: BLCA (Script 91)
+Confirmed: HCC GSE14520 (Script 1)
+Test: HCC TCGA-LIHC (Script 3)
+=================================================================
+  SMAD3 OS: p=0.6416  ns
+  SMAD3-hi=25.9mo SMAD3-lo=27.6mo
+  Cross-cancer SMAD3 OS: BLCA ✓ | GSE14520-HCC ✓ | TCGA-HCC ✗
+
+=================================================================
+SOX4 OS REPLICATION
+GSE14520 p=3.30e-04 ***
+Test: TCGA-LIHC
+=================================================================
+  SOX4 OS TCGA: p=0.0808  ns
+  SOX4-hi=26.2mo SOX4-lo=27.2mo
+  Replication: ✗ NOT CONFIRMED
+
+--- Generating Script 3 figure ---
+
+  Figure saved: ./hcc_false_attractor/results_s3/hcc_tcga_lihc_s3.png
+
+  Scores saved: ./hcc_false_attractor/results_s3/depth_scores_s3.csv
