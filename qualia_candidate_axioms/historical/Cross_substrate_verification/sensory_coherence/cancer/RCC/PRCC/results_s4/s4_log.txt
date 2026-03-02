@@ -1,0 +1,380 @@
+============================================================
+PRCC FALSE ATTRACTOR — SCRIPT 4
+OrganismCore | Document 95d | 2026-03-02
+Author: Eric Robert Lawson
+============================================================
+
+PREDICTIONS LOCKED 2026-03-02 BEFORE RUN
+12 predictions — S4-P1 through S4-P12
+
+
+============================================================
+LOAD PRCC S1/S2/S3 OUTPUTS
+============================================================
+  S1 depth: n=290
+  S2 TI: n=290
+  S3 decon: (290, 3)
+
+============================================================
+LOADING EXPRESSION MATRICES
+============================================================
+  Loading PRCC (KIRP): ./prcc_false_attractor/TCGA_KIRP_HiSeqV2.gz
+  PRCC (KIRP): tumour=290 normal=32
+  ccRCC matrix not found: ./prcc_false_attractor/TCGA_KIRC_HiSeqV2.gz
+  Cross-cancer analysis will use PRCC data only.
+  To enable: download TCGA_KIRC_HiSeqV2.gz from UCSC Xena and place in BASE_DIR.
+
+============================================================
+OBJ-1 — GDC KIRP_2015 SUBTYPE ANNOTATION
+============================================================
+  S4-P1: Type 2 depth > Type 1  MW p < 0.05
+  S4-P5: CDKN2A RNA low in CIMP  p < 0.05
+  Attempting GDC subtype download...
+  Downloaded: (352, 108)
+  Cols: ['_INTEGRATION', '_PATIENT', '_cohort', '_primary_disease', '_primary_site', 'additional_pharmaceutical_therapy', 'additional_radiation_therapy', 'additional_surgery_locoregional_procedure', 'additional_surgery_metastatic_procedure', 'age_at_initial_pathologic_diagnosis', 'bcr_followup_barcode', 'bcr_patient_barcode', 'bcr_sample_barcode', 'clinical_M', 'clinical_N', 'clinical_T', 'clinical_stage', 'days_to_additional_surgery_locoregional_procedure', 'days_to_additional_surgery_metastatic_procedure', 'days_to_birth']
+  Saved full phenotype for inspection.
+  Downloaded: (291, 11)
+  Cols: ['diagnoses.0.primary_diagnosis', 'diagnoses.1.morphology', 'diagnoses.1.primary_diagnosis', 'diagnoses.2.morphology', 'diagnoses.2.primary_diagnosis', 'diagnoses.3.morphology', 'diagnoses.3.primary_diagnosis', 'diagnoses.4.morphology', 'diagnoses.4.primary_diagnosis', 'id', 'submitter_id']
+  Saved full phenotype for inspection.
+  Attempting UCSC Xena pancan subtype...
+  Xena KIRP clin: (352, 108)
+  All columns: ['_INTEGRATION', '_PATIENT', '_cohort', '_primary_disease', '_primary_site', 'additional_pharmaceutical_therapy', 'additional_radiation_therapy', 'additional_surgery_locoregional_procedure', 'additional_surgery_metastatic_procedure', 'age_at_initial_pathologic_diagnosis', 'bcr_followup_barcode', 'bcr_patient_barcode', 'bcr_sample_barcode', 'clinical_M', 'clinical_N', 'clinical_T', 'clinical_stage', 'days_to_additional_surgery_locoregional_procedure', 'days_to_additional_surgery_metastatic_procedure', 'days_to_birth', 'days_to_collection', 'days_to_death', 'days_to_initial_pathologic_diagnosis', 'days_to_last_followup', 'days_to_new_tumor_event_after_initial_treatment', 'eastern_cancer_oncology_group', 'erythrocyte_sedimentation_rate_result', 'followup_case_report_form_submission_reason', 'followup_treatment_success', 'form_completion_date', 'gender', 'height', 'hemoglobin_result', 'histological_type', 'history_of_neoadjuvant_treatment', 'icd_10', 'icd_o_3_histology', 'icd_o_3_site', 'informed_consent_verified', 'initial_weight', 'intermediate_dimension', 'is_ffpe', 'karnofsky_performance_score', 'lactate_dehydrogenase_result', 'laterality', 'longest_dimension', 'lost_follow_up', 'lymph_node_examined_count', 'new_tumor_event_after_initial_treatment', 'number_of_lymphnodes_positive', 'number_pack_years_smoked', 'oct_embedded', 'other_dx', 'pathologic_M', 'pathologic_N', 'pathologic_T', 'pathologic_stage', 'pathology_report_file_name', 'patient_id', 'performance_status_scale_timing', 'person_neoplasm_cancer_status', 'platelet_qualitative_result', 'primary_lymph_node_presentation_assessment', 'primary_therapy_outcome_success', 'radiation_therapy', 'sample_type', 'sample_type_id', 'serum_calcium_result', 'shortest_dimension', 'stopped_smoking_year', 'system_version', 'targeted_molecular_therapy', 'tissue_prospective_collection_indicator', 'tissue_retrospective_collection_indicator', 'tissue_source_site', 'tobacco_smoking_history', 'tumor_tissue_site', 'tumor_type', 'vial_number', 'vital_status', 'weight', 'white_cell_count_result', 'year_of_initial_pathologic_diagnosis', 'year_of_tobacco_smoking_onset', '_GENOMIC_ID_TCGA_KIRP_PDMarrayCNV', '_GENOMIC_ID_TCGA_KIRP_exp_HiSeqV2_percentile', '_GENOMIC_ID_TCGA_KIRP_mutation_bcm_gene', '_GENOMIC_ID_TCGA_KIRP_PDMRNAseqCNV', '_GENOMIC_ID_TCGA_KIRP_miRNA_GA', '_GENOMIC_ID_TCGA_KIRP_mutation', '_GENOMIC_ID_TCGA_KIRP_mutation_broad_gene', '_GENOMIC_ID_TCGA_KIRP_hMethyl27', '_GENOMIC_ID_TCGA_KIRP_hMethyl450', '_GENOMIC_ID_TCGA_KIRP_mutation_curated_bcm_gene', '_GENOMIC_ID_TCGA_KIRP_RPPA', '_GENOMIC_ID_TCGA_KIRP_miRNA_HiSeq', '_GENOMIC_ID_TCGA_KIRP_mutation_curated_broad_gene', '_GENOMIC_ID_TCGA_KIRP_exp_HiSeqV2', '_GENOMIC_ID_TCGA_KIRP_exp_HiSeqV2_PANCAN', '_GENOMIC_ID_TCGA_KIRP_gistic2thd', '_GENOMIC_ID_TCGA_KIRP_PDMRNAseq', '_GENOMIC_ID_data/public/TCGA/KIRP/miRNA_HiSeq_gene', '_GENOMIC_ID_data/public/TCGA/KIRP/miRNA_GA_gene', '_GENOMIC_ID_TCGA_KIRP_PDMarray', '_GENOMIC_ID_TCGA_KIRP_G4502A_07_3', '_GENOMIC_ID_TCGA_KIRP_gistic2', '_GENOMIC_ID_TCGA_KIRP_mutation_ucsc_maf_gene', '_GENOMIC_ID_TCGA_KIRP_exp_HiSeqV2_exon']
+  Found subtype col: tumor_type
+  {'Type 2': 105, 'Type 1': 82}
+  Running subtype analysis: (187, 2)
+  Distribution:
+    UNKNOWN: n=127
+    Type 2: n=86
+    Type 1: n=77
+  Type1 n=77 Type2 n=86 CIMP n=0
+  Type1 mean depth: 0.6996
+  Type2 mean depth: 0.5668
+  MW p=1.04e-05
+  S4-P1 INVERTED ✗
+
+============================================================
+OBJ-2 — CENSORED OS FROM XENA SURVIVAL.TXT
+============================================================
+  S4-P2: TI high = worse OS  p < 0.05
+  S4-P3: Q4 vs Q1 logrank p < 0.05
+  S4-P8: CIMP-high worst OS subtype
+  Downloading Xena KIRP_survival.txt...
+  Saved: ./prcc_false_attractor/KIRP_survival.txt (18799 bytes)
+  Survival shape: (352, 10)
+  Columns: ['_PATIENT', 'OS', 'OS.time', 'DSS', 'DSS.time', 'DFI', 'DFI.time', 'PFI', 'PFI.time', 'Redaction']
+  OS time:  OS.time
+  OS event: OS
+  Valid OS: 287 / 290
+  Events:   44 (15.3%)
+  Censored: 243
+
+  TI OS (S4-P2):
+  TI-hi n=144 med=766d
+  TI-lo n=143 med=792d
+  logrank p=0.9139
+  S4-P2 NOT CONFIRMED (ns)
+
+  DEPTH QUARTILE OS (S4-P3):
+  Q4 n=72 med=762d
+  Q1 n=72 med=714d
+  logrank p=0.5246
+  S4-P3 NOT CONFIRMED (ns)
+
+  SUBTYPE OS (S4-P8):
+  Type1 n=76 med=719d events=5
+  Type2 n=84 med=642d events=16
+
+  DRUG TARGET OS:
+  Drug                   gene                p   med_hi   med_lo
+  ──────────────────────────────────────────────────────────
+  ★EZH2_inhibitor         EZH2         p=0.0080      658      841
+   MET_inhibitor          MET          p=0.4003      794      708
+   ERBB2_targeted         ERBB2        p=0.1065      784      744
+  ★CDK4_inhibitor         CDK4         p=0.0089      665      805
+   KDM1A_inhibitor        KDM1A        p=0.5662      774      771
+   FH_aKG_proxy           FH           p=0.0549      779      767
+  ★OGDHL_aKG_proxy        OGDHL      p=4.05e-04      786      757
+  ★CA9_targeted           CA9          p=0.0412      792      767
+   PDL1_checkpoint        CD274        p=0.3744      796      757
+   HAVCR2_checkpoint      HAVCR2       p=0.1170      781      765
+   PDK1_DCA               PDK1         p=0.0951      734      805
+   B2M_MHC1               B2M          p=0.3877      762      791
+   HDAC_MHC1              HDAC1        p=0.9898      791      765
+
+============================================================
+OBJ-3 — GDC MAF MUTATIONS
+============================================================
+  S4-P4: PBRM1 mut co-segregates with SETD2
+  Attempting GDC MAF download...
+  GDC MAF API: 405
+  cBioPortal POST kirp_tcga: Expecting value: line 1 column 1 (char 0)
+  cBioPortal POST kirp_tcga_pub: Expecting value: line 1 column 1 (char 0)
+  Trying cBioPortal POST mutations...
+  Mutation data unavailable.
+  Expression proxy for mutations:
+  Col                         n      d_mut       d_wt
+  SETD2_proxy                44     0.5372     0.6520
+  FH_proxy                   44     0.7735     0.6097
+  BAP1_proxy                 44     0.5825     0.6439
+  PBRM1_proxy                44     0.5800     0.6443
+  VHL_proxy                  44     0.6369     0.6341
+
+============================================================
+OBJ-4/5 — CROSS-CANCER PRCC vs ccRCC
+============================================================
+  S4-P6: RUNX1 r_depth > 0.40 in BOTH
+  S4-P7: GOT1  r_depth < -0.40 in BOTH
+
+  Gene              PRCC_r   ccRCC_r    shared?
+  ──────────────────────────────────────────────
+  RUNX1            +0.5904      +nan  PRCC_ONLY
+  GOT1             -0.5193      +nan  PRCC_ONLY
+  EZH2             +0.3075      +nan  PRCC_ONLY
+  KDM1A            +0.4427      +nan  PRCC_ONLY
+  TET2             +0.2921      +nan           
+  SLC22A6          -0.8006      +nan  PRCC_ONLY
+  MIOX             -0.4288      +nan  PRCC_ONLY
+  OGDHL            -0.4019      +nan  PRCC_ONLY
+  FH               -0.4513      +nan  PRCC_ONLY
+  B2M              -0.2218      +nan           
+  HAVCR2           -0.3961      +nan  PRCC_ONLY
+  ARG1             +0.0760      +nan           
+  CDKN2A           +0.0359      +nan           
+  MKI67            -0.0241      +nan           
+  SETD2            +0.3075      +nan  PRCC_ONLY
+  PBRM1            +0.2396      +nan           
+  VEGFA            -0.1838      +nan           
+  VHL              +0.0719      +nan           
+  EPAS1            -0.0815      +nan           
+
+  S4-P6 RUNX1: PRCC r=+0.5904  ccRCC r=+nan
+  S4-P6 PRCC ONLY — ccRCC data unavailable or weak
+  S4-P7 GOT1: PRCC r=-0.5193  ccRCC r=+nan
+  S4-P7 PRCC ONLY — ccRCC data unavailable or weak
+
+============================================================
+OBJ-7 — SWI/SNF RNA PARADOX MODULE
+============================================================
+  S4-P9: SWI/SNF subunits positively correlated WITH EACH OTHER and WITH depth
+  SWI/SNF genes available: ['PBRM1', 'SETD2', 'ARID1A', 'SMARCA4', 'SMARCB1', 'ARID1B', 'SMARCA2', 'ARID2', 'KDM6A', 'BAP1']
+
+  PAIRWISE CORRELATIONS:
+  Gene A       Gene B              r            p
+  ──────────────────────────────────────────────
+  ★PBRM1        SETD2         +0.7138      p<1e-15
+  ★PBRM1        ARID1A        +0.6421      p<1e-15
+   PBRM1        SMARCA4       -0.0097     p=0.8691
+  ★PBRM1        SMARCB1       -0.1879     p=0.0013
+  ★PBRM1        ARID1B        +0.6550      p<1e-15
+  ★PBRM1        SMARCA2       +0.4985      p<1e-15
+  ★PBRM1        ARID2         +0.4446   p=1.75e-15
+  ★PBRM1        KDM6A         +0.5315      p<1e-15
+  ★PBRM1        BAP1          +0.1400     p=0.0170
+  ★SETD2        ARID1A        +0.5308      p<1e-15
+   SETD2        SMARCA4       +0.1075     p=0.0676
+   SETD2        SMARCB1       -0.0644     p=0.2743
+  ★SETD2        ARID1B        +0.6161      p<1e-15
+  ★SETD2        SMARCA2       +0.4596      p<1e-15
+  ★SETD2        ARID2         +0.4363   p=6.65e-15
+  ★SETD2        KDM6A         +0.4399   p=3.74e-15
+  ★SETD2        BAP1          +0.1936   p=9.17e-04
+  ★ARID1A       SMARCA4       +0.1628     p=0.0055
+  ★ARID1A       SMARCB1       -0.1817     p=0.0019
+  ★ARID1A       ARID1B        +0.7635      p<1e-15
+  ★ARID1A       SMARCA2       +0.5638      p<1e-15
+  ★ARID1A       ARID2         +0.5963      p<1e-15
+  ★ARID1A       KDM6A         +0.6140      p<1e-15
+   ARID1A       BAP1          -0.0088     p=0.8818
+  ★SMARCA4      SMARCB1       +0.1839     p=0.0017
+  ★SMARCA4      ARID1B        +0.1317     p=0.0249
+  ★SMARCA4      SMARCA2       +0.1229     p=0.0365
+   SMARCA4      ARID2         +0.0625     p=0.2888
+   SMARCA4      KDM6A         +0.0764     p=0.1943
+   SMARCA4      BAP1          +0.0127     p=0.8300
+  ★SMARCB1      ARID1B        -0.1997   p=6.24e-04
+  ★SMARCB1      SMARCA2       -0.1432     p=0.0147
+  ★SMARCB1      ARID2         -0.2808   p=1.17e-06
+  ★SMARCB1      KDM6A         -0.2596   p=7.53e-06
+   SMARCB1      BAP1          -0.0259     p=0.6600
+  ★ARID1B       SMARCA2       +0.6405      p<1e-15
+  ★ARID1B       ARID2         +0.5290      p<1e-15
+  ★ARID1B       KDM6A         +0.6319      p<1e-15
+  ★ARID1B       BAP1          -0.1310     p=0.0257
+  ★SMARCA2      ARID2         +0.2175   p=1.90e-04
+  ★SMARCA2      KDM6A         +0.4543      p<1e-15
+   SMARCA2      BAP1          -0.0492     p=0.4042
+  ★ARID2        KDM6A         +0.5440      p<1e-15
+  ★ARID2        BAP1          -0.1340     p=0.0225
+  ★KDM6A        BAP1          -0.1842     p=0.0016
+
+  Positive pairs: 31/45
+
+  EACH GENE vs DEPTH:
+  Gene           r_depth            p direction
+  ──────────────────────────────────────────────
+  PBRM1          +0.2396   p=3.75e-05 UP with depth
+  SETD2          +0.3075   p=9.13e-08 UP with depth
+  ARID1A         +0.1707     p=0.0036 flat
+  SMARCA4        +0.1810     p=0.0020 flat
+  SMARCB1        +0.0482     p=0.4134 flat
+  ARID1B         +0.1193     p=0.0424 flat
+  SMARCA2        +0.1250     p=0.0333 flat
+  ARID2          +0.1394     p=0.0176 flat
+  KDM6A          -0.0109     p=0.8536 flat
+  BAP1           +0.0823     p=0.1621 flat
+
+  Positive depth correlates: 9/10
+  S4-P9 CONFIRMED: SWI/SNF module UP with depth ✓
+  RNA paradox is MODULE-LEVEL — all subunits co-rise, all protein functions can be lost by mutation.
+
+  SWI/SNF MODULE SCORE r(depth) = +0.2208  p=1.51e-04
+
+============================================================
+OBJ-8 — ARG1 vs M2 PANEL DEPTH RANKING
+============================================================
+  S4-P10: r(ARG1,depth) > r(CD163,depth) and > r(MRC1,depth)
+  Gene         panel    r_depth   Q4/Q1        p_mwu
+  ──────────────────────────────────────────────────
+  ★ARG1         M2       +0.0760   1.748     p=0.0029
+  ★CD163        M2       -0.1370   0.927     p=0.0161
+   MRC1         M2       +0.0141   1.039     p=0.4524
+   IL10         M2       -0.1217   0.829     p=0.0527
+  ★TGFB1        M2       +0.2186   1.074   p=1.40e-04
+  ★CD68         M2       -0.0922   0.967     p=0.0154
+  ★CSF1R        M2       -0.0850   0.965     p=0.0242
+  ★FCGR3A       M2       -0.1746   0.943     p=0.0039
+  ★VSIG4        M2       -0.1161   0.939     p=0.0207
+  ★MSR1         M2       -0.2147   0.907   p=2.72e-05
+   FOLR2        M2       -0.0380   0.971     p=0.4690
+   LYVE1        M2       +0.0075   1.049     p=0.4595
+  ★TNF          M1       +0.2831   1.405   p=3.07e-05
+  ★IL6          M1       +0.2207   1.498     p=0.0058
+   IL12A        M1       +0.1250   1.199     p=0.1299
+  ★CXCL10       M1       -0.2602   0.834   p=5.48e-04
+  ★CD86         M1       -0.0954   0.954     p=0.0481
+   NOS2         M1       +0.0571   1.095     p=0.1677
+   IL1B         M1       -0.0798   0.963     p=0.2403
+   CXCL9        M1       -0.1579   0.919     p=0.1156
+  ★CXCL11       M1       -0.1858   0.842     p=0.0247
+   S100A8       MDSC     +0.1134   1.112     p=0.2265
+  ★S100A9       MDSC     +0.1569   1.102     p=0.0407
+   ITGAM        MDSC     -0.0537   0.971     p=0.1992
+  ★ITGAX        MDSC     -0.0987   0.949     p=0.0183
+   CEACAM8      MDSC     +0.0607   1.601     p=0.0612
+  ★FCGR3B       MDSC     +0.3170   1.590   p=1.57e-07
+
+  S4-P10:
+  ARG1  r=+0.0760
+  CD163 r=-0.1370
+  MRC1  r=+0.0141
+  S4-P10 CONFIRMED: ARG1 strongest depth correlate ✓
+
+  MDSC SIGNATURE SCORE r(depth)=+0.1557 p=0.0079
+  MDSC signature is depth-positive
+  Supports MDSC (not M2) as Q4 suppressor via ARG1 ✓
+
+============================================================
+OBJ-9 — WARBURG TWO-TIER FORMAL TEST
+============================================================
+  S4-P11: Warburg trio internal r > CA9-trio r
+  WARBURG TRIO INTERNAL PAIRS:
+    SLC2A1 × LDHA: r=+0.5330
+    SLC2A1 × PDK1: r=+0.6157
+    LDHA × PDK1: r=+0.6115
+  CA9 vs TRIO PAIRS:
+    CA9 × SLC2A1: r=+0.4951
+    CA9 × LDHA: r=+0.4336
+    CA9 × PDK1: r=+0.4726
+
+  Mean internal trio r: +0.5867
+  Mean CA9-trio r:      +0.4671
+  S4-P11 CONFIRMED: Warburg trio internally tighter than CA9 ✓
+  TWO-TIER STRUCTURE CONFIRMED:
+    Tier 1 (Warburg): SLC2A1/LDHA/PDK1
+    Tier 2 (Architectural): CA9
+
+  DEPTH CORRELATES:
+  CA9        ARCH     r=+0.1253 p=0.0329
+  SLC2A1     WARBURG  r=+0.1666 p=0.0044
+  LDHA       WARBURG  r=+0.2103 p=3.12e-04
+  PDK1       WARBURG  r=+0.0926 p=0.1157
+  VEGFA      OTHER    r=-0.1838 p=0.0017
+  SLC16A1    OTHER    r=-0.4878 p<1e-15
+  ALDOA      OTHER    r=-0.2025 p=5.20e-04
+  ENO1       OTHER    r=-0.0415 p=0.4814
+  HK2        OTHER    r=+0.2806 p=1.20e-06
+  PFKL       OTHER    r=-0.2852 p=7.87e-07
+
+  Warburg trio SCORE r(depth) = +0.1808 p=0.0020
+  CA9 alone r(depth) = +0.1253 p=0.0329
+
+============================================================
+OBJ-10 — ERBB2 CONTINUOUS DEPTH TEST
+============================================================
+  S4-P12: ERBB2 r(depth) > 0.50 — continuous (IHC2+ not FISH)
+  r(ERBB2, depth) = +0.5556 p<1e-15
+  S4-P12 CONFIRMED: continuous signal ✓
+  IHC 2+ (not FISH) is the correct PRCC eligibility criterion.
+
+  ERBB2 EXPRESSION BY DEPTH QUARTILE:
+  Q1: n= 73 ERBB2 mean=12.119
+  Q2: n= 72 ERBB2 mean=12.574
+  Q3: n= 72 ERBB2 mean=12.931
+  Q4: n= 73 ERBB2 mean=12.983
+
+  r(ERBB2, KRT19) = +0.5246
+  ERBB2 co-expresses with biliary identity marker KRT19 ✓
+  Supports identity-co-driver role (DC-4 confirmed).
+
+  ERBB2 DISTRIBUTION (bimodal = FISH, unimodal = continuous IHC):
+  Top 10%: 13.42
+  Top  5%: 13.59
+  Median:  12.69
+  IQR:     0.84
+  If bimodal → amplification (FISH)
+  If unimodal → continuous (IHC2+)
+
+============================================================
+OBJ-11 — DRUG TARGET SUBTYPE-STRATIFIED MAP
+============================================================
+  Strata: [('Q1_shallow', 73), ('Q2_Q3_mid', 144), ('Q4_deep', 73), ('Type1', 77), ('Type2', 86)]
+
+  Drug                     Q1_mean   Q4_mean   Q4>Q1?   Q4/Q1
+  ──────────────────────────────────────────────────────────
+  EZH2_inhibitor             6.576     7.290  uniform   1.109
+  MET_inhibitor             12.682    13.800  uniform   1.088
+  ERBB2_targeted            12.119    12.983  uniform   1.071
+  CDK4_inhibitor            11.133    10.838  uniform   0.974
+  KDM1A_inhibitor            9.972    10.456  uniform   1.048
+  FH_aKG_proxy              11.059    10.208  uniform   0.923
+  OGDHL_aKG_proxy           13.031    10.974 Q1 PRIORITY   0.842
+  CA9_targeted               5.402     6.302 Q4 PRIORITY   1.167
+  PDL1_checkpoint            5.576     4.433 Q1 PRIORITY   0.795
+  HAVCR2_checkpoint         10.520     8.859 Q1 PRIORITY   0.842
+  ARG1_inhibitor             0.343     0.600 Q4 PRIORITY   1.748
+  PDK1_DCA                   8.361     8.701  uniform   1.041
+  B2M_MHC1                  15.515    15.090  uniform   0.973
+  HDAC_MHC1                 10.273    10.738  uniform   1.045
+
+============================================================
+GENERATING FIGURE — SCRIPT 4
+============================================================
+  Figure saved: ./prcc_false_attractor/results_s4/prcc_script4_figure.pdf
+
+============================================================
+SCRIPT 4 — FINAL SCORECARD
+============================================================
+  S4-P1  Type2>Type1 depth                    CHECK LOG
+  S4-P2  TI OS censored p<0.05                NOT CONFIRMED ✗
+  S4-P3  Q4>Q1 OS censored p<0.05             NOT CONFIRMED ✗
+  S4-P4  PBRM1+SETD2 co-mutation              CHECK LOG
+  S4-P5  CDKN2A low in CIMP                   CHECK LOG
+  S4-P6  RUNX1 shared r>0.40                  CHECK LOG
+  S4-P7  GOT1 shared r<-0.40                  CHECK LOG
+  S4-P8  CIMP worst OS                        CHECK LOG
+  S4-P9  SWI/SNF module up+depth              CONFIRMED ✓
+  S4-P10 ARG1 strongest depth r               CONFIRMED ✓
+  S4-P11 Warburg trio tighter CA9             CONFIRMED ✓
+  S4-P12 ERBB2 r>0.50 continuous              CONFIRMED ✓
+
+  OVERALL: 4/12

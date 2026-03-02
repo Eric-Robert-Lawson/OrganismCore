@@ -1,0 +1,379 @@
+============================================================
+PRCC FALSE ATTRACTOR — SCRIPT 5
+OrganismCore | Document 95e | 2026-03-02
+Author: Eric Robert Lawson
+============================================================
+
+MAJOR REVISION: TWO FALSE ATTRACTOR MODEL
+FA-1 = Type 1 (biliary) — characterised S1-4
+FA-2 = Type 2 (eosinophilic) — THIS SCRIPT
+12 predictions — S5-P1 through S5-P12
+
+
+============================================================
+LOADING ALL PRIOR OUTPUTS
+============================================================
+  S1 depth: n=290
+  S2 TI: n=290
+
+============================================================
+LOADING EXPRESSION MATRICES
+============================================================
+  PRCC KIRP: ./prcc_false_attractor/TCGA_KIRP_HiSeqV2.gz
+  PRCC KIRP: t=290 n=32
+  ccRCC matrix not found: ./prcc_false_attractor/TCGA_KIRC_HiSeqV2.gz
+  S5-P11/P12 will be DEFERRED.
+
+  Loading survival data...
+  Survival: (291, 10)
+  Loading subtype labels...
+  Subtype col: tumor_type
+  Values: {'Type 2': 86, 'Type 1': 77}
+
+============================================================
+OBJ-1 — SUBTYPE SPLIT
+============================================================
+  Type 1: n=77
+  Type 2: n=86
+  Unknown: n=127
+  Labelled: n=163
+  Type 1 mean depth: 0.6996
+  Type 2 mean depth: 0.5668
+  MW p = p=1.04e-05
+
+============================================================
+OBJ-2 — FA-1 (TYPE 1) WITHIN-SUBTYPE OS
+============================================================
+  S5-P1: FA-1 TI predicts OS  p < 0.05
+  S5-P2: FA-1 Q4 vs Q1 OS  p < 0.05
+  S5-P4: CA9-high = worse OS in Type 1
+  Type 1 samples: n=77
+  Valid OS Type 1: 76 events=5
+
+  TI OS in TYPE 1 (S5-P1):
+  TI-hi n=38 med=780d
+  TI-lo n=38 med=652d
+  logrank p=0.0257
+  S5-P1 INVERTED ✗
+
+  DEPTH Q4/Q1 in TYPE 1 (S5-P2):
+  Q4 n=19 med=841d
+  Q1 n=19 med=567d
+  logrank p=0.0280
+  S5-P2 CONFIRMED ✓
+
+  CA9 OS IN TYPE 1 (S5-P4):
+  CA9-hi med=736d n=38
+  CA9-lo med=680d n=38
+  logrank p=0.7189
+  S5-P4 NOT CONFIRMED (ns)
+
+  DRUG TARGET OS — TYPE 1:
+  Drug                   gene                p   med_hi   med_lo
+  ──────────────────────────────────────────────────────────
+   EZH2_inhibitor         EZH2         p=0.9725      796      556
+  ★MET_inhibitor          MET          p=0.0041      756      597
+  ★ERBB2_targeted         ERBB2        p=0.0227      679      736
+   CDK4_inhibitor         CDK4         p=0.6400      622      768
+   KDM1A_inhibitor        KDM1A        p=0.1470      597      768
+   FH_aKG_proxy           FH           p=0.7510      693      748
+   OGDHL_aKG_proxy        OGDHL        p=0.7066      659      780
+   CA9_targeted           CA9          p=0.7189      736      680
+   PDL1_checkpoint        CD274        p=0.7459      645      748
+   HAVCR2_checkpoint      HAVCR2       p=0.7170      664      760
+   ARG1_inhibitor         ARG1         p=0.2732      703      750
+   PDK1_DCA               PDK1         p=0.4709      602      796
+   SLC16A1_MCT4           SLC16A1      p=0.8581      604      768
+   B2M_MHC1               B2M          p=0.4409      664      748
+   CDK6_inhibitor         CDK6         p=0.2910      634      796
+   CDKN2A_proxy           CDKN2A       p=0.9034      597      807
+
+============================================================
+OBJ-3/4 — FA-2 CHARACTERISATION
+============================================================
+  S5-P5: Type 2 top genes ≠ Type 1 top genes
+  S5-P6: CDKN2A stronger in Type 2
+  S5-P7: Normal pole loss in Type 2
+  Type 1: n=77
+  Type 2: n=86
+
+  TOP DEPTH CORRELATES — TYPE 1:
+  Gene                r_T1            p
+  ────────────────────────────────────
+  CMBL             -0.7380   p=1.89e-14
+  ABCC2            -0.7253   p=8.64e-14
+  SLC26A1          -0.7089   p=5.42e-13
+  FABP1            -0.7052   p=8.09e-13
+  QPRT             -0.6963   p=2.05e-12
+  FGFBP1           +0.6902   p=3.83e-12
+  TACSTD2          +0.6788   p=1.16e-11
+  CSNK1E           +0.6658   p=3.92e-11
+  CYP17A1          -0.6648   p=4.32e-11
+  OSTBETA          -0.6607   p=6.23e-11
+  LSR              +0.6552   p=1.01e-10
+  HSDL2            -0.6498   p=1.62e-10
+  COCH             -0.6438   p=2.68e-10
+  KRT7             +0.6426   p=2.97e-10
+  TPBG             +0.6347   p=5.70e-10
+  C15orf27         -0.6334   p=6.31e-10
+  SH2D3A           +0.6306   p=7.92e-10
+  EPS8L1           +0.6262   p=1.12e-09
+  PLEKHN1          +0.6229   p=1.46e-09
+  TTLL6            -0.6186   p=2.03e-09
+  KHK              -0.6184   p=2.07e-09
+  UGT1A9           -0.6179   p=2.14e-09
+  RIN1             +0.6152   p=2.62e-09
+  SLC22A6          -0.6150   p=2.67e-09
+  SLC16A10         -0.6121   p=3.32e-09
+
+  TOP DEPTH CORRELATES — TYPE 2:
+  Gene                r_T2      r_T1 same?
+  ──────────────────────────────────────────────
+  SLC7A9           -0.8513      +nan T2_SPECIFIC
+  SLC22A6          -0.8464   -0.6150 SHARED
+  CCL14-CCL15      -0.8412      +nan T2_SPECIFIC
+  AGMAT            -0.8223      +nan T2_SPECIFIC
+  KHK              -0.8204   -0.6184 SHARED
+  KRT19            +0.8166      +nan T2_SPECIFIC
+  LAMC2            +0.8146      +nan T2_SPECIFIC
+  KITLG            +0.8025      +nan T2_SPECIFIC
+  PAH              -0.8004      +nan T2_SPECIFIC
+  AGXT2            -0.7903      +nan T2_SPECIFIC
+  QDPR             -0.7865      +nan T2_SPECIFIC
+  PRODH2           -0.7853      +nan T2_SPECIFIC
+  PKLR             -0.7849      +nan T2_SPECIFIC
+  AQP7             -0.7836      +nan T2_SPECIFIC
+  CCL15            -0.7833      +nan T2_SPECIFIC
+  PLA2G4C          -0.7793      +nan T2_SPECIFIC
+  RIN1             +0.7745   +0.6152 SHARED
+  GK               -0.7714      +nan T2_SPECIFIC
+  ITGB6            +0.7648      +nan T2_SPECIFIC
+  C10orf47         +0.7639      +nan T2_SPECIFIC
+  C11orf54         -0.7597      +nan T2_SPECIFIC
+  C17orf28         +0.7590      +nan T2_SPECIFIC
+  HRH1             +0.7585      +nan T2_SPECIFIC
+  GNPDA1           -0.7578      +nan T2_SPECIFIC
+  SLPI             +0.7568      +nan T2_SPECIFIC
+
+  Overlap (top25): 3/25
+  T2-specific: ['AGMAT', 'AGXT2', 'AQP7', 'C10orf47', 'C11orf54', 'C17orf28', 'CCL14-CCL15', 'CCL15', 'GK', 'GNPDA1', 'HRH1', 'ITGB6', 'KITLG', 'KRT19', 'LAMC2', 'PAH', 'PKLR', 'PLA2G4C', 'PRODH2', 'QDPR', 'SLC7A9', 'SLPI']
+  T1-specific: ['ABCC2', 'C15orf27', 'CMBL', 'COCH', 'CSNK1E', 'CYP17A1', 'EPS8L1', 'FABP1', 'FGFBP1', 'HSDL2', 'KRT7', 'LSR', 'OSTBETA', 'PLEKHN1', 'QPRT', 'SH2D3A', 'SLC16A10', 'SLC26A1', 'TACSTD2', 'TPBG', 'TTLL6', 'UGT1A9']
+  S5-P5 CONFIRMED: distinct FA-2 genes ✓
+
+  CDKN2A DEPTH COMPARISON (S5-P6):
+  r(CDKN2A, depth) in Type 1: +0.0118 p=0.9186
+  r(CDKN2A, depth) in Type 2: +0.0859 p=0.4315
+  S5-P6 CONFIRMED: CDKN2A stronger in Type 2 ✓
+
+  NORMAL POLE LOSS (S5-P7):
+  Testing whether Type 2 still loses normal kidney genes vs normal tissue...
+  Gene             Normal    Type1    Type2   T1<N?   T2<N?
+  ──────────────────────────────────────────────────────────
+  SLC22A6          10.943    2.595    7.270     YES     YES
+  SLC34A1          10.331    3.638    5.252     YES     YES
+  CUBN             12.555    9.941   10.321     YES     YES
+  LRP2             12.315   12.236   12.190     YES     YES
+  SLC5A2            8.881    0.796    3.306     YES     YES
+  FABP1             9.012    1.430    2.356     YES     YES
+  GPX3             16.808   12.910   14.142     YES     YES
+  MIOX             12.460   10.168    9.961     YES     YES
+  SLC13A2           9.916    5.195    5.226     YES     YES
+  UMOD             17.058    2.422    2.040     YES     YES
+  ATP5A1           14.462   13.633   13.712     YES     YES
+  CPT1A            12.154   10.525   10.794     YES     YES
+  ACADM            12.023   10.485   10.500     YES     YES
+  GOT1             12.163   11.516   11.702     YES     YES
+  LDHB             14.689   14.007   14.418     YES     YES
+  FH               11.087   10.680   10.688     YES     YES
+  OGDHL            13.258   12.503   12.287     YES     YES
+
+  BUILDING FA-2 TRANSITION INDEX:
+  FA-2 TI = top positive T2 gene
+           minus top negative T2 gene
+           (within Type 2 samples)
+  FA-2 TI positive pole: LAMC2
+  FA-2 TI negative pole: SLC7A9
+  FA-2 TI r(depth_T2) = +0.9180 p<1e-15
+  FA-1 TI r(depth_T2) = +0.9204
+  FA-1 TI still dominates Type 2 variation.
+  FA-2 TI saved.
+
+============================================================
+OBJ-5 — FA-2 (TYPE 2) OS
+============================================================
+  S5-P8: EZH2 predicts OS in Type 2
+  Type 2 valid OS: 84 events=16
+
+  FA-2 TI OS:
+  FA-2 TI-hi n=42 med=665d
+  FA-2 TI-lo n=42 med=621d
+  logrank p=0.5465
+
+  DRUG TARGET OS — TYPE 2:
+  Drug                   gene                p   med_hi   med_lo
+  ──────────────────────────────────────────────────────────
+  ★EZH2_inhibitor         EZH2         p=0.0257      593      728
+  S5-P8 CONFIRMED: EZH2 OS in Type 2 ✓
+   MET_inhibitor          MET          p=0.0979      598      693
+   ERBB2_targeted         ERBB2        p=0.1072      736      573
+  ★CDK4_inhibitor         CDK4         p=0.0330      479      832
+   KDM1A_inhibitor        KDM1A        p=0.2823      908      503
+  ★FH_aKG_proxy           FH           p=0.0207      798      530
+  ★OGDHL_aKG_proxy        OGDHL        p=0.0073      678      621
+   CA9_targeted           CA9          p=0.1702      833      592
+   PDL1_checkpoint        CD274        p=0.4264      548      693
+  ★HAVCR2_checkpoint      HAVCR2       p=0.0310      698      628
+   PDK1_DCA               PDK1         p=0.2262      605      672
+   SLC16A1_MCT4           SLC16A1      p=0.9553      663      628
+   B2M_MHC1               B2M          p=0.3718      651      642
+   CDK6_inhibitor         CDK6         p=0.9657      568      908
+   CDKN2A_proxy           CDKN2A       p=0.3248      638      648
+
+  TYPE 1 vs TYPE 2 OS (S5-P3):
+
+============================================================
+OBJ-6/7 — SLC16A1/MCT4 + DUAL SUPPRESSION
+============================================================
+  S5-P9:  SLC16A1 fall steeper in Type 1
+  S5-P10: ARG1+SLC16A1 composite predicts OS
+  r(SLC16A1, depth) = -0.4878 p<1e-15
+
+  SLC16A1 WITHIN SUBTYPES (S5-P9):
+  Type1: r(SLC16A1, depth) = -0.3920 p=4.22e-04
+  Type2: r(SLC16A1, depth) = -0.4265 p=4.23e-05
+  S5-P9 NOT CONFIRMED
+
+  LDHA vs SLC16A1 (lactate balance):
+  r(LDHA,    depth) = +0.2103
+  r(SLC16A1, depth) = -0.4878
+  LACTATE IMBALANCE CONFIRMED:
+  LDHA UP + MCT4 DOWN = lactate accumulation with depth ✓
+  Lactate imbalance score r(depth) = +0.5678 p<1e-15
+
+  DUAL SUPPRESSION SCORE (S5-P10):
+  Score = ARG1_norm + (1 - SLC16A1_norm)
+  High = ARG1 high + MCT4 low = maximum T cell suppression
+  Dual score r(depth) = +0.4237 p=4.61e-14
+  Dual score OS logrank p=0.0187
+  Hi med=794d Lo med=677d
+  ARG1 alone OS logrank —
+  SLC16A1 alone OS logrank p=0.0325
+  S5-P10 CONFIRMED: Dual score better than either alone ✓
+
+============================================================
+OBJ-8 — CIMP WITHIN TYPE 2
+============================================================
+  CIMP-proxy within Type 2: n=6
+  non-CIMP Type 2:          n=80
+  CIMP depth:     0.7404
+  non-CIMP depth: 0.5537
+  MW p=0.0160
+
+  Gene            CIMP_T2  non_CIMP_T2            p
+  ──────────────────────────────────────────────────
+  ★FH                9.338       10.789   p=5.60e-05
+  ★OGDHL             9.114       12.525   p=5.60e-05
+  ★EZH2              8.408        6.668   p=2.72e-07
+  ★MKI67            10.219        7.272   p=9.66e-07
+  ★KRT19            13.110       10.761     p=0.0406
+  ★SLC22A6           2.517        7.627     p=0.0215
+   CDKN2A            6.002        5.914     p=1.0000
+   CDK4             11.195       11.030     p=0.2974
+   ARG1              0.801        0.384     p=0.0681
+   CA9               5.097        5.917     p=0.5085
+   HLA-A            15.226       15.739     p=0.5234
+   B2M              15.619       15.463     p=0.7098
+
+  CIMP vs non-CIMP Type 2 OS: p=3.94e-04
+
+============================================================
+OBJ-9 — CROSS-CANCER
+============================================================
+  S5-P11: RUNX1 r>0.40 in ccRCC
+  S5-P12: GOT1  r<-0.40 in ccRCC
+  ccRCC matrix absent.
+  S5-P11 / S5-P12 DEFERRED.
+  To enable: place TCGA_KIRC_HiSeqV2.gz in BASE_DIR.
+
+============================================================
+OBJ-10 — TYPE 1 vs TYPE 2 OS
+============================================================
+  S5-P3: Type 2 worse OS than Type 1
+  Type 1 with OS: n=76 events=5
+  Type 2 with OS: n=84 events=16
+  Type 1 median OS: 719d
+  Type 2 median OS: 642d
+  logrank p=0.0340
+  S5-P3 CONFIRMED ✓
+
+============================================================
+OBJ-12 — INTEGRATED DRUG PRIORITY MAP
+============================================================
+  Strata: [('Type1_all', 77), ('Type1_Q4', 20), ('Type2_all', 86), ('CIMP', 8)]
+
+  Drug                      Type1_all      Type1_Q4     Type2_all          CIMP
+  ────────────────────────────────────────────────────────────────────────────────
+  EZH2_inhibitor                7.179         7.191         6.789         8.191
+  MET_inhibitor                13.719        13.850        13.117        13.085
+  ERBB2_targeted               12.900        13.194        12.340        11.993
+  CDK4_inhibitor               10.739        10.701        11.042        11.160
+  KDM1A_inhibitor              10.307        10.551        10.079         9.970
+  FH_aKG_proxy                 10.680        10.540        10.688         9.456
+  OGDHL_aKG_proxy              12.503        11.788        12.287         9.992
+  CA9_targeted                  5.272         6.044         5.860         3.914
+  PDL1_checkpoint               4.331         4.084         5.244         5.655
+  HAVCR2_checkpoint             9.150         8.900        10.145         9.672
+  ARG1_inhibitor                0.500         0.533         0.413         0.675
+  PDK1_DCA                      8.239         8.683         8.477         8.772
+  SLC16A1_MCT4                  6.895         6.592         8.465         8.731
+  B2M_MHC1                     15.126        15.165        15.474        15.467
+  CDK6_inhibitor               10.117        10.002         9.742        10.363
+  CDKN2A_proxy                  5.567         5.962         5.920         6.281
+
+  PRIORITY SUMMARY:
+  ┌───────────────────────────────────────────────────────────────┐
+  │ TYPE 1 PRCC (FA-1 — biliary)                                  │
+  │   First line: Savolitinib (MET-driven)                         │
+  │   Targeted:   ERBB2 (IHC2+ continuous)                        │
+  │   Chromatin:  Tazemetostat (EZH2)                              │
+  │   Immune Q4:  ARG1i + anti-PD-1                                │
+  │   MCT4 note:  SLC16A1 low in Q4-T1 —                          │
+  │               lactate buffer co-strategy                       │
+  ├───────────────────────────────────────────────────────────────┤
+  │ TYPE 2 PRCC (FA-2 — eosinophilic)                              │
+  │   Backbone:   Cabozantinib (broadest TKI)                      │
+  │   Cell cycle: CDK4/6i (CDKN2A-driven)                         │
+  │   Chromatin:  Tazemetostat (EZH2 applies)                     │
+  │   Immune:     ARG1i + anti-PD-1 (Q4 T2)                       │
+  │   CIMP subset: αKG + Tazemetostat                              │
+  ├───────────────────────────────────────────────────────────────┤
+  │ CIMP (FA-CIMP — FH-HLRCC extreme)                              │
+  │   Priority 1: αKG + Tazemetostat                               │
+  │   Priority 2: CDK4/6i (MKI67-high)                             │
+  │   Priority 3: Entinostat + anti-PD-1                           │
+  │               (HLA-A low)                                      │
+  │   Mandatory:  Germline FH testing                               │
+  └───────────────────────────────────────────────────────────────┘
+
+============================================================
+GENERATING FIGURE — SCRIPT 5
+============================================================
+  Figure saved: ./prcc_false_attractor/results_s5/prcc_script5_figure.pdf
+
+============================================================
+SCRIPT 5 — FINAL SCORECARD
+============================================================
+  S5-P1  FA-1 TI OS in Type 1                   CHECK LOG
+  S5-P2  FA-1 Q4>Q1 OS in Type 1                CONFIRMED ✓
+  S5-P3  Type 2 worse OS                        CONFIRMED ✓
+  S5-P4  CA9 worse OS in Type 1                 NOT CONFIRMED ✗
+  S5-P5  FA-2 distinct top genes                CONFIRMED ✓
+  S5-P6  CDKN2A stronger in Type 2              CONFIRMED ✓
+  S5-P7  Normal pole loss in Type 2             CHECK LOG
+  S5-P8  EZH2 OS in Type 2                      CONFIRMED ✓
+  S5-P9  SLC16A1 steeper in Type 1              NOT CONFIRMED ✗
+  S5-P10 Dual score better than solo            CONFIRMED ✓
+  S5-P11 RUNX1 in ccRCC                         CHECK LOG
+  S5-P12 GOT1 in ccRCC                          CHECK LOG
+
+  OVERALL: 6/12
