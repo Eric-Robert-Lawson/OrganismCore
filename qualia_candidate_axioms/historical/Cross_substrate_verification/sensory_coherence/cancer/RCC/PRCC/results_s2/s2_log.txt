@@ -1,0 +1,447 @@
+OrganismCore — PRCC False Attractor
+Script 2 — Sub-axes / Circuits / Subtype / Panel / Drug Map
+Document 95b | 2026-03-02
+
+PREDICTIONS LOCKED 2026-03-02:
+  S2-P1: r(ERBB2,KRT19) > 0.50  identity not prolif
+  S2-P2: r(AxisA,AxisB) < 0.80  axes separable
+  S2-P3: r(FH,depth) < -0.45   continuous stratifier
+  S2-P4: r(PBRM1,KRT19) < -0.20  biliary release
+  S2-P5: Type2 depth > Type1   MW p<0.05
+  S2-P6: 3-gene panel r > 0.85
+  S2-P7: CD8A/B2M down, IL2RA up in Q4
+  S2-P8: HIF1A drives CA9 more than EPAS1
+
+
+============================================================
+LOADING SCRIPT 1 OUTPUTS
+============================================================
+  S1 depth loaded: n=290
+    mean=0.6345  std=0.1700  range=[0.1292, 0.9691]
+
+============================================================
+RELOAD TCGA-KIRP EXPRESSION
+============================================================
+  Genes available: 96/96
+  Tumour: n=290  Normal: n=32
+
+============================================================
+OBJ-5 — FETCH SUBTYPE ANNOTATION
+============================================================
+  Trying cBioPortal study: kirp_tcga_pan_can_atlas_2018
+  SAMPLE: n=5058 records
+  Subtype-related cols: ['CANCER_TYPE', 'CANCER_TYPE_DETAILED', 'SAMPLE_TYPE', 'TUMOR_TYPE']
+  Saved: ./prcc_false_attractor/KIRP_cbio_clinical.tsv
+  No histologic type column found in cBioPortal data.
+  Available: ['SAMPLE_ID', 'ANEUPLOIDY_SCORE', 'CANCER_TYPE', 'CANCER_TYPE_DETAILED', 'FRACTION_GENOME_ALTERED', 'MSI_SCORE_MANTIS', 'MSI_SENSOR_SCORE', 'MUTATION_COUNT', 'ONCOTREE_CODE', 'SAMPLE_TYPE', 'SOMATIC_STATUS', 'TBL_SCORE', 'TISSUE_PROSPECTIVE_COLLECTION_INDICATOR', 'TISSUE_RETROSPECTIVE_COLLECTION_INDICATOR', 'TISSUE_SOURCE_SITE', 'TISSUE_SOURCE_SITE_CODE', 'TMB_NONSYNONYMOUS', 'TUMOR_TISSUE_SITE', 'TUMOR_TYPE']
+
+════════════════════════════════════════════════════════════
+PRIMARY ANALYSIS — TCGA-KIRP
+════════════════════════════════════════════════════════════
+
+============================================================
+OBJ-1 — SUB-AXIS SEPARATION
+============================================================
+  Axis A: biliary identity (KRT19/SLC22A6 poles)
+  Axis B: TCA metabolic collapse (FABP1/EZH2 poles)
+  S2-P2: r(Axis_A, Axis_B) < 0.80
+
+  Axis A (biliary identity)
+    pos genes: ['KRT19', 'KRT7', 'ERBB2', 'ITGA3', 'SOX4', 'KRT8', 'KRT18', 'MET', 'PROM1', 'EPCAM']
+    neg genes: ['SLC22A6', 'SLC34A1', 'CUBN', 'LRP2', 'SLC5A2', 'SLC13A2']
+    r vs S1_depth = +0.9474  p<1e-15
+  Axis B (TCA metabolic)
+    pos genes: ['FABP1', 'OGDHL', 'SUCLG1', 'GOT1', 'ACADM', 'CPT1A', 'ATP5A1', 'LDHB', 'FH']
+    neg genes: ['EZH2', 'KDM1A', 'MKI67', 'TOP2A']
+    r vs S1_depth = -0.4788  p<1e-15
+
+  r(Axis_A, Axis_B) = -0.4164  p=1.37e-13
+  S2-P2 CONFIRMED: axes separable ✓  (r < 0.80)
+
+  CROSS-AXIS BRIDGING GENES (r with both axes):
+  Gene             r_AxisA   r_AxisB   bridge
+  ────────────────────────────────────────────
+  SUCLG1           -0.4836   +0.6945   0.4836
+  GOT1             -0.4804   +0.7084   0.4804
+  LDHB             -0.4765   +0.5023   0.4765
+  ACADM            -0.4363   +0.5138   0.4363
+  CUBN             -0.5608   +0.4335   0.4335
+  SLC22A6          -0.8289   +0.4168   0.4168
+  LRP2             -0.4695   +0.4113   0.4113
+  SLC13A2          -0.4026   +0.4434   0.4026
+  HAVCR2           -0.5083   +0.3836   0.3836
+  FH               -0.3835   +0.6412   0.3835
+  MIOX             -0.3825   +0.5762   0.3825
+  ATP5A1           -0.3695   +0.7057   0.3695
+  CPT1A            -0.4007   +0.3660   0.3660
+  ACAT1            -0.3641   +0.7337   0.3641
+  OGDHL            -0.3485   +0.7374   0.3485
+
+============================================================
+OBJ-2 — ERBB2 IDENTITY vs PROLIFERATIVE CIRCUIT
+============================================================
+  S2-P1: r(ERBB2, KRT19) > 0.50 — identity
+         r(ERBB2, MKI67) < 0.25 — not proliferative
+
+  Circuit                               r            p Verdict
+  ─────────────────────────────────────────────────────────────────
+  ERBB2 → KRT19 (identity co-expr)  +0.5246      p<1e-15 IDENTITY ✓
+  ERBB2 → KRT7  (biliary identity)  +0.5511      p<1e-15 IDENTITY ✓
+  ERBB2 → KRT8  (simple epithelial)  +0.3822   p=1.60e-11 IDENTITY ✓
+  ERBB2 → KRT18 (simple epithelial)  +0.3331   p=6.08e-09 IDENTITY ✓
+  ERBB2 → MKI67 (proliferation)   -0.1703     p=0.0036 WEAK
+  ERBB2 → TOP2A (replication)     -0.0923     p=0.1166 WEAK
+  ERBB2 → CDK4  (cell cycle)      -0.3680   p=9.96e-11 PROLIF ✓
+  ERBB2 → MET   (RTK co-activation)  +0.3485   p=1.05e-09 CONNECTED
+  ERBB2 → EPCAM (epithelial identity)  +0.3326   p=6.41e-09 IDENTITY ✓
+  ERBB2 → SOX4  (progenitor TF)   +0.5403      p<1e-15 IDENTITY ✓
+  ERBB2 → EZH2  (chromatin lock)  +0.1358     p=0.0207 WEAK
+  ERBB2 → OAT1  (PT identity lost)  -0.4899      p<1e-15 CONNECTED
+
+  S2-P1 FORMAL TEST:
+    r(ERBB2, KRT19) = +0.5246  (pred > 0.50) → CONFIRMED ✓
+    r(ERBB2, MKI67) = -0.1703  (pred < 0.25) → CONFIRMED ✓
+
+============================================================
+OBJ-3 — FH AS CONTINUOUS DEPTH STRATIFIER
+============================================================
+  S2-P3: r(FH, depth) < -0.45
+         FH-low quartile deeper than FH-high
+
+  r(FH, S1_depth) = -0.4513  p<1e-15
+  S2-P3 test: pred r < -0.45 → CONFIRMED ✓
+  FH-low  quartile: n=73  mean depth=0.7371
+  FH-high quartile: n=73  mean depth=0.5335
+  Direction: FH-low DEEPER
+  MW p = p=1.52e-12
+
+  FH CIRCUIT CORRELATIONS (TCA-chromatin axis):
+  Gene             r_vs_FH            p
+  ──────────────────────────────────────
+  OGDHL            +0.6014      p<1e-15
+  SUCLG1           +0.6395      p<1e-15
+  GOT1             +0.6685      p<1e-15
+  TET2             -0.3408   p=2.55e-09
+  EZH2             -0.2930   p=3.78e-07
+  SETD2            -0.2385   p=4.08e-05
+  DNMT3A           -0.0759     p=0.1975
+  HDAC1            -0.0522     p=0.3753
+  KDM1A            -0.1112     p=0.0587
+  SLC13A2          +0.3993   p=1.59e-12
+  FABP1            +0.2015   p=5.55e-04
+
+============================================================
+OBJ-4 — PBRM1 → BILIARY IDENTITY CIRCUIT
+============================================================
+  S2-P4: r(PBRM1, KRT19) < -0.20
+         r(PBRM1, depth) < -0.20
+  PBRM1 loss releases biliary identity genes?
+
+  r(PBRM1, depth) = +0.2396  p=3.75e-05
+  S2-P4 depth test: pred < -0.20 → NOT CONFIRMED ✗
+
+  Gene             r vs PBRM1            p note
+  ────────────────────────────────────────────────────────────
+  KRT19               +0.1439     p=0.0142 biliary cytokeratin  NOT CONFIRMED ✗
+  KRT7                +0.1443     p=0.0139 biliary cytokeratin  NOT CONFIRMED ✗
+  SLC22A6             -0.2457   p=2.32e-05 PT identity — expected POSITIVE  
+  SLC34A1             -0.2244   p=1.16e-04 PT identity — expected POSITIVE  
+  EZH2                +0.0512     p=0.3854 chromatin lock — expected NEGATIVE  
+  SETD2               +0.7138      p<1e-15 H3K36me3 writer  
+  BAP1                +0.1400     p=0.0170 deubiquitinase partner  
+  ARID1A              +0.6421      p<1e-15 SWI/SNF subunit  
+  SMARCA4             -0.0097     p=0.8691 SWI/SNF ATPase  
+  FABP1               -0.2050   p=4.44e-04 PT metabolic  
+
+============================================================
+OBJ-5 — SUBTYPE DEPTH STRATIFICATION
+============================================================
+  S2-P5: Type 2 depth > Type 1 depth  MW p < 0.05
+
+
+  MET-PROXY STRATIFICATION:
+  (Type 1 proxy: MET-high | Type 2 proxy: FH-low)
+  MET-high (Type 1 proxy): n=96  mean=0.7172
+  FH-low   (Type 2 proxy): n=96   mean=0.7311
+  Direction: FH-low DEEPER  MW p = p=0.3418
+
+  KEY GENE EXPRESSION — PROXY SUBTYPES:
+  Gene              MET-hi (T1)    FH-low (T2)
+  ─────────────────────────────────────────────
+  MET                    14.388         13.672
+  KRT19                  13.248         13.236
+  ERBB2                  12.945         12.861
+  EZH2                    7.119          7.187
+  SETD2                  10.668         10.694
+  FH                     10.547         10.021
+  OGDHL                  12.359         11.219
+  SLC22A6                 2.825          2.591
+  CDKN2A                  5.684          5.653
+  PBRM1                   9.457          9.536
+  BAP1                   10.960         11.040
+  VIM                    15.140         15.042
+
+============================================================
+OBJ-6 — 3-GENE CLINICAL PANEL OPTIMISATION
+============================================================
+  S2-P6: r > 0.85  target
+  Predicted panel: KRT19/SLC22A6/ERBB2
+  Exhaustive search over top candidates from S1
+
+  Predicted panel (KRT19/ERBB2 + SLC22A6): r=+0.9031
+  Alternative    (KRT19 + SLC22A6/FABP1):  r=+0.9266
+
+  2-GENE PANELS (1 pos + 1 neg):
+  Pos            Neg                   r
+  ──────────────────────────────────────
+  KRT19          SLC22A6         +0.9046
+  KRT7           SLC22A6         +0.8749
+  KRT19          FABP1           +0.8693
+  KRT19          SLC34A1         +0.8664
+  ITGA3          SLC22A6         +0.8577
+  KRT7           CUBN            +0.8519
+  CD44           SLC22A6         +0.8488
+  KRT19          SLC5A2          +0.8408
+  KRT19          CUBN            +0.8309
+  ERBB2          SLC22A6         +0.8185
+
+  3-GENE PANELS (exhaustive top-15 candidates):
+  Panel                                             r
+  ────────────────────────────────────────────────────
+  ★ KRT19 / SLC22A6+FABP1                     +0.9266
+  ★ KRT7+CD44 / SLC22A6                       +0.9261
+  ★ KRT19+CD44 / SLC22A6                      +0.9239
+  ★ KRT19 / FABP1+SLC34A1                     +0.9239
+  ★ KRT19 / SLC22A6+SLC34A1                   +0.9219
+  ★ KRT19 / SLC22A6+SUCLG1                    +0.9196
+  ★ KRT19+ITGA3 / SLC22A6                     +0.9196
+  ★ KRT19 / SLC22A6+FH                        +0.9175
+  ★ KRT19 / SLC22A6+CUBN                      +0.9165
+  ★ KRT19 / SLC5A2+CUBN                       +0.9162
+  ★ KRT19 / SLC22A6+GOT1                      +0.9162
+  ★ KRT19 / SLC22A6+ACADM                     +0.9151
+  ★ KRT19+KRT7 / SLC22A6                      +0.9146
+  ★ KRT19 / SLC22A6+LDHB                      +0.9131
+  ★ KRT7+ITGA3 / SLC22A6                      +0.9104
+
+  BEST 3-GENE PANEL:
+    Positive: ['KRT19']
+    Negative: ['SLC22A6', 'FABP1']
+    r = +0.9266
+    S2-P6 CONFIRMED ✓  r >= 0.85
+
+============================================================
+OBJ-7 — IMMUNE ARCHITECTURE
+============================================================
+  S2-P7: CD8A & B2M depth-negative
+         IL2RA depth-positive
+         PD-L1 lower in Q4 — immune exclusion
+
+  Gene             r_depth            p   Q4_mean   Q1_mean   Q4/Q1 Verdict
+  ────────────────────────────────────────────────────────────────────────────────
+  CD274            -0.3193   p=2.70e-08     4.433     5.576   0.795 PDL1 DOWN ✓
+  PDCD1            +0.0148     p=0.8014     4.421     4.378   1.010 
+  HAVCR2           -0.3961   p=2.47e-12     8.859    10.520   0.842 TIM3 DOWN ✓
+  TIGIT            -0.0369     p=0.5314     3.729     3.794   0.983 
+  CD8A             -0.0334     p=0.5711     6.418     6.524   0.984 
+  CD8B             -0.0693     p=0.2397     4.283     4.558   0.940 
+  FOXP3            -0.0026     p=0.9650     3.524     3.509   1.004 
+  IL2RA            +0.1249     p=0.0335     4.177     3.500   1.193 
+  B2M              -0.2218   p=1.40e-04    15.090    15.515   0.973 MHC-I DOWN ✓
+  HLA-A            -0.2366   p=4.71e-05    15.177    15.735   0.965 
+  TAP1             -0.0877     p=0.1364    11.264    11.357   0.992 
+  IFI16            +0.1654     p=0.0047    10.371     9.885   1.049 
+  IFNG             -0.0425     p=0.4712     1.044     1.052   0.992 
+  CD4              -0.0904     p=0.1247     9.725    10.073   0.966 
+  CD68             -0.0922     p=0.1173    12.125    12.533   0.967 
+  ARG1             +0.0760     p=0.1971     0.600     0.343   1.748 
+
+  S2-P7 SCORECARD:
+    r(CD8A, depth) = -0.0334  (pred < -0.20) → NOT CONFIRMED ✗
+    r(B2M,  depth) = -0.2218  (pred < -0.15) → CONFIRMED ✓
+    r(IL2RA,depth) = +0.1249 (pred > +0.20) → NOT CONFIRMED ✗
+    PDL1 Q4/Q1     = 0.795   (pred < 1.0)   → CONFIRMED ✓
+
+============================================================
+OBJ-8 — DRUG TARGET DEPTH MAP
+============================================================
+  Q1/Q2/Q3/Q4 expression for each drug target gene.
+  States geometry-derived drug priority per stratum.
+
+  Q1 n=73  Q2 n=72  Q3 n=72  Q4 n=73
+
+  Gene           Drug                        Q1      Q2      Q3      Q4   Q4/Q1
+  ───────────────────────────────────────────────────────────────────────────
+  EZH2           EZH2_inhibitor           6.576   6.723   7.108   7.290   1.109▲
+  MET            MET_inhibitor           12.682  13.360  13.737  13.800   1.088—
+  ERBB2          ERBB2_targeted          12.119  12.574  12.931  12.983   1.071—
+  ERBB3          ERBB2_targeted          11.543  11.788  12.067  11.613   1.006—
+  CDK4           CDK46_inhibitor         11.133  10.811  10.758  10.838   0.974—
+  CCND1          CDK46_inhibitor         11.607  10.905  10.915  11.868   1.022—
+  CDKN2A         CDK46_inhibitor          6.005   5.126   5.641   6.063   1.010—
+  KDM1A          KDM1A_inhibitor          9.972  10.108  10.234  10.456   1.048—
+  FH             aKG_combination         11.059  10.857  10.672  10.208   0.923—
+  OGDHL          aKG_combination         13.031  13.049  12.648  10.974   0.842▼
+  SUCLG1         aKG_combination         12.138  11.794  11.510  11.180   0.921—
+  TET2           aKG_combination          8.161   8.567   8.660   8.732   1.070—
+  EPAS1          NOT_belzutifan          11.423  11.126  10.799  11.312   0.990—
+  VHL            NOT_belzutifan           8.777   8.958   8.865   8.932   1.018—
+  CA9            NOT_belzutifan           5.402   4.815   5.707   6.302   1.167▲
+
+  DRUG MAP INTERPRETATION:
+  ┌───────────────────────────────────────────────────┐
+  │ Q1 (shallowest):                                  │
+  │   MET inhibitor — identity disruption             │
+  │   VEGFR/mTOR — anti-proliferative (current SOC)  │
+  ├───────────────────────────────────────────────────┤
+  │ Q2/Q3 (intermediate):                             │
+  │   EZH2 inhibitor — epigenetic lock opener         │
+  │   KDM1A inhibitor — H3K4me restoration           │
+  │   CDK4/6 inhibitor — CDKN2A paradox              │
+  ├───────────────────────────────────────────────────┤
+  │ Q4 (deepest):                                     │
+  │   ERBB2-targeted (HER2-high deep PRCC)           │
+  │   αKG + EZH2i combination (FH-low)               │
+  │   Anti-CD25/IL2RA (Treg dominant)                │
+  │   NOT anti-PD-L1 (PD-L1 falls with depth)        │
+  │   NOT belzutifan (EPAS1 suppressed)              │
+  └───────────────────────────────────────────────────┘
+
+============================================================
+OBJ-9 — S1 / S2 DEPTH CONCORDANCE
+============================================================
+  Compute alternative S2 depth anchors.
+  Test concordance with S1 depth score.
+
+  S2 Axis A depth (KRT19/SLC22A6):
+    r(S1_depth, S2a_depth) = +0.9046  p<1e-15
+    S2a mean=0.7044  std=0.2024
+
+  TRANSITION INDEX (TI):
+  TI = norm(KRT19) - norm(SLC22A6)
+  High TI = KRT19-dominant = deep false attractor
+  Low TI  = SLC22A6-dominant = normal PT identity
+  TI mean   = 0.4088
+  TI median = 0.5502
+  TI std    = 0.4049
+  TI range  = [-0.930, 1.000]
+  r(TI, S1_depth) = +0.9046  p<1e-15
+  Mean TI > 0: average PRCC tumour is KRT19-dominant (biliary identity)
+
+  TOP TI CORRELATES (same format as ccRCC GOT1/RUNX1 TI):
+  Gene                r_TI            p
+  ──────────────────────────────────────
+  SLC22A6          -0.9307      p<1e-15
+  KRT19            +0.8156      p<1e-15
+  SLC5A2           -0.6824      p<1e-15
+  FABP1            -0.6110      p<1e-15
+  GPX3             -0.6052      p<1e-15
+  SLC34A1          -0.5936      p<1e-15
+  ERBB2            +0.5680      p<1e-15
+  CUBN             -0.5549      p<1e-15
+  KRT7             +0.5486      p<1e-15
+  SLC16A1          -0.5316      p<1e-15
+  LDHB             -0.4679      p<1e-15
+  SOX4             +0.4476   p=1.07e-15
+  GOT1             -0.4469   p=1.21e-15
+  HAVCR2           -0.4439   p=1.98e-15
+  HMOX1            -0.4253   p=3.62e-14
+  AXL              +0.4237   p=4.62e-14
+  LRP2             -0.4206   p=7.37e-14
+  SUCLG1           -0.4133   p=2.15e-13
+  ACADM            -0.4116   p=2.76e-13
+  KDM1A            +0.4105   p=3.26e-13
+
+============================================================
+OBJ-10 — TWIST1 WITHIN-TUMOUR EMT AXIS
+============================================================
+  Is TWIST1 separable from the biliary KRT19 axis?
+  TWIST1 Q4/Q1=1.563 despite being DOWN vs normal.
+
+  Gene             r_depth            p   r_KRT19  r_TWIST1
+  ──────────────────────────────────────────────────────────
+  TWIST1           +0.2105                +0.1111   +1.0000
+  ZEB1             +0.1970                +0.0271   +0.3842
+  ZEB2             -0.0210                -0.1265   +0.1371
+  SNAI1            +0.1584                +0.0853   +0.5756
+  SNAI2            +0.1031                +0.0696   +0.6120
+  VIM              +0.0586                +0.0010   +0.1189
+  CDH1             +0.0918                +0.0483   +0.2531
+  CDH2             +0.0015                -0.0532   -0.1461
+  FN1              -0.1542                -0.2201   +0.3950
+  ACTA2            -0.0123                -0.0620   +0.6364
+
+  EMT score (VIM/TWIST1/ZEB1/SNAI2 mean):
+    r(EMT_score, S1_depth) = +0.2057  p=4.24e-04
+    r(EMT_score, KRT19)    = +0.0898
+  VERDICT: Biliary identity axis (KRT19) is STRONGER depth driver than EMT axis.
+  TWIST1 is a secondary within-tumour signal, not the primary axis.
+
+============================================================
+OBJ-11 — CA9 MECHANISM (VHL vs HIF1A)
+============================================================
+  S2-P8: r(CA9, HIF1A) > r(CA9, EPAS1)
+         VHL→CA9 BROKEN confirmed in S1
+         What DOES drive CA9 in PRCC?
+
+  Gene           r vs CA9            p note
+  ────────────────────────────────────────────────────
+  EPAS1           +0.1092     p=0.0633 
+  HIF1A           -0.0189     p=0.7481 
+  VHL             -0.0978     p=0.0965 BROKEN (confirmed)
+  LDHA            +0.4336   p=1.01e-14 
+  SLC2A1          +0.4951      p<1e-15 
+  VEGFA           +0.3757   p=3.76e-11 
+  PDK1            +0.4726      p<1e-15 
+  KRT19           +0.1021     p=0.0827 
+  MET             -0.0387     p=0.5115 
+  ERBB2           +0.0499     p=0.3973 
+
+  S2-P8 FORMAL TEST:
+    r(CA9, HIF1A) = -0.0189
+    r(CA9, EPAS1) = +0.1092
+    S2-P8 NOT CONFIRMED: EPAS1 >= HIF1A ✗
+  r(CA9, depth) = +0.1253  p=0.0329
+
+============================================================
+GENERATING FIGURE — SCRIPT 2
+============================================================
+  Figure saved: ./prcc_false_attractor/results_s2/prcc_s2_figure.png
+
+============================================================
+SCRIPT 2 COMPLETE
+============================================================
+  Outputs: ./prcc_false_attractor/results_s2/
+    drug_map.csv                                                1731 bytes
+    panel_results.csv                                           1898 bytes
+    prcc_s2_figure.png                                        852567 bytes
+    transition_index.csv                                       15734 bytes
+
+  ┌──────────────────────────────────────────────────┐
+  │  READING ORDER FOR DOCUMENT 95b                  │
+  │                                                  │
+  │  1. OBJ-1: Are the two axes separable?          │
+  │     r(Axis_A, Axis_B) — read the number.        │
+  │     What bridges them?                          │
+  │                                                  │
+  │  2. OBJ-2: Is ERBB2 identity or proliferative?  │
+  │     r(ERBB2,KRT19) vs r(ERBB2,MKI67)            │
+  │     This determines the drug mechanism.         │
+  │                                                  │
+  │  3. OBJ-3: Is FH a continuous depth sensor?     │
+  │     FH-low depth vs FH-high depth. Drug proxy.  │
+  │                                                  │
+  │  4. OBJ-6: Did the panel hit r > 0.85?          │
+  │     Read best_panel. Is KRT19 in it?            │
+  │     Is ERBB2 the third gene?                    │
+  │                                                  │
+  │  5. OBJ-7: Immune exclusion confirmed?          │
+  │     CD8A down? IL2RA up? PDL1 down?             │
+  │     Anti-PD-L1 contra-indicated in Q4?          │
+  │                                                  │
+  │  6. OBJ-9: Transition Index mean.               │
+  │     >0 = KRT19-dominant (biliary locked)        │
+  │     <0 = SLC22A6-dominant (PT identity partial) │
+  │                                                  │
+  │  7. Write Document 95b before Script 3.         │
+  └──────────────────────────────────────────────────┘

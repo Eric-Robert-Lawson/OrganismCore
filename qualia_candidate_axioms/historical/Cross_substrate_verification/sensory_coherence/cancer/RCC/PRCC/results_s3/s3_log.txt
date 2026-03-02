@@ -1,0 +1,393 @@
+============================================================
+PRCC FALSE ATTRACTOR — SCRIPT 3
+OrganismCore | Document 95c | 2026-03-02
+Author: Eric Robert Lawson
+============================================================
+
+PREDICTIONS LOCKED 2026-03-02 BEFORE RUN
+FRAMEWORK CORRECTIONS FROM 95-LC / 95-DLC:
+  FC-1 Subtypes from GDC KIRP_2015
+  FC-2 αKG novelty = FH RNA stratification
+  FC-3 CA9 = HIF protein not RNA
+  FC-4 SAVOIR 27% ORR context
+  FC-5 CDKN2A methylation vs RNA
+  DC-1 Anti-CD25 downgraded
+  DC-2 CSF1R → repolarisation
+  DC-3 PDK1 isoform conflict
+  DC-4 ERBB2 IHC2+ criterion
+  DC-5 αKG AIM2 safety
+
+============================================================
+LOADING SCRIPT 1 AND SCRIPT 2 OUTPUTS
+============================================================
+  S1 depth: n=290
+  S2 TI:    n=290
+
+============================================================
+RELOAD EXPRESSION MATRIX
+============================================================
+  Genes: 129/131 available
+  Missing: ['IGHG1', 'IGHG2']
+  Tumour: n=290  Normal: n=32
+
+============================================================
+LOAD CLINICAL DATA — OS
+============================================================
+  Shape: (352, 108)
+  Columns (first 20): ['_INTEGRATION', '_PATIENT', '_cohort', '_primary_disease', '_primary_site', 'additional_pharmaceutical_therapy', 'additional_radiation_therapy', 'additional_surgery_locoregional_procedure', 'additional_surgery_metastatic_procedure', 'age_at_initial_pathologic_diagnosis', 'bcr_followup_barcode', 'bcr_patient_barcode', 'bcr_sample_barcode', 'clinical_M', 'clinical_N', 'clinical_T', 'clinical_stage', 'days_to_additional_surgery_locoregional_procedure', 'days_to_additional_surgery_metastatic_procedure', 'days_to_birth']
+
+============================================================
+OBJ-1 — FORMAL SUBTYPE ANNOTATION
+============================================================
+  S3-P1: Type 2 depth > Type 1  MW p < 0.05
+  Using cBioPortal col: TUMOR_TYPE
+  Values: {'Kidney Papillary Renal Cell Carcinoma': 283}
+  Applying subtype col: TUMOR_TYPE
+    Kidney Papillary Renal Cell Carcinoma: n=283
+    UNKNOWN: n=7
+  Type1: n=0  Type2: n=0  CIMP: n=0
+  Insufficient labelled samples.
+
+============================================================
+OBJ-2/3 — DECONVOLUTION + TWIST1 STROMAL TEST
+============================================================
+  S3-P2: r(TWIST1, stromal_score) > 0.40
+  Stromal genes: 20/20
+  Immune genes:  16/18
+  Stromal r(depth) = +0.1325  p=0.0240
+  Immune r(depth) = -0.0338  p=0.5659
+
+  TWIST1 STROMAL TEST:
+  r(TWIST1, stromal) = +0.7293  p<1e-15
+  r(TWIST1, depth)   = +0.2105
+  r(TWIST1, KRT19)   = +0.1111
+  S3-P2 CONFIRMED: TWIST1 = stromal ✓
+
+  Gene          r_stromal    r_depth verdict
+  ──────────────────────────────────────────────
+  TWIST1          +0.7293    +0.2105 STROMAL
+  ACTA2           +0.8316    -0.0123 STROMAL
+  FAP             +0.9203    +0.1734 STROMAL
+  VIM             +0.1970    +0.0586 MIXED
+  ZEB1            +0.3884    +0.1970 STROMAL
+  SNAI1           +0.7123    +0.1584 STROMAL
+  SNAI2           +0.7830    +0.1031 STROMAL
+  FN1             +0.5881    -0.1542 STROMAL
+  CDH2            -0.1067    +0.0015 EPITHELIAL
+  S100A4          +0.3943    +0.0238 STROMAL
+
+============================================================
+OBJ-4/5/8/10 — OVERALL SURVIVAL
+============================================================
+  S3-P4: Axis A + B independent OS predictors
+  S3-P8: TI high = worse OS  p < 0.05
+  OS time:  days_to_death
+  OS event: vital_status
+  Valid OS records: 44 / 290
+  OS range: [122, 2941] days
+  Events:   44 (100.0%)
+
+  S3-P8 — TI OS:
+  TI-high n=22 med=647d
+  TI-low  n=22 med=641d
+  logrank p=0.2530
+  S3-P8 NOT CONFIRMED (ns)
+
+  DEPTH QUARTILE OS:
+  Q4 n=11 med=597d
+  Q1 n=11 med=589d
+  logrank p=0.8963
+
+  AXIS A + B OS (S3-P4):
+  Axis_A high vs low: p=0.8101
+  Axis_B high vs low: p=0.0199
+
+  OBJ-10 DRUG TARGET OS:
+  Drug                   gene                p   med_hi   med_lo
+  ──────────────────────────────────────────────────────────────
+  ★EZH2_inhibitor         EZH2         p=0.0483      503     1188
+   MET_inhibitor          MET          p=0.5261      747      610
+   ERBB2_targeted         ERBB2        p=0.1779      865      484
+   CDK4_inhibitor         CDK4         p=0.3971      500     1103
+   KDM1A_inhibitor        KDM1A        p=0.6772      747      606
+   FH_aKG_proxy           FH           p=0.7028      610      747
+  ★OGDHL_aKG_proxy        OGDHL        p=0.0309     1192      441
+   CA9_targeted           CA9          p=0.6635      628      710
+   PDL1_checkpoint        CD274        p=0.1365      678      593
+   HAVCR2_checkpoint      HAVCR2       p=0.9514      606      747
+
+============================================================
+OBJ-6 — MUTATION DATA
+============================================================
+  S3-P5: PBRM1 mut co-segregates with SETD2 + Axis B
+  Fetching mutations: kirp_tcga...
+  HTTP 400
+  Fetching mutations: kirp_tcga_pub...
+  HTTP 400
+  Mutation API unavailable — expression proxy.
+  Expression proxy mutation status:
+  Col                       n_mut      d_mut       d_wt
+  SETD2_proxy_mut              44     0.5372     0.6520
+  FH_proxy_mut                 44     0.7735     0.6097
+  BAP1_proxy_mut               44     0.5825     0.6439
+  PBRM1_proxy_mut              44     0.5800     0.6443
+  VHL_proxy_mut                44     0.6369     0.6341
+
+============================================================
+OBJ-7 — PDK1/CA9 HYPOXIA MODULE
+============================================================
+  S3-P6: core pairwise r > 0.50
+  DC-3:  PDK1 isoform conflict resolution
+  Module genes: ['CA9', 'SLC2A1', 'LDHA', 'PDK1', 'VEGFA', 'SLC16A1', 'ALDOA', 'ENO1', 'PFKL', 'HK2']
+
+  Gene A       Gene B              r            p core?
+  ──────────────────────────────────────────────────
+  CA9          SLC2A1        +0.4951      p<1e-15 ★ CORE
+  CA9          LDHA          +0.4336   p=1.01e-14 ★ CORE
+  CA9          PDK1          +0.4726      p<1e-15 ★ CORE
+  CA9          VEGFA         +0.3757   p=3.76e-11 
+  CA9          SLC16A1       +0.1496     p=0.0108 
+  CA9          ALDOA         +0.3246   p=1.54e-08 
+  CA9          ENO1          +0.4221   p=5.90e-14 
+  CA9          PFKL          +0.2237   p=1.22e-04 
+  CA9          HK2           +0.4578      p<1e-15 
+  SLC2A1       LDHA          +0.5330      p<1e-15 ★ CORE
+  SLC2A1       PDK1          +0.6157      p<1e-15 ★ CORE
+  SLC2A1       VEGFA         +0.5896      p<1e-15 
+  SLC2A1       SLC16A1       +0.2543   p=1.16e-05 
+  SLC2A1       ALDOA         +0.3027   p=1.47e-07 
+  SLC2A1       ENO1          +0.2971   p=2.55e-07 
+  SLC2A1       PFKL          +0.3458   p=1.45e-09 
+  SLC2A1       HK2           +0.4935      p<1e-15 
+  LDHA         PDK1          +0.6115      p<1e-15 ★ CORE
+  LDHA         VEGFA         +0.3463   p=1.36e-09 
+  LDHA         SLC16A1       +0.1832     p=0.0017 
+  LDHA         ALDOA         +0.3560   p=4.33e-10 
+  LDHA         ENO1          +0.4033   p=9.11e-13 
+  LDHA         PFKL          +0.0785     p=0.1827 
+  LDHA         HK2           +0.4828      p<1e-15 
+  PDK1         VEGFA         +0.4022   p=1.06e-12 
+  PDK1         SLC16A1       +0.3144   p=4.48e-08 
+  PDK1         ALDOA         +0.2522   p=1.38e-05 
+  PDK1         ENO1          +0.2960   p=2.83e-07 
+  PDK1         PFKL          +0.1487     p=0.0112 
+  PDK1         HK2           +0.4497      p<1e-15 
+  VEGFA        SLC16A1       +0.4289   p=2.09e-14 
+  VEGFA        ALDOA         +0.1876     p=0.0013 
+  VEGFA        ENO1          +0.0152     p=0.7970 
+  VEGFA        PFKL          +0.2807   p=1.18e-06 
+  VEGFA        HK2           +0.1502     p=0.0105 
+  SLC16A1      ALDOA         +0.3164   p=3.64e-08 
+  SLC16A1      ENO1          +0.1330     p=0.0235 
+  SLC16A1      PFKL          +0.2995   p=2.01e-07 
+  SLC16A1      HK2           +0.0867     p=0.1406 
+  ALDOA        ENO1          +0.5616      p<1e-15 
+  ALDOA        PFKL          +0.3933   p=3.66e-12 
+  ALDOA        HK2           +0.2052   p=4.37e-04 
+  ENO1         PFKL          +0.2527   p=1.33e-05 
+  ENO1         HK2           +0.2766   p=1.72e-06 
+  PFKL         HK2           +0.1110     p=0.0591 
+
+  S3-P6: 3/6 core pairs r>0.50
+  S3-P6 PARTIAL (3/6)
+
+  DC-3 — PDK ISOFORM DEPTH CORRELATES:
+  Isoform    r_depth    r_CA9   r_LDHA  r_GLUT1 module?
+  ───────────────────────────────────────────────────────
+  PDK1       +0.0926  +0.4726  +0.6115  +0.6157 ARCH_HYPOXIA
+  PDK2       -0.3672  -0.0775  -0.2873  -0.3126 OXPHOS
+  PDK3       -0.2194  +0.1338  +0.2304  +0.3834 MIXED
+  PDK4       -0.0654  +0.0266  +0.2062  +0.2065 OXPHOS
+
+  DC-3 CONFLICT:
+  PDK1-hi+CA9-hi (arch): n=57  depth=0.6827
+  PDK1-hi+CA9-lo (oxph): n=16  depth=0.6239
+  MW p=0.2224
+  DC-3 RESOLVED: arch-hypoxia PDK1 is deeper ✓
+  DCA target = PDK1+CA9 co-high only.
+
+============================================================
+OBJ-8 — CDKN2A/CDK4 PARADOX
+============================================================
+  S3-P7: CDKN2A and CDK4 co-occur (not anti-corr)
+  FC-5:  CDKN2A RNA low in CIMP
+  r(CDKN2A, CDK4) = +0.1005  p=0.0877
+  CO-OCCUR (positive r)
+  S3-P7 CONFIRMED: oncogenic stress bypass ✓
+
+  CDKN2A-hi + CDK4-hi (PARADOX): n= 76  d=0.6033
+  CDKN2A-hi + CDK4-lo:           n= 69  d=0.6957
+  CDKN2A-lo + CDK4-lo:           n= 76  d=0.6425
+  CDKN2A-lo + CDK4-hi:           n= 69  d=0.5990
+
+  FC-5 — CDKN2A RNA IN CIMP PROXY:
+  CIMP proxy n=14
+  CDKN2A in CIMP:     5.467
+  CDKN2A in non-CIMP: 5.723
+  MW p=0.7365
+  FC-5 NOT CONFIRMED
+
+  CELL CYCLE PANEL vs DEPTH:
+  Gene           r_depth    r_CDK4
+  CDKN2A         +0.0359   +0.1005
+  CDK4           -0.2229   +1.0000
+  CDK6           +0.1458   -0.1934
+  CCND1          +0.0278   -0.0423
+  CDKN1A         +0.2574   -0.1726
+  CDKN1B         +0.2304   +0.1430
+  MKI67          -0.0241   +0.3350
+  TOP2A          +0.0181   +0.3198
+  CCNE1          +0.0391   +0.4211
+
+============================================================
+OBJ-9 — CROSS-CANCER COMPARISON
+============================================================
+  Gene                r_TI   r_depth  pole
+  ──────────────────────────────────────────────────
+  KRT19            +0.8156   +0.8031  PRCC_ATTRACTOR
+  ERBB2            +0.5680   +0.5556  PRCC_ATTRACTOR
+  KRT7             +0.5486   +0.6432  PRCC_ATTRACTOR
+  SOX4             +0.4476   +0.4634  PRCC_ATTRACTOR
+  AXL              +0.4237   +0.4559  PRCC_ATTRACTOR
+  SLC22A6          -0.9307   -0.8006  PRCC_NORM_POLE
+  FABP1            -0.6110   -0.6710  PRCC_NORM_POLE
+  SLC34A1          -0.5936   -0.6371  PRCC_NORM_POLE
+  GPX3             -0.6052   -0.5251  PRCC_NORM_POLE
+  CUBN             -0.5549   -0.5863  PRCC_NORM_POLE
+  GOT1             -0.4469   -0.5193  PRCC_NORM_POLE
+  RUNX1            +0.4661   +0.5904  PRCC_ATTRACTOR
+  LOXL2            +0.2207   +0.2754  ccRCC_ATTRACTOR
+  TGFB1            +0.1460   +0.2186  ccRCC_ATTRACTOR
+  FBP1             -0.2346   -0.2540  
+  UMOD             +0.0515   +0.0236  
+  MIOX             -0.3593   -0.4288  PRCC_NORM_POLE
+  TWIST1           +0.1378   +0.2105  
+  VIM              -0.0852   +0.0586  
+  FH               -0.3488   -0.4513  PRCC_NORM_POLE
+  EZH2             +0.3301   +0.3075  PRCC_ATTRACTOR
+  PBRM1            +0.2328   +0.2396  
+  SETD2            +0.3441   +0.3075  PRCC_ATTRACTOR
+  MET              +0.3931   +0.4336  PRCC_ATTRACTOR
+  CA9              +0.0336   +0.1253  
+  EPAS1            -0.1352   -0.0815  
+  HIF1A            -0.1217   -0.0189  
+  B2M              -0.3136   -0.2218  PRCC_NORM_POLE
+  HAVCR2           -0.4439   -0.3961  PRCC_NORM_POLE
+  ARG1             +0.0968   +0.0760  
+  KDM1A            +0.4105   +0.4427  PRCC_ATTRACTOR
+  TET2             +0.3155   +0.2921  PRCC_ATTRACTOR
+
+  ATTRACTOR GEOMETRY COMPARISON:
+  ┌─────────────────────────────────────────────┐
+  │ ccRCC: ECM/myofibroblast identity            │
+  │   RUNX1▲ LOXL2▲ TGFB1▲ / FBP1▼ GOT1▼      │
+  │   TI = norm(GOT1) – norm(RUNX1)             │
+  ├─────────────────────────────────────────────┤
+  │ PRCC: Biliary ductal identity                │
+  │   KRT19▲ ERBB2▲ KRT7▲ / SLC22A6▼ FABP1▼   │
+  │   TI = norm(KRT19) – norm(SLC22A6)          │
+  ├─────────────────────────────────────────────┤
+  │ SHARED MECHANISM (Axis B):                  │
+  │   TCA collapse → αKG↓ → TET2↓ → EZH2▲     │
+  │   Identity axis is cancer-type specific     │
+  │   Metabolic axis is universal               │
+  └─────────────────────────────────────────────┘
+
+============================================================
+OBJ-11 — ARG1 / M2 MACROPHAGE
+============================================================
+  S3-P3: ARG1 Q4/Q1 > 1.5  p < 0.05
+  DC-2:  Repolarisation not depletion
+  ARG1 Q4 mean: 0.5996
+  ARG1 Q1 mean: 0.3429
+  ARG1 Q4/Q1:   1.748
+  MW p=0.0029
+  S3-P3 CONFIRMED ✓
+
+  Gene       pheno   r_depth   Q4/Q1
+  ──────────────────────────────────
+  ARG1       M2      +0.0760   1.748
+  MRC1       M2      +0.0141   1.039
+  CD163      M2      -0.1370   0.927
+  IL10       M2      -0.1217   0.829
+  TGFB1      M2      +0.2186   1.074
+  CD68       M2      -0.0922   0.967
+  CSF1R      M2      -0.0850   0.965
+  FCGR3A     M2      -0.1746   0.943
+  TNF        M1      +0.2831   1.405
+  IL6        M1      +0.2207   1.498
+  IL12A      M1      +0.1250   1.199
+  CXCL10     M1      -0.2602   0.834
+  CD86       M1      -0.0954   0.954
+  NOS2       M1      +0.0571   1.095
+  IL1B       M1      -0.0798   0.963
+
+  M2/M1 polarisation index r(depth) = -0.1904  p=0.0011
+
+  r(ARG1, stromal_score) = -0.0241  p=0.6828
+
+============================================================
+OBJ-12 — CIMP SUBGROUP
+============================================================
+  FC-5: CDKN2A methylated in CIMP, RNA in non-CIMP
+  CIMP-high n=9
+  CIMP-mid  n=11
+  Non-CIMP  n=270
+
+  Gene            CIMP_hi   CIMP_mid   non_CIMP   p_hi_vs_rest
+  ────────────────────────────────────────────────────────────
+   CDKN2A            4.989      6.188      5.715       p=0.2749
+  ★CDK4             11.362     10.706     10.877       p=0.0044
+  ★KRT19            14.931     12.849     11.972     p=2.74e-04
+  ★SLC22A6           0.694      2.712      4.850       p=0.0018
+   SETD2            10.813     10.550     10.463       p=0.0959
+  ★PBRM1             9.948      9.319      9.236       p=0.0120
+   TET2              8.756      8.868      8.508       p=0.6791
+   B2M              14.970     15.211     15.268       p=0.3835
+  ★HLA-A            14.388     15.555     15.460       p=0.0178
+  ★MKI67            10.525      8.513      7.217     p=1.14e-06
+   MET              12.487     13.990     13.400       p=0.2542
+   ERBB2            12.631     12.756     12.648       p=0.6336
+  ★EZH2              8.339      7.868      6.839     p=2.58e-06
+  ★FH                9.200     10.185     10.769     p=2.28e-06
+  ★OGDHL             6.687     11.291     12.660     p=1.22e-06
+   CA9               5.756      4.038      5.614       p=0.8616
+   ARG1              1.005      0.468      0.448       p=0.1306
+
+  CIMP-hi depth: 0.8462
+  non-CIMP depth: 0.6260
+  MW p=4.13e-06
+  CIMP proxy is SIGNIFICANTLY DEEPER ✓
+
+============================================================
+GENERATING FIGURE
+============================================================
+  Figure saved: ./prcc_false_attractor/results_s3/prcc_script3_figure.pdf
+
+============================================================
+SCRIPT 3 — FINAL SCORECARD
+============================================================
+  S3-P1: Type 2 depth > Type 1                CHECK LOG
+  S3-P2: TWIST1 = stromal r>0.40              CONFIRMED ✓
+  S3-P3: ARG1 Q4/Q1 > 1.5 p<0.05              CONFIRMED ✓
+  S3-P4: Axis A + B independent OS            CHECK LOG
+  S3-P5: PBRM1 + SETD2 co-mutation            CHECK LOG
+  S3-P6: CA9/SLC2A1/LDHA/PDK1 r>0.50          CHECK LOG
+  S3-P7: CDKN2A/CDK4 co-occur                 CONFIRMED ✓
+  S3-P8: TI high = worse OS                   NOT CONFIRMED ✗
+
+  OVERALL: 3/8
+
+  DRUG CORRECTIONS APPLIED:
+    DC-1  Anti-CD25 downgraded
+    DC-2  Anti-CSF1R → repolarisation
+    DC-3  PDK1 arch-hypoxia subpop tested
+    DC-4  ERBB2 IHC2+ (not FISH) criterion
+    DC-5  αKG AIM2/PANoptosis safety flag
+
+  NOVEL FINDINGS:
+    N-S3-1: CIMP proxy deepest tier                     CONFIRMED ✓
+    N-S3-2: PDK1+CA9 deeper than PDK1 alone             CONFIRMED ✓
+    N-S3-3: M2/M1 index increases with depth            NOT CONFIRMED / CHECK LOG
+    N-S3-4: TWIST1 stromal confirmed                    CONFIRMED ✓
+    N-S3-5: CDKN2A RNA low in CIMP                      NOT CONFIRMED / CHECK LOG

@@ -1,0 +1,720 @@
+OrganismCore — PRCC False Attractor
+Script 1 — Discovery Run
+Document 95a | 2026-03-02
+
+PROTOCOL ORDER (canonical):
+  1. saddle_analysis()
+     → per-gene tumour vs normal
+     → predictions vs actuals
+  2. build_depth_score()
+     → uses confirmed genes
+     → fallback to full panel if <2
+  3. depth_correlations()
+     → Pearson r, every panel gene
+     → READ THIS FIRST — THE DISCOVERY
+  4. gap_tests()
+     → circuit topology
+     → BROKEN = intervention point
+  5. subtype_analysis()
+     → Type 1 vs Type 2 vs CIMP depth
+     → tests S1-P1
+  6. quartile_analysis()
+     → Q4/Q1 gene ratios
+  7. drug_targets()
+     → stated before literature
+
+DISCOVERY PRINCIPLE:
+  Panel is wide (70+ genes).
+  Unexpected signals are the finding.
+  Confirmations validate the framework.
+  Surprises extend it.
+
+============================================================
+DOWNLOAD
+============================================================
+  Trying: https://tcga-xena-hub.s3.us-east-1.amazonaws.com/download/TCGA.KIRP.sampleMap%2FHiSeqV2.gz
+  OK: 17.4 MB → ./prcc_false_attractor/TCGA_KIRP_HiSeqV2.gz
+  Trying: https://tcga-xena-hub.s3.us-east-1.amazonaws.com/download/TCGA.KIRP.sampleMap%2FKIRP_clinicalMatrix
+  OK: 0.3 MB → ./prcc_false_attractor/KIRP_clinicalMatrix.tsv
+
+============================================================
+PARSE TCGA-KIRP HiSeqV2
+============================================================
+  Raw matrix: 20530 genes × 323 samples
+  Panel genes available: 81/81
+  Tumour samples:  290
+  Normal samples:  32
+  Other:           1
+
+============================================================
+PARSE CLINICAL — KIRP
+============================================================
+  Clinical rows: 352, cols: 108
+  Columns: ['_INTEGRATION', '_PATIENT', '_cohort', '_primary_disease', '_primary_site', 'additional_pharmaceutical_therapy', 'additional_radiation_therapy', 'additional_surgery_locoregional_procedure', 'additional_surgery_metastatic_procedure', 'age_at_initial_pathologic_diagnosis', 'bcr_followup_barcode', 'bcr_patient_barcode', 'bcr_sample_barcode', 'clinical_M', 'clinical_N', 'clinical_T', 'clinical_stage', 'days_to_additional_surgery_locoregional_procedure', 'days_to_additional_surgery_metastatic_procedure', 'days_to_birth']
+  Subtype column: histological_type
+  Values:
+histological_type
+Kidney Papillary Renal Cell Carcinoma    352
+
+════════════════════════════════════════════════════════════
+PRIMARY — TCGA-KIRP
+════════════════════════════════════════════════════════════
+
+============================================================
+SADDLE ANALYSIS — TCGA-KIRP
+============================================================
+  Per-gene tumour vs normal comparison.
+  Predictions vs actuals for each panel gene.
+
+  Tumour n=290, Normal n=32
+
+────────────────────────────────────────────────────────────
+  SWITCH GENES (PT identity — predicted DOWN)
+────────────────────────────────────────────────────────────
+  Gene         Pred              FC            p Result   Verdict
+  ────────────────────────────────────────────────────────────────────────────────
+  SLC13A2      DOWN          -5.674   p=1.02e-12 DOWN     CONFIRMED ✓
+  SLC22A6      DOWN          -9.759   p=8.04e-11 DOWN     CONFIRMED ✓
+  SLC34A1      DOWN          -7.498   p=3.12e-12 DOWN     CONFIRMED ✓
+  CUBN         DOWN          -3.048   p=2.67e-06 DOWN     CONFIRMED ✓
+  LRP2         DOWN          -0.305     p=0.5787 NS       FLAT (ns)
+  MIOX         DOWN          -3.630   p=5.03e-07 DOWN     CONFIRMED ✓
+  UMOD         FLAT         -15.133      p<1e-15 DOWN     —
+  SLC5A2       DOWN          -9.522      p<1e-15 DOWN     CONFIRMED ✓
+  FABP1        DOWN          -9.270      p<1e-15 DOWN     CONFIRMED ✓
+  GPX3         DOWN          -3.993   p=2.70e-11 DOWN     CONFIRMED ✓
+  FBP1         DOWN          -2.559      p<1e-15 DOWN     CONFIRMED ✓
+
+────────────────────────────────────────────────────────────
+  FALSE ATTRACTOR MARKERS (predicted UP)
+────────────────────────────────────────────────────────────
+  Gene         Pred              FC            p Result   Verdict
+  ────────────────────────────────────────────────────────────────────────────────
+  MET          UNCERTAIN     +2.301      p<1e-15 UP       —
+  HMOX1        UP            +0.563   p=6.93e-04 UP       CONFIRMED ✓
+  CAV1         UP            -0.211     p=0.1619 NS       FLAT (ns)
+  VIM          UP            +1.774      p<1e-15 UP       CONFIRMED ✓
+  VEGFA        UP            -1.802   p=1.52e-10 DOWN     WRONG (DOWN)
+  KRT7         UP            +1.628     p=0.0086 UP       CONFIRMED ✓
+  KRT19        UP            +1.716   p=8.40e-04 UP       CONFIRMED ✓
+  PROM1        UP            +0.105     p=0.7756 NS       FLAT (ns)
+  CD44         UP            +1.130   p=9.05e-05 UP       CONFIRMED ✓
+  SOX4         UP            +1.232   p=7.31e-08 UP       CONFIRMED ✓
+  TWIST1       UP            -1.355   p=8.60e-07 DOWN     WRONG (DOWN)
+  CDH1         UP            -1.964   p=5.20e-12 DOWN     WRONG (DOWN)
+  ITGA3        UP            +1.634   p=9.46e-14 UP       CONFIRMED ✓
+
+────────────────────────────────────────────────────────────
+  EPIGENETIC PANEL
+────────────────────────────────────────────────────────────
+  Gene         Pred              FC            p Result   Verdict
+  ────────────────────────────────────────────────────────────────────────────────
+  EZH2         UP            +2.175      p<1e-15 UP       CONFIRMED ✓
+  SETD2        DOWN          -0.280   p=1.81e-05 DOWN     CONFIRMED ✓
+  TET2         DOWN          -0.311     p=0.0039 DOWN     CONFIRMED ✓
+  DNMT3A       UNCERTAIN     +0.294     p=0.0332 UP       —
+  KDM1A        UP            +0.001     p=0.3553 NS       FLAT (ns)
+  HDAC1        UP            -0.417   p=1.15e-09 DOWN     WRONG (DOWN)
+  RCOR1        UP            -0.346   p=9.63e-07 DOWN     WRONG (DOWN)
+  ASXL1        UP            -0.234     p=0.0379 DOWN     WRONG (DOWN)
+  BAP1         UNCERTAIN     +0.059     p=0.4726 NS       —
+  PBRM1        UP            -0.412   p=2.31e-05 DOWN     WRONG (DOWN)
+
+────────────────────────────────────────────────────────────
+  TCA / METABOLIC PANEL
+────────────────────────────────────────────────────────────
+  Gene         Pred              FC            p Result   Verdict
+  ────────────────────────────────────────────────────────────────────────────────
+  FH           DOWN          -0.393   p=7.29e-05 DOWN     CONFIRMED ✓
+  OGDHL        DOWN          -0.715     p=0.0017 DOWN     CONFIRMED ✓
+  SUCLG1       DOWN          -0.818   p=4.81e-09 DOWN     CONFIRMED ✓
+  GOT1         DOWN          -0.563   p=2.33e-05 DOWN     CONFIRMED ✓
+  LDHB         DOWN          -0.456   p=2.02e-05 DOWN     CONFIRMED ✓
+  LDHD         DOWN          -0.732     p=0.0020 DOWN     CONFIRMED ✓
+  ATP5A1       DOWN          -0.771   p=6.86e-11 DOWN     CONFIRMED ✓
+  ACAT1        DOWN          -1.040   p=3.15e-09 DOWN     CONFIRMED ✓
+  SLC16A1      UP            -0.517     p=0.1877 NS       FLAT (ns)
+  SLC2A1       UP            -0.474     p=0.0110 DOWN     WRONG (DOWN)
+  SLC2A9       DOWN          +0.191     p=0.6490 NS       FLAT (ns)
+  ACADM        DOWN          -1.392      p<1e-15 DOWN     CONFIRMED ✓
+  CPT1A        DOWN          -1.529      p<1e-15 DOWN     CONFIRMED ✓
+
+────────────────────────────────────────────────────────────
+  ECM / STROMA PANEL
+────────────────────────────────────────────────────────────
+  Gene         Pred              FC            p Result   Verdict
+  ────────────────────────────────────────────────────────────────────────────────
+  LOXL2        UP            +1.091   p=4.39e-04 UP       CONFIRMED ✓
+  COL1A1       UP            +0.092     p=0.5149 NS       FLAT (ns)
+  ACTA2        UP            -1.623   p=1.36e-10 DOWN     WRONG (DOWN)
+  POSTN        UP            -1.512     p=0.0211 DOWN     WRONG (DOWN)
+  TGFB1        UP            +0.035     p=0.6854 NS       FLAT (ns)
+  MMP9         UP            +2.482   p=3.33e-05 UP       CONFIRMED ✓
+  MMP2         UP            -1.086   p=1.19e-07 DOWN     WRONG (DOWN)
+  FN1          UP            -0.487     p=0.1044 NS       FLAT (ns)
+
+────────────────────────────────────────────────────────────
+  IMMUNE / TME PANEL
+────────────────────────────────────────────────────────────
+  Gene         Pred              FC            p Result   Verdict
+  ────────────────────────────────────────────────────────────────────────────────
+  CD274        UNCERTAIN     -0.105     p=0.3825 NS       —
+  FOXP3        UNCERTAIN     -0.187     p=0.1810 NS       —
+  IL2RA        UNCERTAIN     +0.674     p=0.0422 UP       —
+  HAVCR2       UNCERTAIN     +0.882   p=2.04e-04 UP       —
+  CD8A         UNCERTAIN     +1.065   p=7.56e-04 UP       —
+  IFI16        UNCERTAIN     +0.831   p=8.65e-05 UP       —
+  B2M          UNCERTAIN     +0.695   p=1.19e-07 UP       —
+  TIGIT        UNCERTAIN     +0.921     p=0.0129 UP       —
+
+────────────────────────────────────────────────────────────
+  RTK / MET PATHWAY
+────────────────────────────────────────────────────────────
+  Gene         Pred              FC            p Result   Verdict
+  ────────────────────────────────────────────────────────────────────────────────
+  MET          UNCERTAIN     +2.301      p<1e-15 UP       —
+  EGFR         UNCERTAIN     -0.543     p=0.0520 NS       —
+  ERBB2        UNCERTAIN     -0.365   p=3.91e-05 DOWN     —
+  FGFR1        UNCERTAIN     +0.034     p=0.9641 NS       —
+  FGFR3        UNCERTAIN     -1.040   p=1.85e-08 DOWN     —
+  AXL          UNCERTAIN     +1.192   p=3.83e-09 UP       —
+  MTOR         UNCERTAIN     -0.721   p=9.89e-13 DOWN     —
+  RPTOR        UNCERTAIN     +0.532   p=2.27e-14 UP       —
+
+────────────────────────────────────────────────────────────
+  HIF / VHL AXIS (structural contrast with ccRCC)
+────────────────────────────────────────────────────────────
+  Gene         Pred              FC            p Result   Verdict
+  ────────────────────────────────────────────────────────────────────────────────
+  EPAS1        FLAT          -2.395      p<1e-15 DOWN     —
+  HIF1A        UNCERTAIN     -0.018     p=0.2537 NS       —
+  VHL          FLAT          -0.222     p=0.0033 DOWN     —
+  CA9          FLAT          +3.622   p=1.11e-11 UP       —
+  VEGFA        UP            -1.802   p=1.52e-10 DOWN     WRONG (DOWN)
+
+────────────────────────────────────────────────────────────
+  SCAFFOLD / PROLIFERATION
+────────────────────────────────────────────────────────────
+  Gene         Pred              FC            p Result   Verdict
+  ────────────────────────────────────────────────────────────────────────────────
+  MKI67        UP            +2.102   p=4.23e-13 UP       CONFIRMED ✓
+  MYC          UP            +0.860   p=1.07e-04 UP       CONFIRMED ✓
+  CDK4         UP            +0.375   p=5.38e-07 UP       CONFIRMED ✓
+  CCND1        UP            -0.457     p=0.0037 DOWN     WRONG (DOWN)
+  CDKN2A       DOWN          +4.331      p<1e-15 UP       WRONG (UP)
+  CDKN1A       UP            +1.747   p=2.71e-12 UP       CONFIRMED ✓
+  TOP2A        UP            +3.007      p<1e-15 UP       CONFIRMED ✓
+
+  SCORECARD: 36/58 predictions confirmed
+
+============================================================
+DEPTH SCORE — TCGA-KIRP
+============================================================
+  SW confirmed (9): ['SLC13A2', 'SLC22A6', 'SLC34A1', 'CUBN', 'MIOX', 'SLC5A2', 'FABP1', 'GPX3', 'FBP1']
+  FA confirmed (7): ['HMOX1', 'VIM', 'KRT7', 'KRT19', 'CD44', 'SOX4', 'ITGA3']
+  SW used  (9): ['SLC13A2', 'SLC22A6', 'SLC34A1', 'CUBN', 'MIOX', 'SLC5A2', 'FABP1', 'GPX3', 'FBP1']
+  FA used  (7): ['HMOX1', 'VIM', 'KRT7', 'KRT19', 'CD44', 'SOX4', 'ITGA3']
+  Depth score (n=290 tumours):
+    mean   = 0.6345
+    median = 0.6668
+    std    = 0.1700
+    min    = 0.1292
+    max    = 0.9691
+    Q25    = 0.5185
+    Q75    = 0.7629
+
+╔══════════════════════════════════════════════════════════╗
+║  DEPTH CORRELATIONS — READ THIS BEFORE SADDLE TABLE  ║
+╚══════════════════════════════════════════════════════════╝
+
+============================================================
+DEPTH CORRELATIONS — TCGA-KIRP
+============================================================
+  Pearson r vs depth score, tumour samples only.
+  Protocol Step 2.3: read this before the saddle table.
+  The depth correlations are the discovery.
+
+   Rank Gene                  r              p Panel
+  ───────────────────────────────────────────────────────
+      1 KRT19           +0.8031        p<1e-15 FA
+      2 SLC22A6         -0.8006        p<1e-15 SW
+      3 FABP1           -0.6710        p<1e-15 SW
+      4 SLC5A2          -0.6613        p<1e-15 SW
+      5 KRT7            +0.6432        p<1e-15 FA
+      6 SLC34A1         -0.6371        p<1e-15 SW
+      7 CUBN            -0.5863        p<1e-15 SW
+      8 ERBB2           +0.5556        p<1e-15 RTK
+      9 GPX3            -0.5251        p<1e-15 SW
+     10 GOT1            -0.5193        p<1e-15 TCA
+     11 SUCLG1          -0.5192        p<1e-15 TCA
+     12 LDHB            -0.5064        p<1e-15 TCA
+     13 ITGA3           +0.5012        p<1e-15 FA
+     14 SLC16A1         -0.4878        p<1e-15 TCA
+     15 ACADM           -0.4690        p<1e-15 TCA
+     16 SOX4            +0.4634        p<1e-15 FA
+     17 AXL             +0.4559        p<1e-15 RTK
+     18 LRP2            -0.4521        p<1e-15 SW
+     19 FH              -0.4513        p<1e-15 TCA
+     20 KDM1A           +0.4427     p=2.40e-15 EPI
+     21 MET             +0.4336     p=1.00e-14 FA
+     22 MIOX            -0.4288     p=2.11e-14 SW
+     23 PROM1           +0.4192     p=9.12e-14 FA
+     24 CPT1A           -0.4137     p=2.03e-13 TCA
+     25 ATP5A1          -0.4022     p=1.06e-12 TCA
+     26 SLC13A2         -0.4019     p=1.10e-12 SW
+     27 OGDHL           -0.4019     p=1.11e-12 TCA
+     28 HAVCR2          -0.3961     p=2.47e-12 IMM
+     29 ACAT1           -0.3939     p=3.34e-12 TCA
+     30 CD44            +0.3938     p=3.37e-12 FA
+
+  TOP POSITIVES (FA candidates):
+    KRT19          r=+0.8031  p<1e-15
+    KRT7           r=+0.6432  p<1e-15
+    ERBB2          r=+0.5556  p<1e-15
+    ITGA3          r=+0.5012  p<1e-15
+    SOX4           r=+0.4634  p<1e-15
+    AXL            r=+0.4559  p<1e-15
+    KDM1A          r=+0.4427  p=2.40e-15
+    MET            r=+0.4336  p=1.00e-14
+    PROM1          r=+0.4192  p=9.12e-14
+    CD44           r=+0.3938  p=3.37e-12
+
+  TOP NEGATIVES (SW candidates):
+    SLC22A6        r=-0.8006  p<1e-15
+    FABP1          r=-0.6710  p<1e-15
+    SLC5A2         r=-0.6613  p<1e-15
+    SLC34A1        r=-0.6371  p<1e-15
+    CUBN           r=-0.5863  p<1e-15
+    GPX3           r=-0.5251  p<1e-15
+    GOT1           r=-0.5193  p<1e-15
+    SUCLG1         r=-0.5192  p<1e-15
+    LDHB           r=-0.5064  p<1e-15
+    SLC16A1        r=-0.4878  p<1e-15
+
+============================================================
+GAP TESTS — TCGA-KIRP
+============================================================
+  r near 0 = BROKEN circuit = therapeutic gap
+
+  Circuit                                              r            p Verdict
+  ────────────────────────────────────────────────────────────────────────────────
+  MET → OAT1 (PT identity)                       -0.3536   p=5.78e-10 ANTI-CORRELATED (-0.354)
+  MET → CUBN (PT endocytic)                      -0.0208     p=0.7241 BROKEN ✓ (gap)
+  MET → LRP2 (PT endocytic)                      +0.1943   p=8.81e-04 WEAK (+0.194)
+  MET → NaDC1 (PT citrate)                       -0.0196     p=0.7390 BROKEN ✓ (gap)
+  MET → FABP1 (PT metabolic)                     -0.2518   p=1.43e-05 ANTI-CORRELATED (-0.252)
+  SETD2 → EZH2 (H3K36/H3K27 opposition)          +0.0986     p=0.0937 BROKEN ✓ (gap)
+  EZH2 → SLC13A2 (epigenetic silencing)          -0.2257   p=1.06e-04 ANTI-CORRELATED (-0.226)
+  EZH2 → FBP1 (metabolic silencing)              -0.1760     p=0.0026 ANTI-CORRELATED (-0.176)
+  KDM1A → SLC13A2 (LSD1 demethylase)             -0.1730     p=0.0031 ANTI-CORRELATED (-0.173)
+  FH → TET2 (fumarate-αKG coupling)              -0.3408   p=2.55e-09 ANTI-CORRELATED (-0.341)
+  FH → EZH2 (FH loss → EZH2 gain)                -0.2930   p=3.78e-07 ANTI-CORRELATED (-0.293)
+  FH → OGDHL (TCA integrity)                     +0.6014      p<1e-15 CONNECTED (+0.601)
+  OGDHL → EZH2 (αKG production)                  -0.3449   p=1.60e-09 ANTI-CORRELATED (-0.345)
+  SUCLG1 → EZH2 (αKG axis)                       -0.4274   p=2.62e-14 ANTI-CORRELATED (-0.427)
+  VHL → HIF2A (should be BROKEN in PRCC)         +0.2497   p=1.70e-05 WEAK (+0.250)
+  VHL → CA9 (HIF target — flat in PRCC?)         -0.0978     p=0.0965 BROKEN ✓ (gap)
+  HIF2A → GLUT1 (weaker than ccRCC?)             +0.4932      p<1e-15 CONNECTED (+0.493)
+  TGFB1 → ACTA2 (stroma activation)              +0.4607      p<1e-15 CONNECTED (+0.461)
+  LOXL2 → COL1A1 (ECM stiffening)                +0.4680      p<1e-15 CONNECTED (+0.468)
+  VIM → CDH1 (EMT — CDH1 lost?)                  -0.1615     p=0.0058 ANTI-CORRELATED (-0.162)
+  IFI16 → B2M (innate sensing → MHC-I)           +0.3285   p=1.01e-08 WEAK (+0.328)
+  FOXP3 → CD274 (Treg → PD-L1)                   +0.2505   p=1.58e-05 WEAK (+0.251)
+  IL2RA → FOXP3 (Treg circuit)                   +0.4485      p<1e-15 CONNECTED (+0.448)
+  MET → MKI67 (proliferative drive)              -0.0694     p=0.2389 BROKEN ✓ (gap)
+  MET → VEGFA (angiogenic drive)                 -0.3792   p=2.39e-11 ANTI-CORRELATED (-0.379)
+  MET → mTOR (signalling)                        +0.1909     p=0.0011 WEAK (+0.191)
+
+============================================================
+SUBTYPE ANALYSIS — TCGA-KIRP
+============================================================
+  Subtype counts:
+    Kidney Papillary Renal Cell Carcinoma: n=229
+    sampleID
+TCGA-DZ-6132    Kidney Papillary Renal Cell Carcinoma
+TCGA-DZ-6132    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-B3-3926    Kidney Papillary Renal Cell Carcinoma
+TCGA-B3-3926    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5886    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5886    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-A4-7732    Kidney Papillary Renal Cell Carcinoma
+TCGA-A4-7732    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-UZ-A9PS    Kidney Papillary Renal Cell Carcinoma
+TCGA-UZ-A9PS    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-DZ-6135    Kidney Papillary Renal Cell Carcinoma
+TCGA-DZ-6135    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7055    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7055    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-DZ-6134    Kidney Papillary Renal Cell Carcinoma
+TCGA-DZ-6134    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-A4-A57E    Kidney Papillary Renal Cell Carcinoma
+TCGA-A4-A57E    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5884    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5884    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-A4-7585    Kidney Papillary Renal Cell Carcinoma
+TCGA-A4-7585    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5882    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5882    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7056    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7056    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7061    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7061    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5887    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5887    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-A4-A5Y1    Kidney Papillary Renal Cell Carcinoma
+TCGA-A4-A5Y1    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-DZ-6133    Kidney Papillary Renal Cell Carcinoma
+TCGA-DZ-6133    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5888    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5888    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-B9-4113    Kidney Papillary Renal Cell Carcinoma
+TCGA-B9-4113    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7058    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7058    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7051    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7051    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5877    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5877    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-GL-7966    Kidney Papillary Renal Cell Carcinoma
+TCGA-GL-7966    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-P4-A5ED    Kidney Papillary Renal Cell Carcinoma
+TCGA-P4-A5ED    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5883    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5883    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-P4-A5E8    Kidney Papillary Renal Cell Carcinoma
+TCGA-P4-A5E8    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7048    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7048    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-A4-7288    Kidney Papillary Renal Cell Carcinoma
+TCGA-A4-7288    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5889    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5889    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7049    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7049    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7046    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7046    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-B1-A47M    Kidney Papillary Renal Cell Carcinoma
+TCGA-B1-A47M    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-Y8-A8RY    Kidney Papillary Renal Cell Carcinoma
+TCGA-Y8-A8RY    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5879    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5879    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5892    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5892    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5875    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5875    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7059    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7059    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-B3-4103    Kidney Papillary Renal Cell Carcinoma
+TCGA-B3-4103    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7062    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7062    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5891    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5891    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-GL-A9DE    Kidney Papillary Renal Cell Carcinoma
+TCGA-GL-A9DE    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7053    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7053    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-B3-3925    Kidney Papillary Renal Cell Carcinoma
+TCGA-B3-3925    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-DZ-6131    Kidney Papillary Renal Cell Carcinoma
+TCGA-DZ-6131    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5878    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5878    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7060    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7060    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5885    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5885    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7044    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7044    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5880    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5880    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-B3-4104    Kidney Papillary Renal Cell Carcinoma
+TCGA-B3-4104    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5890    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5890    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5876    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5876    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-GL-6846    Kidney Papillary Renal Cell Carcinoma
+TCGA-GL-6846    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-GL-A59R    Kidney Papillary Renal Cell Carcinoma
+TCGA-GL-A59R    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5893    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5893    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5894    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5894    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7050    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7050    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-7045    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-7045    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-A4-A4ZT    Kidney Papillary Renal Cell Carcinoma
+TCGA-A4-A4ZT    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-BQ-5881    Kidney Papillary Renal Cell Carcinoma
+TCGA-BQ-5881    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+    sampleID
+TCGA-B9-4115    Kidney Papillary Renal Cell Carcinoma
+TCGA-B9-4115    Kidney Papillary Renal Cell Carcinoma
+Name: histological_type, dtype: object: n=1
+
+  Subtype                            n   Mean depth     Median
+  ────────────────────────────────────────────────────────────
+  Kidney Papillary Renal Cell Carcinoma   229       0.6489     0.6798
+  S1-P1: Type 1/Type 2 keys not found in subtype column.
+  Available subtypes: ['Kidney Papillary Renal Cell Carcinoma']
+
+============================================================
+DEPTH QUARTILE ANALYSIS — TCGA-KIRP
+============================================================
+  Q1 (shallowest, depth ≤ 0.519): n=73
+  Q4 (deepest,    depth ≥ 0.763): n=73
+
+  TOP 20 Q4-ENRICHED GENES:
+  Gene              Q4_mean    Q1_mean    Q4/Q1            p
+  ────────────────────────────────────────────────────────────
+  KRT19              14.158      8.366    1.692      p<1e-15
+  TWIST1              2.720      1.740    1.563   p=9.05e-04
+  KRT7               13.183      8.703    1.515      p<1e-15
+  PROM1              11.244      8.567    1.312   p=1.10e-09
+  IL2RA               4.177      3.500    1.193     p=0.0140
+  CD44               11.982     10.191    1.176   p=1.97e-10
+  CA9                 6.302      5.402    1.167     p=0.0676
+  POSTN               8.068      7.071    1.141     p=0.0120
+  UMOD                2.280      2.002    1.139     p=0.1355
+  LOXL2               8.998      7.937    1.134   p=1.44e-04
+  AXL                10.721      9.594    1.118   p=4.87e-10
+  ITGA3              14.680     13.222    1.110   p=6.13e-13
+  EZH2                7.290      6.576    1.109   p=3.85e-07
+  MET                13.800     12.682    1.088   p=2.02e-11
+  SLC2A1             10.857      9.988    1.087     p=0.0201
+  SOX4               11.954     11.001    1.087   p=5.95e-10
+  TGFB1              10.522      9.799    1.074   p=1.40e-04
+  CAV1                9.752      9.083    1.074     p=0.0060
+  ERBB2              12.983     12.119    1.071   p=3.44e-13
+  TET2                8.732      8.161    1.070   p=1.37e-06
+
+  TOP 10 Q1-ENRICHED GENES (SW candidates):
+  FABP1          Q4/Q1=0.104  p<1e-15
+  SLC22A6        Q4/Q1=0.112  p<1e-15
+  SLC5A2         Q4/Q1=0.153  p=4.07e-15
+  SLC13A2        Q4/Q1=0.410  p=7.56e-13
+  SLC34A1        Q4/Q1=0.412  p<1e-15
+  CUBN           Q4/Q1=0.639  p<1e-15
+  MIOX           Q4/Q1=0.674  p=2.47e-11
+  LRP2           Q4/Q1=0.726  p<1e-15
+  SLC16A1        Q4/Q1=0.773  p=2.19e-12
+  CD274          Q4/Q1=0.795  p=6.34e-04
+
+============================================================
+DRUG TARGET DERIVATION — FROM GEOMETRY
+============================================================
+  Stated before literature check. Locked 2026-03-02.
+
+  Top depth-positive genes (FA — target for inhibition):
+    KRT19          r=+0.8031  p<1e-15
+    KRT7           r=+0.6432  p<1e-15
+    ERBB2          r=+0.5556  p<1e-15
+    ITGA3          r=+0.5012  p<1e-15
+    SOX4           r=+0.4634  p<1e-15
+
+  Top depth-negative genes (SW — target for restoration):
+    SLC22A6        r=-0.8006  p<1e-15
+    FABP1          r=-0.6710  p<1e-15
+    SLC5A2         r=-0.6613  p<1e-15
+    SLC34A1        r=-0.6371  p<1e-15
+    CUBN           r=-0.5863  p<1e-15
+
+  DERIVED DRUG TARGETS (geometry, no literature):
+
+  TARGET 1: MET INHIBITOR
+    Basis: MET as predicted FA marker
+    Depth-positive → higher MET = deeper attractor
+    Mechanism: MET drives papillary progenitor state
+    Drug: Cabozantinib, savolitinib, tepotinib
+    Best for: Type 1 (MET-amplified)
+
+  TARGET 2: EZH2 INHIBITOR
+    Basis: EZH2 epigenetic lock on PT identity
+    EZH2 UP + SETD2 DOWN → uncontrolled H3K27me3
+    Mechanism: Derepresses SW gene promoters
+    Drug: Tazemetostat (FDA approved)
+    Best for: Type 2 / SETD2-low
+
+  TARGET 3: αKG SUPPLEMENTATION + EZH2i (NOVEL COMBINATION)
+    Basis: FH mutation → fumarate blocks αKG dioxygenases
+    Same TCA-chromatin axis as deep ccRCC
+    Mechanism: Restore TET/KDM function + block EZH2 writing
+    Drug: DMKG (cell-permeable αKG) + tazemetostat
+    Best for: CIMP/FH-mutant Type 2
+    STATED BEFORE LITERATURE — locked 2026-03-02
+
+  TARGET 4: VEGFR/mTOR INHIBITOR
+    Basis: VEGFA elevation, MET → mTOR connection
+    Mechanism: Reduces proliferative drive
+    Drug: Sunitinib, pazopanib, everolimus
+    Both types — depth-unaware (current standard)
+
+  NOT PREDICTED:
+  Belzutifan (HIF2A inhibitor) — structural prediction:
+  EPAS1 (HIF2A) should be FLAT in PRCC (no VHL loss).
+  This is a direct testable contrast with ccRCC.
+  If EPAS1 is flat and CA9 is flat → belzutifan inactive.
+  Read the saddle table to confirm or falsify.
+
+============================================================
+GENERATING FIGURE — TCGA-KIRP
+============================================================
+  Figure saved: ./prcc_false_attractor/results_s1/prcc_s1_figure.png
+
+============================================================
+SCRIPT 1 COMPLETE
+============================================================
+  Outputs: ./prcc_false_attractor/results_s1/
+    depth_corr_tcga-kirp.csv                                    5718 bytes
+    depth_scores_tcga.csv                                      10163 bytes
+    prcc_s1_figure.png                                        298280 bytes
+    quartile_analysis_tcga-kirp.csv                             6732 bytes
+    saddle_results.csv                                          4372 bytes
+
+  ┌─────────────────────────────────────────────────────┐
+  │  READING ORDER FOR DOCUMENT 95a                     │
+  │                                                     │
+  │  1. Read depth_corr_tcga-kirp.csv                   │
+  │     What is rank 1 positive? (primary FA gene)      │
+  │     What is rank 1 negative? (primary SW gene)      │
+  │     What genes were NOT in the panel? (discovery)   │
+  │                                                     │
+  │  2. Read saddle_results.csv                         │
+  │     How many SW genes confirmed DOWN?               │
+  │     How many FA genes confirmed UP?                 │
+  │     Which predictions were WRONG? Read them.        │
+  │     Wrong predictions reveal assumption errors.     │
+  │                                                     │
+  │  3. Read the gap test results                       │
+  │     Which circuits are BROKEN?                      │
+  │     The broken circuits = intervention points.      │
+  │                                                     │
+  │  4. Check subtype_analysis                          │
+  │     Is Type 2 deeper than Type 1?                   │
+  │     Is EPAS1 / CA9 flat? (belzutifan contrast)      │
+  │                                                     │
+  │  5. Write Document 95a before running Script 2      │
+  └─────────────────────────────────────────────────────┘
