@@ -1,0 +1,352 @@
+=================================================================
+HEPATOCELLULAR CARCINOMA — SCRIPT 1
+Dataset: GSE14520
+Framework: OrganismCore
+Doc: 92a | Date: 2026-03-01
+=================================================================
+
+PREDICTIONS LOCKED 2026-03-01:
+HCC-P1: HNF4A r<-0.50 (switch)
+HCC-P2: AFP r>+0.50 (FA gene)
+HCC-P3: MYC r>+0.40 (FA gene)
+HCC-P4: CTNNB1 defines subtype
+HCC-P5: CTNNB1-hi = better prog
+HCC-P6: Depth → sorafenib resistance
+CC-1:   EZH2 r>+0.40 (like EAC)
+CC-2:   FGFR4 falls with depth
+CC-3:   ZEB2-AURKA r>+0.30
+CC-4:   FOXA1/2 r<-0.40
+CC-5:   S100A8 r>+0.30
+
+=================================================================
+STEP 0: DATA ACQUISITION
+=================================================================
+  Already present: ./hcc_false_attractor/GSE14520_series_matrix.txt.gz (21,301,282 bytes)
+  Already present: ./hcc_false_attractor/GPL3921.annot.gz (4,551,278 bytes)
+  Already present: ./hcc_false_attractor/GSE14520_Extra_Supplement.txt.gz (7,334 bytes)
+
+=================================================================
+PARSE GPL ANNOTATION
+=================================================================
+  Symbol col: 2 = GENE SYMBOL
+  Probes mapped : 359
+  Unique genes  : 152
+
+=================================================================
+PARSE SERIES MATRIX
+=================================================================
+  Samples: 445
+  IDs[0:3]: ['GSM362958', 'GSM362959', 'GSM362960']
+  Probe rows matched: 152
+  Matrix shape: (445, 153)
+  Group from titles:
+    HCC: 225
+    Normal: 220
+
+=================================================================
+GROUP SUMMARY
+=================================================================
+  HCC:     225
+  Normal:  220
+  Unknown: 0
+
+=================================================================
+PARSE SUPPLEMENTARY — SURVIVAL
+  File: ./hcc_false_attractor/GSE14520_Extra_Supplement.txt.gz
+=================================================================
+  Header confirmed: ['LCS ID', 'ID', 'Affy_GSM', 'Tissue Type', 'Predicted risk Metastasis Signature']...
+  Using cols: GSM=2 OS_E=18 OS_T=19 RFS_E=20 RFS_T=21
+
+  Rows processed : 445
+  Rows with data : 445
+  OS: n_valid=221
+    events=85 censored=136 range=2.0–67.4 mo
+  RFS: n_valid=221
+    events=121 censored=100 range=0.1–67.4 mo
+  AFP: n=218 high=100 low=118
+  Stage: {np.str_('I'): 219, np.str_('.'): 2}
+
+=================================================================
+NORMAL vs HCC
+=================================================================
+  HCC n=225 Normal n=220
+
+  Gene             Normal        HCC      FC%  p-value
+  ----------------------------------------------------------
+  AFP              4.3355     6.9568    +60.5%  p=1.57e-11 ***
+  ALB             11.2579     9.4963    -15.6%  p=1.63e-50 ***
+  APOB            12.9970    12.7427     -2.0%  p=6.44e-07 ***
+  AURKA            4.7112     6.9857    +48.3%  p=1.90e-62 ***
+  BCL2             4.9352     4.7480     -3.8%  p=1.04e-05 ***
+  BIRC5            3.7221     5.5004    +47.8%  p=3.08e-61 ***
+  CCND1            8.0811     7.3248     -9.4%  p=1.08e-11 ***
+  CD44             6.6659     6.6765     +0.2%  p=0.7229  ns
+  CDK4             6.4948     7.7741    +19.7%  p=9.59e-55 ***
+  CDK6             3.7443     3.6248     -3.2%  p=2.40e-06 ***
+  CTNNB1           6.8280     7.7695    +13.8%  p=7.94e-33 ***
+  CYP3A4          12.3958     9.0386    -27.1%  p=3.08e-44 ***
+  DKK1             3.7465     5.5347    +47.7%  p=2.31e-15 ***
+  EGFR             9.0819     8.2839     -8.8%  p=3.07e-19 ***
+  EPCAM            5.2415     6.1293    +16.9%  p=0.4272  ns
+  EZH2             3.8827     5.6519    +45.6%  p=1.92e-61 ***
+  FGFR1            5.1831     4.8872     -5.7%  p=1.65e-19 ***
+  FGFR2            8.6163     7.5375    -12.5%  p=9.66e-12 ***
+  FGFR3            8.3132     8.2412     -0.9%  p=0.4552  ns
+  FGFR4            6.7012     7.2914     +8.8%  p=1.88e-13 ***
+  FOXA1            4.4900     4.8822     +8.7%  p=9.60e-11 ***
+  FOXA2            7.0788     6.7301     -4.9%  p=1.80e-08 ***
+  G6PC             9.7723     8.3093    -15.0%  p=1.01e-24 ***
+  GLUL             8.2243     8.9486     +8.8%  p=4.03e-08 ***
+  GPC3             5.0054     9.8204    +96.2%  p=3.00e-50 ***
+  HDAC1            8.1967     8.7927     +7.3%  p=8.38e-29 ***
+  HNF4A            5.3923     5.0291     -6.7%  p=2.26e-10 ***
+  IL6              3.6216     3.4188     -5.6%  p=3.42e-09 ***
+  KRT19            4.0404     4.1554     +2.8%  p=5.30e-07 ***
+  LGR5             3.7703     4.7903    +27.1%  p=0.3427  ns
+  MCL1             7.8214     7.2097     -7.8%  p=2.01e-10 ***
+  MET              4.4606     4.5499     +2.0%  p=0.1062  ns
+  MKI67            4.1416     5.3930    +30.2%  p=2.61e-49 ***
+  MYC              8.2093     7.9795     -2.8%  p=0.5504  ns
+  PCK1            12.2577     9.3266    -23.9%  p=6.67e-57 ***
+  S100A8           5.0322     4.6758     -7.1%  p=1.37e-08 ***
+  SMAD3            5.9499     6.3552     +6.8%  p=2.06e-12 ***
+  STAT3            9.0246     8.6666     -4.0%  p=3.85e-09 ***
+  TBX3             6.0788     5.9776     -1.7%  p=0.0663  ns
+  TERT             4.0341     4.3452     +7.7%  p=0.1294  ns
+  TGFB1            4.5167     4.6473     +2.9%  p=0.9081  ns
+  TOP2A            3.8704     6.9175    +78.7%  p=2.60e-63 ***
+  TP53             4.5439     4.9861     +9.7%  p=5.00e-09 ***
+  TTR             12.8768    11.1915    -13.1%  p=4.37e-48 ***
+  VEGFA            6.2410     6.1749     -1.1%  p=0.0960  ns
+  VIM              9.0584     9.1996     +1.6%  p=0.1425  ns
+  ZEB2             4.3500     3.9323     -9.6%  p=1.27e-16 ***
+
+=================================================================
+DEPTH SCORES
+=================================================================
+  HCC depth:
+    Switch used: ['HNF4A', 'FOXA1', 'FOXA2', 'ALB', 'APOB', 'TTR', 'CYP3A4', 'G6PC', 'PCK1']
+    FA used:     ['AFP', 'MYC', 'BIRC5', 'TOP2A', 'MKI67', 'AURKA', 'CCND1', 'EPCAM']
+    n=225 finite=225 mean=0.3217 std=0.1505 min=0.0285 max=0.8019
+
+=================================================================
+DEPTH CORRELATIONS — HCC
+=================================================================
+
+  TOP 20 POSITIVE (FA candidates):
+  Gene                r  p-value
+  CDC20         +0.6406  p=2.19e-27 ***
+  HDAC2         +0.6403  p=2.36e-27 ***
+  CCNB1         +0.6313  p=2.01e-26 ***
+  AFP           +0.6230  p=1.39e-25 ***
+  MKI67         +0.6153  p=7.89e-25 ***
+  EPCAM         +0.6064  p=5.53e-24 ***
+  SOX4          +0.5930  p=9.29e-23 ***
+  TOP2A         +0.5913  p=1.32e-22 ***
+  DKK1          +0.5765  p=2.52e-21 ***
+  BIRC5         +0.5733  p=4.67e-21 ***
+  E2F3          +0.5686  p=1.14e-20 ***
+  CDK4          +0.5223  p=3.77e-17 ***
+  EZH2          +0.5219  p=4.06e-17 ***
+  MCM2          +0.4958  p=2.33e-15 ***
+  KRT19         +0.4886  p=6.62e-15 ***
+  AURKA         +0.4730  p=6.08e-14 ***
+  SOX9          +0.4581  p=4.50e-13 ***
+  HDAC1         +0.4567  p=5.41e-13 ***
+  ACLY          +0.4517  p=1.03e-12 ***
+  DNMT3A        +0.4515  p=1.06e-12 ***
+
+  TOP 20 NEGATIVE (switch candidates):
+  CYP3A4        -0.7245  p=6.71e-38 ***
+  ALDOB         -0.7052  p=3.69e-35 ***
+  PCK1          -0.6317  p=1.83e-26 ***
+  CYP2C9        -0.5855  p=4.26e-22 ***
+  TTR           -0.5824  p=7.91e-22 ***
+  G6PC          -0.5581  p=7.98e-20 ***
+  IGF1          -0.5125  p=1.80e-16 ***
+  ARG1          -0.5107  p=2.38e-16 ***
+  HNF4A         -0.4603  p=3.39e-13 ***
+  APOE          -0.4291  p=1.71e-11 ***
+  KDR           -0.4249  p=2.80e-11 ***
+  RXRA          -0.4083  p=1.88e-10 ***
+  IL6R          -0.3732  p=7.62e-09 ***
+  TSC2          -0.3706  p=9.80e-09 ***
+  PPARA         -0.3666  p=1.46e-08 ***
+  APOB          -0.3266  p=5.43e-07 ***
+  SNAI2         -0.3220  p=8.03e-07 ***
+  FGF21         -0.3163  p=1.27e-06 ***
+  EGFR          -0.3104  p=2.06e-06 ***
+  JAK1          -0.3064  p=2.81e-06 ***
+
+  PREDICTION TESTS:
+  Gene         Role            r  p-value         Pred    Result
+  ----------------------------------------------------------------------
+  HNF4A        switch    -0.4603  p=3.39e-13 ***    <-0.50  ✗
+  FOXA1        switch    +0.2769  p=2.52e-05 ***    <-0.40  ✗
+  FOXA2        switch    -0.1803  p=6.69e-03  **    <-0.40  ✗
+  ALB          switch    -0.2677  p=4.74e-05 ***    <-0.50  ✗
+  APOB         switch    -0.3266  p=5.43e-07 ***    <-0.30  ✓
+  TTR          switch    -0.5824  p=7.91e-22 ***    <-0.30  ✓
+  AFP          FA        +0.6230  p=1.39e-25 ***    >+0.50  ✓
+  MYC          FA        +0.2852  p=1.39e-05 ***    >+0.40  ✗
+  CTNNB1       FA        +0.1364  p=0.0410   *    >+0.20  ✗
+  BIRC5        FA        +0.5733  p=4.67e-21 ***    >+0.40  ✓
+  TOP2A        FA        +0.5913  p=1.32e-22 ***    >+0.40  ✓
+  MKI67        FA        +0.6153  p=7.89e-25 ***    >+0.40  ✓
+  EZH2         FA        +0.5219  p=4.06e-17 ***    >+0.40  ✓
+  HDAC1        FA        +0.4567  p=5.41e-13 ***    >+0.30  ✓
+  AURKA        FA        +0.4730  p=6.08e-14 ***    >+0.30  ✓
+  ZEB2         FA        +0.1294  p=0.0526  ns    >+0.20  ✗
+  FGFR4        switch    +0.3398  p=1.74e-07 ***    <-0.30  ✗
+  FGFR1        FA        +0.2025  p=2.28e-03  **    >+0.20  ✓
+  S100A8       FA        +0.1956  p=3.22e-03  **    >+0.20  ✗
+  TERT         FA        -0.2199  p=8.95e-04 ***    >+0.20  ✗
+  KRT19        FA        +0.4886  p=6.62e-15 ***    >+0.20  ✓
+  EPCAM        FA        +0.6064  p=5.53e-24 ***    >+0.20  ✓
+  GPC3         FA        +0.2350  p=3.77e-04 ***    >+0.20  ✓
+  STAT3        FA        -0.2214  p=8.27e-04 ***    >+0.20  ✗
+
+=================================================================
+CROSS-CANCER TESTS
+=================================================================
+
+  CC-1: EZH2+HDAC1 EPIGENETIC LOCK
+  EAC r=+0.56/+0.47 | BLCA inverted
+  HCC prediction: r>+0.40
+  EZH2       r=+0.5219  p=4.06e-17 ***  ✓
+  EED        r=+0.4023  p=3.67e-10 ***  
+  SUZ12      r=+0.2060  p=1.89e-03  **  
+  HDAC1      r=+0.4567  p=5.41e-13 ***  ✓
+  HDAC2      r=+0.6403  p=2.36e-27 ***  
+  HDAC3      r=-0.1880  p=4.66e-03  **  
+  KDM6A      r=+0.1927  p=3.72e-03  **  
+  ARID1A     r=+0.1606  p=0.0159   *  
+  DNMT3A     r=+0.4515  p=1.06e-12 ***  
+
+  CC-2: FGFR ISOFORM IN LIVER
+  FGFR4=hepatocyte | Pred FGFR4<-0.30 FGFR1/2>+0.20
+  FGFR1    r=+0.2025  p=2.28e-03  **  ✓
+  FGFR2    r=+0.1051  p=0.1160  ns  ✗
+  FGFR3    r=+0.4475  p=1.77e-12 ***  
+  FGFR4    r=+0.3398  p=1.74e-07 ***  ✗
+  FGF21    r=-0.3163  p=1.27e-06 ***  
+
+  CC-3: ZEB2-AURKA COUPLING
+  STAD=+0.99 EAC=+0.47 BLCA≈0
+  HCC prediction: r>+0.30
+  All      r(ZEB2,AURKA)=-0.3339  p=4.75e-13 ***  
+  HCC      r(ZEB2,AURKA)=-0.1663  p=0.0125   *  ✗
+  Normal   r(ZEB2,AURKA)=-0.0482  p=0.4774  ns  
+
+  CC-4: FOXA1/FOXA2 SWITCH GENES
+  BLCA r=-0.84 BRCA confirmed
+  HCC prediction: r<-0.40
+  FOXA1    r=+0.2769  p=2.52e-05 ***  ✗
+  FOXA2    r=-0.1803  p=6.69e-03  **  ✗
+
+  CC-5: S100A8 POOR PROGNOSIS
+  BLCA confirmed | pred r>+0.30
+  S100A8   r=+0.1956  p=3.22e-03  **  ✗
+  S100A9   r=+0.2518  p=1.35e-04 ***  
+  S100A4   r=+0.3707  p=9.71e-09 ***  
+
+=================================================================
+CTNNB1 / MYC SUBTYPE ANALYSIS
+HCC-P4 / HCC-P5
+=================================================================
+  CTNNB1 median: 7.7990
+  MYC median:    8.3110
+  Groups:
+    CTNNB1-hi/MYC-hi: 59
+    CTNNB1-hi/MYC-lo: 54
+    CTNNB1-lo/MYC-hi: 54
+    CTNNB1-lo/MYC-lo: 58
+
+  Depth by group:
+  CTNNB1-hi       mean=0.3328 std=0.1538
+  CTNNB1-lo       mean=0.3106 std=0.1462
+  MYC-hi          mean=0.3578 std=0.1648
+  MYC-lo          mean=0.2854 std=0.1243
+
+  r(depth, CTNNB1) = +0.1364  p=0.0410   *
+  r(depth, MYC)    = +0.2852  p=1.39e-05 ***
+
+  r(CTNNB1, MYC) = +0.0221  p=0.7412  ns
+  Weakly correlated — partial
+
+  Wnt targets CTNNB1-hi vs lo:
+  LGR5     FC=-0.130  p=0.2957  ns
+  GLUL     FC=+0.023  p=0.9428  ns
+  DKK1     FC=+0.153  p=0.5532  ns
+  DKK4     FC=-0.056  p=0.0410   *
+  TBX3     FC=-0.044  p=0.8690  ns
+  MYC      FC=-0.034  p=0.9006  ns
+  CCND1    FC=-0.137  p=0.4609  ns
+  GPC3     FC=+0.431  p=0.9665  ns
+
+=================================================================
+SURVIVAL ANALYSIS — HCC
+=================================================================
+
+  OS: n_valid=221
+  Events=85/221 range=2.0–67.4 mo
+  Deep    (n=111): mean=34.3 mo
+  Shallow (n=110): mean=46.7 mo
+  Log-rank: p=3.80e-04 ***
+  CONFIRMED ✓
+
+  Individual genes OS p<0.05:
+  ACLY         p=0.0136   *  ↑=worse
+  ALDOB        p=4.45e-03  **  ↑=better
+  BAX          p=6.87e-03  **  ↑=worse
+  CDC20        p=5.45e-03  **  ↑=worse
+  CYP3A4       p=0.0115   *  ↑=better
+  DNMT3A       p=0.0346   *  ↑=worse
+  FASN         p=0.0480   *  ↑=worse
+  G6PC         p=1.76e-03  **  ↑=better
+  HDAC2        p=0.0103   *  ↑=worse
+  HDAC3        p=0.0417   *  ↑=better
+  IL6          p=0.0230   *  ↑=better
+  JAK2         p=4.23e-03  **  ↑=better
+  KDR          p=4.77e-05 ***  ↑=better
+  KRT19        p=0.0186   *  ↑=worse
+  MCM2         p=5.63e-03  **  ↑=worse
+  MTOR         p=0.0132   *  ↑=better
+  PROM1        p=2.42e-03  **  ↑=worse
+  PTEN         p=0.0280   *  ↑=worse
+  S100A9       p=0.0291   *  ↑=worse
+  SCD          p=0.0234   *  ↑=worse
+  SMAD3        p=6.21e-03  **  ↑=worse
+  SOX4         p=5.40e-04 ***  ↑=worse
+  TOP2A        p=9.43e-03  **  ↑=worse
+  TSC2         p=0.0500   *  ↑=better
+  TTR          p=3.29e-05 ***  ↑=better
+  VEGFA        p=0.0299   *  ↑=worse
+
+  RFS: n_valid=221
+  Events=121/221 range=0.1–67.4 mo
+  Deep    (n=111): mean=29.5 mo
+  Shallow (n=110): mean=38.8 mo
+  Log-rank: p=0.0296   *
+  CONFIRMED ✓
+
+  Individual genes RFS p<0.05:
+  CDC20        p=0.0317   *  ↑=worse
+  CYP3A4       p=0.0104   *  ↑=better
+  IL6          p=0.0261   *  ↑=better
+  JAK2         p=0.0381   *  ↑=better
+  KDR          p=1.18e-03  **  ↑=better
+  KRT19        p=0.0246   *  ↑=worse
+  KRT7         p=0.0283   *  ↑=better
+  LDLR         p=0.0197   *  ↑=worse
+  MTOR         p=1.92e-03  **  ↑=better
+  PROM1        p=0.0114   *  ↑=worse
+  S100A9       p=0.0189   *  ↑=worse
+  SMAD4        p=0.0460   *  ↑=better
+  SOX4         p=0.0112   *  ↑=worse
+  TOP2A        p=0.0266   *  ↑=worse
+  TTR          p=0.0144   *  ↑=better
+
+--- Generating figure ---
+
+  Figure saved: ./hcc_false_attractor/results_s1/hcc_gse14520_s1.png
