@@ -1,0 +1,293 @@
+=================================================================
+HEPATOCELLULAR CARCINOMA — SCRIPT 6
+Dataset: TCGA-LIHC (continued)
+Framework: OrganismCore
+Doc: 92f | Date: 2026-03-02
+=================================================================
+
+PREDICTIONS LOCKED 2026-03-02:
+S6-P1: CTNNB1-mut better OS (HCC-P5)
+S6-P2: TP53-mut worse OS
+S6-P3: CDK4-hi worse OS in GSE14520
+S6-P4: Depth predicts OS within Stage I
+S6-P5: Depth predicts OS within Stage II
+S6-P6: SMARCA4-hi worse OS in Stage I
+S6-P7: Age independently prognostic
+
+=================================================================
+PARSE EXPRESSION — TCGA-LIHC
+=================================================================
+  Matrix: (423, 82)
+  Sample IDs[0:3]: ['TCGA-FV-A495-01', 'TCGA-G3-A3CH-11', 'TCGA-CC-A3MB-01']
+  HCC: 371  Normal: 50
+
+=================================================================
+PARSE CLINICAL (S6 — age fix applied)
+=================================================================
+  Parsing: ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.survival.tsv.gz (2,438 bytes)
+  Headers: ['sample', 'os', 'os.time']
+  Cols: {'sc': 0, 'ec': 1, 'tc': 2}
+  Parsing: ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.pheno.tsv.gz (31,027 bytes)
+  Headers: ['sample', 'patientid', 'ablation_embolization_tx_adjuvant', 'afp_at_procurement', 'afp_norm_range_lower', 'afp_norm_range_upper', 'age', 'ajcc_metastasis_pathologic_pm', 'ajcc_nodes_pathologic_pn', 'ajcc_pathologic_tumor_stage', 'ajcc_staging_edition', 'ajcc_tumor_pathologic_pt', 'bilirubin_total', 'bilirubin_total_norm_range_lower', 'bilirubin_total_norm_range_upper']
+  Cols: {'sc': 0, 'ac': 6, 'stc': 9, 'gc': 28, 'ec': 42, 'genc': 61}
+
+  OS valid: 367 events=130
+  Stage encoded: {np.int64(1): 172, np.int64(2): 87, np.int64(3): 85, np.int64(4): 5}
+  Grade encoded: {np.int64(2): 178, np.int64(3): 123, np.int64(1): 55, np.int64(4): 12}
+  Age valid: 372
+  Age: mean=59.5 range=16–90
+
+=================================================================
+PARSE MAF
+=================================================================
+  ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.maf.gz (55,112 bytes)
+  Headers: ['HUGO_SYMBOL', 'ENTREZ_GENE_ID', 'CENTER', 'NCBI_BUILD', 'CHROMOSOME', 'START_POSITION', 'END_POSITION', 'STRAND']
+  gene=0 sample=15 effect=8
+
+  Mutations parsed: 2
+
+  Frequencies:
+  Gene               n        %
+  ------------------------------
+  TP53               1      0.2%
+  TSC2               1      0.2%
+
+=================================================================
+DEPTH SCORE
+=================================================================
+  n=371  mean=0.3334  std=0.1599
+
+=================================================================
+S6-1: MUTATION SURVIVAL (HCC-P5 FINAL)
+S6-P1: CTNNB1-mut better OS
+S6-P2: TP53-mut worse OS
+=================================================================
+
+  Gene          n_mut    mut_OS     wt_OS  logrank       dir
+  ----------------------------------------------------------------
+
+  S6-P1: CTNNB1-mut better OS (HCC-P5)
+  STATUS: NOT TESTABLE (n_mut<5)
+  S6-P2: TP53-mut worse OS
+  STATUS: NOT TESTABLE (n_mut<5)
+
+  CTNNB1-mut vs TP53-mut depth:
+
+=================================================================
+S6-2: FULL COX MULTIVARIATE
+S6-P7: Age independently prognostic
+=================================================================
+  Stage valid: 347
+  Grade valid: 366
+  Age valid:   370
+  CTNNB1 mut:  0
+  TP53 mut:    1
+
+  Model 1: depth alone:
+  n=365
+               coef  exp(coef)         p
+covariate                               
+depth      0.308716   1.361676  0.000394
+
+  Model 2: depth + age:
+  n=365
+               coef  exp(coef)         p
+covariate                               
+depth      0.329272   1.389956  0.000145
+age        0.202647   1.224640  0.030196
+
+  S6-P7: Age independently prognostic
+  age p=0.030196
+  STATUS: CONFIRMED ✓
+
+  Model 3: depth + stage:
+  n=341
+               coef  exp(coef)         p
+covariate                               
+depth      0.219186   1.245063  0.017114
+stage      0.401569   1.494167  0.000012
+
+  Model 4: depth + grade:
+  n=360
+               coef  exp(coef)         p
+covariate                               
+depth      0.326361   1.385916  0.000530
+grade     -0.023109   0.977156  0.808268
+
+  Model 5: depth+stage+grade+age:
+  n=339
+               coef  exp(coef)         p
+covariate                               
+depth      0.218067   1.243670  0.027103
+stage      0.420231   1.522313  0.000007
+grade      0.066093   1.068327  0.528780
+age        0.163668   1.177823  0.093821
+
+=================================================================
+S6-3: STAGE-STRATIFIED DEPTH SURVIVAL
+S6-P4: Depth OS within Stage I
+S6-P5: Depth OS within Stage II
+=================================================================
+
+  Stage     n_total  n_valid  depth_OS_p  deep_OS  shall_OS  status
+  ----------------------------------------------------------------------
+  Stage I       171      170  p=0.9199  ns     31.9      27.1  NOT CONF ✗
+  Stage II       86       84  p=0.2314  ns     25.4      26.0  DIR ✓
+  Stage III       85       83  p=0.0511  ns     19.6      26.9  DIR ✓
+  Stage IV        5   (n<10 — skip)
+
+  S6-P4: Depth OS within Stage I
+  deep=31.9mo  shallow=27.1mo  p=0.9199  ns
+  STATUS: NOT CONFIRMED ✗
+
+  S6-P5: Depth OS within Stage II
+  deep=25.4mo  shallow=26.0mo  p=0.2314  ns
+  STATUS: DIRECTIONAL ✓
+
+  Depth vs grade within each stage:
+  Stage 1: r(depth, grade)=+0.4732  p=7.17e-11 ***
+  Stage 2: r(depth, grade)=+0.2566  p=0.0178   *
+  Stage 3: r(depth, grade)=+0.2067  p=0.0577  ns
+
+=================================================================
+S6-4: SMARCA4 WITHIN STAGE I
+S6-P6: SMARCA4-hi worse OS Stage I
+=================================================================
+  All stages: n=371  r(depth)=+0.6071  OS: p=0.4375  ns  hi=25.8mo  lo=27.6mo  ↑worse ✓
+  Stage I: n=171  r(depth)=+0.6307  OS: p=0.9254  ns  hi=29.2mo  lo=29.9mo  ↑worse ✓
+  Stage II: n=86  r(depth)=+0.5071  OS: p=0.1497  ns  hi=29.1mo  lo=22.4mo  ↑better ✗
+  Stage III: n=85  r(depth)=+0.6344  OS: p=0.0509  ns  hi=18.9mo  lo=27.7mo  ↑worse ✓
+
+  S6-P6: SMARCA4-hi worse OS in Stage I
+  STATUS: DIRECTIONAL ✓
+
+=================================================================
+S6-5: CDK4 IN GSE14520
+S6-P3: CDK4-hi worse OS in GSE14520
+=================================================================
+  CDK4 not found in any GSE14520 file.
+  S6-P3: NOT TESTABLE
+  CDK4 was not in the 152-gene target list used in Scripts 1-2.
+  To test: add CDK4 to METAB_SWITCH/PROG_FA lists
+  and reprocess GSE14520 expression matrix.
+
+  CDK4 TCGA-LIHC summary:
+  r(depth) = +0.653  ***
+  OS: p=1.12e-03 **
+  Tertile T3 vs T1: p=2.12e-04 ***
+  Prediction for GSE14520:
+  CDK4-hi worse OS (p<0.05)
+  — pending expression data
+
+=================================================================
+S6-6: IMMUNE-COLD DEEP HCC
+Deep+Exhaust-lo = worst OS group
+(finding from Script 5)
+=================================================================
+
+  Group              n   OS_mean  events  stage_mix
+  -------------------------------------------------------
+  Deep+Cold         65      24.7      32  S1:17/S2:18/S3:24
+  Deep+Hot         118      27.3      46  S1:47/S2:33/S3:32/S4:1
+  Shal+Cold        117      27.2      35  S1:61/S2:24/S3:21/S4:3
+  Shal+Hot          65      26.7      17  S1:45/S2:9/S3:6
+
+  Pairwise OS comparisons:
+  Deep+Cold vs Shal+Hot (worst vs best): p=0.0140   *  24.7 vs 26.7mo
+  Deep+Cold vs Deep+Hot (cold vs hot (deep)): p=0.2390  ns  24.7 vs 27.3mo
+  Deep+Cold vs Shal+Cold (deep vs shal (cold)): p=0.0205   *  24.7 vs 27.2mo
+
+  Deep+Cold characterisation:
+  n=65
+  Grade: {1: 6, 2: 30, 3: 27, 4: 1}
+
+  Gene expression: Deep+Cold vs Deep+Hot
+  Gene              Cold       Hot        FC  p
+  ----------------------------------------------------
+  AFP             7.6958    9.6333    -20.1%  p=5.78e-03  **
+  GPC3            5.4593    6.2642    -12.9%  p=0.2761  ns
+  MKI67           0.0385    0.2060    -81.3%  p=0.4285  ns
+  TOP2A           0.3315    0.3178     +4.3%  p=0.8394  ns
+  CDK4           -0.2511    0.0278  -1004.0%  p=5.10e-03  **
+  EZH2            0.2508    0.2821    -11.1%  p=0.6608  ns
+  HDAC2          -0.7484   -0.5966    -25.4%  p=0.1157  ns
+  CD8A           -2.0195    0.6599   -406.0%  p=3.66e-21 ***
+  CD274          -2.3827   -1.3072    -82.3%  p=1.18e-06 ***
+  FOXP3          -1.3651    0.5072   -369.1%  p=7.40e-13 ***
+  CD68           -0.3699    0.5029   -173.6%  p=5.56e-08 ***
+  CTNNB1         -0.5396   -0.5772     +6.5%  p=0.7385  ns
+  GLUL            1.0987    0.6496    +69.1%  p=0.0598  ns
+  VIM            -1.5992   -0.9864    -62.1%  p=2.39e-05 ***
+
+=================================================================
+S6-7: CDK4 STAGE-STRATIFIED SURVIVAL
+=================================================================
+  r(depth, CDK4) = +0.6531  p=1.74e-46 ***
+
+  Stratum            n           OS_p  hi_OS  lo_OS
+  -------------------------------------------------------
+  All              365  p=1.12e-03  **    23.4    30.0
+  Stage I          170  p=0.1335  ns    28.1    31.0
+  Stage II          84  p=0.0951  ns    19.7    31.7
+  Stage III         83  p=4.88e-04 ***    16.3    30.3
+  G2               175  p=8.16e-03  **    21.3    31.0
+  G3               118  p=0.0253   *    23.9    29.2
+
+=================================================================
+S6-8: COMPREHENSIVE GENE OS TABLE
+All genes in matrix vs OS
+=================================================================
+
+  TOP 20 OS PREDICTORS (TCGA-LIHC):
+  Gene            r_depth            OS_p  hi_OS  lo_OS  dir
+  --------------------------------------------------------------------
+  CDC20           +0.6771  p=2.57e-07 ***    22.8    30.6  ↑=worse
+  BIRC5           +0.6653  p=3.22e-05 ***    23.9    29.5  ↑=worse
+  EZH2            +0.6101  p=3.60e-05 ***    23.7    29.8  ↑=worse
+  G6PC            -0.6230  p=1.27e-04 ***    30.2    23.2  ↑=better
+  CCNB1           +0.6860  p=2.10e-04 ***    24.3    29.2  ↑=worse
+  APOB            -0.5464  p=7.31e-04 ***    29.2    24.2  ↑=better
+  HDAC2           +0.6136  p=7.72e-04 ***    22.8    30.6  ↑=worse
+  CDK4            +0.6531  p=1.12e-03  **    23.4    30.0  ↑=worse
+  CYP2C9          -0.6118  p=1.49e-03  **    29.7    23.7  ↑=better
+  TOP2A           +0.6347  p=2.46e-03  **    22.6    30.8  ↑=worse
+  MKI67           +0.6744  p=3.15e-03  **    24.5    28.9  ↑=worse
+  CYP3A4          -0.6335  p=3.50e-03  **    29.5    23.9  ↑=better
+  IGF1            -0.4502  p=4.10e-03  **    29.6    23.8  ↑=better
+  CDKN2A          +0.1526  p=7.56e-03  **    22.9    30.6  ↑=worse
+  PPARA           -0.6080  p=0.0104   *    28.6    24.8  ↑=better
+  CD8A            +0.2256  p=0.0130   *    29.6    23.8  ↑=better
+  ALDOB           -0.6248  p=0.0161   *    28.9    24.5  ↑=better
+  APOE            -0.4548  p=0.0278   *    28.4    25.1  ↑=better
+  PTEN            -0.1623  p=0.0300   *    29.6    23.8  ↑=better
+  PRF1            +0.0049  p=0.0306   *    29.7    23.7  ↑=better
+
+  GENES WITH p<0.05 (all):
+  n=23
+  CDC20        r=+0.6771  p=2.57e-07 ***  ↑=worse
+  BIRC5        r=+0.6653  p=3.22e-05 ***  ↑=worse
+  EZH2         r=+0.6101  p=3.60e-05 ***  ↑=worse
+  G6PC         r=-0.6230  p=1.27e-04 ***  ↑=better
+  CCNB1        r=+0.6860  p=2.10e-04 ***  ↑=worse
+  APOB         r=-0.5464  p=7.31e-04 ***  ↑=better
+  HDAC2        r=+0.6136  p=7.72e-04 ***  ↑=worse
+  CDK4         r=+0.6531  p=1.12e-03  **  ↑=worse
+  CYP2C9       r=-0.6118  p=1.49e-03  **  ↑=better
+  TOP2A        r=+0.6347  p=2.46e-03  **  ↑=worse
+  MKI67        r=+0.6744  p=3.15e-03  **  ↑=worse
+  CYP3A4       r=-0.6335  p=3.50e-03  **  ↑=better
+  IGF1         r=-0.4502  p=4.10e-03  **  ↑=better
+  CDKN2A       r=+0.1526  p=7.56e-03  **  ↑=worse
+  PPARA        r=-0.6080  p=0.0104   *  ↑=better
+  CD8A         r=+0.2256  p=0.0130   *  ↑=better
+  ALDOB        r=-0.6248  p=0.0161   *  ↑=better
+  APOE         r=-0.4548  p=0.0278   *  ↑=better
+  PTEN         r=-0.1623  p=0.0300   *  ↑=better
+  PRF1         r=+0.0049  p=0.0306   *  ↑=better
+  CD247        r=+0.1319  p=0.0365   *  ↑=better
+  IDH2         r=-0.2063  p=0.0439   *  ↑=better
+  CDH1         r=+0.0899  p=0.0490   *  ↑=better
+
+--- Generating Script 6 figure ---
+
+  Figure saved: ./hcc_false_attractor/results_s6/hcc_tcga_s6.png
