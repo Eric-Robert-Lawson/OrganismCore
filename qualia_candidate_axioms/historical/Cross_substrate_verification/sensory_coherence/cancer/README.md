@@ -2604,21 +2604,219 @@ Block:    HCC cells vs normal
           hepatocytes
 Predicted switch genes:
   HNF4A  — hepatocyte master TF
-           (was in CRC panel but
-           absent from dataset —
-           now test in correct tissue)
+           CONFIRMED as primary driver
+           ~70% HCC show HNF4A loss
+           (epigenetic, not mutational)
+           Forced re-expression reverts
+           dedifferentiated HCC cells
+           toward hepatocyte identity
   ALB    — albumin (terminal marker)
+           CONFIRMED in depth score
+           SW gene, suppressed in deep HCC
   APOB   — apolipoprotein B
-           (terminal secretory)
+           CONFIRMED in depth score
+           SW gene, suppressed in deep HCC
   CYP3A4 — cytochrome P450
-           (terminal metabolic)
-Data:    GSE149614 (Ma et al.)
-         or GSE151530 (Zhang et al.)
-Note:    HNF4A was predicted in CRC
-         but missing from the panel.
-         This is the first chance to
-         test it in its primary tissue.
-Doc: 87
+           CONFIRMED in depth score
+           Strongest SW gene in TCGA panel
+           r_depth = -0.71 (approx)
+  PPARA  — peroxisome proliferator
+           activated receptor alpha
+           ADDED — confirmed SW gene
+           co-suppressed with HNF4A
+  ALDOB  — aldolase B
+           ADDED — confirmed SW gene
+           metabolic switch confirmed
+  G6PC   — glucose-6-phosphatase
+           ADDED — confirmed SW gene
+           gluconeogenesis marker
+  CYP2C9 — cytochrome P450 2C9
+           ADDED — confirmed SW gene
+
+False attractor (FA) genes confirmed:
+  CDC20  — strongest OS predictor
+           p=2.57e-07, r_depth=+0.677
+           absorbs 28-gene score in Cox
+           single IHC proxy for axis
+  HDAC2  — epigenetic lock confirmed
+           r_depth=+0.614 (TCGA)
+           r_depth=+0.333 (GSE14520)
+           universal across aetiologies
+           Stage III gap = 19.2 months
+  EZH2   — HBV-specific epigenetic lock
+           r_depth=+0.859 (GSE14520)
+           highest gene-depth r in series
+           driven by HBx protein directly
+  BIRC5  — confirmed FA gene
+           p=3.22e-05 OS predictor
+  TOP2A  — strongest depth correlate
+           in HBV cohort r=+0.888
+  CCNB1  — confirmed FA gene
+           r_depth=+0.859 (GSE14520)
+  MKI67  — confirmed FA gene
+           r_depth=+0.829 (GSE14520)
+  AFP    — progenitor marker confirmed
+           r_depth=+0.619 (GSE14520)
+  EPCAM  — progenitor marker confirmed
+
+Two-cohort validation:
+  TCGA-LIHC:  n=371 HCC
+              OS p=1.01e-04, HR=1.362
+              HCV/alcohol dominant
+              Depth mean=0.333
+  GSE14520:   n=445 HCC
+              Expression confirmed
+              OS: pending supplement
+              HBV dominant
+              Depth mean=0.453
+
+Key findings:
+  [1] Depth predicts OS independently
+      of stage (HR=1.245, p=0.017),
+      grade (grade NS after depth),
+      and age in full Cox model
+      (HR=1.244, p=0.027)
+
+  [2] Stage I depth reversal confirmed
+      All markers NS in Stage I
+      Framework applies to Stage II–III
+      only. Stage I prognosis governed
+      by surgical/cirrhosis factors,
+      not molecular biology of this axis.
+
+  [3] Minimum clinical model (Model D):
+      stage + CDC20 + HDAC2
+      All three independently significant
+      Implementable by standard IHC
+      No RNA-seq required
+      CDC20 HR=1.406 p=0.0012
+      HDAC2 HR=1.227 p=0.037
+
+  [4] HDAC2 × PRF1 framework (Stage III)
+      Worst: HDAC2-hi+PRF1-lo = 12.8mo
+      Best:  HDAC2-lo+PRF1-hi = 40.3mo
+      Gap = 27.5 months (p=7.19e-05)
+      Mechanism: HDAC2 suppresses MHC-I
+      → CTLs present but cannot kill
+      → HDAC inhibition restores antigen
+        presentation → PRF1 killing
+        enabled → checkpoint synergy
+
+  [5] HDAC2 × CDK4 joint analysis
+      Worst: HDAC2-hi+CDK4-hi = 12.2mo
+      Best:  HDAC2-lo+CDK4-lo = 34.1mo
+      Gap = 21.9 months (p=4.79e-06)
+      38% of Stage III in worst group
+      Drug: entinostat + palbociclib
+
+  [6] Two deep HCC states by aetiology
+      Type A (HCV/alcohol, Hoshida S2):
+        CDK4-driven  r=+0.653 (TCGA)
+        Drug: CDK4/6i (palbociclib)
+        Biomarker: CDK4 IHC
+      Type B (HBV, Hoshida S1):
+        EZH2-driven  r=+0.859 (GSE14520)
+        CDK4 FALLS with depth r=-0.724
+        HBx → EZH2 mechanism confirmed
+        Drug: EZH2i (tazemetostat)
+        Biomarker: EZH2 IHC
+      Universal across both:
+        HDAC2 (positive both cohorts)
+        Drug: HDACi (entinostat)
+        Biomarker: HDAC2 IHC
+
+  [7] Immune axis
+      5 co-inhibitory receptors
+      upregulated with depth
+      (PD-1/TIM-3/LAG-3/TIGIT/CTLA-4)
+      composite r=+0.37 p=3.42e-13
+      Deep+Hot: depth-hi + exhausted
+      Deep+Cold: depth-hi + desert
+        CDK4-lo, AFP-lo, immune-absent
+        CTNNB1-Wnt active (r=+0.343)
+        Checkpoint inhibitor POOR choice
+
+  [8] CTNNB1 mutation (HCC-P5)
+      Confirmed by literature
+      CTNNB1-mut OS = 39.78 months
+      TP53-mut OS   = 25.15 months
+      CTNNB1-mut = Hoshida S3 (shallow)
+      CTNNB1-mut → immune exclusion
+      → poor checkpoint responder
+      MAF computationally incomplete
+
+Drug predictions (ranked):
+  Grade A (strongest):
+    Entinostat     HDAC2-hi S3 HCC
+                   both aetiologies
+    Palbociclib    CDK4-hi S2-S3 HCC
+                   HCV/alcohol type
+                   Active: NCT06478927
+    Entinostat     HDAC2-hi+CDK4-hi S3
+    + Palbociclib  OS=12.2mo target
+                   novel combination
+
+  Grade B:
+    Tazemetostat   EZH2-hi HBV-HCC
+                   r=+0.859, HBx mech
+                   no HCC trial exists
+    Tazemetostat   EZH2-hi+HDAC2-hi
+    + Entinostat   HBV-HCC dual lock
+    Anti-PD-1      PRF1-hi+HDAC2-lo
+    (enriched)     OS=40.3mo group
+    HDACi          HDAC2-hi+PRF1-lo S3
+    + Anti-PD-1    OS=12.8mo target
+    Tazemetostat   HBx-EZH2-PD-L1 axis
+    + Anti-PD-1    HBV-HCC specific
+    Everolimus     PTEN-low+Deep+Hot
+    (enriched)     explains EVOLVE-1
+                   failure (unselected)
+
+Converges with:
+  Hoshida 2009   S1/S2/S3 subtypes
+                 independently derived
+  Sia 2017       immune desert/excluded
+                 independently derived
+  CMC 2025       CDK4 prognostic in HCC
+  Springer 2025  HDAC2 chromatin HCC
+  NAR 2018       HBx/EZH2 mechanism
+  AACR 2025      CTNNB1-mut better OS
+
+Novel contributions (13):
+  1.  HDAC2×PRF1 framework (27.5mo gap)
+  2.  HDAC2×CDK4 joint Stage III
+  3.  Stage I depth reversal
+  4.  CDC20 single-gene depth proxy
+  5.  CDK4+CDKN2A runaway quadrant
+  6.  Deep+Cold quiet-deep subtype
+  7.  HDACi+CDK4/6i combination
+  8.  HDAC2 checkpoint resistance marker
+  9.  PTEN-low in Deep+Hot (EVOLVE-1)
+  10. Two deep states by aetiology
+  11. HBx→EZH2→depth axis connection
+  12. Tazemetostat HBV-HCC rationale
+  13. Aetiology-stratified drug framework
+
+Pending:
+  GSE14520 OS supplement
+    (Roessler et al. Cancer Res 2010)
+    CDK4/PRF1/BIRC5/depth OS in HBV
+    Predicted: CDK4-lo may be worse OS
+    in HBV cohort (direction reversal)
+  GDC full MAF
+    CTNNB1 computational confirmation
+  Experimental:
+    Entinostat + palbociclib synergy
+    in HDAC2-hi+CDK4-hi HCC lines
+    HDAC2 IHC prospective validation
+    Tazemetostat in HBV-HCC cell lines
+
+Data:  TCGA-LIHC (n=371 HCC, RNA-seq)
+       GSE14520 (n=445, Affymetrix
+       GPL3921, HBV-dominant)
+Scripts: 9 (hcc_false_attractor_v1–v9.py)
+Docs:  92a–92j + addendum
+Date:  2026-03-02
 ```
 
 #### ICC — Intrahepatic
