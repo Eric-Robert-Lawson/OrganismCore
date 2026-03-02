@@ -1,0 +1,399 @@
+=================================================================
+ICC FALSE ATTRACTOR — SCRIPT 2
+ITERATION RUN — CORRECTED FRAMEWORK
+Framework: OrganismCore
+Doc: 93e | Date: 2026-03-02
+=================================================================
+
+SCRIPT 1 FINDINGS (Doc 93a):
+  Top TCGA: TWIST1 r=+0.789 (EMT)
+  Top GSE:  ALB    r=-0.803 (SW)
+  Unexpected: KDM1A, DNMT3A, two-basin NMF
+
+SCRIPT 2 PREDICTIONS (locked):
+  S2-P1: KDM1A independent epi lock
+  S2-P2: Two basins — Depth_T/Depth_S
+  S2-P3: FOXA2→ALB broken in GSE
+  S2-P4: DNMT3A depth-negative
+  S2-P5: KDM1A+EZH2 co-elevated
+  S2-P6: S2 depth r>0.80 with S1
+  S2-P7: NMF × depth axis decomposition
+
+=================================================================
+LOADING TCGA-CHOL (reuse S1 download)
+=================================================================
+  tumour=36 normal=9 genes=74
+
+=================================================================
+LOADING GSE32225 (reuse S1 download)
+=================================================================
+  Probe map: 103 probes
+  ICC=149 Normal=6 genes=72
+
+  S1 depth reproduced: TCGA mean=0.4634 GSE mean=0.5278
+
+=================================================================
+S2 DEPTH SCORES — TCGA-CHOL
+=================================================================
+  Depth_T (EMT): mean=0.3837 std=0.1779
+  Depth_S (Stroma): mean=0.4001 std=0.1470
+  Depth_comb: mean=0.3919 std=0.1570
+
+=================================================================
+S2 DEPTH SCORES — GSE32225
+=================================================================
+  Depth_T (EMT): mean=0.5215 std=0.1530
+  Depth_S (Stroma): mean=0.5085 std=0.1567
+  Depth_comb: mean=0.5150 std=0.1497
+
+=================================================================
+S1 vs S2 DEPTH COMPARISON — TCGA-CHOL
+=================================================================
+  r(S1, Depth_T) = +0.8775 p=2.15e-12 ***
+  r(S1, Depth_S) = +0.8685 p=6.74e-12 ***
+  r(Depth_T, Depth_S) = +0.8662 p=8.85e-12 ***
+  S1 vs Depth_T: partial concordance
+  S1 vs Depth_S: partial concordance
+  Depth_T and Depth_S are CORRELATED — same underlying axis
+
+=================================================================
+S1 vs S2 DEPTH COMPARISON — GSE32225
+=================================================================
+  r(S1, Depth_T) = +0.8145 p=1.43e-36 ***
+  r(S1, Depth_S) = +0.9154 p=5.99e-60 ***
+  r(Depth_T, Depth_S) = +0.8686 p=1.14e-46 ***
+  S1 vs Depth_T: partial concordance
+  S1 vs Depth_S: same biology
+  Depth_T and Depth_S are CORRELATED — same underlying axis
+
+=================================================================
+DEPTH CORRELATIONS (Depth_T) — TCGA-CHOL
+=================================================================
+  n = 36
+
+  Rank  Gene                r              p  panel
+  ----------------------------------------------------
+  1     G6PC          -0.8162 p=1.31e-09 ***  SW
+  2     APOB          -0.7308 p=4.17e-07 ***  SW
+  3     ALB           -0.6923 p=2.90e-06 ***  SW
+  4     TWIST1        +0.6863 p=3.83e-06 ***  ctx
+  5     WNT5A         +0.6414 p=2.49e-05 ***  STROMA
+  6     CYP3A4        -0.6050 p=9.29e-05 ***  SW
+  7     CD44          +0.6049 p=9.30e-05 ***  FA
+  8     MMP2          +0.6009 p=1.07e-04 ***  STROMA
+  9     ALDOB         -0.5982 p=1.17e-04 ***  SW
+  10    ZEB1          +0.5797 p=2.11e-04 ***  ctx
+  11    FOXA2         -0.5672 p=3.10e-04 ***  SW
+  12    ZEB2          +0.5641 p=3.40e-04 ***  ctx
+  13    VIM           +0.5536 p=4.61e-04 ***  ctx
+  14    FGFR2         -0.5450 p=5.89e-04 ***  ctx
+  15    TGFB1         +0.5372 p=7.29e-04 ***  STROMA
+  16    KDM1A         +0.5041 p=1.72e-03  **  EPI
+  17    HNF4A         -0.5003 p=1.89e-03  **  SW
+  18    HAVCR2        +0.4979 p=2.00e-03  **  ctx
+  19    ACTA2         +0.4714 p=3.71e-03  **  STROMA
+  20    CDH1          -0.4694 p=3.87e-03  **  ctx
+
+=================================================================
+DEPTH CORRELATIONS (Depth_S) — TCGA-CHOL
+=================================================================
+  n = 36
+
+  Rank  Gene                r              p  panel
+  ----------------------------------------------------
+  1     TWIST1        +0.7664 p=5.08e-08 ***  ctx
+  2     MMP2          +0.7336 p=3.57e-07 ***  STROMA
+  3     ACTA2         +0.7261 p=5.40e-07 ***  STROMA
+  4     APOB          -0.6872 p=3.68e-06 ***  SW
+  5     COL1A1        +0.6657 p=9.38e-06 ***  STROMA
+  6     WNT5A         +0.6641 p=1.01e-05 ***  STROMA
+  7     FAP           +0.6512 p=1.70e-05 ***  STROMA
+  8     POSTN         +0.6489 p=1.86e-05 ***  STROMA
+  9     ZEB2          +0.6362 p=3.04e-05 ***  ctx
+  10    TGFB1         +0.6296 p=3.89e-05 ***  STROMA
+  11    G6PC          -0.5963 p=1.24e-04 ***  SW
+  12    CD44          +0.5812 p=2.01e-04 ***  FA
+  13    ALB           -0.5455 p=5.79e-04 ***  SW
+  14    ZEB1          +0.5247 p=1.02e-03  **  ctx
+  15    CTNNB1        +0.5138 p=1.35e-03  **  ctx
+  16    ALDOB         -0.5104 p=1.47e-03  **  SW
+  17    KDM1A         +0.4964 p=2.08e-03  **  EPI
+  18    MMP9          +0.4686 p=3.95e-03  **  STROMA
+  19    SNAI1         +0.4540 p=5.41e-03  **  ctx
+  20    FOXA2         -0.4509 p=5.78e-03  **  SW
+
+=================================================================
+DEPTH CORRELATIONS (Depth_T) — GSE32225
+=================================================================
+  n = 149
+
+  Rank  Gene                r              p  panel
+  ----------------------------------------------------
+  1     ALB           -0.8218 p=9.68e-38 ***  SW
+  2     VIM           +0.8133 p=2.14e-36 ***  ctx
+  3     ACTA2         +0.7037 p=1.40e-23 ***  STROMA
+  4     ZEB1          +0.6417 p=1.16e-18 ***  ctx
+  5     CD44          +0.6373 p=2.36e-18 ***  FA
+  6     APOB          -0.6342 p=3.86e-18 ***  SW
+  7     HNF4A         -0.6008 p=5.48e-16 ***  SW
+  8     SOX4          +0.5994 p=6.71e-16 ***  FA
+  9     POSTN         +0.5625 p=8.32e-14 ***  STROMA
+  10    HAVCR2        +0.5603 p=1.09e-13 ***  ctx
+  11    EGFR          +0.5538 p=2.38e-13 ***  ctx
+  12    DNMT3A        -0.5520 p=2.93e-13 ***  EPI
+  13    ARID1A        +0.5460 p=5.95e-13 ***  ctx
+  14    CCND1         +0.5255 p=5.96e-12 ***  ctx
+  15    COL1A1        +0.5176 p=1.38e-11 ***  STROMA
+  16    CDK6          +0.5019 p=6.96e-11 ***  FA
+  17    HDAC1         +0.5005 p=8.02e-11 ***  EPI
+  18    NOTCH1        +0.4939 p=1.54e-10 ***  ctx
+  19    EZH2          +0.4865 p=3.15e-10 ***  EPI
+  20    BIRC5         +0.4704 p=1.42e-09 ***  FA
+
+=================================================================
+DEPTH CORRELATIONS (Depth_S) — GSE32225
+=================================================================
+  n = 149
+
+  Rank  Gene                r              p  panel
+  ----------------------------------------------------
+  1     ALB           -0.8474 p=2.98e-42 ***  SW
+  2     ACTA2         +0.8149 p=1.22e-36 ***  STROMA
+  3     COL1A1        +0.7525 p=1.88e-28 ***  STROMA
+  4     APOB          -0.6914 p=1.65e-22 ***  SW
+  5     HNF4A         -0.6807 p=1.31e-21 ***  SW
+  6     CD44          +0.6686 p=1.21e-20 ***  FA
+  7     SOX4          +0.6564 p=1.02e-19 ***  FA
+  8     POSTN         +0.6492 p=3.39e-19 ***  STROMA
+  9     HAVCR2        +0.6117 p=1.17e-16 ***  ctx
+  10    HDAC1         +0.5759 p=1.55e-14 ***  EPI
+  11    VIM           +0.5726 p=2.34e-14 ***  ctx
+  12    ARID1A        +0.5712 p=2.82e-14 ***  ctx
+  13    CCND1         +0.5681 p=4.15e-14 ***  ctx
+  14    ERBB2         +0.5472 p=5.16e-13 ***  ctx
+  15    NOTCH1        +0.5453 p=6.48e-13 ***  ctx
+  16    EGFR          +0.5399 p=1.20e-12 ***  ctx
+  17    DNMT3A        -0.5167 p=1.53e-11 ***  EPI
+  18    SF3B1         +0.5118 p=2.53e-11 ***  ctx
+  19    CDH1          +0.4950 p=1.38e-10 ***  ctx
+  20    ZEB1          +0.4639 p=2.54e-09 ***  ctx
+
+=================================================================
+EXTENDED GAP TESTS — TCGA-CHOL
+=================================================================
+
+  Circuit                                       r              p  classification
+  --------------------------------------------------------------------------------
+  S2-P1: KDM1A→ALB (epi lock→SW gene)     -0.3759   p=0.0238   *  ANTI-CORRELATED −
+    → negative = KDM1A silences biliary
+  S2-P1: KDM1A→HNF4A repression           -0.3203   p=0.0569  ns  ANTI-CORRELATED −
+    → negative = KDM1A represses TF
+  S2-P5: KDM1A+EZH2 co-lock               +0.2089   p=0.2215  ns  WEAK POS
+    → positive = dual epigenetic lock
+  S2-P3: FOXA2→ALB circuit                +0.5089 p=1.53e-03  **  CONNECTED +
+    → near zero/negative = broken
+  FOXA2↔HNF4A co-regulation               +0.7422 p=2.21e-07 ***  CONNECTED +
+    → positive = co-regulated TFs
+  S2-P4: DNMT3A (low=deep) vs ALB         +0.2133   p=0.2117  ns  WEAK POS
+    → positive = low DNMT3A→low ALB
+  DNMT3A vs EZH2 opposition               +0.0647   p=0.7079  ns  BROKEN ✓
+    → negative = DNMT3A loss + EZH2 gain
+  WNT5A→COL1A1 stroma                     +0.4764 p=3.31e-03  **  CONNECTED +
+    → positive = WNT5A activates stroma
+  WNT5A→ACTA2 CAF activation              +0.3282   p=0.0507  ns  CONNECTED +
+    → positive = WNT5A→CAF
+  TGFB1→COL1A1 fibrosis                   +0.5500 p=5.10e-04 ***  CONNECTED +
+    → positive = TGFB1 drives ECM
+  EZH2→TWIST1 (epi→EMT)                   -0.0600   p=0.7280  ns  BROKEN ✓
+    → positive = EZH2 promotes EMT
+  KDM1A→TWIST1 (LSD1→EMT)                 +0.5245 p=1.03e-03  **  CONNECTED +
+    → positive = KDM1A promotes EMT
+  TWIST1↔COL1A1 (EMT vs stroma)           +0.6620 p=1.10e-05 ***  CONNECTED +
+    → independent if different axes
+
+=================================================================
+EXTENDED GAP TESTS — GSE32225
+=================================================================
+
+  Circuit                                       r              p  classification
+  --------------------------------------------------------------------------------
+  S2-P3: FOXA2→ALB circuit                -0.3380 p=2.49e-05 ***  ANTI-CORRELATED −
+    → near zero/negative = broken
+  FOXA2↔HNF4A co-regulation               -0.2675 p=9.74e-04 ***  WEAK NEG
+    → positive = co-regulated TFs
+  S2-P4: DNMT3A (low=deep) vs ALB         +0.5017 p=7.13e-11 ***  CONNECTED +
+    → positive = low DNMT3A→low ALB
+  DNMT3A vs EZH2 opposition               -0.3490 p=1.29e-05 ***  ANTI-CORRELATED −
+    → negative = DNMT3A loss + EZH2 gain
+  WNT5A→COL1A1 stroma                     +0.3339 p=3.16e-05 ***  CONNECTED +
+    → positive = WNT5A activates stroma
+  WNT5A→ACTA2 CAF activation              +0.3337 p=3.20e-05 ***  CONNECTED +
+    → positive = WNT5A→CAF
+  TGFB1→COL1A1 fibrosis                   -0.1364   p=0.0972  ns  BROKEN ✓
+    → positive = TGFB1 drives ECM
+  EZH2→TWIST1 (epi→EMT)                   +0.0140   p=0.8652  ns  BROKEN ✓
+    → positive = EZH2 promotes EMT
+  TWIST1↔COL1A1 (EMT vs stroma)           +0.2808 p=5.22e-04 ***  WEAK POS
+    → independent if different axes
+
+=================================================================
+EPIGENETIC ANALYSIS — TCGA-CHOL
+=================================================================
+
+  Epigenetic gene correlations with Depth_T and Depth_S:
+  Gene           r_DT           p_DT      r_DS           p_DS  axis
+  ------------------------------------------------------------------------
+  EZH2        -0.0973   p=0.5724  ns   -0.2641   p=0.1196  ns  Stroma
+  KDM1A       +0.5041 p=1.72e-03  **   +0.4964 p=2.08e-03  **  Both
+  HDAC1       +0.1071   p=0.5343  ns   +0.0284   p=0.8693  ns  Both
+  HDAC2       +0.3615   p=0.0303   *   +0.3277   p=0.0511  ns  Both
+  DNMT3A      -0.0490   p=0.7766  ns   -0.0198   p=0.9088  ns  Both
+  DNMT1       +0.1710   p=0.3188  ns   +0.0709   p=0.6810  ns  EMT
+  TET2        +0.2857   p=0.0912  ns   +0.3926   p=0.0179   *  Stroma
+  ASXL1       -0.0695   p=0.6872  ns   +0.0710   p=0.6805  ns  Both
+  RCOR1       +0.3598   p=0.0311   *   +0.3757   p=0.0239   *  Both
+
+  S2-P5 TEST: r(KDM1A, EZH2) = +0.2089 p=0.2215  ns
+  S2-P5 NOT CONFIRMED Independent mechanisms
+
+  S2-P4 TEST: DNMT3A depth
+  r(DNMT3A, Depth_T) = -0.0490 p=0.7766  ns
+  r(DNMT3A, Depth_S) = -0.0198 p=0.9088  ns
+  S2-P4 not confirmed in this dataset/axis
+
+=================================================================
+EPIGENETIC ANALYSIS — GSE32225
+=================================================================
+
+  Epigenetic gene correlations with Depth_T and Depth_S:
+  Gene           r_DT           p_DT      r_DS           p_DS  axis
+  ------------------------------------------------------------------------
+  EZH2        +0.4865 p=3.15e-10 ***   +0.4375 p=2.41e-08 ***  Both
+  HDAC1       +0.5005 p=8.02e-11 ***   +0.5759 p=1.55e-14 ***  Both
+  HDAC2       +0.4434 p=1.48e-08 ***   +0.2654 p=1.07e-03  **  EMT
+  DNMT3A      -0.5520 p=2.93e-13 ***   -0.5167 p=1.53e-11 ***  Both
+  DNMT1       +0.1297   p=0.1148  ns   +0.2344 p=4.01e-03  **  Stroma
+  TET2        +0.1998   p=0.0145   *   +0.1120   p=0.1740  ns  Both
+  ASXL1       +0.4410 p=1.82e-08 ***   +0.4413 p=1.77e-08 ***  Both
+  RCOR1       +0.2582 p=1.47e-03  **   +0.2278 p=5.20e-03  **  Both
+
+  S2-P4 TEST: DNMT3A depth
+  r(DNMT3A, Depth_T) = -0.5520 p=2.93e-13 ***
+  r(DNMT3A, Depth_S) = -0.5167 p=1.53e-11 ***
+  S2-P4 CONFIRMED ✓ DNMT3A loss = deeper ICC
+
+=================================================================
+TWO-BASIN DECOMPOSITION — TCGA-CHOL
+=================================================================
+  EMT-dominant (Depth_T>S): n=14
+  Stroma-dominant (Depth_S>=T): n=22
+
+  NMF × Basin contingency:
+  NMF class               EMT_dom   Stroma_dom
+  --------------------------------------------
+  Inflammation                 11           13
+  Proliferation                 3            9
+
+  Key genes by basin (tumour samples):
+  Gene          EMT_dom    Str_dom               p
+  --------------------------------------------------
+  TWIST1          4.646      4.422    p=0.8077  ns
+  ALB            12.386     15.452    p=0.0130   *
+  ACTA2          11.783     12.085    p=0.2916  ns
+  COL1A1         14.363     15.088    p=0.0885  ns
+  EZH2            8.187      7.960    p=0.3898  ns
+  KDM1A           9.830      9.742    p=0.9353  ns
+  WNT5A           7.437      6.869    p=0.1581  ns
+  TGFB1          10.487     10.439    p=1.0000  ns
+  SOX4           11.483     11.898    p=0.2916  ns
+  CDC20           8.444      8.287    p=0.8077  ns
+  HNF4A           8.854      9.913    p=0.0262   *
+  DNMT3A          9.526      9.503    p=0.7827  ns
+
+=================================================================
+TWO-BASIN DECOMPOSITION — GSE32225
+=================================================================
+  EMT-dominant (Depth_T>S): n=79
+  Stroma-dominant (Depth_S>=T): n=70
+
+  NMF × Basin contingency:
+  NMF class               EMT_dom   Stroma_dom
+  --------------------------------------------
+  Inflammation                 33           24
+  Proliferation                46           46
+
+  Key genes by basin (tumour samples):
+  Gene          EMT_dom    Str_dom               p
+  --------------------------------------------------
+  TWIST1        208.123    190.923    p=0.2185  ns
+  ALB          4489.699   4027.884    p=0.0717  ns
+  ACTA2        2665.133   3562.563  p=1.95e-04 ***
+  COL1A1       2989.839   4055.096  p=9.54e-07 ***
+  EZH2          247.694    256.314    p=0.5466  ns
+  WNT5A         383.284    392.862    p=0.5441  ns
+  TGFB1         172.840    157.492    p=0.4503  ns
+  SOX4          382.484    449.708    p=0.0163   *
+  CDC20         483.870    625.511  p=3.79e-04 ***
+  HNF4A         751.983    601.543  p=7.37e-03  **
+  DNMT3A        388.230    334.791    p=0.9742  ns
+
+=================================================================
+NMF × DEPTH AXIS — GSE32225
+=================================================================
+
+  Inflammation (n=57):
+    Depth_T: mean=0.3965 std=0.1424
+    Depth_S: mean=0.3862 std=0.1433
+    Primary axis: EMT (Depth_T dominant)
+    Identity genes (Inflammation):
+      ACTA2: mean=1692.940
+      COL1A1: mean=2786.369
+      FAP: mean=887.979
+      POSTN: mean=149.397
+      WNT5A: mean=275.961
+
+  Proliferation (n=92):
+    Depth_T: mean=0.5990 std=0.0985
+    Depth_S: mean=0.5842 std=0.1098
+    Primary axis: EMT (Depth_T dominant)
+    Identity genes (Proliferation):
+      CDC20: mean=639.920
+      TOP2A: mean=624.420
+      MKI67: mean=199.985
+      CCNB1: mean=203.044
+      BIRC5: mean=166.965
+      CDK4: mean=470.443
+
+=================================================================
+LOADING LIRI-JP (OS validation)
+=================================================================
+  GET https://dcc.icgc.org/api/v1/download?fn=/current/Projects/LIRI-JP/donor.tsv.gz
+  HTTP 200
+  Saved 2,733b
+  GET https://dcc.icgc.org/api/v1/download?fn=/current/Projects/LIRI-JP/exp_seq.tsv.gz
+  HTTP 200
+  Saved 2,733b
+  LIRI parse error: Not a gzipped file (b'<!')
+
+=================================================================
+OS VALIDATION — TCGA-CHOL
+=================================================================
+  (Protocol: OS is one component of Script 2, not primary)
+  No clinical data available
+  OS validation skipped
+
+=================================================================
+SCRIPT 2 PREDICTION SCORECARD
+=================================================================
+
+  Prediction                                TCGA        GSE  verdict
+  ----------------------------------------------------------------------
+  S2-P1 KDM1A→ALB negative                     ?          ?  NOT CONFIRMED
+  S2-P2 Two basins independent            +0.866     +0.869  see output
+  S2-P3 FOXA2→ALB broken                  +0.509     -0.338  see output
+  S2-P4 DNMT3A depth-negative             -0.037     -0.553  CONFIRMED ✓
+  S2-P5 KDM1A+EZH2 co-elevated            +0.209          ?  NOT CONFIRMED
+  S2-P6 r(S1,S2_comb)>0.80                +0.904     +0.895  CONFIRMED ✓
+
+--- Generating Script 2 figure ---
+  Figure: ./icc_false_attractor/results_s2/icc_s2_figure.png

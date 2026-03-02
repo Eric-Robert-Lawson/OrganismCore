@@ -1,0 +1,491 @@
+=================================================================
+ICC FALSE ATTRACTOR — SCRIPT 1
+PROTOCOL-COMPLIANT DISCOVERY RUN
+Framework: OrganismCore
+Doc: 93a | Date: 2026-03-02
+=================================================================
+
+PREDICTIONS (locked Doc 93b):
+  SW↓: FOXA2 HNF4A ALB APOB CYP3A4 ALDOB G6PC GGT1
+  FA↑: SOX4 SOX9 PROM1 CD44 CDC20 EZH2 TWIST1 FAP
+  Epigenetic: EZH2 UP (gain-of-function lock)
+  Drug targets: TGF-β / EZH2 / WNT5A / TWIST1
+
+=================================================================
+TRACK A: TCGA-CHOL
+=================================================================
+
+=================================================================
+LOADING TCGA-CHOL
+=================================================================
+  GET https://tcga-xena-hub.s3.us-east-1.amazonaws.com/download/TCGA.CHOL.sampleMap%2F
+  HTTP 200
+  Saved 2,494,689b
+  n_total=45 tumour=36 normal=9
+  genes=86
+
+=================================================================
+SADDLE POINT ANALYSIS — TCGA-CHOL
+=================================================================
+  n_tumour=36  n_normal=9
+
+  Gene              ICC      Nor       FC         p_down           p_up  result  pred
+  ------------------------------------------------------------------------------------------
+  ACTA2          11.967   11.096   +0.872   p=0.9929  ns p=7.63e-03  **  UP      FA↑✓
+  ALB            14.260   22.526   -8.267 p=2.30e-06 ***   p=1.0000  ns  DOWN    SW↓✓
+  ALDH1A1        11.222   14.831   -3.609 p=2.30e-06 ***   p=1.0000  ns  DOWN    ctx
+  ALDOB           9.098   18.341   -9.244 p=2.30e-06 ***   p=1.0000  ns  DOWN    SW↓✓
+  ANXA4          14.056   12.183   +1.873   p=1.0000  ns p=4.78e-05 ***  UP      SW↓✗
+  APOB           11.699   17.795   -6.096 p=2.30e-06 ***   p=1.0000  ns  DOWN    SW↓✓
+  AQP1           14.008   11.371   +2.637   p=0.9972  ns p=3.09e-03  **  UP      SW↓✗
+  ARID1A         10.465   10.446   +0.019   p=0.5396  ns   p=0.4717  ns  flat    ctx
+  ASXL1          11.028    9.938   +1.090   p=1.0000  ns p=5.11e-06 ***  UP      epi
+  BAP1           10.009   10.591   -0.582   p=0.0185   *   p=0.9827  ns  DOWN    ctx
+  BIRC5           7.668    3.317   +4.352   p=1.0000  ns p=2.30e-06 ***  UP      FA↑✓
+  CA9             9.487    5.518   +3.969   p=0.9994  ns p=6.40e-04 ***  UP      ctx
+  CCNB1           8.853    5.287   +3.566   p=1.0000  ns p=2.30e-06 ***  UP      FA↑✓
+  CCND1          12.774   12.234   +0.540   p=0.8915  ns   p=0.1139  ns  flat    ctx
+  CD274           3.959    3.591   +0.368   p=0.7824  ns   p=0.2260  ns  flat    ctx
+  CD44           11.022    9.274   +1.748   p=0.9974  ns p=2.83e-03  **  UP      FA↑✓
+  CD8A            6.567    7.186   -0.619   p=0.1033  ns   p=0.9017  ns  flat    ctx
+  CDC20           8.348    3.349   +4.999   p=1.0000  ns p=2.30e-06 ***  UP      FA↑✓
+  CDH1           13.511   12.622   +0.889   p=0.9991  ns p=1.04e-03  **  UP      ctx
+  CDK4           11.448   10.155   +1.293   p=1.0000  ns p=9.75e-06 ***  UP      FA↑✓
+  CDK6            9.208    9.461   -0.252   p=0.4157  ns   p=0.5953  ns  flat    FA↑✗
+  CDKN2A          7.023    3.620   +3.403   p=1.0000  ns p=3.77e-05 ***  UP      ctx
+  CFTR           10.279    7.897   +2.382   p=0.9966  ns p=3.67e-03  **  UP      SW↓✗
+  CLDN4          11.816    7.623   +4.193   p=1.0000  ns p=3.77e-05 ***  UP      ctx
+  CLDN7          11.795    8.699   +3.096   p=1.0000  ns p=1.26e-05 ***  UP      ctx
+  COL1A1         14.806   12.271   +2.535   p=1.0000  ns p=3.35e-05 ***  UP      FA↑✓
+  CTNNB1         12.093   12.415   -0.323   p=0.0277   *   p=0.9740  ns  DOWN    ctx
+  CYP3A4          5.363   16.056  -10.694 p=2.63e-06 ***   p=1.0000  ns  DOWN    SW↓✓
+  DNMT1          10.293    8.781   +1.512   p=1.0000  ns p=5.83e-06 ***  UP      FA↑✓
+  DNMT3A          9.512    7.648   +1.864   p=1.0000  ns p=7.55e-06 ***  UP      epi
+  EGFR            9.196   10.657   -1.461 p=2.06e-04 ***   p=0.9998  ns  DOWN    ctx
+  EPCAM          12.635    7.864   +4.771   p=1.0000  ns p=7.55e-06 ***  UP      ctx
+  ERBB2          12.035   11.772   +0.263   p=0.9802  ns   p=0.0212   *  UP      ctx
+  EZH2            8.048    5.094   +2.954   p=1.0000  ns p=2.30e-06 ***  UP      FA↑✓
+  FAP             7.581    3.208   +4.372   p=1.0000  ns p=6.64e-06 ***  UP      FA↑✓
+  FGFR2          11.532   11.264   +0.268   p=0.9017  ns   p=0.1033  ns  flat    ctx
+  FN1            15.640   17.326   -1.686 p=3.67e-03  **   p=0.9966  ns  DOWN    FA↑✗
+  FOXA2           8.682   10.502   -1.820 p=1.11e-05 ***   p=1.0000  ns  DOWN    SW↓✓
+  FOXP3           4.236    4.178   +0.058   p=0.4830  ns   p=0.5283  ns  flat    ctx
+  G6PC            7.766   14.277   -6.511 p=2.30e-06 ***   p=1.0000  ns  DOWN    SW↓✓
+  GGT1           11.057   11.175   -0.117   p=0.7384  ns   p=0.2709  ns  flat    SW↓✗
+  GLUL           13.012   14.345   -1.333 p=3.35e-05 ***   p=1.0000  ns  DOWN    ctx
+  HAVCR2          7.590    6.924   +0.667   p=0.9486  ns   p=0.0544  ns  flat    ctx
+  HDAC1          11.162   10.516   +0.645   p=0.9982  ns p=1.99e-03  **  UP      epi
+  HDAC2          10.451    9.701   +0.749   p=1.0000  ns p=1.82e-05 ***  UP      FA↑✓
+  HNF1B          11.368    9.003   +2.365   p=0.9998  ns p=2.06e-04 ***  UP      SW↓✗
+  HNF4A           9.501   12.580   -3.079 p=3.01e-06 ***   p=1.0000  ns  DOWN    SW↓✓
+  IDH1           11.507   13.678   -2.171 p=2.30e-06 ***   p=1.0000  ns  DOWN    ctx
+  IDH2           11.849   13.135   -1.286 p=1.66e-04 ***   p=0.9999  ns  DOWN    ctx
+  KDM1A           9.776    9.560   +0.216   p=0.8498  ns   p=0.1569  ns  flat    epi
+  KLF4            8.209    8.782   -0.573   p=0.0889  ns   p=0.9156  ns  flat    SW↓✗
+  KRAS            9.837    9.552   +0.285   p=0.9870  ns   p=0.0139   *  UP      ctx
+  KRT19          12.893    8.228   +4.665   p=1.0000  ns p=1.61e-05 ***  UP      ctx
+  KRT7           13.076   10.090   +2.985   p=0.9999  ns p=6.03e-05 ***  UP      ctx
+  MET            10.904   11.686   -0.782 p=6.52e-03  **   p=0.9940  ns  DOWN    ctx
+  MKI67           9.907    5.709   +4.198   p=1.0000  ns p=2.63e-06 ***  UP      FA↑✓
+  MMP2           10.726    9.717   +1.009   p=0.9880  ns   p=0.0130   *  UP      FA↑✓
+  MMP9            8.790    5.828   +2.963   p=0.9994  ns p=6.40e-04 ***  UP      FA↑✓
+  MUC1           10.359    5.267   +5.092   p=1.0000  ns p=2.63e-05 ***  UP      ctx
+  MYC            10.518   10.845   -0.327   p=0.3404  ns   p=0.6700  ns  flat    ctx
+  NOTCH1         10.197    9.487   +0.709   p=0.9957  ns p=4.71e-03  **  UP      ctx
+  NOTCH2         11.981   11.283   +0.698   p=0.9940  ns p=6.52e-03  **  UP      ctx
+  POSTN          10.214    7.746   +2.468   p=0.9997  ns p=3.48e-04 ***  UP      FA↑✓
+  PRF1            6.526    7.852   -1.326 p=6.52e-03  **   p=0.9940  ns  DOWN    ctx
+  PROM1           9.607    6.903   +2.703   p=0.9990  ns p=1.14e-03  **  UP      FA↑✓
+  PTEN           10.530   11.275   -0.745 p=2.33e-05 ***   p=1.0000  ns  DOWN    ctx
+  RB1             9.696    9.177   +0.519   p=0.9990  ns p=1.14e-03  **  UP      ctx
+  RCOR1           9.256    9.206   +0.050   p=0.4943  ns   p=0.5170  ns  flat    epi
+  SF3B1          12.494   12.267   +0.227   p=0.9945  ns p=6.02e-03  **  UP      ctx
+  SLC4A2         11.984   11.313   +0.671   p=0.9999  ns p=1.07e-04 ***  UP      SW↓✗
+  SMAD4          10.526   10.740   -0.214   p=0.0514  ns   p=0.9515  ns  flat    ctx
+  SNAI1           6.775    6.532   +0.243   p=0.7384  ns   p=0.2709  ns  flat    FA↑✗
+  SOX17           5.712    5.739   -0.027   p=0.3198  ns   p=0.6903  ns  flat    ctx
+  SOX4           11.737    8.756   +2.980   p=1.0000  ns p=5.11e-06 ***  UP      FA↑✓
+  SOX9           11.524    8.610   +2.913   p=1.0000  ns p=1.26e-05 ***  UP      FA↑✓
+  STAT3          11.912   12.658   -0.746 p=1.85e-04 ***   p=0.9998  ns  DOWN    ctx
+  TET2            8.375    8.255   +0.119   p=0.7196  ns   p=0.2900  ns  flat    epi
+  TGFB1          10.457    9.198   +1.259   p=0.9980  ns p=2.17e-03  **  UP      FA↑✓
+  TOP2A           9.885    4.918   +4.967   p=1.0000  ns p=3.44e-06 ***  UP      FA↑✓
+  TP53           10.732    9.512   +1.220   p=0.9999  ns p=1.33e-04 ***  UP      ctx
+  TWIST1          4.509    2.687   +1.822   p=0.9991  ns p=9.45e-04 ***  UP      FA↑✓
+  VEGFA          12.308   11.895   +0.414   p=0.9685  ns   p=0.0336   *  UP      ctx
+  VIM            14.253   12.400   +1.854   p=0.9999  ns p=9.52e-05 ***  UP      FA↑✓
+  WNT5A           7.090    7.616   -0.526   p=0.1033  ns   p=0.9017  ns  flat    FA↑✗
+  ZEB1            8.632    9.113   -0.480   p=0.0514  ns   p=0.9515  ns  flat    FA↑✗
+  ZEB2            8.257    9.135   -0.878 p=9.62e-03  **   p=0.9911  ns  DOWN    FA↑✗
+
+  SW↓ confirmed (7): ['FOXA2', 'HNF4A', 'ALB', 'APOB', 'CYP3A4', 'ALDOB', 'G6PC']
+  FA↑ confirmed (22): ['SOX4', 'SOX9', 'PROM1', 'CD44', 'CDC20', 'BIRC5', 'TOP2A', 'MKI67', 'CCNB1', 'CDK4', 'EZH2', 'HDAC2', 'DNMT1', 'VIM', 'TWIST1', 'FAP', 'ACTA2', 'COL1A1', 'POSTN', 'TGFB1', 'MMP2', 'MMP9']
+  EZH2: UP (predicted: UP)
+
+=================================================================
+DEPTH SCORE — TCGA-CHOL
+=================================================================
+  SW genes used (7): ['FOXA2', 'HNF4A', 'ALB', 'APOB', 'CYP3A4', 'ALDOB', 'G6PC']
+  FA genes used (22): ['SOX4', 'SOX9', 'PROM1', 'CD44', 'CDC20', 'BIRC5', 'TOP2A', 'MKI67', 'CCNB1', 'CDK4', 'EZH2', 'HDAC2', 'DNMT1', 'VIM', 'TWIST1', 'FAP', 'ACTA2', 'COL1A1', 'POSTN', 'TGFB1', 'MMP2', 'MMP9']
+
+  Depth statistics (tumour only):
+  mean   = 0.4665
+  median = 0.4693
+  std    = 0.1562
+  min    = 0.0455
+  max    = 0.7662
+  Q25    = 0.3867
+  Q75    = 0.5373
+
+=================================================================
+DEPTH CORRELATIONS — TCGA-CHOL
+=================================================================
+  (Read this before the saddle table)
+  n = 36
+
+  Rank  Gene                r              p  direction  panel
+  ------------------------------------------------------------
+  1     TWIST1        +0.7889 p=1.09e-08 ***  ↑=deeper     FA
+  2     G6PC          -0.7133 p=1.05e-06 ***  ↓=shallower  SW
+  3     WNT5A         +0.6564 p=1.38e-05 ***  ↑=deeper     STROMA
+  4     APOB          -0.6558 p=1.41e-05 ***  ↓=shallower  SW
+  5     ALDOB         -0.6452 p=2.15e-05 ***  ↓=shallower  SW
+  6     TGFB1         +0.5914 p=1.46e-04 ***  ↑=deeper     STROMA
+  7     CYP3A4        -0.5906 p=1.49e-04 ***  ↓=shallower  SW
+  8     MMP2          +0.5628 p=3.52e-04 ***  ↑=deeper     STROMA
+  9     MMP9          +0.5438 p=6.08e-04 ***  ↑=deeper     STROMA
+  10    FAP           +0.5389 p=6.97e-04 ***  ↑=deeper     STROMA
+  11    ALB           -0.5087 p=1.53e-03  **  ↓=shallower  SW
+  12    KDM1A         +0.5033 p=1.75e-03  **  ↑=deeper     EPI
+  13    CD44          +0.5033 p=1.75e-03  **  ↑=deeper     FA
+  14    POSTN         +0.4997 p=1.91e-03  **  ↑=deeper     STROMA
+  15    VIM           +0.4978 p=2.00e-03  **  ↑=deeper     FA
+  16    ACTA2         +0.4898 p=2.43e-03  **  ↑=deeper     STROMA
+  17    HAVCR2        +0.4687 p=3.94e-03  **  ↑=deeper     ctx
+  18    FOXA2         -0.4609 p=4.67e-03  **  ↓=shallower  SW
+  19    HNF4A         -0.4463 p=6.36e-03  **  ↓=shallower  SW
+  20    ZEB2          +0.4358 p=7.88e-03  **  ↑=deeper     FA
+
+  TOP SIGNAL: TWIST1 r=+0.7889
+  TOP SW:     G6PC r=-0.7133
+  TOP FA:     TWIST1 r=+0.7889
+
+=================================================================
+GAP TESTS — TCGA-CHOL
+=================================================================
+  Protocol: r near zero = circuit broken
+  All r values in tumour samples only
+
+  Circuit                             r              p  interpretation
+  --------------------------------------------------------------------------------
+  biliary maturation TF→product  +0.5446 p=5.95e-04 ***  CONNECTED
+    (near zero if block at HNF4A level)
+  biliary TF → metabolic target  +0.4933 p=2.23e-03  **  CONNECTED
+    (near zero if block is TF-level)
+  biliary TF → metabolic target  +0.4312 p=8.64e-03  **  CONNECTED
+    (near zero if block is TF-level)
+  biliary TF → albumin          +0.5089 p=1.53e-03  **  CONNECTED
+    (near zero if FOXA2 block)
+  non-canonical Wnt → EMT       +0.6433 p=2.32e-05 ***  CONNECTED
+    (high r if WNT5A drives TWIST1)
+  TGF-β → EMT bridge            +0.5574 p=4.13e-04 ***  CONNECTED
+    (high r confirms TGFB1 as bridge)
+  TGF-β → stroma bridge         +0.6053 p=9.18e-05 ***  CONNECTED
+    (high r confirms TGFB1→CAF)
+  epigenetic silencer → TF      -0.0103   p=0.9526  ns  BROKEN ✓
+    (negative r = EZH2 silences HNF4A)
+  EMT TF → mesenchymal marker   +0.2293   p=0.1785  ns  WEAK
+    (positive r confirms EMT axis)
+  EGFR paradox: epithelial vs EMT  -0.0932   p=0.5889  ns  BROKEN ✓
+    (negative r predicted)
+  EGFR paradox: epithelial vs stroma  +0.0392   p=0.8204  ns  BROKEN ✓
+    (negative r predicted)
+  progenitor TF → EMT TF co-activation  +0.1403   p=0.4145  ns  BROKEN ✓
+    (positive r if co-regulated)
+  HDAC co-repressor → biliary TF  -0.0407   p=0.8137  ns  BROKEN ✓
+    (negative r if HDAC2 represses HNF4A)
+
+=================================================================
+TRACK B: GSE32225
+=================================================================
+
+=================================================================
+LOADING GSE32225
+=================================================================
+  GET https://ftp.ncbi.nlm.nih.gov/geo/series/GSE32nnn/GSE32225/matrix/GSE32225_series
+  HTTP 200
+  Saved 21,289,696b
+  GET https://ftp.ncbi.nlm.nih.gov/geo/platforms/GPL8nnn/GPL8432/soft/GPL8432_family.s
+  HTTP 200
+  Saved 896,569,897b
+  Probe map: 117 probes
+  n_samples=155 ICC=149 Normal=6 genes=83
+
+=================================================================
+SADDLE POINT ANALYSIS — GSE32225
+=================================================================
+  n_tumour=149  n_normal=6
+
+  Gene              ICC      Nor       FC         p_down           p_up  result  pred
+  ------------------------------------------------------------------------------------------
+  ACTA2        3086.744 3090.275   -3.531   p=0.6531  ns   p=0.3502  ns  flat    FA↑✗
+  ALB          4272.739 7454.214 -3181.475 p=3.28e-06 ***   p=1.0000  ns  DOWN    SW↓✓
+  ALDH1A1       636.472  785.853 -149.381   p=0.0545  ns   p=0.9466  ns  flat    ctx
+  ALDOB        1516.233 4731.015 -3214.782 p=6.71e-06 ***   p=1.0000  ns  DOWN    SW↓✓
+  ANXA4         195.915  175.301  +20.614   p=0.6893  ns   p=0.3140  ns  flat    SW↓✗
+  APOB         1774.025 2971.711 -1197.686 p=2.19e-07 ***   p=1.0000  ns  DOWN    SW↓✓
+  AQP1          694.184  531.332 +162.852   p=0.8909  ns   p=0.1108  ns  flat    SW↓✗
+  ARID1A        508.639  384.009 +124.629   p=0.9181  ns   p=0.0834  ns  flat    ctx
+  ASXL1         228.634  171.993  +56.641   p=0.9526  ns   p=0.0483   *  UP      epi
+  BAP1          178.498  132.478  +46.020   p=0.9959  ns p=4.27e-03  **  UP      ctx
+  BIRC5         148.905  121.259  +27.646   p=0.9825  ns   p=0.0179   *  UP      FA↑✓
+  CA9          1851.554 1596.210 +255.345   p=0.5486  ns   p=0.4550  ns  flat    ctx
+  CCNB1         177.495  115.862  +61.633   p=0.9994  ns p=5.80e-04 ***  UP      FA↑✓
+  CCND1        2976.175 2032.304 +943.872   p=0.9889  ns   p=0.0115   *  UP      ctx
+  CD274         244.965  327.000  -82.035 p=9.97e-03  **   p=0.9903  ns  DOWN    ctx
+  CD44          898.556  572.827 +325.729   p=0.8125  ns   p=0.1900  ns  flat    FA↑✗
+  CD8A          198.907  261.373  -62.466   p=0.1056  ns   p=0.8961  ns  flat    ctx
+  CDC20         550.413  181.569 +368.844   p=0.9998  ns p=1.94e-04 ***  UP      FA↑✓
+  CDH1          334.172  222.642 +111.530   p=0.9455  ns   p=0.0555  ns  flat    ctx
+  CDK4          425.861  317.026 +108.835   p=0.9834  ns   p=0.0170   *  UP      FA↑✓
+  CDK6          151.914  113.988  +37.926   p=0.9966  ns p=3.50e-03  **  UP      FA↑✓
+  CDKN2A        744.476  362.693 +381.783   p=0.9892  ns   p=0.0111   *  UP      ctx
+  CFTR          133.187  130.899   +2.288   p=0.5450  ns   p=0.4586  ns  flat    SW↓✗
+  CLDN4         140.218  128.842  +11.376   p=0.8050  ns   p=0.1976  ns  flat    ctx
+  CLDN7         471.921  259.145 +212.776   p=0.9816  ns   p=0.0188   *  UP      ctx
+  COL1A1       3490.295  475.519 +3014.776   p=1.0000  ns p=3.63e-08 ***  UP      FA↑✓
+  CTNNB1        836.689  392.976 +443.713   p=1.0000  ns p=4.89e-07 ***  UP      ctx
+  CYP3A4        227.535  180.063  +47.472   p=0.5947  ns   p=0.4088  ns  flat    SW↓✗
+  DNMT1         341.580  251.967  +89.613   p=0.9455  ns   p=0.0555  ns  flat    FA↑✗
+  DNMT3A        363.124  145.339 +217.785   p=0.9930  ns p=7.26e-03  **  UP      epi
+  EGFR          642.896  459.152 +183.744   p=0.9076  ns   p=0.0940  ns  flat    ctx
+  ERBB2         699.689  277.611 +422.078   p=0.9983  ns p=1.78e-03  **  UP      ctx
+  EZH2          251.744  125.147 +126.597   p=1.0000  ns p=9.74e-06 ***  UP      FA↑✓
+  FAP          1018.563  262.432 +756.132   p=0.9995  ns p=5.06e-04 ***  UP      FA↑✓
+  FGFR2         210.087  169.691  +40.396   p=0.9076  ns   p=0.0940  ns  flat    ctx
+  FN1          2301.539 2261.757  +39.782   p=0.6017  ns   p=0.4018  ns  flat    FA↑✗
+  FOXA2         822.866  481.546 +341.320   p=0.9797  ns   p=0.0208   *  UP      SW↓✗
+  FOXP3         127.772  131.835   -4.063   p=0.1397  ns   p=0.8624  ns  flat    ctx
+  G6PC          241.057  592.799 -351.742 p=4.60e-04 ***   p=0.9996  ns  DOWN    SW↓✓
+  GGT1          349.324  654.026 -304.702 p=7.70e-03  **   p=0.9925  ns  DOWN    SW↓✓
+  GLUL          305.267  199.188 +106.078   p=0.9982  ns p=1.84e-03  **  UP      ctx
+  HAVCR2       1573.709 1004.347 +569.362   p=0.9647  ns   p=0.0361   *  UP      ctx
+  HDAC1         356.299  213.187 +143.111   p=0.9536  ns   p=0.0474   *  UP      epi
+  HDAC2        1308.997  959.009 +349.988   p=0.9954  ns p=4.71e-03  **  UP      FA↑✓
+  HNF4A         681.306  672.294   +9.013   p=0.4622  ns   p=0.5414  ns  flat    SW↓✗
+  IDH1          428.097  322.382 +105.715   p=0.8819  ns   p=0.1199  ns  flat    ctx
+  IDH2         2854.065 1755.337 +1098.728   p=0.9996  ns p=4.18e-04 ***  UP      ctx
+  KLF4          121.270  133.149  -11.879   p=0.2612  ns   p=0.7417  ns  flat    SW↓✗
+  KRAS          185.213  202.929  -17.717   p=0.2672  ns   p=0.7358  ns  flat    ctx
+  KRT19         755.331 1091.501 -336.170   p=0.0276   *   p=0.9730  ns  DOWN    ctx
+  KRT7          246.146  136.732 +109.414   p=0.9998  ns p=1.94e-04 ***  UP      ctx
+  MET           197.148  190.691   +6.456   p=0.4802  ns   p=0.5234  ns  flat    ctx
+  MKI67         242.448  422.089 -179.641 p=9.16e-03  **   p=0.9911  ns  DOWN    FA↑✗
+  MMP2          447.847  758.984 -311.137 p=1.06e-03  **   p=0.9990  ns  DOWN    FA↑✗
+  MMP9          788.467  937.542 -149.075   p=0.1315  ns   p=0.8704  ns  flat    FA↑✗
+  MUC1          884.341  469.368 +414.973   p=0.9954  ns p=4.71e-03  **  UP      ctx
+  MYC           130.730  118.263  +12.467   p=0.8150  ns   p=0.1875  ns  flat    ctx
+  NOTCH1        258.511  156.280 +102.231   p=0.9987  ns p=1.36e-03  **  UP      ctx
+  NOTCH2        251.939  260.304   -8.365   p=0.2241  ns   p=0.7787  ns  flat    ctx
+  POSTN         203.146  109.702  +93.444   p=1.0000  ns p=2.09e-05 ***  UP      FA↑✓
+  PRF1          127.340  152.329  -24.989   p=0.0445   *   p=0.9564  ns  DOWN    ctx
+  PROM1        3180.287  989.088 +2191.198   p=0.9991  ns p=9.00e-04 ***  UP      FA↑✓
+  PTEN         1556.391 1880.680 -324.288   p=0.1875  ns   p=0.8150  ns  flat    ctx
+  RB1           263.798  324.671  -60.874   p=0.1376  ns   p=0.8644  ns  flat    ctx
+  RCOR1         124.126  100.245  +23.881   p=0.9963  ns p=3.87e-03  **  UP      epi
+  SF3B1        1142.340  778.546 +363.794   p=0.9670  ns   p=0.0338   *  UP      ctx
+  SLC4A2        507.762  422.646  +85.117   p=0.7505  ns   p=0.2524  ns  flat    SW↓✗
+  SMAD4         242.225  218.500  +23.725   p=0.7732  ns   p=0.2296  ns  flat    ctx
+  SNAI1         103.452  103.436   +0.016   p=0.3740  ns   p=0.6294  ns  flat    FA↑✗
+  SOX17         349.864  523.849 -173.985   p=0.0750  ns   p=0.9264  ns  flat    ctx
+  SOX4          414.065  169.669 +244.396   p=0.9999  ns p=9.67e-05 ***  UP      FA↑✓
+  SOX9          772.110  718.223  +53.887   p=0.4658  ns   p=0.5378  ns  flat    FA↑✗
+  STAT3         287.536  361.283  -73.747   p=0.0188   *   p=0.9816  ns  DOWN    ctx
+  TET2          127.297  119.783   +7.514   p=0.8024  ns   p=0.2001  ns  flat    epi
+  TGFB1         165.629  236.280  -70.650   p=0.0410   *   p=0.9599  ns  DOWN    FA↑✗
+  TOP2A         695.518  548.073 +147.446   p=0.8409  ns   p=0.1613  ns  flat    FA↑✗
+  TP53          375.638  279.857  +95.781   p=0.9754  ns   p=0.0252   *  UP      ctx
+  TWIST1        200.043  176.059  +23.984   p=0.8175  ns   p=0.1850  ns  flat    FA↑✗
+  VEGFA         384.138  544.421 -160.283   p=0.3303  ns   p=0.6730  ns  flat    ctx
+  VIM           967.479  910.774  +56.705   p=0.8583  ns   p=0.1438  ns  flat    FA↑✗
+  WNT5A         387.784  152.289 +235.495   p=1.0000  ns p=1.07e-05 ***  UP      FA↑✓
+  ZEB1          181.808  154.517  +27.291   p=0.9028  ns   p=0.0989  ns  flat    FA↑✗
+  ZEB2          135.126  132.186   +2.940   p=0.4622  ns   p=0.5414  ns  flat    FA↑✗
+
+  SW↓ confirmed (5): ['ALB', 'APOB', 'ALDOB', 'G6PC', 'GGT1']
+  FA↑ confirmed (13): ['SOX4', 'PROM1', 'CDC20', 'BIRC5', 'CCNB1', 'CDK4', 'CDK6', 'EZH2', 'HDAC2', 'FAP', 'COL1A1', 'POSTN', 'WNT5A']
+  EZH2: UP (predicted: UP)
+
+=================================================================
+DEPTH SCORE — GSE32225
+=================================================================
+  SW genes used (5): ['ALB', 'APOB', 'ALDOB', 'G6PC', 'GGT1']
+  FA genes used (13): ['SOX4', 'PROM1', 'CDC20', 'BIRC5', 'CCNB1', 'CDK4', 'CDK6', 'EZH2', 'HDAC2', 'FAP', 'COL1A1', 'POSTN', 'WNT5A']
+
+  Depth statistics (tumour only):
+  mean   = 0.5610
+  median = 0.5660
+  std    = 0.1570
+  min    = 0.0676
+  max    = 0.9068
+  Q25    = 0.4471
+  Q75    = 0.6697
+
+=================================================================
+DEPTH CORRELATIONS — GSE32225
+=================================================================
+  (Read this before the saddle table)
+  n = 149
+
+  Rank  Gene                r              p  direction  panel
+  ------------------------------------------------------------
+  1     ALB           -0.8033 p=6.60e-35 ***  ↓=shallower  SW
+  2     COL1A1        +0.6829 p=8.52e-22 ***  ↑=deeper     STROMA
+  3     APOB          -0.6452 p=6.65e-19 ***  ↓=shallower  SW
+  4     ACTA2         +0.6305 p=6.85e-18 ***  ↑=deeper     STROMA
+  5     PROM1         +0.5704 p=3.11e-14 ***  ↑=deeper     FA
+  6     POSTN         +0.5583 p=1.38e-13 ***  ↑=deeper     STROMA
+  7     SOX4          +0.5494 p=3.98e-13 ***  ↑=deeper     FA
+  8     CD44          +0.5436 p=7.85e-13 ***  ↑=deeper     FA
+  9     HNF4A         -0.5400 p=1.19e-12 ***  ↓=shallower  SW
+  10    HAVCR2        +0.5292 p=3.99e-12 ***  ↑=deeper     ctx
+  11    VIM           +0.5043 p=5.51e-11 ***  ↑=deeper     FA
+  12    CCND1         +0.5019 p=6.96e-11 ***  ↑=deeper     ctx
+  13    WNT5A         +0.4821 p=4.82e-10 ***  ↑=deeper     STROMA
+  14    DNMT3A        -0.4507 p=8.04e-09 ***  ↓=shallower  EPI
+  15    HDAC1         +0.4348 p=3.01e-08 ***  ↑=deeper     EPI
+  16    ARID1A        +0.4315 p=3.92e-08 ***  ↑=deeper     ctx
+  17    ERBB2         +0.4297 p=4.54e-08 ***  ↑=deeper     ctx
+  18    BIRC5         +0.4276 p=5.34e-08 ***  ↑=deeper     FA
+  19    EGFR          +0.4255 p=6.32e-08 ***  ↑=deeper     ctx
+  20    ZEB1          +0.4198 p=9.85e-08 ***  ↑=deeper     FA
+
+  TOP SIGNAL: ALB r=-0.8033
+  TOP SW:     ALB r=-0.8033
+  TOP FA:     COL1A1 r=+0.6829
+
+=================================================================
+NMF SUBTYPE ANALYSIS — GSE32225 NMF
+=================================================================
+  Inflammation: n=57 depth_mean=0.4581 ±0.1460
+  Proliferation: n=92 depth_mean=0.6248 ±0.1269
+
+  MW Inflammation vs Proliferation: p=4.73e-10 ***
+
+  Key genes by subtype:
+  Gene           Prolif     Inflam               p
+  --------------------------------------------------
+  TWIST1        177.103    214.255  p=2.22e-04 ***
+  ALB          5222.025   3684.595  p=2.95e-08 ***
+  EZH2          184.103    293.651  p=2.57e-14 ***
+  TGFB1         182.107    155.420    p=0.0348   *
+  WNT5A         275.961    457.066  p=5.13e-08 ***
+  FAP           887.979   1099.469    p=0.0882  ns
+  SOX4          244.716    518.989  p=6.13e-21 ***
+  HNF4A         858.785    571.347  p=6.67e-08 ***
+  ACTA2        1692.940   3950.297  p=5.10e-21 ***
+
+=================================================================
+GAP TESTS — GSE32225
+=================================================================
+  Protocol: r near zero = circuit broken
+  All r values in tumour samples only
+
+  Circuit                             r              p  interpretation
+  --------------------------------------------------------------------------------
+  biliary maturation TF→product  +0.5923 p=1.77e-15 ***  CONNECTED
+    (near zero if block at HNF4A level)
+  biliary TF → metabolic target  +0.0560   p=0.4975  ns  BROKEN ✓
+    (near zero if block is TF-level)
+  biliary TF → metabolic target  -0.0971   p=0.2387  ns  BROKEN ✓
+    (near zero if block is TF-level)
+  biliary TF → albumin          -0.3380 p=2.49e-05 ***  ANTI-CORRELATED
+    (near zero if FOXA2 block)
+  non-canonical Wnt → EMT       +0.1898   p=0.0204   *  WEAK
+    (high r if WNT5A drives TWIST1)
+  TGF-β → EMT bridge            +0.0741   p=0.3691  ns  BROKEN ✓
+    (high r confirms TGFB1 as bridge)
+  TGF-β → stroma bridge         -0.1970   p=0.0160   *  WEAK
+    (high r confirms TGFB1→CAF)
+  epigenetic silencer → TF      -0.2967 p=2.39e-04 ***  WEAK
+    (negative r = EZH2 silences HNF4A)
+  EMT TF → mesenchymal marker   +0.3011 p=1.91e-04 ***  CONNECTED
+    (positive r confirms EMT axis)
+  EGFR paradox: epithelial vs EMT  +0.1280   p=0.1197  ns  BROKEN ✓
+    (negative r predicted)
+  EGFR paradox: epithelial vs stroma  +0.5982 p=7.94e-16 ***  CONNECTED
+    (negative r predicted)
+  progenitor TF → EMT TF co-activation  +0.1856   p=0.0234   *  WEAK
+    (positive r if co-regulated)
+  HDAC co-repressor → biliary TF  -0.0168   p=0.8388  ns  BROKEN ✓
+    (negative r if HDAC2 represses HNF4A)
+
+=================================================================
+CROSS-DATASET CONSENSUS
+=================================================================
+  SW↓ both datasets: ['ALB', 'APOB', 'ALDOB', 'G6PC']
+  FA↑ both datasets: ['SOX4', 'PROM1', 'CDC20', 'BIRC5', 'CCNB1', 'CDK4', 'EZH2', 'HDAC2', 'FAP', 'COL1A1', 'POSTN']
+  EZH2: TCGA=UP GSE=UP (predicted UP)
+  EZH2 CONFIRMED ✓ (gain-of-function lock)
+
+  Top depth driver TCGA: TWIST1 r=+0.7889
+  Top depth driver GSE:  ALB r=-0.8033
+
+=================================================================
+PREDICTION SCORECARD — SCRIPT 1
+=================================================================
+
+  Gene       Pred         TCGA        GSE  Verdict
+  ----------------------------------------------------
+  FOXA2      SW↓          DOWN         UP  CONFIRMED ✓ (TCGA)
+  HNF4A      SW↓          DOWN       flat  CONFIRMED ✓ (TCGA)
+  ALB        SW↓          DOWN       DOWN  CONFIRMED ✓ (both)
+  APOB       SW↓          DOWN       DOWN  CONFIRMED ✓ (both)
+  CYP3A4     SW↓          DOWN       flat  CONFIRMED ✓ (TCGA)
+  ALDOB      SW↓          DOWN       DOWN  CONFIRMED ✓ (both)
+  G6PC       SW↓          DOWN       DOWN  CONFIRMED ✓ (both)
+  GGT1       SW↓          flat       DOWN  CONFIRMED ✓ (GSE)
+  KLF4       SW↓          flat       flat  NOT CONFIRMED ✗
+  HNF1B      SW↓            UP          ?  NOT CONFIRMED ✗
+  AQP1       SW↓            UP       flat  NOT CONFIRMED ✗
+  SLC4A2     SW↓            UP       flat  NOT CONFIRMED ✗
+  ANXA4      SW↓            UP       flat  NOT CONFIRMED ✗
+  CFTR       SW↓            UP       flat  NOT CONFIRMED ✗
+  SOX4       FA↑            UP         UP  CONFIRMED ✓ (both)
+  SOX9       FA↑            UP       flat  CONFIRMED ✓ (TCGA)
+  PROM1      FA↑            UP         UP  CONFIRMED ✓ (both)
+  CD44       FA↑            UP       flat  CONFIRMED ✓ (TCGA)
+  CDC20      FA↑            UP         UP  CONFIRMED ✓ (both)
+  BIRC5      FA↑            UP         UP  CONFIRMED ✓ (both)
+  TOP2A      FA↑            UP       flat  CONFIRMED ✓ (TCGA)
+  MKI67      FA↑            UP       DOWN  CONFIRMED ✓ (TCGA)
+  EZH2       FA↑            UP         UP  CONFIRMED ✓ (both)
+  FAP        FA↑            UP         UP  CONFIRMED ✓ (both)
+  TGFB1      FA↑            UP       DOWN  CONFIRMED ✓ (TCGA)
+  WNT5A      FA↑          flat         UP  CONFIRMED ✓ (GSE)
+  ACTA2      FA↑            UP       flat  CONFIRMED ✓ (TCGA)
+
+=================================================================
+DRUG TARGETS — GEOMETRY DERIVED
+Stated before literature check
+=================================================================
+
+  Target 1: TGF-β inhibitor
+  Geometry: TGFB1 bridges EMT+stroma (r~0.56 TCGA)
+  Drug:     galunisertib / LY2157299
+
+  Target 2: EZH2 inhibitor
+  Geometry: EZH2 UP both datasets — silences HNF4A/FOXA2
+  Drug:     tazemetostat (FDA approved)
+
+  Target 3: WNT5A / non-canonical Wnt
+  Geometry: WNT5A r=+0.65 TCGA — drives TWIST1 (EMT engine)
+  Drug:     ipafricept / anti-FZD5
+
+  Target 4: TWIST1 suppression
+  Geometry: TWIST1 r=+0.799 TCGA — dominant depth driver
+  Drug:     BET inhibitor / JQ1 class
+
+--- Generating figure ---
+  Figure: ./icc_false_attractor/results_s1/icc_s1_figure.png
+  CSV: ./icc_false_attractor/results_s1/saddle_results.csv
