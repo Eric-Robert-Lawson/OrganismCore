@@ -1,0 +1,236 @@
+=================================================================
+HEPATOCELLULAR CARCINOMA — SCRIPT 7
+Dataset: TCGA-LIHC (continued)
+Framework: OrganismCore
+Doc: 92g | Date: 2026-03-02
+=================================================================
+
+PREDICTIONS LOCKED 2026-03-02:
+S7-P1: CTNNB1-mut better OS (HCC-P5)
+S7-P2: CDK4-hi worse OS Stage III
+S7-P3: Depth×stage interaction significant
+S7-P4: CDK4-hi worse OS GSE14520
+S7-P5: PTEN-low enriched in Deep+Cold
+S7-P6: CDKN2A-high co-occurs with CDK4-high
+S7-P7: Depth OS Stage III p<0.05
+
+=================================================================
+PARSE EXPRESSION — TCGA-LIHC
+=================================================================
+  Matrix: (423, 82)
+  HCC: 371  Normal: 50
+
+=================================================================
+PARSE CLINICAL
+=================================================================
+  OS valid: 367 events=130
+  Stage: {np.int64(1): 172, np.int64(2): 87, np.int64(3): 85, np.int64(4): 5}
+  Age valid: 372  mean=59.5
+
+=================================================================
+PARSE MAF
+=================================================================
+  ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.maf.gz (55,112 bytes)
+  Headers: ['HUGO_SYMBOL', 'ENTREZ_GENE_ID', 'CENTER', 'NCBI_BUILD', 'CHROMOSOME', 'START_POSITION', 'END_POSITION', 'STRAND']
+  gene=0 sample=15 effect=8
+  Mutations parsed: 2
+
+  Gene               n        %
+  ------------------------------
+  TP53               1      0.2%
+  TSC2               1      0.2%
+
+=================================================================
+DEPTH SCORE
+=================================================================
+  n=371  mean=0.3334  std=0.1599
+
+=================================================================
+S7-1: MUTATION SURVIVAL (HCC-P5)
+=================================================================
+
+  Gene          n_mut    mut_OS     wt_OS  logrank       dir  depth_mut  depth_wt
+  --------------------------------------------------------------------------------
+
+  S7-P1: CTNNB1-mut better OS (HCC-P5)
+  STATUS: NOT TESTABLE
+  S7-P1: TP53-mut worse OS
+  STATUS: NOT TESTABLE
+
+=================================================================
+S7-2: DEPTH × STAGE INTERACTION
+S7-P3: Interaction term significant
+=================================================================
+  Interaction term n_valid=347
+
+  Model A: depth + stage (standardised):
+  n=341
+               coef  exp(coef)         p
+covariate                               
+depth      0.183021   1.200840  0.025782
+stage      0.321693   1.379462  0.000074
+
+  Model B: depth + stage + depth×stage:
+  n=341
+                 coef  exp(coef)         p
+covariate                                 
+depth        0.147141   1.158518  0.090738
+stage        0.318779   1.375448  0.000102
+depth_x_stg  0.097750   1.102688  0.226169
+
+  Model C: depth + stage + interaction + age:
+  n=341
+                 coef  exp(coef)         p
+covariate                                 
+depth        0.157059   1.170064  0.071613
+stage        0.319635   1.376626  0.000102
+depth_x_stg  0.097579   1.102499  0.228879
+age          0.009548   1.009593  0.127851
+
+  S7-P3: Depth×stage interaction significant
+  HR(interaction)=1.1027  p=0.2262  ns
+  STATUS: NOT CONFIRMED ✗
+  (positive HR = depth is more harmful at higher stage)
+
+  Depth effect stratified by stage:
+  Stage          n  depth_OS_p   deep_OS  shal_OS
+  ----------------------------------------------------
+  Stage 1       171  p=0.9199  ns     31.9     27.1
+  Stage 2        86  p=0.2314  ns     25.4     26.0
+  Stage 3        85  p=0.0511  ns     19.6     26.9
+
+=================================================================
+S7-3: STAGE III DEEP-DIVE
+S7-P2: CDK4-hi worse OS Stage III
+S7-P7: Depth OS Stage III p<0.05
+=================================================================
+  Stage III: n=85
+
+  Depth OS Stage III:
+  deep=19.6mo  shallow=26.9mo  p=0.0511  ns
+  S7-P7: Depth OS Stage III p<0.05
+  STATUS: DIRECTIONAL ✓
+
+  Stage III depth tertiles:
+  T1 shallow: n=28 OS=30.7mo
+  T2 mid: n=27 OS=21.8mo
+  T3 deep: n=28 OS=17.1mo
+  T3 vs T1: p=0.0171   *
+
+  Key gene OS in Stage III:
+  Gene             n  OS_p           hi_OS  lo_OS  dir
+  ------------------------------------------------------------
+  CDK4            83  p=4.88e-04 ***    16.3    30.3  ↑=worse
+  CDC20           83  p=6.71e-03  **    20.7    25.9  ↑=worse
+  BIRC5           83  p=9.12e-04 ***    20.0    26.6  ↑=worse
+  CCNB1           83  p=0.0146   *    20.5    26.0  ↑=worse
+  EZH2            83  p=0.0663  ns    19.2    27.4  ↑=worse
+  HDAC2           83  p=1.93e-04 ***    13.7    32.9  ↑=worse
+  MKI67           83  p=0.0159   *    20.4    26.1  ↑=worse
+  TOP2A           83  p=0.0108   *    19.5    27.1  ↑=worse
+  SMARCA4         83  p=0.0509  ns    18.9    27.7  ↑=worse
+  TWIST1          83  p=0.2254  ns    18.3    28.2  ↑=worse
+  PTEN            83  p=2.67e-03  **    29.4    16.9  ↑=better
+  CDKN2A          83  p=0.3508  ns    23.0    23.5  ↑=worse
+  CD8A            83  p=0.9985  ns    23.2    23.2  ↑=better
+  PRF1            83  p=0.0349   *    29.5    16.9  ↑=better
+  VIM             83  p=0.3463  ns    24.4    22.0  ↑=better
+  AFP             83  p=0.2022  ns    20.7    25.8  ↑=worse
+
+  S7-P2: CDK4-hi worse OS Stage III
+  CDK4-hi=16.3mo  CDK4-lo=30.3mo  p=4.88e-04 ***
+  STATUS: CONFIRMED ✓
+
+  Cox within Stage III:
+  n=83
+               coef  exp(coef)         p
+covariate                               
+depth      0.312792   1.367237  0.083687
+CDK4       0.190596   1.209970  0.221321
+
+=================================================================
+S7-4: CDKN2A / PTEN INVESTIGATION
+S7-P5: PTEN-low enriched in Deep+Cold
+S7-P6: CDKN2A-high co-occurs with CDK4-high
+=================================================================
+
+  Deep+Cold n=65
+  Deep+Hot  n=121
+  Shallow   n=185
+
+  CDKN2A analysis:
+  r(depth, CDKN2A) = +0.1526  p=3.21e-03  **
+  r(CDK4, CDKN2A) = +0.2768  p=5.94e-08 ***
+
+  S7-P6: CDKN2A-high co-occurs with CDK4-high
+  r=+0.2768  (positive = co-expression)
+  STATUS: CONFIRMED ✓
+
+  CDK4/CDKN2A quadrants:
+  CDK4-hi + CDKN2A-hi: n=117
+  CDK4-hi + CDKN2A-lo: n=69
+  CDK4-lo + CDKN2A-lo: n=116
+  CDK4-hi+CDKN2A-hi: n=113  OS=21.1mo  ev=49
+  CDK4-hi+CDKN2A-lo: n=67  OS=27.2mo  ev=27
+  CDK4-lo+CDKN2A-lo: n=116  OS=32.3mo  ev=32
+
+  PTEN analysis:
+  r(depth, PTEN) = -0.1623  p=1.71e-03  **
+  PTEN by subgroup:
+  Deep+Cold: 0.1426
+  Deep+Hot:  -0.0438
+  Shallow:   0.1656
+  Deep+Cold vs Deep+Hot: p=0.2526  ns
+  Deep+Cold vs Shallow: p=0.3266  ns
+
+  S7-P5: PTEN-low enriched in Deep+Cold
+  (PTEN Deep+Cold < Deep+Hot: NO ✗)
+  STATUS: NOT CONFIRMED ✗
+
+  PTEN Cox with depth:
+  n=365
+               coef  exp(coef)         p
+covariate                               
+depth      0.285968   1.331050  0.001163
+PTEN      -0.139146   0.870101  0.100959
+
+=================================================================
+S7-5: CDK4 IN GSE14520
+S7-P4: CDK4-hi worse OS GSE14520
+=================================================================
+  Not found: ./hcc_false_attractor/gse14520/GSE14520_expr.tsv.gz
+  Not found: ./hcc_false_attractor/gse14520/gse14520_expression.csv.gz
+  Not found: ./hcc_false_attractor/gse14520/gse14520_expr.csv
+  Not found: ./hcc_false_attractor/gse14520/GSE14520_series_matrix.txt.gz
+  CDK4 not found in any GSE14520 file.
+  S7-P4: NOT TESTABLE
+  GSE14520 must be reprocessed with CDK4 added.
+  CDK4 Affymetrix probe (GPL3921): 204541_at
+
+=================================================================
+S7-6: CDC20 — STRONGEST OS PREDICTOR
+p=2.57e-07  r(depth)=+0.677
+=================================================================
+  r(depth, CDC20) = +0.6771  p=4.44e-51 ***
+
+  CDC20 tertile OS:
+  T1 low: n=121 OS=30.7mo
+  T2 mid: n=123 OS=27.3mo
+  T3 high: n=121 OS=22.1mo
+  T3 vs T1: p=5.23e-06 ***
+
+  CDC20 OS by stage:
+  Stage 1: p=0.2936  ns  hi=28.8mo  lo=30.3mo
+  Stage 2: p=3.40e-03  **  hi=18.6mo  lo=32.8mo
+  Stage 3: p=6.71e-03  **  hi=20.7mo  lo=25.9mo
+
+  Cox: CDC20 + depth:
+  n=365
+               coef  exp(coef)         p
+covariate                               
+CDC20      0.436477   1.547246  0.000358
+depth      0.040680   1.041519  0.731957
+
+--- Generating Script 7 figure ---
+
+  Figure saved: ./hcc_false_attractor/results_s7/hcc_tcga_s7.png
