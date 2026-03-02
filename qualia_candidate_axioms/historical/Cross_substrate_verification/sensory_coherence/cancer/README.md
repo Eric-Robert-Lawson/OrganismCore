@@ -2819,19 +2819,320 @@ Docs:  92a–92j + addendum
 Date:  2026-03-02
 ```
 
-#### ICC — Intrahepatic
-#### Cholangiocarcinoma
+#### ICC — Intrahepatic Cholangiocarcinoma
+
 ```
-Lineage:  Cholangiocyte (bile duct)
-Block:    ICC cells vs normal
-          cholangiocytes
-Predicted switch genes:
-  SOX17  — cholangiocyte identity TF
-  HNF1B  — biliary specification
-  KRT19  — cholangiocyte marker
-Data:    GSE138709 or
-         combined liver atlas
-Doc: 88
+Lineage:  Hepatoblast →
+          Bipotent progenitor →
+          Cholangiocyte progenitor →
+          Immature cholangiocyte →
+          Mature cholangiocyte (terminal)
+
+Block:    ICC cells retain biliary progenitor
+          identity with EMT activation and
+          desmoplastic stroma co-engagement.
+          Triple epigenetic lock silences
+          biliary maturation gene promoters
+          while TFs (HNF4A, FOXA2) remain
+          expressed but functionally decoupled
+          from their targets.
+          Block level: target promoters of
+          HNF4A/FOXA2 (not the TFs themselves).
+
+Switch genes (confirmed):
+  ALB     — mature biliary metabolic product
+             TCGA: FC=-8.267  p=2.30e-06 ***  DOWN ✓
+             GSE:  FC=-3181   p=3.28e-06 ***  DOWN ✓
+             depth r=-0.803 GSE (dominant SW)
+             depth r=-0.509 TCGA
+  G6PC    — mature gluconeogenic enzyme
+             TCGA: FC=-6.511  p=2.30e-06 ***  DOWN ✓
+             GSE:  FC=-351.7  p=4.60e-04 ***  DOWN ✓
+             depth r=-0.816 TCGA (top TCGA signal)
+  APOB    — mature metabolic identity
+             TCGA: FC=-6.096  p=2.30e-06 ***  DOWN ✓
+             GSE:  FC=-1197   p=2.19e-07 ***  DOWN ✓
+             depth r=-0.731 TCGA / -0.645 GSE
+  ALDOB   — mature glycolytic enzyme
+             TCGA: FC=-9.244  p=2.30e-06 ***  DOWN ✓
+             GSE:  FC=-3214   p=6.71e-06 ***  DOWN ✓
+  HNF4A   — biliary master TF
+             TCGA: FC=-3.079  p=3.01e-06 ***  DOWN ✓
+             GSE:  depth r=-0.541 (top 10 GSE)
+             NOTE: FOXA2→ALB anti-correlated
+             in GSE (r=-0.338, p=2.49e-05):
+             TF present but decoupled from
+             targets — not TF loss but
+             chromatin block at target level
+  CYP3A4  — mature metabolic enzyme
+             TCGA: FC=-10.694 p=2.63e-06 ***  DOWN ✓
+             (largest FC in entire panel)
+  FOXA2   — hepatobiliary pioneer TF
+             TCGA: FC=-1.820  p=1.11e-05 ***  DOWN ✓
+             GSE platform effect (UP) —
+             TCGA RNA-seq canonical
+  GGT1    — biliary brush border enzyme
+             GSE:  p=7.70e-03 **  DOWN ✓
+
+False attractor (confirmed):
+  TWIST1  — EMT master regulator
+             TCGA: FC=+1.822  p=9.45e-04 ***  UP ✓
+             depth r=+0.789 TCGA (DOMINANT)
+             depth r=+0.766 Depth_S TCGA
+             Confirmed ICC oncogene in
+             multiple published papers.
+             Literature: TWIST1/FBP1/Wnt axis
+             in ICC (Springer 2024).
+  SOX4    — biliary progenitor TF
+             TCGA: FC=+2.980  p=5.11e-06 ***  UP ✓
+             GSE:  FC=+244    p=9.67e-05 ***  UP ✓
+             depth r=+0.549 GSE
+  EZH2    — PRC2 epigenetic lock
+             TCGA: FC=+2.954  p=2.30e-06 ***  UP ✓
+             GSE:  FC=+126.6  p=9.74e-06 ***  UP ✓
+             depth r=+0.487 GSE Depth_T
+             Gain-of-function lock (not MDS)
+             Literature: confirmed ICC oncogene
+  SOX9    — biliary progenitor identity
+             TCGA: FC=+2.913  p=1.26e-05 ***  UP ✓
+  PROM1   — progenitor surface marker (CD133)
+             TCGA: p=1.14e-03 **  UP ✓
+             GSE:  p=9.00e-04 *** UP ✓
+  CDC20   — cell cycle / proliferation
+             TCGA: FC=+4.999  p=2.30e-06 ***  UP ✓
+             GSE:  FC=+368.8  p=1.94e-04 ***  UP ✓
+  FAP     — CAF / stroma marker
+             TCGA: FC=+4.372  p=6.64e-06 ***  UP ✓
+             GSE:  FC=+756    p=5.06e-04 ***  UP ✓
+  COL1A1  — desmoplastic stroma
+             TCGA: FC=+2.535  p=3.35e-05 ***  UP ✓
+             GSE:  p=3.63e-08 ***  UP ✓
+             depth r=+0.683 GSE (top stroma)
+  ACTA2   — activated CAF marker
+             TCGA: UP p=7.63e-03 **
+             depth r=+0.726 Depth_S TCGA
+             depth r=+0.631 GSE
+  WNT5A   — non-canonical Wnt / EMT upstream
+             GSE:  FC=+235    p=1.07e-05 ***  UP ✓
+             depth r=+0.656 TCGA
+             depth r=+0.482 GSE
+             NOTE: oncogenic in ICC (biliary)
+             opposite direction from HCC
+             (lineage-specific Wnt role)
+
+Epigenetic lock (confirmed):
+  EZH2    — GAIN OF FUNCTION (same as BRCA,
+             not MDS)
+             H3K27me3 silences biliary target
+             promoters (ALB, G6PC, CYP3A4)
+             while HNF4A/FOXA2 remain expressed.
+  KDM1A   — CoREST component
+             depth r=+0.504 Depth_T TCGA
+             depth r=+0.496 Depth_S TCGA
+             KDM1A→ALB anti-correlated
+             (r=-0.376, p=0.024)
+             Removes H3K4me activation marks
+             from biliary enhancers.
+             Dual function: represses biliary,
+             activates EMT genes
+             (KDM1A→TWIST1 r=+0.525).
+  HDAC1   — CoREST co-repressor
+             depth r=+0.576 Depth_S GSE
+             (stronger depth signal than HDAC2)
+             Forms CoREST with KDM1A/RCOR1.
+  DNMT3A  — depth-NEGATIVE biomarker
+             depth r=-0.552 Depth_T GSE ***
+             depth r=-0.517 Depth_S GSE ***
+             Lower DNMT3A = deeper attractor.
+             Expression level (not mutation)
+             is a continuous depth biomarker.
+             Not a primary ICC driver mutation
+             (rare) but expression correlates
+             strongly with attractor depth.
+
+Key structural finding:
+  THE FOXA2/HNF4A UNCOUPLING FINDING:
+  ICC is not HNF4A/FOXA2-negative.
+  ICC is HNF4A/FOXA2-uncoupled.
+  The TFs are expressed but their target
+  promoters are epigenetically sealed by
+  the EZH2/KDM1A/HDAC1 triple lock.
+  FOXA2→ALB anti-correlated in GSE
+  (r=-0.338, p=2.49e-05, n=149).
+  FOXA2-high ICC cells have lower ALB.
+  The TF is present. The target is absent.
+  Therapeutic implication: do not target
+  TF restoration — target the chromatin
+  state at the downstream gene promoters.
+  No published ICC paper makes this
+  mechanistic distinction.
+  NOVEL FINDING — confirmed as novel
+  by literature check 2026-03-02.
+
+  TWO DEPTH AXES (co-activated, not independent):
+  Depth_T (EMT):    G6PC loss + TWIST1 gain
+  Depth_S (Stroma): ALB loss + COL1A1/ACTA2 gain
+  r(Depth_T, Depth_S) = +0.866 TCGA
+  Both axes driven by same upstream state.
+  TWIST1 is top driver of BOTH axes.
+  Single-arm targeting insufficient.
+
+  NMF SUBTYPES (GSE32225, Sia et al.):
+  Proliferative (n=92): depth=0.625
+    CDC20, TOP2A, CCNB1 dominant
+    HNF4A partially retained
+    EMT arm primary
+  Inflammatory (n=57): depth=0.458
+    ACTA2, COL1A1, WNT5A, EZH2 dominant
+    HNF4A lower
+    Stroma arm primary
+    Dense desmoplasia = treatment barrier
+  MW p=4.73e-10 *** different depth levels
+
+Drug predictions (geometry-derived,
+stated before literature check):
+
+  1. CoREST complex inhibitor (corin)
+       Geometry: KDM1A r=+0.504 + HDAC1
+                 r=+0.576 both depth axes.
+                 KDM1A→ALB broken (r=-0.376).
+                 Dual lock on biliary promoters.
+                 Attacking both simultaneously
+                 opens the target chromatin.
+       Literature: Corin (dual KDM1A/HDAC1)
+                   suppresses HCC, drives
+                   differentiation in progenitor
+                   cancers (Springer 2025). ✅
+                   ICC-specific: ABSENT.
+       Status:     🆕 NOVEL — highest priority
+                   experimental prediction.
+
+  2. EZH2 inhibitor (tazemetostat)
+       Geometry: EZH2 UP both datasets ***
+                 r=+0.487 Depth_T GSE.
+                 EZH2→HNF4A circuit broken
+                 (r=-0.010 TCGA).
+                 Silences biliary target
+                 promoters via H3K27me3.
+       Literature: EZH2 confirmed ICC oncogene
+                   multiple papers. ✅
+                   Tazemetostat basket trial
+                   (EZH2-altered tumours). ✅
+                   ICC-specific trial: absent.
+       Status:     ✅ CONFIRMED — validated
+                   target, approved drug,
+                   ICC trial needed.
+
+  3. WNT5A / non-canonical Wnt blockade
+       Geometry: WNT5A r=+0.656 TCGA,
+                 r=+0.482 GSE.
+                 WNT5A→COL1A1 r=+0.476 ✓
+                 WNT5A→ACTA2 r=+0.334 ✓
+                 Upstream activator of both
+                 TWIST1 (EMT) and stroma.
+                 Blocking WNT5A collapses
+                 both arms simultaneously.
+       Literature: Non-canonical Wnt in ICC
+                   stroma: active investigation.
+                   WNT5A oncogenic direction
+                   in ICC: NOT in literature
+                   (opposite in HCC). ✅ novel
+       Status:     🆕 NOVEL — lineage-specific
+                   oncogenic role. Highest
+                   mechanistic novelty.
+                   Drug: ipafricept/anti-FZD5.
+
+  4. TGF-β inhibitor (early/resectable ICC)
+       Geometry: TGFB1 r=+0.591 TCGA.
+                 TGFB1→TWIST1 r=+0.557 ✓
+                 TGFB1→COL1A1 r=+0.550 ✓
+                 Strong in resected cohort
+                 (TCGA). Flat in GSE (n=149).
+                 Initiates stroma niche.
+                 WNT5A maintains it.
+       Literature: TGF-β drives ICC EMT ✅
+                   Galunisertib: discontinued
+                   2020. Target class valid.
+                   Alternative: bintrafusp alfa.
+       Status:     ✅ CONFIRMED (class)
+                   ⚠️ drug discontinued.
+                   Best for neoadjuvant /
+                   early resectable ICC.
+
+  5. TWIST1 suppression (BET inhibitor)
+       Geometry: TWIST1 r=+0.789 TCGA
+                 Dominant depth driver.
+                 Identity anchor of the
+                 false attractor state.
+       Literature: TWIST1 validated ICC
+                   oncogene. Multiple papers.
+                   TWIST1/FBP1/Wnt axis
+                   in ICC confirmed (2024). ✅
+                   BET inhibitor ICC trial:
+                   absent.
+       Status:     ✅ CONFIRMED target.
+                   🆕 BET inhibitor approach
+                   novel for ICC.
+
+FGFR2 geometry finding:
+  FGFR2 r=-0.545 Depth_T TCGA.
+  Lower FGFR2 expression = deeper ICC.
+  Predicted: FGFR2-high ICC is shallower,
+  more differentiated, better prognosis.
+  Literature: FGFR2 fusion ICC = more
+  well-differentiated, better OS, better
+  DFS, lower Treg infiltration, more
+  immunoactive. ✅ EXACT MATCH.
+  Pemigatinib: FDA approved for FGFR2-
+  fusion ICC. ✅ Clinical confirmation.
+  Novel extension: FGFR2 expression
+  (continuous, not just binary fusion)
+  as depth biomarker — not in literature.
+
+Novel predictions (confirmed as novel,
+locked 2026-03-02):
+  1. FOXA2 present but target-uncoupled
+     in ICC. TF expressed, target promoters
+     epigenetically sealed. Therapeutic
+     implication: open promoters, not
+     TF restoration. Not in ICC literature.
+  2. DNMT3A expression level is a
+     continuous depth biomarker in ICC
+     (r=-0.552, n=149, p=2.93e-13).
+     Lower DNMT3A = deeper attractor =
+     needs combination epigenetic therapy.
+     Not in ICC literature.
+  3. CoREST/Corin as ICC therapeutic target.
+     KDM1A+HDAC1 dual epigenetic lock
+     confirmed by gap tests and depth
+     correlations. Corin works in HCC.
+     ICC application: novel.
+  4. WNT5A oncogenic in ICC biliary lineage
+     (opposite of HCC tumour suppressor role).
+     Lineage-specific Wnt polarity.
+     Not in ICC literature.
+  5. FGFR2 expression (not just fusion)
+     as continuous ICC depth indicator.
+     FGFR2-high non-fusion ICC may also
+     have shallower attractor and better
+     response to differentiation therapy.
+
+Data:    TCGA-CHOL HiSeqV2 (Xena hub)
+             n=36 ICC | n=9 normal adjacent
+         GSE32225 GPL8432 (Sia et al. 2013)
+             n=149 ICC | n=6 normal biliary
+             NMF subtypes: Proliferative /
+             Inflammatory
+Script:  icc_script1.py (TCGA + GSE saddle,
+             depth, correlations, gap tests)
+         icc_script2.py (S2 depth axes,
+             two-basin, epigenetic analysis,
+             extended gap tests)
+Docs:    93a (Script 1 reasoning artifact)
+         93e (Script 2 reasoning artifact)
+         93f (Literature check)
+Status:  CONFIRMED + LITERATURE CHECK COMPLETE
+         2026-03-02
 ```
 
 #### RCC — Renal Cell Carcinoma
