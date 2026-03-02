@@ -1,0 +1,243 @@
+=================================================================
+HEPATOCELLULAR CARCINOMA — SCRIPT 8
+Dataset: TCGA-LIHC (continued)
+Framework: OrganismCore
+Doc: 92h | Date: 2026-03-02
+=================================================================
+
+PREDICTIONS LOCKED 2026-03-02:
+S8-P1: CTNNB1-mut better OS (if MAF)
+S8-P2: TP53-mut worse OS (if MAF)
+S8-P3: HDAC2-hi+CDK4-hi Stage III worst OS
+S8-P4: HDAC2-hi+PRF1-lo Stage III worst immune
+S8-P5: CDC20+stage+HDAC2 beats stage alone
+S8-P6: CDK4-hi worse OS GSE14520
+S8-P7: HDAC2 Cox HR > CDK4 Stage III
+
+=================================================================
+PARSE EXPRESSION — TCGA-LIHC
+=================================================================
+  Matrix: (423, 83)
+  HCC: 371  Normal: 50
+
+=================================================================
+PARSE CLINICAL
+=================================================================
+  OS valid: 367 events=130
+  Stage: {np.int64(1): 172, np.int64(2): 87, np.int64(3): 85, np.int64(4): 5}
+  Age valid: 372  mean=59.5
+
+=================================================================
+PARSE MAF — HCC-P5 FINAL ATTEMPT
+=================================================================
+  File: ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.maf.gz (55,112 bytes)
+  Full MAF detected — parsing...
+  Headers: ['HUGO_SYMBOL', 'ENTREZ_GENE_ID', 'CENTER', 'NCBI_BUILD', 'CHROMOSOME', 'START_POSITION', 'END_POSITION', 'STRAND']
+  gene=0 sample=15
+
+  Mutations parsed: 2
+  Gene               n        %
+  ------------------------------
+  TP53               1      0.2%
+  TSC2               1      0.2%
+
+=================================================================
+DEPTH SCORE
+=================================================================
+  mean=0.3334  std=0.1599
+
+=================================================================
+S8-1: MUTATION SURVIVAL
+S8-P1: CTNNB1-mut better OS (HCC-P5)
+S8-P2: TP53-mut worse OS
+=================================================================
+
+  Gene          n_mut    mut_OS     wt_OS  logrank       dir
+  ----------------------------------------------------------------
+
+  S8-P1: CTNNB1-mut better OS (HCC-P5)
+  STATUS: NOT TESTABLE
+  S8-P2: TP53-mut worse OS
+  STATUS: NOT TESTABLE
+
+=================================================================
+S8-2: HDAC2 STAGE III DEEP-DIVE
+S8-P3: HDAC2-hi+CDK4-hi worst OS
+S8-P7: HDAC2 Cox HR > CDK4 in S3
+=================================================================
+  Stage III n=85
+
+  HDAC2 OS Stage III:
+  hi=13.7mo  lo=32.9mo  p=1.93e-04 ***  gap=19.2mo
+
+  HDAC2 tertile Stage III:
+  T1 low: n=28 OS=39.0mo
+  T2 mid: n=27 OS=18.3mo
+  T3 high: n=28 OS=12.2mo
+  T3 vs T1: p=5.45e-05 ***
+
+  S8-P7: HDAC2 vs CDK4 Cox Stage III:
+
+  HDAC2 + CDK4 + depth (Stage III):
+  n=83
+               coef  exp(coef)         p
+covariate                               
+HDAC2      0.323096   1.381398  0.086562
+CDK4       0.156346   1.169230  0.346902
+depth      0.147241   1.158633  0.477588
+
+  S8-P3: HDAC2 × CDK4 joint OS Stage III:
+  Group                       n   OS_mean  events
+  ---------------------------------------------
+  HDAC2-hi+CDK4-hi           32      12.2  21
+  HDAC2-hi+CDK4-lo           10      18.8  5
+  HDAC2-lo+CDK4-hi           10      29.4  6
+  HDAC2-lo+CDK4-lo           31      34.1  13
+
+  Worst: HDAC2-hi+CDK4-hi OS=12.2mo
+  Best:  HDAC2-lo+CDK4-lo OS=34.1mo
+  Logrank: p=4.79e-06 ***
+
+  S8-P3: HDAC2-hi+CDK4-hi Stage III worst OS
+  Worst group: HDAC2-hi+CDK4-hi (12.2mo)
+  STATUS: CONFIRMED ✓
+
+  S8-P4: HDAC2 × PRF1 joint OS Stage III:
+  Group                       n   OS_mean  events
+  ---------------------------------------------
+  HDAC2-hi+PRF1-lo           24      12.8  16
+  HDAC2-hi+PRF1-hi           18      15.0  10
+  HDAC2-lo+PRF1-lo           17      22.6  8
+  HDAC2-lo+PRF1-hi           24      40.3  11
+
+  Worst: HDAC2-hi+PRF1-lo OS=12.8mo
+  Best:  HDAC2-lo+PRF1-hi OS=40.3mo
+  Logrank: p=7.19e-05 ***
+
+  S8-P4: HDAC2-hi+PRF1-lo Stage III worst immune
+  STATUS: CONFIRMED ✓
+
+=================================================================
+S8-3: CDC20 + STAGE + HDAC2 COX
+S8-P5: Three-variable model beats stage alone
+=================================================================
+
+  Baseline: stage alone:
+  n=341
+               coef  exp(coef)         p
+covariate                               
+stage      0.435784   1.546175  0.000001
+
+  Model A: stage + depth:
+  n=341
+               coef  exp(coef)         p
+covariate                               
+stage      0.401569   1.494167  0.000012
+depth      0.219186   1.245063  0.017114
+
+  Model B: stage + CDC20:
+  n=341
+               coef  exp(coef)         p
+covariate                               
+stage      0.373228   1.452416  0.000058
+CDC20      0.420080   1.522084  0.000027
+
+  Model C: stage + HDAC2:
+  n=341
+               coef  exp(coef)         p
+covariate                               
+stage      0.405251   1.499679  0.000007
+HDAC2      0.330937   1.392272  0.000441
+
+  Model D: stage + CDC20 + HDAC2:
+  n=341
+               coef  exp(coef)         p
+covariate                               
+stage      0.367863   1.444644  0.000075
+CDC20      0.340977   1.406321  0.001207
+HDAC2      0.204749   1.227217  0.037447
+
+  Model E: stage + CDC20 + HDAC2 + depth:
+  n=341
+               coef  exp(coef)         p
+covariate                               
+stage      0.378183   1.459630  0.000047
+CDC20      0.466610   1.594579  0.000299
+HDAC2      0.297711   1.346773  0.008931
+depth     -0.244027   0.783467  0.090588
+  AIC error: Since the model is semi-parametric (and not fully-parametric), the AIC does not exist. You probably want the `.AIC_partial_` property instead.
+
+=================================================================
+S8-4: GSE14520 CDK4 — GEO DOWNLOAD
+S8-P6: CDK4-hi worse OS GSE14520
+=================================================================
+  Downloading GSE14520 series matrix from NCBI GEO...
+  URL: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE14nnn/GSE14520/matrix/GSE14520_series_matrix.txt.gz
+  HTTP 404
+  Download failed: HTTP 404
+  Trying: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE14nnn/GSE14520/matrix/GSE14520-GPL3921_series_matrix.txt.gz
+  HTTP 200
+  Saved GSE14520_part1: 21,301,282 bytes
+
+  Parsing: ./hcc_false_attractor/gse14520/GSE14520_part1_matrix.txt.gz
+  Found CDK4 probe: 204541_at
+  Samples: 445
+  CDK4 values: n=445
+  Score file: (225, 5)  cols=['sample_id', 'depth_s1_TF', 'depth_s2_metabolic', 'metab_score', 'depth_combined']
+  Length mismatch: CDK4=445 scores=225
+  Attempting positional match...
+  Survival columns not found
+  Available: ['sample_id', 'depth_s1_TF', 'depth_s2_metabolic', 'metab_score', 'depth_combined']
+  Trying: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE14nnn/GSE14520/matrix/GSE14520-GPL10687_series_matrix.txt.gz
+  HTTP 404
+  GEO download failed.
+  S8-P6: NOT TESTABLE
+  CDK4 in GSE14520 remains deferred post-literature.
+
+=================================================================
+S8-5: FINAL PRE-LITERATURE SUMMARY
+All confirmed findings across 8 scripts
+=================================================================
+
+  CORE FRAMEWORK:
+  Finding                                             Evidence
+  ----------------------------------------------------------------------
+  ✓  Depth score predicts OS (TCGA-LIHC)                 p=1.01e-04  HR=1.362
+  ✓  Depth score predicts OS (GSE14520)                  p=1.78e-05
+  ✓  Depth independent of stage (Cox)                    HR=1.245  p=0.017
+  ✓  Depth absorbs grade (grade NS Cox)                  grade HR=0.977  p=0.808
+  ✓  Age independently prognostic                        HR=1.225  p=0.030
+  ✓  Full model: depth+stage+grade+age                   depth HR=1.244  p=0.027
+  ✓  CDC20 = best depth proxy gene                       r=+0.677  absorbs depth in Cox
+  ✓  Stage I depth reversal                              deep=31.9mo > shal=27.1mo
+  ✓  Stage II-III depth predicts OS                      S3 tertile p=0.017
+  ✓  HDAC2 Stage III gap = 19.2mo                        p=1.93e-04  13.7 vs 32.9mo
+  ✓  CDK4 Stage III gap = 14.0mo                         p=4.88e-04  16.3 vs 30.3mo
+  ✓  CDKN2A co-expresses with CDK4                       r=+0.277  p=5.94e-08
+  ✓  CDK4+CDKN2A-hi worst quadrant                       OS=21.1mo vs 32.3mo
+  ✓  Deep+Cold immune-desert subtype                     OS=24.7mo  CD8A p=3.66e-21
+  ✓  CD8A-high better OS                                 p=0.013  29.6 vs 23.8mo
+  ✓  PRF1-high better OS Stage III                       p=0.035  29.5 vs 16.9mo
+  ✓  Immune exhaustion r=+0.37 w depth                   composite p=3.42e-13
+  ✓  CDC20 tertile T3 vs T1                              p=5.23e-06  22.1 vs 30.7mo
+  ✓  5 co-inhibitory receptors up                        PD-1/TIM-3/LAG-3/TIGIT/CTLA-4
+
+  PENDING:
+  ?  HCC-P5 (CTNNB1 mut OS)  — MAF file incomplete
+  ?  CDK4 in GSE14520  — expression data needed
+
+  DRUG HYPOTHESIS PRIORITIES:
+  Target               Biomarker                 Stage      Grade
+  -----------------------------------------------------------------
+  HDAC2 inhib          HDAC2-high                Stage III  A
+  CDK4/6 inhib         CDK4-hi+CDKN2A-hi         Stage II-III A
+  Checkpoint inhib     PRF1-hi/exhaust-hi        Stage II-III B
+  CDC20 inhib          CDC20-high/depth          Stage II-III B
+  mTOR inhib           PTEN-low+Deep+Hot         All        B
+  Sorafenib            Depth-deep                Stage II-III B
+
+  Gene OS summary saved: gene_os_summary_s8.csv
+
+--- Generating Script 8 figure ---
+
+  Figure saved: ./hcc_false_attractor/results_s8/hcc_tcga_s8.png
