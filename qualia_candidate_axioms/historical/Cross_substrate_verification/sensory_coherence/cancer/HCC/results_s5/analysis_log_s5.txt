@@ -1,0 +1,198 @@
+=================================================================
+HEPATOCELLULAR CARCINOMA — SCRIPT 5
+Dataset: TCGA-LIHC (continued)
+Framework: OrganismCore
+Doc: 92e | Date: 2026-03-02
+=================================================================
+
+PREDICTIONS LOCKED 2026-03-02:
+S5-P1: CTNNB1-mut better OS (HCC-P5)
+S5-P2: TP53-mut worse OS
+S5-P3: CTNNB1-mut shallower than TP53-mut
+S5-P4: CDK4-hi worse OS in GSE14520
+S5-P5: Exhaustion-high worse OS
+S5-P6: Depth independent of stage (Cox)
+S5-P7: Deep+exhaustion-hi worst OS group
+
+=================================================================
+MAF STATUS
+=================================================================
+  MAF: 55,112 bytes ✓
+
+=================================================================
+PARSE EXPRESSION — TCGA-LIHC
+=================================================================
+  Matrix: (423, 82)
+  Sample IDs[0:3]: ['TCGA-FV-A495-01', 'TCGA-G3-A3CH-11', 'TCGA-CC-A3MB-01']
+  HCC: 371  Normal: 50
+  Genes: ['SMAD3', 'FGFR1', 'LAG3', 'PCK1', 'PRF1', 'DNMT3A', 'PTEN', 'APOB', 'TIGIT', 'TGFB1']
+
+=================================================================
+PARSE CLINICAL (S5 — stage map fixed)
+=================================================================
+  Parsing: ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.survival.tsv.gz (2,438 bytes)
+  Headers: ['sample', 'os', 'os.time']
+  Cols: {'sc': 0, 'ec': 1, 'tc': 2}
+  Parsing: ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.pheno.tsv.gz (31,027 bytes)
+  Headers: ['sample', 'patientid', 'ablation_embolization_tx_adjuvant', 'afp_at_procurement', 'afp_norm_range_lower', 'afp_norm_range_upper', 'age', 'ajcc_metastasis_pathologic_pm', 'ajcc_nodes_pathologic_pn', 'ajcc_pathologic_tumor_stage', 'ajcc_staging_edition', 'ajcc_tumor_pathologic_pt', 'bilirubin_total', 'bilirubin_total_norm_range_lower', 'bilirubin_total_norm_range_upper']
+  Cols: {'sc': 0, 'stc': 9, 'gc': 28, 'ec': 42, 'genc': 61}
+
+  OS valid: 367 events=130
+  Stage encoded: {np.int64(1): 172, np.int64(2): 87, np.int64(3): 85, np.int64(4): 5}
+  Grade encoded: {np.int64(2): 178, np.int64(3): 123, np.int64(1): 55, np.int64(4): 12}
+
+=================================================================
+PARSE MAF
+=================================================================
+  ./hcc_false_attractor/tcga_lihc/TCGA-LIHC.maf.gz (55,112 bytes)
+  Headers: ['HUGO_SYMBOL', 'ENTREZ_GENE_ID', 'CENTER', 'NCBI_BUILD', 'CHROMOSOME', 'START_POSITION', 'END_POSITION', 'STRAND']
+  gene=0 sample=15 effect=8
+
+  Mutations parsed: 2
+
+  Frequencies:
+  Gene               n        %
+  ------------------------------
+  TP53               1      0.2%
+  TSC2               1      0.2%
+
+=================================================================
+DEPTH SCORE
+=================================================================
+  Switch genes: ['CYP3A4', 'ALDOB', 'PCK1', 'G6PC', 'CYP2C9', 'TTR', 'IGF1', 'ARG1', 'APOE', 'RXRA', 'PPARA', 'FGF21', 'FABP1', 'ALB', 'APOB', 'HNF4A']
+  FA genes:     ['SOX4', 'PROM1', 'AFP', 'EPCAM', 'CDC20', 'BIRC5', 'TOP2A', 'MKI67', 'CCNB1', 'KRT19', 'EZH2', 'HDAC2']
+  mean=0.3334 std=0.1599 range=0.0069–0.8985
+
+=================================================================
+S5-1: MUTATION SURVIVAL
+S5-P1: CTNNB1-mut better OS (HCC-P5)
+S5-P2: TP53-mut worse OS
+S5-P3: CTNNB1-mut shallower than TP53-mut
+=================================================================
+
+  Gene          n_mut    mut_OS     wt_OS  logrank       direction
+  ------------------------------------------------------------------
+
+  S5-P1: CTNNB1-mut better OS (HCC-P5)
+  STATUS: NOT TESTABLE (n_mut<5)
+  S5-P2: TP53-mut worse OS
+  STATUS: NOT TESTABLE (n_mut<5)
+
+  S5-P3: CTNNB1-mut shallower than TP53-mut
+  STATUS: NOT TESTABLE
+
+=================================================================
+S5-2: FULL COX MULTIVARIATE
+S5-P6: Depth independent of stage
+=================================================================
+  Stage valid: 347
+  Grade valid: 366
+  Age valid:   0
+  CTNNB1 mut:  0
+  TP53 mut:    1
+
+  Model 1: depth alone:
+  n=365
+               coef  exp(coef)         p
+covariate                               
+depth      0.308716   1.361676  0.000394
+
+  Model 2: depth + age:
+  Skipped: n=0 < 20
+
+  Model 3: depth + stage:
+  n=341
+               coef  exp(coef)         p
+covariate                               
+depth      0.219186   1.245063  0.017114
+stage      0.401569   1.494167  0.000012
+
+  S5-P6: depth independent of stage
+  depth p=0.017114
+  STATUS: CONFIRMED ✓
+
+  Model 4: depth + grade:
+  n=360
+               coef  exp(coef)         p
+covariate                               
+depth      0.326361   1.385916  0.000530
+grade     -0.023109   0.977156  0.808268
+
+  Model 5: depth+stage+grade+age:
+  Skipped: n=0 < 20
+
+=================================================================
+S5-3: CDK4 REPLICATION — GSE14520
+S5-P4: CDK4-hi worse OS in GSE14520
+=================================================================
+  CDK4 not in ./hcc_false_attractor/results_s2/depth_scores_s2.csv (cols: ['sample_id', 'depth_s1_TF', 'depth_s2_metabolic', 'metab_score', 'depth_combined'])
+  CDK4 not in ./hcc_false_attractor/results_s2/depth_scores_s2.csv (cols: ['sample_id', 'depth_s1_TF', 'depth_s2_metabolic', 'metab_score', 'depth_combined'])
+  CDK4 not in any GSE14520 score file.
+  CDK4 was not in the 152-gene target list for Scripts 1-2.
+  S5-P4: NOT TESTABLE — deferred to Script 6
+  Script 6 will re-process GSE14520 with CDK4 added.
+
+=================================================================
+S5-4: EXHAUSTION SCORE vs OS
+S5-P5: Exhaustion-high worse OS
+S5-P7: Deep+exhaustion-hi worst OS
+=================================================================
+  Exhaustion genes: ['PDCD1', 'HAVCR2', 'LAG3', 'TIGIT', 'CTLA4', 'CD8A']
+
+  r(depth, exhaustion_score) = +0.3659  p=3.42e-13 ***
+
+  Exhaustion OS: hi=27.1mo  lo=26.3mo  p=0.6149  ns
+
+  S5-P5: Exhaustion-high worse OS
+  STATUS: NOT CONFIRMED ✗ (dir=✗ sig=✗)
+
+  Individual gene OS:
+  Gene          r_depth            OS_p  hi_OS  lo_OS
+  -------------------------------------------------------
+  PDCD1         +0.3934  p=0.3098  ns    28.3   25.1
+  HAVCR2        +0.3851  p=0.8287  ns    27.0   26.4
+  LAG3          +0.2733  p=0.5607  ns    28.0   25.4
+  TIGIT         +0.2950  p=0.3887  ns    27.2   26.3
+  CTLA4         +0.3710  p=0.6607  ns    26.5   26.9
+  CD8A          +0.2256  p=0.0130   *    29.6   23.8
+
+=================================================================
+S5-P7: DEPTH × EXHAUSTION 4-GROUP KM
+=================================================================
+  Group                      n   OS_mean  events
+  ----------------------------------------------
+  Deep+Exhaust-hi          118      27.3  46
+  Deep+Exhaust-lo           65      24.7  32
+  Shall+Exhaust-hi          65      26.7  17
+  Shall+Exhaust-lo         117      27.2  35
+
+  Shall+lo vs Deep+hi: p=0.2639  ns
+
+  S5-P7: Deep+exhaustion-hi worst OS
+  Deep+hi=27.3mo  Shall+lo=27.2mo
+  STATUS: NOT CONFIRMED ✗
+
+=================================================================
+S5-5: CDK4 — TCGA-LIHC
+CDK4 r=+0.65 OS p=0.001 (Script 4)
+=================================================================
+  r(depth, CDK4) = +0.6531  p=1.74e-46 ***
+
+  CDK4 OS: p=1.12e-03  **
+  CDK4-hi=23.4mo  CDK4-lo=30.0mo
+
+  CDK4 tertile OS:
+  T1 low: n=121 OS=30.2mo
+  T2 mid: n=123 OS=26.1mo
+  T3 high: n=121 OS=23.8mo
+  T3 vs T1: p=2.12e-04 ***
+
+  Cox: CDK4 + depth:
+               coef  exp(coef)         p
+covariate                               
+CDK4       0.194688   1.214932  0.051344
+depth      0.178940   1.195949  0.106975
+
+--- Generating Script 5 figure ---
+
+  Figure saved: ./hcc_false_attractor/results_s5/hcc_tcga_s5.png
