@@ -1,62 +1,71 @@
 """
-ccRCC False Attractor Analysis — Script 1 (Discovery Run)
-OrganismCore — Cancer False Attractor Framework
-Document 94 | 2026-03-02
+ccRCC False Attractor Analysis — Script 1 v3
+PROTOCOL-COMPLIANT DISCOVERY RUN
 
-BIOLOGICAL GROUNDING (locked before data contact):
-    Cancer:         Clear Cell Renal Cell Carcinoma (ccRCC)
-    Cell of origin: Proximal tubule epithelium — S3 segment
-    Arrest point:   Proximal tubule maturation arrest
-    Key driver:     VHL loss → constitutive HIF1A/EPAS1 activation
-    Phenotype:      Clear cell (lipid/glycogen accumulation),
-                    loss of proximal tubule metabolic identity,
-                    retention of partial tubule markers
+Framework: OrganismCore
+Document 94 | 2026-03-02
+Author: Eric Robert Lawson
+
+PREDICTIONS LOCKED BEFORE DATA:
+
+CELL OF ORIGIN: Proximal tubule epithelium — S3 segment
+LINEAGE:
+    Metanephric mesenchyme
+        → Nephron progenitor (SIX2+, PAX2+)
+        → Renal vesicle
+        → S-shaped body
+        → Proximal tubule progenitor (LHX1+, JAG1+)
+        → Immature proximal tubule (CUBN+, LRP2+, SLC3A1+)
+        → Mature PT S1/S2 (SLC34A1+, GATM+, AGXT+)
+        → Mature PT S3 (AQP1+, PCK1+)   ← cell of origin
+        → FALSE ATTRACTOR (VHL loss → EPAS1 lock)
+
+PREDICTED BLOCK: PT maturation arrest at S3 stage
+KEY EVENT:       VHL loss → constitutive EPAS1/HIF2α activation
+PHENOTYPE:       Clear cell (lipid/glycogen), PT metabolic identity lost
+
+SWITCH GENES (predicted DOWN in ccRCC):
+    UMOD    — PT S3 marker, strongest
+    SLC34A1 — NaPi-IIa, PT sodium-phosphate cotransporter
+    SLC13A3 — NaDC3, PT S3 dicarboxylate transporter
+    AGXT    — PT-specific aminotransferase
+    PCK1    — PEPCK1, gluconeogenic PT metabolic identity
+    SLC22A6 — OAT1, PT identity transporter
+    GATM    — Glycine amidinotransferase, PT specific
+    AQP1    — PT water channel
+    FBP1    — Fructose-1,6-bisphosphatase, gluconeogenic
+    G6PC    — G6Pase, gluconeogenic
+
+FA MARKERS (predicted UP in ccRCC):
+    CA9     — direct EPAS1/HIF2α target, canonical ccRCC marker
+    VEGFA   — EPAS1 transcriptional target
+    EGLN3   — PHD3, HIF feedback target
+    SLC2A1  — GLUT1, HIF glycolytic target
+    PDK1    — HIF metabolic switch
+    LDHA    — HIF glycolytic target
+    EPAS1   — HIF2α, constitutively active in ccRCC
+    SCD     — fatty acid desaturation
+    ACLY    — acetyl-CoA from citrate
+    EZH2    — PRC2 lock, predicted to silence PT identity
+
+DRUG TARGETS (pre-data, stated before analysis):
+    1. EPAS1/HIF2α inhibitor (belzutifan — MK-6482)
+       Mechanism: direct EPAS1 inhibition breaks the lock
+    2. mTOR inhibitor (everolimus, temsirolimus)
+       Mechanism: mTORC1 downstream of EPAS1 in PT cells
+    3. EZH2 inhibitor (tazemetostat)
+       Mechanism: epigenetic lock maintenance
+    4. VEGF/VEGFR inhibitor (sunitinib, bevacizumab)
+       Mechanism: VEGFA is EPAS1 downstream, drives angiogenesis
 
 DATASETS:
-    Primary:    TCGA-KIRC (Xena HiSeqV2) — 534T / 72N — RNA-seq log2 CPM
-    Validation: GSE53757 (GEO GPL570) — 72T / 72N matched pairs
-                Affymetrix HG-U133 Plus 2.0 microarray
-
-GPL570 ANNOTATION:
-    Script attempts automatic download from multiple URLs.
-    If all fail, it looks for any of these files already present:
-        ./ccrcc_false_attractor/GPL570_soft.txt
-        ./ccrcc_false_attractor/GPL570_full_table.txt
-        ./ccrcc_false_attractor/GPL570_soft.txt.gz
-        ./ccrcc_false_attractor/GPL570_full_table.txt.gz
-    If none found, TCGA arm runs and GEO arm is skipped with
-    clear instructions. Re-run after placing the file.
-
-    Manual download (run once in terminal):
-        curl -L "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi
-                 ?acc=GPL570&targ=self&form=text&view=full" \
-             -o ./ccrcc_false_attractor/GPL570_soft.txt
-
-REPRODUCIBILITY:
-    Single script. No external dependencies beyond numpy/pandas/scipy/
-    matplotlib. All downloads attempted automatically. Run once.
-
-OUTPUTS (./ccrcc_false_attractor/results/):
-    gene_matrix_tcga.csv
-    metadata_tcga.csv
-    saddle_point_tcga.csv
-    depth_score_tcga.csv
-    identity_switch_tcga.csv
-    figure_s1_tcga.png
-    gene_matrix_geo.csv          (GPL570 required)
-    metadata_geo.csv             (GPL570 required)
-    saddle_point_geo.csv         (GPL570 required)
-    depth_score_geo.csv          (GPL570 required)
-    identity_switch_geo.csv      (GPL570 required)
-    figure_s1_geo.png            (GPL570 required)
-    cross_dataset_comparison.csv (GPL570 required)
-    s1_log.txt
+    Primary:    TCGA-KIRC (Xena HiSeqV2) — 534T / 72N
+    Validation: GSE53757 (GEO GPL570)    — 72T  / 72N matched pairs
 """
 
 import os
 import gzip
 import urllib.request
-import urllib.error
 
 import numpy as np
 import pandas as pd
@@ -66,186 +75,144 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
 # DIRECTORIES
-# ═══════════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
 
 BASE_DIR    = "./ccrcc_false_attractor/"
-RESULTS_DIR = os.path.join(BASE_DIR, "results")
+RESULTS_DIR = os.path.join(BASE_DIR, "results_s1")
 LOG_FILE    = os.path.join(RESULTS_DIR, "s1_log.txt")
-
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# FILE PATHS
-# ═══════════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
+# GENE PANELS — PREDICTIONS LOCKED
+# ═════════════════════════════════���═════════════════════
+
+SW_GENES = [
+    "UMOD",    "SLC34A1", "SLC13A3",
+    "AGXT",    "PCK1",    "SLC22A6",
+    "GATM",    "AQP1",    "FBP1",
+    "G6PC",
+]
+
+FA_GENES = [
+    "CA9",    "VEGFA",  "EGLN3",
+    "SLC2A1", "PDK1",   "LDHA",
+    "EPAS1",  "SCD",    "ACLY",
+    "EZH2",
+]
+
+# Gap test circuits — pairs to test
+# (gene_A, gene_B, expected, biological_meaning)
+GAP_TEST_CIRCUITS = [
+    # VHL → PT identity axis
+    ("VHL",    "SLC34A1",  "connected",
+     "VHL loss = PT identity loss"),
+    ("VHL",    "PCK1",     "connected",
+     "VHL loss = gluconeogenic loss"),
+    # EPAS1 direct targets
+    ("EPAS1",  "CA9",      "connected",
+     "EPAS1 directly activates CA9"),
+    ("EPAS1",  "VEGFA",    "connected",
+     "EPAS1 activates VEGFA"),
+    ("VHL",    "EPAS1",    "inverse",
+     "VHL degrades EPAS1"),
+    ("EGLN3",  "EPAS1",    "connected",
+     "EGLN3 is EPAS1 feedback target"),
+    # PT maturation regulators
+    ("LHX1",   "SLC34A1",  "connected",
+     "LHX1 drives PT maturation"),
+    ("HNF4A",  "PCK1",     "connected",
+     "HNF4A drives gluconeogenesis"),
+    # Metabolic circuits
+    ("CPT1A",  "SCD",      "inverse",
+     "FAO loss = desaturation gain"),
+    ("PCK1",   "G6PC",     "connected",
+     "gluconeogenic co-regulation"),
+    # Epigenetic lock
+    ("EZH2",   "LHX1",     "inverse",
+     "EZH2 silences differentiation TFs"),
+    ("EZH2",   "UMOD",     "inverse",
+     "EZH2 silences PT identity"),
+    # mTOR axis
+    ("MTOR",   "SLC2A1",   "connected",
+     "mTORC1 drives GLUT1 expression"),
+    # VHL circuit integrity test
+    ("VHL",    "CA9",      "inverse",
+     "VHL intact = CA9 suppressed"),
+]
+
+# Full panel for depth correlations
+# All genes the script will test r against depth
+FULL_PANEL = list(dict.fromkeys(
+    SW_GENES + FA_GENES + [
+    # HIF circuit
+    "HIF1A",  "VHL",    "ARNT",
+    "EGLN1",  "EGLN2",
+    # PT maturation
+    "LHX1",   "HNF4A",  "HNF1A",
+    "JAG1",   "PAX8",
+    # Nephron progenitor
+    "SIX2",   "PAX2",   "WT1",
+    # Gluconeogenics
+    "PCK2",   "ALDOB",
+    # Lipid
+    "FASN",   "ACACA",  "HMGCR",
+    "CPT1A",  "FABP7",  "PLIN2",
+    # EMT — open question
+    "TWIST1", "VIM",    "ZEB1",
+    "SNAI1",  "CDH1",   "FN1",
+    # Stroma
+    "ACTA2",  "FAP",    "TGFB1",
+    "COL1A1", "WNT5A",
+    # Epigenetic
+    "BAP1",   "PBRM1",  "SETD2",
+    "KDM5C",  "KDM1A",  "DNMT3A",
+    # Immune
+    "CD8A",   "CD274",  "FOXP3",
+    "CD68",   "PDCD1",
+    # mTOR / growth
+    "MTOR",   "CCND1",  "MYC",
+    "MET",    "PIK3CA", "PTEN",
+    # Proliferation
+    "MKI67",  "TOP2A",  "CDC20",
+    "CCNB1",
+]))
+
+# ═══════════════════════════════════════════════════════
+# DOWNLOADS
+# ═══════════════════════════════════════════════════════
 
 XENA_LOCAL = os.path.join(BASE_DIR, "TCGA_KIRC_HiSeqV2.gz")
 GEO_LOCAL  = os.path.join(BASE_DIR, "GSE53757_series_matrix.txt.gz")
 
-# GPL570 — all acceptable filenames, plain or gzipped
-GPL570_CANDIDATES = [
-    os.path.join(BASE_DIR, "GPL570_soft.txt"),
-    os.path.join(BASE_DIR, "GPL570_full_table.txt"),
-    os.path.join(BASE_DIR, "GPL570_soft.txt.gz"),
-    os.path.join(BASE_DIR, "GPL570_full_table.txt.gz"),
-]
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# DOWNLOAD URLs
-# ═══════════════════════════════════════════════════════════════════════════════
-
-XENA_KIRC_URLS = [
+XENA_URLS = [
     "https://tcga-xena-hub.s3.us-east-1.amazonaws.com/download/"
     "TCGA.KIRC.sampleMap%2FHiSeqV2.gz",
     "https://tcga.xenahubs.net/download/TCGA.KIRC.sampleMap/HiSeqV2.gz",
 ]
-
-GEO_MATRIX_URLS = [
+GEO_URLS = [
     "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE53nnn/GSE53757/"
     "matrix/GSE53757_series_matrix.txt.gz",
 ]
-
-# GPL570 — multiple attempts before falling back to manual
 GPL570_URLS = [
-    # GEO SOFT full format — most reliable
     (
         "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi"
         "?acc=GPL570&targ=self&form=text&view=full",
         os.path.join(BASE_DIR, "GPL570_soft.txt"),
     ),
-    # NCBI FTP annot (path varies by NCBI version)
     (
         "https://ftp.ncbi.nlm.nih.gov/geo/platforms/GPL570nnn/"
         "GPL570/annot/GPL570.annot.gz",
         os.path.join(BASE_DIR, "GPL570_full_table.txt.gz"),
     ),
-    (
-        "https://ftp.ncbi.nlm.nih.gov/geo/platforms/GPL570nnn/"
-        "GPL570/GPL570.annot.gz",
-        os.path.join(BASE_DIR, "GPL570_full_table.txt.gz"),
-    ),
 ]
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# GENE PANELS
-# Derived exclusively from ccRCC proximal tubule S3 lineage biology.
-# All panels locked before data contact.
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# VHL-HIF axis — primary lock mechanism in ccRCC
-# VHL loss → HIF1A/EPAS1 constitutive activation
-VHL_HIF = [
-    "VHL",   "HIF1A",  "EPAS1",  "ARNT",
-    "CA9",   "VEGFA",  "SLC2A1", "LDHA",
-    "PDK1",  "EGLN1",  "EGLN3",
+GPL570_CANDIDATES = [
+    os.path.join(BASE_DIR, "GPL570_soft.txt"),
+    os.path.join(BASE_DIR, "GPL570_soft.txt.gz"),
+    os.path.join(BASE_DIR, "GPL570_full_table.txt"),
+    os.path.join(BASE_DIR, "GPL570_full_table.txt.gz"),
 ]
-
-# Proximal tubule S3 identity — expected LOST in tumour
-PROXIMAL_TUBULE_IDENTITY = [
-    "SLC34A1", "GATM",    "AGXT",    "PCK1",
-    "AQP1",    "CUBN",    "LRP2",    "SLC3A1",
-    "SLC7A9",  "SLC22A6", "UMOD",    "SLC13A3",
-    "PRODH",
-]
-
-# Nephron progenitor — silent in normal adult kidney
-# Re-emergence = dedifferentiation signal
-NEPHRON_PROGENITOR = [
-    "SIX2",   "PAX2",  "WT1",
-    "CITED1", "SALL1", "OSR1",
-]
-
-# Proximal tubule maturation markers
-PROXIMAL_MATURATION = [
-    "LHX1",  "JAG1",  "DLL1",
-    "HNF4A", "HNF1A", "PROM1",
-]
-
-# Epigenetic regulators — frequently mutated in ccRCC
-# BAP1, PBRM1, SETD2 define distinct subtypes
-EPIGENETIC_REGULATORS = [
-    "BAP1",   "PBRM1",  "SETD2",
-    "KDM5C",  "KDM6A",  "SMARCA4",
-    "ARID1A",
-]
-
-# Metabolic reprogramming — clear cell phenotype
-# Lipogenic arm: expected UP in false attractor (lipid synthesis)
-METABOLIC_LIPOGENIC = [
-    "FASN",  "ACACA", "SCD",
-    "HMGCR", "ACLY",  "CPT1A",
-]
-
-# Gluconeogenic arm: expected DOWN — PT metabolic identity loss
-METABOLIC_GLUCONEOGENIC = [
-    "G6PC", "FBP1", "PCK2",
-]
-
-METABOLIC_REPROGRAMMING = METABOLIC_LIPOGENIC + METABOLIC_GLUCONEOGENIC
-
-# mTOR pathway — major therapeutic axis in ccRCC
-# Note: activation is predominantly post-translational;
-# transcript-level signal may be modest
-MTOR_PATHWAY = [
-    "MTOR",    "RPTOR",    "RICTOR",
-    "RPS6KB1", "EIF4EBP1", "AKT1",
-    "PIK3CA",  "PTEN",
-]
-
-# Immune microenvironment
-IMMUNE_MARKERS = [
-    "PDCD1", "CD274", "CTLA4",
-    "CD8A",  "FOXP3", "CD4",
-    "CD68",  "TIGIT", "LAG3",
-]
-
-# Proliferation
-PROLIFERATION = [
-    "MKI67", "TOP2A", "PCNA",
-    "CDK4",  "CCND1", "CCNE1",
-    "CDK2",
-]
-
-# ── Role map ──────────────────────────────────────────────────────────────────
-
-ROLE_MAP = {}
-for _g in VHL_HIF:
-    ROLE_MAP[_g] = "VHL_HIF"
-for _g in PROXIMAL_TUBULE_IDENTITY:
-    ROLE_MAP[_g] = "PT_IDENTITY"
-for _g in NEPHRON_PROGENITOR:
-    ROLE_MAP[_g] = "PROGENITOR"
-for _g in PROXIMAL_MATURATION:
-    ROLE_MAP[_g] = "PT_MATURATION"
-for _g in EPIGENETIC_REGULATORS:
-    ROLE_MAP[_g] = "EPIGENETIC"
-for _g in METABOLIC_LIPOGENIC:
-    ROLE_MAP[_g] = "METABOLIC_LIPOGENIC"
-for _g in METABOLIC_GLUCONEOGENIC:
-    ROLE_MAP[_g] = "METABOLIC_GLUCONEOGENIC"
-for _g in MTOR_PATHWAY:
-    ROLE_MAP[_g] = "MTOR"
-for _g in IMMUNE_MARKERS:
-    ROLE_MAP[_g] = "IMMUNE"
-for _g in PROLIFERATION:
-    ROLE_MAP[_g] = "PROLIFERATION"
-
-ALL_TARGET = list(dict.fromkeys(
-    VHL_HIF +
-    PROXIMAL_TUBULE_IDENTITY +
-    NEPHRON_PROGENITOR +
-    PROXIMAL_MATURATION +
-    EPIGENETIC_REGULATORS +
-    METABOLIC_REPROGRAMMING +
-    MTOR_PATHWAY +
-    IMMUNE_MARKERS +
-    PROLIFERATION
-))
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# LOGGING
-# ═══════════════════════════════════════════════════════════════════════════════
 
 log_lines = []
 
@@ -257,29 +224,22 @@ def write_log():
     with open(LOG_FILE, "w") as f:
         f.write("\n".join(log_lines))
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# UTILITIES
-# ═════════════════════════════════════════════════════════��═════════════════════
-
 def fmt_p(p):
-    if p is None or (isinstance(p, float) and np.isnan(p)):
+    if p is None or (isinstance(p, float)
+                     and np.isnan(p)):
         return "NA"
     if p < 0.0001:
-        return "<0.0001"
+        return f"{p:.2e}"
     return f"{p:.4f}"
 
-def safe_mwu(a, b, alternative="two-sided"):
-    try:
-        a = pd.Series(a).dropna()
-        b = pd.Series(b).dropna()
-        if len(a) < 3 or len(b) < 3:
-            return np.nan, np.nan
-        u, p = stats.mannwhitneyu(a, b, alternative=alternative)
-        return u, p
-    except Exception:
-        return np.nan, np.nan
+def norm01(arr):
+    arr = np.asarray(arr, dtype=float)
+    mn, mx = np.nanmin(arr), np.nanmax(arr)
+    if mx == mn:
+        return np.full_like(arr, 0.5)
+    return (arr - mn) / (mx - mn)
 
-def safe_pearsonr(x, y):
+def safe_r(x, y):
     try:
         x = np.asarray(x, dtype=float)
         y = np.asarray(y, dtype=float)
@@ -291,1057 +251,1000 @@ def safe_pearsonr(x, y):
     except Exception:
         return np.nan, np.nan
 
+def safe_mwu(a, b):
+    try:
+        a = pd.Series(a).dropna()
+        b = pd.Series(b).dropna()
+        if len(a) < 3 or len(b) < 3:
+            return np.nan, np.nan
+        _, p = stats.mannwhitneyu(
+            a, b, alternative="two-sided")
+        return _, p
+    except Exception:
+        return np.nan, np.nan
+
 def fetch_url(url, dest, timeout=120):
     try:
         log(f"  Trying: {url}")
-        def hook(count, block_size, total_size):
-            if total_size > 0:
-                pct = min(count * block_size * 100 // total_size, 100)
-                print(f"\r  Progress: {pct}%", end="", flush=True)
-        urllib.request.urlretrieve(url, dest, reporthook=hook)
+        def hook(c, b, t):
+            if t > 0:
+                pct = min(c * b * 100 // t, 100)
+                print(f"\r  {pct}%",
+                      end="", flush=True)
+        urllib.request.urlretrieve(
+            url, dest, reporthook=hook)
         print()
-        size_mb = os.path.getsize(dest) / (1024 * 1024)
-        log(f"  Downloaded: {size_mb:.1f} MB → {dest}")
+        mb = os.path.getsize(dest) / (1024*1024)
+        log(f"  OK: {mb:.1f} MB → {dest}")
         return True
-    except urllib.error.URLError as e:
-        log(f"  FAILED: {e}")
-        return False
     except Exception as e:
-        log(f"  FAILED (unexpected): {e}")
+        log(f"  FAILED: {e}")
         return False
 
 def try_urls(url_list, dest):
     if os.path.exists(dest):
-        size_mb = os.path.getsize(dest) / (1024 * 1024)
-        log(f"  Already present ({size_mb:.1f} MB): {dest}")
+        mb = os.path.getsize(dest) / (1024*1024)
+        log(f"  Present ({mb:.1f} MB): {dest}")
         return True
     for url in url_list:
         if fetch_url(url, dest):
             return True
     return False
 
-# ═════════════════════════════════════════���═════════════════════════════════════
-# DOWNLOAD
-# ═══════════════════════════════════════════════════════════════════════════════
+def find_gpl570():
+    for path in GPL570_CANDIDATES:
+        if os.path.exists(path):
+            return path
+    return None
 
 def download_all():
     log("=" * 60)
     log("DOWNLOAD")
     log("=" * 60)
-
-    # TCGA-KIRC — required
-    xena_ok = try_urls(XENA_KIRC_URLS, XENA_LOCAL)
-    if not xena_ok:
-        log("CRITICAL: TCGA-KIRC download failed. Cannot proceed.")
-        raise SystemExit(1)
-
-    # GSE53757 — required
-    geo_ok = try_urls(GEO_MATRIX_URLS, GEO_LOCAL)
-    if not geo_ok:
-        log("CRITICAL: GSE53757 download failed. Cannot proceed.")
-        raise SystemExit(1)
-
-    # GPL570 — attempt automatic download
-    log("")
-    log("  GPL570 annotation — checking...")
-
-    # Check if already present under any acceptable name
-    gpl570_path = _find_gpl570()
-    if gpl570_path is not None:
-        return gpl570_path
-
-    # Attempt automatic download
+    if not try_urls(XENA_URLS, XENA_LOCAL):
+        raise SystemExit("CRITICAL: TCGA-KIRC download failed.")
+    if not try_urls(GEO_URLS, GEO_LOCAL):
+        raise SystemExit("CRITICAL: GSE53757 download failed.")
+    gpl570 = find_gpl570()
+    if gpl570:
+        return gpl570
     for url, dest in GPL570_URLS:
         if os.path.exists(dest):
-            log(f"  Already present: {dest}")
             return dest
         if fetch_url(url, dest):
-            log(f"  GPL570 downloaded ✓ → {dest}")
             return dest
-
-    # All automatic attempts failed — instruct manual download
-    log("")
-    log("=" * 60)
-    log("  GPL570 ANNOTATION — AUTOMATIC DOWNLOAD FAILED")
-    log("  GSE53757 validation arm will be SKIPPED.")
-    log("")
-    log("  To enable validation arm, run once in terminal:")
-    log('  curl -L "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi'
-        '?acc=GPL570&targ=self&form=text&view=full" \\')
-    log(f'       -o {os.path.join(BASE_DIR, "GPL570_soft.txt")}')
-    log("  Then re-run this script.")
-    log("=" * 60)
+    log("  GPL570 not found — GEO arm will be skipped.")
     return None
 
-def _find_gpl570():
-    """Return path to GPL570 file if any candidate exists."""
-    for path in GPL570_CANDIDATES:
-        if os.path.exists(path):
-            size_mb = os.path.getsize(path) / (1024 * 1024)
-            log(f"  GPL570 found ({size_mb:.1f} MB): {path}")
-            return path
-    return None
+# ═══════════════════════════════════════════════════════
+# GPL570 LOADER
+# ═══════════════════════════════════════════════════════
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# GPL570 ANNOTATION PARSER
-# ═══════════════════════════════════════════════════════════════════════════════
-
-def load_gpl570_annotation(gpl570_path):
-    """
-    Load GPL570 probe → gene symbol mapping.
-
-    Handles:
-        - NCBI GEO SOFT format (lines starting with ^, !, #)
-        - Plain tab-delimited full table
-        - Gzipped versions of either
-
-    Returns dict: probe_id (str) → gene_symbol (str, uppercase)
-    Returns None if loading fails.
-    """
-    log("")
-    log("=" * 60)
-    log("GPL570 ANNOTATION — Loading")
-    log("=" * 60)
-    log(f"  File: {gpl570_path}")
-
-    is_gz  = gpl570_path.endswith(".gz")
+def load_gpl570(path):
+    is_gz  = path.endswith(".gz")
     opener = gzip.open if is_gz else open
-
     probe_map = {}
-    header    = None
-    id_col    = None
-    sym_col   = None
-
+    header = id_col = sym_col = None
     try:
-        with opener(gpl570_path, "rt",
-                    encoding="utf-8", errors="replace") as f:
+        with opener(path, "rt",
+                    encoding="utf-8",
+                    errors="replace") as f:
             for line in f:
                 line = line.rstrip("\n")
-
-                # Skip SOFT metadata and comment lines
-                if line.startswith(("^", "!", "#")):
+                if line.startswith(("^","!","#")):
                     continue
-
                 parts = line.split("\t")
-
-                # Detect header — must contain "ID" column
                 if header is None:
-                    lower = [p.strip().lower() for p in parts]
+                    lower = [
+                        p.strip().lower()
+                        for p in parts]
                     if "id" in lower:
-                        header = parts
-                        id_col = lower.index("id")
+                        header  = parts
+                        id_col  = lower.index("id")
                         sym_col = None
-                        # Gene symbol column — try common names
-                        for candidate in [
-                            "gene symbol",
-                            "gene_symbol",
-                            "genesymbol",
-                            "symbol",
-                            "gene assignment",
-                            "gene_assignment",
-                            "gene title",
-                        ]:
+                        for c in [
+                            "gene symbol","gene_symbol",
+                            "symbol","gene assignment"]:
                             for i, lp in enumerate(lower):
-                                if candidate in lp:
+                                if c in lp:
                                     sym_col = i
                                     break
                             if sym_col is not None:
                                 break
                         if sym_col is None:
-                            sym_col = 1  # fallback: second column
-                        log(f"  Header detected.")
-                        log(f"  ID col:     {id_col} "
-                            f"('{parts[id_col]}')")
-                        log(f"  Symbol col: {sym_col} "
-                            f"('{parts[sym_col]}')")
+                            sym_col = 1
                     continue
-
-                # Parse data rows
-                if len(parts) <= max(id_col, sym_col):
+                if len(parts) <= max(id_col,
+                                     sym_col):
                     continue
-
-                probe_id = parts[id_col].strip()
-                raw_sym  = parts[sym_col].strip()
-
-                if not probe_id or not raw_sym:
+                pid = parts[id_col].strip()
+                raw = parts[sym_col].strip()
+                if not pid or not raw:
                     continue
-
-                # Take first symbol before " /// "
-                sym = raw_sym.split("///")[0].strip().upper()
-
-                # Skip empty / missing annotations
-                if sym in ("", "---", "----", "N/A", "NA",
-                           "NULL", "NONE"):
+                sym = raw.split("///")[0].strip(
+                    ).upper().split()[0]
+                if sym in ("","---","N/A","NA"):
                     continue
-
-                # Take first token (some fields have extra text)
-                sym = sym.split()[0]
-
-                probe_map[probe_id] = sym
-
-        log(f"  Probes mapped: {len(probe_map)}")
-
-        if not probe_map:
-            log("  WARNING: No probes mapped. "
-                "Check annotation file format.")
-            return None
-
-        # Spot check
-        items = list(probe_map.items())[:4]
-        for pid, gsym in items:
-            log(f"    {pid} → {gsym}")
-        log("  GPL570 annotation: LOADED ✓")
+                probe_map[pid] = sym
+        log(f"  GPL570 probes: {len(probe_map)}")
         return probe_map
-
     except Exception as e:
-        log(f"  CRITICAL: Failed to load GPL570: {e}")
+        log(f"  GPL570 load failed: {e}")
         return None
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# TCGA-KIRC PARSER
-# ═══════════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
+# TCGA PARSER
+# ═══════════════════════════════════════════════════════
 
-def parse_tcga_kirc():
-    """
-    Parse TCGA-KIRC HiSeqV2.
-    Format: gzipped TSV, first col = gene symbol,
-            remaining cols = TCGA barcodes (log2 CPM).
-    Tumour/normal from TCGA barcode sample type code
-    (4th hyphen-delimited field, first 2 chars):
-        01-09 = tumour
-        10-19 = normal
-    Returns:
-        gene_df  — DataFrame (target genes x all samples)
-        meta_df  — DataFrame (sample_id, sample_type)
-    """
+def parse_tcga():
     log("")
     log("=" * 60)
     log("TCGA-KIRC — Parsing")
     log("=" * 60)
-
     with gzip.open(XENA_LOCAL, "rt") as f:
-        gene_df = pd.read_csv(f, sep="\t", index_col=0)
+        raw = pd.read_csv(f, sep="\t",
+                          index_col=0)
+    log(f"  Shape: {raw.shape}")
 
-    log(f"  Shape (genes x samples): {gene_df.shape}")
-
-    sample_types = {}
-    for s in gene_df.columns:
-        parts = s.split("-")
-        if len(parts) >= 4:
-            code_str = parts[3][:2]
+    types = {}
+    for s in raw.columns:
+        p = s.split("-")
+        if len(p) >= 4:
+            code_str = p[3][:2]
             if code_str.isdigit():
                 code = int(code_str)
                 if 1 <= code <= 9:
-                    sample_types[s] = "tumour"
+                    types[s] = "tumour"
                 elif 10 <= code <= 19:
-                    sample_types[s] = "normal"
+                    types[s] = "normal"
                 else:
-                    sample_types[s] = "other"
+                    types[s] = "other"
             else:
-                sample_types[s] = "other"
+                types[s] = "other"
         else:
-            sample_types[s] = "other"
+            types[s] = "other"
 
-    meta_df = pd.DataFrame({
-        "sample_id":   list(sample_types.keys()),
-        "sample_type": list(sample_types.values()),
+    meta = pd.DataFrame({
+        "sample_id":   list(types.keys()),
+        "sample_type": list(types.values()),
     })
-
-    n_t = (meta_df.sample_type == "tumour").sum()
-    n_n = (meta_df.sample_type == "normal").sum()
+    n_t = (meta.sample_type=="tumour").sum()
+    n_n = (meta.sample_type=="normal").sum()
     log(f"  Tumour: {n_t}  Normal: {n_n}")
 
-    available = [g for g in ALL_TARGET if g in gene_df.index]
-    missing   = [g for g in ALL_TARGET if g not in gene_df.index]
-    log(f"  Target genes available: {len(available)} / {len(ALL_TARGET)}")
-    if missing:
-        log(f"  Missing: {missing}")
+    avail = [g for g in FULL_PANEL
+             if g in raw.index]
+    miss  = [g for g in FULL_PANEL
+             if g not in raw.index]
+    log(f"  Panel available: "
+        f"{len(avail)} / {len(FULL_PANEL)}")
+    if miss:
+        log(f"  Missing: {miss}")
 
-    gene_df = gene_df.loc[available]
+    expr = raw.loc[avail]
+    return expr, meta
 
-    gene_df.to_csv(os.path.join(RESULTS_DIR, "gene_matrix_tcga.csv"))
-    meta_df.to_csv(os.path.join(RESULTS_DIR, "metadata_tcga.csv"),
-                   index=False)
-    log("  TCGA-KIRC parsed and saved ✓")
-    return gene_df, meta_df
+# ═══════════════════════════════════════════════════════
+# GEO PARSER
+# ═══════════════════════════════════════════════════════
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# GSE53757 PARSER
-# ═══════════════════════════════════════════════════════════════════════════════
-
-def parse_gse53757(probe_map):
-    """
-    Parse GSE53757 Affymetrix series matrix (GPL570).
-
-    Classification uses exact source name strings confirmed
-    in Phase 0 diagnostic:
-        'Stage X ccRCC'              → tumour, stage X
-        'normal match to Stage X...' → normal, matched
-
-    Sample titles NNNT / NNNL / NNNN:
-        suffix T or absence of N = tumour
-        suffix N = normal
-        numeric prefix = matched pair ID
-
-    Probe → gene symbol via probe_map (GPL570 annotation).
-    Multiple probes per gene: keep probe with highest mean
-    expression across tumour samples (most informative).
-
-    Values: log2 microarray intensity.
-    Comparable to TCGA log2 CPM for FC direction analysis.
-
-    Returns:
-        gene_df  — DataFrame (target genes x samples)
-        meta_df  — DataFrame (sample_id, sample_type, stage, pair_id)
-    """
+def parse_geo(probe_map):
     log("")
     log("=" * 60)
     log("GSE53757 — Parsing")
     log("=" * 60)
-
     if probe_map is None:
-        log("  probe_map is None. Skipping.")
+        log("  No probe map. Skipping.")
         return None, None
 
-    # ── Metadata pass ─────────────────────────────────────────
-    sample_ids    = []
-    source_names  = []
+    sample_ids = []
+    source_names = []
     sample_titles = []
 
     with gzip.open(GEO_LOCAL, "rt") as f:
         for line in f:
             line = line.rstrip()
-
-            if line.startswith("!Sample_geo_accession"):
+            if line.startswith(
+                    "!Sample_geo_accession"):
                 parts = line.split("\t")
-                ids = [
-                    p.strip().strip('"') for p in parts[1:]
-                    if p.strip().strip('"').startswith("GSM")
-                ]
-                sample_ids.extend(ids)
-
-            elif line.startswith("!Sample_source_name_ch1"):
+                sample_ids.extend([
+                    p.strip().strip('"')
+                    for p in parts[1:]
+                    if p.strip().strip('"'
+                    ).startswith("GSM")])
+            elif line.startswith(
+                    "!Sample_source_name_ch1"):
                 parts = line.split("\t")
-                names = [
-                    p.strip().strip('"') for p in parts[1:]
-                    if p.strip()
-                ]
-                source_names.extend(names)
-
-            elif line.startswith("!Sample_title"):
+                source_names.extend([
+                    p.strip().strip('"')
+                    for p in parts[1:]
+                    if p.strip()])
+            elif line.startswith(
+                    "!Sample_title"):
                 parts = line.split("\t")
-                titles = [
-                    p.strip().strip('"') for p in parts[1:]
-                    if p.strip()
-                ]
-                sample_titles.extend(titles)
-
-            elif line.startswith("!series_matrix_table_begin"):
+                sample_titles.extend([
+                    p.strip().strip('"')
+                    for p in parts[1:]
+                    if p.strip()])
+            elif line.startswith(
+                "!series_matrix_table_begin"):
                 break
 
-    log(f"  Sample IDs:    {len(sample_ids)}")
-    log(f"  Source names:  {len(source_names)}")
-
-    # Classify — exact strings from Phase 0 diagnostic
-    sample_types_geo = []
-    stages_geo       = []
-    pair_ids_geo     = []
-
+    types_geo = []
     for name in source_names:
         nl = name.lower()
         if "normal" in nl:
-            sample_types_geo.append("normal")
-            stages_geo.append("normal")
-        elif "ccrcc" in nl or "stage" in nl:
-            sample_types_geo.append("tumour")
-            stage = "stage_unknown"
-            for sn in ["1", "2", "3", "4"]:
-                if f"stage {sn}" in nl:
-                    stage = f"stage_{sn}"
-                    break
-            stages_geo.append(stage)
+            types_geo.append("normal")
         else:
-            sample_types_geo.append("unknown")
-            stages_geo.append("unknown")
+            types_geo.append("tumour")
 
-    # Extract matched pair ID from title (e.g. '102T' → '102')
-    for title in sample_titles[:len(sample_types_geo)]:
-        pair_id = title.rstrip("TtNnLl")
-        pair_ids_geo.append(pair_id)
-
-    n = min(len(sample_ids), len(sample_types_geo))
+    n = min(len(sample_ids),
+            len(types_geo))
     meta_geo = pd.DataFrame({
         "sample_id":   sample_ids[:n],
         "title":       sample_titles[:n],
         "source":      source_names[:n],
-        "sample_type": sample_types_geo[:n],
-        "stage":       stages_geo[:n],
-        "pair_id":     pair_ids_geo[:n],
+        "sample_type": types_geo[:n],
     })
-
-    n_t = (meta_geo.sample_type == "tumour").sum()
-    n_n = (meta_geo.sample_type == "normal").sum()
+    n_t = (meta_geo.sample_type=="tumour").sum()
+    n_n = (meta_geo.sample_type=="normal").sum()
     log(f"  Tumour: {n_t}  Normal: {n_n}")
-
-    # ── Expression table pass ─────────────────────────────────
-    log("  Parsing expression table...")
 
     col_header = None
     expr_rows  = []
-
     with gzip.open(GEO_LOCAL, "rt") as f:
         in_table = False
         for line in f:
             line = line.rstrip()
-            if line.startswith("!series_matrix_table_begin"):
+            if line.startswith(
+                "!series_matrix_table_begin"):
                 in_table = True
                 continue
-            if line.startswith("!series_matrix_table_end"):
+            if line.startswith(
+                "!series_matrix_table_end"):
                 break
             if in_table:
                 if col_header is None:
                     col_header = line.split("\t")
                 else:
-                    expr_rows.append(line.split("\t"))
+                    expr_rows.append(
+                        line.split("\t"))
 
-    if col_header is None or not expr_rows:
-        log("  CRITICAL: Expression table not found.")
+    if not col_header or not expr_rows:
+        log("  CRITICAL: No expression table.")
         return None, None
 
-    probe_ids = [row[0].strip('"') for row in expr_rows]
-    col_ids   = [c.strip('"') for c in col_header[1:]]
+    probe_ids = [r[0].strip('"')
+                 for r in expr_rows]
+    col_ids   = [c.strip('"')
+                 for c in col_header[1:]]
 
     values = []
     for row in expr_rows:
         vals = []
         for v in row[1:]:
-            v = v.strip()
             try:
-                vals.append(float(v))
+                vals.append(float(v.strip()))
             except ValueError:
                 vals.append(np.nan)
-        values.append(vals)
-
-    n_cols = len(col_ids)
-    values = [v[:n_cols] for v in values]
+        values.append(vals[:len(col_ids)])
 
     probe_df = pd.DataFrame(
         values,
         index=probe_ids,
-        columns=col_ids,
-    )
-
-    log(f"  Probes: {len(probe_ids)}  Columns: {len(col_ids)}")
-
-    # ── Probe → gene mapping ──────────────────────────────────
-    log("  Mapping probes to target genes...")
-
-    tumour_ids  = meta_geo.loc[
-        meta_geo.sample_type == "tumour", "sample_id"
-    ].tolist()
-    tumour_cols = [c for c in tumour_ids if c in probe_df.columns]
+        columns=col_ids)
+    probe_df = np.log2(
+        probe_df.clip(lower=0) + 1)
+    log("  Log2(x+1) applied ✓")
 
     target_probes = {}
-    for probe_id in probe_df.index:
-        sym = probe_map.get(probe_id)
-        if sym and sym in ALL_TARGET:
-            target_probes.setdefault(sym, []).append(probe_id)
+    for pid in probe_df.index:
+        sym = probe_map.get(pid)
+        if sym and sym in FULL_PANEL:
+            target_probes.setdefault(
+                sym, []).append(pid)
 
-    log(f"  Target genes with probes: {len(target_probes)}")
+    t_ids = meta_geo.loc[
+        meta_geo.sample_type == "tumour",
+        "sample_id"].tolist()
+    t_cols = [c for c in t_ids
+              if c in probe_df.columns]
 
     gene_rows = {}
     for sym, probes in target_probes.items():
         if len(probes) == 1:
-            gene_rows[sym] = probe_df.loc[probes[0]]
+            gene_rows[sym] = probe_df.loc[
+                probes[0]]
         else:
-            best_probe = max(
-                probes,
-                key=lambda p: (
-                    probe_df.loc[p, tumour_cols].mean()
-                    if tumour_cols
-                    else probe_df.loc[p].mean()
-                )
-            )
-            gene_rows[sym] = probe_df.loc[best_probe]
+            best = max(probes, key=lambda p:(
+                probe_df.loc[p, t_cols].mean()
+                if t_cols
+                else probe_df.loc[p].mean()))
+            gene_rows[sym] = probe_df.loc[best]
 
-    gene_df_geo = pd.DataFrame(gene_rows).T
-    gene_df_geo.columns = col_ids[:gene_df_geo.shape[1]]
+    gene_df = pd.DataFrame(gene_rows).T
+    gene_df.columns = col_ids[:gene_df.shape[1]]
+    log(f"  Panel genes mapped: {len(gene_df)}")
+    return gene_df, meta_geo
 
-    log(f"  Gene matrix shape: {gene_df_geo.shape}")
+# ═══════════════════════════════════════════════════════
+# SADDLE ANALYSIS
+#
+# Step 1 of the framework — canonical.
+# Per-gene tumour vs normal FC + MWU.
+# Produces saddle_res: gene → {result, fc, p}
+# where result = "UP", "DOWN", or "NS".
+# This feeds directly into build_depth_score.
+# ═══════════════════════════════════════════════════════
 
-    gene_df_geo.to_csv(
-        os.path.join(RESULTS_DIR, "gene_matrix_geo.csv"))
-    meta_geo.to_csv(
-        os.path.join(RESULTS_DIR, "metadata_geo.csv"),
-        index=False)
-    log("  GSE53757 parsed and saved ✓")
-    return gene_df_geo, meta_geo
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# SAMPLE SPLITTER
-# ═══════════════════════════════════════════════════════════════════════════════
-
-def split_tumour_normal(gene_df, meta_df):
-    t_ids = meta_df.loc[
-        meta_df.sample_type == "tumour", "sample_id"].tolist()
-    n_ids = meta_df.loc[
-        meta_df.sample_type == "normal", "sample_id"].tolist()
-    t_cols = [c for c in t_ids if c in gene_df.columns]
-    n_cols = [c for c in n_ids if c in gene_df.columns]
-    return gene_df[t_cols], gene_df[n_cols]
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# SADDLE POINT ANALYSIS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-def saddle_point_analysis(tumour, normal, label="TCGA"):
-    """
-    Per-gene:
-        log2FC = tumour median − normal median (log2 space)
-        Mann-Whitney U test (two-sided)
-        Direction: UP / DOWN
-    Ranked by |log2FC|.
-    """
+def saddle_analysis(expr, tumour_mask,
+                    meta, label):
     log("")
     log("=" * 60)
-    log(f"SADDLE POINT ANALYSIS — {label}")
+    log(f"SADDLE ANALYSIS — {label}")
     log("=" * 60)
+    log("  Per-gene tumour vs normal.")
+    log("  Produces saddle_res for depth score.")
+    log("")
 
-    results = []
-    for gene in ALL_TARGET:
-        if gene not in tumour.index:
-            continue
-        t_vals = tumour.loc[gene].dropna()
-        n_vals = normal.loc[gene].dropna()
+    t_cols = expr.columns[tumour_mask]
+    n_mask = (
+        meta.set_index("sample_id")
+        .reindex(expr.columns)
+        .sample_type == "normal"
+    ).values
+    n_cols = expr.columns[n_mask]
+
+    if len(n_cols) == 0:
+        log("  No normal samples. "
+            "Using full panel for depth.")
+        saddle_res = {
+            g: {"result": "PREDICTED_UP"
+                if g in FA_GENES else
+                "PREDICTED_DOWN",
+                "fc": 0.0, "p": 1.0}
+            for g in expr.index
+        }
+        return saddle_res
+
+    saddle_res = {}
+    rows = []
+
+    for gene in expr.index:
+        t_vals = expr.loc[gene, t_cols].dropna()
+        n_vals = expr.loc[gene, n_cols].dropna()
         if len(t_vals) < 3 or len(n_vals) < 3:
             continue
-        t_med = float(t_vals.median())
-        n_med = float(n_vals.median())
-        fc    = t_med - n_med
-        _, p  = safe_mwu(t_vals, n_vals)
-        results.append({
+        fc  = float(
+            t_vals.median() - n_vals.median())
+        _, p = safe_mwu(t_vals, n_vals)
+        if np.isnan(p):
+            result = "NS"
+        elif p < 0.05 and fc > 0:
+            result = "UP"
+        elif p < 0.05 and fc < 0:
+            result = "DOWN"
+        else:
+            result = "NS"
+        saddle_res[gene] = {
+            "result": result,
+            "fc":     fc,
+            "p":      p,
+        }
+        rows.append({
             "gene":      gene,
-            "role":      ROLE_MAP.get(gene, "UNKNOWN"),
-            "log2FC":    round(fc,    4),
-            "t_median":  round(t_med, 4),
-            "n_median":  round(n_med, 4),
-            "direction": "UP" if fc > 0 else "DOWN",
+            "log2FC":    round(fc, 4),
+            "direction": result,
             "p_mwu":     p,
             "p_fmt":     fmt_p(p),
         })
 
-    df = pd.DataFrame(results)
-    if df.empty:
-        log("  WARNING: No results.")
-        return df
-
-    df = df.sort_values("log2FC", key=abs, ascending=False)
+    df = pd.DataFrame(rows)
+    df = df.sort_values("log2FC",
+                        key=abs,
+                        ascending=False)
     df.to_csv(
         os.path.join(RESULTS_DIR,
-                     f"saddle_point_{label.lower()}.csv"),
-        index=False,
-    )
+                     f"saddle_{label.lower()}.csv"),
+        index=False)
 
-    log(f"  Genes analysed: {len(df)}")
+    # Prediction scorecard
+    log(f"  {'Gene':<12} {'Pred':>6} "
+        f"{'Found':>6} {'FC':>8}  Verdict")
+    log(f"  {'-'*12} {'-'*6} {'-'*6} "
+        f"{'-'*8}  {'-'*12}")
+
+    sw_conf  = []
+    fa_conf  = []
+    sw_wrong = []
+    fa_wrong = []
+
+    for gene in SW_GENES + FA_GENES:
+        pred = ("DOWN" if gene in SW_GENES
+                else "UP")
+        res  = saddle_res.get(gene, {})
+        found = res.get("result", "NOT_IN_DATA")
+        fc    = res.get("fc", np.nan)
+        if found == pred:
+            verdict = "✓"
+            if gene in SW_GENES:
+                sw_conf.append(gene)
+            else:
+                fa_conf.append(gene)
+        else:
+            verdict = "✗ WRONG"
+            if gene in SW_GENES:
+                sw_wrong.append(gene)
+            else:
+                fa_wrong.append(gene)
+        fc_str = (f"{fc:.3f}"
+                  if not np.isnan(fc) else "NA")
+        log(f"  {gene:<12} {pred:>6} "
+            f"{found:>6} {fc_str:>8}  {verdict}")
+
     log("")
-    log(f"  {'Gene':<14} {'Role':<26} "
-        f"{'log2FC':>8} {'Dir':>5}  {'p':>10}")
-    log(f"  {'-'*14} {'-'*26} "
-        f"{'-'*8} {'-'*5}  {'-'*10}")
-    for _, row in df.head(25).iterrows():
-        log(f"  {row.gene:<14} {row.role:<26} "
-            f"{row.log2FC:>8.3f} {row.direction:>5}  "
-            f"{row.p_fmt:>10}")
+    log(f"  SW↓ confirmed ({len(sw_conf)}): "
+        f"{sw_conf}")
+    log(f"  SW↓ wrong     ({len(sw_wrong)}): "
+        f"{sw_wrong}")
+    log(f"  FA↑ confirmed ({len(fa_conf)}): "
+        f"{fa_conf}")
+    log(f"  FA↑ wrong     ({len(fa_wrong)}): "
+        f"{fa_wrong}")
 
-    # Prediction checks
+    return saddle_res
+
+# ═══════════════════════════════════════════════════════
+# DEPTH SCORE
+#
+# Protocol-canonical build:
+#   C1 = 1 - norm(mean of confirmed SW genes)
+#   C2 = norm(mean of confirmed FA genes)
+#   depth = (C1 + C2) / 2
+#
+# Uses saddle_res to select confirmed genes.
+# Fallback to full predicted panel if <2 confirmed.
+# This is identical to ICC v1 architecture.
+# ═══════════════════════════════════════════════════════
+
+def build_depth_score(expr, tumour_mask,
+                      saddle_res, label):
     log("")
-    log("  PREDICTION CHECK:")
+    log("=" * 60)
+    log(f"DEPTH SCORE — {label}")
+    log("=" * 60)
 
-    def check(panel, direction, label_str):
-        sub   = df.loc[
-            df.gene.isin(panel) & (df.direction == direction)]
-        total = df.loc[df.gene.isin(panel)]
-        log(f"  {label_str:<35} "
-            f"{len(sub)}/{len(total)}  (predicted {direction})")
+    # Confirmed SW genes (predicted DOWN, found DOWN)
+    sw_ok = [g for g in SW_GENES
+             if g in expr.index
+             and saddle_res.get(g, {})
+             .get("result") == "DOWN"]
+    # Confirmed FA genes (predicted UP, found UP)
+    fa_ok = [g for g in FA_GENES
+             if g in expr.index
+             and saddle_res.get(g, {})
+             .get("result") == "UP"]
 
-    check(PROXIMAL_TUBULE_IDENTITY, "DOWN", "PT identity DOWN")
-    check(VHL_HIF,                  "UP",   "VHL-HIF UP")
-    check(METABOLIC_LIPOGENIC,      "UP",   "Lipogenic UP")
-    check(METABOLIC_GLUCONEOGENIC,  "DOWN", "Gluconeogenic DOWN")
+    # Fallback: use full predicted panel
+    if len(sw_ok) < 2:
+        log("  WARNING: <2 SW confirmed. "
+            "Using full SW panel.")
+        sw_ok = [g for g in SW_GENES
+                 if g in expr.index]
+    if len(fa_ok) < 2:
+        log("  WARNING: <2 FA confirmed. "
+            "Using full FA panel.")
+        fa_ok = [g for g in FA_GENES
+                 if g in expr.index]
+
+    log(f"  SW genes ({len(sw_ok)}): {sw_ok}")
+    log(f"  FA genes ({len(fa_ok)}): {fa_ok}")
+
+    idx = expr.columns[tumour_mask]
+
+    sw_mat = expr.loc[sw_ok, idx].values.T
+    fa_mat = expr.loc[fa_ok, idx].values.T
+
+    sw_mean = np.nanmean(sw_mat, axis=1)
+    fa_mean = np.nanmean(fa_mat, axis=1)
+
+    c1 = 1 - norm01(sw_mean)
+    c2 = norm01(fa_mean)
+    depth = (c1 + c2) / 2.0
+    depth = pd.Series(depth, index=idx)
+
+    log(f"  n tumour: {len(depth)}")
+    log(f"  mean:     {depth.mean():.4f}")
+    log(f"  median:   {depth.median():.4f}")
+    log(f"  std:      {depth.std():.4f}")
+    log(f"  Q25:      "
+        f"{depth.quantile(0.25):.4f}")
+    log(f"  Q75:      "
+        f"{depth.quantile(0.75):.4f}")
+
+    return depth
+
+# ═══════════════════════════════════════════════════════
+# DEPTH CORRELATIONS
+#
+# Protocol Step 2.3 — canonical.
+# Pearson r for EVERY gene in full panel
+# vs depth score, in tumour samples only.
+# Sorted by |r|.
+# This is the discovery step.
+# ═══════════════════════════════════════════════════════
+
+def depth_correlations(expr, depth,
+                       tumour_mask, label):
+    log("")
+    log("=" * 60)
+    log(f"DEPTH CORRELATIONS — {label}")
+    log("=" * 60)
+
+    idx        = expr.columns[tumour_mask]
+    depth_vals = depth.reindex(idx).dropna()
+
+    rows = []
+    for gene in expr.index:
+        gene_vals = expr.loc[
+            gene, idx].reindex(depth_vals.index)
+        r, p = safe_r(gene_vals.values,
+                      depth_vals.values)
+        if not np.isnan(r):
+            rows.append({
+                "gene": gene,
+                "r":    round(r, 4),
+                "p":    p,
+                "p_fmt": fmt_p(p),
+            })
+
+    df = pd.DataFrame(rows)
+    df = df.sort_values("r", ascending=False)
+    df.to_csv(
+        os.path.join(RESULTS_DIR,
+                     f"depth_corr_{label.lower()}.csv"),
+        index=False)
+
+    log(f"  {'Rank':<5} {'Gene':<12} "
+        f"{'r':>8}  direction")
+    log(f"  {'-'*5} {'-'*12} {'-'*8}  {'-'*20}")
+
+    pos = df[df.r > 0].head(15)
+    log(f"\n  TOP 15 POSITIVE "
+        f"(UP in deeper tumours):")
+    for rank, (_, row) in enumerate(
+            pos.iterrows(), 1):
+        log(f"  {rank:<5} {row.gene:<12} "
+            f"{row.r:>+8.4f}  {row.p_fmt}")
+
+    neg = df[df.r < 0].tail(15).iloc[::-1]
+    log(f"\n  TOP 15 NEGATIVE "
+        f"(DOWN in deeper tumours):")
+    for rank, (_, row) in enumerate(
+            neg.iterrows(), 1):
+        log(f"  {rank:<5} {row.gene:<12} "
+            f"{row.r:>+8.4f}  {row.p_fmt}")
 
     return df
 
-# ════════════════════════════════════════════════════════════��══════════════════
-# DEPTH SCORING
-# ═══════════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
+# GAP TESTS
+# ═══════════════════════════════════════════════════════
 
-def depth_scoring(tumour, normal, label="TCGA"):
-    """
-    Composite false attractor depth score per tumour sample.
-
-    Three components (each normalised 0-1 before combining):
-        1. PT identity loss  — mean PT identity genes, inverted
-           (low PT identity = high arrest depth)
-        2. HIF activation    — mean HIF downstream targets
-        3. Lipogenic reprog  — mean lipogenic arm genes
-
-    Composite = mean of three normalised components.
-    Range 0-1. Higher = more deeply arrested in false attractor.
-    """
+def gap_tests(expr, tumour_mask, label):
     log("")
     log("=" * 60)
-    log(f"DEPTH SCORING — {label}")
+    log(f"GAP TESTS — {label}")
     log("=" * 60)
-
-    def norm01(s):
-        mn, mx = s.min(), s.max()
-        if mx == mn:
-            return pd.Series(0.0, index=s.index)
-        return (s - mn) / (mx - mn)
-
-    hif_targets = [
-        "CA9", "VEGFA", "SLC2A1", "LDHA", "PDK1", "EGLN3"
-    ]
-    lip_targets = [
-        "FASN", "ACACA", "SCD", "HMGCR", "ACLY"
-    ]
-
-    pt_avail  = [g for g in PROXIMAL_TUBULE_IDENTITY
-                 if g in tumour.index]
-    hif_avail = [g for g in hif_targets if g in tumour.index]
-    lip_avail = [g for g in lip_targets if g in tumour.index]
-
-    idx = tumour.columns
-
-    if pt_avail:
-        pt_raw   = tumour.loc[pt_avail].mean(axis=0)
-        pt_score = 1 - norm01(pt_raw)
-    else:
-        pt_score = pd.Series(0.0, index=idx)
-
-    if hif_avail:
-        hif_score = norm01(tumour.loc[hif_avail].mean(axis=0))
-    else:
-        hif_score = pd.Series(0.0, index=idx)
-
-    if lip_avail:
-        lip_score = norm01(tumour.loc[lip_avail].mean(axis=0))
-    else:
-        lip_score = pd.Series(0.0, index=idx)
-
-    pt_score  = pt_score.reindex(idx).fillna(0)
-    hif_score = hif_score.reindex(idx).fillna(0)
-    lip_score = lip_score.reindex(idx).fillna(0)
-
-    composite = (pt_score + hif_score + lip_score) / 3.0
-
-    depth_df = pd.DataFrame({
-        "sample_id":   idx,
-        "pt_loss":     pt_score.values,
-        "hif_act":     hif_score.values,
-        "lip_reprog":  lip_score.values,
-        "depth_score": composite.values,
-    })
-
-    depth_df.to_csv(
-        os.path.join(RESULTS_DIR,
-                     f"depth_score_{label.lower()}.csv"),
-        index=False,
-    )
-
-    log(f"  PT identity genes:    {len(pt_avail)}")
-    log(f"  HIF target genes:     {len(hif_avail)}")
-    log(f"  Lipogenic genes:      {len(lip_avail)}")
-    log(f"  Mean depth score:     {composite.mean():.3f}")
-    log(f"  Range:                "
-        f"{composite.min():.3f} — {composite.max():.3f}")
-
-    if pt_avail:
-        pt_n = [g for g in pt_avail if g in normal.index]
-        if pt_n:
-            log(f"  Normal PT mean:       "
-                f"{normal.loc[pt_n].mean().mean():.3f}")
-            log(f"  Tumour PT mean:       "
-                f"{tumour.loc[pt_avail].mean().mean():.3f}")
-
-    return depth_df
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# IDENTITY SWITCH ANALYSIS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-def identity_switch(tumour, normal, label="TCGA"):
-    """
-    Group-level mean expression: tumour vs normal.
-    Reports Δ (tumour − normal) and MWU p-value per group.
-    Identity switch score = HIF_delta − PT_delta
-    Positive = switched from PT identity toward HIF lock.
-    """
+    log("  |r|>0.4 = CONNECTED")
+    log("  |r|<0.2 = BROKEN → intervention point")
     log("")
-    log("=" * 60)
-    log(f"IDENTITY SWITCH ANALYSIS — {label}")
-    log("=" * 60)
 
-    groups = {
-        "PT_identity":        PROXIMAL_TUBULE_IDENTITY,
-        "HIF_targets":        [
-            "CA9", "VEGFA", "SLC2A1",
-            "LDHA", "PDK1", "EGLN3"
-        ],
-        "Progenitor":         NEPHRON_PROGENITOR,
-        "PT_maturation":      PROXIMAL_MATURATION,
-        "Epigenetic":         EPIGENETIC_REGULATORS,
-        "Metabolic_lipogenic":METABOLIC_LIPOGENIC,
-        "Metabolic_gluconeo": METABOLIC_GLUCONEOGENIC,
-        "mTOR":               MTOR_PATHWAY,
-        "Immune":             IMMUNE_MARKERS,
-        "Proliferation":      PROLIFERATION,
-    }
-
+    idx  = expr.columns[tumour_mask]
     rows = []
-    log(f"  {'Group':<24} {'T_mean':>8} {'N_mean':>8} "
-        f"{'Δ':>8}  {'p':>10}")
-    log(f"  {'-'*24} {'-'*8} {'-'*8} "
-        f"{'-'*8}  {'-'*10}")
 
-    for gname, glist in groups.items():
-        avail = [g for g in glist
-                 if g in tumour.index and g in normal.index]
-        if not avail:
+    for gene_a, gene_b, expected, meaning \
+            in GAP_TEST_CIRCUITS:
+        if (gene_a not in expr.index or
+                gene_b not in expr.index):
+            rows.append({
+                "gene_a":   gene_a,
+                "gene_b":   gene_b,
+                "r":        np.nan,
+                "status":   "NOT_IN_DATA",
+                "expected": expected,
+                "meaning":  meaning,
+            })
             continue
-        t_arr = tumour.loc[avail].values.flatten()
-        n_arr = normal.loc[avail].values.flatten()
-        t_arr = t_arr[~np.isnan(t_arr)]
-        n_arr = n_arr[~np.isnan(n_arr)]
-        t_mean = float(np.mean(t_arr))
-        n_mean = float(np.mean(n_arr))
-        delta  = t_mean - n_mean
-        _, p   = safe_mwu(pd.Series(t_arr), pd.Series(n_arr))
-
+        a = expr.loc[gene_a, idx]
+        b = expr.loc[gene_b, idx]
+        r, p = safe_r(a.values, b.values)
+        if np.isnan(r):
+            status = "INSUFFICIENT"
+        elif abs(r) > 0.4:
+            status = "CONNECTED"
+        elif abs(r) < 0.2:
+            status = "BROKEN"
+        else:
+            status = "WEAK"
         rows.append({
-            "group":   gname,
-            "t_mean":  round(t_mean, 4),
-            "n_mean":  round(n_mean, 4),
-            "delta":   round(delta,  4),
-            "p_mwu":   p,
-            "p_fmt":   fmt_p(p),
-            "n_genes": len(avail),
+            "gene_a":   gene_a,
+            "gene_b":   gene_b,
+            "r":        round(r, 4),
+            "p_fmt":    fmt_p(p),
+            "status":   status,
+            "expected": expected,
+            "meaning":  meaning,
         })
-        log(f"  {gname:<24} {t_mean:>8.3f} {n_mean:>8.3f} "
-            f"{delta:>8.3f}  {fmt_p(p):>10}")
 
-    sw_df = pd.DataFrame(rows)
-    sw_df.to_csv(
+    df = pd.DataFrame(rows)
+    df.to_csv(
         os.path.join(RESULTS_DIR,
-                     f"identity_switch_{label.lower()}.csv"),
-        index=False,
-    )
+                     f"gap_tests_{label.lower()}.csv"),
+        index=False)
 
-    hif_row = sw_df.loc[sw_df.group == "HIF_targets"]
-    pt_row  = sw_df.loc[sw_df.group == "PT_identity"]
-    if not hif_row.empty and not pt_row.empty:
-        score = (hif_row.delta.values[0]
-                 - pt_row.delta.values[0])
+    log(f"  {'Circuit':<26} {'r':>8} "
+        f"  {'Status':>12}  Meaning")
+    log(f"  {'-'*26} {'-'*8}  {'-'*12}  {'-'*35}")
+    for _, row in df.iterrows():
+        circuit = f"{row.gene_a}→{row.gene_b}"
+        r_s = (f"{row.r:>8.4f}"
+               if not pd.isna(row.r)
+               else f"{'NA':>8}")
+        log(f"  {circuit:<26} {r_s}  "
+            f"{row.status:>12}  {row.meaning}")
+
+    broken = df[df.status == "BROKEN"]
+    if not broken.empty:
         log("")
-        log(f"  Identity switch score: {score:.4f}")
-        log("  Positive = PT→HIF switch confirmed ✓"
-            if score > 0
-            else "  Negative — review required")
+        log("  BROKEN CIRCUITS — INTERVENTION POINTS:")
+        for _, row in broken.iterrows():
+            log(f"    {row.gene_a} → {row.gene_b}  "
+                f"r={row.r:.3f}")
+            log(f"    Block is between "
+                f"{row.gene_a} and {row.gene_b}.")
+            log(f"    Meaning: {row.meaning}")
 
-    return sw_df
+    return df
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
 # FIGURE
-# ═══════════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
 
-ROLE_COLORS = {
-    "VHL_HIF":                "#e74c3c",
-    "PT_IDENTITY":            "#2ecc71",
-    "PROGENITOR":             "#9b59b6",
-    "PT_MATURATION":          "#1abc9c",
-    "EPIGENETIC":             "#f39c12",
-    "METABOLIC_LIPOGENIC":    "#e67e22",
-    "METABOLIC_GLUCONEOGENIC":"#d35400",
-    "MTOR":                   "#3498db",
-    "IMMUNE":                 "#95a5a6",
-    "PROLIFERATION":          "#c0392b",
-    "UNKNOWN":                "#bdc3c7",
-}
-
-def generate_figure(tumour, normal, saddle_df,
-                    depth_df, switch_df, label="TCGA"):
+def generate_figure(depth_t, depth_g,
+                    corr_t, corr_g,
+                    saddle_t, expr_t,
+                    tumour_mask_t):
     log("")
-    log(f"Generating figure — {label}...")
-
-    fig = plt.figure(figsize=(16, 12))
+    log("Generating figure...")
+    fig = plt.figure(figsize=(16, 10))
     gs  = gridspec.GridSpec(
-        2, 2, figure=fig, hspace=0.45, wspace=0.35)
+        2, 3, figure=fig,
+        hspace=0.45, wspace=0.40)
     ax_a = fig.add_subplot(gs[0, 0])
     ax_b = fig.add_subplot(gs[0, 1])
-    ax_c = fig.add_subplot(gs[1, 0])
-    ax_d = fig.add_subplot(gs[1, 1])
+    ax_c = fig.add_subplot(gs[0, 2])
+    ax_d = fig.add_subplot(gs[1, 0])
+    ax_e = fig.add_subplot(gs[1, 1])
+    ax_f = fig.add_subplot(gs[1, 2])
 
-    # ── Panel A: Top 25 genes by |log2FC| ─────────────────────
-    top = saddle_df.head(25).copy()
-    ax_a.barh(
-        top.gene[::-1],
-        top.log2FC[::-1],
-        color=[ROLE_COLORS.get(r, "#bdc3c7")
-               for r in top.role[::-1]],
-        edgecolor="black", linewidth=0.4,
-    )
-    ax_a.axvline(0, color="black",
-                 linewidth=0.8, linestyle="--")
-    ax_a.set_xlabel(
-        "log2 Fold Change (Tumour / Normal)", fontsize=9)
-    ax_a.set_title(
-        f"A — Top 25 Genes |log2FC| ({label})", fontsize=10)
-    ax_a.tick_params(axis="y", labelsize=7)
+    # Panel A — depth distribution
+    ax_a.hist(depth_t.values, bins=30,
+              color="#e74c3c",
+              edgecolor="black",
+              linewidth=0.4, alpha=0.85)
+    ax_a.axvline(depth_t.median(),
+                 color="black",
+                 linewidth=1.5,
+                 linestyle="--")
+    ax_a.set_title("A — Depth (TCGA)", fontsize=9)
+    ax_a.set_xlabel("Depth Score", fontsize=8)
+    ax_a.set_ylabel("Samples", fontsize=8)
 
-    # ── Panel B: Identity switch by group ─────────────────────
-    if switch_df is not None and not switch_df.empty:
-        grp_colors = []
-        for g in switch_df.group:
-            if "PT_identity" in g:
-                grp_colors.append("#2ecc71")
-            elif "HIF" in g:
-                grp_colors.append("#e74c3c")
-            elif "Progenitor" in g:
-                grp_colors.append("#9b59b6")
-            elif "lipogenic" in g.lower():
-                grp_colors.append("#e67e22")
-            elif "gluconeo" in g.lower():
-                grp_colors.append("#d35400")
-            elif "Immune" in g:
-                grp_colors.append("#95a5a6")
-            elif "Prolif" in g:
-                grp_colors.append("#c0392b")
-            else:
-                grp_colors.append("#7f8c8d")
-
-        ax_b.barh(
-            switch_df.group[::-1],
-            switch_df.delta[::-1],
-            color=grp_colors[::-1],
-            edgecolor="black", linewidth=0.4,
-        )
+    # Panel B — top depth correlates TCGA
+    if corr_t is not None and not corr_t.empty:
+        top = pd.concat([
+            corr_t.head(10),
+            corr_t.tail(10).iloc[::-1]
+        ])
+        colors_b = ["#e74c3c" if r > 0
+                    else "#2ecc71"
+                    for r in top.r.values]
+        ax_b.barh(top.gene[::-1].values,
+                  top.r[::-1].values,
+                  color=colors_b[::-1],
+                  edgecolor="black",
+                  linewidth=0.3)
         ax_b.axvline(0, color="black",
-                     linewidth=0.8, linestyle="--")
-        ax_b.set_xlabel(
-            "Mean Δ Expression (Tumour − Normal)", fontsize=9)
+                     linewidth=0.8,
+                     linestyle="--")
         ax_b.set_title(
-            "B — Identity Switch by Gene Group", fontsize=10)
-        ax_b.tick_params(axis="y", labelsize=8)
+            "B — Top Depth Correlates (TCGA)",
+            fontsize=9)
+        ax_b.set_xlabel("r with depth", fontsize=8)
+        ax_b.tick_params(axis="y",
+                         labelsize=6)
 
-    # ── Panel C: Depth score distribution ─────────────────────
-    if depth_df is not None and not depth_df.empty:
-        ax_c.hist(
-            depth_df.depth_score, bins=30,
-            color="#e74c3c", edgecolor="black",
-            linewidth=0.4, alpha=0.8,
-        )
-        med = depth_df.depth_score.median()
-        ax_c.axvline(
-            med, color="black", linewidth=1.5,
-            linestyle="--",
-            label=f"Median = {med:.2f}",
-        )
-        ax_c.set_xlabel("Composite Depth Score", fontsize=9)
-        ax_c.set_ylabel("Samples", fontsize=9)
-        ax_c.set_title(
-            "C — False Attractor Depth Distribution",
-            fontsize=10)
-        ax_c.legend(fontsize=8)
+    # Panel C — saddle FC plot
+    if saddle_t is not None:
+        saddle_df = pd.DataFrame([
+            {"gene": g,
+             "fc":   saddle_t.get(g, {}).get(
+                 "fc", 0)}
+            for g in SW_GENES + FA_GENES
+            if g in saddle_t
+        ])
+        if not saddle_df.empty:
+            saddle_df = saddle_df.sort_values("fc")
+            colors_c = [
+                "#e74c3c" if fc > 0
+                else "#2ecc71"
+                for fc in saddle_df.fc.values]
+            ax_c.barh(saddle_df.gene.values,
+                      saddle_df.fc.values,
+                      color=colors_c,
+                      edgecolor="black",
+                      linewidth=0.3)
+            ax_c.axvline(0, color="black",
+                         linewidth=0.8,
+                         linestyle="--")
+            ax_c.set_title(
+                "C — Saddle FC (T/N)",
+                fontsize=9)
+            ax_c.set_xlabel(
+                "log2FC", fontsize=8)
+            ax_c.tick_params(axis="y",
+                             labelsize=7)
 
-    # ── Panel D: PT loss vs HIF activation scatter ────────────
-    if depth_df is not None and not depth_df.empty:
-        sc = ax_d.scatter(
-            depth_df.pt_loss,
-            depth_df.hif_act,
-            alpha=0.4, s=14,
-            c=depth_df.depth_score,
-            cmap="RdYlGn_r",
-            edgecolors="none",
-        )
-        ax_d.set_xlabel("PT Identity Loss Score", fontsize=9)
-        ax_d.set_ylabel("HIF Activation Score", fontsize=9)
+    # Panel D — GEO depth distribution
+    if depth_g is not None:
+        ax_d.hist(depth_g.values, bins=20,
+                  color="#3498db",
+                  edgecolor="black",
+                  linewidth=0.4, alpha=0.85)
+        ax_d.axvline(depth_g.median(),
+                     color="black",
+                     linewidth=1.5,
+                     linestyle="--")
         ax_d.set_title(
-            "D — PT Loss vs HIF Activation (per sample)",
-            fontsize=10)
-        plt.colorbar(sc, ax=ax_d,
-                     label="Depth Score", pad=0.01)
+            "D — Depth (GEO)", fontsize=9)
+        ax_d.set_xlabel("Depth Score",
+                        fontsize=8)
+        ax_d.set_ylabel("Samples", fontsize=8)
+
+    # Panel E — GEO top correlates
+    if corr_g is not None and not corr_g.empty:
+        top_g = pd.concat([
+            corr_g.head(10),
+            corr_g.tail(10).iloc[::-1]
+        ])
+        colors_e = ["#e74c3c" if r > 0
+                    else "#2ecc71"
+                    for r in top_g.r.values]
+        ax_e.barh(top_g.gene[::-1].values,
+                  top_g.r[::-1].values,
+                  color=colors_e[::-1],
+                  edgecolor="black",
+                  linewidth=0.3)
+        ax_e.axvline(0, color="black",
+                     linewidth=0.8,
+                     linestyle="--")
+        ax_e.set_title(
+            "E — Top Depth Correlates (GEO)",
+            fontsize=9)
+        ax_e.set_xlabel("r with depth",
+                        fontsize=8)
+        ax_e.tick_params(axis="y",
+                         labelsize=6)
+
+    # Panel F — cross-dataset r comparison
+    if (corr_t is not None
+            and corr_g is not None
+            and not corr_t.empty
+            and not corr_g.empty):
+        merged = corr_t.merge(
+            corr_g[["gene","r"]],
+            on="gene",
+            suffixes=("_tcga","_geo"))
+        if not merged.empty:
+            ax_f.scatter(
+                merged.r_tcga.values,
+                merged.r_geo.values,
+                alpha=0.5, s=15,
+                color="#9b59b6",
+                edgecolors="black",
+                linewidths=0.3)
+            for _, row in merged.iterrows():
+                if abs(row.r_tcga) > 0.45:
+                    ax_f.annotate(
+                        row.gene,
+                        (row.r_tcga,
+                         row.r_geo),
+                        fontsize=5,
+                        xytext=(3, 3),
+                        textcoords="offset points")
+            r_cr, _ = safe_r(
+                merged.r_tcga.values,
+                merged.r_geo.values)
+            ax_f.set_title(
+                f"F — Cross-Dataset r "
+                f"(r={r_cr:.3f})",
+                fontsize=9)
+            ax_f.set_xlabel(
+                "r TCGA", fontsize=8)
+            ax_f.set_ylabel(
+                "r GEO", fontsize=8)
+            merged.to_csv(
+                os.path.join(
+                    RESULTS_DIR,
+                    "cross_dataset_r.csv"),
+                index=False)
 
     fig.suptitle(
-        f"ccRCC False Attractor — Script 1 Discovery ({label})\n"
-        "Proximal Tubule S3 Maturation Arrest | VHL-HIF Lock",
-        fontsize=12, fontweight="bold",
-    )
-
-    out = os.path.join(
-        RESULTS_DIR, f"figure_s1_{label.lower()}.png")
-    fig.savefig(out, dpi=150, bbox_inches="tight")
+        "ccRCC False Attractor — Script 1 v3\n"
+        "Protocol-compliant: saddle → "
+        "depth → correlations → gap tests",
+        fontsize=11, fontweight="bold")
+    out = os.path.join(RESULTS_DIR,
+                       "figure_s1_v3.png")
+    fig.savefig(out, dpi=150,
+                bbox_inches="tight")
     plt.close(fig)
     log(f"  Figure saved: {out}")
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# CROSS-DATASET COMPARISON
-# ═══════════════════════════════════════════════════════════════════════════════
-
-def cross_dataset_comparison(saddle_tcga, saddle_geo):
-    log("")
-    log("=" * 60)
-    log("CROSS-DATASET COMPARISON")
-    log("=" * 60)
-
-    if saddle_geo is None or saddle_geo.empty:
-        log("  GSE53757 arm not available. Skipping.")
-        return
-
-    merged = saddle_tcga.merge(
-        saddle_geo[["gene", "log2FC", "direction"]],
-        on="gene",
-        suffixes=("_tcga", "_geo"),
-    )
-
-    if merged.empty:
-        log("  No common genes found. Skipping.")
-        return
-
-    concordant = (
-        merged.direction_tcga == merged.direction_geo
-    ).sum()
-    total = len(merged)
-    pct   = 100 * concordant / total if total > 0 else 0.0
-
-    r, p = safe_pearsonr(
-        merged.log2FC_tcga.values,
-        merged.log2FC_geo.values,
-    )
-
-    log(f"  Common genes:          {total}")
-    log(f"  Direction concordant:  "
-        f"{concordant}/{total} ({pct:.1f}%)")
-    log(f"  log2FC correlation:    "
-        f"r={r:.3f}  p={fmt_p(p)}")
-
-    discordant = merged.loc[
-        merged.direction_tcga != merged.direction_geo]
-    if not discordant.empty:
-        log(f"  Discordant genes ({len(discordant)}):")
-        for _, row in discordant.iterrows():
-            log(f"    {row.gene:<12} "
-                f"TCGA:{row.direction_tcga}"
-                f"({row.log2FC_tcga:+.2f})  "
-                f"GEO:{row.direction_geo}"
-                f"({row.log2FC_geo:+.2f})")
-
-    merged.to_csv(
-        os.path.join(RESULTS_DIR,
-                     "cross_dataset_comparison.csv"),
-        index=False,
-    )
-
-# ═══════════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
 # MAIN
-# ═══════════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
 
 def main():
-    log("OrganismCore — ccRCC False Attractor Framework")
-    log("Script 1 — Discovery Run")
+    log("OrganismCore — ccRCC False Attractor")
+    log("Script 1 v3 — Protocol-Compliant")
     log("Document 94 | 2026-03-02")
     log("")
-    log("BIOLOGICAL GROUNDING (locked):")
-    log("  Cancer:         ccRCC")
-    log("  Cell of origin: Proximal tubule S3")
-    log("  Driver:         VHL loss → HIF1A/EPAS1 activation")
-    log("  Arrest:         Proximal tubule maturation arrest")
-    log("  Phenotype:      Clear cell, metabolic reprogramming,")
-    log("                  loss of PT identity")
-    log(f"  Target genes:   {len(ALL_TARGET)}")
+    log("PROTOCOL ORDER (canonical):")
+    log("  1. saddle_analysis()")
+    log("     → per-gene tumour vs normal")
+    log("     → produces saddle_res")
+    log("  2. build_depth_score(saddle_res)")
+    log("     → uses CONFIRMED genes only")
+    log("     → fallback to full panel if <2")
+    log("  3. depth_correlations()")
+    log("     → Pearson r, every panel gene")
+    log("     → THE DISCOVERY")
+    log("  4. gap_tests()")
+    log("     → circuit topology")
+    log("     → BROKEN = intervention point")
     log("")
 
-    # ── Downloads + GPL570 location ───────────────────────────
+    # Downloads
     gpl570_path = download_all()
+    probe_map   = None
+    if gpl570_path:
+        log("")
+        log("=" * 60)
+        log("GPL570")
+        log("=" * 60)
+        probe_map = load_gpl570(gpl570_path)
 
-    # ── GPL570 annotation ─────────────────────────────────────
-    probe_map = None
-    if gpl570_path is not None:
-        probe_map = load_gpl570_annotation(gpl570_path)
-
-    # ── TCGA arm ──────────────────────────────────────────────
+    # ── TCGA arm ────────────────────────────
     log("")
     log("═" * 60)
-    log("PRIMARY ARM — TCGA-KIRC")
+    log("PRIMARY — TCGA-KIRC")
     log("═" * 60)
 
-    gene_df_t, meta_t    = parse_tcga_kirc()
-    tumour_t, normal_t   = split_tumour_normal(gene_df_t, meta_t)
-    log(f"  Tumour: {tumour_t.shape}  Normal: {normal_t.shape}")
+    expr_t, meta_t = parse_tcga()
 
-    saddle_t = saddle_point_analysis(tumour_t, normal_t, "TCGA")
-    depth_t  = depth_scoring(tumour_t, normal_t, "TCGA")
-    switch_t = identity_switch(tumour_t, normal_t, "TCGA")
-    generate_figure(
-        tumour_t, normal_t,
-        saddle_t, depth_t, switch_t, "TCGA")
+    meta_idx_t = (
+        meta_t.set_index("sample_id")
+        .reindex(expr_t.columns))
+    tumour_mask_t = (
+        meta_idx_t.sample_type == "tumour"
+    ).values
 
-    # ── GEO arm ───────────────────────────────────────────────
-    saddle_geo = None
+    # Step 1 — saddle
+    saddle_t = saddle_analysis(
+        expr_t, tumour_mask_t,
+        meta_t, "TCGA")
+
+    # Step 2 — depth from confirmed genes
+    depth_t = build_depth_score(
+        expr_t, tumour_mask_t,
+        saddle_t, "TCGA")
+
+    # Step 3 — depth correlations (discovery)
+    corr_t = depth_correlations(
+        expr_t, depth_t,
+        tumour_mask_t, "TCGA")
+
+    # Step 4 — gap tests
+    gap_t = gap_tests(
+        expr_t, tumour_mask_t, "TCGA")
+
+    # Save depth scores
+    pd.DataFrame({
+        "sample_id":   depth_t.index,
+        "depth_score": depth_t.values,
+    }).to_csv(
+        os.path.join(RESULTS_DIR,
+                     "depth_scores_tcga.csv"),
+        index=False)
+
+    # ── GEO arm ─────────────────────────────
+    depth_g = None
+    corr_g  = None
 
     if probe_map is not None:
         log("")
         log("═" * 60)
-        log("VALIDATION ARM — GSE53757")
+        log("VALIDATION — GSE53757")
         log("═" * 60)
 
-        gene_df_geo, meta_geo = parse_gse53757(probe_map)
+        expr_g, meta_g = parse_geo(probe_map)
 
-        if gene_df_geo is not None and meta_geo is not None:
-            tumour_geo, normal_geo = split_tumour_normal(
-                gene_df_geo, meta_geo)
-            log(f"  Tumour: {tumour_geo.shape}  "
-                f"Normal: {normal_geo.shape}")
+        if expr_g is not None:
+            meta_idx_g = (
+                meta_g.set_index("sample_id")
+                .reindex(expr_g.columns))
+            tumour_mask_g = (
+                meta_idx_g.sample_type
+                == "tumour").values
 
-            saddle_geo = saddle_point_analysis(
-                tumour_geo, normal_geo, "GEO")
-            depth_geo  = depth_scoring(
-                tumour_geo, normal_geo, "GEO")
-            switch_geo = identity_switch(
-                tumour_geo, normal_geo, "GEO")
-            generate_figure(
-                tumour_geo, normal_geo,
-                saddle_geo, depth_geo, switch_geo, "GEO")
-    else:
-        log("")
-        log("GSE53757 arm SKIPPED — GPL570 annotation not found.")
-        log("Run once in terminal to enable:")
-        log('  curl -L "https://www.ncbi.nlm.nih.gov/geo/query/'
-            'acc.cgi?acc=GPL570&targ=self&form=text&view=full" \\')
-        log(f'       -o '
-            f'{os.path.join(BASE_DIR, "GPL570_soft.txt")}')
-        log("Then re-run this script.")
+            saddle_g = saddle_analysis(
+                expr_g, tumour_mask_g,
+                meta_g, "GEO")
 
-    # ── Cross-dataset ─────────────────────────────────────────
-    cross_dataset_comparison(saddle_t, saddle_geo)
+            depth_g = build_depth_score(
+                expr_g, tumour_mask_g,
+                saddle_g, "GEO")
 
-    # ── Summary ───────────────────────────────────────────────
+            corr_g = depth_correlations(
+                expr_g, depth_g,
+                tumour_mask_g, "GEO")
+
+            gap_g = gap_tests(
+                expr_g, tumour_mask_g, "GEO")
+
+            pd.DataFrame({
+                "sample_id":   depth_g.index,
+                "depth_score": depth_g.values,
+            }).to_csv(
+                os.path.join(
+                    RESULTS_DIR,
+                    "depth_scores_geo.csv"),
+                index=False)
+
+    # Figure
+    generate_figure(
+        depth_t, depth_g,
+        corr_t, corr_g,
+        saddle_t, expr_t,
+        tumour_mask_t)
+
+    # Summary
     log("")
     log("=" * 60)
-    log("SCRIPT 1 COMPLETE")
+    log("SCRIPT 1 v3 COMPLETE")
     log("=" * 60)
     log(f"  Outputs: {RESULTS_DIR}")
-    for fname in sorted(os.listdir(RESULTS_DIR)):
-        fpath = os.path.join(RESULTS_DIR, fname)
-        log(f"    {fname:<50} "
+    for fname in sorted(
+            os.listdir(RESULTS_DIR)):
+        fpath = os.path.join(
+            RESULTS_DIR, fname)
+        log(f"    {fname:<55} "
             f"{os.path.getsize(fpath):>8} bytes")
     log("")
-    log("  NEXT STEP:")
-    log("  Read saddle_point_tcga.csv against locked predictions.")
-    log("  Record confirmations, contradictions, surprises.")
-    log("  Then proceed to Script 2.")
+    log("  NEXT: Read saddle predictions.")
+    log("  How many SW genes confirmed DOWN?")
+    log("  How many FA genes confirmed UP?")
+    log("  Any wrong predictions reveal")
+    log("  assumption errors — read them.")
+    log("  Then read depth_corr_tcga.csv.")
+    log("  What is rank 1 positive?")
+    log("  What is rank 1 negative?")
+    log("  What was not predicted?")
+    log("  That is the ccRCC attractor geometry.")
 
     write_log()
-
 
 if __name__ == "__main__":
     main()
