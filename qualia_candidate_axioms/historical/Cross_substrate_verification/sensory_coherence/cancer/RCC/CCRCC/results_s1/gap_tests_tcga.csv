@@ -1,0 +1,15 @@
+gene_a,gene_b,r,p_fmt,status,expected,meaning
+VHL,SLC34A1,-0.0387,0.3718,BROKEN,connected,VHL loss = PT identity loss
+VHL,PCK1,-0.1302,0.0026,BROKEN,connected,VHL loss = gluconeogenic loss
+EPAS1,CA9,0.416,9.19e-24,CONNECTED,connected,EPAS1 directly activates CA9
+EPAS1,VEGFA,0.5441,1.79e-42,CONNECTED,connected,EPAS1 activates VEGFA
+VHL,EPAS1,-0.0086,0.8434,BROKEN,inverse,VHL degrades EPAS1
+EGLN3,EPAS1,0.4942,3.08e-34,CONNECTED,connected,EGLN3 is EPAS1 feedback target
+LHX1,SLC34A1,0.0558,0.1982,BROKEN,connected,LHX1 drives PT maturation
+HNF4A,PCK1,0.3782,1.33e-19,WEAK,connected,HNF4A drives gluconeogenesis
+CPT1A,SCD,-0.0868,0.0450,BROKEN,inverse,FAO loss = desaturation gain
+PCK1,G6PC,0.7178,1.10e-85,CONNECTED,connected,gluconeogenic co-regulation
+EZH2,LHX1,0.0213,0.6238,BROKEN,inverse,EZH2 silences differentiation TFs
+EZH2,UMOD,-0.1445,0.0008,BROKEN,inverse,EZH2 silences PT identity
+MTOR,SLC2A1,-0.089,0.0398,BROKEN,connected,mTORC1 drives GLUT1 expression
+VHL,CA9,-0.3245,1.46e-14,WEAK,inverse,VHL intact = CA9 suppressed

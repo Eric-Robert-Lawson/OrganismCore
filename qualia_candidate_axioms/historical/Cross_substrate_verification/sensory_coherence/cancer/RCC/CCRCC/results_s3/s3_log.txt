@@ -1,0 +1,441 @@
+OrganismCore — ccRCC Script 3
+Sub-axis / EMT / Chromatin / Panel Optimisation
+Document 94c-pre | 2026-03-02
+
+PREDICTIONS LOCKED:
+  S3-P1  r(Depth_A,Depth_B)<0.80
+  S3-P2  SREBF1>MYC for SCD
+  S3-P3  CDH1 r<-0.25
+  S3-P4  BAP1 r<-0.20
+  S3-P5  PBRM1 r>+0.10
+  S3-P6  panel r>=0.85 both
+  S3-P7  AXL r>+0.25
+
+Loading TCGA-KIRC...
+  TCGA genes=119, tumours=534
+Loading GSE53757...
+  GPL570 probe map: 340 probes → panel genes
+  GEO genes=117, tumours=72
+
+============================================================
+OBJ-1 — PT SUB-AXES — TCGA
+============================================================
+  Depth_A (transport)
+    genes: ['SLC34A1', 'SLC22A6', 'AQP1', 'SLC13A3', 'SLC22A8']
+    r vs depth = +0.7162  p = 3.75e-85
+  Depth_B (metabolic)
+    genes: ['FBP1', 'G6PC', 'PCK1', 'AGXT', 'GATM', 'PCK2']
+    r vs depth = +0.6334  p = 3.05e-61
+
+  r(Depth_A, Depth_B) = +0.7426  p = 1.07e-94
+  PREDICTION S3-P1 CONFIRMED: r < 0.80 — axes separable ✓
+
+  Cross-axis gene correlations (top 10 by |r|):
+  Gene A       Gene B              r  class
+  ------------ ------------ --------  ---------------
+  SLC22A6      FBP1          +0.6561  COUPLED
+  SLC22A6      G6PC          +0.6535  COUPLED
+  SLC22A6      GATM          +0.6079  COUPLED
+  SLC22A6      PCK1          +0.5736  COUPLED
+  AQP1         G6PC          +0.5594  COUPLED
+  SLC22A8      G6PC          +0.5483  COUPLED
+  SLC34A1      G6PC          +0.5422  COUPLED
+  AQP1         PCK1          +0.5364  COUPLED
+  AQP1         GATM          +0.5223  COUPLED
+  SLC22A6      AGXT          +0.5148  COUPLED
+
+============================================================
+OBJ-1 — PT SUB-AXES — GEO
+============================================================
+  Depth_A (transport)
+    genes: ['SLC34A1', 'SLC22A6', 'AQP1', 'SLC13A3', 'SLC22A8']
+    r vs depth = +0.7170  p = 1.40e-12
+  Depth_B (metabolic)
+    genes: ['FBP1', 'G6PC', 'PCK1', 'AGXT', 'GATM', 'PCK2']
+    r vs depth = +0.4930  p = 1.08e-05
+
+  r(Depth_A, Depth_B) = +0.6733  p = 9.15e-11
+  PREDICTION S3-P1 CONFIRMED: r < 0.80 — axes separable ✓
+
+  Cross-axis gene correlations (top 10 by |r|):
+  Gene A       Gene B              r  class
+  ------------ ------------ --------  ---------------
+  AQP1         PCK1          +0.7119  COUPLED
+  SLC22A6      G6PC          +0.6848  COUPLED
+  SLC22A6      PCK1          +0.6847  COUPLED
+  SLC22A6      PCK2          +0.6667  COUPLED
+  SLC22A6      FBP1          +0.6051  COUPLED
+  SLC22A8      PCK2          +0.5806  COUPLED
+  AQP1         FBP1          +0.5600  COUPLED
+  AQP1         G6PC          +0.5188  COUPLED
+  SLC22A8      G6PC          +0.5103  COUPLED
+  SLC22A8      FBP1          +0.4656  COUPLED
+
+============================================================
+OBJ-2 — LIPID ARM DRIVERS — TCGA
+============================================================
+  TF               SCD      ACLY      FASN     PLIN2  depth_r
+  -----------------------------------------------------------
+  SREBF1       +0.2877   -0.0444   +0.3486   +0.0350  -0.0047
+  SREBF2       -0.2242   -0.2276   +0.2464   -0.3902  -0.1713
+  MYC          +0.2443   +0.4577   +0.2466   +0.3522  +0.3484
+  EPAS1        +0.0184   +0.4179   -0.1598   +0.3001  +0.1396
+  HIF1A        -0.0382   -0.1537   +0.0244   -0.2537  +0.0300
+  MLXIPL       +0.1402   +0.1826   -0.0526   +0.3955  -0.2846
+  PPARA        +0.0849   +0.1308   -0.0860   +0.1851  -0.4102
+  PPARG        -0.0825   -0.2539   -0.1580   +0.0296  -0.4378
+
+  TOP TF for SCD: SREBF1  r=+0.2877
+  2nd TF for SCD: MYC  r=+0.2443
+  S3-P2 CONFIRMED: SREBF1 > MYC ✓
+
+============================================================
+OBJ-2 — LIPID ARM DRIVERS — GEO
+============================================================
+  TF               SCD      ACLY      FASN     PLIN2  depth_r
+  -----------------------------------------------------------
+  SREBF1       +0.1797   +0.1415   -0.0025   -0.0837  +0.1418
+  SREBF2       +0.0685   -0.2198   +0.1686   -0.2446  -0.3279
+  MYC          +0.1066   +0.5307   -0.2781   +0.6283  +0.6225
+  EPAS1        +0.1155   +0.1950   -0.1161   +0.0302  -0.0514
+  HIF1A        +0.1834   -0.6753   +0.3296   -0.5528  -0.2217
+  MLXIPL       +0.1078   +0.1256   +0.0641   +0.1369  -0.1878
+  PPARA        -0.0673   -0.3407   +0.1504   -0.2710  -0.3118
+  PPARG        -0.0960   -0.0614   -0.0885   -0.0052  -0.1839
+
+  TOP TF for SCD: HIF1A  r=+0.1834
+  2nd TF for SCD: SREBF1  r=+0.1797
+  S3-P2 WRONG: HIF1A beats SREBF1 ✗
+
+============================================================
+OBJ-3 — FULL EMT CIRCUIT — TCGA
+============================================================
+  Gene         r(depth)           p  direction
+  ---------- ----------  ----------  --------------------
+  VIM           +0.5298    5.57e-40  ↑ deeper
+  FN1           +0.4019    3.75e-22  ↑ deeper
+  MMP9          +0.3704    8.36e-19  ↑ deeper
+  ZEB2          +0.3652    2.73e-18  ↑ deeper
+  SNAI2         +0.3637    3.81e-18  ↑ deeper
+  KRT19         +0.3466    1.62e-16  ↑ deeper
+  SNAI1         +0.3286    6.59e-15  ↑ deeper
+  OCLN          -0.3207    3.06e-14  ↓ shallower
+  TWIST1        +0.3045    6.41e-13  ↑ deeper
+  MMP2          +0.2414    1.60e-08  ↑ deeper
+  CDH1          -0.2369    3.03e-08  ↓ shallower
+  CLDN4         -0.2135    6.34e-07  ↓ shallower
+  TWIST2        +0.2095    1.04e-06  ↑ deeper
+  EPCAM         -0.2094    1.05e-06  ↓ shallower
+  MMP14         +0.1992    3.49e-06  ↑ deeper
+  ZEB1          +0.1965    4.78e-06  ↑ deeper
+  CDH2          +0.1709    7.18e-05  ↑ deeper
+  ESRP1         -0.1579      0.0002  ↓ shallower
+  KRT7          -0.1568      0.0003  ↓ shallower
+  ESRP2         -0.1299      0.0026  ↓ shallower
+  ITGB6         +0.0701      0.1057  ↑ deeper
+  CTNNB1        +0.0138      0.7510  ↑ deeper
+
+  S3-P3: CDH1 r = -0.2369
+  PARTIAL: CDH1 trending negative but > -0.25
+
+  EMT circuit pairs:
+  Circuit                     r        Status  V
+  -------------------- --------  ------------  -
+  SNAI1→CDH1            -0.2551          WEAK  ✓
+  ZEB1→CDH1            -0.1873        BROKEN  ✓
+  ZEB2→CDH1            -0.2517          WEAK  ✓
+  TWIST1→VIM             +0.2942          WEAK  ✓
+  SNAI1→VIM             +0.3582          WEAK  ✓
+  ZEB1→VIM             +0.2542          WEAK  ✓
+  VIM→CDH2            +0.5831     CONNECTED  ✓
+  VIM→EPCAM           -0.2736          WEAK  ✓
+  CTNNB1→CDH1            -0.0681        BROKEN  ✗
+  ESRP1→CDH1            +0.2878          WEAK  ✓
+
+============================================================
+OBJ-3 — FULL EMT CIRCUIT — GEO
+============================================================
+  Gene         r(depth)           p  direction
+  ---------- ----------  ----------  --------------------
+  VIM           +0.6850    3.21e-11  ↑ deeper
+  ESRP1         -0.4772    2.25e-05  ↓ shallower
+  OCLN          -0.4689    3.26e-05  ↓ shallower
+  EPCAM         -0.3537      0.0023  ↓ shallower
+  ESRP2         -0.3323      0.0044  ↓ shallower
+  ITGB6         -0.2637      0.0252  ↓ shallower
+  CDH2          +0.2071      0.0809  ↑ deeper
+  CDH1          -0.1913      0.1074  ↓ shallower
+  KRT7          -0.1903      0.1094  ↓ shallower
+  ZEB2          +0.1575      0.1865  ↑ deeper
+  TWIST2        -0.1252      0.2946  ↓ shallower
+  CTNNB1        -0.1134      0.3427  ↓ shallower
+  MMP14         -0.1127      0.3459  ↓ shallower
+  CLDN4         -0.1085      0.3643  ↓ shallower
+  MMP9          +0.0996      0.4051  ↑ deeper
+  SNAI2         -0.0985      0.4104  ↓ shallower
+  MMP2          -0.0725      0.5448  ↓ shallower
+  TWIST1        -0.0512      0.6694  ↓ shallower
+  FN1           +0.0507      0.6724  ↑ deeper
+  KRT19         +0.0424      0.7235  ↑ deeper
+  SNAI1         -0.0100      0.9338  ↓ shallower
+
+  S3-P3: CDH1 r = -0.1913
+  PARTIAL: CDH1 trending negative but > -0.25
+
+  EMT circuit pairs:
+  Circuit                     r        Status  V
+  -------------------- --------  ------------  -
+  SNAI1→CDH1            -0.0125        BROKEN  ✓
+  ZEB2→CDH1            +0.0191        BROKEN  ✗
+  TWIST1→VIM             -0.0663        BROKEN  ✗
+  SNAI1→VIM             -0.1964        BROKEN  ✗
+  VIM→CDH2            +0.2803          WEAK  ✓
+  VIM→EPCAM           -0.2365          WEAK  ✓
+  CTNNB1→CDH1            -0.0330        BROKEN  ✗
+  ESRP1→CDH1            +0.1514        BROKEN  ✓
+
+============================================================
+OBJ-4/5 — CHROMATIN DEPTH MAP — TCGA
+============================================================
+  Predicted DOWN: BAP1, SETD2, KDM5C, VHL
+  Predicted UP:   EZH2, PBRM1
+
+  Gene           r(depth)           p  pred        result
+  ------------ ----------  ----------  ------------  --------
+  BAP1            -0.2345    4.16e-08  DOWN pred     ✓ S3-P4
+  EZH1            -0.1404      0.0011                 
+  SMARCA4         -0.1096      0.0113                 
+  SMARCB1         -0.0920      0.0335                 
+  VHL             -0.0354      0.4149  DOWN pred     ✗ 
+  SUZ12           -0.0289      0.5055  UP pred       ✗ 
+  SETD2           -0.0188      0.6647  DOWN pred     ✗ 
+  CREBBP          +0.0359      0.4075                 
+  PBRM1           +0.0379      0.3817  UP pred       ✗ S3-P5
+  EP300           +0.0412      0.3417                 
+  KDM1A           +0.0470      0.2786  UP pred       ✗ 
+  KDM5C           +0.0678      0.1176  DOWN pred     ✗ 
+  BCOR            +0.0713      0.0998                 
+  KDM6A           +0.0861      0.0467                 
+  EED             +0.1240      0.0041                 
+  RCOR1           +0.1496      0.0005                 
+  HDAC2           +0.1580      0.0002                 
+  ARID1A          +0.1614      0.0002                 
+  JARID2          +0.1754    4.62e-05                 
+  TET2            +0.1756    4.52e-05                 
+  DNMT3A          +0.2517    3.67e-09  DOWN pred     ✗ 
+  ASXL1           +0.2839    2.36e-11                 
+  EZH2            +0.3042    6.79e-13  UP pred       ✓ 
+  HDAC1           +0.3758    2.32e-19  UP pred       ✓ 
+
+  S3-P4: BAP1 r = -0.2345
+    CONFIRMED ✓
+
+  S3-P5: PBRM1 r = +0.0379
+    NOT CONFIRMED ✗
+
+  MUTATION PROXY ANALYSIS:
+  Q1-low expressers vs Q4-high — are low-Q1 deeper?
+
+  BAP1    : low-Q1 vs high-Q4  Δdepth=+0.0464  p=0.0158  low='deeper'
+  PBRM1   : low-Q1 vs high-Q4  Δdepth=-0.0096  p=0.1074  low='shallower'
+  SETD2   : low-Q1 vs high-Q4  Δdepth=+0.0157  p=0.9090  low='deeper'
+  KDM5C   : low-Q1 vs high-Q4  Δdepth=-0.0202  p=0.1856  low='shallower'
+
+============================================================
+OBJ-4/5 — CHROMATIN DEPTH MAP — GEO
+============================================================
+  Predicted DOWN: BAP1, SETD2, KDM5C, VHL
+  Predicted UP:   EZH2, PBRM1
+
+  Gene           r(depth)           p  pred        result
+  ------------ ----------  ----------  ------------  --------
+  EZH1            -0.2985      0.0109                 
+  KDM5C           -0.2722      0.0207  DOWN pred     ✓ 
+  PBRM1           -0.2719      0.0209  UP pred       ✗ S3-P5
+  BCOR            -0.2683      0.0227                 
+  SMARCA4         -0.2533      0.0318                 
+  JARID2          -0.2420      0.0406                 
+  CREBBP          -0.2376      0.0444                 
+  TET2            -0.2086      0.0786                 
+  HDAC2           -0.2043      0.0852                 
+  SETD2           -0.1777      0.1352  DOWN pred     ✓ 
+  ARID1A          -0.1769      0.1372                 
+  EED             -0.1601      0.1792                 
+  BAP1            -0.1555      0.1921  DOWN pred     ✓ S3-P4
+  SUZ12           -0.0840      0.4828  UP pred       ✗ 
+  EP300           -0.0756      0.5281                 
+  ASXL1           -0.0680      0.5702                 
+  KDM6A           -0.0386      0.7474                 
+  DNMT3A          -0.0380      0.7516  DOWN pred     ✗ 
+  SMARCB1         +0.0092      0.9388                 
+  RCOR1           +0.0334      0.7805                 
+  KDM1A           +0.0449      0.7079  UP pred       ✗ 
+  VHL             +0.1044      0.3828  DOWN pred     ✗ 
+  HDAC1           +0.2415      0.0410  UP pred       ✓ 
+  EZH2            +0.5279    1.89e-06  UP pred       ✓ 
+
+  S3-P4: BAP1 r = -0.1555
+    NOT CONFIRMED ✗
+
+  S3-P5: PBRM1 r = -0.2719
+    NOT CONFIRMED ✗
+
+  MUTATION PROXY ANALYSIS:
+  Q1-low expressers vs Q4-high — are low-Q1 deeper?
+
+  BAP1    : low-Q1 vs high-Q4  Δdepth=+0.0718  p=0.2482  low='deeper'
+  PBRM1   : low-Q1 vs high-Q4  Δdepth=+0.0543  p=0.1101  low='deeper'
+  SETD2   : low-Q1 vs high-Q4  Δdepth=+0.0268  p=0.1687  low='deeper'
+  KDM5C   : low-Q1 vs high-Q4  Δdepth=+0.0494  p=0.2232  low='deeper'
+
+============================================================
+OBJ-6 — PANEL OPTIMISATION
+Target: r >= 0.85 BOTH datasets
+============================================================
+
+  2-gene panels (1 pos + 1 neg):
+         Pos          Neg   r_TCGA    r_GEO    r_min
+  ---------- ------------ -------- -------- --------
+         CA9      SLC22A6   0.8153   0.7797   0.7797
+         CA9         G6PC   0.7800   0.7645   0.7645
+         CA9         FBP1   0.7584   0.8310   0.7584
+         VIM         FBP1   0.7577   0.8233   0.7577
+       EGLN3         FBP1   0.7542   0.7713   0.7542
+       VEGFA         PCK1   0.7447   0.7840   0.7447
+       VEGFA      SLC22A6   0.7501   0.7422   0.7422
+       EGLN3      SLC22A6   0.7608   0.7326   0.7326
+        LDHA         FBP1   0.7196   0.8204   0.7196
+       EGLN3         PCK1   0.7191   0.7844   0.7191
+         CA9         PCK1   0.7187   0.7731   0.7187
+        LDHA      SLC22A6   0.7115   0.7113   0.7113
+
+  3-gene panels:
+                 Pos            Neg   r_TCGA    r_GEO    r_min
+  ------------------ -------------- -------- -------- --------
+                 CA9   FBP1+SLC22A6   0.8558   0.8513   0.8513
+                 CA9   SLC22A6+UMOD   0.8508   0.8686   0.8508
+                 CA9      FBP1+G6PC   0.8387   0.8259   0.8259
+                 CA9   SLC22A6+PCK1   0.8460   0.8218   0.8218
+               EGLN3   SLC22A6+UMOD   0.8210   0.8420   0.8210
+                 VIM   SLC22A6+UMOD   0.8206   0.8433   0.8206
+                 CA9   SLC22A6+G6PC   0.8615   0.8198   0.8198
+               EGLN3      FBP1+PCK1   0.8167   0.8370   0.8167
+               VEGFA   SLC22A6+PCK1   0.8231   0.8123   0.8123
+               VEGFA      FBP1+PCK1   0.8098   0.8424   0.8098
+               EGLN3   SLC22A6+PCK1   0.8283   0.8093   0.8093
+                 CA9 SLC22A6+SLC13A3   0.8347   0.8079   0.8079
+                 CA9      G6PC+UMOD   0.8073   0.8669   0.8073
+                 CA9 SLC34A1+SLC22A6   0.8869   0.8039   0.8039
+             VIM+CA9        SLC22A6   0.8114   0.8039   0.8039
+
+  4-gene panels (extend best 3-gene):
+                       Pos              Neg   r_TCGA    r_GEO    r_min
+  ------------------------ ---------------- -------- -------- --------
+                       CA9 FBP1+SLC22A6+UMOD   0.8888   0.8936   0.8888
+                       CA9 FBP1+SLC22A6+ALDOB   0.8840   0.8766   0.8766
+                 CA9+VEGFA     FBP1+SLC22A6   0.8726   0.8721   0.8721
+                       CA9 FBP1+SLC22A6+AGXT   0.8796   0.8636   0.8636
+                  CA9+LDHA     FBP1+SLC22A6   0.8616   0.8923   0.8616
+                   CA9+MYC     FBP1+SLC22A6   0.8599   0.8847   0.8599
+                 CA9+EGLN3     FBP1+SLC22A6   0.8594   0.8654   0.8594
+                   CA9+VIM     FBP1+SLC22A6   0.8575   0.8783   0.8575
+                       CA9 FBP1+SLC22A6+PCK1   0.8677   0.8546   0.8546
+                       CA9 FBP1+SLC22A6+SLC22A8   0.8708   0.8543   0.8543
+                       CA9 FBP1+SLC22A6+G6PC   0.8802   0.8525   0.8525
+                       CA9 FBP1+SLC22A6+SLC13A3   0.8687   0.8493   0.8493
+                       CA9 FBP1+SLC22A6+CPT1A   0.8489   0.8616   0.8489
+                       CA9 FBP1+SLC22A6+HNF1A   0.8603   0.8482   0.8482
+                       CA9 FBP1+SLC22A6+SLC34A1   0.8970   0.8463   0.8463
+
+  BEST PANELS FOUND:
+  2-gene: Pos=['CA9']  Neg=['SLC22A6']  r_min=0.7797  below target ✗
+  3-gene: Pos=['CA9']  Neg=['FBP1', 'SLC22A6']  r_min=0.8513  TARGET ACHIEVED ✓
+  4-gene: Pos=['CA9']  Neg=['FBP1', 'SLC22A6', 'UMOD']  r_min=0.8888  TARGET ACHIEVED ✓
+
+  S3-P6 CONFIRMED: r >= 0.85 BOTH datasets ✓
+
+============================================================
+OBJ-7 — CABOZANTINIB GEOMETRY — TCGA
+============================================================
+  S3-P7: AXL depth-positive r > +0.25
+
+  Gene         r(depth)           p  tier
+  ---------- ----------  ----------  ---------------
+  AXL           +0.5072    3.02e-36  TIER_1
+  VEGFA         +0.4238    1.08e-24  TIER_1
+  ANGPT2        +0.3517    5.37e-17  TIER_2
+  HGF           +0.3257    1.16e-14  TIER_2
+  NTRK1         +0.3076    3.61e-13  TIER_2
+  PDGFRB        +0.2952    3.40e-12  TIER_2
+  FLT1          +0.1991    3.55e-06  TIER_3
+  FGF2          +0.1732    5.75e-05  TIER_3
+  FGFR1         +0.1579      0.0002  TIER_3
+  PDGFRA        +0.1295      0.0027  TIER_3
+  VEGFC         +0.1242      0.0040  TIER_3
+  RET           +0.1031      0.0171  TIER_3
+  MET           +0.0905      0.0366  AGNOSTIC
+  TYRO3         +0.0815      0.0600  AGNOSTIC
+  KDR           +0.0358      0.4089  AGNOSTIC
+  TEK           -0.0372      0.3912  AGNOSTIC
+  MERTK         -0.0693      0.1097  AGNOSTIC
+  GAS6          -0.1180      0.0063  TIER_3
+
+  S3-P7: AXL r = +0.5072
+  CONFIRMED: AXL depth-positive ✓
+  Cabozantinib benefits deep ccRCC via AXL arm
+
+============================================================
+OBJ-7 — CABOZANTINIB GEOMETRY — GEO
+============================================================
+  S3-P7: AXL depth-positive r > +0.25
+
+  Gene         r(depth)           p  tier
+  ---------- ----------  ----------  ---------------
+  VEGFA         +0.4546    6.03e-05  TIER_1
+  ANGPT2        +0.4003      0.0005  TIER_1
+  AXL           +0.3796      0.0010  TIER_2
+  KDR           +0.1617      0.1747  TIER_3
+  HGF           +0.1025      0.3914  TIER_3
+  FGFR1         +0.0961      0.4218  AGNOSTIC
+  FGF2          +0.0855      0.4753  AGNOSTIC
+  FLT1          +0.0558      0.6413  AGNOSTIC
+  PDGFRB        +0.0306      0.7984  AGNOSTIC
+  MET           +0.0068      0.9550  AGNOSTIC
+  TYRO3         -0.0098      0.9348  AGNOSTIC
+  NTRK1         -0.0270      0.8216  AGNOSTIC
+  VEGFC         -0.0321      0.7887  AGNOSTIC
+  TEK           -0.0719      0.5481  AGNOSTIC
+  MERTK         -0.1465      0.2195  TIER_3
+  RET           -0.1783      0.1340  TIER_3
+  PDGFRA        -0.2195      0.0639  TIER_3
+  GAS6          -0.2289      0.0531  TIER_3
+
+  S3-P7: AXL r = +0.3796
+  CONFIRMED: AXL depth-positive ✓
+  Cabozantinib benefits deep ccRCC via AXL arm
+
+Generating Script 3 figure...
+  Figure saved: ./ccrcc_false_attractor/results_s3/figure_s3.png
+
+============================================================
+SCRIPT 3 COMPLETE
+============================================================
+  cabo_geo.csv                                       828 bytes
+  cabo_tcga.csv                                      848 bytes
+  chromatin_geo.csv                                  813 bytes
+  chromatin_tcga.csv                                 827 bytes
+  emt_geo.csv                                        976 bytes
+  emt_tcga.csv                                      1047 bytes
+  figure_s3.png                                   268285 bytes
+  lipid_tfs_geo.csv                                  899 bytes
+  lipid_tfs_tcga.csv                                 897 bytes
+  panel_2gene.csv                                   6851 bytes
+  panel_3gene.csv                                  33286 bytes
+  panel_4gene.csv                                   2159 bytes
+  pt_subaxes_geo.csv                                4858 bytes
+  pt_subaxes_tcga.csv                              38998 bytes
+
+  NEXT: paste full output.
+  Classify all 7 predictions.
+  Write document 94c-pre.
+  Then literature check (94c).

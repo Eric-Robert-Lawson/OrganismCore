@@ -1,0 +1,445 @@
+OrganismCore — ccRCC False Attractor
+Script 2 — Protocol-Compliant
+Document 94b | 2026-03-02
+
+OBJECTIVES LOCKED BEFORE RUN:
+  OBJ-1  Depth strata
+  OBJ-2  SCD×CPT1A lipid circuit
+  OBJ-3  VIM×FBP1 mesenchymal circuit
+  OBJ-4  Fibrotic circuit (TGFB1 arm)
+  OBJ-5  Immune circuit (FOXP3 arm)
+  OBJ-6  Survival stratification
+  OBJ-7  3-gene panel r >= 0.85
+  OBJ-8  Drug target depth map
+
+
+============================================================
+LOADING SCRIPT 1 OUTPUTS
+============================================================
+  TCGA depth loaded: n=534
+  GEO  depth loaded: n=72
+
+============================================================
+TCGA-KIRC — Reloading
+============================================================
+  Panel genes: 73
+  Tumour samples: 534
+
+============================================================
+GSE53757 — Reloading
+============================================================
+  Panel genes: 72
+
+============================================================
+SURVIVAL — TCGA-KIRC
+============================================================
+  Trying: https://tcga-xena-hub.s3.us-east-1.amazonaws.com/download/survival%2FKIRC_survival.txt
+  OK: 0.0 MB → ./ccrcc_false_attractor/TCGA_KIRC_survival.txt
+  Columns: ['sample', '_PATIENT', 'OS', 'OS.time', 'DSS', 'DSS.time', 'DFI', 'DFI.time', 'PFI', 'PFI.time', 'Redaction']
+  Shape: (944, 11)
+  id=sample  time=OS.time  event=OS
+  Valid survival: 944
+
+════════════════════════════════════════════════════════════
+PRIMARY — TCGA-KIRC
+════════════════════════════════════════════════════════════
+
+============================================================
+OBJ-1 — DEPTH STRATA — TCGA
+============================================================
+  Distribution:
+    Q25=0.5867  Q50=0.6449  Q75=0.7103
+  Strata thresholds:
+    Low  ≤ 0.55  (n=86, 16.1%)
+    Mid    0.55-0.70  (n=293, 54.9%)
+    High > 0.70  (n=155, 29.0%)
+
+  Gene expression by stratum:
+  Gene               Low       Mid      High  trend
+  ------------ --------- --------- ---------  --------------------
+  UMOD            4.9672    2.2427    1.4044  DOWN with depth
+  SLC34A1         6.0940    4.0896    1.7926  DOWN with depth
+  SLC13A3         7.5750    5.0205    4.9675  DOWN with depth
+  AGXT            4.4688    3.8430    2.3297  DOWN with depth
+  PCK1           11.2104   10.4327    7.4342  DOWN with depth
+  SLC22A6         8.3341    7.4400    2.7594  DOWN with depth
+  GATM           12.4029   12.5120   11.3386  DOWN with depth
+  AQP1           13.7806   14.1140   12.6110  DOWN with depth
+  FBP1           10.2275    9.6342    8.0655  DOWN with depth
+  G6PC            6.8296    6.1331    2.4887  DOWN with depth
+  CA9             9.3496   12.2800   12.4652  UP with depth
+  VEGFA          13.5390   14.9126   15.0010  UP with depth
+  EGLN3          11.6301   13.4585   13.4872  UP with depth
+  SLC2A1         11.2164   12.3193   13.2117  UP with depth
+  PDK1            9.7570   10.4248   10.4889  UP with depth
+  LDHA           14.6476   15.2515   15.3819  UP with depth
+  EPAS1          13.2903   14.1380   13.8369  UP with depth
+  SCD            12.3518   13.0973   13.1859  UP with depth
+  ACLY           12.5832   13.1792   13.0879  UP with depth
+  EZH2            6.5957    7.0185    7.2285  UP with depth
+  PAX8           11.5045   11.0834   10.8770  DOWN with depth
+  CPT1A          11.5446   11.2737   10.7866  DOWN with depth
+  PLIN2          13.4632   14.2905   13.4418  DOWN with depth
+  VIM            15.2462   16.2039   16.5973  UP with depth
+  FAP             5.4337    6.6113    7.6489  UP with depth
+  TGFB1          10.5797   11.3245   11.8310  UP with depth
+  COL1A1         12.1718   13.2158   14.3846  UP with depth
+  FOXP3           3.7237    4.8413    5.1755  UP with depth
+  MYC             9.9510   10.9347   11.1013  UP with depth
+
+============================================================
+OBJ 2-5 — CIRCUIT TESTS — TCGA
+============================================================
+  |r|>0.40 = CONNECTED
+  |r|<0.20 = BROKEN
+  Prediction in brackets
+
+
+  OBJ-2  LIPID CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  SCD→CPT1A                     -0.0868        BROKEN  ✓
+  SCD→ACLY                       0.2062          WEAK  ✓
+  SCD→PLIN2                      0.4168     CONNECTED  ✓
+  SCD→FBP1                       0.0309        BROKEN  ✗
+  VIM→FBP1                      -0.0841        BROKEN  ✓
+  EPAS1→SCD                      0.0184        BROKEN  ✓
+  EZH2→FBP1                     -0.1048        BROKEN  ✓
+  PAX8→FBP1                      0.2317          WEAK  ✓
+
+  OBJ-3  MESENCHYMAL CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  SCD→FBP1                       0.0309        BROKEN  ✗
+  VIM→FBP1                      -0.0841        BROKEN  ✓
+  VIM→SLC34A1                   -0.0219        BROKEN  ✓
+  VIM→TGFB1                      0.6519     CONNECTED  ✓
+  VIM→SNAI1                      0.3582          WEAK  ✓
+  TGFB1→FAP                      0.5268     CONNECTED  ✓
+  TGFB1→COL1A1                   0.5760     CONNECTED  ✓
+  TGFB1→ACTA2                    0.4674     CONNECTED  ✓
+  TGFB1→FOXP3                    0.3834          WEAK  ✓
+  EZH2→FBP1                     -0.1048        BROKEN  ✓
+  EZH2→SLC34A1                   0.0189        BROKEN  ✗
+  EZH2→VIM                       0.2367          WEAK  ✓
+  PAX8→SLC34A1                   0.1413        BROKEN  ✓
+  PAX8→FBP1                      0.2317          WEAK  ✓
+
+  OBJ-4  FIBROTIC CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  VIM→TGFB1                      0.6519     CONNECTED  ✓
+  TGFB1→FAP                      0.5268     CONNECTED  ✓
+  TGFB1→COL1A1                   0.5760     CONNECTED  ✓
+  FAP→COL1A1                     0.8840     CONNECTED  ✓
+  TGFB1→ACTA2                    0.4674     CONNECTED  ✓
+  TGFB1→FOXP3                    0.3834          WEAK  ✓
+
+  OBJ-5  IMMUNE CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  VIM→TGFB1                      0.6519     CONNECTED  ✓
+  TGFB1→FAP                      0.5268     CONNECTED  ✓
+  TGFB1→COL1A1                   0.5760     CONNECTED  ✓
+  TGFB1→ACTA2                    0.4674     CONNECTED  ✓
+  TGFB1→FOXP3                    0.3834          WEAK  ✓
+  CD68→FOXP3                     0.5254     CONNECTED  ✓
+  CD274→FOXP3                    0.1293        BROKEN  ✓
+
+  EPAS1 CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  EPAS1→SLC2A1                   0.2819          WEAK  ✓
+  EPAS1→SCD                      0.0184        BROKEN  ✓
+  EPAS1→LDHA                     0.1749        BROKEN  ✓
+  VHL→EPAS1                     -0.0086        BROKEN  ✓
+
+  EZH2 CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  EZH2→FBP1                     -0.1048        BROKEN  ✓
+  EZH2→SLC34A1                   0.0189        BROKEN  ✗
+  EZH2→VIM                       0.2367          WEAK  ✓
+
+  PAX CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  PAX8→SLC34A1                   0.1413        BROKEN  ✓
+  PAX8→FBP1                      0.2317          WEAK  ✓
+  PAX2→PAX8                      0.3753          WEAK  ✓
+
+  MYC/mTOR CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  MTOR→PTEN                      0.0873        BROKEN  ✗
+  MTOR→MYC                       0.0249        BROKEN  ✓
+  MYC→SLC2A1                     0.4337     CONNECTED  ✓
+  MYC→LDHA                       0.3492          WEAK  ✓
+
+============================================================
+OBJ-6 — SURVIVAL STRATIFICATION
+============================================================
+  Samples with valid survival: 532
+
+  KAPLAN-MEIER BY DEPTH QUARTILE:
+  Q1 = shallowest, Q4 = deepest
+
+  Quartile       n     Median OS (days)   Events
+  ---------- ----- -------------------- --------
+  Q1           133                  nan       36
+  Q2           133               3554.0       31
+  Q3           133               2564.0       48
+  Q4           133               1610.0       60
+
+  Log-rank Q1 vs Q4:
+    χ² = 14.620  p = 0.0001
+    PREDICTION CONFIRMED: p < 0.01 ✓
+
+  DEPTH vs OS (events only, Pearson on log-time):
+    r(depth, log_OS) = -0.0940  p = 0.2161
+    Direction or significance unexpected.
+
+  SURVIVAL BY STRATUM (Low/Mid/High):
+  Stratum        n    Median OS   Events
+  ---------- ----- ------------ --------
+  Low           86          nan       23
+  Mid          291       3554.0       83
+  High         155       1598.0       69
+
+============================================================
+OBJ-7 — 3-GENE PANEL VALIDATION — TCGA
+============================================================
+  Predicted panel: SLC2A1(+) / VIM(+) / FBP1(-)
+  Target r >= 0.85
+
+  Panel candidates:
+    SLC2A1(+) VIM(+) FBP1(-)            r=+0.8058  p=3.98e-123  ~
+    SLC2A1(+) VIM(+) TGFB1(+) FBP1(-)   r=+0.7959  p=4.95e-118  ~
+    SLC2A1(+) VIM(+) CA9(+) FBP1(-)     r=+0.8043  p=2.44e-122  ~
+    SLC2A1(+) SCD(+) FBP1(-) CPT1A(-)   r=+0.7605  p=7.82e-102  ~
+    SLC2A1(+) FBP1(-)                   r=+0.7742  p=9.11e-108  ~
+    SLC2A1(+) SLC34A1(-)                r=+0.7766  p=7.52e-109  ~
+
+  PARTIAL: 3-gene panel r >= 0.70 — expand panel
+
+============================================================
+OBJ-8 — DRUG TARGET MAP
+============================================================
+
+  Gene         Drug                                       r(depth)           p  Tier
+  ------------ ---------------------------------------- ----------  ----------  ------------
+  FBP1         FBP1 restoration (experimental)             -0.5844    3.12e-50  TIER_1
+  TGFB1        TGF-β inhibitor / Galunisertib              +0.5179    5.65e-38  TIER_1
+  CA9          CA9 inhibitor (SLC-0111)                    +0.4572    6.07e-29  TIER_2
+  FAP          FAP-targeted therapy (ADC / CAR-T)          +0.4557    9.66e-29  TIER_2
+  VEGFA        Anti-VEGF / Sunitinib / Bevacizumab         +0.4238    1.08e-24  TIER_2
+  CPT1A        CPT1A restoration (experimental)            -0.3822    5.18e-20  TIER_2
+  MYC          MYC inhibitor / BET bromodomain             +0.3484    1.09e-16  TIER_2
+  TOP2A        Topoisomerase inhibitor                     +0.3107    2.05e-13  TIER_2
+  FOXP3        Anti-Treg / Anti-CTLA-4                     +0.3089    2.84e-13  TIER_2
+  EZH2         EZH2 inhibitor / Tazemetostat               +0.3042    6.79e-13  TIER_2
+  MKI67        Proliferation marker (not target)           +0.2836    2.45e-11  TIER_3
+  SCD          SCD inhibitor (MF-438 / A939572)            +0.2355    3.65e-08  TIER_3
+  ACLY         ACLY inhibitor / Bempedoic acid analogue    +0.2174    3.94e-07  TIER_3
+  EPAS1        HIF2α inhibitor / Belzutifan                +0.1396      0.0012  DEPTH_AGNOSTIC
+  CD274        Anti-PD-L1 / Atezolizumab                   -0.0962      0.0262  DEPTH_AGNOSTIC
+  MET          MET inhibitor / Cabozantinib                +0.0905      0.0366  DEPTH_AGNOSTIC
+  MTOR         mTOR inhibitor / Everolimus                 -0.0879      0.0423  DEPTH_AGNOSTIC
+  CCND1        CDK4/6 inhibitor / Palbociclib              +0.0791      0.0677  DEPTH_AGNOSTIC
+
+  TIER 1 (|r| >= 0.50 — depth dominant):
+    FBP1         FBP1 restoration (experimental)
+    ↓ with depth — shallow tumour marker
+    TGFB1        TGF-β inhibitor / Galunisertib
+    ↑ with depth — target deep tumours
+
+  DEPTH-STRATIFIED PRESCRIPTION MAP:
+  (derived from geometry — pre-literature)
+
+  HIGH DEPTH (>0.70):
+    TGF-β inhibitor / Galunisertib
+    CA9 inhibitor (SLC-0111)
+    FAP-targeted therapy (ADC / CAR-T)
+    Anti-VEGF / Sunitinib / Bevacizumab
+    MYC inhibitor / BET bromodomain
+    Topoisomerase inhibitor
+
+  LOW DEPTH (<0.55):
+    FBP1 restoration (experimental)
+    CPT1A restoration (experimental)
+
+════════════════════════════════════════════════════════════
+VALIDATION — GSE53757
+════════════════════════════════════════════════════════════
+
+============================================================
+OBJ-1 — DEPTH STRATA — GEO
+============================================================
+  Distribution:
+    Q25=0.6720  Q50=0.7192  Q75=0.7711
+  Strata thresholds:
+    Low  ≤ 0.55  (n=4, 5.6%)
+    Mid    0.55-0.76  (n=46, 63.9%)
+    High > 0.76  (n=22, 30.6%)
+
+  Gene expression by stratum:
+  Gene               Low       Mid      High  trend
+  ------------ --------- --------- ---------  --------------------
+  UMOD           15.0219    6.5383    5.8903  DOWN with depth
+  SLC34A1         9.1382    6.5462    5.6301  DOWN with depth
+  SLC13A3         8.9062    5.9646    5.3067  DOWN with depth
+  AGXT            7.1525    5.7610    4.5181  DOWN with depth
+  PCK1           12.7275   12.0740    8.7589  DOWN with depth
+  SLC22A6         8.3694    7.4969    4.3158  DOWN with depth
+  GATM           12.7421   12.9802   12.2527  DOWN with depth
+  AQP1           12.4833   13.0161   11.2059  DOWN with depth
+  FBP1           11.0914   10.1919    9.1143  DOWN with depth
+  G6PC            7.8688    6.3315    5.2466  DOWN with depth
+  CA9             9.0743   11.5855   11.5694  UP with depth
+  VEGFA          13.5693   14.9230   15.0206  UP with depth
+  EGLN3          10.4434   11.9565   11.8936  UP with depth
+  SLC2A1          9.8754   10.5926   11.2157  UP with depth
+  PDK1           10.3667   12.0047   12.1180  UP with depth
+  LDHA           13.8521   15.2929   15.4207  UP with depth
+  EPAS1          13.1624   14.3283   13.9007  UP with depth
+  SCD             9.2329   12.1082   12.5498  UP with depth
+  ACLY           12.3346   13.6157   13.6793  UP with depth
+  EZH2            7.3087    8.5133    8.6861  UP with depth
+  PAX8           11.7328   11.1482   10.8107  DOWN with depth
+  CPT1A          11.1016   10.7642   10.2667  DOWN with depth
+  PLIN2          11.5975   14.8904   14.6959  UP with depth
+  VIM            13.2293   15.1747   15.3726  UP with depth
+  FAP             7.6922    7.3086    7.9044  UP with depth
+  TGFB1           9.1194   10.4159   10.8203  UP with depth
+  COL1A1         13.1653   13.2855   14.0463  UP with depth
+  FOXP3           5.5291    5.6061    5.8988  UP with depth
+  MYC            10.0774   11.9380   12.0679  UP with depth
+
+============================================================
+OBJ 2-5 — CIRCUIT TESTS — GEO
+============================================================
+  |r|>0.40 = CONNECTED
+  |r|<0.20 = BROKEN
+  Prediction in brackets
+
+
+  OBJ-2  LIPID CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  SCD→CPT1A                     -0.3208          WEAK  ✓
+  SCD→ACLY                       0.4508     CONNECTED  ✓
+  SCD→PLIN2                      0.5144     CONNECTED  ✓
+  SCD→FBP1                      -0.4001     CONNECTED  ✓
+  VIM→FBP1                      -0.3566          WEAK  ✓
+  EPAS1→SCD                      0.0330        BROKEN  ✓
+  EZH2→FBP1                     -0.2711          WEAK  ✓
+  PAX8→FBP1                      0.2291          WEAK  ✓
+
+  OBJ-3  MESENCHYMAL CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  SCD→FBP1                      -0.4001     CONNECTED  ✓
+  VIM→FBP1                      -0.3566          WEAK  ✓
+  VIM→SLC34A1                   -0.4065     CONNECTED  ✓
+  VIM→TGFB1                      0.4314     CONNECTED  ✓
+  VIM→SNAI1                     -0.1964        BROKEN  ✗
+  TGFB1→FAP                      0.1645        BROKEN  ✓
+  TGFB1→COL1A1                   0.2142          WEAK  ✓
+  TGFB1→ACTA2                    0.2077          WEAK  ✓
+  TGFB1→FOXP3                    0.0265        BROKEN  ✓
+  EZH2→FBP1                     -0.2711          WEAK  ✓
+  EZH2→SLC34A1                  -0.1900        BROKEN  ✓
+  EZH2→VIM                       0.5336     CONNECTED  ✓
+  PAX8→SLC34A1                   0.1129        BROKEN  ✓
+  PAX8→FBP1                      0.2291          WEAK  ✓
+
+  OBJ-4  FIBROTIC CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  VIM→TGFB1                      0.4314     CONNECTED  ✓
+  TGFB1→FAP                      0.1645        BROKEN  ✓
+  TGFB1→COL1A1                   0.2142          WEAK  ✓
+  FAP→COL1A1                     0.8486     CONNECTED  ✓
+  TGFB1→ACTA2                    0.2077          WEAK  ✓
+  TGFB1→FOXP3                    0.0265        BROKEN  ✓
+
+  OBJ-5  IMMUNE CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  VIM→TGFB1                      0.4314     CONNECTED  ✓
+  TGFB1→FAP                      0.1645        BROKEN  ✓
+  TGFB1→COL1A1                   0.2142          WEAK  ✓
+  TGFB1→ACTA2                    0.2077          WEAK  ✓
+  TGFB1→FOXP3                    0.0265        BROKEN  ✓
+  CD68→FOXP3                     0.0585        BROKEN  ✓
+  CD274→FOXP3                    0.0201        BROKEN  ✓
+
+  EPAS1 CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  EPAS1→SLC2A1                  -0.0096        BROKEN  ✗
+  EPAS1→SCD                      0.0330        BROKEN  ✓
+  EPAS1→LDHA                     0.3114          WEAK  ✓
+  VHL→EPAS1                     -0.0448        BROKEN  ✓
+
+  EZH2 CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  EZH2→FBP1                     -0.2711          WEAK  ✓
+  EZH2→SLC34A1                  -0.1900        BROKEN  ✓
+  EZH2→VIM                       0.5336     CONNECTED  ✓
+
+  PAX CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  PAX8→SLC34A1                   0.1129        BROKEN  ✓
+  PAX8→FBP1                      0.2291          WEAK  ✓
+  PAX2→PAX8                      0.3098          WEAK  ✓
+
+  MYC/mTOR CIRCUIT:
+  Circuit                             r        Status  V
+  ---------------------------- --------  ------------  -
+  MTOR→PTEN                      0.1068        BROKEN  ✗
+  MTOR→MYC                      -0.1759        BROKEN  ✗
+  MYC→SLC2A1                     0.3935          WEAK  ✓
+  MYC→LDHA                       0.6305     CONNECTED  ✓
+
+============================================================
+OBJ-7 — 3-GENE PANEL VALIDATION — GEO
+============================================================
+  Predicted panel: SLC2A1(+) / VIM(+) / FBP1(-)
+  Target r >= 0.85
+
+  Panel candidates:
+    SLC2A1(+) VIM(+) FBP1(-)            r=+0.8102  p=6.74e-18  ~
+    SLC2A1(+) VIM(+) TGFB1(+) FBP1(-)   r=+0.8178  p=1.83e-18  ~
+    SLC2A1(+) VIM(+) CA9(+) FBP1(-)     r=+0.8883  p=2.37e-25  ✓
+    SLC2A1(+) SCD(+) FBP1(-) CPT1A(-)   r=+0.8089  p=8.37e-18  ~
+    SLC2A1(+) FBP1(-)                   r=+0.7240  p=6.67e-13  ~
+    SLC2A1(+) SLC34A1(-)                r=+0.7379  p=1.42e-13  ~
+
+  PARTIAL: 3-gene panel r >= 0.70 — expand panel
+
+Generating Script 2 figure...
+  Figure saved: ./ccrcc_false_attractor/results_s2/figure_s2.png
+
+============================================================
+SCRIPT 2 COMPLETE
+============================================================
+  Outputs: ./ccrcc_false_attractor/results_s2
+    circuits_geo.csv                                            3032 bytes
+    circuits_tcga.csv                                           3066 bytes
+    drug_targets.csv                                            1357 bytes
+    figure_s2.png                                             181885 bytes
+    strata_geo.csv                                              3091 bytes
+    strata_tcga.csv                                             3114 bytes
+    survival_depth.csv                                         25951 bytes
+
+  NEXT: Read s2_log.txt fully.
+  What are the circuit r values?
+  Which objectives confirmed?
+  Which predictions wrong?
+  What is the panel r?
+  What does the drug map show?
+  Then write document 94b.
+  Then run literature check (94c).

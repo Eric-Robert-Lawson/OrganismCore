@@ -1,0 +1,693 @@
+OrganismCore — ccRCC Script 4
+LANDSCAPE DISCOVERY — geometry first
+Document 94d-pre | 2026-03-02
+
+SINGLE LOCKED PREDICTION:
+  S4-P1: full genome scan finds
+         >= 5 novel |r|>0.50 genes
+
+All other modules: OPEN DISCOVERY.
+No predicted directions.
+No confirmation targets.
+The data speaks.
+
+Loading TCGA-KIRC — FULL GENOME...
+  Total genes: 20,530
+  Tumour samples: 534
+  Normal samples: 72
+
+=================================================================
+MODULE A — FULL GENOME DEPTH SCAN
+No panel. Every gene. Raw discovery.
+=================================================================
+  Computing r(gene, depth) for 20,530 genes across n=534 tumours...
+  (This may take 30-60 seconds)
+
+  Total genes computed: 20,244
+  Genes |r|>0.50: 103
+  Genes |r|>0.60: 7
+  Genes |r|>0.70: 0
+
+  NOVEL HITS |r|>0.50 (not in S1-3 panels): 91
+
+  S4-P1 CONFIRMED: >= 5 novel genes with |r|>0.50 ✓
+  The S1-3 panels were INCOMPLETE.
+  The landscape contained real biology that was missed.
+
+  TOP 50 POSITIVE (deeper=higher):
+  Rank  Gene                  r           p   novel  panel_status
+  ----- -------------- --------  ----------  ------  --------------
+  1     SLC2A1          +0.6722    1.80e-71   known
+  2     LOXL2           +0.6312    1.04e-60     NEW
+  3     RUNX1           +0.6255    2.56e-59     NEW
+  4     NAP1L1          +0.6109    6.00e-56     NEW
+  5     CAV1            +0.5891    3.42e-51     NEW
+  6     CTHRC1          +0.5774    8.41e-49     NEW
+  7     SLC2A3          +0.5772    9.13e-49   known
+  8     LOX             +0.5737    4.61e-48     NEW
+  9     FAM115C         +0.5636    4.28e-46     NEW
+  10    TGFBI           +0.5576    5.94e-45     NEW
+  11    PLOD2           +0.5526    5.05e-44     NEW
+  12    IFI16           +0.5467    6.10e-43     NEW
+  13    SLC43A3         +0.5455    9.91e-43     NEW
+  14    SHC1            +0.5450    1.22e-42     NEW
+  15    RUNX2           +0.5420    4.27e-42     NEW
+  16    GLT25D1         +0.5375    2.62e-41     NEW
+  17    STC1            +0.5355    5.97e-41     NEW
+  18    ITGA5           +0.5350    7.12e-41     NEW
+  19    ENO2            +0.5342    1.01e-40     NEW
+  20    SEMA4B          +0.5339    1.10e-40     NEW
+  21    RNF24           +0.5332    1.45e-40     NEW
+  22    SLC2A14         +0.5299    5.47e-40     NEW
+  23    VIM             +0.5298    5.57e-40   known
+  24    OSMR            +0.5286    8.99e-40     NEW
+  25    IGFBP3          +0.5264    2.18e-39     NEW
+  26    NRD1            +0.5243    4.76e-39     NEW
+  27    CSDA            +0.5238    5.97e-39     NEW
+  28    CHSY1           +0.5218    1.25e-38     NEW
+  29    CDCA7L          +0.5217    1.32e-38     NEW
+  30    LOC154761       +0.5203    2.21e-38     NEW
+  31    IL1RAP          +0.5197    2.78e-38     NEW
+  32    SERPINB8        +0.5181    5.22e-38     NEW
+  33    TGFB1           +0.5179    5.65e-38   known
+  34    SERPINE1        +0.5155    1.40e-37     NEW
+  35    ARL4C           +0.5133    3.09e-37     NEW
+  36    TRAM2           +0.5112    6.89e-37     NEW
+  37    EFNA3           +0.5098    1.16e-36     NEW
+  38    AXL             +0.5072    3.02e-36   known
+  39    MYOF            +0.5068    3.47e-36     NEW
+  40    SAP30           +0.5014    2.42e-35     NEW
+  41    SLFN11          +0.4984    7.06e-35     NEW
+  42    SYNPO           +0.4966    1.32e-34     NEW
+  43    TMEM44          +0.4960    1.65e-34     NEW
+  44    DPYSL3          +0.4951    2.24e-34     NEW
+  45    AP3S1           +0.4922    6.19e-34     NEW
+  46    FKBP10          +0.4915    8.04e-34     NEW
+  47    CBFB            +0.4901    1.28e-33     NEW
+  48    CLEC2B          +0.4895    1.57e-33     NEW
+  49    BCL6            +0.4876    3.02e-33     NEW
+  50    C9orf110        +0.4876    3.05e-33     NEW
+
+  TOP 50 NEGATIVE (deeper=lower):
+  Rank  Gene                  r           p   novel
+  ----- -------------- --------  ----------  ------
+  1     SLC13A2         -0.6414    3.18e-63     NEW
+  2     SLC22A8         -0.6213    2.53e-58   known
+  3     SUCLG1          -0.6144    9.88e-57     NEW
+  4     LDHD            -0.5938    3.38e-52     NEW
+  5     CYP17A1         -0.5921    7.97e-52     NEW
+  6     ABAT            -0.5902    1.97e-51     NEW
+  7     FBP1            -0.5844    3.12e-50   known
+  8     OGDHL           -0.5844    3.18e-50     NEW
+  9     ATP5A1          -0.5822    9.01e-50     NEW
+  10    GOT1            -0.5820    1.01e-49     NEW
+  11    ENAM            -0.5762    1.47e-48     NEW
+  12    AIFM1           -0.5724    8.35e-48     NEW
+  13    PECI            -0.5670    9.65e-47     NEW
+  14    TMEM171         -0.5666    1.12e-46     NEW
+  15    SLC22A6         -0.5639    3.82e-46   known
+  16    ACAT1           -0.5624    7.39e-46     NEW
+  17    IVD             -0.5597    2.40e-45     NEW
+  18    SLC34A1         -0.5592    2.99e-45   known
+  19    PEPD            -0.5580    4.90e-45     NEW
+  20    HIBCH           -0.5533    3.71e-44     NEW
+  21    SEPHS2          -0.5526    4.99e-44     NEW
+  22    TST             -0.5517    7.31e-44     NEW
+  23    HSDL2           -0.5512    9.12e-44     NEW
+  24    BPHL            -0.5506    1.16e-43     NEW
+  25    OSTBETA         -0.5501    1.48e-43     NEW
+  26    G6PC            -0.5490    2.29e-43   known
+  27    ACY1            -0.5484    2.92e-43     NEW
+  28    PCCA            -0.5458    8.87e-43     NEW
+  29    ALDH1L1         -0.5453    1.07e-42     NEW
+  30    ALDOB           -0.5442    1.71e-42   known
+  31    HMGCS2          -0.5402    8.64e-42     NEW
+  32    CRAT            -0.5400    9.71e-42     NEW
+  33    PANK1           -0.5348    7.83e-41     NEW
+  34    AQP7            -0.5346    8.31e-41     NEW
+  35    SPRYD4          -0.5345    8.76e-41     NEW
+  36    AGPAT9          -0.5326    1.87e-40     NEW
+  37    MSRA            -0.5318    2.57e-40     NEW
+  38    CBARA1          -0.5312    3.22e-40     NEW
+  39    ACO2            -0.5309    3.63e-40     NEW
+  40    WDR72           -0.5294    6.74e-40     NEW
+  41    CCDC64          -0.5293    6.94e-40     NEW
+  42    TOLLIP          -0.5282    1.07e-39     NEW
+  43    ALDH1B1         -0.5278    1.25e-39     NEW
+  44    PAH             -0.5252    3.43e-39     NEW
+  45    QDPR            -0.5243    4.84e-39     NEW
+  46    EPHX2           -0.5230    7.96e-39     NEW
+  47    PEBP1           -0.5189    3.83e-38     NEW
+  48    C2orf24         -0.5173    6.96e-38     NEW
+  49    PCYT2           -0.5158    1.24e-37     NEW
+  50    ACSL1           -0.5108    7.89e-37     NEW
+
+  NOVEL HITS — DETAIL:
+  Gene                  r           p  direction
+  -------------- --------  ----------  ------------
+  SLC13A2         -0.6414    3.18e-63  ↓ shallower
+  LOXL2           +0.6312    1.04e-60  ↑ deeper
+  RUNX1           +0.6255    2.56e-59  ↑ deeper
+  SUCLG1          -0.6144    9.88e-57  ↓ shallower
+  NAP1L1          +0.6109    6.00e-56  ↑ deeper
+  LDHD            -0.5938    3.38e-52  ↓ shallower
+  CYP17A1         -0.5921    7.97e-52  ↓ shallower
+  ABAT            -0.5902    1.97e-51  ↓ shallower
+  CAV1            +0.5891    3.42e-51  ↑ deeper
+  OGDHL           -0.5844    3.18e-50  ↓ shallower
+  ATP5A1          -0.5822    9.01e-50  ↓ shallower
+  GOT1            -0.5820    1.01e-49  ↓ shallower
+  CTHRC1          +0.5774    8.41e-49  ↑ deeper
+  ENAM            -0.5762    1.47e-48  ↓ shallower
+  LOX             +0.5737    4.61e-48  ↑ deeper
+  AIFM1           -0.5724    8.35e-48  ↓ shallower
+  PECI            -0.5670    9.65e-47  ↓ shallower
+  TMEM171         -0.5666    1.12e-46  ↓ shallower
+  FAM115C         +0.5636    4.28e-46  ↑ deeper
+  ACAT1           -0.5624    7.39e-46  ↓ shallower
+  IVD             -0.5597    2.40e-45  ↓ shallower
+  PEPD            -0.5580    4.90e-45  ↓ shallower
+  TGFBI           +0.5576    5.94e-45  ↑ deeper
+  HIBCH           -0.5533    3.71e-44  ↓ shallower
+  SEPHS2          -0.5526    4.99e-44  ↓ shallower
+  PLOD2           +0.5526    5.05e-44  ↑ deeper
+  TST             -0.5517    7.31e-44  ↓ shallower
+  HSDL2           -0.5512    9.12e-44  ↓ shallower
+  BPHL            -0.5506    1.16e-43  ↓ shallower
+  OSTBETA         -0.5501    1.48e-43  ↓ shallower
+  ACY1            -0.5484    2.92e-43  ↓ shallower
+  IFI16           +0.5467    6.10e-43  ↑ deeper
+  PCCA            -0.5458    8.87e-43  ↓ shallower
+  SLC43A3         +0.5455    9.91e-43  ↑ deeper
+  ALDH1L1         -0.5453    1.07e-42  ↓ shallower
+  SHC1            +0.5450    1.22e-42  ↑ deeper
+  RUNX2           +0.5420    4.27e-42  ↑ deeper
+  HMGCS2          -0.5402    8.64e-42  ↓ shallower
+  CRAT            -0.5400    9.71e-42  ↓ shallower
+  GLT25D1         +0.5375    2.62e-41  ↑ deeper
+  STC1            +0.5355    5.97e-41  ↑ deeper
+  ITGA5           +0.5350    7.12e-41  ↑ deeper
+  PANK1           -0.5348    7.83e-41  ↓ shallower
+  AQP7            -0.5346    8.31e-41  ↓ shallower
+  SPRYD4          -0.5345    8.76e-41  ↓ shallower
+  ENO2            +0.5342    1.01e-40  ↑ deeper
+  SEMA4B          +0.5339    1.10e-40  ↑ deeper
+  RNF24           +0.5332    1.45e-40  ↑ deeper
+  AGPAT9          -0.5326    1.87e-40  ↓ shallower
+  MSRA            -0.5318    2.57e-40  ↓ shallower
+  CBARA1          -0.5312    3.22e-40  ↓ shallower
+  ACO2            -0.5309    3.63e-40  ↓ shallower
+  SLC2A14         +0.5299    5.47e-40  ↑ deeper
+  WDR72           -0.5294    6.74e-40  ↓ shallower
+  CCDC64          -0.5293    6.94e-40  ↓ shallower
+  OSMR            +0.5286    8.99e-40  ↑ deeper
+  TOLLIP          -0.5282    1.07e-39  ↓ shallower
+  ALDH1B1         -0.5278    1.25e-39  ↓ shallower
+  IGFBP3          +0.5264    2.18e-39  ↑ deeper
+  PAH             -0.5252    3.43e-39  ↓ shallower
+  NRD1            +0.5243    4.76e-39  ↑ deeper
+  QDPR            -0.5243    4.84e-39  ↓ shallower
+  CSDA            +0.5238    5.97e-39  ↑ deeper
+  EPHX2           -0.5230    7.96e-39  ↓ shallower
+  CHSY1           +0.5218    1.25e-38  ↑ deeper
+  CDCA7L          +0.5217    1.32e-38  ↑ deeper
+  LOC154761       +0.5203    2.21e-38  ↑ deeper
+  IL1RAP          +0.5197    2.78e-38  ↑ deeper
+  PEBP1           -0.5189    3.83e-38  ↓ shallower
+  SERPINB8        +0.5181    5.22e-38  ↑ deeper
+  C2orf24         -0.5173    6.96e-38  ↓ shallower
+  PCYT2           -0.5158    1.24e-37  ↓ shallower
+  SERPINE1        +0.5155    1.40e-37  ↑ deeper
+  ARL4C           +0.5133    3.09e-37  ↑ deeper
+  TRAM2           +0.5112    6.89e-37  ↑ deeper
+  ACSL1           -0.5108    7.89e-37  ↓ shallower
+  ETFA            -0.5101    1.04e-36  ↓ shallower
+  DHRS11          -0.5099    1.10e-36  ↓ shallower
+  EFNA3           +0.5098    1.16e-36  ↑ deeper
+  ABHD6           -0.5075    2.70e-36  ↓ shallower
+  MYOF            +0.5068    3.47e-36  ↑ deeper
+  ALDH4A1         -0.5041    9.28e-36  ↓ shallower
+  COQ9            -0.5035    1.13e-35  ↓ shallower
+  TACO1           -0.5016    2.25e-35  ↓ shallower
+  SAP30           +0.5014    2.42e-35  ↑ deeper
+  TMEM174         -0.5011    2.70e-35  ↓ shallower
+  C1orf210        -0.5009    2.91e-35  ↓ shallower
+  AUH             -0.5008    2.99e-35  ↓ shallower
+  CLCN5           -0.5004    3.44e-35  ↓ shallower
+  SLC22A13        -0.5001    3.92e-35  ↓ shallower
+  PTPN3           -0.5000    3.99e-35  ↓ shallower
+
+=================================================================
+MODULE B — CO-EXPRESSION MODULE DISCOVERY (NMF)
+Data-driven. No panel assumption.
+=================================================================
+  NMF input: top 150 depth-correlated genes
+
+  NMF k=2...
+    Component 1: top genes = ['TGFBI', 'LOX', 'ENO2', 'CTHRC1', 'ADAM12']
+    Component 2: top genes = ['PCK1', 'ALDOB', 'MIOX', 'SLC22A6', 'HMGCS2']
+    r(component, depth):
+      C1: r=+0.8496 p=<1e-100 ↑ depth
+      C2: r=-0.8242 p=<1e-100 ↓ depth
+    Reconstruction error: 290.5322
+
+  NMF k=3...
+    Component 1: top genes = ['TGFBI', 'LOX', 'ENO2', 'CTHRC1', 'ADAM12']
+    Component 2: top genes = ['OGDHL', 'WDR72', 'ALDH1L1', 'LDHD', 'ENAM']
+    Component 3: top genes = ['ALDOB', 'SLC22A6', 'MIOX', 'PCK1', 'TMEM174']
+    r(component, depth):
+      C1: r=+0.8510 p=<1e-100 ↑ depth
+      C2: r=-0.3610 p=6.96e-18 ↓ depth
+      C3: r=-0.6496 p=2.47e-65 ↓ depth
+    Reconstruction error: 268.1711
+
+  NMF k=4...
+    Component 1: top genes = ['TGFBI', 'LOX', 'ENO2', 'ADAM12', 'CTHRC1']
+    Component 2: top genes = ['OGDHL', 'WDR72', 'ALDH1L1', 'LDHD', 'ENAM']
+    Component 3: top genes = ['ALDOB', 'PAH', 'SLC22A6', 'SLC22A8', 'FABP1']
+    Component 4: top genes = ['PCK1', 'ALDH1L1', 'MIOX', 'WDR72', 'TMEM174']
+    r(component, depth):
+      C1: r=+0.7137 p=2.61e-84 ↑ depth
+      C2: r=-0.4410 p=8.05e-27 ↓ depth
+      C3: r=-0.7249 p=3.50e-88 ↓ depth
+      C4: r=-0.3170 p=6.25e-14 ↓ depth
+    Reconstruction error: 254.3943
+
+  NMF k=5...
+    Component 1: top genes = ['TGFBI', 'LOX', 'ENO2', 'ADAM12', 'CTHRC1']
+    Component 2: top genes = ['OGDHL', 'WDR72', 'ALDH1L1', 'LDHD', 'ENAM']
+    Component 3: top genes = ['ALDOB', 'FABP1', 'PAH', 'SLC22A8', 'SLC22A6']
+    Component 4: top genes = ['HMGCS2', 'PCK1', 'WDR72', 'ALDOB', 'PAH']
+    Component 5: top genes = ['MIOX', 'TMEM174', 'ALDH1L1', 'CCDC64', 'OGDHL']
+    r(component, depth):
+      C1: r=+0.7290 p=1.23e-89 ↑ depth
+      C2: r=-0.4217 p=1.97e-24 ↓ depth
+      C3: r=-0.7133 p=3.60e-84 ↓ depth
+      C4: r=-0.2605 p=9.95e-10 ↓ depth
+      C5: r=-0.4044 p=2.00e-22 ↓ depth
+    Reconstruction error: 243.3807
+
+  HIERARCHICAL CLUSTERING (top 60 depth genes):
+  Clustering failed: Distance matrix 'X' must be symmetric.
+
+=================================================================
+MODULE C — FULL IMMUNE ARCHITECTURE
+Complete immune geometry vs depth.
+=================================================================
+
+  Gene           r(depth)           p  tier  cell_type
+  ------------ ----------  ----------  -----  ---------------
+  TGFB1           +0.5179    5.65e-38     T1  Immunosuppressive
+  LEF1            +0.4050    1.68e-22     T1  T-naive
+  IL2RA           +0.3571    1.66e-17     T2  Treg
+  CD276           +0.3437    2.97e-16     T2  B7-H3
+  NCAM1           +0.3317    3.50e-15     T2  NK
+  FCGR3A          +0.3211    2.82e-14     T2  NK/Mono
+  FOXP3           +0.3089    2.84e-13     T2  Treg
+  ENTPD1          +0.2965    2.67e-12     T2  Exhaustion
+  CD80            +0.2841    2.26e-11     T2  B7-1
+  FCGR1A          +0.2840    2.29e-11     T2  Mono/Macro
+  MKI67           +0.2836    2.45e-11     T2  Proliferation
+  LGALS9          +0.2826    2.93e-11     T2  Gal9
+  TNFRSF18        +0.2623    7.52e-10     T2  Treg
+  CD163           +0.2607    9.65e-10     T2  M2-Macro
+  CXCL13          +0.2580    1.44e-09     T2  Exhaustion
+  LAMP3           +0.2570    1.68e-09     T2  mDC
+  PDCD1LG2        +0.2549    2.28e-09     T2  PDL2
+  CD68            +0.2449    9.86e-09     T3  Macrophage
+  CTLA4           +0.2336    4.75e-08     T3  Exhaustion
+  CD4             +0.2284    9.51e-08     T3  CD4-T
+  IL10            +0.2220    2.19e-07     T3  Immunosuppressive
+  CD86            +0.2211    2.44e-07     T3  B7-2
+  TIGIT           +0.2189    3.24e-07     T3  Exhaustion
+  MSR1            +0.2142    5.86e-07     T3  M2-Macro
+  CSF1R           +0.1971    4.46e-06     T3  Macrophage
+  LAG3            +0.1933    6.83e-06     T3  Exhaustion
+  GZMB            +0.1869    1.38e-05     T3  Cytotoxic
+  S100A9          +0.1861    1.51e-05     T3  MDSC/Mono
+  CD2             +0.1811    2.55e-05     T3  T-cell
+  IFNG            +0.1779    3.54e-05     T3  Th1
+  IKZF2           +0.1777    3.65e-05     T3  Treg
+  TYROBP          +0.1747    4.91e-05     T3  NK/Macro
+  CCR7            +0.1721    6.39e-05     T3  mDC
+  IL7R            +0.1712    6.97e-05     T3  T-mem
+  CD3E            +0.1684    9.25e-05     T3  T-cell
+  KLRK1           +0.1681    9.51e-05     T3  NK
+  CD3G            +0.1660      0.0001     T3  T-cell
+  CD3D            +0.1653      0.0001     T3  T-cell
+  CD8A            +0.1596      0.0002     T3  CD8-T
+  S100A8          +0.1574      0.0003     T3  MDSC/Mono
+  FASLG           +0.1562      0.0003     T3  Cytotoxic
+  CD79A           +0.1523      0.0004     T3  B-cell
+  CD19            +0.1457      0.0007     T3  B-cell
+  KLRB1           +0.1420      0.0010     T3  NK
+  MS4A1           +0.1376      0.0014     T3  B-cell
+  GZMK            +0.1305      0.0025     T3  Cytotoxic
+  PRF1            +0.1294      0.0027     T3  Cytotoxic
+  PDCD1           +0.1293      0.0028     T3  Exhaustion
+  ITGAM           +0.1265      0.0034     T3  Monocyte
+  GZMA            +0.1162      0.0072     T3  Cytotoxic
+  TOX             +0.1154      0.0076     T3  Exhaustion
+  NKG7            +0.1147      0.0080     T3  NK/CTL
+  CPA3            +0.1049      0.0153     T3  Mast
+  KLRD1           +0.0997      0.0212         NK
+  IL1B            +0.0982      0.0233         Inflammatory
+  CD8B            +0.0968      0.0252         CD8-T
+  NCR3            +0.0922      0.0331         NK
+  MRC1            +0.0919      0.0337         M2-Macro
+  ITGAX           +0.0843      0.0516         DC
+  TAPBP           +0.0802      0.0640         Ag-present
+  MS4A2           +0.0791      0.0677         Mast
+  XCR1            +0.0749      0.0837         cDC1
+  TNF             +0.0536      0.2165         Th1
+  TAP1            +0.0529      0.2224         Ag-present
+  CD79B           +0.0509      0.2399         B-cell
+  NCR1            +0.0476      0.2726         NK
+  TCF7            +0.0372      0.3905         T-naive
+  HLA-B           -0.0287      0.5084         MHC-I
+  HLA-C           -0.0590      0.1733         MHC-I
+  HLA-A           -0.0765      0.0774         MHC-I
+  B2M             -0.0918      0.0340         MHC-I
+  CCL17           -0.0936      0.0305         mDC
+  CD274           -0.0962      0.0262         PDL1
+  CLEC9A          -0.1063      0.0140     T3  cDC1
+  HAVCR2          -0.1095      0.0113     T3  Exhaustion
+  KIT             -0.1390      0.0013     T3  Mast
+  CD1C            -0.1423      0.0010     T3  cDC2
+  CEACAM1         -0.3217    2.52e-14     T2  Checkpoint
+
+  KEY STRUCTURAL FINDINGS:
+  Checkpoint axis:
+    CD274        r=-0.0962 p=0.0262
+    PDCD1        r=+0.1293 p=0.0028
+    LAG3         r=+0.1933 p=6.83e-06
+    HAVCR2       r=-0.1095 p=0.0113
+    TIGIT        r=+0.2189 p=3.24e-07
+    CTLA4        r=+0.2336 p=4.75e-08
+    PDCD1LG2     r=+0.2549 p=2.28e-09
+    CD80         r=+0.2841 p=2.26e-11
+    CD86         r=+0.2211 p=2.44e-07
+  Cytotoxic / effector arm:
+    CD8A         r=+0.1596 p=0.0002
+    GZMB         r=+0.1869 p=1.38e-05
+    PRF1         r=+0.1294 p=0.0027
+    NKG7         r=+0.1147 p=0.0080
+    IFNG         r=+0.1779 p=3.54e-05
+    GZMA         r=+0.1162 p=0.0072
+    GZMK         r=+0.1305 p=0.0025
+    FASLG        r=+0.1562 p=0.0003
+  Suppressive arm:
+    FOXP3        r=+0.3089 p=2.84e-13
+    IL10         r=+0.2220 p=2.19e-07
+    TGFB1        r=+0.5179 p=5.65e-38
+    CD163        r=+0.2607 p=9.65e-10
+    MRC1         r=+0.0919 p=0.0337
+    IL2RA        r=+0.3571 p=1.66e-17
+    S100A8       r=+0.1574 p=0.0003
+    S100A9       r=+0.1861 p=1.51e-05
+  Antigen presentation:
+    HLA-A        r=-0.0765 p=0.0774
+    HLA-B        r=-0.0287 p=0.5084
+    HLA-C        r=-0.0590 p=0.1733
+    B2M          r=-0.0918 p=0.0340
+    TAP1         r=+0.0529 p=0.2224
+    TAPBP        r=+0.0802 p=0.0640
+
+  CD274 × FOXP3 INDEPENDENCE TEST:
+  r(CD274,FOXP3) = +0.1293  p=0.0028  INDEPENDENT
+  r(CD8A,FOXP3) = +0.6074  p=3.69e-55  COUPLED
+  r(CD274,CD8A) = +0.2054  p=1.69e-06  WEAK
+  r(CD8A,CD274) = +0.2054  p=1.69e-06  WEAK
+  r(GZMB,FOXP3) = +0.4158  p=9.77e-24  COUPLED
+
+=================================================================
+MODULE D — TUMOUR PURITY TEST
+Does depth survive purity?
+=================================================================
+  Proxy scores vs depth:
+  Immune score proxy  : r(vs depth)=+0.2234  p=1.82e-07
+  Stromal score proxy : r(vs depth)=+0.4814  p=2.51e-32
+  Tumour score proxy  : r(vs depth)=+0.9214  p=<1e-100
+
+  PURITY INTERPRETATION:
+  r(immune, depth) > 0 —
+  MORE immune infiltration in
+  deeper tumours.
+  Depth score may conflate
+  tumour and immune biology.
+
+  Cross-correlations:
+  r(immune, stromal)    = +0.3004  p=1.35e-12
+  r(immune, tumour)     = +0.2880  p=1.16e-11
+  r(stromal, tumour)    = +0.5372  p=3.01e-41
+
+=================================================================
+MODULE E — CORRELATION NETWORK
+Hub genes = landscape nodes.
+=================================================================
+  Network: 40 genes
+  Computing 800 pairwise correlations...
+
+  HUB GENES (by mean |r| with top-40 network):
+  Rank  Gene            hub_score   depth_r  novel
+  ----- -------------- ---------- --------- ------
+  1     RUNX1              0.5167   +0.6255    NEW
+  2     ACAT1              0.4949   -0.5624    NEW
+  3     GOT1               0.4938   -0.5820    NEW
+  4     TMEM171            0.4848   -0.5666    NEW
+  5     LOXL2              0.4814   +0.6312    NEW
+  6     HIBCH              0.4676   -0.5533    NEW
+  7     CTHRC1             0.4653   +0.5774    NEW
+  8     IVD                0.4640   -0.5597    NEW
+  9     NAP1L1             0.4607   +0.6109    NEW
+  10    SUCLG1             0.4607   -0.6144    NEW
+  11    AIFM1              0.4564   -0.5724    NEW
+  12    LDHD               0.4548   -0.5938    NEW
+  13    IFI16              0.4546   +0.5467    NEW
+  14    OGDHL              0.4535   -0.5844    NEW
+  15    HSDL2              0.4517   -0.5512    NEW
+  16    TGFBI              0.4506   +0.5576    NEW
+  17    PCCA               0.4480   -0.5458    NEW
+  18    ATP5A1             0.4455   -0.5822    NEW
+  19    BPHL               0.4444   -0.5506    NEW
+  20    PECI               0.4380   -0.5670    NEW
+
+  STRONGEST EDGES (|r| > 0.70):
+  Gene A         Gene B                r  type
+  -------------- -------------- --------  ----------
+  RUNX1          TGFBI           +0.7656  CO-ACTIVATE
+  SUCLG1         ATP5A1          +0.7361  CO-ACTIVATE
+  GOT1           ACAT1           +0.7219  CO-ACTIVATE
+  RUNX1          ACAT1           -0.7213  OPPOSE
+  ACAT1          HIBCH           +0.7188  CO-ACTIVATE
+  ACAT1          PCCA            +0.7174  CO-ACTIVATE
+  TST            ACY1            +0.7151  CO-ACTIVATE
+  ATP5A1         GOT1            +0.7145  CO-ACTIVATE
+  SLC22A8        SLC22A6         +0.7065  CO-ACTIVATE
+  PEPD           ACY1            +0.7063  CO-ACTIVATE
+
+=================================================================
+MODULE F — UNSUPERVISED CLUSTERING
+Do the data contain natural subgroups beyond depth?
+=================================================================
+
+  k-means k=2:
+    Inertia: 22748.56
+    Cluster 1: n=232  depth_mean=0.7183  ±0.0715
+    Cluster 2: n=302  depth_mean=0.5825  ±0.0889
+    MWU depth C1 vs C2: p=2.71e-58
+    Clusters ARE depth-stratified.
+    Top marker genes (mean difference):
+    C1 UP:   ['TGFBI', 'CTHRC1', 'LOX', 'RUNX1', 'LOXL2']
+    C1 DOWN: ['SLC22A6', 'HMGCS2', 'ALDOB', 'G6PC', 'SLC22A8']
+    C2 UP:   ['SLC22A6', 'HMGCS2', 'ALDOB', 'G6PC', 'SLC22A8']
+    C2 DOWN: ['TGFBI', 'CTHRC1', 'LOX', 'RUNX1', 'LOXL2']
+
+  k-means k=3:
+    Inertia: 19643.03
+    Cluster 1: n=287  depth_mean=0.6083  ±0.0662
+    Cluster 2: n=43  depth_mean=0.4522  ±0.1019
+    Cluster 3: n=204  depth_mean=0.7280  ±0.0665
+    Top marker genes (mean difference):
+    C1 UP:   ['SLC22A6', 'ALDOB', 'HMGCS2', 'G6PC', 'SLC22A8']
+    C1 DOWN: ['TGFBI', 'CTHRC1', 'RUNX1', 'SEMA4B', 'RUNX2']
+    C2 UP:   ['CYP17A1', 'OGDHL', 'LDHD', 'ENAM', 'AGPAT9']
+    C2 DOWN: ['LOX', 'TGFBI', 'STC1', 'CTHRC1', 'SLC2A3']
+    C3 UP:   ['TGFBI', 'CTHRC1', 'LOX', 'RUNX1', 'LOXL2']
+    C3 DOWN: ['SLC22A6', 'HMGCS2', 'ALDOB', 'G6PC', 'SLC22A8']
+
+  k-means k=4:
+    Inertia: 18055.71
+    Cluster 1: n=161  depth_mean=0.7439  ±0.0612
+    Cluster 2: n=202  depth_mean=0.6437  ±0.0542
+    Cluster 3: n=28  depth_mean=0.4242  ±0.1051
+    Cluster 4: n=143  depth_mean=0.5656  ±0.0676
+    Top marker genes (mean difference):
+    C1 UP:   ['TGFBI', 'CTHRC1', 'LOX', 'RUNX1', 'LOXL2']
+    C1 DOWN: ['SLC22A6', 'HMGCS2', 'ALDOB', 'G6PC', 'ALDH1L1']
+    C2 UP:   ['SLC22A6', 'ALDOB', 'ALDH1L1', 'G6PC', 'HMGCS2']
+    C2 DOWN: ['SLC13A2', 'CYP17A1', 'SUCLG1', 'SEMA4B', 'ACY1']
+    C3 UP:   ['CYP17A1', 'OGDHL', 'LDHD', 'AGPAT9', 'ENAM']
+    C3 DOWN: ['LOX', 'TGFBI', 'STC1', 'ENO2', 'SLC2A1']
+
+  k-means k=5:
+    Inertia: 17236.19
+    Cluster 1: n=181  depth_mean=0.6192  ±0.0539
+    Cluster 2: n=107  depth_mean=0.7633  ±0.0595
+    Cluster 3: n=142  depth_mean=0.6771  ±0.0558
+    Cluster 4: n=78  depth_mean=0.5303  ±0.0775
+    Cluster 5: n=26  depth_mean=0.4348  ±0.0969
+    Top marker genes (mean difference):
+    C1 UP:   ['SLC22A6', 'ALDOB', 'HMGCS2', 'G6PC', 'SLC22A8']
+    C1 DOWN: ['TGFBI', 'CTHRC1', 'RUNX1', 'PLOD2', 'SEMA4B']
+    C2 UP:   ['TGFBI', 'CTHRC1', 'LOXL2', 'LOX', 'RUNX1']
+    C2 DOWN: ['SLC22A6', 'HMGCS2', 'ALDOB', 'G6PC', 'ALDH1L1']
+    C3 UP:   ['TGFBI', 'LOX', 'CTHRC1', 'STC1', 'RUNX1']
+    C3 DOWN: ['SLC22A8', 'SLC13A2', 'SLC22A6', 'HMGCS2', 'CYP17A1']
+
+=================================================================
+MODULE G — NORMAL FIELD EFFECT
+Does normal tissue variation predict tumour depth?
+=================================================================
+  Matched normal-tumour pairs: 72
+
+  r(normal_expr, paired_tumour_depth):
+  Gene                  r           p  interpretation
+  -------------- --------  ----------  --------------------
+  FBP1            +0.0046      0.9691  No field effect
+  SLC22A6         -0.1741      0.1436  Field effect: weak
+  AQP1            +0.1898      0.1102  Field effect: weak
+  G6PC            -0.1057      0.3769  No field effect
+  SLC34A1         -0.0773      0.5188  No field effect
+  UMOD            +0.3620      0.0018  Field effect: YES
+  AGXT            -0.1032      0.3883  No field effect
+  PCK1            -0.0586      0.6251  No field effect
+  GATM            -0.0803      0.5027  No field effect
+  PAX8            +0.3256      0.0052  Field effect: YES
+  CA9             -0.3693      0.0014  Field effect: YES
+  VEGFA           -0.3257      0.0052  Field effect: YES
+  VIM             -0.3750      0.0012  Field effect: YES
+  EZH2            -0.0684      0.5680  No field effect
+  HDAC1           +0.1815      0.1270  Field effect: weak
+  ACTA2           -0.2394      0.0428  Field effect: weak
+
+  FIELD EFFECT CONFIRMED:
+  5 genes show r >= 0.30 between normal expression and paired tumour depth.
+  The landscape begins in the normal tissue.
+  Pre-malignant PT state predicts tumour depth.
+
+=================================================================
+MODULE H — SPLICING FACTOR SCAN
+Are RNA splicing regulators lost in deep ccRCC?
+=================================================================
+
+  Gene           r(depth)           p  direction
+  ------------ ----------  ----------  ---------------
+  ELAVL1          -0.1863    1.47e-05  ↓ shallower
+  ESRP1           -0.1579      0.0002  ↓ shallower
+  ELAVL2          -0.1530      0.0004  ↓ shallower
+  UPF1            -0.1427      0.0009  ↓ shallower
+  ESRP2           -0.1299      0.0026  ↓ shallower
+  DDX5            -0.0479      0.2688  ↓ shallower
+  DHX9            -0.0376      0.3856  ↓ shallower
+  NOVA1           -0.0253      0.5594  ↓ shallower
+  SF3B2           -0.0251      0.5628  ↓ shallower
+  HNRNPM          +0.0005      0.9899  ↑ deeper
+  SF3A1           +0.0235      0.5884  ↑ deeper
+  SRPK1           +0.0330      0.4467  ↑ deeper
+  TRA2B           +0.0541      0.2121  ↑ deeper
+  HNRNPC          +0.0679      0.1169  ↑ deeper
+  U2AF2           +0.0700      0.1061  ↑ deeper
+  HNRNPA2B1       +0.0932      0.0312  ↑ deeper
+  HNRNPD          +0.0949      0.0283  ↑ deeper
+  DDX17           +0.0980      0.0236  ↑ deeper
+  CLK3            +0.1010      0.0195  ↑ deeper
+  PTBP1           +0.1040      0.0162  ↑ deeper
+  SRPK2           +0.1108      0.0104  ↑ deeper
+  SF3A2           +0.1170      0.0068  ↑ deeper
+  HNRNPL          +0.1177      0.0065  ↑ deeper
+  SF3B1           +0.1257      0.0036  ↑ deeper
+  U2AF1           +0.1344      0.0019  ↑ deeper
+  CLK4            +0.1448      0.0008  ↑ deeper
+  CLK1            +0.1457      0.0007  ↑ deeper
+  NOVA2           +0.1579      0.0003  ↑ deeper
+  PTBP2           +0.1755    4.54e-05  ↑ deeper
+  TRA2A           +0.2069    1.43e-06  ↑ deeper
+  CLK2            +0.2091    1.09e-06  ↑ deeper
+  UPF2            +0.2102    9.54e-07  ↑ deeper
+  MBNL2           +0.2125    7.25e-07  ↑ deeper
+  KHSRP           +0.2169    4.20e-07  ↑ deeper
+  UPF3B           +0.2200    2.83e-07  ↑ deeper
+  SF3B3           +0.2336    4.75e-08  ↑ deeper
+  MBNL1           +0.2391    2.22e-08  ↑ deeper
+  HNRNPA1         +0.2738    1.24e-10  ↑ deeper
+  QKI             +0.2967    2.61e-12  ↑ deeper
+  SF3A3           +0.3238    1.69e-14  ↑ deeper
+
+  Splicing factors LOST in deep ccRCC (r<-0.20): 0
+  Splicing factors GAINED in deep ccRCC (r>+0.20): 11
+  ['TRA2A', 'CLK2', 'UPF2', 'MBNL2', 'KHSRP', 'UPF3B', 'SF3B3', 'MBNL1', 'HNRNPA1', 'QKI', 'SF3A3']
+
+  ESRP1 r = -0.1579 (confirmed from S3: ESRP1=-0.158, ESRP2=-0.130)
+
+  ESRP2 r = -0.1299 (confirmed from S3: ESRP1=-0.158, ESRP2=-0.130)
+
+  SF3B1 r = +0.1257
+  SF3B1 flat — splicing mechanism differs from ICC.
+
+=================================================================
+VALIDATION — novel hits in GEO
+=================================================================
+Loading GSE53757 for validation...
+  GEO genes=27, tumours=72
+
+  Gene             r_TCGA    r_GEO  cross_dataset
+  -------------- -------- --------  ---------------
+  SLC13A2         -0.6414  -0.5591  CONSISTENT ✓
+  LOXL2           +0.6312  +0.1661  WEAK/NA
+  RUNX1           +0.6255       NA  (not in GEO)
+  SUCLG1          -0.6144  -0.4269  CONSISTENT ✓
+  NAP1L1          +0.6109  +0.5785  CONSISTENT ✓
+  LDHD            -0.5938  -0.4766  CONSISTENT ✓
+  CYP17A1         -0.5921  -0.3587  CONSISTENT ✓
+  ABAT            -0.5902  -0.6119  CONSISTENT ✓
+  CAV1            +0.5891  +0.5893  CONSISTENT ✓
+  OGDHL           -0.5844  -0.6122  CONSISTENT ✓
+  ATP5A1          -0.5822  -0.2383  CONSISTENT ✓
+  GOT1            -0.5820  -0.3571  CONSISTENT ✓
+  CTHRC1          +0.5774  +0.4650  CONSISTENT ✓
+  ENAM            -0.5762  -0.5384  CONSISTENT ✓
+  LOX             +0.5737  +0.5948  CONSISTENT ✓
+  AIFM1           -0.5724  -0.2819  CONSISTENT ✓
+  PECI            -0.5670       NA  (not in GEO)
+  TMEM171         -0.5666  -0.3514  CONSISTENT ✓
+  FAM115C         +0.5636  -0.0488  INCONSISTENT ✗
+  ACAT1           -0.5624  -0.3509  CONSISTENT ✓
+  IVD             -0.5597  -0.2192  CONSISTENT ✓
+  PEPD            -0.5580  -0.3439  CONSISTENT ✓
+  TGFBI           +0.5576  +0.5574  CONSISTENT ✓
+  HIBCH           -0.5533  -0.4161  CONSISTENT ✓
+  SEPHS2          -0.5526  -0.1550  WEAK/NA
+  PLOD2           +0.5526  +0.6605  CONSISTENT ✓
+  TST             -0.5517  -0.3766  CONSISTENT ✓
+  HSDL2           -0.5512  -0.3575  CONSISTENT ✓
+  BPHL            -0.5506  -0.4612  CONSISTENT ✓
+  OSTBETA         -0.5501       NA  (not in GEO)
+
+Generating Script 4 figure...
+  Figure saved: ./ccrcc_false_attractor/results_s4/figure_s4.png
+
+=================================================================
+SCRIPT 4 COMPLETE
+=================================================================
+  field_effect.csv                                         747 bytes
+  figure_s4.png                                         384022 bytes
+  genome_scan_full.csv                                 1475870 bytes
+  immune_scan.csv                                         3682 bytes
+  network_corr.csv                                       31360 bytes
+  splicing_scan.csv                                       1908 bytes
+
+  NEXT: paste full output.
+  Write document 94d.
+  The landscape is what the data
+  shows, not what was predicted.

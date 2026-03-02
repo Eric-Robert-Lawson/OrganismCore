@@ -1,0 +1,30 @@
+gene_a,gene_b,r,p,p_fmt,status,expected,verdict,meaning
+SCD,CPT1A,-0.0868,0.04499446794809233,0.0450,BROKEN,negative,✓,FAO suppressed as lipid synthesis rises
+SCD,ACLY,0.2062,1.5455870552320112e-06,1.55e-06,WEAK,positive,✓,SCD and ACLY co-drive lipid false attractor
+SCD,PLIN2,0.4168,7.38406478203698e-24,7.38e-24,CONNECTED,positive,✓,Lipid droplet formation tracks desaturation
+SCD,FBP1,0.0309,0.4759637743619871,0.4760,BROKEN,negative,✗,Gluconeogenesis loss as lipid synthesis gains
+VIM,FBP1,-0.0841,0.05217318488664585,0.0522,BROKEN,negative,✓,PT identity loss and mesenchymal shift inversely coupled
+VIM,SLC34A1,-0.0219,0.6142077203435059,0.6142,BROKEN,negative,✓,PT transporter loss as mesenchymal shift gains
+VIM,TGFB1,0.6519,6.417477956468516e-66,6.42e-66,CONNECTED,positive,✓,TGF-β1 drives vimentin in mesenchymal shift
+VIM,SNAI1,0.3582,1.3106583922619683e-17,1.31e-17,WEAK,positive,✓,SNAI1 drives vimentin expression
+TGFB1,FAP,0.5268,1.8331416266545063e-39,1.83e-39,CONNECTED,positive,✓,TGF-β1 activates CAFs
+TGFB1,COL1A1,0.576,1.580953887525154e-48,1.58e-48,CONNECTED,positive,✓,TGF-β1 drives collagen deposition
+FAP,COL1A1,0.884,7.90672464487695e-178,7.91e-178,CONNECTED,positive,✓,FAP-positive CAFs deposit collagen
+TGFB1,ACTA2,0.4674,2.463188858717132e-30,2.46e-30,CONNECTED,positive,✓,TGF-β1 drives myofibroblast activation
+TGFB1,FOXP3,0.3834,3.839836961081308e-20,3.84e-20,WEAK,positive,✓,TGF-β1 drives Treg expansion
+CD68,FOXP3,0.5254,3.1964847495735325e-39,3.20e-39,CONNECTED,positive,✓,Macrophage and Treg infiltration coupled
+CD274,FOXP3,0.1293,0.002760902217324717,0.0028,BROKEN,positive,✓,PD-L1 and Treg immunosuppression coupled
+EPAS1,SLC2A1,0.2819,3.2447720954769626e-11,3.24e-11,WEAK,positive,✓,EPAS1 directly activates GLUT1
+EPAS1,SCD,0.0184,0.671119778106769,0.6711,BROKEN,positive,✓,EPAS1 drives lipid synthesis
+EPAS1,LDHA,0.1749,4.81290330809638e-05,4.81e-05,BROKEN,positive,✓,EPAS1 drives lactate production
+VHL,EPAS1,-0.0086,0.8434481617661415,0.8434,BROKEN,negative,✓,VHL degrades EPAS1 — post-translational break
+MTOR,PTEN,0.0873,0.04370121241068909,0.0437,BROKEN,negative,✗,PTEN suppresses mTOR
+MTOR,MYC,0.0249,0.5657668682084228,0.5658,BROKEN,positive,✓,mTOR drives MYC translation
+MYC,SLC2A1,0.4337,6.670171701665457e-26,6.67e-26,CONNECTED,positive,✓,MYC drives GLUT1 co-regulation
+MYC,LDHA,0.3492,9.300987285614784e-17,9.30e-17,WEAK,positive,✓,MYC drives glycolytic gene expression
+EZH2,FBP1,-0.1048,0.01544558660541236,0.0154,BROKEN,negative,✓,EZH2 silences gluconeogenic genes
+EZH2,SLC34A1,0.0189,0.6628970075101326,0.6629,BROKEN,negative,✗,EZH2 silences PT identity
+EZH2,VIM,0.2367,3.098845345094279e-08,3.10e-08,WEAK,positive,✓,EZH2 maintains mesenchymal state
+PAX8,SLC34A1,0.1413,0.0010598713572348404,0.0011,BROKEN,positive,✓,PAX8 drives PT identity
+PAX8,FBP1,0.2317,6.123578591779392e-08,6.12e-08,WEAK,positive,✓,PAX8 drives gluconeogenic identity
+PAX2,PAX8,0.3753,2.6362448358911037e-19,2.64e-19,WEAK,positive,✓,PAX2 and PAX8 co-expressed in renal identity

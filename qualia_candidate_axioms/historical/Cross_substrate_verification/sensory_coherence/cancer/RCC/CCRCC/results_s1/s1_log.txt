@@ -1,0 +1,353 @@
+OrganismCore — ccRCC False Attractor
+Script 1 v3 — Protocol-Compliant
+Document 94 | 2026-03-02
+
+PROTOCOL ORDER (canonical):
+  1. saddle_analysis()
+     → per-gene tumour vs normal
+     → produces saddle_res
+  2. build_depth_score(saddle_res)
+     → uses CONFIRMED genes only
+     → fallback to full panel if <2
+  3. depth_correlations()
+     → Pearson r, every panel gene
+     → THE DISCOVERY
+  4. gap_tests()
+     → circuit topology
+     → BROKEN = intervention point
+
+============================================================
+DOWNLOAD
+============================================================
+  Trying: https://tcga-xena-hub.s3.us-east-1.amazonaws.com/download/TCGA.KIRC.sampleMap%2FHiSeqV2.gz
+  OK: 30.9 MB → ./ccrcc_false_attractor/TCGA_KIRC_HiSeqV2.gz
+  Trying: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE53nnn/GSE53757/matrix/GSE53757_series_matrix.txt.gz
+  OK: 31.3 MB → ./ccrcc_false_attractor/GSE53757_series_matrix.txt.gz
+  Trying: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GPL570&targ=self&form=text&view=full
+  OK: 81.6 MB → ./ccrcc_false_attractor/GPL570_soft.txt
+
+============================================================
+GPL570
+============================================================
+  GPL570 probes: 45782
+
+════════════════════════════════════════════════════════════
+PRIMARY — TCGA-KIRC
+════════════════════════════════════════════════════════════
+
+============================================================
+TCGA-KIRC — Parsing
+============================================================
+  Shape: (20530, 606)
+  Tumour: 534  Normal: 72
+  Panel available: 73 / 73
+
+============================================================
+SADDLE ANALYSIS — TCGA
+============================================================
+  Per-gene tumour vs normal.
+  Produces saddle_res for depth score.
+
+  Gene           Pred  Found       FC  Verdict
+  ------------ ------ ------ --------  ------------
+  UMOD           DOWN   DOWN  -16.080  ✓
+  SLC34A1        DOWN   DOWN   -7.410  ✓
+  SLC13A3        DOWN   DOWN   -7.370  ✓
+  AGXT           DOWN   DOWN   -3.332  ✓
+  PCK1           DOWN   DOWN   -3.391  ✓
+  SLC22A6        DOWN   DOWN   -4.056  ✓
+  GATM           DOWN   DOWN   -1.838  ✓
+  AQP1           DOWN   DOWN   -0.939  ✓
+  FBP1           DOWN   DOWN   -1.840  ✓
+  G6PC           DOWN   DOWN   -4.316  ✓
+  CA9              UP     UP   10.826  ✓
+  VEGFA            UP     UP    3.465  ✓
+  EGLN3            UP     UP    4.607  ✓
+  SLC2A1           UP     UP    2.069  ✓
+  PDK1             UP     UP    2.044  ✓
+  LDHA             UP     UP    1.951  ✓
+  EPAS1            UP     UP    0.625  ✓
+  SCD              UP     UP    3.568  ✓
+  ACLY             UP     UP    1.437  ✓
+  EZH2             UP     UP    2.077  ✓
+
+  SW↓ confirmed (10): ['UMOD', 'SLC34A1', 'SLC13A3', 'AGXT', 'PCK1', 'SLC22A6', 'GATM', 'AQP1', 'FBP1', 'G6PC']
+  SW↓ wrong     (0): []
+  FA↑ confirmed (10): ['CA9', 'VEGFA', 'EGLN3', 'SLC2A1', 'PDK1', 'LDHA', 'EPAS1', 'SCD', 'ACLY', 'EZH2']
+  FA↑ wrong     (0): []
+
+============================================================
+DEPTH SCORE — TCGA
+============================================================
+  SW genes (10): ['UMOD', 'SLC34A1', 'SLC13A3', 'AGXT', 'PCK1', 'SLC22A6', 'GATM', 'AQP1', 'FBP1', 'G6PC']
+  FA genes (10): ['CA9', 'VEGFA', 'EGLN3', 'SLC2A1', 'PDK1', 'LDHA', 'EPAS1', 'SCD', 'ACLY', 'EZH2']
+  n tumour: 534
+  mean:     0.6415
+  median:   0.6449
+  std:      0.1060
+  Q25:      0.5867
+  Q75:      0.7103
+
+============================================================
+DEPTH CORRELATIONS — TCGA
+============================================================
+  Rank  Gene                r  direction
+  ----- ------------ --------  --------------------
+
+  TOP 15 POSITIVE (UP in deeper tumours):
+  1     SLC2A1        +0.6722  1.80e-71
+  2     VIM           +0.5298  5.57e-40
+  3     TGFB1         +0.5179  5.65e-38
+  4     CA9           +0.4572  6.07e-29
+  5     FAP           +0.4557  9.66e-29
+  6     LDHA          +0.4290  2.56e-25
+  7     VEGFA         +0.4238  1.08e-24
+  8     COL1A1        +0.4171  6.77e-24
+  9     EGLN3         +0.4161  9.06e-24
+  10    FN1           +0.4019  3.75e-22
+  11    PDK1          +0.3579  1.39e-17
+  12    MYC           +0.3484  1.09e-16
+  13    SNAI1         +0.3286  6.59e-15
+  14    TOP2A         +0.3107  2.05e-13
+  15    FOXP3         +0.3089  2.84e-13
+
+  TOP 15 NEGATIVE (DOWN in deeper tumours):
+  1     FBP1          -0.5844  3.12e-50
+  2     SLC22A6       -0.5639  3.82e-46
+  3     SLC34A1       -0.5592  2.99e-45
+  4     G6PC          -0.5490  2.29e-43
+  5     ALDOB         -0.5442  1.71e-42
+  6     PCK1          -0.5044  8.24e-36
+  7     AGXT          -0.4717  6.19e-31
+  8     PCK2          -0.4440  3.38e-27
+  9     CPT1A         -0.3822  5.18e-20
+  10    UMOD          -0.3806  7.43e-20
+  11    SLC13A3       -0.3671  1.76e-18
+  12    GATM          -0.3292  5.80e-15
+  13    AQP1          -0.2960  2.95e-12
+  14    HNF1A         -0.2570  1.67e-09
+  15    CDH1          -0.2369  3.03e-08
+
+============================================================
+GAP TESTS — TCGA
+============================================================
+  |r|>0.4 = CONNECTED
+  |r|<0.2 = BROKEN → intervention point
+
+  Circuit                           r         Status  Meaning
+  -------------------------- --------  ------------  -----------------------------------
+  VHL→SLC34A1                 -0.0387        BROKEN  VHL loss = PT identity loss
+  VHL→PCK1                    -0.1302        BROKEN  VHL loss = gluconeogenic loss
+  EPAS1→CA9                    0.4160     CONNECTED  EPAS1 directly activates CA9
+  EPAS1→VEGFA                  0.5441     CONNECTED  EPAS1 activates VEGFA
+  VHL→EPAS1                   -0.0086        BROKEN  VHL degrades EPAS1
+  EGLN3→EPAS1                  0.4942     CONNECTED  EGLN3 is EPAS1 feedback target
+  LHX1→SLC34A1                 0.0558        BROKEN  LHX1 drives PT maturation
+  HNF4A→PCK1                   0.3782          WEAK  HNF4A drives gluconeogenesis
+  CPT1A→SCD                   -0.0868        BROKEN  FAO loss = desaturation gain
+  PCK1→G6PC                    0.7178     CONNECTED  gluconeogenic co-regulation
+  EZH2→LHX1                    0.0213        BROKEN  EZH2 silences differentiation TFs
+  EZH2→UMOD                   -0.1445        BROKEN  EZH2 silences PT identity
+  MTOR→SLC2A1                 -0.0890        BROKEN  mTORC1 drives GLUT1 expression
+  VHL→CA9                     -0.3245          WEAK  VHL intact = CA9 suppressed
+
+  BROKEN CIRCUITS — INTERVENTION POINTS:
+    VHL → SLC34A1  r=-0.039
+    Block is between VHL and SLC34A1.
+    Meaning: VHL loss = PT identity loss
+    VHL → PCK1  r=-0.130
+    Block is between VHL and PCK1.
+    Meaning: VHL loss = gluconeogenic loss
+    VHL → EPAS1  r=-0.009
+    Block is between VHL and EPAS1.
+    Meaning: VHL degrades EPAS1
+    LHX1 → SLC34A1  r=0.056
+    Block is between LHX1 and SLC34A1.
+    Meaning: LHX1 drives PT maturation
+    CPT1A → SCD  r=-0.087
+    Block is between CPT1A and SCD.
+    Meaning: FAO loss = desaturation gain
+    EZH2 → LHX1  r=0.021
+    Block is between EZH2 and LHX1.
+    Meaning: EZH2 silences differentiation TFs
+    EZH2 → UMOD  r=-0.144
+    Block is between EZH2 and UMOD.
+    Meaning: EZH2 silences PT identity
+    MTOR → SLC2A1  r=-0.089
+    Block is between MTOR and SLC2A1.
+    Meaning: mTORC1 drives GLUT1 expression
+
+════════════════════════════════════════════════════════════
+VALIDATION — GSE53757
+════════════════════════════════════════════════════════════
+
+============================================================
+GSE53757 — Parsing
+============================================================
+  Tumour: 72  Normal: 72
+  Log2(x+1) applied ✓
+  Panel genes mapped: 72
+
+============================================================
+SADDLE ANALYSIS — GEO
+============================================================
+  Per-gene tumour vs normal.
+  Produces saddle_res for depth score.
+
+  Gene           Pred  Found       FC  Verdict
+  ------------ ------ ------ --------  ------------
+  UMOD           DOWN   DOWN   -9.228  ✓
+  SLC34A1        DOWN   DOWN   -4.379  ✓
+  SLC13A3        DOWN   DOWN   -7.142  ✓
+  AGXT           DOWN   DOWN   -4.020  ✓
+  PCK1           DOWN   DOWN   -3.557  ✓
+  SLC22A6        DOWN   DOWN   -5.562  ✓
+  GATM           DOWN   DOWN   -1.594  ✓
+  AQP1           DOWN   DOWN   -1.698  ✓
+  FBP1           DOWN   DOWN   -3.451  ✓
+  G6PC           DOWN   DOWN   -3.075  ✓
+  CA9              UP     UP    4.918  ✓
+  VEGFA            UP     UP    1.883  ✓
+  EGLN3            UP     UP    3.752  ✓
+  SLC2A1           UP     UP    1.490  ✓
+  PDK1             UP     UP    3.170  ✓
+  LDHA             UP     UP    1.261  ✓
+  EPAS1            UP     UP    0.563  ✓
+  SCD              UP     UP    2.777  ✓
+  ACLY             UP     UP    1.066  ✓
+  EZH2             UP     UP    1.765  ✓
+
+  SW↓ confirmed (10): ['UMOD', 'SLC34A1', 'SLC13A3', 'AGXT', 'PCK1', 'SLC22A6', 'GATM', 'AQP1', 'FBP1', 'G6PC']
+  SW↓ wrong     (0): []
+  FA↑ confirmed (10): ['CA9', 'VEGFA', 'EGLN3', 'SLC2A1', 'PDK1', 'LDHA', 'EPAS1', 'SCD', 'ACLY', 'EZH2']
+  FA↑ wrong     (0): []
+
+============================================================
+DEPTH SCORE — GEO
+============================================================
+  SW genes (10): ['UMOD', 'SLC34A1', 'SLC13A3', 'AGXT', 'PCK1', 'SLC22A6', 'GATM', 'AQP1', 'FBP1', 'G6PC']
+  FA genes (10): ['CA9', 'VEGFA', 'EGLN3', 'SLC2A1', 'PDK1', 'LDHA', 'EPAS1', 'SCD', 'ACLY', 'EZH2']
+  n tumour: 72
+  mean:     0.7066
+  median:   0.7192
+  std:      0.1381
+  Q25:      0.6720
+  Q75:      0.7711
+
+============================================================
+DEPTH CORRELATIONS — GEO
+============================================================
+  Rank  Gene                r  direction
+  ----- ------------ --------  --------------------
+
+  TOP 15 POSITIVE (UP in deeper tumours):
+  1     SCD           +0.7381  1.39e-13
+  2     PDK1          +0.6943  1.35e-11
+  3     VIM           +0.6850  3.21e-11
+  4     LDHA          +0.6764  6.96e-11
+  5     MYC           +0.6225  5.29e-09
+  6     SLC2A1        +0.5903  4.84e-08
+  7     CA9           +0.5595  3.24e-07
+  8     VEGFA         +0.5559  4.00e-07
+  9     CD68          +0.5552  4.17e-07
+  10    TOP2A         +0.5445  7.62e-07
+  11    ACLY          +0.5409  9.35e-07
+  12    PLIN2         +0.5382  1.08e-06
+  13    EGLN1         +0.5312  1.58e-06
+  14    EZH2          +0.5279  1.89e-06
+  15    TGFB1         +0.5101  4.72e-06
+
+  TOP 15 NEGATIVE (DOWN in deeper tumours):
+  1     UMOD          -0.6809  4.66e-11
+  2     FBP1          -0.6780  6.08e-11
+  3     SLC34A1       -0.6139  9.79e-09
+  4     PCK2          -0.5399  9.84e-07
+  5     G6PC          -0.5397  9.98e-07
+  6     PCK1          -0.5347  1.31e-06
+  7     SLC22A6       -0.5093  4.90e-06
+  8     SLC13A3       -0.4980  8.54e-06
+  9     ALDOB         -0.4798  2.00e-05
+  10    PAX8          -0.4461  8.60e-05
+  11    AGXT          -0.4228  0.0002
+  12    PAX2          -0.4038  0.0004
+  13    CPT1A         -0.3974  0.0005
+  14    AQP1          -0.3363  0.0039
+  15    PTEN          -0.3033  0.0096
+
+============================================================
+GAP TESTS — GEO
+============================================================
+  |r|>0.4 = CONNECTED
+  |r|<0.2 = BROKEN → intervention point
+
+  Circuit                           r         Status  Meaning
+  -------------------------- --------  ------------  -----------------------------------
+  VHL→SLC34A1                  0.1568        BROKEN  VHL loss = PT identity loss
+  VHL→PCK1                    -0.0997        BROKEN  VHL loss = gluconeogenic loss
+  EPAS1→CA9                    0.2901          WEAK  EPAS1 directly activates CA9
+  EPAS1→VEGFA                  0.7312     CONNECTED  EPAS1 activates VEGFA
+  VHL→EPAS1                   -0.0448        BROKEN  VHL degrades EPAS1
+  EGLN3→EPAS1                  0.4619     CONNECTED  EGLN3 is EPAS1 feedback target
+  LHX1→SLC34A1                 0.1497        BROKEN  LHX1 drives PT maturation
+  HNF4A→PCK1                   0.1220        BROKEN  HNF4A drives gluconeogenesis
+  CPT1A→SCD                   -0.3208          WEAK  FAO loss = desaturation gain
+  PCK1→G6PC                    0.4602     CONNECTED  gluconeogenic co-regulation
+  EZH2→LHX1                   -0.0682        BROKEN  EZH2 silences differentiation TFs
+  EZH2→UMOD                   -0.4401     CONNECTED  EZH2 silences PT identity
+  MTOR→SLC2A1                 -0.0249        BROKEN  mTORC1 drives GLUT1 expression
+  VHL→CA9                      0.1631        BROKEN  VHL intact = CA9 suppressed
+
+  BROKEN CIRCUITS — INTERVENTION POINTS:
+    VHL → SLC34A1  r=0.157
+    Block is between VHL and SLC34A1.
+    Meaning: VHL loss = PT identity loss
+    VHL → PCK1  r=-0.100
+    Block is between VHL and PCK1.
+    Meaning: VHL loss = gluconeogenic loss
+    VHL → EPAS1  r=-0.045
+    Block is between VHL and EPAS1.
+    Meaning: VHL degrades EPAS1
+    LHX1 → SLC34A1  r=0.150
+    Block is between LHX1 and SLC34A1.
+    Meaning: LHX1 drives PT maturation
+    HNF4A → PCK1  r=0.122
+    Block is between HNF4A and PCK1.
+    Meaning: HNF4A drives gluconeogenesis
+    EZH2 → LHX1  r=-0.068
+    Block is between EZH2 and LHX1.
+    Meaning: EZH2 silences differentiation TFs
+    MTOR → SLC2A1  r=-0.025
+    Block is between MTOR and SLC2A1.
+    Meaning: mTORC1 drives GLUT1 expression
+    VHL → CA9  r=0.163
+    Block is between VHL and CA9.
+    Meaning: VHL intact = CA9 suppressed
+
+Generating figure...
+  Figure saved: ./ccrcc_false_attractor/results_s1/figure_s1_v3.png
+
+============================================================
+SCRIPT 1 v3 COMPLETE
+============================================================
+  Outputs: ./ccrcc_false_attractor/results_s1
+    cross_dataset_r.csv                                         3634 bytes
+    depth_corr_geo.csv                                          2995 bytes
+    depth_corr_tcga.csv                                         3136 bytes
+    depth_scores_geo.csv                                        2162 bytes
+    depth_scores_tcga.csv                                      18679 bytes
+    figure_s1_v3.png                                          166906 bytes
+    gap_tests_geo.csv                                           1028 bytes
+    gap_tests_tcga.csv                                          1034 bytes
+    saddle_geo.csv                                              3448 bytes
+    saddle_tcga.csv                                             3518 bytes
+
+  NEXT: Read saddle predictions.
+  How many SW genes confirmed DOWN?
+  How many FA genes confirmed UP?
+  Any wrong predictions reveal
+  assumption errors — read them.
+  Then read depth_corr_tcga.csv.
+  What is rank 1 positive?
+  What is rank 1 negative?
+  What was not predicted?
+  That is the ccRCC attractor geometry.

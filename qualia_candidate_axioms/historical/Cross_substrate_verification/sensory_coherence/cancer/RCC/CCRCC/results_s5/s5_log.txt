@@ -1,0 +1,279 @@
+OrganismCore — ccRCC Script 5
+Clinical Translation + Mechanistic Interactions + Transition Index
+Document 94e-pre | 2026-03-02
+
+LOCKED PREDICTIONS:
+  S5-P1: RUNX1 = top depth correlate
+  S5-P2: r(OGDHL,EZH2) < 0
+  S5-P3: r(RUNX1,LOXL2) > 0.50
+  S5-P4: 3-gene panel r > 0.85
+  S5-P5: BAP1-mut deeper than PBRM1-mut
+  S5-P6: Q4 OS < Q1 OS (p<0.05)
+
+Loading TCGA-KIRC...
+  Total samples: 606
+  Tumour:        534
+  Normal:        72
+  Genes loaded:  76
+
+Loading S1 depth scores...
+  S1 depth n = 534
+
+Loading clinical data...
+  Downloading clinical: https://gdc-hub.s3.us-east-1.amazonaws.com/download/TCGA-KIRC.GDC_phenotype.tsv.gz
+  HTTP 403
+
+Loading mutation data...
+  Downloading mutations: https://gdc-hub.s3.us-east-1.amazonaws.com/download/TCGA-KIRC.mutect2_snv.tsv.gz
+  HTTP 403
+
+============================================================
+MODULE A — S4-REVISED DEPTH SCORE
+Anchor: SLC13A2 (neg) + SLC2A1 (pos)
+The two strongest S4 poles.
+============================================================
+
+  Tumour samples in s1_depth: 534
+
+  r(S1_depth, S5_depth) = +0.8056  p=<1e-100
+  Partial concordance — S5 shifts the axis modestly.
+
+  S5 depth statistics (n=534):
+  mean   = 0.7630
+  median = 0.7778
+  std    = 0.1156
+  min    = 0.2045
+  max    = 1.0000
+
+  Top 20 genes vs S5 depth (anchor pair excluded from ranking):
+  Rk   Gene                  r             p
+  ---- -------------- --------  ------------
+  1    LOXL2           +0.6281      6.06e-60
+  2    CYP17A1         -0.6035      2.79e-54
+  3    CAV1            +0.5818      1.11e-49
+  4    TGFBI           +0.5661      1.40e-46
+  5    NAP1L1          +0.5614      1.14e-45
+  6    CDCA7L          +0.5604      1.77e-45
+  7    LOX             +0.5593      2.82e-45
+  8    RUNX1           +0.5590      3.15e-45
+  9    SLC43A3         +0.5541      2.61e-44
+  10   ABAT            -0.5526      5.11e-44
+  11   CTHRC1          +0.5473      4.67e-43
+  12   TGFB1           +0.5430      2.75e-42
+  13   ITGA5           +0.5352      6.65e-41
+  14   STC1            +0.5288      8.44e-40
+  15   AIFM1           -0.5279      1.17e-39
+  16   SLC22A13        -0.5279      1.20e-39
+  17   GOT1            -0.5270      1.67e-39
+  18   HIBCH           -0.5246      4.34e-39
+  19   CBARA1          -0.5240      5.46e-39
+  20   FBP1            -0.5206      1.97e-38
+
+  S5-P1: top non-anchor depth correlate = LOXL2
+  S5-P1 NOT CONFIRMED — top is LOXL2
+
+============================================================
+MODULE B — MECHANISTIC INTERACTIONS
+Testing the attractor wall circuitry.
+============================================================
+
+  Circuit                                         r             p  status
+  ---------------------------------------- --------  ------------  ---------------
+  S5-P2 metabolic->chromatin                -0.2838      2.39e-11  WEAK
+  TCA->chromatin (aKG)                      -0.2997      1.53e-12  WEAK
+  metabolic->DNA methylation                -0.2202      2.76e-07  WEAK
+  S5-P3 TF hub->ECM effector                +0.6081      2.58e-55  CO-ACTIVE
+  RUNX complex integrity                    +0.4624      1.21e-29  CO-ACTIVE
+  TF hub->ECM anchor (S4 edge)              +0.7656       <1e-100  CO-ACTIVE
+  TF hub->collagen hydroxylase              +0.5305      4.37e-40  CO-ACTIVE
+  TF hub->ECM guide                         +0.6611      2.14e-68  CO-ACTIVE
+  ECM stiffening->membrane node             +0.5945      2.45e-52  CO-ACTIVE
+  membrane->HIF2A                           +0.3332      2.62e-15  CO-ACTIVE
+  membrane node->AXL                        +0.4817      2.23e-32  CO-ACTIVE
+  metabolic hub co-vary                     +0.7219      3.97e-87  CO-ACTIVE
+  attractor axis S4                         -0.6387      1.51e-62  OPPOSING
+  two reversibility gates                   +0.3416      4.66e-16  CO-ACTIVE
+  innate sensing->MHC-I                     +0.1399        0.0012  BROKEN
+  innate sensing->chromatin                 +0.3782      1.32e-19  CO-ACTIVE
+  two repressors co-active                  +0.1874      1.31e-05  WEAK
+  BCL6 recruited by RUNX1?                  +0.4838      1.12e-32  CO-ACTIVE
+  nucleosome remodelling->PRC2              +0.2161      4.60e-07  WEAK
+  dicarboxylate import->transaminase        +0.3890      9.88e-21  CO-ACTIVE
+  TCA co-disruption                         +0.5763      1.41e-48  CO-ACTIVE
+  RUNX complex->ECM                         +0.3550      2.64e-17  CO-ACTIVE
+  RUNX2->ECM (bone met)                     +0.5075      2.70e-36  CO-ACTIVE
+  RUNX family co-vary                       +0.6726      1.43e-71  CO-ACTIVE
+  VHL loss->RUNX1?                          +0.0968        0.0253  BROKEN
+  HIF2A->LOXL2?                             +0.3501      7.69e-17  CO-ACTIVE
+  S3 co-repressors                          +0.1578        0.0003  WEAK
+
+  S5-P2: r(OGDHL, EZH2) = -0.2838
+  S5-P2 CONFIRMED ✓
+  Low OGDHL -> high EZH2
+  Metabolic aKG depletion -> chromatin lock coupling confirmed.
+
+  S5-P3: r(RUNX1, LOXL2) = +0.6081
+  S5-P3 CONFIRMED ✓
+
+  WALL CIRCUIT SUMMARY:
+  Wall 2 (chromatin):
+    Wall2: met->chrom                        r=-0.2838
+    Wall2: TCA->chrom                        r=-0.2997
+    Wall2: co-repressor                      r=+0.1874
+    Wall2: nuc->PRC2                         r=+0.2161
+    Wall2: co-repressor                      r=+0.1578
+  Wall 3 (ECM stiffening):
+    Wall3: TF->crosslink                     r=+0.6081
+    Wall3: TF->ECM anchor                    r=+0.7656
+    Wall3: TF->OH-collagen                   r=+0.5305
+    Wall3: ECM->membrane                     r=+0.5945
+    Wall3: RUNX cpx->ECM                     r=+0.3550
+    Wall3: RUNX2->ECM                        r=+0.5075
+
+============================================================
+MODULE C — 3-GENE CLINICAL PANEL
+Predicted: SLC13A2 / RUNX1 / LOXL2
+============================================================
+
+  Candidate genes: 50
+  Combinations: 19,600
+
+  TOP 10 THREE-GENE PANELS:
+  Rk   Genes                                               r
+  ---- ------------------------------------------ ----------
+  1    SLC13A2/SLC2A1/IL1RAP                         +0.9628
+  2    SLC13A2/SLC2A1/SEMA4B                         +0.9594
+  3    SLC13A2/CAV1/SLC2A1                           +0.9584
+  4    SLC13A2/LOXL2/SLC2A1                          +0.9575
+  5    SLC13A2/SLC43A3/SLC2A1                        +0.9503
+  6    SLC13A2/SLC2A1/NAP1L1                         +0.9425
+  7    SLC13A2/ENO2/SLC2A1                           +0.9416
+  8    SLC13A2/SUCLG1/SLC2A1                         +0.9409
+  9    SLC13A2/SLC2A1/GLT25D1                        +0.9377
+  10   SLC13A2/ATP5A1/SLC2A1                         +0.9377
+
+  PREDICTED PANEL TEST:
+  Genes:     ['SLC13A2', 'RUNX1', 'LOXL2']
+  Available: ['SLC13A2', 'RUNX1', 'LOXL2']
+  r(predicted panel, depth) = +0.8635  p=<1e-100
+  S5-P4 CONFIRMED ✓
+
+  BEST PANEL:
+  Genes: ['SLC13A2', 'SLC2A1', 'IL1RAP']
+  r = +0.9628  p = <1e-100
+  S5-P4 CONFIRMED (best panel) ✓  r=0.9628
+
+  GEO VALIDATION:
+  GEO probe map: 6
+  r(GEO panel, depth) = +0.5542  p=4.41e-07  n=72
+
+============================================================
+MODULE D — OS VALIDATION
+S5 depth vs overall survival.
+============================================================
+  Clinical data not available
+
+============================================================
+MODULE E — MUTATION x DEPTH
+ccRCC driver mutations vs S5 depth.
+============================================================
+  Mutation data not available
+
+============================================================
+MODULE F — DEPTH QUARTILE DRUG MAP
+============================================================
+
+  Gene         Description                    Q1      Q2      Q3      Q4    Q4/Q1
+  ------------ ------------------------- ------- ------- ------- -------  -------
+  EPAS1        Wall1: Belzutifan target   13.738  13.928  14.110  13.882    1.01 
+  SLC2A1       Wall1: HIF glycolysis      11.453  12.134  12.556  13.459    1.18 
+  EZH2         Wall2: Tazemetostat         6.771   7.067   7.058   7.150    1.06 
+  HDAC1        Wall2: Entinostat          10.720  10.869  10.962  11.022    1.03 
+  DNMT3A       Wall2: Decitabine           8.404   8.520   8.619   8.684    1.03 
+  OGDHL        Wall2: aKG depletion       10.804   9.766   9.496   8.673    0.80 
+  NAP1L1       Wall2: Chromatin remdl     12.469  12.710  12.913  13.240    1.06 
+  LOXL2        Wall3: Simtuzumab          10.060  10.617  11.122  11.978    1.19 
+  LOX          Wall3: LOX crosslink       10.357  11.124  12.258  12.925    1.25 
+  RUNX1        Wall3: RUNX1 hub            9.407   9.902  10.390  11.031    1.17 
+  RUNX2        Wall3: Bone met             6.809   7.157   7.721   8.189    1.20 
+  CBFB         Wall3: RUNX complex         9.745  10.018  10.094  10.201    1.05 
+  TGFBI        Wall3: ECM anchor          11.872  12.537  14.003  15.446    1.30 
+  PLOD2        Wall3: Collagen OH         11.878  12.220  12.486  13.245    1.12 
+  FOXP3        Wall4: Treg marker          3.984   4.743   5.016   5.292    1.33 
+  CD276        Wall4: B7-H3               10.461  10.635  10.760  11.037    1.06 
+  CD274        Wall4: PDL1                 5.462   5.405   5.373   5.164    0.95 
+  IL2RA        Wall4: Treg activ           4.342   4.887   5.478   5.975    1.38 
+  TGFB1        Wall4: TGF-b               10.817  11.153  11.502  11.935    1.10 
+  SLC13A2      Met: Dicarboxylate          4.935   2.401   1.196   0.435    0.09v
+  SUCLG1       Met: TCA                   11.034  10.620  10.519  10.434    0.95 
+  GOT1         Met: Attractor gate        11.411  11.062  10.682  10.262    0.90 
+  ACAT1        Met: Hub                   12.034  11.491  11.113  10.617    0.88 
+  LDHD         Met: Reversibility          8.339   7.422   6.888   6.323    0.76 
+  CAV1         Novel: Membrane node       11.710  12.282  12.460  12.918    1.10 
+  IFI16        Novel: Innate sensing      10.832  11.162  11.448  11.702    1.08 
+  BCL6         Novel: Diff repressor      10.153  10.365  10.468  10.784    1.06 
+  IL1RAP       Novel: IL-1 signal          7.771   8.054   8.453   8.967    1.15 
+  AXL          Novel: AXL invasion        10.632  11.005  11.220  11.768    1.11 
+
+  DRUG MAP SUMMARY:
+  Q1: Anti-VEGF / Belzutifan
+  Q2-Q3: + EZH2i / LOXL2i
+  Q4: RUNX1/CBFBi + LOXL2i + Anti-B7-H3 + aKG + Anti-Treg
+  NOT anti-PDL1 at any quartile (CD274 flat/down in Q4)
+
+============================================================
+MODULE G — GOT1/RUNX1 TRANSITION INDEX
+GOT1 = normal PT metabolic hub
+RUNX1 = deep false attractor hub
+TI = norm(GOT1) - norm(RUNX1)
+============================================================
+
+  r(TI, S5_depth) = -0.6002  p=1.43e-53
+  (Negative = low TI -> high depth -> deep attractor confirmed)
+
+  TI statistics:
+  mean   = -0.1676
+  median = -0.1626
+  std    = 0.2575
+  min    = -0.8505
+  max    = 1.0000
+
+  TI correlations with key genes:
+  Gene            r(TI)             p
+  ------------ --------  ------------
+  SLC2A1        -0.5459      8.53e-43
+  LOXL2         -0.6507      1.34e-65
+  RUNX1         -0.9088       <1e-100
+  NAP1L1        -0.6002      1.43e-53
+  CAV1          -0.4979      8.50e-35
+  CTHRC1        -0.6324      5.48e-61
+  LOX           -0.5514      8.31e-44
+  TGFBI         -0.7341      1.68e-91
+  PLOD2         -0.5382      1.99e-41
+  IFI16         -0.7350      7.96e-92
+  SLC13A2       +0.4437      3.67e-27
+  SLC22A8       +0.3629      4.60e-18
+  SUCLG1        +0.6969      7.65e-79
+  LDHD          +0.7313      1.87e-90
+  CYP17A1       +0.5379      2.26e-41
+  ABAT          +0.4644      6.35e-30
+  FBP1          +0.4232      1.28e-24
+  OGDHL         +0.6636      4.49e-69
+  ATP5A1        +0.7381      5.68e-93
+  GOT1          +0.9015       <1e-100
+
+Generating Script 5 figure...
+  Figure: ./ccrcc_false_attractor/results_s5/figure_s5.png
+
+============================================================
+SCRIPT 5 COMPLETE
+============================================================
+  depth_s5.csv                                            18641 bytes
+  drug_map.csv                                             3431 bytes
+  figure_s5.png                                          265779 bytes
+  panel_depth.csv                                         18638 bytes
+  transition_index.csv                                    19454 bytes
+
+  Paste full output.
+  Write document 94e (synthesis).
+  Then document 94f (literature check).
