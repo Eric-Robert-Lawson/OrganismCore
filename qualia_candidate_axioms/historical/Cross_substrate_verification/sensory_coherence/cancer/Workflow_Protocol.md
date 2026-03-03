@@ -1,8 +1,8 @@
 # ORGANISM CORE — CANCER FALSE ATTRACTOR ANALYSIS
 ## WORKFLOW PROTOCOL
-## Version 1.0
+## Version 2.0
 ## Derived from 10 cancer validations
-## Date: 2026-03-01
+## Date: 2026-03-01 (v1.0) / 2026-03-03 (v2.0)
 
 ---
 
@@ -28,23 +28,106 @@ Wrong predictions in this framework
    predictions before seeing the data.
    When the analyst is wrong, the framework
    reveals why.
-   
+
+---
+
+## **Important — for machine agents (v2.0 addition)**
+
+This is a continuous failure point in onboarding.
+Read this before generating any script.
+
+Script 1 is a DISCOVERY script.
+It is not a confirmation script.
+It is not a prediction verification script.
+
+The distinction is not subtle. It is structural.
+
+```
+DISCOVERY means:
+  The geometry speaks first.
+  The predictions are a reference frame,
+  not the goal.
+  The primary output of Script 1 is
+  the geometric landscape — what the data
+  shows when no prior knowledge is imposed.
+  The top movers, the PCA structure, the
+  depth gradient — these are read on their
+  own terms first.
+  Predictions are verified against the
+  landscape, not the other way around.
+
+CONFIRMATION means:
+  The prediction panel organizes the output.
+  The summary asks "confirmed or not."
+  The landscape is subordinate to the panel.
+  This is the wrong frame for Script 1.
+
+HOW TO TELL IF YOU ARE DOING IT WRONG:
+  If the saddle point table leads with the
+  prediction panel genes — wrong frame.
+  If the attractor summary asks "confirmed
+  or not" before reading the top movers —
+  wrong frame.
+  If the unexpected top movers are listed
+  after the prediction verification — wrong
+  frame. They should be listed first.
+  If a machine agent organizes Script 1
+  output around predictions, it has failed
+  to instantiate the workflow correctly.
+
+THE CORRECT FRAME FOR SCRIPT 1:
+  1. What are the top 15-20 genes lost?
+     (unfiltered — no panel imposed)
+  2. What are the top 15-20 genes gained?
+     (unfiltered — no panel imposed)
+  3. What does the PCA geometry show?
+     (what axes, what variance, what structure)
+  4. Where do the prediction panel genes
+     appear in that landscape?
+     (not — do the panel genes confirm?)
+  5. What was not predicted that the geometry
+     found?
+  6. Depth scores read after the landscape
+     is described, not before.
+
+The predictions are locked before data
+so that when the geometry contradicts them,
+the contradiction is visible and informative.
+They are not locked so that they can
+organize the output.
+
+This principle is non-negotiable.
+Every script generated under this protocol
+must reflect it in its output structure.
+```
+
 ---
 
 ## METADATA
 
 ```
 document_type:      Protocol — workflow specification
-version:            1.0
+version:            2.0
 derived_from:       10 cancer validations
                     AML, CML, CRC, GBM, BRCA, LUAD,
                     B-ALL, T-ALL, CLL, MM, MDS
 key_documents:      Doc 80 (MM), Doc 86a/b/c (MDS)
+                    Doc 88a/b (PRAD)
 author:             Eric Robert Lawson
                     OrganismCore
-date:               2026-03-01
+date_v1:            2026-03-01
+date_v2:            2026-03-03
 purpose:            Any session, any cancer, same process
                     Reproducible from first principles
+v2_change_reason:   Continuous machine agent failure:
+                    Script 1 generated as prediction
+                    confirmation rather than geometric
+                    discovery. Protocol now makes the
+                    discovery frame explicit and
+                    machine-readable. Library size
+                    outlier detection and file name
+                    discovery requirements also added
+                    based on observed session failures.
 ```
 
 ---
@@ -169,7 +252,7 @@ STEP 0.2 — SEARCH GEO
     for acc in accessions:
       fetch metadata
       check for: human, correct cell type,
-                 MDS/cancer + normal donors,
+                 cancer + normal donors,
                  single-cell or bulk RNA-seq
       flag relevant hits
 
@@ -181,7 +264,7 @@ STEP 0.2 — SEARCH GEO
 STEP 0.3 — INSPECT DATASET STRUCTURE
   Run the structure check script before analysis:
     - How many files?
-    - What format? (MTX, TXT, CSV, H5)
+    - What format? (MTX, TXT, CSV, H5, TAR)
     - Are genes rows or columns?
     - Are gene IDs Ensembl or symbols?
     - How many samples?
@@ -189,6 +272,18 @@ STEP 0.3 — INSPECT DATASET STRUCTURE
     - Human or mouse? (check gene name case)
       Human: SPI1, ELANE, CD34 (all caps)
       Mouse: Spi1, Elane, Cd34 (title case)
+
+  [v2.0 addition]
+    - Library sizes — are any outliers?
+      A sample with library size >5x below median
+      is a sequencing depth outlier.
+      Flag it before analysis. It will distort PCA.
+    - For TAR files: list contents before assuming
+      file names. Never hardcode expected file names.
+      Discover them from the archive listing first.
+      Hardcoding expected file names causes cascade
+      failures — this is a confirmed session failure
+      mode.
 
 STEP 0.4 — CONFIRM DATASET IS USABLE
   Minimum checklist:
@@ -199,6 +294,13 @@ STEP 0.4 — CONFIRM DATASET IS USABLE
     ☐ Expression data readable (not corrupt)
     ☐ Gene names mappable to symbols
     ☐ Sample labels present (disease vs normal)
+
+  [v2.0 addition]
+    ☐ No library size outliers that would
+       dominate PCA (or flagged for exclusion)
+    ☐ Supplementary file names confirmed from
+       FTP directory listing or SOFT series text,
+       not assumed from web search results
 
   If dataset fails any check:
     Do not proceed — find a different dataset
@@ -211,6 +313,11 @@ OUTPUTS OF PHASE 0:
   - Confirmed data format
   - Confirmed gene nomenclature
   - Structure check output pasted and saved
+
+  [v2.0 addition]
+  - Library size range and any outlier flags
+  - Confirmed supplementary file names from
+    FTP or SOFT listing
 ```
 
 ---
@@ -370,6 +477,17 @@ PURPOSE:
   Record everything — confirmed, denied,
   and unexpected.
 
+  [v2.0 clarification — this is the most
+   commonly violated principle in practice]
+
+  This is a DISCOVERY run, not a confirmation run.
+  The geometry reveals itself first.
+  The predictions are checked against the geometry,
+  not the other way around.
+  See the "Important — for machine agents" section
+  at the top of this document for the full
+  statement of this principle.
+
 STEP 2.1 — BUILD THE ANALYSIS SCRIPT
   The script must be self-contained and
   reproducible. Required components:
@@ -387,12 +505,25 @@ STEP 2.1 — BUILD THE ANALYSIS SCRIPT
     Verify file integrity (size check)
     Cache metadata after first fetch
 
+    [v2.0 addition]
+    Discover supplementary file names from
+    FTP directory listing before attempting
+    download. Never hardcode assumed file names.
+
   DATA LOADING:
     Load expression matrix
     Map gene IDs to symbols if needed
     (hard-coded Ensembl map — no API needed)
     Transpose to samples × genes
     Clean sample index to patient IDs
+
+    [v2.0 addition]
+    Compute and report library sizes before
+    any normalisation. Flag samples with
+    library size < median/5 or > median*5
+    as outliers. Record their sample IDs.
+    These will be candidates for exclusion
+    in Script 2.
 
   METADATA MERGE:
     Join expression with sample metadata
@@ -447,7 +578,46 @@ STEP 2.1 — BUILD THE ANALYSIS SCRIPT
     Panel H: Secondary panel (context-specific)
     Panel I: Summary text
 
-  OUTPUT:
+  [v2.0 addition — SCRIPT OUTPUT STRUCTURE]
+  The script output must be organized in this
+  section order. This order is non-negotiable:
+
+    Section 1: TOP MOVERS (unfiltered)
+      Top 20 genes LOST (sorted by diff)
+      Top 20 genes GAINED (sorted by diff)
+      No panel imposed. No prediction reference.
+      Read cold. This is what the geometry found.
+
+    Section 2: PCA GEOMETRY
+      Variance explained per PC
+      PC1 top loadings (positive and negative)
+      PC2 top loadings
+      Sample coordinates summary
+      PC1 separation quality (tumour vs normal)
+
+    Section 3: DEPTH SCORES
+      Per-sample depth on PC1
+      MIS (mean tumour depth)
+      Depth correlations for target genes
+      Any outlier samples identified
+
+    Section 4: PREDICTION PANEL CHECK
+      Where do prediction panel genes appear
+      in the landscape found above?
+      Confirmed / weakly confirmed /
+      not confirmed / inverted
+      Analyst assumption errors identified
+
+    Section 5: NOVEL SIGNALS
+      Signals in top movers not in prediction panel
+      Named and described without literature
+      consultation at this stage
+
+  A script that leads with the prediction panel
+  (Section 4 before Section 1) has failed to
+  implement the discovery frame.
+
+  OUTPUT FILES:
     PNG figure at 150 DPI
     CSV of saddle results
     Log file of all printed output
@@ -469,6 +639,18 @@ STEP 2.3 — READ THE DEPTH CORRELATIONS FIRST
   The highest |r| genes are the true biology.
   The saddle table is the test of predictions.
   The depth correlations are the discovery.
+
+  [v2.0 addition]
+  Also read the PCA geometry before the
+  saddle table:
+    - Does PC1 separate tumour from normal cleanly?
+    - What do the top PC1 loadings encode?
+      Read from the gene names, not from
+      what was predicted.
+    - Are any samples outliers on PC1?
+      If yes, check their library size.
+      A PC1 outlier with anomalous library size
+      is a technical artefact, not biology.
 
 STEP 2.4 — CLASSIFY EACH PREDICTION
   For each prediction from Phase 1:
@@ -540,6 +722,17 @@ STEP 3.1 — STATE NEW PREDICTIONS
       Correlation prediction (r direction)
 
   SPECIFIC NEW TESTS TO DESIGN:
+
+    [v2.0 addition]
+    0. The outlier correction test:
+       If any sample was identified as a technical
+       outlier in Script 1 (library size, PC1
+       displacement), exclude it and re-run PCA.
+       Compute corrected MIS and depth scores.
+       State the correction explicitly in the
+       script header. Record both the distorted
+       and corrected MIS in Document [N]b.
+
     1. The gap test:
        If Gene A is elevated and Gene B is
        suppressed, and A normally drives B,
@@ -584,6 +777,12 @@ STEP 3.2 — BUILD SCRIPT 2
     Compare S1 vs S2 depth scores
     (r(S1,S2) tells if same biology captured)
 
+    [v2.0 addition]
+    If outlier samples were flagged in Script 1,
+    exclude them explicitly and recompute PCA
+    and depth scores. Report both corrected
+    and uncorrected MIS in the output.
+
 STEP 3.3 — RUN SCRIPT 2
   Run. Paste full output.
 
@@ -620,6 +819,10 @@ STEP 3.6 — WRITE DOCUMENT [N]b
     - Drug targets from the final geometry
     - Novel predictions before literature check
     - Framework confirmation statement
+
+    [v2.0 addition]
+    - Corrected MIS (outlier-adjusted if applicable)
+      with both raw and corrected values recorded
 
 OUTPUTS OF PHASE 3:
   - Script 2 Python file
@@ -971,6 +1174,18 @@ ALWAYS CHECK DEPTH BY SUBTYPE:
     p < 0.05 = different attractor basins
     Different basins = different drug targets
     Different basins = different depth axes needed
+
+[v2.0 addition]
+OUTLIER-CORRECTED MIS:
+  If a sample was flagged as a library size
+  outlier in Phase 0 or as a PCA outlier
+  in Script 1:
+    Compute MIS including outlier (raw MIS)
+    Compute MIS excluding outlier (corrected MIS)
+    Report both in Script 2 output
+    Use corrected MIS as the canonical value
+    Record the distortion magnitude:
+      raw MIS − corrected MIS = outlier effect
 ```
 
 ---
@@ -1137,6 +1352,44 @@ LESSON 10 (from all validations):
   changes themselves.
 ```
 
+### [v2.0 additions]
+
+```
+LESSON 11 (from cdRCC session, 2026-03-03):
+  Machine agents consistently misframe Script 1
+  as a prediction confirmation script.
+  The output is organized around the prediction
+  panel and the summary asks "confirmed or not."
+  This is the wrong frame.
+  The geometric landscape must be reported first,
+  on its own terms, before predictions are checked.
+  The section order in Script 1 output is:
+    top movers → PCA → depth → predictions → novel.
+  Any other order fails the discovery principle.
+  This is the primary motivation for v2.0.
+
+LESSON 12 (from cdRCC session, 2026-03-03):
+  Library size outliers dominate PCA.
+  A sample with 3.4M reads when the median is 27M
+  will appear as a strong PC1 outlier regardless
+  of biology.
+  This is technical artefact, not attractor depth.
+  The structural check must report library size
+  distributions. Script 1 must flag outliers.
+  Script 2 must exclude them and report both
+  the distorted and corrected MIS explicitly.
+
+LESSON 13 (from cdRCC session, 2026-03-03):
+  GEO supplementary file names cannot be assumed
+  from web search results or prior knowledge.
+  They must be discovered from the actual FTP
+  directory listing or the SOFT series text
+  before any download attempt is made.
+  Hardcoding assumed file names causes cascade
+  failures in Phase 0 and wastes session time.
+  Discovery before assumption. Always.
+```
+
 ---
 
 ## X. QUALITY CHECKS
@@ -1151,6 +1404,9 @@ PHASE 0 → PHASE 1 CHECKLIST:
   ☐ Correct tissue/cell type confirmed
   ☐ Data is readable and parseable
   ☐ No dataset modification after prediction
+  ☐ [v2.0] Library sizes reported, outliers flagged
+  ☐ [v2.0] Supplementary file names confirmed
+           from FTP or SOFT listing
 
 PHASE 1 → PHASE 2 CHECKLIST:
   ☐ All predictions written before data loaded
@@ -1173,6 +1429,10 @@ PHASE 2 → PHASE 3 CHECKLIST:
   ☐ New predictions derived from Script 1
   ☐ Script 1 NOT modified after running
   ☐ Document [N]a written
+  ☐ [v2.0] Top movers read before saddle table
+  ☐ [v2.0] PCA geometry read before predictions
+  ☐ [v2.0] Library size outliers flagged
+           for exclusion in Script 2
 
 PHASE 3 → PHASE 4 CHECKLIST:
   ☐ Script 2 predictions stated before writing
@@ -1184,6 +1444,8 @@ PHASE 3 → PHASE 4 CHECKLIST:
   ☐ Drug targets stated before literature
   ☐ Novel predictions listed and dated
   ☐ Document [N]b written
+  ☐ [v2.0] Corrected MIS reported if outliers
+           were present
 
 PHASE 4 → PHASE 5 CHECKLIST:
   ☐ Predictions locked before any search
@@ -1248,11 +1510,13 @@ Assigned document numbers:
   Doc 86a  — MDS Script 1
   Doc 86b  — MDS Script 2 + reasoning artifact
   Doc 86c  — MDS Literature check
+  Doc 88a  — PRAD Script 1
+  Doc 88b  — PRAD Script 2 + reasoning artifact
 
 Next cancer:
-  Doc 87a  �� [cancer] Script 1
-  Doc 87b  — [cancer] Script 2
-  Doc 87c  — [cancer] Literature check
+  Doc 89a  — [cancer] Script 1
+  Doc 89b  — [cancer] Script 2
+  Doc 89c  — [cancer] Literature check
 
 Session continuity:
   Each new session begins by reading the
@@ -1301,7 +1565,7 @@ THE KEY INVARIANT:
 ## STATUS
 
 ```
-protocol_version:   1.0
+protocol_version:   2.0
 validated_against:  10 cancer types
                     AML, CML, CRC, GBM, BRCA,
                     LUAD, B-ALL, T-ALL, CLL,
@@ -1315,6 +1579,16 @@ novel_predictions:  at least 1 per cancer type
                     not in existing literature
 author:             Eric Robert Lawson
                     OrganismCore
-date:               2026-03-01
+date_v1:            2026-03-01
+date_v2:            2026-03-03
+v2_changes:         Discovery frame made explicit
+                    and machine-readable.
+                    Library size outlier detection
+                    added to Phase 0 and Phase 3.
+                    GEO file name discovery
+                    requirement added to Phase 0.
+                    Lessons 11-13 added.
+                    v2.0 additions marked inline
+                    throughout the document.
 next_cancer:        any — protocol is ready
 ```
