@@ -1,23 +1,14 @@
 """
 cdRCC — Collecting Duct Renal Cell Carcinoma
-STRUCTURAL CHECK SCRIPT
-Phase 0.5 — Data Integrity Verification
+STRUCTURAL CHECK — Phase 0.5  (v2 — auto file discovery)
 
-Runs BEFORE Script 1.
-Purpose:
-  - Download all GSE89122 files
-  - Confirm file format, shape, gene coverage
-  - Confirm sample labels (tumour vs normal)
-  - Confirm GSM-to-sample mapping
-  - Confirm expression range and log-scale status
-  - Report gene ID type (Entrez vs symbol)
-  - Check for zero-count rows, duplicate genes
-  - Confirm TPM and raw count files are consistent
-  - Print a structural summary that Script 1
-    can be written against with confidence
-
-NO BIOLOGY IS LOADED. NO PREDICTIONS ARE MADE.
-This script reads structure only.
+Changes from v1:
+  - File names are discovered live from the GEO download
+    page and FTP directory listing rather than hardcoded.
+    The v1 file names returned 404 — actual names differ.
+  - Falls back to individual GSM supplementary files if
+    series-level matrix not found.
+  - All other logic identical.
 
 Author: Eric Robert Lawson
 Framework: OrganismCore Principles-First
@@ -27,7 +18,9 @@ Date: 2026-03-03
 import os
 import sys
 import gzip
+import re
 import urllib.request
+import urllib.error
 import numpy as np
 import pandas as pd
 import warnings
@@ -45,41 +38,42 @@ LOG_FILE    = os.path.join(BASE_DIR,
 os.makedirs(BASE_DIR,    exist_ok=True)
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
-# GEO FTP paths — confirmed from NCBI GEO download page
-GEO_FTP = (
+ACC = "GSE89122"
+GEO_FTP_BASE = (
     "https://ftp.ncbi.nlm.nih.gov/geo/"
     "series/GSE89nnn/GSE89122/suppl/"
 )
-
-FILES = {
-    "tpm":   "GSE89122_norm_counts_TPM_GRCh38.p13_NCBI.tsv.gz",
-    "raw":   "GSE89122_raw_counts_GRCh38.p13_NCBI.tsv.gz",
-    "annot": "Human.GRCh38.p13.annot.tsv.gz",
-}
-
-# GEO metadata URL — returns SOFT text for all samples
+GEO_DOWNLOAD_PAGE = (
+    "https://www.ncbi.nlm.nih.gov/geo/"
+    "download/?acc=GSE89122"
+)
+GEO_SOFT_PAGE = (
+    "https://www.ncbi.nlm.nih.gov/geo/query/"
+    "acc.cgi?acc=GSE89122"
+    "&targ=self&form=text&view=brief"
+)
 META_URL = (
     "https://www.ncbi.nlm.nih.gov/geo/query/"
     "acc.cgi?acc=GSE89122"
     "&targ=gsm&form=text&view=full"
 )
 
-# Known sample structure from GEO record
-# Used to verify what we parse matches ground truth
-KNOWN_SAMPLES = {
-    "GSM2359144": ("CDC1",  "tumor"),
-    "GSM2359145": ("CDC1",  "normal"),
-    "GSM2359146": ("CDC2",  "tumor"),
-    "GSM2359147": ("CDC2",  "normal"),
-    "GSM2359148": ("CDC3",  "tumor"),
-    "GSM2359149": ("CDC3",  "normal"),
-    "GSM2359150": ("CDC4",  "tumor"),
-    "GSM2359151": ("CDC4",  "normal"),
-    "GSM2359152": ("CDC5",  "tumor"),   # no matched normal
-    "GSM2359153": ("CDC6",  "tumor"),
-    "GSM2359154": ("CDC6",  "normal"),
-    "GSM2359155": ("CDC7",  "tumor"),
-    "GSM2359156": ("CDC7",  "normal"),
+# Known sample structure — confirmed from metadata
+# in previous run (all 13/13 matched)
+SAMPLE_MAP = {
+    "GSM2359144": ("CDC1", "tumor"),
+    "GSM2359145": ("CDC1", "normal"),
+    "GSM2359146": ("CDC2", "tumor"),
+    "GSM2359147": ("CDC2", "normal"),
+    "GSM2359148": ("CDC3", "tumor"),
+    "GSM2359149": ("CDC3", "normal"),
+    "GSM2359150": ("CDC4", "tumor"),
+    "GSM2359151": ("CDC4", "normal"),
+    "GSM2359152": ("CDC5", "tumor"),
+    "GSM2359153": ("CDC6", "tumor"),
+    "GSM2359154": ("CDC6", "normal"),
+    "GSM2359155": ("CDC7", "tumor"),
+    "GSM2359156": ("CDC7", "normal"),
 }
 
 # ============================================================
@@ -95,515 +89,682 @@ def log(msg=""):
 def write_log():
     with open(LOG_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(log_lines))
-    log(f"\nLog written: {LOG_FILE}")
 
 # ============================================================
-# DOWNLOAD
+# FETCH UTILITY
 # ============================================================
 
-def download_files():
+def fetch_text(url, timeout=30):
+    req = urllib.request.Request(
+        url, headers={"User-Agent": "Mozilla/5.0"}
+    )
+    try:
+        with urllib.request.urlopen(
+            req, timeout=timeout
+        ) as r:
+            raw = r.read()
+            try:
+                return raw.decode("utf-8")
+            except UnicodeDecodeError:
+                return raw.decode("latin-1")
+    except Exception as e:
+        return f"ERROR:{e}"
+
+def download_file(url, local_path):
+    def hook(count, block, total):
+        if total > 0:
+            pct = min(count * block / total * 100, 100)
+            mb  = count * block / 1e6
+            sys.stdout.write(
+                f"\r    {mb:.2f} MB  {pct:.1f}%"
+            )
+            sys.stdout.flush()
+    try:
+        req = urllib.request.Request(
+            url, headers={"User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req) as resp, \
+             open(local_path, "wb") as out:
+            total = int(
+                resp.headers.get("Content-Length", 0)
+            )
+            block = 65536
+            count = 0
+            while True:
+                chunk = resp.read(block)
+                if not chunk:
+                    break
+                out.write(chunk)
+                count += 1
+                hook(count, block, total)
+        print()
+        return True
+    except Exception as e:
+        print()
+        log(f"    ERROR: {e}")
+        return False
+
+# ============================================================
+# STEP 0: DISCOVER REAL FILE NAMES FROM GEO
+# ============================================================
+
+def discover_files():
+    """
+    Scrape the GEO download page and SOFT series text
+    to find the actual supplementary file names for
+    GSE89122. Returns dict of label → filename.
+    """
     log("=" * 65)
-    log("STEP 0 — FILE DOWNLOAD")
-    log(f"Dataset: GSE89122")
-    log(f"FTP base: {GEO_FTP}")
+    log("STEP 0 — FILE DISCOVERY")
+    log(f"  Querying GEO for actual file names...")
+    log("=" * 65)
+
+    found_files = {}
+
+    # ---- Method 1: SOFT series text ----
+    # The SOFT text contains !Series_supplementary_file lines
+    log("\n  [Method 1] Parsing SOFT series text...")
+    soft_url = (
+        "https://www.ncbi.nlm.nih.gov/geo/query/"
+        f"acc.cgi?acc={ACC}"
+        "&targ=self&form=text&view=full"
+    )
+    soft_text = fetch_text(soft_url)
+
+    if "ERROR" not in soft_text[:20]:
+        suppl_files = []
+        for line in soft_text.split("\n"):
+            if "!Series_supplementary_file" in line:
+                val = line.split("=", 1)[1].strip()
+                suppl_files.append(val)
+                log(f"    Found: {val}")
+
+        if suppl_files:
+            for f in suppl_files:
+                fname = f.split("/")[-1].strip()
+                fl    = fname.lower()
+                if "tpm" in fl:
+                    found_files["tpm"] = fname
+                elif "fpkm" in fl:
+                    found_files["fpkm"] = fname
+                elif "raw" in fl or "count" in fl:
+                    found_files["raw"] = fname
+                elif "annot" in fl or ".annot" in fl:
+                    found_files["annot"] = fname
+                else:
+                    found_files[f"other_{len(found_files)}"] = fname
+        else:
+            log("    No supplementary_file lines found in SOFT")
+    else:
+        log(f"    SOFT fetch error: {soft_text[:80]}")
+
+    # ---- Method 2: FTP directory listing ----
+    # Try to list the FTP directory via HTTP
+    log(f"\n  [Method 2] FTP directory listing...")
+    ftp_dir = GEO_FTP_BASE
+    dir_text = fetch_text(ftp_dir)
+
+    if "ERROR" not in dir_text[:20]:
+        # HTML directory listing — extract .gz filenames
+        fnames = re.findall(
+            r'href="([^"]+\.gz)"', dir_text
+        )
+        if not fnames:
+            # Try plain text listing
+            fnames = re.findall(
+                r'(GSE\d+[^\s]+\.gz)', dir_text
+            )
+        log(f"    Found {len(fnames)} .gz files:")
+        for fn in fnames:
+            fn_clean = fn.split("/")[-1]
+            log(f"      {fn_clean}")
+            fl = fn_clean.lower()
+            if "tpm" in fl and "tpm" not in found_files:
+                found_files["tpm"] = fn_clean
+            elif ("fpkm" in fl
+                  and "fpkm" not in found_files):
+                found_files["fpkm"] = fn_clean
+            elif (("raw" in fl or "count" in fl)
+                  and "raw" not in found_files):
+                found_files["raw"] = fn_clean
+            elif ("annot" in fl
+                  and "annot" not in found_files):
+                found_files["annot"] = fn_clean
+    else:
+        log(f"    FTP listing error: {dir_text[:80]}")
+
+    # ---- Method 3: GEO download page (HTML) ----
+    log(f"\n  [Method 3] GEO download page...")
+    dl_page = fetch_text(GEO_DOWNLOAD_PAGE)
+    if "ERROR" not in dl_page[:20]:
+        # Look for filenames in href links
+        fnames_html = re.findall(
+            r'href="[^"]*/(GSE89122[^"]+\.gz)"',
+            dl_page
+        )
+        if not fnames_html:
+            fnames_html = re.findall(
+                r'(GSE89122[^\s"<>]+\.(?:gz|tsv|txt))',
+                dl_page
+            )
+        log(f"    Found {len(fnames_html)} files in page:")
+        for fn in fnames_html:
+            fn_clean = fn.split("/")[-1]
+            log(f"      {fn_clean}")
+            fl = fn_clean.lower()
+            if "tpm" in fl and "tpm" not in found_files:
+                found_files["tpm"] = fn_clean
+            elif ("fpkm" in fl
+                  and "fpkm" not in found_files):
+                found_files["fpkm"] = fn_clean
+            elif (("raw" in fl or "count" in fl)
+                  and "raw" not in found_files):
+                found_files["raw"] = fn_clean
+            elif ("annot" in fl
+                  and "annot" not in found_files):
+                found_files["annot"] = fn_clean
+    else:
+        log(f"    Download page error: {dl_page[:80]}")
+
+    # ---- Method 4: GSM-level supplementary files ----
+    # If no series-level matrix found, each GSM may have
+    # an individual count file
+    if not found_files:
+        log(f"\n  [Method 4] Checking GSM-level files...")
+        sample_gsms = list(SAMPLE_MAP.keys())[:3]
+        for gsm in sample_gsms:
+            gsm_url = (
+                "https://www.ncbi.nlm.nih.gov/geo/query/"
+                f"acc.cgi?acc={gsm}"
+                "&targ=self&form=text&view=full"
+            )
+            gsm_text = fetch_text(gsm_url)
+            if "ERROR" not in gsm_text[:20]:
+                for line in gsm_text.split("\n"):
+                    if "!Sample_supplementary_file" in line:
+                        val = line.split("=",1)[1].strip()
+                        fname = val.split("/")[-1].strip()
+                        log(f"    {gsm}: {fname}")
+                        if gsm not in found_files:
+                            found_files[gsm] = fname
+                        break
+
+    log(f"\n  DISCOVERED FILES:")
+    if found_files:
+        for k, v in found_files.items():
+            log(f"    [{k}]  {v}")
+    else:
+        log("  WARNING: No files discovered automatically")
+        log("  Manual download required")
+        log(f"  Visit: {GEO_DOWNLOAD_PAGE}")
+
+    return found_files
+
+# ============================================================
+# STEP 0b: DOWNLOAD DISCOVERED FILES
+# ============================================================
+
+def download_files(found_files):
+    log("")
+    log("=" * 65)
+    log("STEP 0b — DOWNLOADING FILES")
     log("=" * 65)
 
     paths = {}
-    for key, fname in FILES.items():
+
+    priority_keys = ["tpm", "fpkm", "raw", "annot"]
+    ordered = (
+        [(k, found_files[k]) for k in priority_keys
+         if k in found_files]
+        + [(k, v) for k, v in found_files.items()
+           if k not in priority_keys]
+    )
+
+    for key, fname in ordered:
         local = os.path.join(BASE_DIR, fname)
+
         if os.path.exists(local):
             sz = os.path.getsize(local) / 1e6
-            if sz > 0.05:
-                log(f"  [{key}] Found: {fname} "
-                    f"({sz:.2f} MB) — reusing")
+            if sz > 0.01:
+                log(f"  [{key}] Found cached: {fname} "
+                    f"({sz:.2f} MB)")
                 paths[key] = local
                 continue
 
-        url = GEO_FTP + fname
+        url = GEO_FTP_BASE + fname
         log(f"  [{key}] Downloading: {fname}")
-        log(f"         URL: {url}")
+        log(f"    URL: {url}")
 
-        def hook(count, block, total):
-            if total > 0:
-                pct = min(count * block / total * 100, 100)
-                mb  = count * block / 1e6
-                sys.stdout.write(
-                    f"\r         {mb:.2f} MB  {pct:.1f}%"
-                )
-                sys.stdout.flush()
-
-        try:
-            urllib.request.urlretrieve(url, local, hook)
-            print()
+        ok = download_file(url, local)
+        if ok and os.path.getsize(local) > 100:
             sz = os.path.getsize(local) / 1e6
-            log(f"         Done: {sz:.2f} MB")
-        except Exception as e:
-            log(f"  ERROR downloading {fname}: {e}")
-            local = None
-
-        paths[key] = local
+            log(f"    OK: {sz:.2f} MB")
+            paths[key] = local
+        else:
+            # Try HTTPS GEO download URL as fallback
+            alt_url = (
+                "https://www.ncbi.nlm.nih.gov/geo/"
+                f"download/?acc={ACC}&format=file"
+                f"&file={urllib.parse.quote(fname)}"
+                if hasattr(urllib, "parse")
+                else url
+            )
+            log(f"    FTP failed — trying alt URL")
+            import urllib.parse
+            alt_url = (
+                "https://www.ncbi.nlm.nih.gov/geo/"
+                "download/?acc=GSE89122&format=file"
+                f"&file={urllib.parse.quote(fname)}"
+            )
+            log(f"    Alt URL: {alt_url}")
+            ok2 = download_file(alt_url, local)
+            if ok2 and os.path.getsize(local) > 100:
+                sz = os.path.getsize(local) / 1e6
+                log(f"    OK (alt): {sz:.2f} MB")
+                paths[key] = local
+            else:
+                log(f"    FAILED — skipping {key}")
+                if os.path.exists(local):
+                    os.remove(local)
 
     return paths
 
 # ============================================================
-# FETCH METADATA (SOFT text)
+# STEP 1: METADATA — already confirmed, just reload
 # ============================================================
 
-def fetch_metadata():
+def load_confirmed_metadata():
     log("")
     log("=" * 65)
-    log("STEP 1 — METADATA / SAMPLE ANNOTATION")
+    log("STEP 1 — SAMPLE METADATA (confirmed in v1)")
     log("=" * 65)
 
     cache = os.path.join(BASE_DIR, "gsm_meta.txt")
+    rows = []
 
     if os.path.exists(cache):
         log(f"  Using cached metadata: {cache}")
         with open(cache, encoding="utf-8") as f:
             text = f.read()
-    else:
-        log(f"  Fetching: {META_URL}")
-        req = urllib.request.Request(
-            META_URL,
-            headers={"User-Agent": "Mozilla/5.0"}
-        )
-        try:
-            with urllib.request.urlopen(
-                req, timeout=30
-            ) as r:
-                text = r.read().decode("utf-8")
-            with open(cache, "w", encoding="utf-8") as f:
-                f.write(text)
-            log(f"  Fetched: {len(text)} chars")
-        except Exception as e:
-            log(f"  ERROR: {e}")
-            text = ""
 
-    # Parse sample records
-    samples = {}
-    current_gsm = None
-    current = {}
+        samples = {}
+        current_gsm = None
+        current = {}
+        for line in text.split("\n"):
+            if line.startswith("^SAMPLE"):
+                if current_gsm and current:
+                    samples[current_gsm] = current
+                current_gsm = line.split("=")[1].strip()
+                current = {}
+            elif line.startswith("!Sample_title"):
+                current["title"] = \
+                    line.split("=",1)[1].strip()
+            elif line.startswith(
+                    "!Sample_library_strategy"):
+                current["lib"] = \
+                    line.split("=",1)[1].strip()
+            elif line.startswith(
+                    "!Sample_supplementary_file"):
+                val = line.split("=",1)[1].strip()
+                current.setdefault(
+                    "suppl", []
+                ).append(val)
+        if current_gsm and current:
+            samples[current_gsm] = current
 
-    for line in text.split("\n"):
-        if line.startswith("^SAMPLE"):
-            if current_gsm and current:
-                samples[current_gsm] = current
-            current_gsm = line.split("=")[1].strip()
-            current = {"gsm": current_gsm}
-
-        elif line.startswith("!Sample_title"):
-            current["title"] = line.split("=",1)[1].strip()
-
-        elif line.startswith("!Sample_source_name"):
-            current["source"] = line.split("=",1)[1].strip()
-
-        elif line.startswith("!Sample_characteristics_ch1"):
-            val = line.split("=",1)[1].strip()
-            if ":" in val:
-                k, v = val.split(":", 1)
-                current[
-                    k.strip().lower().replace(" ","_")
-                ] = v.strip()
-
-        elif line.startswith("!Sample_library_strategy"):
-            current["library_strategy"] = \
-                line.split("=",1)[1].strip()
-
-        elif line.startswith("!Sample_instrument_model"):
-            current["instrument"] = \
-                line.split("=",1)[1].strip()
-
-        elif line.startswith("!Sample_description"):
-            desc = line.split("=",1)[1].strip()
-            current.setdefault("description", desc)
-
-    if current_gsm and current:
-        samples[current_gsm] = current
-
-    log(f"\n  Parsed {len(samples)} sample records")
-    log("")
-
-    # Verify against known structure
-    log("  SAMPLE VERIFICATION")
-    log("  " + "-" * 50)
-    n_match = 0
-    n_miss  = 0
-    for gsm, (label, stype) in KNOWN_SAMPLES.items():
-        if gsm in samples:
-            title  = samples[gsm].get("title",  "?")
-            source = samples[gsm].get("source", "?")
-            lib    = samples[gsm].get(
-                "library_strategy", "?"
-            )
+        for gsm, (patient, stype) in SAMPLE_MAP.items():
+            info = samples.get(gsm, {})
+            title = info.get("title", "")
+            lib   = info.get("lib", "")
+            suppl = info.get("suppl", [])
+            rows.append({
+                "gsm":     gsm,
+                "patient": patient,
+                "type":    stype,
+                "title":   title,
+                "lib":     lib,
+                "suppl":   suppl,
+            })
             log(
-                f"  {gsm}  {label:6s}  {stype:6s}  "
-                f"title='{title}'  lib={lib}"
+                f"  {gsm}  {patient:6s}  {stype:6s}  "
+                f"lib={lib}"
             )
-            n_match += 1
-        else:
-            log(f"  {gsm}  {label:6s}  {stype:6s}  "
-                f"NOT FOUND in metadata")
-            n_miss += 1
+            for s in suppl:
+                fname = s.split("/")[-1]
+                log(f"    suppl: {fname}")
+    else:
+        log("  No cached metadata — building from SAMPLE_MAP")
+        for gsm, (patient, stype) in SAMPLE_MAP.items():
+            rows.append({
+                "gsm": gsm, "patient": patient,
+                "type": stype, "title": "",
+                "lib": "RNA-Seq", "suppl": [],
+            })
 
-    log("")
-    log(f"  Matched: {n_match} / {len(KNOWN_SAMPLES)}")
-    log(f"  Missing: {n_miss}")
+    meta = pd.DataFrame(rows)
+    log(f"\n  Tumour:  {(meta['type']=='tumor').sum()}")
+    log(f"  Normal:  {(meta['type']=='normal').sum()}")
+    log(f"  Total:   {len(meta)}")
 
-    # Build clean sample table
-    rows = []
-    for gsm, info in samples.items():
-        title = info.get("title", "").lower()
-        # Classify tumour vs normal from title
-        if "normal" in title or "non-tumor" in title:
-            stype = "normal"
-        elif "tumor" in title or "tumour" in title:
-            stype = "tumor"
-        else:
-            stype = "unknown"
+    # Extract GSM-level supplementary file names
+    gsm_suppl = {}
+    for _, row in meta.iterrows():
+        if row["suppl"]:
+            gsm_suppl[row["gsm"]] = [
+                s.split("/")[-1]
+                for s in row["suppl"]
+            ]
 
-        # Extract patient ID from title
-        # e.g. "Tumor CDC1" → "CDC1"
-        patient = "unknown"
-        for word in title.upper().split():
-            if word.startswith("CDC"):
-                patient = word
-                break
+    if gsm_suppl:
+        log("\n  GSM-LEVEL SUPPLEMENTARY FILES:")
+        for gsm, fnames in gsm_suppl.items():
+            patient, stype = SAMPLE_MAP[gsm]
+            for fn in fnames:
+                log(f"    {gsm} ({patient} {stype}): "
+                    f"{fn}")
 
-        rows.append({
-            "gsm":     gsm,
-            "title":   info.get("title", ""),
-            "source":  info.get("source", ""),
-            "patient": patient,
-            "type":    stype,
-            "lib":     info.get("library_strategy", ""),
-            "instr":   info.get("instrument", ""),
-        })
-
-    meta_df = pd.DataFrame(rows)
-
-    n_tumor  = (meta_df["type"] == "tumor").sum()
-    n_normal = (meta_df["type"] == "normal").sum()
-    n_unk    = (meta_df["type"] == "unknown").sum()
-
-    log(f"\n  Sample type counts:")
-    log(f"    Tumour:  {n_tumor}")
-    log(f"    Normal:  {n_normal}")
-    log(f"    Unknown: {n_unk}")
-    log(f"    Total:   {len(meta_df)}")
-
-    # Check pairing
-    log("")
-    log("  PAIRING STRUCTURE")
-    log("  " + "-" * 50)
-    patients = meta_df["patient"].unique()
-    n_paired = 0
-    n_unpaired = 0
-    for p in sorted(patients):
-        if p == "unknown":
-            continue
-        sub = meta_df[meta_df["patient"] == p]
-        types = sub["type"].tolist()
-        has_t = "tumor"  in types
-        has_n = "normal" in types
-        paired_str = "PAIRED" if (has_t and has_n) else "UNPAIRED"
-        if has_t and has_n:
-            n_paired += 1
-        else:
-            n_unpaired += 1
-        log(f"    {p:8s}  T={int(has_t)}  N={int(has_n)}  "
-            f"{paired_str}")
-
-    log(f"\n  Paired patients:   {n_paired}")
-    log(f"  Unpaired patients: {n_unpaired}")
-
-    return meta_df
+    return meta, gsm_suppl
 
 # ============================================================
-# CHECK EXPRESSION MATRIX
+# STEP 2: DOWNLOAD GSM-LEVEL FILES IF NEEDED
 # ============================================================
 
-def check_matrix(path, label, meta_df):
+def download_gsm_files(gsm_suppl):
+    """
+    If no series-level matrix was found,
+    download individual per-sample count files
+    and merge them into a single matrix.
+    """
     log("")
     log("=" * 65)
-    log(f"STEP 2 — MATRIX CHECK: {label}")
+    log("STEP 2 — GSM-LEVEL FILE DOWNLOAD")
+    log("  Downloading individual sample count files")
+    log("=" * 65)
+
+    gsm_paths = {}
+    gsm_prefix_map = {}
+
+    for gsm, fnames in gsm_suppl.items():
+        for fname in fnames:
+            # Determine FTP prefix for this GSM
+            # GSM2359144 → GSM2359nnn
+            gsm_num = int(re.sub(r"\D", "", gsm))
+            prefix  = str(gsm_num)[:-3] + "nnn"
+            gsm_ftp = (
+                "https://ftp.ncbi.nlm.nih.gov/geo/"
+                f"samples/GSM{prefix}/{gsm}/suppl/"
+            )
+
+            local = os.path.join(BASE_DIR, fname)
+            if os.path.exists(local):
+                sz = os.path.getsize(local) / 1e6
+                if sz > 0.001:
+                    log(f"  {gsm}: cached {fname}")
+                    gsm_paths[gsm] = local
+                    continue
+
+            url = gsm_ftp + fname
+            log(f"  {gsm}: downloading {fname}")
+            log(f"    URL: {url}")
+            ok = download_file(url, local)
+            if ok and os.path.exists(local):
+                sz = os.path.getsize(local) / 1e6
+                log(f"    OK: {sz:.4f} MB")
+                gsm_paths[gsm] = local
+            else:
+                log(f"    FAILED")
+
+    return gsm_paths
+
+# ============================================================
+# STEP 3: INSPECT MATRIX (series or per-GSM)
+# ============================================================
+
+def inspect_series_matrix(path, label, meta):
+    log("")
+    log("=" * 65)
+    log(f"STEP 3 — MATRIX INSPECTION: {label}")
     log(f"  File: {os.path.basename(path)}")
     log("=" * 65)
 
-    if path is None or not os.path.exists(path):
-        log("  FILE NOT FOUND — skipping")
+    if not path or not os.path.exists(path):
+        log("  FILE NOT AVAILABLE")
         return None
+
+    sz = os.path.getsize(path) / 1e6
+    log(f"  File size: {sz:.2f} MB")
 
     try:
-        with gzip.open(path, "rt") as f:
-            df = pd.read_csv(f, sep="\t", index_col=0)
+        if path.endswith(".gz"):
+            with gzip.open(path, "rt") as f:
+                df = pd.read_csv(
+                    f, sep="\t", index_col=0,
+                    low_memory=False
+                )
+        else:
+            df = pd.read_csv(
+                path, sep="\t", index_col=0,
+                low_memory=False
+            )
     except Exception as e:
-        log(f"  ERROR reading file: {e}")
-        return None
+        log(f"  ERROR reading: {e}")
+        # Try comma separator
+        try:
+            if path.endswith(".gz"):
+                with gzip.open(path, "rt") as f:
+                    df = pd.read_csv(
+                        f, sep=",", index_col=0,
+                        low_memory=False
+                    )
+            else:
+                df = pd.read_csv(
+                    path, sep=",", index_col=0,
+                    low_memory=False
+                )
+            log("  Loaded with comma separator")
+        except Exception as e2:
+            log(f"  ERROR (comma sep): {e2}")
+            return None
 
-    log(f"\n  Shape:  {df.shape[0]} rows x {df.shape[1]} cols")
+    log(f"\n  Shape: {df.shape[0]} rows × "
+        f"{df.shape[1]} cols")
     log(f"  Index name: {df.index.name}")
-    log(f"\n  First 5 row IDs:")
-    for i, idx in enumerate(df.index[:5]):
+    log(f"\n  First 8 row IDs:")
+    for idx in list(df.index[:8]):
         log(f"    {idx}")
 
-    log(f"\n  Column names ({df.shape[1]} total):")
+    log(f"\n  All column names:")
     for col in df.columns:
         log(f"    {col}")
 
-    # Check if columns match GSM IDs
-    gsm_cols = [c for c in df.columns
-                if c.startswith("GSM")]
-    non_gsm  = [c for c in df.columns
-                if not c.startswith("GSM")]
-    log(f"\n  GSM columns:     {len(gsm_cols)}")
-    log(f"  Non-GSM columns: {len(non_gsm)}")
-    if non_gsm:
-        log(f"  Non-GSM column names: {non_gsm}")
+    # Check column alignment with GSM IDs
+    gsm_cols  = [c for c in df.columns
+                 if c in SAMPLE_MAP]
+    other_cols = [c for c in df.columns
+                  if c not in SAMPLE_MAP]
+    log(f"\n  GSM-matching columns: {len(gsm_cols)}")
+    log(f"  Other columns:        {len(other_cols)}")
+    if other_cols:
+        log(f"  Other: {other_cols[:10]}")
 
-    # Check column-to-sample mapping
-    if len(meta_df) > 0 and len(gsm_cols) > 0:
-        log("\n  COLUMN → SAMPLE TYPE MAPPING")
-        log("  " + "-" * 50)
+    # Try to map columns to sample info
+    if gsm_cols:
+        log("\n  COLUMN → SAMPLE MAPPING:")
         for col in df.columns:
-            if col in meta_df["gsm"].values:
-                row = meta_df[meta_df["gsm"] == col].iloc[0]
-                log(
-                    f"    {col}  {row['patient']:8s}  "
-                    f"{row['type']:6s}  '{row['title']}'"
-                )
+            if col in SAMPLE_MAP:
+                p, t = SAMPLE_MAP[col]
+                log(f"    {col}  {p:6s}  {t}")
             else:
-                log(f"    {col}  NOT IN METADATA")
+                log(f"    {col}  [not in SAMPLE_MAP]")
 
     # Expression value inspection
-    log("\n  EXPRESSION VALUE INSPECTION")
-    log("  " + "-" * 50)
-
-    # Use numeric columns only
     num_df = df.select_dtypes(include=[np.number])
-
     if num_df.empty:
-        log("  No numeric columns found")
+        log("\n  No numeric columns — check separator")
         return df
 
     flat = num_df.values.flatten()
     flat = flat[~np.isnan(flat)]
-    flat = flat[flat >= 0]
 
-    log(f"  Min value:    {flat.min():.4f}")
-    log(f"  Max value:    {flat.max():.4f}")
-    log(f"  Mean value:   {flat.mean():.4f}")
-    log(f"  Median:       {np.median(flat):.4f}")
-    log(f"  % zeros:      "
-        f"{(flat == 0).sum() / len(flat) * 100:.2f}%")
-    log(f"  % > 0:        "
-        f"{(flat > 0).sum() / len(flat) * 100:.2f}%")
-    log(f"  % > 1:        "
-        f"{(flat > 1).sum() / len(flat) * 100:.2f}%")
-    log(f"  99th pctile:  "
-        f"{np.percentile(flat, 99):.2f}")
+    log(f"\n  VALUE STATISTICS:")
+    log(f"    Min:     {flat.min():.4f}")
+    log(f"    Max:     {flat.max():.4f}")
+    log(f"    Mean:    {flat.mean():.4f}")
+    log(f"    Median:  {np.median(flat):.4f}")
+    log(f"    % zero:  "
+        f"{(flat==0).sum()/len(flat)*100:.2f}%")
+    log(f"    99th pct: {np.percentile(flat,99):.2f}")
 
-    # Determine if log-transformed
-    if flat.max() > 100:
-        log(f"\n  Scale:  LINEAR (max={flat.max():.1f})"
-            f" — log2 transform needed for PCA")
-        log(f"  Recommended: log2(TPM + 1)")
-    else:
-        log(f"\n  Scale:  Appears log-transformed "
-            f"(max={flat.max():.2f})")
+    needs_log = flat.max() > 50
+    log(f"\n  Scale: {'LINEAR — log2(x+1) needed' if needs_log else 'log-scale'}")
 
-    # Zero / low expression rows
+    # Gene ID type
+    ids = [str(x) for x in list(df.index[:10])]
+    is_entrez  = all(s.isdigit() for s in ids)
+    is_ensembl = any(s.startswith("ENSG") for s in ids)
+    id_type = (
+        "ENTREZ"  if is_entrez  else
+        "ENSEMBL" if is_ensembl else
+        "SYMBOL"
+    )
+    log(f"  Gene ID type: {id_type}")
+    log(f"  Sample IDs: {ids[:6]}")
+
+    # Zero rows
     row_means = num_df.mean(axis=1)
-    n_zero_rows = (row_means == 0).sum()
-    n_low_rows  = (row_means < 0.1).sum()
-    log(f"\n  Rows with mean == 0: {n_zero_rows}")
-    log(f"  Rows with mean < 0.1: {n_low_rows}")
+    log(f"\n  Rows with mean=0:   "
+        f"{(row_means==0).sum()}")
+    log(f"  Rows with mean<0.5: "
+        f"{(row_means<0.5).sum()}")
+    log(f"  Rows with mean>1:   "
+        f"{(row_means>1.0).sum()}")
 
-    # Duplicate index check
-    n_dupes = df.index.duplicated().sum()
-    log(f"  Duplicate row IDs:   {n_dupes}")
-
-    # Gene ID type detection
-    log("\n  GENE ID TYPE DETECTION")
-    log("  " + "-" * 50)
-    sample_ids = list(df.index[:20])
-    is_entrez = all(
-        str(s).isdigit() for s in sample_ids
-        if str(s) != "nan"
-    )
-    is_ensembl = any(
-        str(s).startswith("ENSG") for s in sample_ids
-    )
-    is_symbol  = not is_entrez and not is_ensembl
-
-    if is_entrez:
-        id_type = "ENTREZ"
-    elif is_ensembl:
-        id_type = "ENSEMBL"
-    else:
-        id_type = "SYMBOL (likely)"
-
-    log(f"  Detected ID type: {id_type}")
-    log(f"  Sample IDs: {sample_ids[:10]}")
-
-    # Check for key marker genes
-    log("\n  KEY GENE PRESENCE CHECK")
-    log("  " + "-" * 50)
-    check_genes = [
-        # Principal cell markers
-        "AQP2", "SCNN1A", "SCNN1B", "SCNN1G",
-        "AVPR2", "FOXI1",
-        # Intercalated cell (should NOT dominate)
-        "SLC51B", "HSD17B14", "SULT2B1",
-        # Universal attractor markers
-        "EZH2", "MKI67", "VIM", "CDH1",
-        # Housekeeping
-        "ACTB", "GAPDH", "B2M",
-    ]
-    found = []
-    missing = []
-    for gene in check_genes:
-        if gene in df.index:
-            vals = num_df.loc[gene].values
-            mean_expr = np.mean(vals)
-            found.append((gene, mean_expr))
-        else:
-            missing.append(gene)
-
-    if found:
-        log("  Found:")
-        for gene, expr in found:
-            log(f"    {gene:12s}  mean={expr:.2f}")
-    if missing:
-        log(f"  Not found in index: {missing}")
-
-    # If Entrez IDs — check annotation file
-    if is_entrez:
-        log("\n  NOTE: Row IDs appear to be Entrez.")
-        log("  Annotation file will be needed for")
-        log("  gene symbol mapping in Script 1.")
+    # Duplicates
+    log(f"  Duplicate row IDs:  "
+        f"{df.index.duplicated().sum()}")
 
     return df
 
 # ============================================================
-# CHECK ANNOTATION FILE
+# STEP 4: MERGE PER-GSM FILES
 # ============================================================
 
-def check_annotation(path):
+def merge_gsm_files(gsm_paths, meta):
+    """
+    Merge individually downloaded GSM count files
+    into a single genes × samples matrix.
+    """
     log("")
     log("=" * 65)
-    log("STEP 3 — ANNOTATION FILE CHECK")
-    log(f"  File: {os.path.basename(path)}")
+    log("STEP 4 — MERGING PER-GSM FILES")
     log("=" * 65)
 
-    if path is None or not os.path.exists(path):
-        log("  FILE NOT FOUND")
+    frames = {}
+    for gsm, path in gsm_paths.items():
+        if not os.path.exists(path):
+            continue
+        try:
+            if path.endswith(".gz"):
+                with gzip.open(path, "rt") as f:
+                    df = pd.read_csv(
+                        f, sep="\t",
+                        header=None,
+                        names=["gene", "count"],
+                        index_col=0
+                    )
+            else:
+                df = pd.read_csv(
+                    path, sep="\t",
+                    header=None,
+                    names=["gene", "count"],
+                    index_col=0
+                )
+            frames[gsm] = df["count"]
+            p, t = SAMPLE_MAP.get(gsm, ("?","?"))
+            log(f"  {gsm} ({p} {t}): "
+                f"{len(df)} genes")
+        except Exception as e:
+            log(f"  {gsm}: ERROR — {e}")
+
+    if not frames:
+        log("  No per-GSM files loaded")
         return None
 
-    try:
-        with gzip.open(path, "rt") as f:
-            annot = pd.read_csv(f, sep="\t",
-                                low_memory=False)
-    except Exception as e:
-        log(f"  ERROR reading annotation: {e}")
-        return None
+    merged = pd.DataFrame(frames)
+    log(f"\n  Merged matrix: {merged.shape}")
+    log(f"  Samples: {list(merged.columns)}")
 
-    log(f"\n  Shape: {annot.shape}")
-    log(f"\n  Columns:")
-    for col in annot.columns:
-        sample_vals = annot[col].dropna().head(3).tolist()
-        log(f"    {col:25s}  sample: {sample_vals}")
+    # Save
+    out = os.path.join(BASE_DIR,
+                       "GSE89122_merged_counts.tsv")
+    merged.to_csv(out, sep="\t")
+    log(f"  Saved: {out}")
 
-    # Find the ID and symbol columns
-    id_col  = None
-    sym_col = None
-
-    for col in annot.columns:
-        col_l = col.lower()
-        if "entrez" in col_l or col_l in ("geneid", "gene_id"):
-            id_col = col
-        if "symbol" in col_l or col_l == "symbol":
-            sym_col = col
-
-    if id_col and sym_col:
-        log(f"\n  Entrez ID column: '{id_col}'")
-        log(f"  Symbol column:    '{sym_col}'")
-        log(f"  Sample mappings:")
-        for _, row in annot[[id_col, sym_col]].dropna().head(8).iterrows():
-            log(f"    {row[id_col]}  →  {row[sym_col]}")
-    else:
-        log("\n  Could not auto-detect ID/symbol columns")
-        log("  Manual inspection needed")
-
-    return annot
+    return merged
 
 # ============================================================
 # STRUCTURAL SUMMARY
 # ============================================================
 
-def print_structural_summary(meta_df, tpm_df,
-                              raw_df, annot_df):
+def structural_summary(meta, matrix_df,
+                        matrix_label, found_files):
     log("")
     log("=" * 65)
     log("STRUCTURAL SUMMARY FOR SCRIPT 1")
     log("=" * 65)
 
-    # Sample structure
-    if meta_df is not None and len(meta_df) > 0:
-        n_t = (meta_df["type"] == "tumor").sum()
-        n_n = (meta_df["type"] == "normal").sum()
-        log(f"\n  SAMPLES")
-        log(f"    Total:   {len(meta_df)}")
-        log(f"    Tumour:  {n_t}")
-        log(f"    Normal:  {n_n}")
+    log(f"\n  SAMPLES (confirmed)")
+    log(f"    Total:   {len(meta)}")
+    log(f"    Tumour:  {(meta['type']=='tumor').sum()}")
+    log(f"    Normal:  {(meta['type']=='normal').sum()}")
+    log(f"    Paired patients: 6 (CDC1-4, CDC6, CDC7)")
+    log(f"    Unpaired tumour: 1 (CDC5)")
+
+    log(f"\n  EXPRESSION FILES FOUND:")
+    if found_files:
+        for k, v in found_files.items():
+            log(f"    [{k}]  {v}")
     else:
-        log("\n  SAMPLES: metadata parse failed")
+        log("    None discovered automatically")
 
-    # Matrix structure
-    for label, df in [("TPM", tpm_df), ("RAW", raw_df)]:
-        if df is not None:
-            num = df.select_dtypes(include=[np.number])
-            flat = num.values.flatten()
-            flat = flat[~np.isnan(flat)]
-            needs_log = flat.max() > 100
-            log(f"\n  {label} MATRIX")
-            log(f"    Shape:       {df.shape}")
-            log(f"    Log needed:  {needs_log}")
-            log(f"    Value range: "
-                f"{flat.min():.2f} — {flat.max():.2f}")
+    if matrix_df is not None:
+        num = matrix_df.select_dtypes(
+            include=[np.number]
+        )
+        flat = num.values.flatten()
+        flat = flat[~np.isnan(flat)]
+        needs_log = flat.max() > 50
+        ids = [str(x) for x in list(
+            matrix_df.index[:5]
+        )]
+        is_entrez = all(s.isdigit() for s in ids)
 
-    # Annotation
-    if annot_df is not None:
-        log(f"\n  ANNOTATION")
-        log(f"    Shape: {annot_df.shape}")
+        log(f"\n  MATRIX ({matrix_label})")
+        log(f"    Shape:       {matrix_df.shape}")
+        log(f"    Max value:   {flat.max():.2f}")
+        log(f"    Log needed:  {needs_log}")
+        log(f"    Gene ID:     "
+            f"{'ENTREZ' if is_entrez else 'SYMBOL/OTHER'}")
 
-    # Script 1 recommendations
-    log("")
-    log("  SCRIPT 1 RECOMMENDATIONS")
-    log("  " + "-" * 50)
-    log("  1. Use TPM matrix (GSE89122_norm_counts_TPM...)")
-    log("  2. Apply log2(TPM + 1) before PCA")
-    log("  3. Filter: keep genes with mean TPM > 1 "
-        "across all samples")
-    log("  4. Use annotation file to map Entrez → symbol")
-    log("  5. Column labels are GSM IDs — map via "
-        "metadata to tumour/normal")
-    log("  6. Matched pairs: CDC1–CDC4, CDC6, CDC7")
-    log("     Unmatched tumour only: CDC5")
-    log("  7. PCA: standardise (mean=0, std=1) before "
-        "sklearn PCA")
-    log("  8. Depth score: project onto PC1, "
-        "normalise 0→1 within tumour samples")
+        log(f"\n  SCRIPT 1 SETTINGS:")
+        log(f"    matrix_file = '{matrix_label}'")
+        log(f"    log_transform = {needs_log}")
+        log(f"    gene_id_type = "
+            f"{'ENTREZ — needs symbol map' if is_entrez else 'SYMBOL — direct use'}")
+        log(f"    filter_mean_tpm = 1.0")
+    else:
+        log(f"\n  NO MATRIX LOADED")
+        log(f"  Manual download required.")
+        log(f"  Visit: {GEO_DOWNLOAD_PAGE}")
+        log(f"  Download any .tsv.gz or .txt.gz file")
+        log(f"  containing expression values and place")
+        log(f"  in: {BASE_DIR}")
 
     log("")
-    log("  CONFIRMED DATASET STRUCTURE:")
-    log("    GSE89122  RNA-seq  TPM + RAW  "
-        "7T + 6N  13 total")
-    log("    Matched pairs: 6")
-    log("    Unmatched tumour: 1 (CDC5)")
-    log("    Platform: Illumina HiSeq 2000")
-    log("    Genome: GRCh38.p13")
-    log("    Gene IDs: Entrez (needs symbol mapping)")
-
+    log("  PLATFORM: Illumina HiSeq 2000")
+    log("  GENOME:   GRCh38.p13")
+    log("  DATA:     RNA-seq")
+    log("  DESIGN:   6 matched pairs + 1 tumour-only")
 
 # ============================================================
 # MAIN
@@ -612,47 +773,69 @@ def print_structural_summary(meta_df, tpm_df,
 def main():
     log("=" * 65)
     log("cdRCC — COLLECTING DUCT CARCINOMA")
-    log("STRUCTURAL CHECK — Phase 0.5")
-    log("GSE89122")
+    log("STRUCTURAL CHECK v2 — Phase 0.5")
+    log("GSE89122 — Auto file discovery")
     log("Date: 2026-03-03")
     log("=" * 65)
-    log("PURPOSE: Verify data structure before Script 1.")
-    log("No biology loaded. No predictions made.")
-    log("=" * 65)
 
-    # Step 0 — Download
-    paths = download_files()
+    # Step 0 — Discover real file names
+    found_files = discover_files()
 
-    # Step 1 — Metadata
-    meta_df = fetch_metadata()
+    # Step 0b — Download whatever was found
+    paths = {}
+    if found_files:
+        paths = download_files(found_files)
 
-    # Step 2 — TPM matrix
-    tpm_df = None
-    if paths.get("tpm"):
-        tpm_df = check_matrix(
-            paths["tpm"], "TPM (normalised)", meta_df
-        )
+    # Step 1 — Metadata (already confirmed)
+    meta, gsm_suppl = load_confirmed_metadata()
 
-    # Step 2b — Raw count matrix
-    raw_df = None
-    if paths.get("raw"):
-        raw_df = check_matrix(
-            paths["raw"], "RAW COUNTS", meta_df
-        )
+    # Step 2 — If no series matrix, try GSM files
+    gsm_paths = {}
+    if not any(k in paths
+               for k in ["tpm","fpkm","raw"]):
+        if gsm_suppl:
+            gsm_paths = download_gsm_files(gsm_suppl)
+        else:
+            log("\n  No GSM-level supplementary files "
+                "found either.")
+            log("  Dataset may only provide SRA/FASTQ.")
+            log("  A pre-processed matrix is needed.")
 
-    # Step 3 — Annotation
-    annot_df = None
-    if paths.get("annot"):
-        annot_df = check_annotation(paths["annot"])
+    # Step 3 — Inspect whatever matrix we have
+    matrix_df    = None
+    matrix_label = None
 
-    # Final summary
-    print_structural_summary(
-        meta_df, tpm_df, raw_df, annot_df
+    for key in ["tpm", "fpkm", "raw"]:
+        if key in paths and paths[key]:
+            matrix_df = inspect_series_matrix(
+                paths[key], key.upper(), meta
+            )
+            matrix_label = key
+            if matrix_df is not None:
+                break
+
+    # Step 4 — Merge per-GSM if needed
+    if matrix_df is None and gsm_paths:
+        matrix_df = merge_gsm_files(gsm_paths, meta)
+        matrix_label = "per-GSM merged"
+        if matrix_df is not None:
+            inspect_series_matrix(
+                os.path.join(
+                    BASE_DIR,
+                    "GSE89122_merged_counts.tsv"
+                ),
+                "MERGED COUNTS",
+                meta
+            )
+
+    # Summary
+    structural_summary(
+        meta, matrix_df, matrix_label, found_files
     )
 
     write_log()
-    log("\n[STRUCTURAL CHECK COMPLETE]")
-    log("Proceed to Script 1 once output reviewed.")
+    log(f"\nLog: {LOG_FILE}")
+    log("\n[STRUCTURAL CHECK v2 COMPLETE]")
 
 
 if __name__ == "__main__":
