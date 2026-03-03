@@ -1,0 +1,192 @@
+========================================================
+GBM FALSE ATTRACTOR ANALYSIS
+OrganismCore — False Attractor Framework
+Cancer Validation #3
+February 28, 2026
+========================================================
+File found.
+========================================================
+STEP 1: LOADING EXPRESSION MATRIX
+========================================================
+File: GSM3828672_Smartseq2_GBM_IDHwt_processed_TPM.tsv.gz
+Loading TPM matrix (genes x cells)...
+This will take ~60 seconds...
+Full matrix: (23686, 7930) (genes x cells)
+
+Target genes found:   ['OLIG2', 'SOX10', 'MBP', 'MOG', 'PLP1', 'PDGFRA', 'SOX2', 'EGFR', 'NES', 'CDX2', 'SPI1', 'KLF4', 'IRF8', 'OLIG1', 'GFAP', 'MKI67']
+
+Extracted: (7930, 16) (cells x genes)
+Log1p transformed.
+Cached: ./gbm_saddle_results/expr_cache.csv
+========================================================
+STEP 2: CELL STATE CLASSIFICATION
+========================================================
+Strategy: marker-based scoring
+  Normal oligodendrocyte = high MBP/MOG/PLP1/SOX10
+  OPC-like false attractor = high PDGFRA/SOX2/EGFR/NES
+
+Myelination markers available: ['MBP', 'MOG', 'PLP1', 'SOX10']
+Progenitor markers available:  ['PDGFRA', 'SOX2', 'EGFR', 'NES']
+
+Oligo score:      mean=0.377  max=2.282
+Progenitor score: mean=0.797  max=1.874
+
+Thresholds (top 20%):
+  Oligo:      0.585
+  Progenitor: 1.224
+
+Cell state distribution:
+cell_state
+Ambiguous       5262
+Normal_Oligo    1334
+OPC_like        1334
+Name: count, dtype: int64
+
+Normal oligodendrocytes: 1334
+OPC-like (false attractor): 1334
+
+Marker expression by cell state:
+GENE            MBP    MOG   PLP1  SOX10  PDGFRA   SOX2   EGFR    NES
+cell_state                                                           
+Ambiguous     0.159  0.421  0.237  0.149   0.551  0.717  0.898  0.546
+Normal_Oligo  0.915  0.896  1.663  0.822   0.755  0.818  0.516  0.507
+OPC_like      0.095  0.387  0.276  0.094   1.383  1.274  1.816  1.177
+========================================================
+STEP 3: SADDLE POINT SIGNATURE
+========================================================
+FRAMEWORK PREDICTION (GBM):
+  Reference:  Normal_Oligo
+              (myelinating oligodendrocytes)
+  Blocked:    OPC_like
+              (false attractor)
+
+  SUPPRESSED candidates:
+    ['OLIG2', 'SOX10', 'MBP', 'MOG', 'PLP1']
+  ELEVATED predicted:
+    ['PDGFRA', 'SOX2', 'EGFR', 'NES']
+  CONTROLS (prior cancer switch genes):
+    ['CDX2', 'SPI1', 'KLF4', 'IRF8']
+
+n normal oligo:  1334
+n OPC-like:      1334
+
+OLIG2    [CANDIDATE ] | normal=0.663 blocked=0.806 | elevated   +21.5%          | p=1.0000     | ✗ INVERTED
+SOX10    [CANDIDATE ] | normal=0.822 blocked=0.094 | suppressed +88.6%          | p=5.50e-188 *** | ✓ CONFIRMED
+MBP      [CANDIDATE ] | normal=0.915 blocked=0.095 | suppressed +89.6%          | p=1.97e-143 *** | ✓ CONFIRMED
+MOG      [CANDIDATE ] | normal=0.896 blocked=0.387 | suppressed +56.9%          | p=2.97e-91 *** | ✓ CONFIRMED
+PLP1     [CANDIDATE ] | normal=1.663 blocked=0.276 | suppressed +83.4%          | p=1.27e-280 *** | ✓ CONFIRMED
+PDGFRA   [ELEVATED  ] | normal=0.755 blocked=1.383 | elevated   +83.1%          | p=1.0000     | ✓ ELEVATED
+SOX2     [ELEVATED  ] | normal=0.818 blocked=1.274 | elevated   +55.7%          | p=1.0000     | ✓ ELEVATED
+EGFR     [ELEVATED  ] | normal=0.516 blocked=1.816 | elevated   +252.2%         | p=1.0000     | ✓ ELEVATED
+NES      [ELEVATED  ] | normal=0.507 blocked=1.177 | elevated   +132.3%         | p=1.0000     | ✓ ELEVATED
+CDX2     [CONTROL   ] | normal=0.000 blocked=0.001 | elevated   +97487.4%       | p=0.9215     | ✗ CONTROL UNEXPECTED
+SPI1     [CONTROL   ] | normal=0.017 blocked=0.003 | suppressed +81.0%          | p=0.0021 **  | ✗ CONTROL UNEXPECTED
+KLF4     [CONTROL   ] | normal=0.270 blocked=0.185 | suppressed +31.4%          | p=5.53e-05 *** | ✗ CONTROL UNEXPECTED
+IRF8     [CONTROL   ] | normal=0.051 blocked=0.006 | suppressed +87.6%          | p=4.94e-08 *** | ✗ CONTROL UNEXPECTED
+OLIG1    [SCAFFOLD  ] | normal=1.123 blocked=1.367 | elevated   +21.7%          | p=1.0000     | ~ SCAFFOLD
+GFAP     [SCAFFOLD  ] | normal=0.799 blocked=1.017 | elevated   +27.2%          | p=1.0000     | ~ SCAFFOLD
+
+========================================================
+GBM FRAMEWORK PREDICTION RESULT
+========================================================
+Switch genes confirmed:  4/5
+Switch genes partial:    0/5
+Elevated as predicted:   4/4
+Controls as expected:    0/4
+
+** PARTIAL CONFIRMATION **
+Consistent with framework.
+========================================================
+STEP 4: GENERATING FIGURE
+========================================================
+Figure saved: ./gbm_saddle_results/gbm_saddle_figure.png
+========================================================
+STEP 5: CROSS-CANCER SUMMARY
+========================================================
+
+CROSS-CANCER FALSE ATTRACTOR ANALYSIS
+OrganismCore — February 28, 2026
+============================================================
+
+THE PRINCIPLE:
+  Cancer is a false attractor in the Waddington
+  epigenetic landscape. Malignant cells are stuck
+  below the differentiation threshold — a ceiling
+  imposed by suppression of lineage-specific switch
+  genes. The switch genes are identifiable by their
+  expression profile: suppressed in the blocked
+  population relative to the normal differentiated
+  endpoint.
+
+CANCER 1: AML — Acute Myeloid Leukemia
+  Lineage:    Myeloid
+  Block:      GMP-like vs CD14+ monocytes
+  Switch genes (myeloid differentiation):
+    SPI1:  90.5% suppressed  p=0.00e+00 ***
+    KLF4:  94.7% suppressed  p=0.00e+00 ***
+    IRF8:  69.5% suppressed  p=0.00e+00 ***
+
+CANCER 2: CRC — Colorectal Cancer
+  Lineage:    Epithelial/Colonocyte
+  Block:      Epithelial 2 (cycling) vs Epithelial 1
+  Switch genes (colonocyte differentiation):
+    CDX2:  79.5% suppressed  p=3.89e-154 ***
+  Unexpected: IRF8 elevated 211%
+              (lineage infidelity)
+
+CANCER 3: GBM — Glioblastoma
+  Lineage:    Neural/Oligodendrocyte
+  Block:      OPC-like vs normal oligodendrocytes
+  Switch genes (myelination/oligodendrocyte):
+    OLIG2   : -21.5% suppressed  p=1.00e+00   [INVERTED]
+    SOX10   :  88.6% suppressed  p=5.50e-188 ***  [CONFIRMED]
+    MBP     :  89.6% suppressed  p=1.97e-143 ***  [CONFIRMED]
+    MOG     :  56.9% suppressed  p=2.97e-91 ***  [CONFIRMED]
+    PLP1    :  83.4% suppressed  p=1.27e-280 ***  [CONFIRMED]
+
+  Elevated (false attractor drivers):
+    PDGFRA  :  83.1% elevated  [ELEVATED AS PREDICTED]
+    SOX2    :  55.7% elevated  [ELEVATED AS PREDICTED]
+    EGFR    : 252.2% elevated  [ELEVATED AS PREDICTED]
+    NES     : 132.3% elevated  [ELEVATED AS PREDICTED]
+
+  Controls (prior cancer switch genes):
+    CDX2    : suppression=-97487.4%  [CONTROL UNEXPECTED]
+    SPI1    : suppression=+81.0%  [CONTROL UNEXPECTED]
+    KLF4    : suppression=+31.4%  [CONTROL UNEXPECTED]
+    IRF8    : suppression=+87.6%  [CONTROL UNEXPECTED]
+
+ZERO GENE OVERLAP (confirmed):
+  AML:  SPI1, KLF4, IRF8   — myeloid TFs
+  CRC:  CDX2               — colonocyte TF
+  GBM:  OLIG2, SOX10, MBP, MOG, PLP1
+        — oligodendrocyte/myelin TFs and proteins
+
+  None of these gene sets overlap.
+  The framework finds lineage-specific gates
+  in each cancer type.
+  The lock is the same. The gates are different.
+
+THERAPEUTIC IMPLICATIONS:
+  AML:  CRISPRa SPI1 + KLF4 + IRF8
+  CRC:  CRISPRa CDX2  +  CRISPRi IRF8
+  GBM:  CRISPRa [confirmed switch genes above]
+
+  Same intervention logic. Different targets.
+  Computable from public data.
+  Testable with standard tools.
+
+============================================================
+Eric Robert Lawson — OrganismCore
+February 28, 2026
+
+Saved: ./gbm_saddle_results/cross_cancer_summary.txt
+
+========================================================
+COMPLETE
+Results: ./gbm_saddle_results/
+Files:
+  ./gbm_saddle_results/gbm_saddle_figure.png
+  ./gbm_saddle_results/gbm_saddle_results.csv
+  ./gbm_saddle_results/cross_cancer_summary.txt
+========================================================

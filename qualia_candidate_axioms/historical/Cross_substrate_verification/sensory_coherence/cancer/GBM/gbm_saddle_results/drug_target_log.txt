@@ -1,0 +1,204 @@
+========================================================
+GBM DRUG TARGET EXPLORATION
+OrganismCore — Document 81
+========================================================
+
+STEP 1: LOADING GBM CACHE
+----------------------------------------
+Cache shape: (7930, 16)
+Columns: ['OLIG2', 'SOX10', 'MBP', 'MOG', 'PLP1', 'PDGFRA', 'SOX2', 'EGFR', 'NES', 'CDX2', 'SPI1', 'KLF4', 'IRF8', 'OLIG1', 'GFAP', 'MKI67']
+
+Cell state distribution:
+cell_state
+Ambiguous       5010
+Normal_Oligo    1586
+OPC_like        1334
+Name: count, dtype: int64
+
+========================================================
+STEP 2: EGFR / PDGFRA CO-ELEVATION
+========================================================
+OPC-like cells: 1334
+
+EGFR  threshold (p70): 2.0816
+PDGFRA threshold (p70): 1.8241
+
+Elevation pattern in OPC-like cells:
+  DUAL high (EGFR + PDGFRA):   27 (2.0%)
+  EGFR only:                  373 (28.0%)
+  PDGFRA only:                373 (28.0%)
+  Neither elevated:           561 (42.1%)
+
+EGFR vs PDGFRA correlation:
+  Pearson r = -0.4134  p = 3.18e-56
+  ANTI-CORRELATED or independent
+  Independent attractor inputs
+
+========================================================
+STEP 3: OLIG2 LOCK CORRELATION
+========================================================
+OLIG2 is downstream of EGFR/PDGFRA
+in OPCs. If it is the attractor lock,
+OLIG2 should be highest in DUAL cells.
+
+OLIG2 expression by elevation group:
+  DUAL        : mean=1.0538 ± 0.1113 n=27
+  EGFR_only   : mean=0.8480 ± 0.0300 n=373
+  PDGFRA_only : mean=0.9589 ± 0.0332 n=373
+  NEITHER     : mean=0.6646 ± 0.0263 n=561
+
+DUAL vs NEITHER OLIG2:
+  p = 8.28e-04
+  OLIG2 significantly higher
+  in DUAL co-elevated cells ***
+  OLIG2 IS the downstream lock
+  Dual EGFR+PDGFRA → OLIG2 → lock
+
+EGFR vs OLIG2:   r=-0.0708 p=9.71e-03
+PDGFRA vs OLIG2: r=0.1397 p=3.02e-07
+
+========================================================
+STEP 4: ATTRACTOR DEPTH SCORING
+========================================================
+Deeper attractor = more myelination
+genes suppressed + more progenitor
+genes elevated simultaneously
+Myelination genes: ['MBP', 'MOG', 'PLP1', 'SOX10']
+Progenitor genes:  ['EGFR', 'PDGFRA', 'SOX2', 'NES']
+
+Attractor depth by elevation group:
+  DUAL        : depth=0.6291 ± 0.0405
+  EGFR only   : depth=0.4631 ± 0.0096
+  PDGFRA only : depth=0.4583 ± 0.0101
+  NEITHER     : depth=0.4483 ± 0.0079
+
+DUAL vs NEITHER depth: p=4.39e-06
+  DUAL cells are DEEPER in attractor ***
+  Co-elevation = stronger lock
+DUAL vs EGFR-only:    p=2.85e-05
+DUAL vs PDGFRA-only:  p=3.32e-05
+
+========================================================
+STEP 5: MYELINATION SUPPRESSION
+BY ELEVATION GROUP
+========================================================
+If DUAL cells are deepest in attractor
+they should have the MOST suppressed
+myelination genes — most lost identity
+
+  DUAL (n=27):
+    MBP=0.058  MOG=0.347  PLP1=0.116  SOX10=0.000
+    avg myelination = 0.1300
+
+  EGFR only (n=373):
+    MBP=0.134  MOG=0.346  PLP1=0.341  SOX10=0.019
+    avg myelination = 0.2102
+
+  PDGFRA only (n=373):
+    MBP=0.111  MOG=0.443  PLP1=0.123  SOX10=0.243
+    avg myelination = 0.2302
+
+  NEITHER (n=561):
+    MBP=0.061  MOG=0.378  PLP1=0.341  SOX10=0.048
+    avg myelination = 0.2071
+
+Interpretation:
+Myelination suppression ranking:
+(lowest = most suppressed = deepest attractor)
+  1. DUAL        : avg=0.1300
+  2. NEITHER     : avg=0.2071
+  3. EGFR only   : avg=0.2102
+  4. PDGFRA only : avg=0.2302
+
+========================================================
+STEP 6: DRUG TARGET DERIVATION
+FROM ATTRACTOR LOGIC
+========================================================
+OPC-like cells:          1334
+DUAL elevated:           27 (2.0%)
+EGFR only elevated:      373 (28.0%)
+PDGFRA only elevated:    373 (28.0%)
+
+DRUG TARGET PREDICTIONS:
+========================================
+
+TARGET 1: EGFR inhibition
+  EGFR elevated +252% in OPC-like
+  Mean EGFR in OPC-like: 1.8164
+  Relevant to: EGFR-only + DUAL cells
+  = 30.0% of OPC-like cells
+  Drug class: EGFR inhibitor
+  Known drugs: erlotinib, gefitinib,
+               osimertinib, cetuximab
+  Clinical history: FAILED as
+  monotherapy in GBM
+  Attractor reason for failure:
+  PDGFRA compensates when EGFR blocked
+
+TARGET 2: PDGFRA inhibition
+  PDGFRA elevated +83% in OPC-like
+  Mean PDGFRA in OPC-like: 1.3827
+  Relevant to: PDGFRA-only + DUAL cells
+  = 30.0% of OPC-like cells
+  Drug class: PDGFR inhibitor
+  Known drugs: imatinib, sunitinib,
+               ripretinib, avapritinib
+  Clinical history: FAILED as
+  monotherapy in GBM
+  Attractor reason for failure:
+  EGFR compensates when PDGFRA blocked
+
+TARGET 3: EGFR + PDGFRA DUAL BLOCKADE
+  *** PRIMARY NOVEL PREDICTION ***
+  DUAL co-elevated cells: 2.0%
+  These are the DEEPEST in attractor
+  Both upstream signals active
+  Single blockade insufficient —
+  the other signal compensates
+  Dual blockade removes both inputs
+  → attractor has no maintenance signal
+  → cells differentiate or die
+  Drug combinations to test:
+    erlotinib + imatinib
+    osimertinib + avapritinib
+    cetuximab + sunitinib
+  Clinical status: NOT systematically
+  tested as attractor-dissolution
+  strategy in GBM
+  THIS IS THE TESTABLE PREDICTION
+
+TARGET 4: OLIG2 (downstream lock)
+  OLIG2 elevated in OPC-like cells
+  Downstream of EGFR and PDGFRA
+  Transcription factor — harder to drug
+  CT-179 OLIG2 inhibitor in preclinical
+  Prediction: OLIG2 inhibition would
+  dissolve attractor independently of
+  upstream RTK signals
+  Combination: RTK dual + OLIG2
+  = triple attractor dissolution
+
+========================================
+WHY PREVIOUS GBM TRIALS FAILED:
+========================================
+The attractor has multiple inputs.
+EGFR alone: blocked → PDGFRA compensates
+PDGFRA alone: blocked → EGFR compensates
+Both: blocked → OLIG2 may persist
+All three: blocked → attractor dissolved
+
+This is the attractor topology
+explanation for why GBM is
+resistant to single-target therapy.
+
+========================================================
+STEP 7: GENERATING FIGURE
+========================================================
+Figure saved: /Users/ericlawson/cancer/GBM/gbm_saddle_results/gbm_drug_target_figure.png
+
+========================================================
+GBM DRUG TARGET EXPLORATION COMPLETE
+Results: /Users/ericlawson/cancer/GBM/gbm_saddle_results/
+Key output: drug_target_log.txt
+Figure:     gbm_drug_target_figure.png
+========================================================
