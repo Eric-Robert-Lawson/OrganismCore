@@ -1,0 +1,5 @@
+cancer_type,TCA_gene_down,TCA_down_found,EZH2_up,KDM1A_up,chrom_up_found,mechanism
+ccRCC,SUCLG1,SUCLG1(0.001),YES,YES,"EZH2(0.528), EZH2(0.304), DNMT3A(0.252), DNMT3A(0.184), KDM5C(0.068)",EZH2↑+KDM1A↑ co-elevated; SUCLG1↓ → αKG↓ → EZH2 hyperactive
+PRCC,FH,"SUCLG1(0.519), FH(0.451), OGDHL(0.402)",YES,YES,"KDM1A(0.443), HDAC1(0.330), EZH2(0.308), SETD2(0.307), PBRM1(0.240)",EZH2↑+KDM1A↑ co-elevated; FH↓ → fumarate↑ / αKG↓ → chromatin lock
+chRCC,OGDHL,OGDHL(0.001),YES,not_measured/locked,EZH2(0.001),EZH2↑; KEAP1/NRF2 → AKR axis; OGDHL predicted down
+cdRCC,OGDHL,OGDHL(0.001),YES,not_measured/locked,"EZH2(0.199), DNMT3B(0.157), HDAC2(0.027), DNMT3A(0.025), KDM6A(0.013)",EZH2↑ (paired p=0.031); silences CEBPA; CEBPA removal allows PPARG module; OGDHL r=-1.000 depth
