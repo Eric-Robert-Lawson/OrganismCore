@@ -1,0 +1,5 @@
+rcc_type,gene,r_depth,method,low_power,verdict
+ccRCC,IL1RAP,0.519744766502103,depth_corr,False,context
+PRCC,IL1RAP,,not_found,False,UNTESTABLE
+chRCC,IL1RAP,0.3111,depth_corr,False,DENIED
+cdRCC,IL1RAP,0.9642857142857144,depth_corr,True,context

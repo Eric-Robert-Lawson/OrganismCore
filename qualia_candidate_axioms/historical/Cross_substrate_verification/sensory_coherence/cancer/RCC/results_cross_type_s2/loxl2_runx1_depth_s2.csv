@@ -1,0 +1,9 @@
+gene,rcc_type,r_depth,method,low_power
+LOXL2,ccRCC,0.6312499822598088,depth_corr,False
+LOXL2,PRCC,0.2753876553678188,depth_corr,False
+LOXL2,chRCC,0.1353,depth_corr,False
+LOXL2,cdRCC,0.3214285714285715,depth_corr,True
+RUNX1,ccRCC,0.6254768447856361,depth_corr,False
+RUNX1,PRCC,,not_found,False
+RUNX1,chRCC,,not_found,False
+RUNX1,cdRCC,0.7142857142857144,depth_corr,True

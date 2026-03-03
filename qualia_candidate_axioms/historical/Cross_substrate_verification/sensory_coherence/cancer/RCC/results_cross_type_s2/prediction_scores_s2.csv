@@ -1,0 +1,19 @@
+prediction,rcc_type,gene_a,gene_b,expected,r_value,method,low_power,approx,verdict
+P2-1a,ccRCC,EZH2,DNMT3A,> 0.30,0.276713069963176,approx_depth_corr,False,True,DENIED [APPROX]
+P2-1b,PRCC,EZH2,DNMT3A,> 0.30,0.19488859225611677,approx_depth_corr,False,True,DENIED [APPROX]
+P2-1c,cdRCC,EZH2,DNMT3A,> 0.30,0.4230769230769231,expr_direct,True,False,CONFIRMED [LOW-POWER]
+P2-1d,chRCC,EZH2,DNMT3A,< 0.20,0.38862855016069003,approx_depth_corr,False,True,DENIED [APPROX]
+P2-2a,ccRCC,MYC,RUNX1,< -0.20,0.4668419419614366,approx_depth_corr,False,True,DENIED [APPROX]
+P2-2b,PRCC,MYC,KDM1A,< -0.20,-0.3479405099553612,approx_depth_corr,False,True,CONFIRMED [APPROX]
+P2-2c,cdRCC,MYC,BHLHE40,< -0.90,0.18131868131868134,expr_direct,True,False,DENIED [LOW-POWER]
+P2-2d,chRCC,MYC,BHLHE40,< -0.30,0.4227363007833607,approx_depth_corr,False,True,DENIED [APPROX]
+P2-2e,ccRCC,MYC,BHLHE40,< -0.20,0.2153428092539226,approx_depth_corr,False,True,DENIED [APPROX]
+P2-3a,PRCC,IL1RAP,depth,> 0.25,,not_found,False,False,UNTESTABLE
+P2-3b,chRCC,IL1RAP,depth,< 0.15,0.3111,depth_corr,False,False,DENIED
+P2-5a,ccRCC,TI,depth,< -0.50,-1.2074291357785478,approx_diff_depth_r,False,True,CONFIRMED [APPROX]
+P2-5b,PRCC,TI,depth,< -0.35,,unavailable,False,False,UNTESTABLE
+P2-5c,chRCC,TI,depth,> -0.20,,unavailable,False,False,UNTESTABLE
+P2-5d,cdRCC,TI,depth,< -0.30,-0.8791208791208791,expr_direct_cdRCC,True,False,CONFIRMED [LOW-POWER]
+P2-7a,PRCC,LOXL2,depth,> 0.25,0.2753876553678188,depth_corr,False,False,CONFIRMED
+P2-7b,chRCC,LOXL2,depth,< 0.15,0.1353,depth_corr,False,False,CONFIRMED
+P2-8a,PRCC,RUNX1,depth,> 0.30,,not_found,False,False,UNTESTABLE

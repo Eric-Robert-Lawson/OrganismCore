@@ -1,0 +1,5 @@
+rcc_type,pred,r_GOT1_depth,r_RUNX1_depth,ti_r,method,low_power,approx,verdict
+ccRCC,P2-5a,-0.5819522909929116,0.6254768447856361,-1.2074291357785478,approx_diff_depth_r,False,True,CONFIRMED [APPROX]
+PRCC,P2-5b,-0.5193465487066395,,,unavailable,False,False,UNTESTABLE
+chRCC,P2-5c,0.1983,,,unavailable,False,False,UNTESTABLE
+cdRCC,P2-5d,-0.7142857142857144,0.7142857142857144,-0.8791208791208791,expr_direct_cdRCC,True,False,CONFIRMED [LOW-POWER]

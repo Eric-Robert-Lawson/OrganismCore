@@ -1,0 +1,11 @@
+{
+  "pc2_correlates_loaded": true,
+  "pc2_residualised_loaded": true,
+  "attractor_panel_loaded": false,
+  "genes_loaded": 15244,
+  "ezh2_present": true,
+  "dnmt3a_absent": false,
+  "genes_ok": true,
+  "r_EZH2": -0.2115,
+  "r_DNMT3A": -0.7141
+}
