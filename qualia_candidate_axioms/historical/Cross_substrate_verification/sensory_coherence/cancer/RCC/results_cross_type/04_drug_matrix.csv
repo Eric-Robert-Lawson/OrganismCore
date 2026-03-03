@@ -1,0 +1,30 @@
+drug,ccRCC,PRCC,chRCC,cdRCC,n_types_target,n_types_contra
+Tazemetostat,T,T,T,T,4,0
+αKG supplement,T,T,T,U,3,0
+HDACi + anti-PD1,T,T,U,U,2,0
+IKKβ inhibitor,T,U,U,T,2,0
+AKR1C3 inhibitor,U,U,T,U,1,0
+AXL inhibitor,T,U,U,U,1,0
+Anti-CSF1R / repol,U,T,U,U,1,0
+BET inhibitor,U,U,U,T,1,0
+Belzutifan,T,U,U,U,1,0
+Bexarotene,U,U,U,T,1,0
+CDK4/6 inhibitor,U,T,U,U,1,0
+Ipatasertib/MK-2206,U,U,U,T,1,0
+KDM1A inhibitor,U,T,U,U,1,0
+LOXL2 inhibitor,T,U,U,U,1,0
+MAP3K19 inhibitor,U,U,T,U,1,0
+NOX4 inhibitor,U,U,T,U,1,0
+PRKCI inhibitor,U,U,U,T,1,0
+RUNX1 inhibitor,T,U,U,U,1,0
+SLC inhibitors,U,U,T,U,1,0
+Savolitinib,U,T,U,U,1,0
+Trastuzumab/T-DXd,U,T,U,U,1,0
+Anti-PD-L1,C,C,U,U,0,2
+Anti-TIM-3,C,C,U,U,0,2
+Belzutifan/HIF2α inhibitor,U,C,C,C,0,3
+MET inhibitor,U,U,U,C,0,1
+STING agonist,U,C,U,U,0,1
+SULT2B1 inhibitor,U,U,C,U,0,1
+Sunitinib/VEGFR TKI,U,U,C,U,0,1
+TZD/PPARG agonist,U,U,U,C,0,1

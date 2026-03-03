@@ -1,0 +1,40 @@
+PREDICTION SCORING — RCC Cross-Type
+============================================================
+Total: 14  Confirmed=9  Partial=4  Denied=1  Untestable=0
+
+--- CONFIRMED ---
+  X1      EZH2 positive depth correlator in all 4 types
+         Evidence: EZH2 positive in: ['ccRCC', 'PRCC', 'chRCC', 'cdRCC']
+  X5      OGDHL negative depth correlator in >=3 types
+         Evidence: OGDHL negative in: ['PRCC', 'chRCC', 'cdRCC']
+  X6      Top FA marker uncoupled from MKI67 in >=3 types
+         Evidence: ccRCC:CA9=0.5595,MKI67=0.2836; PRCC:KRT19=0.8031,MKI67=0.0000; chRCC:AKR1C1=0.0010,MKI67=0.0000; cdRCC:IL1RAP=0.2285,MKI
+  X7      TCA gene down + EZH2 up circuit in all types
+         Evidence: ccRCC:EZH2_up=True,SUCLG1_down=True; PRCC:EZH2_up=True,FH_down=True; chRCC:EZH2_up=True,OGDHL_down=True; cdRCC:EZH2_up=T
+  X11     Tazemetostat justified as target in all 4 types
+         Evidence: {'ccRCC': 'T', 'PRCC': 'T', 'chRCC': 'T', 'cdRCC': 'T'}
+  X16     False attractor identity genes non-overlapping between types
+         Evidence: {'ccRCC∩PRCC': [], 'ccRCC∩chRCC': [], 'ccRCC∩cdRCC': [], 'PRCC∩chRCC': [], 'PRCC∩cdRCC': [], 'chRCC∩cdRCC': []}
+  X17     Normal identity genes are SLC/channel family in all types
+         Evidence: 4/4 types have SLC/channel in normal identity panel
+  XN2     Cell-of-origin recoverable from negative panel (>=3 genes/type)
+         Evidence: {'ccRCC': ['SLC13A3', 'AQP1', 'G6PC', 'GATM', 'PCK1', 'SLC13A2', 'UMOD', 'SLC22A6', 'SLC34A1', 'AGXT', 'ALDOB', 'FBP1', 
+         Note: Structural validation: depth score methodology recovers nephron segment
+  XN4     CEBPA-analogous differentiation TF suppressed in >=3 types
+         Evidence: {'ccRCC': ['HNF4A', 'PAX8', 'WT1', 'LHX1'], 'PRCC': [], 'chRCC': ['FOXI1'], 'cdRCC': ['HNF4A', 'TFCP2L1', 'PAX8', 'FOXI1
+
+--- PARTIAL ---
+  X3      LOXL2 positive in >=2 types beyond ccRCC
+         Evidence: LOXL2 positive in: ['PRCC']
+  X4      SLC transporter in top negative correlators in all types
+         Evidence: Types with SLC neg: ['ccRCC', 'PRCC', 'chRCC']; samples: {'ccRCC': ['SLC13A3', 'SLC34A1', 'SLC22A6', 'SLC13A2'], 'PRCC':
+  X13     Checkpoint therapy contraindicated in deep stratum >=3 types
+         Evidence: Contra types: ['PRCC', 'ccRCC']
+  XN3     All false attractor identities are epithelial not mesenchymal
+         Evidence: {'ccRCC': 'Hypoxic mesenchymal / pseudo-endothelial', 'PRCC': 'Biliary epithelium / intrahepatic bile duct', 'chRCC': 'A
+
+--- DENIED ---
+  X2      IL1RAP positive in >=3 types
+         Evidence: IL1RAP positive in: ['cdRCC']; not in: ['ccRCC', 'PRCC', 'chRCC']
+
+--- UNTESTABLE ---

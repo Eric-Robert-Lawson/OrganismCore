@@ -1,0 +1,22 @@
+UNIVERSAL AND NEAR-UNIVERSAL GENES
+RCC Cross-Type Analysis | 2026-03-03
+============================================================
+
+POSITIVE DEPTH GENES — UNIVERSAL (4/4 types):
+  EZH2
+    ccRCC: 0.5279
+    PRCC: 0.3075
+    chRCC: 0.0010
+    cdRCC: 0.1991
+
+POSITIVE DEPTH GENES — NEAR-UNIVERSAL (3/4):
+  CCND1: ['PRCC', 'ccRCC', 'cdRCC']
+  DNMT3A: ['PRCC', 'ccRCC', 'cdRCC']
+
+NEGATIVE DEPTH GENES — UNIVERSAL (4/4):
+  None found in all 4 CSVs simultaneously.
+
+NEGATIVE DEPTH GENES — NEAR-UNIVERSAL (3/4):
+  MTOR: ['PRCC', 'ccRCC', 'cdRCC']
+  OGDHL: ['PRCC', 'cdRCC', 'chRCC']
+  UMOD: ['PRCC', 'ccRCC', 'cdRCC']

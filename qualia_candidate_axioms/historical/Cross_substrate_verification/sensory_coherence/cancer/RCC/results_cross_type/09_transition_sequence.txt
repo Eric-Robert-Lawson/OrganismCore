@@ -1,0 +1,38 @@
+TRANSITION SEQUENCE COMPARISON — RCC Cross-Type
+============================================================
+
+[ccRCC]
+  Confirmed:      True
+  Early markers:  MYC, TOP2A, MKI67, CCNB1
+  Late markers:   RUNX1, LOXL2, TGFBI, EZH2, AXL, IFI16
+  Structure:      Continuous Q1→Q4 depth; proliferative early, identity-locked late; RUNX1→LOXL2→TGFBI→EZH2 late circuit confirmed
+  Note:           Early/late phase inferred from Q1/Q4 differential gene patterns; not separately named in scripts
+
+[PRCC]
+  Confirmed:      True
+  Early markers:  MET, MKI67, CCND1
+  Late markers:   ERBB2, KDM1A, LAMC2, TWIST1, TPSAB1, RUNX1
+  Structure:      FA-1 (proliferative/MET) vs FA-2 (biliary/ERBB2); within FA-2: MET early, ERBB2 consolidation late; mast cell programme (TPSAB1) late-phase marker
+  Note:           Type 1 / Type 2 subtype discontinuity adds complexity to phase assignment
+
+[chRCC]
+  Confirmed:      False
+  Early markers:  Unknown
+  Late markers:   AKR1C1, AKR1C3, ZNF574, C4orf17, MAP3K19
+  Structure:      Depth axis confirmed; two-phase structure not formally characterised; Tier3 genes (ZNF574, C4orf17) may be late-phase
+  Note:           Predicted: Nrf2/KEAP1 early → AKR consolidation late; not confirmed from data
+
+[cdRCC]
+  Confirmed:      True
+  Early markers:  MYC, MKI67, TOP2A
+  Late markers:   BHLHE40, PPARG, KLF5, AGR2, IL1RAP, PRKCI, HK2
+  Structure:      MYC early (CDC3-like) / BHLHE40 late (CDC6-like); r(MYC, BHLHE40) = -0.964 p<0.001; BET/CDK9 window closes when BHLHE40 consolidates
+  Note:           n=7 caveat applies to all cdRCC findings
+
+SHARED EARLY-PHASE MARKERS (>=2 types):
+  MKI67: ['ccRCC', 'PRCC', 'cdRCC']
+  MYC: ['ccRCC', 'cdRCC']
+  TOP2A: ['ccRCC', 'cdRCC']
+
+SHARED LATE-PHASE MARKERS (>=2 types):
+  RUNX1: ['ccRCC', 'PRCC']

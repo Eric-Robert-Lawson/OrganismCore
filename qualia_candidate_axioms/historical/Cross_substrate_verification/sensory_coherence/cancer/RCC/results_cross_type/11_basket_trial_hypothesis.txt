@@ -1,0 +1,61 @@
+=================================================================
+BASKET TRIAL HYPOTHESIS
+OrganismCore RCC Cross-Type Analysis | 2026-03-03
+Hypothesis only — not a clinical protocol.
+Requires independent replication before formal proposal.
+=================================================================
+
+DESIGN CONCEPT:
+  Eligibility:      Any advanced RCC subtype (ccRCC, PRCC,
+                    chRCC, cdRCC)
+  Stratification:   Histological subtype + depth score
+  Depth scoring:    Each type uses its own validated panel;
+                    depth scores NOT pooled across types
+  Arms:             Backbone (pan-renal) + subtype-specific
+
+PAN-RENAL BACKBONE CANDIDATES (T in >=3 types):
+  Tazemetostat
+    Types: ['ccRCC', 'PRCC', 'chRCC', 'cdRCC']  (n=4/4)
+  αKG supplement
+    Types: ['ccRCC', 'PRCC', 'chRCC']  (n=3/4)
+
+SUBTYPE-SPECIFIC ADD-ON ARMS:
+  ccRCC:
+    + AXL inhibitor
+    + Belzutifan
+    + LOXL2 inhibitor
+    + RUNX1 inhibitor
+  PRCC:
+    + Anti-CSF1R / repol
+    + CDK4/6 inhibitor
+    + KDM1A inhibitor
+    + Savolitinib
+    + Trastuzumab/T-DXd
+  chRCC:
+    + AKR1C3 inhibitor
+    + MAP3K19 inhibitor
+    + NOX4 inhibitor
+    + SLC inhibitors
+  cdRCC:
+    + BET inhibitor
+    + Bexarotene
+    + Ipatasertib/MK-2206
+    + PRKCI inhibitor
+
+UNIVERSAL CONTRAINDICATIONS IN DEEP STRATUM (C in >=2 types):
+  AVOID: Anti-PD-L1
+    Contraindicated in deep: ['ccRCC', 'PRCC']
+  AVOID: Anti-TIM-3
+    Contraindicated in deep: ['ccRCC', 'PRCC']
+  AVOID: Belzutifan/HIF2α inhibitor
+    Contraindicated in deep: ['PRCC', 'chRCC', 'cdRCC']
+
+NOTES:
+  The pan-renal backbone (Tazemetostat + αKG supplement)
+  targets the TCA→αKG→EZH2 chromatin lock which appears
+  conserved across all four renal cancer types.
+  IKKβ inhibitor targets NF-κB/RELA elevated in both
+  ccRCC and cdRCC — a shared inflammatory axis.
+  HDACi + anti-PD1 for MHC-I restoration is shared between
+  ccRCC and PRCC Q4 deep strata — same evasion mechanism.
+  All drug claims require prospective validation.

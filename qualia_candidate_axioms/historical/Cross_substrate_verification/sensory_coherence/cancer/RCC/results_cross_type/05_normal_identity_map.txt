@@ -1,0 +1,49 @@
+NORMAL IDENTITY LOSS MAP — RCC Cross-Type
+============================================================
+
+[ccRCC]
+  Cell of origin:  Proximal tubule S1
+  Gene families:   SLC (citrate/αKG/OAT); Gluconeogenesis; TCA/oxidative; TF (LHX1, HNF4A)
+  Top genes:       UMOD, SLC34A1, SLC13A3, SLC22A6, ALDOB, PCK1, AGXT, FBP1, G6PC, LHX1, AQP1, GATM, SLC13A2
+  In CSV neg data: UMOD, SLC34A1, SLC13A3, SLC22A6, ALDOB, PCK1, AGXT, FBP1, G6PC, LHX1, AQP1, GATM, SLC13A2
+
+[PRCC]
+  Cell of origin:  Proximal tubule S2/S3
+  Gene families:   SLC (OAT1); TCA (FH, SUCLG1); Fatty acid binding; Cubilin pathway
+  Top genes:       SLC22A6, FABP1, UMOD, SLC34A2, CUBN, PDZK1, GOT1, SLC7A9, FH, SUCLG1
+  In CSV neg data: SLC22A6, FABP1, UMOD, SLC34A2, CUBN, PDZK1, GOT1, SLC7A9, FH, SUCLG1
+
+[chRCC]
+  Cell of origin:  Intercalated cell (collecting duct)
+  Gene families:   SLC (bile acid, GLUT2, glutamate); Steroid metabolism (HSD17B14, RDH5); Intercalated cell TF (FOXI1); Calbindin
+  Top genes:       SLC51B, SLC2A2, SLC1A1, SLC5A12, FOXI1, HSD17B14, SULT2B1, RDH5, CALB1, ATP6V1G3
+  In CSV neg data: SLC51B, SLC2A2, SLC1A1, SLC5A12, FOXI1, HSD17B14, SULT2B1, RDH5, CALB1, ATP6V1G3
+
+[cdRCC]
+  Cell of origin:  Principal / intercalated cell (collecting duct)
+  Gene families:   Aquaporin; ENaC (SCNN1); AVPR2 (vasopressin R); PKA (PRKAR2B); TF (TFCP2L1, HNF4A, FOXI1)
+  Top genes:       AQP2, SCNN1A, SCNN1B, SCNN1G, AVPR2, TFCP2L1, PRKAR2B, UMOD, CALB1, FOXI1, EPAS1, HNF4A
+  In CSV neg data: AQP2, SCNN1A, SCNN1B, SCNN1G, AVPR2, TFCP2L1, PRKAR2B, UMOD, CALB1, FOXI1, EPAS1, HNF4A
+
+SHARED NORMAL IDENTITY GENES (>=2 types):
+  MTOR             3/4  ['PRCC', 'ccRCC', 'cdRCC']
+  UMOD             3/4  ['PRCC', 'ccRCC', 'cdRCC']
+  OGDHL            3/4  ['PRCC', 'cdRCC', 'chRCC']
+  SETD2            2/4  ['ccRCC', 'cdRCC']
+  CD274            2/4  ['PRCC', 'ccRCC']
+  HNF4A            2/4  ['ccRCC', 'cdRCC']
+  PAX8             2/4  ['ccRCC', 'cdRCC']
+  CPT1A            2/4  ['PRCC', 'ccRCC']
+  SLC34A1          2/4  ['PRCC', 'ccRCC']
+  SLC22A6          2/4  ['PRCC', 'ccRCC']
+  FBP1             2/4  ['PRCC', 'ccRCC']
+  HIF1A            2/4  ['PRCC', 'ccRCC']
+  PTEN             2/4  ['ccRCC', 'cdRCC']
+  SLC13A2          2/4  ['PRCC', 'ccRCC']
+  SUCLG1           2/4  ['PRCC', 'ccRCC']
+  CUBN             2/4  ['PRCC', 'cdRCC']
+  LRP2             2/4  ['PRCC', 'cdRCC']
+  EPAS1            2/4  ['PRCC', 'cdRCC']
+  FOXI1            2/4  ['cdRCC', 'chRCC']
+  CALB1            2/4  ['cdRCC', 'chRCC']
+  ATP6V1G3         2/4  ['cdRCC', 'chRCC']

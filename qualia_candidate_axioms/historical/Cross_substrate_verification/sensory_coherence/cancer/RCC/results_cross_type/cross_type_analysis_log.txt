@@ -1,0 +1,221 @@
+=================================================================
+RCC CROSS-TYPE ANALYSIS
+OrganismCore | 2026-03-03
+Author: Eric Robert Lawson
+=================================================================
+
+Protocol: ranked list comparison only.
+  No cross-type p-values. No pooled expression.
+  Individual type predictions not revised.
+  cdRCC findings carry n=7 caveat.
+
+Layout detected:  LOCAL
+RCC base dir:     /Users/ericlawson/cancer/RCC
+
+Output directory: /Users/ericlawson/cancer/RCC/results_cross_type
+
+=================================================================
+STEP 1 — FILE DISCOVERY AND LOADING
+=================================================================
+
+  [ccRCC]
+    Base dir:   /Users/ericlawson/cancer/RCC/CCRCC/ccrcc_false_attractor
+    Files found: ['saddle_tcga', 'depth_corr_tcga', 'depth_scores_tcga', 'gap_geo', 'gap_tcga', 'depth_corr_geo', 'saddle_geo', 'depth_scores_geo']
+    Loaded depth_corr_tcga: depth_corr_tcga.csv
+    Loaded depth_corr_geo: depth_corr_geo.csv
+    Positive genes loaded: 84
+    Negative genes loaded: 61
+
+  [PRCC]
+    Base dir:   /Users/ericlawson/cancer/RCC/PRCC/prcc_false_attractor
+    Files found: ['depth_scores_tcga', 'saddle_tcga', 'depth_corr_tcga']
+    Loaded depth_corr_tcga: depth_corr_tcga-kirp.csv
+    Positive genes loaded: 42
+    Negative genes loaded: 39
+
+  [chRCC]
+    Base dir:   /Users/ericlawson/cancer/RCC/chRCC/chrcc_false_attractor
+    Files found: ['pc2_results', 'depth_scores_tcga']
+    Positive genes loaded: 0
+    Negative genes loaded: 0
+
+  [cdRCC]
+    Base dir:   /Users/ericlawson/cancer/RCC/cdRCC/cdRCC_false_attractor
+    Files found: ['depth_corr_tcga', 'saddle_tcga', 'paired_results']
+    Loaded depth_corr_tcga: depth_correlations_spearman_s3.csv
+    Supplemented from paired_results
+    Positive genes loaded: 69
+    Negative genes loaded: 50
+
+=================================================================
+STEP 2 — GENE OVERLAP ANALYSIS
+=================================================================
+
+  Positive (attractor) genes:
+    Universal 4/4:      1
+    Near-universal 3/4: 2
+    Shared 2/4:         22
+    Type-specific 1/4:  125
+
+  Negative (normal identity) genes:
+    Universal 4/4:      0
+    Near-universal 3/4: 3
+    Shared 2/4:         18
+    Type-specific 1/4:  101
+
+  UNIVERSAL POSITIVE GENES (4/4):
+    EZH2: ['PRCC', 'ccRCC', 'cdRCC', 'chRCC']
+
+  NEAR-UNIVERSAL POSITIVE (3/4):
+    CCND1            in=['PRCC', 'ccRCC', 'cdRCC']  missing=['chRCC']
+    DNMT3A           in=['PRCC', 'ccRCC', 'cdRCC']  missing=['chRCC']
+
+=================================================================
+STEP 3 — DRUG TARGET RECURRENCE MATRIX
+=================================================================
+
+  Drugs targeted in >=2 types:
+  Tazemetostat                                T=4  C=0  in=['ccRCC', 'PRCC', 'chRCC', 'cdRCC']  contra=[]
+  αKG supplement                              T=3  C=0  in=['ccRCC', 'PRCC', 'chRCC']  contra=[]
+  HDACi + anti-PD1                            T=2  C=0  in=['ccRCC', 'PRCC']  contra=[]
+  IKKβ inhibitor                              T=2  C=0  in=['ccRCC', 'cdRCC']  contra=[]
+
+=================================================================
+STEP 4 — NORMAL IDENTITY MAP
+=================================================================
+
+=================================================================
+STEP 5 — FALSE ATTRACTOR IDENTITY MAP
+=================================================================
+
+=================================================================
+STEP 6 — TCA→αKG→CHROMATIN CIRCUIT
+=================================================================
+  ccRCC:
+    TCA down (CSV): SUCLG1(0.001)
+    Chromatin up:   EZH2(0.528), EZH2(0.304), DNMT3A(0.252), DNMT3A(0.184), KDM5C(0.068)
+    Mechanism:      EZH2↑+KDM1A↑ co-elevated; SUCLG1↓ → αKG↓ → EZH2 hyperactive
+  PRCC:
+    TCA down (CSV): SUCLG1(0.519), FH(0.451), OGDHL(0.402)
+    Chromatin up:   KDM1A(0.443), HDAC1(0.330), EZH2(0.308), SETD2(0.307), PBRM1(0.240)
+    Mechanism:      EZH2↑+KDM1A↑ co-elevated; FH↓ → fumarate↑ / αKG↓ → chromatin lock
+  chRCC:
+    TCA down (CSV): OGDHL(0.001)
+    Chromatin up:   EZH2(0.001)
+    Mechanism:      EZH2↑; KEAP1/NRF2 → AKR axis; OGDHL predicted down
+  cdRCC:
+    TCA down (CSV): OGDHL(0.001)
+    Chromatin up:   EZH2(0.199), DNMT3B(0.157), HDAC2(0.027), DNMT3A(0.025), KDM6A(0.013)
+    Mechanism:      EZH2↑ (paired p=0.031); silences CEBPA; CEBPA removal allows PPARG module; OGDHL r=-1.000 depth
+
+=================================================================
+STEP 7 — IMMUNE ARCHITECTURE COMPARISON
+=================================================================
+  ccRCC:
+    MHC-I:    DOWN (B2M and HLA-A fall with depth)
+    Evasion:  Innate sensing UP / adaptive presentation DOWN — immune evasion not exhaustion
+    Strategy: MHC-I restoration (HDACi + anti-PD1); NOT anti-PD-L1 monotherapy in Q4
+  PRCC:
+    MHC-I:    DOWN (B2M r=-0.222, HLA-A r=-0.237)
+    Evasion:  Innate sensing active / MHC-I down / ARG1+ myeloid suppression in Q4
+    Strategy: MHC-I restoration (HDACi + anti-PD1) + macrophage repolarisation (anti-CSF1R / lenvatinib); NOT STING agonist in Q4
+  chRCC:
+    MHC-I:    Unknown — immune analysis not complete in scripts
+    Evasion:  Predicted: BTNL3-mediated immune modulation; MHC-I pattern unknown
+    Strategy: Pending — immune script not completed for chRCC
+  cdRCC:
+    MHC-I:    Not formally analysed in scripts 1-4
+    Evasion:  Inflammatory rather than suppressive (NF-κB/IL1B dominant); checkpoint analysis incomplete
+    Strategy: IKKβ inhibitor may reduce inflammatory evasion; checkpoint analysis not completed
+
+=================================================================
+STEP 8 — TRANSITION SEQUENCE COMPARISON
+=================================================================
+
+=================================================================
+STEP 9 — SCORING LOCKED PREDICTIONS
+=================================================================
+
+  CONFIRMED:  9
+  PARTIAL:    4
+  DENIED:     1
+  UNTESTABLE: 0
+  X1      CONFIRMED     EZH2 positive depth correlator in all 4 types
+  X2      DENIED        IL1RAP positive in >=3 types
+  X3      PARTIAL       LOXL2 positive in >=2 types beyond ccRCC
+  X4      PARTIAL       SLC transporter in top negative correlators in all type
+  X5      CONFIRMED     OGDHL negative depth correlator in >=3 types
+  X6      CONFIRMED     Top FA marker uncoupled from MKI67 in >=3 types
+  X7      CONFIRMED     TCA gene down + EZH2 up circuit in all types
+  X11     CONFIRMED     Tazemetostat justified as target in all 4 types
+  X13     PARTIAL       Checkpoint therapy contraindicated in deep stratum >=3 
+  X16     CONFIRMED     False attractor identity genes non-overlapping between 
+  X17     CONFIRMED     Normal identity genes are SLC/channel family in all typ
+  XN2     CONFIRMED     Cell-of-origin recoverable from negative panel (>=3 gen
+  XN3     PARTIAL       All false attractor identities are epithelial not mesen
+  XN4     CONFIRMED     CEBPA-analogous differentiation TF suppressed in >=3 ty
+
+=================================================================
+STEP 10 — BASKET TRIAL HYPOTHESIS
+=================================================================
+  =================================================================
+  BASKET TRIAL HYPOTHESIS
+  OrganismCore RCC Cross-Type Analysis | 2026-03-03
+  Hypothesis only — not a clinical protocol.
+  Requires independent replication before formal proposal.
+  =================================================================
+  
+  DESIGN CONCEPT:
+    Eligibility:      Any advanced RCC subtype (ccRCC, PRCC,
+                      chRCC, cdRCC)
+    Stratification:   Histological subtype + depth score
+    Depth scoring:    Each type uses its own validated panel;
+                      depth scores NOT pooled across types
+    Arms:             Backbone (pan-renal) + subtype-specific
+  
+  PAN-RENAL BACKBONE CANDIDATES (T in >=3 types):
+    Tazemetostat
+      Types: ['ccRCC', 'PRCC', 'chRCC', 'cdRCC']  (n=4/4)
+    αKG supplement
+      Types: ['ccRCC', 'PRCC', 'chRCC']  (n=3/4)
+  
+  SUBTYPE-SPECIFIC ADD-ON ARMS:
+    ccRCC:
+      + AXL inhibitor
+      + Belzutifan
+      + LOXL2 inhibitor
+      + RUNX1 inhibitor
+    PRCC:
+      + Anti-CSF1R / repol
+      + CDK4/6 inhibitor
+      + KDM1A inhibitor
+      + Savolitinib
+      + Trastuzumab/T-DXd
+    chRCC:
+      + AKR1C3 inhibitor
+
+=================================================================
+CROSS-TYPE ANALYSIS COMPLETE
+=================================================================
+
+  Layout used:   LOCAL
+  RCC base dir:  /Users/ericlawson/cancer/RCC
+  Output dir:    /Users/ericlawson/cancer/RCC/results_cross_type
+
+  File sources per type:
+    ccRCC : ['saddle_tcga', 'depth_corr_tcga', 'depth_scores_tcga', 'gap_geo', 'gap_tcga', 'depth_corr_geo', 'saddle_geo', 'depth_scores_geo']
+    PRCC  : ['depth_scores_tcga', 'saddle_tcga', 'depth_corr_tcga']
+    chRCC : ['pc2_results', 'depth_scores_tcga']
+    cdRCC : ['depth_corr_tcga', 'saddle_tcga', 'paired_results']
+
+  SUMMARY COUNTS:
+    Universal pos genes (4/4): 1
+    Near-universal pos (3/4):  2
+    Universal neg genes (4/4): 0
+    Near-universal neg (3/4):  3
+    Drug targets in matrix:    29
+    Pan-renal candidates:      2
+    Predictions scored:        14
+    Confirmed:                 9
+    Partial:                   4
+    Denied:                    1

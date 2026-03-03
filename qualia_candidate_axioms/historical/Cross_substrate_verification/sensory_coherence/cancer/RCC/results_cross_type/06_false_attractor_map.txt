@@ -1,0 +1,38 @@
+FALSE ATTRACTOR IDENTITY MAP — RCC Cross-Type
+============================================================
+
+[ccRCC]
+  Description:       HIF/VHL-null hypoxic mesenchymal-like programme
+  Non-renal tissue:  Hypoxic mesenchymal / pseudo-endothelial
+  Key TF:            EPAS1 (HIF2α)
+  Top genes:         CA9, VEGFA, SLC2A1, LDHA, PDK1, SCD, EGLN3, FABP7, VIM, TGFB1
+  In CSV pos data:   CA9, VEGFA, SLC2A1, LDHA, PDK1, SCD, EGLN3, FABP7, VIM, TGFB1
+
+[PRCC]
+  Description:       Biliary ductal / intrahepatic cholangiocarcinoma-like
+  Non-renal tissue:  Biliary epithelium / intrahepatic bile duct
+  Key TF:            RUNX1 + KDM1A
+  Top genes:         KRT19, KRT7, ERBB2, LAMC2, RUNX1, EZH2, KDM1A, MUC1, TWIST1, COL1A1
+  In CSV pos data:   KRT19, KRT7, ERBB2, LAMC2, RUNX1, EZH2, KDM1A, MUC1, TWIST1, COL1A1
+
+[chRCC]
+  Description:       Steroid-metabolising / adrenocortical-like programme
+  Non-renal tissue:  Adrenocortical / steroid-metabolising epithelium
+  Key TF:            NRF2/KEAP1-AKR axis
+  Top genes:         AKR1C1, AKR1C3, AKR1E2, HSD17B14, CYP1B1, SULT2B1, TM6SF2, ABCC2, SLC51B, GPD1
+  In CSV pos data:   AKR1C1, AKR1C3, AKR1E2, HSD17B14, CYP1B1, SULT2B1, TM6SF2, ABCC2, SLC51B, GPD1
+
+[cdRCC]
+  Description:       Aberrant ductal secretory programme
+  Non-renal tissue:  Aberrant collecting duct secretory / pancreatic ductal-like
+  Key TF:            PPARG (uncoupled from RXRA) + BHLHE40
+  Top genes:         IL1RAP, PPARG, KLF5, AGR2, GPRC5A, CST6, KLF10, TMPRSS4, ESRP1, SERPINA1
+  In CSV pos data:   IL1RAP, PPARG, KLF5, AGR2, GPRC5A, CST6, KLF10, TMPRSS4, ESRP1, SERPINA1
+
+CROSS-TYPE OVERLAP IN FALSE ATTRACTOR GENE SETS:
+  ccRCC ∩ PRCC: NONE
+  ccRCC ∩ chRCC: NONE
+  ccRCC ∩ cdRCC: NONE
+  PRCC ∩ chRCC: NONE
+  PRCC ∩ cdRCC: NONE
+  chRCC ∩ cdRCC: NONE
