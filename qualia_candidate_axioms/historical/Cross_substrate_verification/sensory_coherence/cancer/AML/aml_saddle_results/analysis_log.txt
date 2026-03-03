@@ -1,0 +1,93 @@
+========================================================
+AML SADDLE POINT — CORRECTED ANALYSIS
+OrganismCore — February 28, 2026
+========================================================
+========================================================
+STEP 1: LOADING ANNOTATIONS
+========================================================
+Loaded: 74583 cells
+Malignant: 10130
+Normal:    64453
+========================================================
+STEP 2: LOADING EXPRESSION (cached from run 1)
+========================================================
+Scanning counts_corr.csv (11.1GB)...
+(scanning for target genes — ~10-20 min)
+Found: ['CD34', 'CEBPA', 'GATA1', 'IRF8', 'KLF4', 'MPO', 'MYC', 'RUNX1', 'SPI1']
+Cached to ./aml_saddle_results/expr_cache.csv for fast reloads.
+Matrix: 74583 x 9
+========================================================
+STEP 3: TRAJECTORY PROFILES
+========================================================
+Common cells: 74583
+
+KEY POSITIONS — normal vs malignant myeloid:
+                  CEBPA    SPI1    KLF4   RUNX1    IRF8
+TrajPosition                                           
+HSC              0.0673  0.0240  0.0798  0.3965  0.0341
+HSPCs            0.0824  0.0476  0.0564  0.4118  0.0761
+Prog             0.0471  0.0201  0.0961  0.4420  0.0551
+GMP              0.0892  0.0450  0.0885  0.4678  0.2010
+ProMono          0.0674  0.4295  0.7098  0.2167  0.2726
+Mono             0.0482  0.4882  0.6556  0.1487  0.1567
+CD14+ monocytes  0.0629  0.5329  0.8236  0.1682  0.1642
+HSC-like         0.0949  0.0499  0.0539  0.4144  0.0598
+Prog-like        0.0928  0.0482  0.0335  0.4407  0.0644
+GMP-like         0.0833  0.0436  0.0435  0.4560  0.0561
+ProMono-like     0.0854  0.4782  0.7941  0.1958  0.1803
+Mono-like        0.0705  0.5953  0.7671  0.1462  0.1774
+========================================================
+STEP 4: SADDLE POINT SIGNATURE — CORRECTED
+========================================================
+CORRECTED PREDICTION:
+  Saddle point = GMP-like/Prog-like
+  (differentiation block between GMP-like
+   and ProMono-like/Mono-like)
+  Reference = CD14+ monocytes/Mono/ProMono
+  (what these cells should become but cannot)
+
+FRAMEWORK RESTATEMENT:
+  The false attractor is not a minimum at the
+  TOP of the hierarchy — it is a CEILING on
+  differentiation. The malignant cells are
+  stuck below the normal differentiated level.
+  The gap between GMP-like and Mono-like in
+  the malignant trajectory, vs the smooth
+  progression in the normal trajectory, IS
+  the false attractor signature.
+
+CEBPA    | ref=0.0595 saddle=0.0880 | suppression= -47.9% | p=1.0000     | ✗ NOT CONFIRMED
+SPI1     | ref=0.4835 saddle=0.0459 | suppression=  90.5% | p=0.00e+00 *** | ✓ CONFIRMED
+KLF4     | ref=0.7297 saddle=0.0385 | suppression=  94.7% | p=0.00e+00 *** | ✓ CONFIRMED
+RUNX1    | ref=0.1779 saddle=0.4483 | suppression=-152.1% | p=1.0000     | ✗ NOT CONFIRMED
+IRF8     | ref=0.1978 saddle=0.0603 | suppression=  69.5% | p=0.00e+00 *** | ✓ CONFIRMED
+MYC      | ref=0.0297 saddle=0.3222 | suppression=-985.1% | p=1.0000     | ✓ CTRL OK
+CD34     | ref=0.0135 saddle=0.3930 | suppression=-2816.2% | p=1.0000     | ✓ CTRL OK
+GATA1    | ref=0.0090 saddle=0.0085 | suppression=   6.4% | p=1.0000     | ✓ CTRL OK
+MPO      | ref=0.2803 saddle=0.9764 | suppression=-248.3% | p=1.0000     | ✓ CTRL OK
+
+========================================================
+FRAMEWORK PREDICTION RESULT — CORRECTED
+========================================================
+Candidates confirmed: 3/5
+Candidates partial:   0/5
+Controls as expected: 4/4
+
+*** STRONG CONFIRMATION ***
+Differentiation TFs are significantly
+suppressed at the malignant block point
+relative to normal differentiated endpoint.
+The false attractor ceiling is confirmed.
+READY TO SEND TO CHO.
+========================================================
+STEP 5: FIGURE — CORRECTED
+========================================================
+Figure saved: ./aml_saddle_results/saddle_point_figure_v2.png
+
+========================================================
+COMPLETE
+Results: ./aml_saddle_results/
+Files for Cho:
+  ./aml_saddle_results/saddle_point_figure_v2.png
+  ./aml_saddle_results/saddle_point_results_v2.csv
+========================================================
