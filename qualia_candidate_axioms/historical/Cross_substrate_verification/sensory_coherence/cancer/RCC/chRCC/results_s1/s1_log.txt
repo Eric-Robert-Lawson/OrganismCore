@@ -1,0 +1,380 @@
+============================================================
+chRCC FALSE ATTRACTOR — SCRIPT 1
+OrganismCore | Document 96a | 2026-03-02
+Author: Eric Robert Lawson
+============================================================
+
+DATA:  GSE19982 + GSE95425
+GENES: 15244  |  SAMPLES: 83
+n_tumour=15  r>0.514 for p<0.05
+
+
+============================================================
+OBJ-1 — LOAD AND QC
+============================================================
+  Raw matrix: 15244 genes × 83 samples
+  Barcode examples (first 5):
+    TCGA-KI-0001-X01-01A-01-01  →  chRCC
+    TCGA-KI-0002-X02-01A-01-01  →  chRCC
+    TCGA-KI-0003-X03-01A-01-01  →  chRCC
+    TCGA-KI-0004-X04-01A-01-01  →  chRCC
+    TCGA-KI-0005-X05-01A-01-01  →  chRCC
+  chRCC:      n=15
+  Oncocytoma: n=15
+  Normal:     n=53
+    cortex: n=23
+    medulla: n=24
+    cortex/medulla: n=6
+
+  Statistical thresholds at n_tumour=15:
+    |r| > 0.514  p < 0.05
+    |r| > 0.641  p < 0.01
+    |r| > 0.760  p < 0.001
+
+  KEY GENE QC:
+  Gene             N_mean   T_mean  Oc_mean   Status
+  ──────────────────────────────────────────────────────
+  ATP6V1B1          0.968    0.970    0.969        ✓
+  ATP6V0A4          0.938    0.979    0.992        ✓
+  ATP6V1C2          0.589    0.895    0.746        ✓
+  FOXI1             0.523    0.985    0.980        ✓
+  SLC4A1                                         ABSENT
+  KRT7              0.695    0.713    0.687        ✓
+  EZH2              0.309    0.110    0.081        ✓
+  OGDHL             0.917    0.993    0.993        ✓
+  KIT               0.765    0.983    0.980        ✓
+  TP53                                           ABSENT
+  PTEN              0.946    0.936    0.939        ✓
+
+============================================================
+OBJ-2 — DEPTH SCORE
+============================================================
+  Genes after expression filter (mean>0.05): 15244
+  Using top 5000 variable genes
+  Matrix for SVD: (5000, 83)
+  SVD input: (83, 5000)
+  PC1 flipped (tumour > normal)
+  PC1 variance explained: 72.7%
+  Normal depth:     mean=0.022  std=0.019
+  chRCC depth:      mean=0.929  std=0.035
+  Oncocytoma depth: mean=0.927  std=0.047
+  MW chRCC > normal: p=4.31e-09
+  Depth score validated ✓
+  MW oncocytoma > normal: p=4.31e-09
+  MW chRCC > oncocytoma:  p=0.9339
+  Saved: depth_scores.csv
+
+============================================================
+OBJ-3 — NORMAL POLE PANEL
+============================================================
+
+  INTERCALATED:
+  Gene             N_mean   T_mean   T<N        r   sig            p
+  ────────────────────────────────────────────────────────────
+  ATP6V1B1          0.968    0.970     N  +0.5466  ★    p=0.0350 [n=15]
+  ATP6V0A4          0.938    0.979     N  +0.3043       p=0.2702 [n=15]
+  ATP6V1C2          0.589    0.895     N  +0.5216  ★    p=0.0462 [n=15]
+  FOXI1             0.523    0.985     N  +0.3163       p=0.2508 [n=15]
+  SLC4A1         ABSENT
+  SLC26A4           0.365    0.256     Y  -0.0987       p=0.7263 [n=15]
+  AQP6              0.632    0.754     N  +0.4806  ~    p=0.0697 [n=15]
+  CA2               0.989    0.986     Y  -0.5232  ★    p=0.0454 [n=15]
+  RHBG              0.501    0.957     N  +0.2593       p=0.3506 [n=15]
+  RHCG              0.714    0.977     N  +0.1427       p=0.6120 [n=15]
+  KIT               0.765    0.983     N  -0.2469       p=0.3751 [n=15]
+  SLC4A9            0.410    0.725     N  +0.4533  ~    p=0.0897 [n=15]
+  CLCNKB         ABSENT
+  UMOD              0.972    0.446     Y  +0.2946       p=0.2864 [n=15]
+
+  PROXIMAL:
+  Gene             N_mean   T_mean   T<N        r   sig            p
+  ────────────────────────────────────────────────────────────
+  SLC22A6           0.714    0.320     Y  +0.0004       p=0.9988 [n=15]
+  SLC34A1           0.713    0.468     Y  +0.6222  ★    p=0.0133 [n=15]
+  SLC5A2            0.521    0.533     N  +0.4105  ~    p=0.1285 [n=15]
+  FABP1             0.203    0.341     N  +0.3008       p=0.2759 [n=15]
+  CUBN              0.865    0.227     Y  +0.5364  ★    p=0.0393 [n=15]
+  LRP2              0.711    0.207     Y  +0.6049  ★    p=0.0169 [n=15]
+  MIOX              0.604    0.341     Y  +0.3591  ~    p=0.1887 [n=15]
+  GPX3              0.990    0.993     N  -0.1996       p=0.4758 [n=15]
+  ACADM             0.980    0.850     Y  +0.1726       p=0.5384 [n=15]
+  GOT1              0.973    0.978     N  +0.6513  ★★   p=0.0085 [n=15]
+  OGDHL             0.917    0.993     N  +0.5335  ★    p=0.0405 [n=15]
+  FH                0.960    0.946     Y  +0.5412  ★    p=0.0372 [n=15]
+  KHK               0.741    0.473     Y  +0.8357  ★★★  p=0.0001 [n=15]
+  SLC13A2           0.484    0.316     Y  +0.6019  ★    p=0.0176 [n=15]
+
+  BILIARY:
+  Gene             N_mean   T_mean   T<N        r   sig            p
+  ────────────────────────────────────────────────────────────
+  KRT7              0.695    0.713     N  +0.0782       p=0.7818 [n=15]
+  KRT19             0.910    0.231     Y  -0.0253       p=0.9286 [n=15]
+  KRT8              0.847    0.963     N  -0.6298  ★    p=0.0119 [n=15]
+  KRT18             0.572    0.983     N  -0.5016  ~    p=0.0568 [n=15]
+  ERBB2             0.957    0.912     Y  +0.5674  ★    p=0.0274 [n=15]
+  ERBB3             0.853    0.808     Y  +0.4399  ~    p=0.1008 [n=15]
+  MUC1              0.989    0.952     Y  +0.1888       p=0.5003 [n=15]
+  EPCAM             0.983    0.915     Y  -0.0001       p=0.9997 [n=15]
+  SOX4              0.874    0.825     Y  -0.2748       p=0.3217 [n=15]
+  CLDN4             0.393    0.777     N  -0.3762  ~    p=0.1670 [n=15]
+  CLDN7          ABSENT
+  TACSTD2           0.988    0.694     Y  -0.0010       p=0.9973 [n=15]
+  TFF1              0.135    0.458     N  +0.3915  ~    p=0.1489 [n=15]
+  TFF3              0.710    0.444     Y  -0.7239  ★★   p=0.0023 [n=15]
+  GPC1              0.511    0.755     N  +0.0113       p=0.9680 [n=15]
+  HNF1B             0.872    0.916     N  +0.8470  ★★★  p=0.0001 [n=15]
+
+  C1-P1 ATP6V1B1 r=+0.5466  NOT CONFIRMED ✗
+  C1-P2 FOXI1 r=+0.3163  NOT CONFIRMED ✗
+
+============================================================
+OBJ-4 — ATTRACTOR POLE GENES
+============================================================
+  n_tumour = 15  |r|>0.514 for p<0.05
+  Expressed genes: 14833
+
+  TOP 30 POSITIVE (acquired):
+    # Gene                   r   sig   N_mean   T_mean
+  ────────────────────────────────────────────────────
+    1. DNAJC5B          +0.9685   ★★★    0.188    0.603
+    2. ZNF574           +0.9594   ★★★    0.197    0.828
+    3. NFATC1           +0.9592   ★★★    0.486    0.708
+    4. INSM2            +0.9576   ★★★    0.092    0.513
+    5. IL17C            +0.9558   ★★★    0.333    0.854
+    6. NSL1             +0.9539   ★★★    0.883    0.682
+    7. METTL6           +0.9514   ★★★    0.425    0.720
+    8. SIX3             +0.9513   ★★★    0.140    0.300
+    9. CCDC155          +0.9486   ★★★    0.200    0.413
+   10. SRRM4            +0.9479   ★★★    0.122    0.606
+   11. FEZ1             +0.9453   ★★★    0.660    0.581
+   12. MAEL             +0.9449   ★★★    0.332    0.259
+   13. WDR89            +0.9446   ★★★    0.451    0.883
+   14. CYP4F2           +0.9439   ★★★    0.503    0.478
+   15. SLAMF1           +0.9431   ★★★    0.096    0.548
+   16. ZBTB9            +0.9429   ★★★    0.662    0.668
+   17. LINC00599        +0.9410   ★★★    0.430    0.728
+   18. ANKRD34A         +0.9409   ★★★    0.366    0.629
+   19. CACNB4           +0.9408   ★★★    0.309    0.584
+   20. AKR1E2           +0.9408   ★★★    0.206    0.852
+   21. SEMA6A           +0.9403   ★★★    0.695    0.668
+   22. FAM135B          +0.9403   ★★★    0.227    0.624
+   23. AFF2             +0.9397   ★★★    0.155    0.374
+   24. ZKSCAN3          +0.9395   ★★★    0.535    0.727
+   25. GJA8             +0.9390   ★★★    0.135    0.617
+   26. RAB3IL1          +0.9387   ★★★    0.738    0.758
+   27. FOXN3-AS1        +0.9381   ★★★    0.210    0.643
+   28. C6orf52          +0.9366   ★★★    0.592    0.645
+   29. SOX10            +0.9362   ★★★    0.149    0.640
+   30. FLYWCH1          +0.9358   ★★★    0.389    0.789
+
+  TOP 30 NEGATIVE (lost):
+    # Gene                   r   sig   N_mean   T_mean
+  ────────────────────────────────────────────────────
+    1. KIAA0430         -0.9188   ★★★    0.897    0.562
+    2. L3MBTL4          -0.9183   ★★★    0.453    0.639
+    3. NAMPT            -0.9053   ★★★    0.662    0.887
+    4. TARDBP           -0.9009   ★★★    0.638    0.856
+    5. NKAP             -0.8908   ★★★    0.560    0.402
+    6. SNRPD1           -0.8886   ★★★    0.591    0.652
+    7. KLHL42           -0.8883   ★★★    0.830    0.635
+    8. MLN              -0.8852   ★★★    0.279    0.347
+    9. INO80C           -0.8841   ★★★    0.733    0.510
+   10. PHF14            -0.8809   ★★★    0.310    0.499
+   11. TEX22            -0.8809   ★★★    0.239    0.400
+   12. ENAH             -0.8753   ★★★    0.495    0.672
+   13. KRTAP10-12       -0.8752   ★★★    0.163    0.104
+   14. SIN3A            -0.8750   ★★★    0.763    0.631
+   15. DHX15            -0.8738   ★★★    0.951    0.949
+   16. PHLPP1           -0.8737   ★★★    0.411    0.554
+   17. ZNF134           -0.8732   ★★★    0.294    0.397
+   18. ATP11C           -0.8694   ★★★    0.714    0.711
+   19. SWAP70           -0.8690   ★★★    0.839    0.514
+   20. SAFB2            -0.8674   ★★★    0.911    0.755
+   21. ZBTB44           -0.8647   ★★★    0.713    0.863
+   22. AASDHPPT         -0.8646   ★★★    0.708    0.812
+   23. MLLT3            -0.8642   ★★★    0.479    0.517
+   24. ZNF326           -0.8616   ★★★    0.499    0.391
+   25. MAP3K8           -0.8612   ★★★    0.466    0.455
+   26. CTSC             -0.8600   ★★★    0.940    0.838
+   27. COQ7             -0.8593   ★★★    0.602    0.598
+   28. PTS              -0.8593   ★★★    0.959    0.910
+   29. TDRD7            -0.8573   ★★★    0.672    0.484
+   30. UNC5D            -0.8568   ★★★    0.145    0.372
+
+  ATTRACTOR IDENTITY HYPOTHESIS PANEL:
+  BILIARY/DUCTAL           mean_r= -0.0006  sig_pos=2  sig_neg=2  (15 genes)
+  INVASION/EMT             mean_r= -0.0118  sig_pos=2  sig_neg=0  (11 genes)
+  MITOCHONDRIAL            mean_r= +0.0843  sig_pos=4  sig_neg=2  (9 genes)
+  INTERCALATED             mean_r= +0.2042  sig_pos=2  sig_neg=1  (12 genes)
+  PROXIMAL_TUBULE          mean_r= +0.4265  sig_pos=8  sig_neg=0  (14 genes)
+
+  DOMINANT ACQUIRED IDENTITY: PROXIMAL_TUBULE (mean_r=+0.4265)
+
+  C1-P3 KRT7 r=+0.0782   NOT CONFIRMED ✗
+  C1-P4 EZH2 r=-0.1218   NOT CONFIRMED ✗
+  C1-P5 OGDHL r=+0.5335 ★  NOT CONFIRMED ✗
+
+  Saved: attractor_gene_panel.csv (14833 genes)
+
+============================================================
+OBJ-5 — CROSS-CANCER COMPARISON
+============================================================
+
+  Gene             chRCC_r    PRCC_r    delta pattern             
+  ────────────────────────────────────────────────────────────────
+  ACADM            +0.1726   -0.4120  +0.5846 PRCC_SPECIFIC       
+  ACSL4            -0.1272   +0.1710  -0.2982 WEAK_BOTH           
+  ARG1             +0.2482   +0.0760  +0.1722 chRCC_SPECIFIC      
+  ATP6V1B1         +0.5466   -0.0600  +0.6066 chRCC_SPECIFIC      
+  B2M              -0.3972   -0.2220  -0.1752 SHARED_NORMAL       
+  CA9              +0.6310   +0.1250  +0.5060 chRCC_SPECIFIC      
+  CCND1            +0.3483   +0.0800  +0.2683 chRCC_SPECIFIC      
+  CCNE1            -0.3417   +0.1500  -0.4917 chRCC_SPECIFIC      
+  CDK2             -0.1333   +0.2890  -0.4223 PRCC_SPECIFIC       
+  CDK4             -0.0381   +0.1180  -0.1561 WEAK_BOTH           
+  CDK6             +0.2763   +0.0900  +0.1863 chRCC_SPECIFIC      
+  CDKN2A           +0.7208   +0.0360  +0.6848 chRCC_SPECIFIC      
+  CUBN             +0.5364   -0.3970  +0.9334 DIVERGENT(+/-)      
+  EPAS1            +0.2548   -0.0820  +0.3368 chRCC_SPECIFIC      
+  ERBB2            +0.5674   +0.3600  +0.2074 SHARED_ATTRACTOR    
+  ESRRA            +0.2944   -0.1200  +0.4144 chRCC_SPECIFIC      
+  EZH2             -0.1218   +0.3080  -0.4298 PRCC_SPECIFIC       
+  FABP1            +0.3008   -0.6710  +0.9718 DIVERGENT(+/-)      
+  FH               +0.5412   -0.4510  +0.9922 DIVERGENT(+/-)      
+  FOXI1            +0.3163   -0.0500  +0.3663 chRCC_SPECIFIC      
+  GOT1             +0.6513   -0.5190  +1.1703 DIVERGENT(+/-)      
+  GPX3             -0.1996   -0.4120  +0.2124 PRCC_SPECIFIC       
+  GPX4             -0.3681   -0.3190  -0.0491 SHARED_NORMAL       
+  HAVCR2               N/A   -0.3960      N/A                     
+  HDC              -0.1200   +0.6270  -0.7470 PRCC_SPECIFIC       
+  HIF1A            -0.4959   -0.0190  -0.4769 chRCC_SPECIFIC      
+  HRH1             +0.6585   +0.6300  +0.0285 SHARED_ATTRACTOR    
+  KDM1A            +0.3287   +0.4430  -0.1143 SHARED_ATTRACTOR    
+  KHK              +0.8357   -0.7460  +1.5817 DIVERGENT(+/-)      
+  KIT              -0.2469   +0.4680  -0.7149 DIVERGENT(-/+)      
+  KITLG            -0.2432   +0.6900  -0.9332 DIVERGENT(-/+)      
+  KRT19            -0.0253   +0.8030  -0.8283 PRCC_SPECIFIC       
+  KRT7             +0.0782   +0.2000  -0.1218 WEAK_BOTH           
+  LAMC2            +0.3857   +0.7600  -0.3743 SHARED_ATTRACTOR    
+  LDHA             -0.2049   +0.2100  -0.4149 DIVERGENT(-/+)      
+  MET              -0.0529   +0.2460  -0.2989 PRCC_SPECIFIC       
+  MIOX             +0.3591   -0.4290  +0.7881 DIVERGENT(+/-)      
+  MKI67            +0.4882   -0.0240  +0.5122 chRCC_SPECIFIC      
+  OGDHL            +0.5335   -0.4020  +0.9355 DIVERGENT(+/-)      
+  PBRM1                N/A   +0.2400      N/A                     
+  PDK1             +0.0140   +0.1620  -0.1480 WEAK_BOTH           
+  PPARGC1A         -0.5612   -0.1800  -0.3812 chRCC_SPECIFIC      
+  PTEN             +0.7558   -0.1000  +0.8558 chRCC_SPECIFIC      
+  RB1              -0.1119   -0.0800  -0.0319 WEAK_BOTH           
+  RUNX1                N/A   +0.5900      N/A                     
+  SDHA             +0.5212   -0.1500  +0.6712 chRCC_SPECIFIC      
+  SDHB             -0.2779   -0.1400  -0.1379 chRCC_SPECIFIC      
+  SETD2            -0.4274   +0.3080  -0.7354 DIVERGENT(-/+)      
+  SLC16A1          -0.0957   -0.4880  +0.3923 PRCC_SPECIFIC       
+  SLC22A6          +0.0004   -0.8010  +0.8014 PRCC_SPECIFIC       
+  SLC2A1           +0.7772   +0.1370  +0.6402 chRCC_SPECIFIC      
+  SLC34A1          +0.6222   -0.6370  +1.2592 DIVERGENT(+/-)      
+  SLC5A2           +0.4105   -0.6610  +1.0715 DIVERGENT(+/-)      
+  SLC7A9           +0.0108   -0.7200  +0.7308 PRCC_SPECIFIC       
+  TET2             -0.7200   +0.2920  -1.0120 DIVERGENT(-/+)      
+  TOP2A            -0.1038   +0.0830  -0.1868 WEAK_BOTH           
+  TP53                 N/A   +0.0500      N/A                     
+  TPSAB1           -0.2328   +0.6890  -0.9218 DIVERGENT(-/+)      
+  UMOD             +0.2946   -0.5910  +0.8856 DIVERGENT(+/-)      
+  VHL              +0.3487   +0.0720  +0.2767 chRCC_SPECIFIC      
+
+  PATTERN SUMMARY:
+  SHARED_ATTRACTOR       n=4  ['ERBB2', 'HRH1', 'KDM1A', 'LAMC2']
+  SHARED_NORMAL          n=2  ['B2M', 'GPX4']
+  chRCC_SPECIFIC         n=18  ['ARG1', 'ATP6V1B1', 'CA9', 'CCND1', 'CCNE1', 'CDK6']
+  PRCC_SPECIFIC          n=10  ['ACADM', 'CDK2', 'EZH2', 'GPX3', 'HDC', 'KRT19']
+  DIVERGENT(+/-)         n=10  ['CUBN', 'FABP1', 'FH', 'GOT1', 'KHK', 'MIOX']
+  DIVERGENT(-/+)         n=6  ['KIT', 'KITLG', 'LDHA', 'SETD2', 'TET2', 'TPSAB1']
+  WEAK_BOTH              n=6  ['ACSL4', 'CDK4', 'KRT7', 'PDK1', 'RB1', 'TOP2A']
+
+============================================================
+OBJ-6 — DRUG TARGET PANEL
+============================================================
+  OS DEFERRED (no GEO survival data)
+
+  Drug                         Gene                 r   sig   N_mean   T_mean
+  ──────────────────────────────────────────────────────────────────────────
+  EZH2_inhibitor               EZH2           -0.1218          0.309    0.110
+  KDM1A_inhibitor              KDM1A          +0.3287          0.847    0.839
+  MET_inhibitor                MET            -0.0529          0.851    0.966
+  ERBB2_TDXd                   ERBB2          +0.5674     ★    0.957    0.912
+  CDK4_inhibitor               CDK4           -0.0381          0.890    0.917
+  CDK2_inhibitor               CDK2           -0.1333          0.662    0.614
+  CDK6_inhibitor               CDK6           +0.2763          0.681    0.432
+  mTOR_inhibitor               MTOR           -0.0523          0.837    0.470
+  PTEN_loss                    PTEN           +0.7558    ★★    0.946    0.936
+  TP53_proxy                   TP53         ABSENT
+  CA9_targeted                 CA9            +0.6310     ★    0.204    0.636
+  PDL1_checkpoint              CD274          +0.2403          0.108    0.442
+  HAVCR2_checkpoint            HAVCR2       ABSENT
+  ARG1_inhibitor               ARG1           +0.2482          0.177    0.285
+  PDK1_DCA                     PDK1           +0.0140          0.265    0.526
+  SLC16A1_MCT4                 SLC16A1        -0.0957          0.142    0.732
+  Ferroptosis_GPX4             GPX4           -0.3681     ~    0.992    0.987
+  Ferroptosis_SLC7A9           SLC7A9         +0.0108          0.825    0.341
+  HRH1_antihistamine           HRH1           +0.6585    ★★    0.509    0.374
+  KIT_imatinib                 KIT            -0.2469          0.765    0.983
+  CDKN2A_proxy                 CDKN2A         +0.7208    ★★    0.210    0.669
+  RB1_proxy                    RB1            -0.1119          0.544    0.573
+  SDHA_SDHi                    SDHA           +0.5212     ★    0.894    0.973
+  PPARGC1A_mito                PPARGC1A       -0.5612     ★    0.922    0.913
+  EZH2_PBAF_synth              PBRM1        ABSENT
+  SETD2_proxy                  SETD2          -0.4274     ~    0.825    0.832
+  BAP1_proxy                   BAP1           +0.0569          0.658    0.883
+
+  Saved: drug_target_panel.csv
+
+============================================================
+OBJ-7 — TRANSITION INDEX
+============================================================
+  TI positive pole: DNAJC5B
+  TI negative pole: KIAA0430
+  TI r(depth) = +0.9647 p=6.52e-09 [n=15]
+  Saved: transition_index.csv
+
+============================================================
+OBJ-8 — FIGURE
+============================================================
+  Figure saved: ./chrcc_false_attractor/results_s1/chrcc_script1_figure.pdf
+
+============================================================
+FINAL SCORECARD
+============================================================
+  C1-P1  ATP6V1B1 falls with depth            NOT CONFIRMED ✗
+  C1-P2  FOXI1 falls with depth               NOT CONFIRMED ✗
+  C1-P3  KRT7 rises with depth                NOT CONFIRMED ✗
+  C1-P4  EZH2 rises with depth                NOT CONFIRMED ✗
+  C1-P5  OGDHL falls with depth               NOT CONFIRMED ✗
+  C1-P6  Depth predicts OS                    CHECK LOG
+
+  OVERALL: 0/5 (+1 deferred)
+
+  DOMINANT ACQUIRED IDENTITY: PROXIMAL_TUBULE
+    PROXIMAL_TUBULE             +0.4265
+    INTERCALATED                +0.2042
+    MITOCHONDRIAL               +0.0843
+    BILIARY/DUCTAL              -0.0006
+    INVASION/EMT                -0.0118
+
+  TOP 5 ACQUIRED (positive depth):
+    DNAJC5B        r=+0.9685 ★★★
+    ZNF574         r=+0.9594 ★★★
+    NFATC1         r=+0.9592 ★★★
+    INSM2          r=+0.9576 ★★★
+    IL17C          r=+0.9558 ★★★
+
+  TOP 5 LOST (negative depth):
+    KIAA0430       r=-0.9188 ★★★
+    L3MBTL4        r=-0.9183 ★★★
+    NAMPT          r=-0.9053 ★★★
+    TARDBP         r=-0.9009 ★★★
+    NKAP           r=-0.8908 ★★★
+
+  NEXT: review OBJ-4 attractor genes
+  to set Script 2 predictions.
+  OS: re-run when TCGA-KICH survival available.

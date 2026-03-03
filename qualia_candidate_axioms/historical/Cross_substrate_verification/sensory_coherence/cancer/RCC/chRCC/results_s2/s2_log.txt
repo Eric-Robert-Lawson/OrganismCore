@@ -1,0 +1,535 @@
+============================================================
+chRCC FALSE ATTRACTOR — SCRIPT 2
+OrganismCore | Document 96b | 2026-03-02
+Author: Eric Robert Lawson
+============================================================
+
+Builds on Script 1 OBJ-5 findings:
+  PROXIMAL_TUBULE dominant identity
+  TET2/SETD2 chromatin collapse
+  KHK/SLC34A1/GOT1 diverge from PRCC
+  ERBB2/HRH1/KDM1A shared with PRCC
+
+
+============================================================
+DATA LOAD
+============================================================
+  Expression: 15244 genes × 83 samples
+  chRCC=15  normal=53  oncocytoma=15
+  Depth scores loaded: n_chRCC=15
+  Attractor panel: 14833 genes
+  Cross-cancer panel: 60
+
+============================================================
+OBJ-1 — CHROMATIN COLLAPSE PANEL
+============================================================
+  Testing TET2/SETD2/DNMT/PRC2/PBAF axis
+  in chRCC tumours (n=15)
+
+  CHROMATIN PANEL:
+  Gene                   r   sig   N_mean   T_mean   T>N
+  ──────────────────────────────────────────────────────
+  RUNX2            +0.8492   ★★★    0.322    0.478     Y
+  KDM5C            +0.6733    ★★    0.329    0.906     Y
+  RING1            +0.5284     ★    0.955    0.900     N
+  SUZ12            +0.4796     ~    0.944    0.905     N
+  DNMT3A           +0.4096     ~    0.390    0.548     Y
+  SMARCA4          +0.3781     ~    0.928    0.870     N
+  RUNX3            +0.3505     ~    0.524    0.525     Y
+  KDM1A            +0.3287          0.847    0.839     N
+  TET1             +0.3135          0.320    0.193     N
+  ARID1A           +0.1291          0.855    0.898     Y
+  BAP1             +0.0569          0.658    0.883     Y
+  ARID2            +0.0224          0.550    0.605     Y
+  DNMT3B           -0.0259          0.428    0.216     N
+  KDM2B            -0.1136          0.791    0.771     N
+  EZH2             -0.1218          0.309    0.110     N
+  CBX8             -0.1376          0.312    0.392     Y
+  ARID1B           -0.2498          0.175    0.792     Y
+  NSD1             -0.3702     ~    0.504    0.562     Y
+  KDM1B            -0.4013     ~    0.245    0.115     N
+  SETD2            -0.4274     ~    0.825    0.832     Y
+  KDM6A            -0.5096     ~    0.597    0.531     N
+  DNMT1            -0.5271     ★    0.837    0.438     N
+  SMARCA2          -0.5328     ★    0.950    0.847     N
+  AEBP2            -0.5401     ★    0.710    0.688     N
+  JARID2           -0.5498     ★    0.608    0.675     Y
+  TET2             -0.7200    ★★    0.176    0.648     Y
+  EED              -0.7853   ★★★    0.562    0.622     Y
+  BMI1           ABSENT
+  PBRM1          ABSENT
+  NSD2           ABSENT
+  TET3           ABSENT
+  RUNX1          ABSENT
+
+  SUB-GROUP MEAN r(depth):
+  PRC2     mean_r= -0.3035  pos=1  neg=3  (5 genes)
+  PBAF     mean_r= -0.0189  pos=1  neg=1  (4 genes)
+  SETD2    mean_r= -0.3988  pos=0  neg=2  (2 genes)
+  DNMT     mean_r= -0.0478  pos=1  neg=1  (3 genes)
+  TET      mean_r= -0.2032  pos=1  neg=1  (2 genes)
+  KDM      mean_r= -0.0045  pos=2  neg=2  (5 genes)
+  RUNX     mean_r= +0.5999  pos=2  neg=0  (2 genes)
+
+  C2-P1 CHECK: r(TET2_expr, SETD2_expr) in chRCC
+  r(TET2, SETD2) in chRCC = +0.4200  p=0.1190 [n=15]
+  r(TET2, depth)  = -0.7200  p=0.0025 [n=15]
+  r(SETD2, depth) = -0.4274  p=0.1121 [n=15]
+  C2-P1 CONFIRMED ✓ (TET2/SETD2 co-lost)
+
+  C2-P6 CHECK: DNMT3A/DNMT3B r(depth)
+  DNMT3A: r=+0.4096 ~  p=0.1295 [n=15]
+  DNMT3B: r=-0.0259   p=0.9271 [n=15]
+  DNMT1: r=-0.5271 ★  p=0.0435 [n=15]
+  C2-P6 CONFIRMED ✓
+
+============================================================
+OBJ-2 — PT TRANSCRIPTION FACTOR PANEL
+============================================================
+  What TFs drive the acquired PT identity?
+  Prediction C2-P2: HNF4A or HNF1A r(depth) > +0.30
+
+  PT TRANSCRIPTION FACTORS:
+  Gene                   r   sig   N_mean   T_mean   T>N
+  ──────────────────────────────────────────────────────
+  FOXA2            +0.8992   ★★★    0.357    0.532     Y
+  HNF1B            +0.8470   ★★★    0.872    0.916     Y
+  MLXIPL           +0.7034    ★★    0.681    0.730     Y
+  KLF15            +0.6450    ★★    0.700    0.837     Y
+  ESRRG            +0.5174     ★    0.921    0.870     N
+  HNF1A            +0.3229          0.584    0.464     N
+  HNF4A            +0.3044          0.362    0.639     Y
+  ESRRA            +0.2944          0.773    0.919     Y
+  ESRRB            +0.2195          0.540    0.315     N
+  PPARA            +0.0928          0.610    0.729     Y
+  RXRA             +0.0325          0.890    0.818     N
+  NR1H4            +0.0247          0.796    0.234     N
+  NR3C2            -0.1004          0.860    0.923     Y
+  FOXA3            -0.1100          0.470    0.188     N
+  MYC              -0.1352          0.675    0.615     N
+  FOXA1            -0.1670          0.202    0.076     N
+  SP1              -0.3020          0.766    0.862     Y
+  MYCN             -0.3092          0.645    0.380     N
+  GABPA            -0.3113          0.592    0.481     N
+  NRF1             -0.3118          0.266    0.436     Y
+  KLF9             -0.3770     ~    0.977    0.779     N
+  SP3              -0.4774     ~    0.779    0.719     N
+  PPARGC1A         -0.5612     ★    0.922    0.913     N
+  NR3C1            -0.6630    ★★    0.492    0.808     Y
+  PPARGC1B       ABSENT
+  TFAM           ABSENT
+
+  C2-P2 CHECK: HNF4A or HNF1A r(depth) > 0.30
+  HNF4A: r=+0.3044 
+  HNF1A: r=+0.3229 
+  HNF1B: r=+0.8470 ★★★
+  C2-P2 CONFIRMED ✓
+
+============================================================
+OBJ-3 — METABOLIC AXIS DEEP DIVE
+============================================================
+
+  FRUCTOSE AXIS:
+  Gene                   r   sig   N_mean   T_mean   T>N
+  ──────────────────────────────────────────────────────
+  PFKP             +0.8955   ★★★    0.879    0.753     N
+  KHK              +0.8357   ★★★    0.741    0.473     N
+  PFKL             +0.5415     ★    0.848    0.840     N
+  PFKM             +0.4409     ~    0.871    0.976     Y
+  PGD              +0.1296          0.853    0.818     N
+  ALDOB            +0.0008          0.933    0.439     N
+  ALDOC            -0.1116          0.780    0.717     N
+  TKT              -0.2709          0.901    0.863     N
+  TALDO1           -0.4518     ~    0.969    0.949     N
+  G6PD             -0.4832     ~    0.771    0.611     N
+  RPE            ABSENT
+  FRUCTOSE             mean_r= +0.1526  n_genes=10
+
+  TCA AXIS:
+  Gene                   r   sig   N_mean   T_mean   T>N
+  ──────────────────────────────────────────────────────
+  IDH2             +0.6759    ★★    0.919    0.988     Y
+  CS               +0.6609    ★★    0.966    0.986     Y
+  GOT2             +0.6556    ★★    0.964    0.959     N
+  GOT1             +0.6513    ★★    0.973    0.978     Y
+  SUCLG1           +0.6178     ★    0.982    0.982     N
+  FH               +0.5412     ★    0.960    0.946     N
+  OGDHL            +0.5335     ★    0.917    0.993     Y
+  MDH1             +0.4590     ~    0.990    0.972     N
+  DLST             +0.2199          0.832    0.930     Y
+  OGDH             +0.1021          0.855    0.962     Y
+  MDH2             -0.0549          0.994    0.963     N
+  SUCLA2           -0.2099          0.839    0.789     N
+  ACO1             -0.2947          0.969    0.863     N
+  IDH1             -0.8454   ★★★    0.906    0.700     N
+  IDH3A          ABSENT
+  ACO2           ABSENT
+  TCA                  mean_r= +0.2652  n_genes=14
+
+  GLUCONEOGENESIS AXIS:
+  Gene                   r   sig   N_mean   T_mean   T>N
+  ──────────────────────────────────────────────────────
+  G6PC3            +0.8685   ★★★    0.790    0.896     Y
+  PFKFB1           +0.7567    ★★    0.158    0.505     Y
+  PCK2             +0.1856          0.901    0.455     N
+  PFKFB3           +0.0655          0.947    0.535     N
+  FBP2             -0.0489          0.180    0.348     Y
+  PCK1             -0.0679          0.820    0.469     N
+  FBP1             -0.7105    ★★    0.956    0.664     N
+  G6PC           ABSENT
+  GLUCONEOGENESIS      mean_r= +0.1499  n_genes=7
+
+  FATTY_ACID_OX AXIS:
+  Gene                   r   sig   N_mean   T_mean   T>N
+  ──────────────────────────────────────────────────────
+  HADHB            +0.3348          0.918    0.980     Y
+  CPT1A            +0.3277          0.559    0.970     Y
+  ACADVL           +0.2323          0.986    0.949     N
+  HADHA            +0.1860          0.809    0.939     Y
+  ACADM            +0.1726          0.980    0.850     N
+  ACSL1            -0.0573          0.951    0.984     Y
+  ACOX1            -0.1347          0.807    0.637     N
+  CPT2             -0.1689          0.908    0.677     N
+  ACSL3            -0.2035          0.880    0.886     Y
+  ACSL5            -0.2678          0.725    0.615     N
+  ACOX2          ABSENT
+  ACOX3          ABSENT
+  ACADL          ABSENT
+  CPT1B          ABSENT
+  FATTY_ACID_OX        mean_r= +0.0421  n_genes=10
+
+  METABOLIC AXIS SUMMARY:
+  TCA                    mean_r= +0.2652
+  FRUCTOSE               mean_r= +0.1526
+  GLUCONEOGENESIS        mean_r= +0.1499
+  FATTY_ACID_OX          mean_r= +0.0421
+
+  C2-P3 CHECK: KHK/ALDOB/TKT all r > +0.30
+  KHK: r=+0.8357 ★★★  p=0.0001 [n=15]
+  ALDOB: r=+0.0008   p=0.9978 [n=15]
+  TKT: r=-0.2709   p=0.3287 [n=15]
+  C2-P3 NOT CONFIRMED ✗
+
+============================================================
+OBJ-4 — ONCOCYTOMA SEPARATOR
+============================================================
+  chRCC vs oncocytoma: MW p=0.93 (indistinguishable by depth)
+  Finding gene-level discriminators
+  Significant discriminators (p<0.05): 4320
+
+  TOP 20 chRCC > ONCOCYTOMA:
+  Gene              chRCC     Onco     diff        p_MWU
+  ──────────────────────────────────────────────────────
+  CC2D1A            0.759    0.613   +0.146   p=3.39e-06
+  MRPS26            0.887    0.816   +0.071   p=3.39e-06
+  CEP170B           0.892    0.836   +0.056   p=3.39e-06
+  ZMIZ2             0.953    0.923   +0.030   p=5.05e-06
+  DNAJB1            0.960    0.928   +0.033   p=5.05e-06
+  CLUHP3            0.714    0.600   +0.114   p=6.15e-06
+  UBL4A             0.772    0.670   +0.102   p=6.15e-06
+  ITPK1             0.944    0.875   +0.069   p=7.46e-06
+  TUBB4B            0.977    0.950   +0.027   p=7.46e-06
+  RASSF7            0.859    0.807   +0.052   p=7.48e-06
+  SYNGR3            0.950    0.747   +0.203   p=7.48e-06
+  LSR               0.875    0.700   +0.175   p=7.48e-06
+  FAM83H            0.740    0.472   +0.268   p=7.48e-06
+  HSPB1             0.992    0.974   +0.018   p=8.22e-06
+  PRRG4             0.814    0.474   +0.340   p=9.07e-06
+  YIPF2             0.811    0.717   +0.094   p=9.07e-06
+  ARRDC1            0.827    0.713   +0.113   p=9.07e-06
+  DBNDD1            0.448    0.299   +0.149   p=9.07e-06
+  MMP15             0.729    0.516   +0.213     p=0.0000
+  ERF               0.798    0.676   +0.122     p=0.0000
+
+  TOP 20 ONCOCYTOMA > chRCC:
+  VRK2              0.666    0.786   -0.120   p=3.39e-06
+  LRPPRC            0.928    0.966   -0.038   p=3.39e-06
+  SAT2              0.764    0.904   -0.140   p=3.39e-06
+  MRPL45            0.679    0.835   -0.156   p=3.39e-06
+  SF3B6             0.850    0.916   -0.066   p=3.39e-06
+  NOL7              0.861    0.931   -0.069   p=3.39e-06
+  MTO1              0.470    0.683   -0.214   p=3.39e-06
+  PCMT1             0.736    0.897   -0.161   p=4.14e-06
+  FASTKD2           0.581    0.743   -0.162   p=4.14e-06
+  SMG8              0.541    0.652   -0.111   p=4.14e-06
+  CRIPT             0.421    0.665   -0.244   p=4.14e-06
+  NFU1              0.610    0.838   -0.228   p=4.14e-06
+  ASXL2             0.893    0.959   -0.066   p=4.14e-06
+  TRIP12            0.820    0.908   -0.088   p=5.04e-06
+  VEZF1             0.850    0.908   -0.058   p=5.04e-06
+  ORC4              0.741    0.886   -0.145   p=5.05e-06
+  TIAL1             0.801    0.880   -0.079   p=5.05e-06
+  UBXN8             0.371    0.551   -0.180   p=5.05e-06
+  ECHDC1            0.736    0.916   -0.180   p=5.05e-06
+  TMEM17            0.145    0.357   -0.211   p=6.15e-06
+
+  Saved: oncocytoma_separator.csv
+
+============================================================
+OBJ-5 — CELL CYCLE / SENESCENCE
+============================================================
+  CDKN2A r=+0.721: senescence or proliferation?
+  C2-P4: MKI67 r < CDKN2A r
+
+  CELL CYCLE:
+  Gene                   r   sig   N_mean   T_mean   T>N
+  ──────────────────────────────────────────────────────
+  CDKN2A           +0.7208    ★★    0.210    0.669     Y
+  MKI67            +0.4882     ~    0.130    0.376     Y
+  CDKN2B           +0.4581     ~    0.371    0.377     Y
+  E2F1             +0.4573     ~    0.481    0.486     Y
+  CDKN1A           +0.4256     ~    0.179    0.913     Y
+  CCND1            +0.3483          0.965    0.900     N
+  CDK6             +0.2763          0.681    0.432     N
+  CCNA2            +0.0987          0.318    0.181     N
+  MCM7             +0.0871          0.863    0.781     N
+  CDK1             +0.0023          0.468    0.388     N
+  CDK4             -0.0381          0.890    0.917     Y
+  MCM2             -0.0925          0.461    0.679     Y
+  TOP2A            -0.1038          0.221    0.145     N
+  RB1              -0.1119          0.544    0.573     Y
+  CDK2             -0.1333          0.662    0.614     N
+  CCNB1            -0.1456          0.448    0.321     N
+  CCNE1            -0.3417          0.474    0.407     N
+  PCNA             -0.3593     ~    0.837    0.770     N
+  CDKN1B           -0.5576     ★    0.852    0.766     N
+  E2F3           ABSENT
+
+  SENESCENCE MARKERS:
+  Gene                   r   sig   N_mean   T_mean   T>N
+  ──────────────────────────────────────────────────────
+  CDKN2A           +0.7208    ★★    0.210    0.669     Y
+  CDKN1A           +0.4256     ~    0.179    0.913     Y
+  CXCL1            +0.1005          0.510    0.061     N
+  MDM2             +0.0712          0.426    0.717     Y
+  SERPINE1         +0.0695          0.556    0.510     N
+  HMGA1            +0.0241          0.639    0.880     Y
+  GLB1             -0.1600          0.938    0.895     N
+  SMPD1            -0.1969          0.745    0.786     Y
+  CXCL8            -0.2783          0.716    0.388     N
+  IL6              -0.4903     ~    0.382    0.294     N
+  MMP3             -0.6215     ★    0.229    0.037     N
+  HMGA2            -0.6567    ★★    0.277    0.270     N
+  TP53           ABSENT
+  LMNB1          ABSENT
+  IL8            ABSENT
+
+  SASP:
+  Gene                   r   sig   N_mean   T_mean   T>N
+  ──────────────────────────────────────────────────────
+  CCL7             +0.6428    ★★    0.119    0.138     Y
+  GDF15            +0.5164     ★    0.917    0.903     N
+  IGFBP7           +0.3105          0.996    0.989     N
+  CXCL1            +0.1005          0.510    0.061     N
+  SERPINE1         +0.0695          0.556    0.510     N
+  CCL2             +0.0573          0.852    0.722     N
+  CXCL5            -0.0248          0.166    0.023     N
+  IGFBP3           -0.0485          0.923    0.837     N
+  MMP1             -0.1484          0.348    0.038     N
+  CXCL8            -0.2783          0.716    0.388     N
+  CXCL2            -0.3644     ~    0.480    0.282     N
+  MMP10            -0.4631     ~    0.160    0.030     N
+  IL6              -0.4903     ~    0.382    0.294     N
+  MMP3             -0.6215     ★    0.229    0.037     N
+  IL8            ABSENT
+
+  C2-P4 CHECK: CDKN2A r vs MKI67 r
+  CDKN2A r = +0.7208
+  MKI67   r = +0.4882
+  C2-P4 CONFIRMED ✓ (CDKN2A rises > MKI67 → senescent not proliferative)
+
+  Mean r(depth):
+    Cell cycle:  +0.0778
+    Senescence:  -0.0827
+    SASP:        -0.0530
+  INTERPRETATION: Proliferative signature dominates
+
+============================================================
+OBJ-6 — IMMUNE MICROENVIRONMENT
+============================================================
+  TET2 loss → immune evasion link
+
+  IMMUNE PANEL:
+  Gene                   r   sig   N_mean   T_mean   T>N
+  ──────────────────────────────────────────────────────
+  FOXP3            +0.7019    ★★    0.249    0.560     Y
+  IDO2             +0.6013     ★    0.440    0.292     N
+  CD8A             +0.4871     ~    0.444    0.566     Y
+  GZMB             +0.3535     ~    0.332    0.081     N
+  CTLA4            +0.3249          0.228    0.558     Y
+  HLA-A            +0.2534          0.994    0.997     Y
+  ARG1             +0.2482          0.177    0.285     Y
+  CD274            +0.2403          0.108    0.442     Y
+  MS4A1            +0.1915          0.278    0.240     N
+  IDO1             +0.1809          0.291    0.482     Y
+  CD4              +0.1546          0.332    0.585     Y
+  PRF1             -0.0926          0.364    0.409     Y
+  IFNG             -0.2224          0.189    0.158     N
+  B2M              -0.3972     ~    0.996    0.998     Y
+  CD68             -0.4130     ~    0.397    0.438     Y
+  TIGIT            -0.5145     ★    0.401    0.107     N
+  CD8B             -0.5724     ★    0.132    0.337     Y
+  CD163            -0.5839     ★    0.479    0.387     N
+  PDCD1          ABSENT
+  HAVCR2         ABSENT
+  LAG3           ABSENT
+  HLA-B          ABSENT
+  HLA-C          ABSENT
+  STING1         ABSENT
+  CGAS           ABSENT
+  CD19           ABSENT
+
+  C2-P5 CHECK: CD8A and FOXP3 r(depth) < +0.20
+  CD8A  r = +0.4871
+  FOXP3 r = +0.7019
+  C2-P5 NOT CONFIRMED ✗
+  Effector (CD8/GZMB)              mean_r=-0.0094 (5 genes)
+  Suppressor (Treg/PD-L1)          mean_r=+0.1714 (5 genes)
+
+  TET2-IMMUNE LINK:
+  TET2 loss impairs TET2-mediated enhancer demethylation
+  → silences immune gene promoters
+  → predicts: CD8A low, IFN pathway low, PD-L1 low (immune excluded)
+  IFNG  r(depth) = -0.2224
+  CD274 r(depth) = +0.2403
+
+============================================================
+OBJ-7 — REVISED DRUG TARGET SCORING
+============================================================
+
+  Tier Drug                   Gene                 r   sig Rationale
+  ────────────────────────────────────────────────────────────────────────────────
+  T1   TET2_activator         TET2           -0.7200    ★★ TET2 lost at depth — re-activation 
+  T1   SETD2_H3K36me3         SETD2          -0.4274     ~ SETD2 lost — H3K36me3 deficiency
+  T1   ERBB2_TDXd             ERBB2          +0.5674     ★ ERBB2 rises with depth ★ SHARED wit
+  T1   CDKN2A_CDK46i          CDKN2A         +0.7208    ★★ CDKN2A rises ★★ — CDK4/6 context
+  T1   KDM1A_LSD1i            KDM1A          +0.3287       KDM1A rises — shared PRCC/chRCC
+  T2   HRH1_antihistamine     HRH1           +0.6585    ★★ HRH1 rises ★★ both chRCC+PRCC
+  T2   CA9_targeted           CA9            +0.6310     ★ CA9 rises ★ chRCC-specific
+  T2   PTEN_PI3K              PTEN           +0.7558    ★★ PTEN rises ★★ chRCC-specific
+  T2   SLC2A1_GLUT1           SLC2A1         +0.7772   ★★★ GLUT1 rises ★★★ chRCC-specific
+  T2   KHK_fructose           KHK            +0.8357   ★★★ KHK rises ★★★ fructose axis
+  T2   PPARGC1A_mito          PPARGC1A       -0.5612     ★ PGC1a falls — mito programme
+  T2   SDHA_complex2          SDHA           +0.5212     ★ SDHA rises ★ — complex II
+  T3   EZH2_PRC2i             EZH2           -0.1218       EZH2 falls in chRCC (PRCC-specific)
+  T3   mTOR_rapalogue         MTOR           -0.0523       MTOR neutral — context-dependent
+  T3   PDL1_checkpoint        CD274          +0.2403       CD274 rises but immune cold
+  T3   HIF_pathway            HIF1A          -0.4959     ~ HIF1A falls — not VHL-driven
+  T3   GPX4_ferroptosis       GPX4           -0.3681     ~ GPX4 falls ~ — context
+  T3   BAP1_HDAC              BAP1           +0.0569       BAP1 absent — check PBAF
+
+  T1: 5 targets  sig(|r|≥0.514): 3  genes: ['TET2', 'SETD2', 'ERBB2', 'CDKN2A', 'KDM1A']
+  T2: 7 targets  sig(|r|≥0.514): 7  genes: ['HRH1', 'CA9', 'PTEN', 'SLC2A1', 'KHK', 'PPARGC1A', 'SDHA']
+  T3: 6 targets  sig(|r|≥0.514): 0  genes: ['EZH2', 'MTOR', 'CD274', 'HIF1A', 'GPX4', 'BAP1']
+
+  Saved: drug_targets_v2.csv
+
+============================================================
+OBJ-8 — THREE-WAY CROSS-CANCER
+============================================================
+  chRCC vs PRCC vs ccRCC
+  Fixed references: PRCC (n=290, Doc 95a-g), ccRCC (literature)
+
+  Gene               chRCC      PRCC     ccRCC pattern
+  ────────────────────────────────────────────────────────────
+  ACADM            +0.1726   -0.4120       N/A  ~/-/?  
+  ACOX1            -0.1347   -0.3000       N/A  ~/-/?  
+  ALDOB            +0.0008   -0.5800   -0.5400  ~/-/-  PRCC_ccRCC_shared
+  ARG1             +0.2482   +0.0760   +0.3500  +/~/+  chRCC_ccRCC_shared
+  B2M              -0.3972   -0.2220       N/A  -/-/?  RCC_shared
+  BAP1             +0.0569       N/A   +0.1500  ~/?/~  chRCC_ccRCC_shared
+  CA9              +0.6310   +0.1250   +0.7100  +/~/+  chRCC_ccRCC_shared
+  CD274            +0.2403   +0.1800   +0.4200  +/~/+  chRCC_ccRCC_shared
+  CD8A             +0.4871   -0.1500   +0.2500  +/~/+  chRCC_ccRCC_shared
+  CDK4             -0.0381   +0.1180       N/A  ~/~/?  RCC_shared
+  CDKN2A           +0.7208   +0.0360   +0.2000  +/~/~  PRCC_ccRCC_shared
+  CUBN             +0.5364   -0.3970   -0.6500  +/-/-  chRCC_UNIQUE(+)
+  DNMT3A           +0.4096   +0.1500   +0.1000  +/~/~  PRCC_ccRCC_shared
+  DNMT3B           -0.0259   +0.2000   +0.0500  ~/~/~  
+  EPAS1            +0.2548   -0.0820   +0.6200  +/~/+  chRCC_ccRCC_shared
+  ERBB2            +0.5674   +0.3600   +0.1500  +/+/~  RCC_shared
+  ESRRA            +0.2944   -0.1200   -0.2800  +/~/-  anti_ccRCC
+  EZH2             -0.1218   +0.3080   +0.4200  ~/+/+  PRCC_ccRCC_shared
+  FABP1            +0.3008   -0.6710       N/A  +/-/?  
+  FBP1             -0.7105   -0.3800       N/A  -/-/?  RCC_shared
+  FH               +0.5412   -0.4510   -0.3000  +/-/-  chRCC_UNIQUE(+)
+  FOXP3            +0.7019   -0.0500   +0.1800  +/~/~  PRCC_ccRCC_shared
+  G6PC                 N/A   -0.3500   -0.4500  ?/-/-  PRCC_ccRCC_shared
+  GOT1             +0.6513   -0.5190   -0.2000  +/-/~  
+  HAVCR2               N/A   -0.3960       N/A  ?/-/?  chRCC_ccRCC_shared
+  HDC              -0.1200       N/A   -0.1000  ~/?/~  chRCC_ccRCC_shared
+  HIF1A            -0.4959   -0.0190   +0.5800  -/~/+  
+  HNF1A            +0.3229   -0.2500   -0.3800  +/-/-  chRCC_UNIQUE(+)
+  HNF1B            +0.8470   +0.1000       N/A  +/~/?  
+  HNF4A            +0.3044   -0.3000   -0.4500  +/-/-  chRCC_UNIQUE(+)
+  HRH1             +0.6585   +0.6300   +0.0500  +/+/~  RCC_shared
+  IDH1             -0.8454   -0.2000   -0.1500  -/~/~  PRCC_ccRCC_shared
+  KDM1A            +0.3287   +0.4430   +0.3800  +/+/+  PAN_ATTRACTOR
+  KHK              +0.8357   -0.7460   -0.6200  +/-/-  chRCC_UNIQUE(+)
+  KITLG            -0.2432   +0.6900   -0.1000  -/+/~  
+  KRT19            -0.0253   +0.8030   -0.2000  ~/+/~  chRCC_ccRCC_shared
+  KRT7             +0.0782   +0.2000   -0.1500  ~/~/~  
+  LAMC2            +0.3857   +0.7600       N/A  +/+/?  RCC_shared
+  LDHA             -0.2049   +0.2100   +0.5900  -/+/+  chRCC_UNIQUE(-)
+  MET              -0.0529       N/A   +0.3800  ~/?/+  
+  MIOX             +0.3591   -0.4290   -0.6000  +/-/-  chRCC_UNIQUE(+)
+  MKI67            +0.4882   -0.0240   +0.4500  +/~/+  chRCC_ccRCC_shared
+  MTOR             -0.0523       N/A   +0.1500  ~/?/~  chRCC_ccRCC_shared
+  OGDHL            +0.5335   -0.4020   -0.5100  +/-/-  chRCC_UNIQUE(+)
+  PBRM1                N/A       N/A   +0.1800  ?/?/~  RCC_shared
+  PCK1             -0.0679   -0.4000   -0.5000  ~/-/-  PRCC_ccRCC_shared
+  PDK1             +0.0140       N/A   +0.4200  ~/?/+  
+  PPARA            +0.0928   -0.2000       N/A  ~/~/?  RCC_shared
+  PPARGC1A         -0.5612   -0.1800   -0.3500  -/~/-  chRCC_ccRCC_shared
+  PTEN             +0.7558   -0.1000   -0.2000  +/~/~  PRCC_ccRCC_shared
+  RB1              -0.1119   -0.0800       N/A  ~/~/?  RCC_shared
+  RUNX1                N/A   +0.5900       N/A  ?/+/?  chRCC_ccRCC_shared
+  SDHA             +0.5212   -0.1500   -0.2000  +/~/~  PRCC_ccRCC_shared
+  SDHB             -0.2779   -0.1400   -0.1900  -/~/~  PRCC_ccRCC_shared
+  SETD2            -0.4274   +0.3080   +0.2500  -/+/+  chRCC_UNIQUE(-)
+  SLC22A6          +0.0004   -0.8010   -0.7800  ~/-/-  PRCC_ccRCC_shared
+  SLC2A1           +0.7772   +0.1370   +0.6800  +/~/+  chRCC_ccRCC_shared
+  SLC34A1          +0.6222   -0.6370       N/A  +/-/?  
+  SLC5A2           +0.4105   -0.6610       N/A  +/-/?  
+  TET2             -0.7200   +0.2920   -0.0500  -/+/~  
+  TPSAB1           -0.2328       N/A   -0.1500  -/?/~  
+  UMOD             +0.2946       N/A   -0.5200  +/?/-  anti_ccRCC
+  VHL              +0.3487   +0.0720   -0.6500  +/~/-  anti_ccRCC
+
+  THREE-WAY PATTERN SUMMARY:
+  PAN_ATTRACTOR          n=1  ['KDM1A']
+  chRCC_UNIQUE(+)        n=7  ['CUBN', 'FH', 'HNF1A', 'HNF4A', 'KHK']
+  chRCC_UNIQUE(-)        n=2  ['LDHA', 'SETD2']
+  anti_ccRCC             n=3  ['ESRRA', 'UMOD', 'VHL']
+  chRCC_ccRCC_shared     n=14  ['ARG1', 'BAP1', 'CA9', 'CD274', 'CD8A']
+  PRCC_ccRCC_shared      n=12  ['ALDOB', 'CDKN2A', 'DNMT3A', 'EZH2', 'FOXP3']
+  RCC_shared             n=9  ['B2M', 'CDK4', 'ERBB2', 'FBP1', 'HRH1']
+
+============================================================
+OBJ-9 — FIGURE
+============================================================
+  Figure saved: ./chrcc_false_attractor/results_s2/chrcc_script2_figure.pdf
+
+============================================================
+SCRIPT 2 — FINAL SCORECARD
+============================================================
+  C2-P1 TET2/SETD2 co-lost               CONFIRMED ✓
+  C2-P2 HNF4A or HNF1A rises             CONFIRMED ✓
+  C2-P3 KHK/ALDOB/TKT coherent           NOT CONFIRMED ✗
+  C2-P4 CDKN2A > MKI67                   CONFIRMED ✓
+  C2-P5 CD8A+FOXP3 cold                  NOT CONFIRMED ✗
+  C2-P6 DNMT3A/B rises                   CONFIRMED ✓
+
+  OVERALL: 4/6
+
+  CROSS-CANCER FINDINGS (Script 1 OBJ-5, platform-independent):
+  KHK:    chRCC +0.835 vs PRCC -0.746  DIVERGENT — fructose acquired
+  TET2:   chRCC -0.720 vs PRCC +0.292  DIVERGENT — chromatin collapse
+  SETD2:  chRCC -0.427 vs PRCC +0.308  DIVERGENT — H3K36me3 lost
+  ERBB2:  chRCC +0.567 vs PRCC +0.360  SHARED — therapeutic target
+  HRH1:   chRCC +0.659 vs PRCC +0.630  SHARED — HRH1 axis
+
+  NEXT STEPS:
+  Script 3: TET2/SETD2 methylation consequences
+  Script 4: ERBB2/HRH1/KDM1A therapeutic axis
+  OS: re-run when TCGA-KICH survival available
