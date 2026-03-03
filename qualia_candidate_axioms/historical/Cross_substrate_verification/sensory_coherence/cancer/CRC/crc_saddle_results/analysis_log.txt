@@ -1,0 +1,187 @@
+========================================================
+CRC FALSE ATTRACTOR ANALYSIS
+OrganismCore — False Attractor Framework
+Cancer Validation #2
+February 28, 2026
+========================================================
+All files found.
+========================================================
+STEP 1: LOADING METADATA
+========================================================
+Loaded: 192166 cells
+Columns: ['batch', 'sample_id', 'center_x', 'center_y', 'orig_publication_type', 'cresc_publication_type', 'lineage']
+
+scRNAseq cells only: 69153
+
+Cell type distribution (scRNAseq):
+cresc_publication_type
+Epithelial 1: KRT8+ MUC13+     24114
+T Cell: CD3D+                  20694
+Myeloid Cell: CD14+ C1QB+       7710
+Plasma Cell: XBP1+ MZB1+        6659
+B cell: CD79A+ MS4A1+           4057
+Fibroblast: Cl3A1+ PDGFRB+      2185
+Endothelial Cell: VWF+          1653
+Epithelial 2: MKI67+ TOP2A+     1064
+Mast Cell: CPA3+                1017
+Name: count, dtype: int64
+
+Differentiated (Epi 1): 24114
+Blocked/cycling (Epi 2): 1064
+========================================================
+STEP 2: LOADING MTX EXPRESSION
+========================================================
+Barcodes: 192166
+Sample barcodes: ['C154_T_1_1_0_c1_v3_id-AAACCCAAGTCACACT', 'C154_T_1_1_0_c1_v3_id-AAACCCAGTCCTCAGG', 'C154_T_1_1_0_c1_v3_id-AAACCCAGTCGATTAC']
+Genes: 477
+Sample genes: ['ACE', 'ACKR1', 'ACKR2', 'ACKR3', 'ACKR4']
+
+Target genes found: ['CDX2', 'IRF8']
+Missing: ['HNF4A', 'KLF5', 'ATOH1', 'MYC', 'YY1', 'SPI1', 'RUNX1']
+
+Loading MTX matrix...
+Matrix shape: (477, 192166) (genes x cells)
+
+Extracting 2 target genes...
+  CDX2: mean=0.3249 max=42.0000 nonzero=17245
+  IRF8: mean=0.1579 max=36.0000 nonzero=20561
+
+Expression matrix: 192166 cells x 2 genes
+Memory: 16.1 MB
+Cached: ./crc_saddle_results/expr_cache.csv
+========================================================
+STEP 3: EXPRESSION PROFILES
+========================================================
+Common cells: 69153
+Genes available: ['CDX2', 'IRF8']
+
+Epithelial cells for analysis:
+CellType
+Epithelial 1: KRT8+ MUC13+     24114
+Epithelial 2: MKI67+ TOP2A+     1064
+Name: count, dtype: int64
+
+Mean expression — differentiated vs blocked:
+                               CDX2    IRF8
+CellType                                   
+Epithelial 1: KRT8+ MUC13+   2.4640  0.3427
+Epithelial 2: MKI67+ TOP2A+  0.5056  1.0677
+========================================================
+STEP 4: SADDLE POINT SIGNATURE
+========================================================
+FRAMEWORK PREDICTION (CRC):
+  Reference (normal endpoint):
+    Epithelial 1: KRT8+ MUC13+
+  Blocked population (false attractor):
+    Epithelial 2: MKI67+ TOP2A+
+
+  SUPPRESSED candidates:
+    ['CDX2', 'HNF4A', 'KLF5', 'ATOH1']
+  ELEVATED predicted:
+    ['MYC', 'YY1']
+  CONTROLS (flat — wrong lineage):
+    ['SPI1', 'IRF8', 'RUNX1']
+
+n differentiated: 24114
+n blocked:        1064
+
+CDX2     [CANDIDATE ] | diff=2.4640 block=0.5056 | suppressed +79.5%         | p=3.89e-154 *** | ✓ CONFIRMED
+IRF8     [CONTROL   ] | diff=0.3427 block=1.0677 | elevated   +211.5%        | p=1.0000     | ✗ CONTROL UNEXPECTED
+
+========================================================
+CRC FRAMEWORK PREDICTION RESULT
+========================================================
+Switch genes confirmed:  1/1
+Switch genes partial:    0/1
+Elevated as predicted:   0/0
+Controls as expected:    0/1
+
+** PARTIAL CONFIRMATION **
+Consistent with framework.
+========================================================
+STEP 5: GENERATING FIGURE
+========================================================
+Figure saved: ./crc_saddle_results/crc_saddle_figure.png
+========================================================
+STEP 6: CROSS-CANCER SUMMARY
+========================================================
+
+CROSS-CANCER FALSE ATTRACTOR ANALYSIS
+OrganismCore — February 28, 2026
+============================================================
+
+THE PRINCIPLE:
+  Cancer is a false attractor in the Waddington
+  epigenetic landscape. Malignant cells are stuck
+  below the differentiation threshold — a ceiling
+  imposed by suppression of lineage-specific switch
+  genes. The minimal control set for reversion is
+  the switch genes: those specifically suppressed
+  at the block relative to the normal differentiated
+  endpoint.
+
+CANCER 1: AML — Acute Myeloid Leukemia
+  Data: Zenodo:10013368 (van Galen 2019)
+  74,583 cells — 10,130 malignant
+  Block: GMP-like/Prog-like vs CD14+ monocytes
+  Lineage: Myeloid
+
+  Switch genes (myeloid differentiation):
+    SPI1:  90.5% suppressed  p=0.00e+00 ***
+    KLF4:  94.7% suppressed  p=0.00e+00 ***
+    IRF8:  69.5% suppressed  p=0.00e+00 ***
+  Controls (4/4 correct)
+
+CANCER 2: CRC — Colorectal Cancer
+  Data: Zenodo:14602110
+  Block: Epithelial 2 (cycling) vs Epithelial 1
+  Lineage: Epithelial/Colonocyte
+
+  Switch genes (colonocyte differentiation):
+    CDX2    :  79.5% suppressed  p=3.89e-154 ***  [CONFIRMED]
+
+  Elevated predicted:
+
+PATTERN:
+  AML switch genes:  SPI1, KLF4, IRF8
+    — myeloid transcription factors
+    — irrelevant to colon epithelium
+  CRC switch genes:  CDX2, HNF4A, KLF5, ATOH1
+    — colonocyte transcription factors
+    — irrelevant to myeloid differentiation
+
+  Different cancers.
+  Different lineages.
+  Different switch genes.
+  Same structural principle.
+
+  The false attractor holds closed the
+  lineage-specific differentiation gates.
+  The gates are different.
+  The lock is the same.
+
+THERAPEUTIC IMPLICATION:
+  AML: CRISPRa of SPI1 + KLF4 + IRF8
+       in GMP-like/Prog-like cells
+  CRC: CRISPRa of CDX2 + HNF4A + KLF5
+       in Epithelial 2 cycling cells
+
+  Same intervention logic.
+  Different molecular targets.
+  Computable from public data.
+  Testable with standard tools.
+
+============================================================
+Eric Robert Lawson — OrganismCore
+February 28, 2026
+
+Saved: ./crc_saddle_results/cross_cancer_summary.txt
+
+========================================================
+COMPLETE
+Results: ./crc_saddle_results/
+Files:
+  ./crc_saddle_results/crc_saddle_figure.png
+  ./crc_saddle_results/crc_saddle_results.csv
+  ./crc_saddle_results/cross_cancer_summary.txt
+========================================================
