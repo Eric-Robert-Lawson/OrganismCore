@@ -1,0 +1,24 @@
+{
+  "date": "2026-03-03",
+  "script": "RCC_Cross_Type_Analysis_v3.py",
+  "gene_counts": {
+    "ccRCC": 20244,
+    "PRCC": 193,
+    "chRCC": 15244,
+    "cdRCC": 22452
+  },
+  "cdRCC_tumour_n": 7,
+  "cdRCC_normal_n": 6,
+  "predictions_total": 14,
+  "confirmed": 9,
+  "denied": 3,
+  "untestable": 2,
+  "loxl2_positive_types": 4,
+  "il1rap_confirmed_types": 3,
+  "il1rap_untestable_types": 1,
+  "ct1_justified_types": [
+    "ccRCC",
+    "PRCC",
+    "cdRCC"
+  ]
+}

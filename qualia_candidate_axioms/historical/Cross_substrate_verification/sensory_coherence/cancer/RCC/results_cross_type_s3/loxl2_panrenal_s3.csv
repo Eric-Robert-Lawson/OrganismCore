@@ -1,0 +1,5 @@
+rcc_type,r_loxl2,axis,positive,significant,low_power
+ccRCC,0.6312499822598088,depth,True,True,False
+PRCC,0.2753876553678188,depth,True,True,False
+chRCC,0.1353,PC2,True,False,False
+cdRCC,0.3214285714285715,depth,True,True,True

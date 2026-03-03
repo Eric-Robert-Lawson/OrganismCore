@@ -1,0 +1,2 @@
+ti_name,r_ABCC2_PC2,r_SULT2B1_PC2,ti_approx_r,method,verdict
+ABCC2 - SULT2B1,0.9677,-0.9209,0.9443,approx_mean_abs,CONFIRMED [APPROX]

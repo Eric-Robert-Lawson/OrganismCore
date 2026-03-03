@@ -1,0 +1,19 @@
+gene,r_depth_prcc,source,pred_id,expected,verdict
+RUNX1,0.5903641159269566,integrated,P3-3,> 0.30,CONFIRMED
+IL1RAP,,—,P3-2,> 0.25,context
+BHLHE40,,—,P3-4,> 0.15,context
+MYC,-0.2734857262357888,s1,,,context
+KDM1A,0.4426651442994188,integrated,,,context
+EZH2,0.3075475278401051,integrated,,,context
+DNMT3A,0.1234981911846733,s1,,,context
+LOXL2,0.2753876553678188,integrated,,,context
+FH,-0.4512573581481378,integrated,,,context
+OGDHL,-0.4018732728399567,integrated,,,context
+SUCLG1,-0.5192296127337435,s1,,,context
+SLC13A2,-0.4019333234533918,s1,,,context
+GOT1,-0.5193465487066394,integrated,,,context
+B2M,-0.2217964781587332,integrated,,,context
+HLA-A,-0.236600604209398,integrated,,,context
+CD8A,-0.0333953633052296,s1,,,context
+IFI16,0.1654138665327873,s1,,,context
+ARG1,0.0759684333050068,integrated,,,context
