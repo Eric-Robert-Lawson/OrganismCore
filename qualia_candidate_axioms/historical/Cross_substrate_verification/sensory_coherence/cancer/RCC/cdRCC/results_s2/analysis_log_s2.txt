@@ -1,0 +1,691 @@
+=================================================================
+OrganismCore — cdRCC False Attractor Circuit Analysis
+SCRIPT 2 — PREDICTIONS FROM DOC 89a
+Dataset: GSE89122
+7 CDC tumours | 6 matched normals | 6 pairs
+Date: 2026-03-03
+=================================================================
+
+Script 1 established geometry.
+Script 2 tests 6 predictions locked in Doc 89a.
+
+PREDICTIONS UNDER TEST:
+  P1: IL1B-IL1RAP autocrine loop (r > 0.5)
+  P2: PKA/vasopressin circuit broken in tumours
+  P3: PPARG drives attractor (r(PPARG,KLF5) > 0.5)
+  P4: EZH2 NOT the lock — VDR/CYP24A1 is
+  P5: PRKCI coordinates PAR polarity complex
+  P6: Findings CDC4-independent
+
+=================================================================
+STEP 1: LOADING SCRIPT 1 MATRIX
+  ./cdrcc_false_attractor/results/GSE89122_log2cpm.csv
+=================================================================
+  Shape: 22452 genes × 13 samples
+  Columns: ['GSM2359144', 'GSM2359145', 'GSM2359146', 'GSM2359147', 'GSM2359148', 'GSM2359149', 'GSM2359150', 'GSM2359151', 'GSM2359152', 'GSM2359153', 'GSM2359154', 'GSM2359155', 'GSM2359156']
+  Tumour cols: 7
+  Normal cols: 6
+
+=================================================================
+STEP 2: LOADING SCRIPT 1 DEPTH CORRELATIONS
+=================================================================
+  Loaded 22452 depth correlations
+
+  Top positive correlators (FA axis):
+    IL1RAP               r=+0.9604  p=5.85e-04
+    PRKCI                r=+0.9579  p=6.83e-04
+    RHBDL2               r=+0.9462  p=1.26e-03
+    B4GALT5              r=+0.9431  p=1.44e-03
+    LOC101927630         r=+0.9423  p=1.49e-03
+    SERPINA1             r=+0.9411  p=1.56e-03
+    IKZF2                r=+0.9350  p=2.00e-03
+    NOMO1                r=+0.9342  p=2.06e-03
+    AGR2                 r=+0.9313  p=2.29e-03
+    KLF5                 r=+0.9304  p=2.37e-03
+
+  Top negative correlators (switch axis):
+    CDS2                 r=-0.9599  p=6.04e-04
+    PRKAR2B              r=-0.9459  p=1.27e-03
+    ZBED6CL              r=-0.9443  p=1.36e-03
+    ADPRM                r=-0.9407  p=1.59e-03
+    MYC                  r=-0.9405  p=1.61e-03
+    USP45                r=-0.9374  p=1.82e-03
+    MPP6                 r=-0.9370  p=1.85e-03
+    CD48                 r=-0.9368  p=1.86e-03
+    RNF135               r=-0.9340  p=2.07e-03
+    TMEM121              r=-0.9333  p=2.13e-03
+
+=================================================================
+STEP 3: CORRECTED DEPTH SCORE (S2)
+  Top S1 suppressed: CDS2  (r=-0.960)
+  Top S1 elevated:   IL1RAP (r=+0.960)
+  Depth_S2 = mean(1-norm(CDS2), norm(IL1RAP))
+=================================================================
+  Switch gene: CDS2
+  FA marker:   IL1RAP
+
+  S2 Depth (7 tumours):
+    Mean  : 0.4585
+    Median: 0.4626
+    Std   : 0.3157
+    Min   : 0.0000
+    Max   : 1.0000
+
+  Per-sample S2 depth:
+    GSM2359144 (CDC1): 0.4893
+    GSM2359146 (CDC2): 0.6271
+    GSM2359148 (CDC3): 0.0000
+    GSM2359150 (CDC4): 0.4252
+    GSM2359152 (CDC5): 0.4626
+    GSM2359153 (CDC6): 1.0000
+    GSM2359155 (CDC7): 0.2052
+
+  S1 vs S2 depth comparison:
+    r(S1, S2) = +0.9884  p=0.0000
+    SAME BIOLOGY — both axes capture the same attractor
+
+=================================================================
+STEP 4: PREDICTION 1 — IL1 AUTOCRINE CIRCUIT
+  Prediction: r(IL1B, IL1RAP) > 0.5 in tumours
+  Autocrine IL-1 loop maintains the attractor
+=================================================================
+
+  IL-1 panel genes found: 11/12
+  Genes: ['IL1RAP', 'IL1B', 'IL1A', 'IL1R1', 'IL1R2', 'IL1RN', 'NLRP3', 'IL18', 'NFKB1', 'NFKBIA', 'IL6']
+
+  Gene           Normal   Tumour    Change               p
+  ----------------------------------------------------------
+  IL1RAP         3.8650   6.1678    +59.6%  p=1.17e-03  **
+  IL1B           1.7725   3.4107    +92.4%  p=1.17e-03  **
+  IL1A           0.2398   2.4896   +938.0%  p=2.33e-03  **
+  IL1R1          6.8909   7.2248     +4.8%  p=0.7308  ns
+  IL1R2          2.7145   3.5651    +31.3%  p=0.1375  ns
+  IL1RN          0.9682   3.5174   +263.3%  p=1.17e-03  **
+  NLRP3          2.5781   3.9849    +54.6%  p=1.17e-03  **
+  IL18           4.2135   4.9692    +17.9%  p=0.3660  ns
+  NFKB1          5.9414   6.3988     +7.7%  p=0.0513  ns
+  NFKBIA         6.9212   7.3193     +5.8%  p=0.5338  ns
+  IL6            0.7716   2.7429   +255.5%  p=2.33e-03  **
+
+  INTRA-TUMOUR CORRELATIONS:
+  Pair                            r  p-value
+  ------------------------------------------
+  IL1B → IL1RAP             +0.2706  p=0.5572  ns
+  IL1A → IL1RAP             +0.4695  p=0.2878  ns
+  IL1B → IL1R1              -0.1728  p=0.7110  ns
+  IL1RN → IL1RAP            +0.7322  p=0.0613  ns
+  IL1RN → IL1B              +0.7581  p=0.0483   *
+  NFKB1 → IL1B              +0.1772  p=0.7039  ns
+  NFKB1 → IL1RAP            +0.3698  p=0.4142  ns
+  IL6 → IL1B                +0.2500  p=0.5887  ns
+
+  DEPTH CORRELATIONS (IL-1 genes):
+  Gene                r  p-value
+  ------------------------------
+  IL1RAP        +0.9682  p=3.40e-04 ***
+  IL1B          +0.4334  p=0.3314  ns
+  IL1A          +0.5549  p=0.1961  ns
+  IL1R1         +0.3267  p=0.4745  ns
+  IL1R2         -0.0640  p=0.8915  ns
+  IL1RN         +0.8723  p=0.0104   *
+  NLRP3         -0.1582  p=0.7347  ns
+  IL18          -0.4974  p=0.2561  ns
+  NFKB1         +0.3133  p=0.4938  ns
+  NFKBIA        +0.6606  p=0.1063  ns
+  IL6           -0.0738  p=0.8751  ns
+
+  PREDICTION 1 VERDICT:
+  Predicted: r(IL1B, IL1RAP) > 0.5
+  NOT CONFIRMED or IL1B not detectable
+  IL1RAP elevation may reflect receptor
+  upregulation without autocrine ligand
+
+=================================================================
+STEP 5: PREDICTION 2 — PKA/VASOPRESSIN GAP TEST
+  Prediction: r(AVPR2, PRKAR2B) < 0.4 in tumours
+  Prediction: r(AVPR2, PRKAR2B) > 0.4 in normals
+  Circuit: AVPR2 → ADCY6 → cAMP →
+           PRKAR2B/PKA → AQP2 insertion
+=================================================================
+
+  PKA circuit genes found: 15/15
+  Genes: ['AVPR2', 'AVPR1A', 'ADCY3', 'ADCY6', 'PRKAR1A', 'PRKAR2A', 'PRKAR2B', 'PRKACB', 'PRKACA', 'AQP2', 'AQP3', 'AQP4', 'SCNN1A', 'SCNN1B', 'SCNN1G']
+
+  Gene           Normal   Tumour    Change               p
+  ----------------------------------------------------------
+  AVPR2          2.6298   1.3513    -48.6%  p=0.0350   *
+  AVPR1A         5.8539   2.8861    -50.7%  p=2.33e-03  **
+  ADCY3          3.8755   5.4495    +40.6%  p=1.17e-03  **
+  ADCY6          6.5149   5.8809     -9.7%  p=0.1807  ns
+  PRKAR1A        8.8228   8.3473     -5.4%  p=0.2343  ns
+  PRKAR2A        5.4662   5.0993     -6.7%  p=0.0734  ns
+  PRKAR2B        4.6357   4.8647     +4.9%  p=0.4452  ns
+  PRKACB         6.7228   6.2779     -6.6%  p=0.1375  ns
+  PRKACA         5.4203   5.2104     -3.9%  p=0.3660  ns
+  AQP2           9.6957   2.7337    -71.8%  p=2.33e-03  **
+  AQP3           7.3481   4.8973    -33.4%  p=0.0513  ns
+  AQP4           2.8268   1.8863    -33.3%  p=0.2949  ns
+  SCNN1A         7.9788   5.3963    -32.4%  p=1.17e-03  **
+  SCNN1B         5.4361   2.2040    -59.5%  p=8.16e-03  **
+  SCNN1G         7.0253   2.6905    -61.7%  p=1.17e-03  **
+
+  CIRCUIT CONNECTIONS — TUMOUR vs NORMAL:
+  Pair                     r_tumour   r_normal  Architecture
+  ----------------------------------------------------------
+  AVPR2 → PRKAR2B            +0.396      +0.813  GAP CONFIRMED
+  AVPR2 → AQP2               +0.824      +0.953  INTACT
+  AVPR2 → ADCY6              +0.816      +0.869  INTACT
+  ADCY6 → PRKAR2B            +0.080      +0.613  GAP CONFIRMED
+  PRKAR2B → AQP2             +0.437      +0.798  WEAK
+  PRKAR2B → PRKACB           +0.153      +0.532  GAP CONFIRMED
+  PRKAR2B → PRKACA           +0.097      +0.025  BROKEN/LOW
+  AQP2 → AQP3                +0.269      +0.976  GAP CONFIRMED
+  SCNN1A → PRKAR2B           -0.537      +0.686  INTACT
+
+  DEPTH CORRELATIONS (PKA circuit):
+  Gene                r  p-value
+  ------------------------------
+  AVPR2         -0.2025  p=0.6632  ns
+  AVPR1A        -0.1251  p=0.7893  ns
+  ADCY3         -0.4600  p=0.2990  ns
+  ADCY6         +0.0366  p=0.9380  ns
+  PRKAR1A       -0.0142  p=0.9760  ns
+  PRKAR2A       -0.1191  p=0.7992  ns
+  PRKAR2B       -0.9596  p=6.16e-04 ***
+  PRKACB        -0.1894  p=0.6842  ns
+  PRKACA        -0.0349  p=0.9408  ns
+  AQP2          -0.3361  p=0.4611  ns
+  AQP3          +0.6483  p=0.1153  ns
+  AQP4          -0.0676  p=0.8854  ns
+  SCNN1A        +0.5659  p=0.1854  ns
+  SCNN1B        +0.2793  p=0.5440  ns
+  SCNN1G        +0.0327  p=0.9446  ns
+
+  PREDICTION 2 VERDICT:
+  Predicted: AVPR2→PRKAR2B gap in tumours
+  CONFIRMED: PKA circuit broken in tumours, intact in normals
+
+=================================================================
+STEP 6: PREDICTION 3 — PPARG DRIVER VS MARKER
+  Prediction: r(PPARG, KLF5) > 0.5 in tumours
+  Determines if PPARG drives the attractor
+  or is a co-marker of the same state
+=================================================================
+
+  PPARG panel genes found: 12/12
+
+  Gene           Normal   Tumour    Change               p
+  ----------------------------------------------------------
+  PPARG          4.9224   4.9594     +0.8%  p=0.8357  ns
+  RXRA           6.4064   5.6314    -12.1%  p=0.0513  ns
+  KLF5           4.2287   5.6656    +34.0%  p=0.0350   *
+  KLF4           4.2606   4.4028     +3.3%  p=0.6282  ns
+  KLF2           4.6338   3.6389    -21.5%  p=0.1807  ns
+  FABP4          2.2867   2.3488     +2.7%  p=0.7308  ns
+  ADIPOQ         0.2272   1.1124   +389.5%  p=0.4190  ns
+  CEBPA          3.0025   3.7095    +23.5%  p=0.1375  ns
+  CEBPB          3.5936   5.5425    +54.2%  p=1.17e-03  **
+  FASN           5.7954   6.6795    +15.3%  p=0.1807  ns
+  SCD            5.0828   7.4277    +46.1%  p=0.0350   *
+  ACACA          6.2401   7.0189    +12.5%  p=8.16e-03  **
+
+  INTRA-TUMOUR CORRELATIONS (PPARG circuit):
+  Pair                            r  p-value
+  ------------------------------------------
+  PPARG vs KLF5             +0.9652  p=4.25e-04 ***
+  PPARG vs RXRA             +0.2830  p=0.5385  ns
+  PPARG vs PAEP             -0.2854  p=0.5350  ns
+  PPARG vs AGR2             +0.9240  p=2.94e-03  **
+  PPARG vs IL1RAP           +0.8465  p=0.0163   *
+  PPARG vs CEBPA            -0.6302  p=0.1292  ns
+  KLF5 vs PAEP              -0.0720  p=0.8781  ns
+  KLF5 vs AGR2              +0.9402  p=1.62e-03  **
+  KLF5 vs IL1RAP            +0.8993  p=5.85e-03  **
+  KLF5 vs ESRP1             +0.9343  p=2.05e-03  **
+  RXRA vs CYP24A1           +0.3871  p=0.3910  ns
+
+  PPARG depth correlations:
+  PPARG        r=+0.9249  p=2.85e-03  **
+  KLF5         r=+0.9497  p=1.06e-03  **
+  RXRA         r=+0.4250  p=0.3418  ns
+  CEBPA        r=-0.6399  p=0.1216  ns
+
+  PREDICTION 3 VERDICT:
+  Predicted: PPARG drives attractor (r(PPARG,KLF5) > 0.5)
+  CONFIRMED: PPARG is a driver of the attractor identity
+  PPARG agonist paradox: may push deeper
+  PPARG inhibitor OR upstream pathway
+  disruption is the therapeutic target
+
+=================================================================
+STEP 7: PREDICTION 4 — EZH2 / EPIGENETIC LOCK
+  Prediction: EZH2 NOT elevated (< +15%)
+  Prediction: EZH2 NOT in top depth correlators
+  VDR/CYP24A1 axis is the candidate lock instead
+=================================================================
+
+  Epigenetic genes found: 13/13
+  VDR circuit genes found: 9/10
+
+  Gene           Normal   Tumour    Change               p  r_depth
+  --------------------------------------------------------------------
+  EZH2           2.7647   4.6888    +69.6%  p=2.33e-03  **  +0.191
+  EED            4.2297   4.6376     +9.6%  p=0.1807  ns  +0.298
+  SUZ12          6.0902   6.4327     +5.6%  p=0.5338  ns  -0.066
+  BMI1           1.3041   1.0878    -16.6%  p=0.2949  ns  +0.439
+  DNMT3A         5.4264   5.5665     +2.6%  p=0.7308  ns  +0.149
+  DNMT3B         3.2866   4.6683    +42.0%  p=8.16e-03  **  -0.273
+  TET2           6.9850   6.8867     -1.4%  p=0.4452  ns  +0.587
+  HDAC1          5.9737   5.9980     +0.4%  p=0.4452  ns  +0.623
+  HDAC2          5.9423   6.3518     +6.9%  p=0.0513  ns  +0.204
+  KDM6A          6.1286   6.1125     -0.3%  p=0.7308  ns  +0.501
+  KDM6B          5.5915   5.3654     -4.0%  p=0.5338  ns  +0.155
+  ASXL1          6.8914   6.7128     -2.6%  p=0.6282  ns  +0.078
+  SETD2          7.9715   7.4597     -6.4%  p=0.0350   *  +0.178
+  VDR            6.2319   5.2922    -15.1%  p=0.0734  ns  +0.666
+  CYP24A1        6.3897   4.8414    -24.2%  p=0.1375  ns  +0.927
+  CYP27B1        4.4239   2.3007    -48.0%  p=8.16e-03  **  -0.017
+  CYP2R1         3.2341   2.9332     -9.3%  p=0.2343  ns  -0.075
+  GC             1.9409   0.9624    -50.4%  p=0.1014  ns  +0.068
+  CUBN          10.5212   4.3821    -58.3%  p=1.17e-03  **  -0.190
+  LRP2          11.4463   4.4957    -60.7%  p=1.17e-03  **  -0.662
+  CASR           6.2706   2.5034    -60.1%  p=4.66e-03  **  -0.294
+  PTHLH          1.4805   2.6493    +79.0%  p=0.2343  ns  +0.700
+
+  PREDICTION 4 VERDICT:
+  Predicted: EZH2 NOT the lock mechanism
+  EZH2 elevated >15%: True
+  EZH2 depth r:       +0.1905
+  CYP24A1 elevated:   False
+  VDR suppressed:     False
+  NOT CONFIRMED: EZH2 IS elevated
+  cdRCC joins BRCA/PAAD/PRAD pattern
+  EZH2 inhibitor target prediction holds
+
+=================================================================
+STEP 8: PREDICTION 5 — PRKCI POLARITY LOCK
+  Prediction: PRKCI coordinates with PAR complex
+  Polarity complex maintains false attractor ID
+=================================================================
+
+  Polarity genes found: 12/12
+
+  Gene           Normal   Tumour    Change               p  r_depth
+  --------------------------------------------------------------------
+  PRKCI          6.3561   6.8310     +7.5%  p=0.1014  ns  +0.965
+  PRKCZ          4.5926   3.7961    -17.3%  p=4.66e-03  **  +0.737
+  PARD3          7.3221   7.2331     -1.2%  p=0.7308  ns  -0.690
+  PARD6A         2.5079   1.7823    -28.9%  p=0.1014  ns  -0.449
+  PARD6B         7.3624   6.4566    -12.3%  p=0.0350   *  -0.200
+  LLGL2          7.0512   5.0417    -28.5%  p=1.17e-03  **  +0.364
+  LLGL1          4.6856   5.0811     +8.4%  p=0.2343  ns  +0.093
+  SCRIB          5.8702   5.9863     +2.0%  p=0.7308  ns  +0.163
+  DLG1           7.2018   7.0180     -2.6%  p=1.0000  ns  +0.591
+  CDC42          7.8163   7.8417     +0.3%  p=0.7308  ns  +0.079
+  RAC1           7.3639   7.9240     +7.6%  p=0.0734  ns  +0.621
+  RHOA           8.2094   8.3509     +1.7%  p=0.1807  ns  -0.598
+
+  INTRA-TUMOUR CORRELATIONS (polarity):
+  Pair                          r  p-value
+  ----------------------------------------
+  PRKCI vs PARD3          -0.6720  p=0.0982  ns
+  PRKCI vs PARD6A         -0.4297  p=0.3360  ns
+  PRKCI vs PARD6B         -0.0647  p=0.8904  ns
+  PRKCI vs LLGL2          +0.2063  p=0.6572  ns
+  PRKCI vs SCRIB          -0.0071  p=0.9879  ns
+  PRKCI vs CDC42          +0.1409  p=0.7631  ns
+  PRKCI vs IL1RAP         +0.9743  p=2.00e-04 ***
+  PRKCI vs PPARG          +0.8485  p=0.0158   *
+  PRKCI vs KLF5           +0.8583  p=0.0134   *
+  LLGL2 vs SCRIB          +0.7119  p=0.0727  ns
+
+  PREDICTION 5 VERDICT:
+  Predicted: PRKCI coordinates PAR complex
+  NOT CONFIRMED or PAR complex genes below
+  detection threshold
+  PRKCI still depth-correlated (r=+0.958)
+  May act independently of PAR complex here
+
+=================================================================
+STEP 9: PREDICTION 6 — CDC4 ROBUSTNESS CHECK
+  CDC4 tumour library: 3.4M (outlier)
+  Prediction: top 10 depth correlators
+  stable when CDC4 excluded
+=================================================================
+  Full set:    7 tumours (includes CDC4)
+  No-CDC4 set: 6 tumours
+
+  Top 10 depth correlators (full vs no-CDC4):
+           Gene (full)        Gene (no-CDC4)
+  --------------------------------------------
+          LOC101927630                 KLF10   
+                  CDS2                RHBDL2   
+                 USP45                  MPP6   
+                IL1RAP                 FKBP9   
+                   MYC                   MYC  ✓
+                 PRKCI                 GRB14   
+                  CD48                TCF7L2   
+               PRKAR2B                  EMC3   
+                INPP4B                 ADPRM   
+                 CHPT1               SULT2B1   
+
+  Overlap in top 10: 1/10
+
+  PREDICTION 6 VERDICT:
+  Predicted: top 10 stable when CDC4 excluded
+  NOT CONFIRMED: CDC4 significantly drives depth correlations
+  Interpret all depth results cautiously
+
+=================================================================
+STEP 10: COLLECTING DUCT IDENTITY ANALYSIS
+  Are BOTH collecting duct programmes lost?
+  Principal cell (AVPR2/AQP2/PRKAR2B)
+  Intercalated cell (ATP6V1G3/FOXI1)
+=================================================================
+
+  CD identity genes found: 13/13
+
+  Gene           Normal   Tumour    Change               p  r_depth
+  --------------------------------------------------------------------
+  ATP6V1G3       4.4636   0.7551    -83.1%  p=1.17e-03  **  -0.168
+  ATP6V0A4       7.6603   2.5100    -67.2%  p=1.17e-03  **  -0.029
+  FOXI1          4.9745   1.2758    -74.4%  p=2.33e-03  **  -0.188
+  TFCP2L1        9.2265   5.1214    -44.5%  p=1.17e-03  **  -0.561
+  HNF1B          7.0835   5.5624    -21.5%  p=0.0140   *  -0.733
+  HNF4A          7.3352   2.5798    -64.8%  p=2.33e-03  **  +0.077
+  PAX8           8.3645   6.9651    -16.7%  p=0.0513  ns  -0.408
+  KRT7           5.8268   6.9651    +19.5%  p=0.7308  ns  +0.775
+  KRT8           7.7455   8.4284     +8.8%  p=0.2949  ns  +0.477
+  KRT18          6.9854   7.6780     +9.9%  p=0.3660  ns  +0.528
+  KRT19          6.0202   8.6974    +44.5%  p=1.17e-03  **  +0.470
+  CALB1          8.8148   1.9031    -78.4%  p=1.17e-03  **  +0.025
+  UMOD          11.0885   2.8951    -73.9%  p=2.33e-03  **  -0.362
+
+  SUMMARY:
+  Principal cell markers lost (>20% down): 1
+  Intercalated cell markers lost (>30% down): 3
+  BOTH collecting duct identities lost
+  Tumour is not stuck at collecting duct
+  progenitor — it has escaped entirely
+
+=================================================================
+STEP 11: FALSE ATTRACTOR IDENTITY PANEL
+  Confirming and extending S1 FA signature
+=================================================================
+
+  FA identity genes found: 16/16
+
+  Gene           Normal   Tumour    Change               p  r_depth
+  --------------------------------------------------------------------
+  PAEP           0.0128   1.9886 +15431.4%  p=2.59e-03  **  +0.015
+  CST1           0.0215   1.7975  +8276.9%  p=3.23e-03  **  -0.298
+  S100A7         0.0159   1.2650  +7862.7%  p=2.98e-03  **  +0.747
+  AGR2           2.6324   4.2078    +59.8%  p=0.2949  ns  +0.927
+  IL1RAP         3.8650   6.1678    +59.6%  p=1.17e-03  **  +0.968
+  ANXA8          0.0121   1.5406 +12676.1%  p=0.0331   *  +0.853
+  ANXA8L1        0.0056   1.7547 +17491.0%  p=4.16e-03  **  +0.803
+  LY6D           0.0000   1.6568 +16567.8%  p=6.57e-03  **  +0.878
+  HOXC13         0.0000   1.4238 +14237.8%  p=6.57e-03  **  +0.343
+  BARX1          0.0000   0.8802  +8801.6%  p=6.57e-03  **  +0.741
+  NPBWR1         0.0040   1.3621 +13581.4%  p=2.59e-03  **  +0.163
+  ISL2           0.0110   0.9179  +8232.3%  p=2.59e-03  **  -0.203
+  ESRP1          4.8363   4.5413     -6.1%  p=0.6282  ns  +0.903
+  ESRP2          5.2002   4.0753    -21.6%  p=0.6282  ns  +0.653
+  GPRC5A         3.9632   6.2376    +57.4%  p=0.0350   *  +0.956
+  SERPINA1       7.2919   8.7088    +19.4%  p=0.1014  ns  +0.912
+
+  FA MARKER CO-EXPRESSION (tumour):
+  Pair                          r  p-value
+  ----------------------------------------
+  PAEP vs CST1            -0.4323  p=0.3327  ns
+  PAEP vs S100A7          -0.1767  p=0.7047  ns
+  PAEP vs AGR2            -0.0468  p=0.9207  ns
+  PAEP vs IL1RAP          +0.1510  p=0.7465  ns
+  AGR2 vs ESRP1           +0.9659  p=4.05e-04 ***
+  AGR2 vs IL1RAP          +0.8527  p=0.0148   *
+  IL1RAP vs PRKCI         +0.9743  p=2.00e-04 ***
+  PPARG vs IL1RAP         +0.8465  p=0.0163   *
+  KLF5 vs PPARG           +0.9652  p=4.25e-04 ***
+  GPRC5A vs IL1RAP        +0.9231  p=3.02e-03  **
+
+  Confirmed FA markers (elevated + depth-r>0.3):
+    S100A7
+    IL1RAP
+    ANXA8
+    ANXA8L1
+    LY6D
+    HOXC13
+    BARX1
+    GPRC5A
+
+=================================================================
+STEP 12: FULL DEPTH CORRELATIONS (S2)
+  All genes vs S2 corrected depth score
+=================================================================
+
+  =================================================================
+  S2 DEPTH CORRELATIONS (top 40)
+  Using corrected depth axis: IL1RAP / CDS2
+  =================================================================
+  Gene                        r  p-value
+  --------------------------------------------
+  LOC101927630          +0.9786  p=1.28e-04 ***
+  CDS2                  -0.9744  p=1.99e-04 ***
+  USP45                 -0.9683  p=3.39e-04 ***
+  IL1RAP                +0.9682  p=3.40e-04 ***
+  MYC                   -0.9668  p=3.78e-04 ***
+  PRKCI                 +0.9651  p=4.29e-04 ***
+  CD48                  -0.9634  p=4.84e-04 ***
+  PRKAR2B               -0.9596  p=6.16e-04 ***
+  INPP4B                +0.9571  p=7.15e-04 ***
+  CHPT1                 -0.9559  p=7.68e-04 ***
+  GPRC5A                +0.9556  p=7.79e-04 ***
+  ADPRM                 -0.9523  p=9.31e-04 ***
+  KLF5                  +0.9497  p=1.06e-03  **
+  MPP6                  -0.9483  p=1.13e-03  **
+  TMPRSS4               +0.9464  p=1.24e-03  **
+  RHBDL2                +0.9456  p=1.29e-03  **
+  NOMO1                 +0.9455  p=1.29e-03  **
+  IKZF2                 +0.9417  p=1.53e-03  **
+  CST6                  +0.9400  p=1.64e-03  **
+  B4GALT5               +0.9388  p=1.72e-03  **
+  FAM49A                -0.9355  p=1.96e-03  **
+  RNF135                -0.9348  p=2.01e-03  **
+  KLF10                 +0.9324  p=2.20e-03  **
+  BHLHE40               +0.9309  p=2.32e-03  **
+  CELSR1                +0.9303  p=2.37e-03  **
+  PCBD1                 -0.9291  p=2.47e-03  **
+  CYP24A1               +0.9270  p=2.65e-03  **
+  AGR2                  +0.9267  p=2.69e-03  **
+  TSPAN15               +0.9264  p=2.71e-03  **
+  ZNF185                +0.9253  p=2.81e-03  **
+  ACSL5                 +0.9251  p=2.83e-03  **
+  HK1                   +0.9251  p=2.83e-03  **
+  PPARG                 +0.9249  p=2.85e-03  **
+  ZBED6CL               -0.9244  p=2.90e-03  **
+  PCSK6                 +0.9231  p=3.02e-03  **
+  PPL                   +0.9231  p=3.02e-03  **
+  POGK                  -0.9215  p=3.17e-03  **
+  NET1                  +0.9183  p=3.51e-03  **
+  SEMA4B                +0.9164  p=3.70e-03  **
+  NT5DC3                -0.9157  p=3.79e-03  **
+
+  Saved: depth_correlations_s2.csv
+
+=================================================================
+STEP 13: PAIRED ANALYSIS — S2 PANEL
+  6 matched pairs
+  Extended gene panel
+=================================================================
+  Available pairs: 6
+  Genes tested: 119
+
+  Paired significant (p<0.05): 46
+
+  Gene                   MeanDiff    Dir  p_paired
+  --------------------------------------------------
+  UMOD                    -8.0779    DOWN  p=0.0312 *
+  LRP2                    -7.0159    DOWN  p=0.0312 *
+  CALB1                   -6.9756    DOWN  p=0.0312 *
+  AQP2                    -6.9497    DOWN  p=0.0312 *
+  CUBN                    -6.1514    DOWN  p=0.0312 *
+  ATP6V0A4                -5.2507    DOWN  p=0.0312 *
+  HNF4A                   -4.9661    DOWN  p=0.0312 *
+  SCNN1G                  -4.3479    DOWN  p=0.0312 *
+  MKI67                   +4.1690      UP  p=0.0312 *
+  TFCP2L1                 -4.0291    DOWN  p=0.0312 *
+  CASR                    -3.8807    DOWN  p=0.0312 *
+  ATP6V1G3                -3.7353    DOWN  p=0.0312 *
+  FOXI1                   -3.6895    DOWN  p=0.0625  
+  SCNN1B                  -3.2009    DOWN  p=0.0312 *
+  AVPR1A                  -3.0529    DOWN  p=0.0625  
+  MYC                     +2.6480      UP  p=0.0312 *
+  IL1RN                   +2.6462      UP  p=0.0312 *
+  SCNN1A                  -2.4548    DOWN  p=0.0312 *
+  KRT19                   +2.4481      UP  p=0.0312 *
+  GPRC5A                  +2.3710      UP  p=0.0625  
+  SCD                     +2.3314      UP  p=0.0625  
+  IL1RAP                  +2.2849      UP  p=0.0312 *
+  IL1A                    +2.1880      UP  p=0.0312 *
+  PAEP                    +2.1617      UP  p=0.0312 *
+  IL6                     +2.1315      UP  p=0.0312 *
+  CYP27B1                 -2.0949    DOWN  p=0.0625  
+  AQP3                    -2.0488    DOWN  p=0.0625  
+  MYCN                    -2.0251    DOWN  p=0.0625  
+  EZH2                    +1.9912      UP  p=0.0312 *
+  CEBPB                   +1.9860      UP  p=0.0312 *
+
+  Saved: paired_results_s2.csv
+
+=================================================================
+STEP 14: SADDLE TABLE — S2 GENE PANEL
+=================================================================
+  S2 panel genes found: 119/122
+
+  Gene           Normal   Tumour    Change               p
+  ----------------------------------------------------------
+  AVPR2          2.6298   1.3513    -48.6%  p=0.0350   *
+  AVPR1A         5.8539   2.8861    -50.7%  p=2.33e-03  **
+  ADCY3          3.8755   5.4495    +40.6%  p=1.17e-03  **
+  ADCY6          6.5149   5.8809     -9.7%  p=0.1807  ns
+  PRKAR1A        8.8228   8.3473     -5.4%  p=0.2343  ns
+  PRKAR2A        5.4662   5.0993     -6.7%  p=0.0734  ns
+  PRKAR2B        4.6357   4.8647     +4.9%  p=0.4452  ns
+  PRKACB         6.7228   6.2779     -6.6%  p=0.1375  ns
+  PRKACA         5.4203   5.2104     -3.9%  p=0.3660  ns
+  AQP2           9.6957   2.7337    -71.8%  p=2.33e-03  **
+  AQP3           7.3481   4.8973    -33.4%  p=0.0513  ns
+  AQP4           2.8268   1.8863    -33.3%  p=0.2949  ns
+  SCNN1A         7.9788   5.3963    -32.4%  p=1.17e-03  **
+  SCNN1B         5.4361   2.2040    -59.5%  p=8.16e-03  **
+  SCNN1G         7.0253   2.6905    -61.7%  p=1.17e-03  **
+  IL1RAP         3.8650   6.1678    +59.6%  p=1.17e-03  **
+  IL1B           1.7725   3.4107    +92.4%  p=1.17e-03  **
+  IL1A           0.2398   2.4896   +938.0%  p=2.33e-03  **
+  IL1R1          6.8909   7.2248     +4.8%  p=0.7308  ns
+  IL1R2          2.7145   3.5651    +31.3%  p=0.1375  ns
+  IL1RN          0.9682   3.5174   +263.3%  p=1.17e-03  **
+  NLRP3          2.5781   3.9849    +54.6%  p=1.17e-03  **
+  IL18           4.2135   4.9692    +17.9%  p=0.3660  ns
+  NFKB1          5.9414   6.3988     +7.7%  p=0.0513  ns
+  NFKBIA         6.9212   7.3193     +5.8%  p=0.5338  ns
+  IL6            0.7716   2.7429   +255.5%  p=2.33e-03  **
+  PPARG          4.9224   4.9594     +0.8%  p=0.8357  ns
+  RXRA           6.4064   5.6314    -12.1%  p=0.0513  ns
+  KLF5           4.2287   5.6656    +34.0%  p=0.0350   *
+  KLF4           4.2606   4.4028     +3.3%  p=0.6282  ns
+  KLF2           4.6338   3.6389    -21.5%  p=0.1807  ns
+  FABP4          2.2867   2.3488     +2.7%  p=0.7308  ns
+  ADIPOQ         0.2272   1.1124   +389.5%  p=0.4190  ns
+  CEBPA          3.0025   3.7095    +23.5%  p=0.1375  ns
+  CEBPB          3.5936   5.5425    +54.2%  p=1.17e-03  **
+  FASN           5.7954   6.6795    +15.3%  p=0.1807  ns
+  SCD            5.0828   7.4277    +46.1%  p=0.0350   *
+  ACACA          6.2401   7.0189    +12.5%  p=8.16e-03  **
+  VDR            6.2319   5.2922    -15.1%  p=0.0734  ns
+  CYP24A1        6.3897   4.8414    -24.2%  p=0.1375  ns
+  CYP27B1        4.4239   2.3007    -48.0%  p=8.16e-03  **
+  CYP2R1         3.2341   2.9332     -9.3%  p=0.2343  ns
+  GC             1.9409   0.9624    -50.4%  p=0.1014  ns
+  CUBN          10.5212   4.3821    -58.3%  p=1.17e-03  **
+  LRP2          11.4463   4.4957    -60.7%  p=1.17e-03  **
+  CASR           6.2706   2.5034    -60.1%  p=4.66e-03  **
+  PTHLH          1.4805   2.6493    +79.0%  p=0.2343  ns
+  EZH2           2.7647   4.6888    +69.6%  p=2.33e-03  **
+  EED            4.2297   4.6376     +9.6%  p=0.1807  ns
+  SUZ12          6.0902   6.4327     +5.6%  p=0.5338  ns
+  BMI1           1.3041   1.0878    -16.6%  p=0.2949  ns
+  DNMT3A         5.4264   5.5665     +2.6%  p=0.7308  ns
+  DNMT3B         3.2866   4.6683    +42.0%  p=8.16e-03  **
+  TET2           6.9850   6.8867     -1.4%  p=0.4452  ns
+  HDAC1          5.9737   5.9980     +0.4%  p=0.4452  ns
+  HDAC2          5.9423   6.3518     +6.9%  p=0.0513  ns
+  KDM6A          6.1286   6.1125     -0.3%  p=0.7308  ns
+  KDM6B          5.5915   5.3654     -4.0%  p=0.5338  ns
+  ASXL1          6.8914   6.7128     -2.6%  p=0.6282  ns
+  SETD2          7.9715   7.4597     -6.4%  p=0.0350   *
+  PRKCI          6.3561   6.8310     +7.5%  p=0.1014  ns
+  PRKCZ          4.5926   3.7961    -17.3%  p=4.66e-03  **
+  PARD3          7.3221   7.2331     -1.2%  p=0.7308  ns
+  PARD6A         2.5079   1.7823    -28.9%  p=0.1014  ns
+  PARD6B         7.3624   6.4566    -12.3%  p=0.0350   *
+  LLGL2          7.0512   5.0417    -28.5%  p=1.17e-03  **
+  LLGL1          4.6856   5.0811     +8.4%  p=0.2343  ns
+  SCRIB          5.8702   5.9863     +2.0%  p=0.7308  ns
+  DLG1           7.2018   7.0180     -2.6%  p=1.0000  ns
+  CDC42          7.8163   7.8417     +0.3%  p=0.7308  ns
+  RAC1           7.3639   7.9240     +7.6%  p=0.0734  ns
+  RHOA           8.2094   8.3509     +1.7%  p=0.1807  ns
+  ATP6V1G3       4.4636   0.7551    -83.1%  p=1.17e-03  **
+  ATP6V0A4       7.6603   2.5100    -67.2%  p=1.17e-03  **
+  FOXI1          4.9745   1.2758    -74.4%  p=2.33e-03  **
+  TFCP2L1        9.2265   5.1214    -44.5%  p=1.17e-03  **
+  HNF1B          7.0835   5.5624    -21.5%  p=0.0140   *
+  HNF4A          7.3352   2.5798    -64.8%  p=2.33e-03  **
+  PAX8           8.3645   6.9651    -16.7%  p=0.0513  ns
+  KRT7           5.8268   6.9651    +19.5%  p=0.7308  ns
+  KRT8           7.7455   8.4284     +8.8%  p=0.2949  ns
+  KRT18          6.9854   7.6780     +9.9%  p=0.3660  ns
+  KRT19          6.0202   8.6974    +44.5%  p=1.17e-03  **
+  CALB1          8.8148   1.9031    -78.4%  p=1.17e-03  **
+  UMOD          11.0885   2.8951    -73.9%  p=2.33e-03  **
+  PAEP           0.0128   1.9886 +15431.4%  p=2.59e-03  **
+  CST1           0.0215   1.7975  +8276.9%  p=3.23e-03  **
+  S100A7         0.0159   1.2650  +7862.7%  p=2.98e-03  **
+  AGR2           2.6324   4.2078    +59.8%  p=0.2949  ns
+  ANXA8          0.0121   1.5406 +12676.1%  p=0.0331   *
+  ANXA8L1        0.0056   1.7547 +17491.0%  p=4.16e-03  **
+  LY6D           0.0000   1.6568 +16567.8%  p=6.57e-03  **
+  HOXC13         0.0000   1.4238 +14237.8%  p=6.57e-03  **
+  BARX1          0.0000   0.8802  +8801.6%  p=6.57e-03  **
+  NPBWR1         0.0040   1.3621 +13581.4%  p=2.59e-03  **
+  ISL2           0.0110   0.9179  +8232.3%  p=2.59e-03  **
+  ESRP1          4.8363   4.5413     -6.1%  p=0.6282  ns
+  ESRP2          5.2002   4.0753    -21.6%  p=0.6282  ns
+  GPRC5A         3.9632   6.2376    +57.4%  p=0.0350   *
+  SERPINA1       7.2919   8.7088    +19.4%  p=0.1014  ns
+  MYC            4.3768   7.0117    +60.2%  p=2.33e-03  **
+  MYCN           2.9221   1.0394    -64.4%  p=0.0221   *
+  MKI67          3.4296   7.5420   +119.9%  p=4.66e-03  **
+  CCND1          7.2132   7.5952     +5.3%  p=0.0734  ns
+  CDKN1A         5.3890   6.3426    +17.7%  p=0.0350   *
+  CDKN2A         0.0873   1.5745  +1703.3%  p=8.13e-03  **
+  TP53           4.7512   5.7593    +21.2%  p=4.66e-03  **
+  PTEN           7.6234   7.3377     -3.7%  p=0.6282  ns
+  INPP4B         5.5379   5.9211     +6.9%  p=0.3660  ns
+  AKT1           6.7511   6.7364     -0.2%  p=0.7308  ns
+  MTOR           7.3720   6.7546     -8.4%  p=4.66e-03  **
+  VHL            6.2005   6.6972     +8.0%  p=0.2949  ns
+  HIF1A          8.0338   8.3414     +3.8%  p=0.2343  ns
+  CDS2           7.3417   6.7911     -7.5%  p=0.0140   *
+  RHBDL2         1.3907   3.2098   +130.8%  p=4.66e-03  **
+  ZBED6CL        2.9324   3.5709    +21.8%  p=0.1014  ns
+  B4GALT5        6.4623   7.2076    +11.5%  p=0.1014  ns
+  ADPRM          2.9018   3.2873    +13.3%  p=0.2949  ns
+  MIR31HG        1.0724   3.0436   +183.8%  p=0.1375  ns
+
+  Saved: saddle_s2.csv
+
+--- Generating S2 figure ---
+
+  Figure saved: ./cdrcc_false_attractor/results_s2/GSE89122_circuit_analysis_s2.png

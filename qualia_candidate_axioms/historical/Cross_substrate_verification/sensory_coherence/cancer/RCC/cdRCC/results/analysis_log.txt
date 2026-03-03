@@ -1,0 +1,372 @@
+=================================================================
+OrganismCore — cdRCC False Attractor Discovery
+SCRIPT 1 — BLIND GEOMETRIC LANDSCAPE SCAN
+Dataset: GSE89122
+7 CDC tumours | 6 matched normals | 6 pairs
+Platform: Illumina HiSeq 2000 | RNA-seq
+Date: 2026-03-03
+=================================================================
+
+The geometry reveals itself.
+No pre-loaded cancer-specific gene panels.
+Analyst reads output and writes Phase 1.
+
+=================================================================
+STEP 1: DOWNLOADING PER-GSM COUNT FILES
+  13 samples
+=================================================================
+
+  GSM2359144  (CDC1  tumor)
+  File: GSM2359144_CDC001-Td1.count.txt.gz
+  FTP fallback: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2359nnn/GSM2359144/suppl/GSM2359144_CDC001-Td1.count.txt.gz
+  Downloading: GSM2359144_CDC001-Td1.count.txt.gz
+  Fetch attempt 1 failed: The read operation timed out
+  OK: 111.0 KB
+
+  GSM2359145  (CDC1  normal)
+  File: GSM2359145_CDC001-N1.count.txt.gz
+  FTP fallback: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2359nnn/GSM2359145/suppl/GSM2359145_CDC001-N1.count.txt.gz
+  Downloading: GSM2359145_CDC001-N1.count.txt.gz
+  OK: 110.8 KB
+
+  GSM2359146  (CDC2  tumor)
+  File: GSM2359146_CDC002-Td1.count.txt.gz
+  FTP fallback: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2359nnn/GSM2359146/suppl/GSM2359146_CDC002-Td1.count.txt.gz
+  Downloading: GSM2359146_CDC002-Td1.count.txt.gz
+  OK: 111.8 KB
+
+  GSM2359147  (CDC2  normal)
+  File: GSM2359147_CDC002-N1.count.txt.gz
+  FTP fallback: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2359nnn/GSM2359147/suppl/GSM2359147_CDC002-N1.count.txt.gz
+  Downloading: GSM2359147_CDC002-N1.count.txt.gz
+  OK: 109.2 KB
+
+  GSM2359148  (CDC3  tumor)
+  File: GSM2359148_CDC003-Td1.count.txt.gz
+  FTP fallback: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2359nnn/GSM2359148/suppl/GSM2359148_CDC003-Td1.count.txt.gz
+  Downloading: GSM2359148_CDC003-Td1.count.txt.gz
+  Fetch attempt 1 failed: The read operation timed out
+  OK: 112.5 KB
+
+  GSM2359149  (CDC3  normal)
+  File: GSM2359149_CDC003-N1.count.txt.gz
+  FTP fallback: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2359nnn/GSM2359149/suppl/GSM2359149_CDC003-N1.count.txt.gz
+  Downloading: GSM2359149_CDC003-N1.count.txt.gz
+  OK: 111.6 KB
+
+  GSM2359150  (CDC4  tumor)
+  File: GSM2359150_CDC004-Td1.count.txt.gz
+  FTP fallback: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2359nnn/GSM2359150/suppl/GSM2359150_CDC004-Td1.count.txt.gz
+  Downloading: GSM2359150_CDC004-Td1.count.txt.gz
+  OK: 105.1 KB
+
+  GSM2359151  (CDC4  normal)
+  File: GSM2359151_CDC004-N1.count.txt.gz
+  FTP fallback: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2359nnn/GSM2359151/suppl/GSM2359151_CDC004-N1.count.txt.gz
+  Downloading: GSM2359151_CDC004-N1.count.txt.gz
+  OK: 109.5 KB
+
+  GSM2359152  (CDC5  tumor)
+  File: GSM2359152_CDC005-Td1.count.txt.gz
+  FTP fallback: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2359nnn/GSM2359152/suppl/GSM2359152_CDC005-Td1.count.txt.gz
+  Downloading: GSM2359152_CDC005-Td1.count.txt.gz
+  Fetch attempt 1 failed: The read operation timed out
+  OK: 110.8 KB
+
+  GSM2359153  (CDC6  tumor)
+  File: GSM2359153_CDC006-Td1.count.txt.gz
+  FTP fallback: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2359nnn/GSM2359153/suppl/GSM2359153_CDC006-Td1.count.txt.gz
+  Downloading: GSM2359153_CDC006-Td1.count.txt.gz
+  OK: 110.3 KB
+
+  GSM2359154  (CDC6  normal)
+  File: GSM2359154_CDC006-N1.count.txt.gz
+  FTP fallback: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2359nnn/GSM2359154/suppl/GSM2359154_CDC006-N1.count.txt.gz
+  Downloading: GSM2359154_CDC006-N1.count.txt.gz
+  OK: 113.3 KB
+
+  GSM2359155  (CDC7  tumor)
+  File: GSM2359155_CDC007-Td1.count.txt.gz
+  FTP fallback: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2359nnn/GSM2359155/suppl/GSM2359155_CDC007-Td1.count.txt.gz
+  Downloading: GSM2359155_CDC007-Td1.count.txt.gz
+  OK: 108.9 KB
+
+  GSM2359156  (CDC7  normal)
+  File: GSM2359156_CDC007-N1.count.txt.gz
+  FTP fallback: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2359nnn/GSM2359156/suppl/GSM2359156_CDC007-N1.count.txt.gz
+  Downloading: GSM2359156_CDC007-N1.count.txt.gz
+  Fetch attempt 1 failed: The read operation timed out
+  OK: 107.7 KB
+
+  Downloaded: 13/13
+
+=================================================================
+STEP 2: MERGING COUNT FILES
+=================================================================
+  Loading GSM2359144 (CDC1 tumor)...
+    25861 genes, total counts: 113225609
+  Loading GSM2359145 (CDC1 normal)...
+    25861 genes, total counts: 116971062
+  Loading GSM2359146 (CDC2 tumor)...
+    25861 genes, total counts: 120397267
+  Loading GSM2359147 (CDC2 normal)...
+    25861 genes, total counts: 98978894
+  Loading GSM2359148 (CDC3 tumor)...
+    25861 genes, total counts: 144801899
+  Loading GSM2359149 (CDC3 normal)...
+    25861 genes, total counts: 142345215
+  Loading GSM2359150 (CDC4 tumor)...
+    25861 genes, total counts: 91755381
+  Loading GSM2359151 (CDC4 normal)...
+    25861 genes, total counts: 78653732
+  Loading GSM2359152 (CDC5 tumor)...
+    25861 genes, total counts: 104889423
+  Loading GSM2359153 (CDC6 tumor)...
+    25861 genes, total counts: 78024093
+  Loading GSM2359154 (CDC6 normal)...
+    25861 genes, total counts: 179540134
+  Loading GSM2359155 (CDC7 tumor)...
+    25861 genes, total counts: 100602511
+  Loading GSM2359156 (CDC7 normal)...
+    25861 genes, total counts: 100447190
+
+  Merged matrix: 25861 genes × 13 samples
+  Samples in matrix: ['GSM2359144', 'GSM2359145', 'GSM2359146', 'GSM2359147', 'GSM2359148', 'GSM2359149', 'GSM2359150', 'GSM2359151', 'GSM2359152', 'GSM2359153', 'GSM2359154', 'GSM2359155', 'GSM2359156']
+  Removing 5 summary rows: ['__no_feature', '__ambiguous', '__too_low_aQual', '__not_aligned', '__alignment_not_unique']
+  Final matrix: (25856, 13)
+
+=================================================================
+STEP 3: NORMALISATION  log2(CPM + 1)
+=================================================================
+  Library sizes:
+    GSM2359144 (CDC1 tumor): 40,388,821
+    GSM2359145 (CDC1 normal): 36,568,631
+    GSM2359146 (CDC2 tumor): 44,438,071
+    GSM2359147 (CDC2 normal): 24,921,714
+    GSM2359148 (CDC3 tumor): 66,510,141
+    GSM2359149 (CDC3 normal): 42,661,255
+    GSM2359150 (CDC4 tumor): 3,434,462
+    GSM2359151 (CDC4 normal): 25,084,299
+    GSM2359152 (CDC5 tumor): 18,046,637
+    GSM2359153 (CDC6 tumor): 27,403,629
+    GSM2359154 (CDC6 normal): 59,906,099
+    GSM2359155 (CDC7 tumor): 22,959,250
+    GSM2359156 (CDC7 normal): 20,874,060
+
+  Genes before filter: 25856
+  CPM >= 0.5: 22452
+  Genes removed: 3404
+
+  log2(CPM+1) statistics:
+    Min:    0.0000
+    Max:    15.3947
+    Mean:   3.4530
+    Median: 3.5927
+
+  Saved: ./cdrcc_false_attractor/results/GSE89122_log2cpm.csv
+
+=================================================================
+STEP 4: GENE ID HANDLING
+=================================================================
+  Sample gene IDs: ['A1BG', 'A1BG-AS1', 'A1CF', 'A2M', 'A2M-AS1', 'A2ML1', 'A2MP1', 'A4GALT', 'A4GNT', 'AAAS', 'AACS', 'AACSP1', 'AADAC', 'AADACL2', 'AADACL2-AS1']
+  Ensembl IDs: False
+  Gene symbols: True
+  Entrez IDs: False
+  Gene symbols — no mapping needed.
+  Final gene count: 22452
+
+=================================================================
+STEP 6: BLIND SADDLE POINT SCAN
+All genes. No pre-selected panels.
+Tumour vs Normal. Geometry reveals itself.
+=================================================================
+  Tumour samples : 7
+  Normal samples : 6
+  Genes to test  : 22452
+  Genes tested: 22452
+  Significant (p<0.05): 8523
+
+  =================================================================
+  TOP SUPPRESSED IN TUMOUR  (switch gene candidates)
+  =================================================================
+  Gene                   Normal   Tumour    Change           p-value
+  --------------------------------------------------------------------
+  PFN3                   1.4342   0.0996    -93.1%      p=0.0186   *
+  SLC16A12-AS1           1.7247   0.1497    -91.3%    p=5.83e-04 ***
+  TTC36                  1.5969   0.1415    -91.1%      p=0.0175   *
+  MCCD1                  4.1128   0.4772    -88.4%    p=5.83e-04 ***
+  CTSLP2                 1.6735   0.2054    -87.7%    p=1.68e-03  **
+  RNF186                 4.0307   0.5072    -87.4%    p=5.83e-04 ***
+  FABP1                  5.4894   0.7811    -85.8%    p=1.17e-03  **
+  NAT8                   7.5693   1.1056    -85.4%    p=5.83e-04 ***
+  LOC389332              5.4117   0.8085    -85.1%    p=5.83e-04 ***
+  MIR6863                1.1203   0.1685    -85.0%      p=0.0331   *
+  PRODH2                 6.7137   1.0463    -84.4%    p=5.83e-04 ***
+  SLC6A19                7.6327   1.2587    -83.5%    p=5.83e-04 ***
+  CRYAA                  5.8539   0.9661    -83.5%    p=5.83e-04 ***
+  AFM                    6.1601   1.0281    -83.3%    p=2.33e-03  **
+  ATP6V1G3               4.4636   0.7551    -83.1%    p=5.83e-04 ***
+  MIOX                   8.0605   1.3750    -82.9%    p=5.83e-04 ***
+  HNF4A-AS1              2.7567   0.4717    -82.9%    p=9.13e-03  **
+  TMEM174                5.4257   0.9290    -82.9%    p=1.17e-03  **
+  SLC22A12               7.5858   1.3291    -82.5%    p=5.83e-04 ***
+  CLEC18C                3.0815   0.5479    -82.2%    p=5.83e-04 ***
+  SLC22A6                7.5247   1.3700    -81.8%    p=5.83e-04 ***
+  SLC22A7                5.5622   1.0208    -81.6%    p=2.33e-03  **
+  HAO2                   6.6154   1.2316    -81.4%    p=1.17e-03  **
+  GSTA1                  7.0495   1.3137    -81.4%    p=5.83e-04 ***
+  LINC01187              5.5259   1.0418    -81.1%    p=5.83e-04 ***
+  SLC22A8                7.0106   1.3347    -81.0%    p=1.17e-03  **
+  MT1H                   6.3563   1.2484    -80.4%    p=5.83e-04 ***
+  DPEP1                  7.6122   1.4984    -80.3%    p=5.83e-04 ***
+  SLC36A2                6.8799   1.3601    -80.2%    p=5.83e-04 ***
+  SLC13A1                7.2137   1.4272    -80.2%    p=5.83e-04 ***
+
+  =================================================================
+  TOP ELEVATED IN TUMOUR    (FA marker candidates)
+  =================================================================
+  Gene                   Normal   Tumour    Change           p-value
+  --------------------------------------------------------------------
+  ANXA8L1                0.0056   1.7547 +17491.0%    p=2.08e-03  **
+  LY6D                   0.0000   1.6568 +16567.8%    p=3.29e-03  **
+  PAEP                   0.0128   1.9886 +15431.4%    p=1.30e-03  **
+  HOXC13                 0.0000   1.4238 +14237.8%    p=3.29e-03  **
+  NPBWR1                 0.0040   1.3621 +13581.4%    p=1.30e-03  **
+  MAGEB2                 0.0000   1.2834 +12834.2%    p=9.09e-03  **
+  ANXA8                  0.0121   1.5406 +12676.1%      p=0.0166   *
+  THEG                   0.0094   1.2236 +12141.8%    p=8.10e-03  **
+  LOC101927797           0.0128   1.4120 +10928.5%    p=8.10e-03  **
+  SPRR1A                 0.0094   1.0904 +10810.1%      p=0.0261   *
+  FLJ46066               0.0094   1.0605 +10510.5%    p=8.10e-03  **
+  LINC01441              0.0094   0.9886  +9792.2%    p=8.10e-03  **
+  LINC00462              0.0189   1.8373  +9642.2%    p=1.49e-03  **
+  DCAF8L2                0.0000   0.9589  +9588.6%    p=1.03e-03  **
+  DSCAM-AS1              0.0121   1.1619  +9536.0%      p=0.0236   *
+  MIR205                 0.0065   0.9483  +9418.3%    p=5.32e-03  **
+  C7orf72                0.0000   0.9413  +9412.8%    p=3.29e-03  **
+  ECEL1P2                0.0056   0.9436  +9380.7%      p=0.0261   *
+  LOC338797              0.0000   0.9296  +9296.0%    p=3.29e-03  **
+  LOC100506271           0.0000   0.9264  +9263.8%    p=3.29e-03  **
+  GABRR3                 0.0095   0.9227  +9132.8%      p=0.0261   *
+  GJA10                  0.0094   0.9155  +9061.3%      p=0.0121   *
+  BARX1                  0.0000   0.8802  +8801.6%    p=3.29e-03  **
+  WFDC9                  0.0000   0.8796  +8795.7%    p=3.29e-03  **
+  LOC349160              0.0094   0.8874  +8780.2%    p=8.10e-03  **
+  LOC101928012           0.0094   0.8816  +8721.8%      p=0.0177   *
+  CHRNB3                 0.0094   0.8759  +8665.5%    p=8.10e-03  **
+  CSN1S2AP               0.0094   0.8704  +8610.2%      p=0.0261   *
+  OR13H1                 0.0094   0.8662  +8568.1%      p=0.0121   *
+  CST1                   0.0215   1.7975  +8276.9%    p=1.62e-03  **
+
+=================================================================
+STEP 7: BLIND DEPTH SCORE
+  Top 50 suppressed + top 50 elevated (p<0.05)
+  Geometry-derived. No pre-loaded panels.
+=================================================================
+  Switch candidates used : 50
+  FA candidates used     : 50
+
+  Block depth (7 tumours):
+    Mean  : 0.5030
+    Median: 0.5096
+    Std   : 0.0518
+    Min   : 0.4240
+    Max   : 0.5811
+
+  Depth by sample:
+    GSM2359144 (CDC1): 0.5096
+    GSM2359146 (CDC2): 0.5367
+    GSM2359148 (CDC3): 0.4240
+    GSM2359150 (CDC4): 0.5000
+    GSM2359152 (CDC5): 0.5156
+    GSM2359153 (CDC6): 0.5811
+    GSM2359155 (CDC7): 0.4538
+
+  =================================================================
+  DEPTH CORRELATIONS (top 30)
+  These are the true biology signals.
+  =================================================================
+  Gene                        r  p-value
+  --------------------------------------------
+  IL1RAP                +0.9604  p=5.85e-04
+  CDS2                  -0.9599  p=6.04e-04
+  PRKCI                 +0.9579  p=6.83e-04
+  RHBDL2                +0.9462  p=1.26e-03
+  PRKAR2B               -0.9459  p=1.27e-03
+  ZBED6CL               -0.9443  p=1.36e-03
+  B4GALT5               +0.9431  p=1.44e-03
+  LOC101927630          +0.9423  p=1.49e-03
+  SERPINA1              +0.9411  p=1.56e-03
+  ADPRM                 -0.9407  p=1.59e-03
+  MYC                   -0.9405  p=1.61e-03
+  USP45                 -0.9374  p=1.82e-03
+  MPP6                  -0.9370  p=1.85e-03
+  CD48                  -0.9368  p=1.86e-03
+  IKZF2                 +0.9350  p=2.00e-03
+  NOMO1                 +0.9342  p=2.06e-03
+  RNF135                -0.9340  p=2.07e-03
+  TMEM121               -0.9333  p=2.13e-03
+  AGR2                  +0.9313  p=2.29e-03
+  OGDHL                 -0.9312  p=2.30e-03
+  KLF5                  +0.9304  p=2.37e-03
+  CYP24A1               +0.9292  p=2.47e-03
+  NT5DC3                -0.9292  p=2.47e-03
+  PPARG                 +0.9283  p=2.55e-03
+  SNORD10               -0.9274  p=2.63e-03
+  INPP4B                +0.9260  p=2.75e-03
+  ARHGEF6               -0.9254  p=2.80e-03
+  GPRC5A                +0.9250  p=2.84e-03
+  ESRP1                 +0.9242  p=2.92e-03
+  MIR31HG               +0.9238  p=2.96e-03
+
+  Saved: depth_correlations.csv
+  Saved: saddle_results.csv
+
+=================================================================
+STEP 8: PAIRED ANALYSIS
+  6 matched tumour–normal pairs
+  Wilcoxon signed-rank for top movers
+=================================================================
+  Pairs available: 6
+
+  Paired analysis (6 pairs):
+  Top genes by mean paired difference:
+
+  Gene                   MeanDiff    Dir     p_paired
+  ------------------------------------------------------
+  PAEP                    +2.1617      UP  p=0.0312 *
+  CST1                    +1.9783      UP  p=0.0312 *
+  LY6D                    +1.7473      UP  p=0.0625  
+  ANXA8L1                 +1.7370      UP  p=0.0625  
+  ANXA8                   +1.4697      UP  p=0.1250  
+  NPBWR1                  +1.4471      UP  p=0.0312 *
+  LOC101927797            +1.3893      UP  p=0.0938  
+  HOXC13                  +1.3565      UP  p=0.0625  
+  LINC00462               +1.3250      UP  p=0.0312 *
+  MAGEB2                  +1.3057      UP  p=0.1250  
+  S100A7                  +1.2936      UP  p=0.0312 *
+  THEG                    +1.1681      UP  p=0.0625  
+  MIR205                  +1.0869      UP  p=0.0625  
+  SPRR1A                  +1.0273      UP  p=0.1250  
+  DSCAM-AS1               +1.0209      UP  p=0.3125  
+  BARX1                   +0.9480      UP  p=0.0625  
+  DCAF8L2                 +0.9393      UP  p=0.0312 *
+  OR13H1                  +0.8786      UP  p=0.0625  
+  FLJ46066                +0.8579      UP  p=0.0625  
+  C7orf72                 +0.8389      UP  p=0.0625  
+  ECEL1P2                 +0.8272      UP  p=0.2500  
+  LOC100506271            +0.8261      UP  p=0.0625  
+  LINC01441               +0.8145      UP  p=0.0625  
+  ISL2                    +0.8052      UP  p=0.0312 *
+  LOC349160               +0.7955      UP  p=0.0625  
+  LOC338797               +0.7838      UP  p=0.0625  
+  LOC100996671            +0.7686      UP  p=0.0625  
+  SSX6                    +0.7675      UP  p=0.0312 *
+  GABRR3                  +0.7663      UP  p=0.1250  
+  CHRNB3                  +0.7579      UP  p=0.0625  
+
+  Saved: paired_results.csv
+
+--- Generating figure ---
+
+  Figure saved: ./cdrcc_false_attractor/results/GSE89122_attractor_landscape.png
