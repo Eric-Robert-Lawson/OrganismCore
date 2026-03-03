@@ -1,0 +1,166 @@
+========================================================
+CML FALSE ATTRACTOR ANALYSIS
+OrganismCore — False Attractor Framework
+Cancer Validation #6 — Document 78
+Session 2 — Hematopoietic
+========================================================
+========================================================
+STEP 1: LOADING ALL SAMPLES
+========================================================
+Loading CML1_34p...
+  Orientation: cells_x_genes shape: (33538, 648)
+  CML1_34p: 648 cells
+Loading CML2_34p2...
+  Orientation: cells_x_genes shape: (33538, 4124)
+  CML2_34p2: 4124 cells
+Loading CML2_38n2...
+  Orientation: cells_x_genes shape: (33538, 1610)
+  CML2_38n2: 1610 cells
+Loading CML3_34p...
+  Orientation: cells_x_genes shape: (33538, 897)
+  CML3_34p: 897 cells
+Loading CML3_38n...
+  Orientation: cells_x_genes shape: (33538, 255)
+  CML3_38n: 255 cells
+Loading CML4_34p...
+  Orientation: cells_x_genes shape: (33538, 1361)
+  CML4_34p: 1361 cells
+Loading CML4_38n...
+  Orientation: cells_x_genes shape: (33538, 654)
+  CML4_38n: 654 cells
+Loading CML5_34p...
+  Orientation: cells_x_genes shape: (33538, 1237)
+  CML5_34p: 1237 cells
+Loading CML5_38n...
+  Orientation: cells_x_genes shape: (33538, 357)
+  CML5_38n: 357 cells
+Loading CML6_34p...
+  Orientation: cells_x_genes shape: (33538, 1145)
+  CML6_34p: 1145 cells
+Loading CML6_38n...
+  Orientation: cells_x_genes shape: (33538, 177)
+  CML6_38n: 177 cells
+Loading CML7_34p...
+  Orientation: cells_x_genes shape: (33538, 2861)
+  CML7_34p: 2861 cells
+Loading CML7_38n...
+  Orientation: cells_x_genes shape: (33538, 2823)
+  CML7_38n: 2823 cells
+Loading CML8_34p...
+  Orientation: cells_x_genes shape: (33538, 346)
+  CML8_34p: 346 cells
+Loading CML8_38n...
+  Orientation: cells_x_genes shape: (33538, 79)
+  CML8_38n: 79 cells
+Loading CML9_34p...
+  Orientation: cells_x_genes shape: (33538, 997)
+  CML9_34p: 997 cells
+Loading CML9_38n...
+  Orientation: cells_x_genes shape: (33538, 824)
+  CML9_38n: 824 cells
+
+Total cells loaded: 20395
+Cached: ./cml_saddle_results/expr_cache.pkl
+========================================================
+STEP 2: CLASSIFY AND SUMMARIZE
+========================================================
+Cell type distribution:
+transferred_labels
+MEP            4319
+Primitive      3910
+MPP1           3345
+ErP            2191
+My/Ly          1685
+My             1327
+MPP2           1055
+MkP             892
+Baso/mc         685
+Cycling         665
+Ly/pDc/mono      83
+Name: count, dtype: int64
+
+Primitive cells: 3910
+My cells:        1327
+
+Available target genes: ['CEBPA', 'CEBPE', 'ELANE', 'CAMP', 'LTF', 'SPI1', 'KLF4', 'IRF8', 'CD34', 'MPO', 'MKI67', 'CDX2', 'CSF3R']
+
+Mean expression — Primitive vs My:
+                     CEBPA   CEBPE   ELANE    CAMP  LTF  ...    CD34     MPO   MKI67  CDX2   CSF3R
+transferred_labels                                       ...                                      
+My                  0.8887  0.1973  0.5707  0.0016  0.0  ...  0.8884  2.8669  0.5521   0.0  1.3182
+Primitive           0.0866  0.0018  0.0133  0.0002  0.0  ...  0.8160  0.1186  0.0393   0.0  0.4908
+
+[2 rows x 13 columns]
+========================================================
+STEP 3: SADDLE POINT SIGNATURE
+========================================================
+Reference (further differentiated): My
+Blocked (false attractor):          Primitive
+
+CONSERVATIVE NOTE:
+  My cells are NOT terminal granulocytes.
+  Any suppression seen here is a lower bound.
+  True signal vs mature neutrophils is larger.
+
+CRITICAL TEST:
+  SPI1, KLF4, IRF8 — confirmed AML switches.
+  If confirmed here — same switch genes in two
+  independent myeloid cancers.
+
+CEBPA    [SWITCH    ] | Prim=0.0866 My=0.8887 | suppressed +90.3%                | p=0.00e+00 *** | ✓ CONFIRMED
+CEBPE    [SWITCH    ] | Prim=0.0018 My=0.1973 | suppressed +99.1%                | p=1.14e-161 *** | ✓ CONFIRMED
+ELANE    [SWITCH    ] | Prim=0.0133 My=0.5707 | suppressed +97.7%                | p=4.30e-205 *** | ✓ CONFIRMED
+CAMP     [SWITCH    ] | Prim=0.0002 My=0.0016 | suppressed +88.6%                | p=0.0112 *   | ✓ CONFIRMED
+LTF      [SWITCH    ] | Prim=0.0000 My=0.0000 | elevated   +0.0%                 | p=1.0000     | ✗ NOT CONFIRMED
+SPI1     [AML_GENE  ] | Prim=0.3431 My=1.1774 | suppressed +70.9%                | p=0.00e+00 *** | ✓ CONFIRMED  ← AML cross-cancer test
+KLF4     [AML_GENE  ] | Prim=0.1300 My=0.1475 | suppressed +11.8%                | p=0.0549     | ✗ NOT CONFIRMED  ← AML cross-cancer test
+IRF8     [AML_GENE  ] | Prim=0.0029 My=0.0462 | suppressed +93.7%                | p=3.18e-30 *** | ✓ CONFIRMED  ← AML cross-cancer test
+CD34     [SCAFFOLD  ] | Prim=0.8160 My=0.8884 | suppressed +8.1%                 | p=3.96e-04 *** | ✓ SCAFFOLD
+MPO      [SCAFFOLD  ] | Prim=0.1186 My=2.8669 | suppressed +95.9%                | p=0.00e+00 *** | ✗ SCAFFOLD UNEXPECTED
+MKI67    [SCAFFOLD  ] | Prim=0.0393 My=0.5521 | suppressed +92.9%                | p=1.55e-277 *** | ✗ SCAFFOLD UNEXPECTED
+CDX2     [CONTROL   ] | Prim=0.0000 My=0.0000 | elevated   +0.0%                 | p=1.0000     | ✓ CTRL
+CSF3R    [CONTROL   ] | Prim=0.4908 My=1.3182 | suppressed +62.8%                | p=2.45e-238 *** | ✗ CONTROL UNEXPECTED
+
+========================================================
+CML FRAMEWORK PREDICTION RESULT
+========================================================
+CML switch genes confirmed: 4/5
+CML switch genes partial:   0/5
+AML genes in CML:           2/3
+
+CRITICAL TEST — AML SWITCH GENES IN CML:
+  SPI1  : +70.9% [CONFIRMED]
+  KLF4  : +11.8% [NOT CONFIRMED]
+  IRF8  : +93.7% [CONFIRMED]
+
+** PARTIAL CROSS-CANCER CONFIRMATION **
+
+*** CML FALSE ATTRACTOR CONFIRMED ***
+========================================================
+STEP 4: FALSE ATTRACTOR DEPTH ANALYSIS
+========================================================
+Testing: switch gene expression along
+differentiation hierarchy.
+Primitive → MPP2 → MPP1 → My/Ly → My
+
+Stage        | CEBPA    | CEBPE    | ELANE    | CAMP     | LTF      | SPI1     | KLF4     | IRF8    
+------------------------------------------------------------------------------------------------------
+Primitive    | 0.0866   | 0.0018   | 0.0133   | 0.0002   | 0.0000   | 0.3431   | 0.1300   | 0.0029  
+MPP2         | 0.0662   | 0.0033   | 0.0112   | 0.0007   | 0.0000   | 0.5085   | 0.0745   | 0.0000  
+MPP1         | 0.2670   | 0.0047   | 0.0079   | 0.0015   | 0.0000   | 0.6385   | 0.0519   | 0.0079  
+My/Ly        | 0.5274   | 0.0167   | 0.0096   | 0.0029   | 0.0000   | 0.9708   | 0.0826   | 0.0107  
+My           | 0.8887   | 0.1973   | 0.5707   | 0.0016   | 0.0000   | 1.1774   | 0.1475   | 0.0462  
+
+If values increase Primitive → My:
+False attractor depth is real.
+More primitive = more suppressed.
+Waddington geometry directly observed.
+========================================================
+STEP 5: GENERATING FIGURE
+========================================================
+Figure saved: ./cml_saddle_results/cml_saddle_figure.png
+
+========================================================
+CML ANALYSIS COMPLETE
+Results: ./cml_saddle_results/
+========================================================
