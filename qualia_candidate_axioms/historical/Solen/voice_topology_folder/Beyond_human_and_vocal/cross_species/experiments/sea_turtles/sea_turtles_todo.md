@@ -434,3 +434,8 @@ v1.0 — February 27, 2026
   No data in hand.
   Pre-registration complete.
 ```
+
+---
+
+
+I received the data on march 20th in email, I just got email, I see data is in email. I will not open it, I am getting back into groove of what to do with data here, and will run the protocol as needed.
