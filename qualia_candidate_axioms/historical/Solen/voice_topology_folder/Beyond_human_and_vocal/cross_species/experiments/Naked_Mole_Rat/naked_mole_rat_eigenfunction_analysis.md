@@ -41,6 +41,275 @@ The naked mole-rat is selected as the next test case because:
    making the physical prediction derivable from first principles
 4. The soft chirp is the dominant social call — bounded, stereotyped,
    and produced by a well-defined resonating system
+5. The species' extreme sensory constraints make the acoustic channel
+   the primary substrate of social reality — producing the strongest
+   possible coherence signal between Tonnetz structure and behavior
+
+---
+
+## WHY THE NAKED MOLE-RAT IS THE OPTIMAL TEST CASE
+## The Sensory Deprivation Argument
+
+This section establishes why Heterocephalus glaber is not merely a
+convenient test case but the strongest possible test case for the
+coherence claim of the Universal Tonnetz framework.
+
+### The elimination of competing channels
+
+Naked mole-rats live in complete darkness underground. Their eyes are
+vestigial and functionally useless. Visual communication is zero.
+
+Olfaction works in open environments where chemical gradients can form
+and disperse directionally. Underground in packed tunnel systems,
+chemical signals diffuse poorly, cannot carry directional information
+reliably, and are easily contaminated by the substrate itself. Olfaction
+plays a role in close-contact recognition and queen pheromone signaling —
+but it is a low-bandwidth, short-range, slow channel in that environment.
+
+What remains as the primary high-bandwidth communication channel in
+total darkness in confined tunnels?
+
+**Acoustic. Only acoustic.**
+
+This is not a species that uses sound as one of several communication
+channels. It is a species for which acoustic communication is the
+dominant channel by environmental necessity. The Tonnetz is not one
+tool among many for a naked mole-rat. It is essentially the entire
+communication substrate.
+
+### Coherence signal strength scales with channel dependence
+
+In the Universal Tonnetz framework, coherence signal strength scales
+with how much the organism's behavior is predicated on the communication
+channel. A species that uses sound occasionally will show weak coherence
+between acoustic signal structure and behavioral outcomes. A species
+for which the acoustic channel is the primary reality-construction
+mechanism will show extremely strong coherence.
+
+The naked mole-rat is at the extreme end of that axis.
+
+Their acoustic signals do not just convey information. They construct
+the social reality of the colony in real time — who is present, where,
+what their status is, what the colony's identity is, what the queen's
+state is. The soft chirp is not incidental social noise. It is the
+medium through which the colony exists as a coherent entity.
+
+This means:
+
+- The coherence between Tonnetz structure and behavioral outcome
+  should be very high
+- Signal degradation or corruption should produce measurable
+  behavioral disruption rapidly
+- The colony's behavioral state should be directly predictable
+  from the acoustic state of the Tonnetz
+
+The tunnel darkness did not just shape their communication system.
+It made the communication system the primary substrate of their
+social reality.
+
+### The acoustic Tonnetz as constitutive, not descriptive
+
+For most species, communication is downstream of behavior — animals
+act, then communicate about what they did or are going to do.
+
+For the naked mole-rat, the causal arrow runs the other way. The
+acoustic Tonnetz position of the colony is not describing the social
+state. It is constituting it. The colony is what its Tonnetz position
+says it is. Change the Tonnetz position and you change what the colony
+is.
+
+This is the strongest version of the coherence argument and the naked
+mole-rat is the species where it is most testable because the
+environmental constraints make the dependence so absolute.
+
+---
+
+## THE QUEEN, HIVE COLLAPSE, AND COHERENCE DISRUPTION
+
+This section establishes the most direct observable prediction of the
+coherence argument: that queen loss produces Tonnetz coherence collapse,
+not merely social disruption.
+
+### The queen as acoustic anchor
+
+The naked mole-rat colony is a eusocial superorganism. The queen is
+not just a reproductive individual. She is the acoustic anchor of the
+entire colony's social coherence. Her vocalizations — particularly
+specific call patterns associated with her shoving behavior — suppress
+reproductive physiology in all other females and maintain colony
+hierarchy.
+
+Under the Universal Tonnetz framework, the queen is the primary
+reference point that holds the colony's Tonnetz position stable. Her
+calls are not orders. They are the continuous signal that defines
+where the colony is in eigenfunction space.
+
+### What happens when the queen dies — coherence collapse
+
+When the queen dies, the colony does not simply lose a reproductive
+individual. It loses the primary coherence signal that was organizing
+the Tonnetz position of the entire colony. The acoustic substrate
+through which social reality was being constructed is suddenly absent
+or disrupted.
+
+The behavioral consequences are immediate and dramatic:
+
+- Worker aggression increases
+- Reproductive competition begins among previously suppressed females
+- Colony coordination breaks down
+- In some cases the colony fragments or collapses entirely
+
+Under a conventional social biology interpretation, this is explained
+as competition for reproductive dominance in the absence of suppression.
+
+Under the Universal Tonnetz framework, this is **coherence collapse**.
+The Tonnetz position that the colony was organized around — anchored
+by the queen's acoustic signature — is gone. The animals have no
+external reference to navigate back to a stable position. The social
+superorganism loses its organizing signal and begins to dissolve.
+
+The prediction is precise:
+
+> If behavior is predicated on navigation within the Tonnetz, and
+> the primary anchor of the Tonnetz position is removed, the behavioral
+> system that depended on that anchor will destabilize in proportion
+> to its dependence on it.
+
+The naked mole-rat colony, being almost entirely acoustically organized,
+destabilizes almost entirely. A species with multiple redundant
+communication channels would show less collapse under the same
+perturbation. This cross-species prediction is testable.
+
+### The queen succession trajectory as Tonnetz restabilization
+
+After queen loss, one female eventually achieves reproductive dominance
+and becomes the new queen. Colony behavior gradually restabilizes.
+
+Under the framework this is not merely social hierarchy reestablishment.
+It is Tonnetz restabilization around a new acoustic anchor. The new
+queen's call signature defines a new stable position in eigenfunction
+space. Colony members converge toward that position over time — the
+same convergence dynamic Barker 2021 documented for colony transfers,
+now occurring at the whole-colony level following queen succession.
+
+The predicted trajectory:
+
+```
+Stable Tonnetz position (queen alive)
+    → Coherence collapse (queen dies, acoustic anchor removed)
+    → High variance, fragmented positions (succession competition)
+    → Convergence (new queen established)
+    → New stable Tonnetz position (new queen's acoustic signature)
+```
+
+This trajectory is directly measurable in acoustic data if queen
+transition records exist in the dataset or in supplementary literature.
+
+### The measurement implication
+
+If the Barker dataset or supplementary colony records contain any
+queen loss or queen transition events with longitudinal acoustic data,
+this becomes a natural experiment of exceptional power:
+
+- **Before queen loss:** colony calls organized around stable Tonnetz
+  position, low within-colony variance in eigenfunction space
+- **Queen loss event:** primary acoustic anchor removed
+- **After queen loss:** Tonnetz position variance increases, coherence
+  score drops, eigenfunction space distribution widens
+- **New queen established:** new Tonnetz position emerges and stabilizes,
+  variance decreases, coherence score recovers
+
+A coherence score computed from eigenfunction space variance before,
+during, and after queen transition would be a direct quantitative
+measure of the constitutive role of acoustic communication in naked
+mole-rat social organization.
+
+This would be the first direct measurement of Tonnetz coherence collapse
+and restabilization in a biological system.
+
+---
+
+## THE GENERATIVE MODEL — FROM ANALYSIS TO COMMUNICATION
+
+Confirming the Tonnetz map enables something beyond analysis: a
+physically grounded generative model of naked mole-rat communication.
+
+### Why the Tonnetz enables genuine communication
+
+A generative model built on statistical interpolation between recorded
+chirps produces sounds that are statistically plausible but occupy no
+defined position on the physical map. The animal has no reason to
+interpret such a signal as meaningful — it is not a position it
+recognizes in its own communication space.
+
+A generative model built on the Tonnetz produces sounds that are
+**physically grounded** — they are positions on the same map the
+animals themselves are navigating. Playing a signal at a defined
+Tonnetz position is speaking in the correct coordinate system. The
+animal's auditory system is already tuned to interpret positions in
+that space.
+
+That is the difference between mimicry and communication.
+
+### The generative pipeline
+
+```
+PHYSICAL LAYER
+Derive resonance modes from vocal anatomy
+→ These are the basis functions (eigenfunctions)
+→ These define the Tonnetz node positions
+
+MAPPING LAYER
+Confirm empirical eigenfunctions match physical predictions
+→ Map each colony dialect to its Tonnetz position
+→ Map individual variation as local navigation
+  around colony position
+
+GENERATIVE LAYER
+Parameterize the Tonnetz: position = (e1, e2, e3, ...)
+→ Generate audio by synthesizing the harmonic series
+   at a specified Tonnetz position
+→ Control trajectory through the space over time
+→ Produce any valid position, including positions
+   no colony currently occupies
+
+COMMUNICATION LAYER
+Design signals at specific Tonnetz positions
+→ Positions the animal's auditory system is tuned to
+→ Novel positions that are physically valid but not
+   any known colony dialect
+→ Trajectories that move through the space in ways
+   that carry meaning within the framework
+```
+
+### Novel positions as the most important signals
+
+The most interesting signals are not imitations of existing colony
+dialects. They are **novel positions on the Tonnetz** — positions that
+are physically valid, that the animal's auditory system should be able
+to process, but that correspond to no existing colony.
+
+A signal at a novel Tonnetz position is not mimicking any colony. It
+is introducing itself as a new position in the known space. That is
+not noise. It is not a known dialect. It is something the animal has
+the perceptual machinery to process but has not encountered before.
+
+What does the animal do with that? That is the communication experiment
+that follows this analysis.
+
+### Connection to the Vedic reconstruction
+
+This is the same operation performed on Vedic Sanskrit. The eigenfunction
+basis of the human vocal instrument was derived from physical principles.
+The phonemes of Vedic Sanskrit were located as positions in that space.
+Sounds were generated from the physical positions rather than from
+historical recordings. The result was valid because the correct
+coordinate system — the physical map of the instrument — was used
+rather than statistical interpolation between fragmentary records.
+
+The naked mole-rat analysis applies the same operation to a living
+species with a verified dataset, allowing the map to be confirmed
+against real data before it is used generatively.
 
 ---
 
@@ -66,12 +335,16 @@ acoustic variance. They did not ask:
 
 1. Do the empirical eigenfunctions correspond to the physically-predicted
    resonance modes of the naked mole-rat vocal anatomy?
-2. Is the eigenfunction space a Tonnetz — a topologically structured space
-   where positions are not arbitrary but determined by the instrument physics?
-3. Are colony dialects positions or trajectories within a shared Tonnetz,
-   or do different colonies navigate structurally different spaces?
+2. Is the eigenfunction space a Tonnetz — a topologically structured
+   space where positions are not arbitrary but determined by the
+   instrument physics?
+3. Are colony dialects positions or trajectories within a shared
+   Tonnetz, or do different colonies navigate structurally different
+   spaces?
 4. Does the soft chirp's eigenfunction structure match the prediction
    derivable from the bounded resonating system geometry alone?
+5. Does queen loss produce measurable coherence collapse in eigenfunction
+   space, and does succession produce measurable restabilization?
 
 These are the questions this analysis asks.
 
@@ -133,6 +406,11 @@ If the Universal Tonnetz framework is correct:
 5. **Individual variation within a colony will be lower-amplitude
    navigation within the colony's Tonnetz region** — coherent with
    the colony position but not departing from the shared topology
+
+6. **Queen loss will produce measurable coherence collapse in
+   eigenfunction space** — increased variance, loss of stable Tonnetz
+   position — followed by restabilization when a new queen is
+   established
 
 These predictions are falsifiable. If the empirical eigenfunctions are
 arbitrary statistical components with no correspondence to vocal anatomy
@@ -243,7 +521,29 @@ If those longitudinal records are included:
 - Track the trajectory of transferred individuals in eigenfunction space
 - Test whether convergence trajectories follow geodesics in the Tonnetz
   (shortest path between two Tonnetz positions) or arbitrary paths
-- This would be direct evidence of navigation within the Tonnetz structure
+- This would be direct evidence of navigation within the Tonnetz
+  structure
+
+### Step 9 — Queen transition coherence test (if data permits)
+
+If the dataset or supplementary literature contains longitudinal records
+spanning queen loss or succession events:
+
+- Compute a coherence score for each time window: mean pairwise
+  distance of calls within eigenfunction space (lower = more coherent)
+- Track coherence score before, during, and after queen transition
+- Test whether coherence score increases significantly at queen loss
+  (coherence collapse) and recovers at new queen establishment
+  (restabilization)
+- Compare the magnitude of coherence collapse to the variance reduction
+  seen in normal colony-transfer convergence
+
+**Key test:** Does queen loss produce measurable Tonnetz coherence
+collapse? Does succession produce measurable restabilization at a
+new eigenfunction position?
+
+**This is the direct test of the constitutive claim:** that the acoustic
+Tonnetz is not describing the colony's social state but organizing it.
 
 ---
 
@@ -269,8 +569,8 @@ consistent with Tonnetz node structure, not continuously distributed.
 **Confirmation:** Hartigan's dip test significant for multimodality.
 Number of natural clusters matches predicted number of Tonnetz nodes.
 
-**Falsification:** Continuous uniform distribution in eigenfunction space.
-No evidence of discrete clustering.
+**Falsification:** Continuous uniform distribution in eigenfunction
+space. No evidence of discrete clustering.
 
 ### Tertiary prediction
 
@@ -279,9 +579,23 @@ variance in eigenfunction space, and the ratio will be consistent with
 bounded local navigation.
 
 **Confirmation:** F-statistic from one-way ANOVA of colony membership
-on eigenfunction coordinates significant with large effect size (η² > 0.5).
+on eigenfunction coordinates significant with large effect size
+(η² > 0.5).
 
 **Falsification:** No significant colony effect in eigenfunction space.
+
+### Quaternary prediction (if queen transition data available)
+
+Queen loss will produce a measurable increase in eigenfunction space
+variance (coherence collapse) followed by measurable decrease in
+variance upon new queen establishment (restabilization).
+
+**Confirmation:** Coherence score significantly higher during succession
+period than stable periods. New stable position differs from old stable
+position. Convergence trajectory toward new position is measurable.
+
+**Falsification:** No measurable change in eigenfunction space variance
+associated with queen transition events.
 
 ---
 
@@ -289,16 +603,29 @@ on eigenfunction coordinates significant with large effect size (η² > 0.5).
 
 ### For the naked mole-rat specifically
 
-The Barker 2021 finding that "most variance is explained by colony" would
-be reinterpreted: colonies do not develop arbitrary dialects through
-cultural drift. They navigate to specific positions within a physically-
-determined eigenfunction space. The dial they are turning has discrete
-positions. Cultural transmission is the mechanism by which new colony
-members learn which position their colony occupies.
+The Barker 2021 finding that "most variance is explained by colony"
+would be reinterpreted: colonies do not develop arbitrary dialects
+through cultural drift. They navigate to specific positions within a
+physically-determined eigenfunction space. The dial they are turning
+has discrete positions. Cultural transmission is the mechanism by
+which new colony members learn which position their colony occupies.
 
-This reframes the naked mole-rat dialect from a social phenomenon to
-a physical navigation phenomenon — which is consistent with and predicted
-by the Universal Tonnetz framework.
+Queen loss is not social disruption. It is coherence collapse — the
+removal of the acoustic anchor that was constituting the colony's
+position in eigenfunction space.
+
+This reframes both the dialect and the eusocial organization of the
+naked mole-rat as consequences of acoustic Tonnetz navigation, not
+merely correlates of it.
+
+### For the generative communication program
+
+Confirming the Tonnetz map enables construction of a physically grounded
+generative model. Novel signals can be synthesized at defined Tonnetz
+positions — speaking in the correct coordinate system of the animal's
+own communication space. This is the prerequisite for the cross-species
+communication protocol described in the naked mole-rat instrument
+document.
 
 ### For the Universal Tonnetz framework
 
@@ -306,24 +633,26 @@ A confirmed result in naked mole-rats would be the second empirical
 confirmation of the framework across two completely different:
 
 - Species (loggerhead sea turtle vs. Heterocephalus glaber)
-- Communication modalities (geomagnetic navigation vs. acoustic vocalization)
+- Communication modalities (geomagnetic navigation vs. acoustic
+  vocalization)
 - Frequency ranges (AM band 530-1700 kHz vs. soft chirp 1-4 kHz)
 - Analysis methods (circular statistics vs. eigenfunction decomposition)
 - Dataset sources (NOAA STSSN restricted vs. Zenodo open access)
 
 Two independent confirmations across five orders of magnitude of the
-EM/acoustic spectrum, derived from the same theoretical framework, using
-different methods, in different species, is the beginning of a consilience
-argument for the Universal Tonnetz as a general law of biological
-communication.
+EM/acoustic spectrum, derived from the same theoretical framework,
+using different methods, in different species, is the beginning of a
+consilience argument for the Universal Tonnetz as a general law of
+biological communication.
 
 ### For the Barker 2021 paper
 
-This analysis does not contradict Barker et al. It extends their finding.
-Their result (cultural transmission of dialect) remains fully valid.
-This analysis asks whether the eigenfunction space within which that
-cultural transmission operates has physical structure — which is a
-question their paper did not pose.
+This analysis does not contradict Barker et al. It extends their
+finding. Their result (cultural transmission of dialect) remains fully
+valid. This analysis asks whether the eigenfunction space within which
+that cultural transmission operates has physical structure — and whether
+the coherence of that space organizes colony behavior at the level of
+eusocial superorganism function.
 
 The appropriate relationship to their work is collaborative extension,
 not competition.
@@ -336,9 +665,9 @@ A null result — empirical eigenfunctions do not correspond to physical
 predictions, eigenfunction space has no Tonnetz topology — is informative
 in two ways:
 
-1. It constrains the Universal Tonnetz framework: the framework may apply
-   to navigational systems (magnetoreception, migration) but not to
-   social vocalization systems
+1. It constrains the Universal Tonnetz framework: the framework may
+   apply to navigational systems (magnetoreception, migration) but not
+   to social vocalization systems
 2. It provides a clean negative result that narrows the claim and
    makes the positive results in sea turtles and monarchs stronger
    by comparison
@@ -410,6 +739,9 @@ None. This analysis can begin immediately.
 - [x] Physical predictions derivable from published anatomy
 - [x] Analysis pipeline specifiable before data loading
 - [x] Pre-registration document complete
+- [x] Sensory deprivation argument documented
+- [x] Queen transition coherence collapse prediction documented
+- [x] Generative model pathway documented
 
 ---
 
@@ -427,13 +759,25 @@ before the first audio file is opened.
 ## VERSION AND AUDIT TRAIL
 
 ```
-Document version:    1.0
+Document version:    1.1
 Document date:       2026-03-23
 Status:              Pre-registration (no data loaded)
 Framework origin:    Universal Tonnetz (OrganismCore)
 Dataset:             Barker et al. 2021, Zenodo 4104396
 Extends:             OC-OBS-002 (sea turtle), OC-OBS-001 (monarch)
 Author:              Eric Robert Lawson
+
+Changes from v1.0:
+  - Added: Sensory deprivation argument and coherence
+    signal strength rationale
+  - Added: Queen loss as coherence collapse, succession
+    as Tonnetz restabilization
+  - Added: Step 9 queen transition coherence test
+  - Added: Quaternary prediction (queen transition)
+  - Added: Generative model pathway and connection
+    to Vedic reconstruction
+  - Added: Constitutive vs. descriptive distinction
+    for acoustic Tonnetz
 ```
 
 ---
