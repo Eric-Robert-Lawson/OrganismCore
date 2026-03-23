@@ -20,11 +20,17 @@ document_type:
 
 status:
   LOCKED — preregistration.
-  Content reflects the state of
-  understanding as of 2026-03-23,
-  prior to administration of the
-  protocol to any person other than
-  the framework author.
+  Version 1.1 amendment applied
+  2026-03-23, same date as original,
+  prior to first external session.
+  Amendment is methodological only:
+  timing protocol corrected from
+  beanie observation.
+  No predictions, claims, success
+  criteria, or failure criteria
+  are changed.
+  See VERSION section for full
+  amendment record.
 
 author:
   Eric Robert Lawson
@@ -302,6 +308,88 @@ input at the eigenfunction position.
 The navigator prefers it.
 While the correction is applied:
 the false attractor is displaced.
+
+BEANIE TIMING AMENDMENT
+(Eric Robert Lawson, 2026-03-23):
+  The beanie observation has a second
+  implication, identified prior to
+  first external session and therefore
+  recorded here before empirical testing.
+
+  The false attractor does not form
+  immediately when the beanie is placed.
+  It builds over several seconds.
+  The false attractor does not dissolve
+  immediately when the beanie is removed.
+  It drains over several seconds.
+
+  Both formation and dissolution have
+  temporal lag. The lag is a property
+  of attractor well depth:
+
+    Deep wells (severe tinnitus,
+    acute trauma):
+      formation lag SHORT
+      dissolution lag LONG
+
+    Shallow wells (mild tinnitus):
+      formation lag LONGER
+      dissolution lag SHORT
+
+  IMPLICATION FOR CALIBRATION:
+
+  The original protocol asked for
+  B/W/N feedback immediately when
+  each calibration tone stopped.
+  This was wrong. At tone offset,
+  the person is at the beginning of
+  the dissolution phase — maximum
+  perceptual ambiguity, not maximum
+  perceptual clarity.
+
+  The corrected protocol:
+    1. Tone plays for personalised
+       duration (set from formation lag)
+    2. 5-second post-tone settling
+       window — effect may still be
+       building after tone stops
+    3. B/W/N feedback at settled
+       perception
+    4. Inter-trial interval confirmed
+       by person (ENTER when back to
+       baseline) — not a fixed timer
+
+  ADDITIONAL INSIGHT:
+  Dissolution time after each tone
+  is a second feedback channel —
+  objective, timeable, independent
+  of subjective B/W/N accuracy.
+  Longer dissolution = deeper
+  attractor interaction = closer to
+  FA eigenfunction position.
+  This cross-validates B/W/N
+  throughout the protocol.
+
+  BEANIE PRE-CALIBRATION (Phase 0B):
+  Formation and dissolution lag are
+  measured individually at the start
+  of each ear's session using manual
+  occlusion (hand or beanie over ear).
+  These measurements personalise
+  tone duration and inter-trial
+  timing for that individual's
+  attractor dynamics before the
+  sweep begins.
+
+  This amendment does not change
+  any prediction, claim, success
+  criterion, or failure criterion.
+  It corrects when feedback is
+  requested and how inter-trial
+  timing is set. The measurement
+  targets, the three-layer remedy,
+  the gradient descent logic, and
+  the glasses principle are unchanged.
 ```
 
 ### 2.2 The central perpetuation question
@@ -409,8 +497,10 @@ The correction addresses what is there.
 Duration is a parameter of the
 calibration (longer duration may
 require more amplitude, more precise
-phase calibration) but not a parameter
-of whether the mechanism operates.
+phase calibration, longer dissolution
+wait times between tones) but not a
+parameter of whether the mechanism
+operates.
 ```
 
 ---
@@ -494,6 +584,20 @@ WHAT IS NOVEL IN THIS FRAMEWORK:
      phase) + FR boost.
      This specific combination is not
      in any prior literature.
+
+  7. Attractor temporal dynamics
+     (beanie timing amendment):
+     Formation lag and dissolution lag
+     are individually measured before
+     calibration begins and used to
+     personalise tone duration and
+     inter-trial timing. Dissolution
+     time after each tone is treated
+     as a second objective feedback
+     channel throughout all phases.
+     This correction to calibration
+     timing is not in any prior
+     literature.
 ```
 
 ---
@@ -534,8 +638,14 @@ FALSIFICATION CRITERION:
   (central perpetuation has fully
   replaced peripheral source) or
   the calibration has a parameter
-  error. The RI sweep result
-  distinguishes these.
+  error. The dissolution time data
+  from Phase 0B distinguishes these:
+  absent dissolution response in
+  beanie pre-calibration suggests
+  mechanism failure; present
+  dissolution response with absent
+  B/W/N clarity suggests parameter
+  error.
 ```
 
 ### 4.2 Secondary predictions
@@ -604,12 +714,31 @@ PREDICTION P-OC-006:
   can still be driven. These are
   adjacent but not equal in the
   majority of damage cases.
+
+PREDICTION P-OC-007:
+  Beanie pre-calibration (Phase 0B)
+  will show shorter formation lag
+  and longer dissolution lag for the
+  more severely damaged ear (the ear
+  that popped first).
+
+  BASIS: Deeper attractor wells fill
+  faster and drain slower. The first
+  ear to receive acoustic trauma is
+  predicted to have more severe
+  damage and therefore a deeper
+  false attractor well at the
+  eigenfunction position.
+  Asymmetric formation and dissolution
+  dynamics between ears is expected
+  and predicted by the attractor
+  depth model.
 ```
 
 ### 4.3 What success looks like
 
 ```
-MINIMUM (floor ��� first night):
+MINIMUM (floor — first night):
   The individual reports that tinnitus
   is less intrusive while the correction
   is playing before sleep onset.
@@ -671,11 +800,24 @@ PARAMETER FAILURE (addressable):
   → Re-calibrate. Consider adaptive
     tracking (Level 2 development).
 
+  B/W/N feedback consistently
+  inconsistent despite long tones
+  and confirmed baseline between
+  trials.
+  → Check Phase 0B dissolution
+    response. If dissolution response
+    is present, feedback quality is
+    the issue — coach more carefully
+    on what "better" means. If
+    dissolution response is absent,
+    see mechanism failure below.
+
 MECHANISM FAILURE (informative):
   Full protocol correctly administered.
   No response at any phase or amplitude.
-  RI sweep confirms no residual
-  inhibition.
+  Phase 0B shows no formation or
+  dissolution response to beanie
+  occlusion.
   → Cochlear mechanical component
     is absent or minimal.
   → Central perpetuation has fully
@@ -710,21 +852,60 @@ Full protocol documented in:
   tinnitus_trial_protocol.md
     (Document 68)
 
-Summary:
+Summary (Version 1.1 — beanie
+timing amendment applied):
 
-  PHASE 0 — Volume calibration
+  PHASE 0A — Volume calibration
     Confirm tones audible and comfortable.
     Adjust AMPLITUDE until reference
     tone clearly perceptible.
     For severe tinnitus cases:
     start at AMPLITUDE = 0.15.
 
+  PHASE 0B — Beanie pre-calibration
+    [ADDED IN VERSION 1.1]
+    Measure formation lag and dissolution
+    lag of individual false attractor
+    using manual ear occlusion.
+    Formation lag: time from occlusion
+      onset to first perceptible change.
+      Sets minimum tone duration.
+      Tone duration = max(formation_lag
+      × 2.5, 15 seconds).
+    Dissolution lag: time from occlusion
+      removal to return to baseline.
+      Sets inter-trial timing expectation.
+      Inter-trial interval is
+      person-confirmed (not fixed timer)
+      throughout all subsequent phases.
+    Output: formation_lag_s,
+      dissolution_lag_s, tone_duration_s
+
+  TIMING PROTOCOL — all phases
+    [CORRECTED IN VERSION 1.1]
+    Every tone in every phase follows:
+      1. Tone plays (personalised duration)
+      2. 5-second post-tone settling window
+         (effect may still be building —
+          feedback not requested yet)
+      3. B/W/N feedback
+      4. Person confirms baseline restored
+         before next tone (ENTER)
+      5. Dissolution time logged —
+         second objective feedback channel
+    This replaces the original fixed
+    timing and immediate post-tone
+    feedback request.
+
   PHASE 1 — Rainbow sweep
     12 tones at Greenwood-spaced
     cochlear eigenfunction positions.
     One ear at a time.
     Feedback: B / W / N per tone.
-    Builds eigenfunction landscape map.
+    Dissolution time logged per tone.
+    Builds eigenfunction landscape map
+    with both subjective and objective
+    channels.
     Identifies gradient starting region.
 
   PHASE 2 — Gradient descent
@@ -732,6 +913,10 @@ Summary:
     FA from rainbow sweep starting point.
     Step size halves on direction change.
     Convergence: 3× B with step < 8 Hz.
+    Dissolution time cross-validates
+    convergence: consistently long
+    dissolution at B = structural
+    confirmation of FA position.
     Manual lock available at any point.
     Output: FA (false attractor Hz)
 
@@ -739,15 +924,16 @@ Summary:
     8-point coarse sweep (0–315° in 45°)
     Fine sweep ±40° around best phase.
     Feedback: B / W / N per angle.
+    Dissolution time used as tiebreaker
+    when B/W/N scores are equal.
     Output: cancellation phase (°)
 
   PHASE 4 — FR sweep
     Anti-signal at FA active throughout.
     Test frequencies FA ± 400 Hz in
     13 steps.
-    Identifies frequency at which
-    damaged zone retains mechanical
-    response capacity.
+    Dissolution time cross-validates
+    FR identification.
     Output: FR (residual resonant Hz)
 
   PHASE 5 — Orthogonal re-sweep
@@ -755,6 +941,7 @@ Summary:
     anti-signal active continuously.
     Checks for residual gradient in
     other eigenfunction dimensions.
+    Dissolution times logged throughout.
     Output: converged (T/F)
     If not converged: second gradient
     descent from new B cluster.
@@ -809,16 +996,34 @@ Protocol adjustments for this case:
     mandatory (broadband trauma may
     produce multi-component tinnitus)
 
+Expected Phase 0B result for this case:
+  Acute severe trauma predicts:
+    Formation lag SHORT (deep well
+      fills fast)
+    Dissolution lag LONG (deep well
+      drains slow)
+    Asymmetric between ears (first ear
+      to pop expected deeper well)
+  This is now a pre-stated prediction
+  (P-OC-007 above).
+  Record actual values and compare.
+
 Session record document:
   OC-TINNITUS-002_FIRST_EXTERNAL_
     SESSION.md
   (to be created after session)
   Contents:
     Pre-session answers
+    Phase 0B beanie calibration values
+      (formation lag, dissolution lag,
+       tone duration — per ear)
     Per-ear calibration values
-    Gradient descent history
-    Phase sweep responses
-    FR sweep responses
+    Gradient descent history with
+      dissolution times
+    Phase sweep responses with
+      dissolution times
+    FR sweep responses with
+      dissolution times
     Orthogonal sweep result
     First-night report
     Administrator observations
@@ -883,8 +1088,10 @@ at the following position:
 ```
 THIS PROTOCOL CLAIMS:
   For tonal tinnitus of cochlear origin
-  with detectable residual inhibition:
-  acoustic correction while applied.
+  with detectable residual inhibition
+  (confirmed by Phase 0B dissolution
+  response): acoustic correction while
+  applied.
   Structural. Not therapeutic.
   Like glasses.
 
@@ -896,7 +1103,8 @@ THIS PROTOCOL DOES NOT CLAIM:
   Efficacy for noise-like/broadband
     tinnitus without tonal component.
   Efficacy where cochlear mechanical
-    component is fully absent.
+    component is fully absent (no
+    Phase 0B dissolution response).
 
 THIS PROTOCOL CANNOT BE JUDGED BY:
   Whether tinnitus returns when
@@ -960,9 +1168,85 @@ NEXT DOCUMENT:
 ## VERSION
 
 ```
-version: 1.0
-date: 2026-03-23
+version: 1.1
+date_original: 2026-03-23
+date_amended:  2026-03-23
 status: LOCKED — preregistration
+  Version 1.1 amendment applied same
+  day as original, prior to first
+  external session.
+
+WHAT CHANGED IN VERSION 1.1:
+
+  ADDED:
+    Phase 0B — Beanie Pre-Calibration.
+    Formation lag and dissolution lag
+    measurement by manual occlusion.
+    Personalised tone duration from
+    formation lag.
+    Person-confirmed inter-trial
+    interval (not fixed timer).
+    Dissolution time as second feedback
+    channel throughout all phases.
+    Prediction P-OC-007 (asymmetric
+    attractor depth between ears).
+    Expected Phase 0B result for first
+    external session subject.
+    Phase 0B values added to session
+    record document specification.
+    Phase 0B dissolution response added
+    as mechanism failure diagnostic.
+
+  CORRECTED:
+    Timing protocol for all phases:
+    post-tone settling window before
+    feedback, person-confirmed baseline
+    between trials.
+    Session duration estimate updated
+    to 45–60 minutes.
+    Falsification criterion for P-OC-001
+    updated to reference Phase 0B
+    dissolution response as diagnostic.
+    Duration as calibration parameter
+    updated to note longer dissolution
+    wait times for severe cases.
+
+  UNCHANGED:
+    All predictions except P-OC-007
+    (which is new, not modified).
+    Core claims.
+    Glasses principle.
+    Success criteria.
+    Failure criteria (parameter and
+    mechanism — mechanism failure
+    criterion updated only to add
+    Phase 0B as diagnostic, not to
+    change what constitutes failure).
+    Three-layer remedy specification.
+    WAV generation.
+    Framework position.
+    Honest limits.
+
+BASIS FOR AMENDMENT:
+  Beanie observation extended
+  (Eric Robert Lawson, 2026-03-23):
+  The false attractor does not form
+  or dissolve instantaneously.
+  Placing a beanie does not produce
+  tinnitus immediately.
+  Removing it does not stop tinnitus
+  immediately.
+  Both have temporal lag.
+  This lag must be measured individually
+  before calibration begins.
+  Feedback requested at tone offset
+  (original protocol) is feedback at
+  maximum perceptual ambiguity.
+  This amendment corrects that.
+  The amendment is methodological.
+  It does not change what is being
+  measured — only when and how
+  the measurement is taken.
 
 This document records the state of
 the theoretical framework, predictions,
@@ -970,7 +1254,6 @@ protocol, and success criteria as of
 2026-03-23, prior to first external
 administration.
 
-It is not modified after the session.
 The session results are recorded
 separately in OC-TINNITUS-002.
 
