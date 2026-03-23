@@ -79,6 +79,22 @@ PROTOCOL:
              calibrated parameters.
              Per-ear. Independent L/R channels.
 
+SEGMENTED SESSION SUPPORT:
+  Sessions can be interrupted and resumed at any
+  phase boundary. The script detects which phases
+  are complete per ear and resumes from the correct
+  point. No completed work is repeated.
+
+  At the end of each phase, the script offers a
+  pause option. If taken, all data is saved and
+  the script exits cleanly. On next run, resume
+  is offered and the session continues from where
+  it stopped.
+
+  Ctrl+C at any point saves current state before
+  exiting. Partial phases are not marked complete
+  — they will be re-run on resume from their start.
+
 SELF-ADMINISTRABLE:
   No second person required.
   You are the measurement instrument.
@@ -122,27 +138,23 @@ import time
 import datetime
 import json
 import os
+import sys
 
-# ═══════════════════════════════════════════════════════════
+# ════════════��══════════════════════════════════════════════
 # CONFIGURATION
 # ═══════════════════════════════════════════════════════════
 
-SAMPLE_RATE    = 44100
-LOG_FILE       = "tinnitus_calibration_log.json"
-OUTPUT_WAV_L   = "remedy_left.wav"
-OUTPUT_WAV_R   = "remedy_right.wav"
-OUTPUT_WAV_B   = "remedy_binaural.wav"
+SAMPLE_RATE           = 44100
+LOG_FILE              = "tinnitus_calibration_log.json"
+OUTPUT_WAV_L          = "remedy_left.wav"
+OUTPUT_WAV_R          = "remedy_right.wav"
+OUTPUT_WAV_B          = "remedy_binaural.wav"
 
-# These are DEFAULTS — both are overridden by
-# Phase 0B beanie pre-calibration for each ear.
-# Minimum tone duration (seconds).
-# Phase 0B sets this per-ear from formation lag.
-DEFAULT_TONE_DURATION   = 15
+DEFAULT_TONE_DURATION = 15
 
 # Post-tone settling window before feedback (seconds).
-# Effect may continue building after tone stops.
 # Fixed at 5s — not personalised, not skippable.
-POST_TONE_SETTLE_S      = 5
+POST_TONE_SETTLE_S    = 5
 
 # Starting amplitude — adjusted by Phase 0A.
 AMPLITUDE = 0.10
@@ -150,40 +162,45 @@ AMPLITUDE = 0.10
 # Fade in/out duration (ms) — prevents clicks.
 FADE_MS = 80
 
+# Phase identifiers — used as completion flag keys.
+PHASE_0B  = "phase_0b"
+PHASE_1   = "phase_1"
+PHASE_2   = "phase_2"
+PHASE_3   = "phase_3"
+PHASE_4   = "phase_4"
+PHASE_5   = "phase_5"
+PHASE_6   = "phase_6"
+
+PHASE_ORDER = [PHASE_0B, PHASE_1, PHASE_2,
+               PHASE_3,  PHASE_4, PHASE_5, PHASE_6]
+
+PHASE_LABELS = {
+    PHASE_0B: "Phase 0B — Beanie Pre-Calibration",
+    PHASE_1:  "Phase 1  — Rainbow Sweep",
+    PHASE_2:  "Phase 2  — Gradient Descent",
+    PHASE_3:  "Phase 3  — Phase Calibration",
+    PHASE_4:  "Phase 4  — FR Sweep",
+    PHASE_5:  "Phase 5  — Orthogonal Re-Sweep",
+    PHASE_6:  "Phase 6  — WAV Generation",
+}
+
 # ═══════════════════════════════════════════════════════════
 # GREENWOOD FUNCTION — COCHLEAR EIGENFUNCTION POSITIONS
 # ═══════════════════════════════════════════════════════════
 
 def greenwood_freq(x_norm, A=165.4, a=2.1, k=0.88):
-    """
-    Frequency at normalised cochlear position x_norm.
-    x_norm: 0.0 = apex (low freq), 1.0 = base (high freq)
-    Human parameters: A=165.4, a=2.1, k=0.88
-    """
     return A * (10 ** (a * x_norm) - k)
 
 def greenwood_pos(freq, A=165.4, a=2.1, k=0.88):
-    """Normalised cochlear position for a given frequency."""
     return np.log10((freq / A) + k) / a
 
 def eigenfunction_rainbow(n_tones=12,
                            pos_lo=0.30,
                            pos_hi=0.95):
-    """
-    Generate n_tones frequencies equally spaced in
-    cochlear position (geometric invariance on
-    basilar membrane).
-
-    pos_lo=0.30 → ~500 Hz  (avoid very low)
-    pos_hi=0.95 → ~14 kHz  (avoid extreme base)
-
-    Returns list of (cochlear_pos, frequency_hz) tuples.
-    """
     positions = np.linspace(pos_lo, pos_hi, n_tones)
     return [(float(p), float(greenwood_freq(p)))
             for p in positions]
 
-# Pre-compute the standard rainbow
 RAINBOW = eigenfunction_rainbow(n_tones=12)
 
 # ═══════════════════════════════════════════════════════════
@@ -196,15 +213,11 @@ def make_tone(freq_hz, duration_s,
               harmonic_2=0.0,
               harmonic_3=0.0,
               sr=SAMPLE_RATE):
-    """
-    Generate a sine tone with optional harmonics
-    and smooth fade in/out.
-    """
     if amplitude is None:
         amplitude = AMPLITUDE
-    n   = int(sr * duration_s)
-    t   = np.linspace(0, duration_s, n, endpoint=False)
-    ph  = np.deg2rad(phase_deg)
+    n  = int(sr * duration_s)
+    t  = np.linspace(0, duration_s, n, endpoint=False)
+    ph = np.deg2rad(phase_deg)
 
     sig = np.sin(2 * np.pi * freq_hz * t + ph)
     if harmonic_2 > 0:
@@ -221,12 +234,9 @@ def make_tone(freq_hz, duration_s,
     sig[-fade_n:] *= np.linspace(1, 0, fade_n)
     return sig.astype(np.float32)
 
+
 def make_pink_noise(duration_s, amplitude=0.03,
                     sr=SAMPLE_RATE):
-    """
-    Approximate pink noise (1/f) by summing
-    octave-spaced sine waves with 1/f amplitudes.
-    """
     n   = int(sr * duration_s)
     t   = np.linspace(0, duration_s, n, endpoint=False)
     octave_freqs = [125, 250, 500, 1000,
@@ -238,6 +248,7 @@ def make_pink_noise(duration_s, amplitude=0.03,
         sig += (a * np.sin(2 * np.pi * f * t + ph)
                 ).astype(np.float32)
     return sig
+
 
 def stereo_left(mono):
     z = np.zeros_like(mono)
@@ -265,11 +276,25 @@ def play_both(sig_l, sig_r):
     sd.wait()
 
 # ═══════════════════════════════════════════════════════════
-# LOGGING
+# SESSION — DATA MODEL WITH PHASE FLAGS
 # ═══════════════════════════════════════════════════════════
 
 class Session:
-    """Holds all calibration data for one session."""
+    """
+    Holds all calibration data for one session.
+
+    Each ear dict contains:
+      — Beanie calibration values
+      — Rainbow and dissolution data
+      — Calibrated parameters (FA, FR, phase)
+      — Phase completion flags
+
+    Phase completion flags are set as the LAST
+    act of each phase function, after all data
+    is written and saved. This ensures that an
+    interrupted phase is never marked complete
+    and will be re-run on resume.
+    """
 
     def __init__(self):
         self.timestamp = datetime.datetime.now(
@@ -286,7 +311,7 @@ class Session:
             "tone_duration_s":    DEFAULT_TONE_DURATION,
             # Rainbow and descent
             "rainbow":            {},
-            "dissolution_map":    {},  # freq → dissolution_s
+            "dissolution_map":    {},
             "fa_hz":              None,
             "fr_hz":              None,
             "phase_deg":          180.0,
@@ -295,10 +320,52 @@ class Session:
             "suppression":        None,
             "converged":          False,
             "orthogonal_clear":   False,
+            # Phase completion flags
+            # Set only after phase data is fully saved.
+            # Never set during a phase — only at its end.
+            "phases_complete":    [],
         }
 
     def ear(self, side):
         return self.left if side == "L" else self.right
+
+    def phase_complete(self, side, phase_id):
+        """Return True if the given phase is complete."""
+        return phase_id in self.ear(side)["phases_complete"]
+
+    def mark_phase_complete(self, side, phase_id):
+        """
+        Mark a phase complete and save immediately.
+        Called as the last act of each phase function.
+        """
+        ear = self.ear(side)
+        if phase_id not in ear["phases_complete"]:
+            ear["phases_complete"].append(phase_id)
+        self.save()
+
+    def next_incomplete_phase(self, side):
+        """
+        Return the first phase not yet complete,
+        or None if all phases are done.
+        """
+        for phase_id in PHASE_ORDER:
+            if not self.phase_complete(side, phase_id):
+                return phase_id
+        return None
+
+    def status_summary(self, side):
+        """
+        Return a human-readable status string
+        showing which phases are done and which
+        remain for the given ear.
+        """
+        lines = [f"  {side} EAR STATUS:"]
+        for phase_id in PHASE_ORDER:
+            done  = self.phase_complete(side, phase_id)
+            label = PHASE_LABELS[phase_id]
+            mark  = "✓" if done else "·"
+            lines.append(f"    {mark} {label}")
+        return "\n".join(lines)
 
     def save(self):
         with open(LOG_FILE, "w") as f:
@@ -307,20 +374,64 @@ class Session:
 
     @classmethod
     def load(cls):
-        if os.path.exists(LOG_FILE):
+        if not os.path.exists(LOG_FILE):
+            return None
+        try:
             with open(LOG_FILE) as f:
                 data = json.load(f)
             s = cls()
             s.__dict__.update(data)
+            # Ensure phases_complete list exists in
+            # both ear dicts — handles sessions saved
+            # before this field was added.
+            for ear_data in [s.left, s.right]:
+                if "phases_complete" not in ear_data:
+                    ear_data["phases_complete"] = []
+                    # Infer completed phases from data
+                    # so old sessions resume correctly.
+                    _infer_completed_phases(ear_data)
             return s
-        return None
+        except (json.JSONDecodeError, KeyError):
+            return None
 
+
+def _infer_completed_phases(ear_data):
+    """
+    For sessions saved before phase flags existed,
+    infer which phases were complete from the
+    presence of their output data.
+    Called once during load for old sessions only.
+    """
+    if ear_data.get("formation_lag_s") is not None:
+        if PHASE_0B not in ear_data["phases_complete"]:
+            ear_data["phases_complete"].append(PHASE_0B)
+    if ear_data.get("rainbow"):
+        if PHASE_1 not in ear_data["phases_complete"]:
+            ear_data["phases_complete"].append(PHASE_1)
+    if ear_data.get("fa_hz") is not None:
+        if PHASE_2 not in ear_data["phases_complete"]:
+            ear_data["phases_complete"].append(PHASE_2)
+    # Phase 3 output is phase_deg — but default is 180.0
+    # so presence alone is ambiguous. Only infer if
+    # Phase 2 is done and FR is also set (meaning
+    # Phase 3 must have run between them).
+    if (ear_data.get("fa_hz") is not None and
+            ear_data.get("fr_hz") is not None):
+        if PHASE_3 not in ear_data["phases_complete"]:
+            ear_data["phases_complete"].append(PHASE_3)
+    if ear_data.get("fr_hz") is not None:
+        if PHASE_4 not in ear_data["phases_complete"]:
+            ear_data["phases_complete"].append(PHASE_4)
+    if ear_data.get("orthogonal_clear") is not False:
+        if PHASE_5 not in ear_data["phases_complete"]:
+            ear_data["phases_complete"].append(PHASE_5)
+
+# ═══════════════════════════════════════════════════════════
+# INPUT HELPERS
+# ═══════════════════════════════════════════════════════════
 
 def ask(prompt, valid=None):
-    """
-    Prompt for input, validate against allowed set.
-    Case-insensitive.
-    """
+    """Prompt for input, validate against allowed set."""
     while True:
         raw = input(f"  {prompt} ").strip().upper()
         if valid is None or raw in valid:
@@ -328,11 +439,84 @@ def ask(prompt, valid=None):
         print(f"  → Please enter one of: "
               f"{', '.join(sorted(valid))}")
 
+
+def offer_break(session, side, after_phase):
+    """
+    After completing a phase, offer the person
+    the option to pause and save before continuing.
+
+    If they take the break:
+      — Print resume instructions
+      — Exit the script cleanly
+
+    This is the designed session boundary.
+    The next run will detect the saved session
+    and resume from the next incomplete phase.
+
+    Returns True if continuing, False if pausing.
+    """
+    r = ask(
+        f"Phase complete. Take a break? "
+        f"(Y to save and exit / N to continue):",
+        valid={"Y", "N"}
+    )
+    if r == "Y":
+        session.save()
+        ear = session.ear(side)
+        next_phase = session.next_incomplete_phase(side)
+        print(f"""
+  ── SESSION PAUSED ─────────────────────────────
+  All data saved to: {LOG_FILE}
+
+  Completed so far ({side} ear):
+{session.status_summary(side)}
+
+  Next phase when you return:
+    {PHASE_LABELS.get(next_phase, "All phases complete")}
+
+  TO RESUME:
+    Run the script again.
+    When asked "Resume previous session?",
+    answer Y.
+    The script will continue from where
+    you stopped — no completed work repeated.
+  ───────────────────────────────────────────────
+        """)
+        sys.exit(0)
+    return True
+
+
+# ═══════════════════════════════════════════════════════════
+# CTRL+C HANDLER — SAVE ON INTERRUPT
+# ═══════════════════════════════════════════════════════════
+
+_current_session = None
+
+def _save_on_interrupt(session):
+    """Register session for save-on-interrupt."""
+    global _current_session
+    _current_session = session
+
+
+import signal as _signal
+
+def _signal_handler(sig, frame):
+    print("\n\n  [Interrupted — saving session ...]")
+    if _current_session is not None:
+        try:
+            _current_session.save()
+            print(f"  Saved to {LOG_FILE}")
+            print("  Run the script again and answer Y")
+            print("  to resume from where you stopped.")
+        except Exception:
+            pass
+    sys.exit(0)
+
+_signal.signal(_signal.SIGINT, _signal_handler)
+
 # ═══════════════════════════════════════════════════════════
 # CORE TRIAL PRIMITIVE
-# Encapsulates the corrected timing protocol for
-# every tone played in every phase.
-# ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════��═══════════════════
 
 def run_trial(freq_hz, tone_duration_s, play_fn,
               amplitude=None,
@@ -346,28 +530,9 @@ def run_trial(freq_hz, tone_duration_s, play_fn,
       1. Optional baseline bother check.
       2. Play tone (+ optional extra_signal mixed in).
       3. Post-tone settling window (POST_TONE_SETTLE_S).
-         Effect may continue building after tone stops.
-         Feedback is NOT requested during this window.
       4. Request B/W/N feedback at settled perception.
-      5. Start dissolution timer.
-      6. Wait for person to confirm baseline restored.
-      7. Log and return result.
-
-    Parameters:
-      freq_hz        : frequency of probe tone
-      tone_duration_s: how long to play (from beanie cal)
-      play_fn        : play_left or play_right
-      amplitude      : override global AMPLITUDE
-      phase_deg      : phase of probe tone
-      extra_signal   : numpy array mixed with probe
-                       (used in FR sweep and ortho sweep)
-      label          : display label for this trial
-      ask_baseline   : if True, ask bother score before
-
-    Returns:
-      (response, dissolution_s)
-      response      : "B", "W", or "N"
-      dissolution_s : seconds until baseline restored
+      5. Dissolution timer until baseline confirmed.
+      6. Return (response, dissolution_s).
     """
     if amplitude is None:
         amplitude = AMPLITUDE
@@ -378,40 +543,33 @@ def run_trial(freq_hz, tone_duration_s, play_fn,
             "  Tinnitus bother RIGHT NOW (0–10): "
         ).strip())
 
-    # Build probe tone
     probe = make_tone(freq_hz, tone_duration_s,
                       amplitude=amplitude,
                       phase_deg=phase_deg)
 
-    # Mix extra signal if provided
     if extra_signal is not None:
-        n = len(probe)
-        bg = extra_signal[:n] if len(
-            extra_signal) >= n else np.pad(
-            extra_signal, (0, n - len(extra_signal)))
-        combined = np.clip(probe + bg, -1.0, 1.0
-                           ).astype(np.float32)
+        n  = len(probe)
+        bg = (extra_signal[:n]
+              if len(extra_signal) >= n
+              else np.pad(extra_signal,
+                          (0, n - len(extra_signal))))
+        combined = np.clip(
+            probe + bg, -1.0, 1.0).astype(np.float32)
     else:
         combined = probe
 
-    # Play tone
     print(f"  Playing{' ' + label if label else ''} "
-          f"{freq_hz:.0f} Hz  "
-          f"({tone_duration_s}s) ...")
+          f"{freq_hz:.0f} Hz  ({tone_duration_s}s) ...")
     play_fn(combined)
 
-    # Post-tone settling window — do not ask yet.
-    # The effect may still be building.
     print(f"  [Settling {POST_TONE_SETTLE_S}s "
           f"— notice what is happening ...]")
     time.sleep(POST_TONE_SETTLE_S)
 
-    # Request feedback at settled perception
     response = ask("B / W / N  "
                    "(better / worse / no difference):",
                    valid={"B", "W", "N"})
 
-    # Dissolution timer — starts at feedback moment
     print("  Press ENTER the moment tinnitus "
           "returns to your normal baseline ...")
     t0 = time.time()
@@ -427,14 +585,11 @@ def run_trial(freq_hz, tone_duration_s, play_fn,
 
 # ═══════════════════════════════════════════════════════════
 # PHASE 0A — VOLUME CALIBRATION
+# (Not per-ear, not tracked by phase flags —
+#  runs at session start regardless of resume state)
 # ═══════════════════════════════════════════════════════════
 
 def calibrate_volume():
-    """
-    Confirm tones are audible and comfortable.
-    Adjust AMPLITUDE until reference tone is
-    clearly perceptible and never uncomfortable.
-    """
     global AMPLITUDE
 
     print("""
@@ -446,7 +601,7 @@ def calibrate_volume():
 
   If all rainbow tones produce N responses later,
   return here and increase volume.
-  ─────────────────���───────────────────────────────
+  ─────────────────────────────────────────────────
     """)
 
     ref_freq = 6000.0
@@ -480,68 +635,29 @@ def calibrate_volume():
 
 def beanie_calibration(session, side):
     """
-    Measure the formation lag and dissolution lag
-    of the individual's false attractor using manual
-    ear occlusion (hand or beanie pressed over ear).
+    Measure formation lag and dissolution lag.
+    Sets personalised tone duration for all phases.
 
-    WHAT IS BEING MEASURED:
-
-    Formation lag:
-      Time from occlusion onset to first perceptible
-      change in tinnitus (any change — louder, different
-      quality, new tone). The false attractor is forming
-      under the occluded resonant cavity.
-      This is the minimum tone duration needed to allow
-      the cancellation effect to stabilise before
-      feedback is requested.
-
-    Dissolution lag:
-      Time from occlusion removal to return to normal
-      baseline tinnitus. The false attractor is draining.
-      This is the minimum inter-trial interval — the
-      time the person needs between tones to ensure
-      each trial is measured on a clean baseline.
-
-    RELATIONSHIP TO ATTRACTOR WELL DEPTH:
-      Deep wells (severe tinnitus, acute trauma):
-        formation lag SHORT — deep wells fill fast
-        dissolution lag LONG — deep wells drain slow
-      Shallow wells (mild tinnitus):
-        formation lag LONGER — shallow wells fill slow
-        dissolution lag SHORT — shallow wells drain fast
-
-      Fixed timing assumes the opposite relationship
-      and gets severe cases exactly wrong.
-      This measurement corrects that.
-
-    TONE DURATION RULE:
-      tone_duration_s = max(formation_lag_s * 2.5,
-                            DEFAULT_TONE_DURATION)
-      The factor of 2.5 ensures the effect has fully
-      stabilised before the post-tone settling window.
-
+    Marks PHASE_0B complete as its final act.
     Returns: (formation_lag_s, dissolution_lag_s,
               tone_duration_s)
     """
-    ear  = session.ear(side)
-    play = play_left if side == "L" else play_right
+    ear = session.ear(side)
 
     print(f"""
   ┌─────────────────────────────────────────────┐
   │  PHASE 0B: BEANIE PRE-CALIBRATION           │
   │  {side} EAR                                       │
   │                                             │
-  │  This measures how quickly your false       │
-  │  attractor forms and dissolves.             │
+  │  Measures how quickly your false attractor  │
+  │  forms and dissolves. Personalises all      │
+  │  subsequent tone durations and inter-trial  │
+  │  timing for your attractor depth.           │
   │                                             │
-  │  These two timings personalise the entire   │
-  │  sweep for your specific attractor depth.   │
-  │                                             │
-  │  You will use your hand or a beanie to      │
-  │  partially occlude the ear canal.           │
-  │  Fold your palm gently over the ear —       │
-  │  enough to muffle outside sound but not     │
-  │  enough to cause discomfort or pressure.    │
+  │  Use your hand or a beanie to gently cover  │
+  │  the ear canal. Fold palm over ear —        │
+  │  enough to muffle sound, not to cause       │
+  │  pressure or discomfort.                    │
   │                                             │
   │  Do not press hard. Gentle occlusion only.  │
   └─────────────────────────────────────────────┘
@@ -550,33 +666,22 @@ def beanie_calibration(session, side):
     # ── FORMATION LAG ──────────────────────────────
     print("  ── FORMATION LAG ──────────────────────────")
     print("""
-  Sit quietly. Notice your tinnitus at its
-  current baseline level.
+  Sit quietly. Notice tinnitus at baseline.
 
-  When you press ENTER below, start timing.
-  Gently press your palm over the affected ear
-  to partially occlude it.
+  Press ENTER, then immediately occlude your ear.
+  Press ENTER again the moment you notice ANY
+  change (louder, different, new tone appearing).
 
-  The moment you notice ANY change in the
-  tinnitus — louder, different, a new tone
-  appearing — press ENTER again immediately.
-
-  If nothing changes after 30 seconds,
-  press ENTER anyway and we will note that.
+  If nothing changes after 30 seconds, press
+  ENTER anyway.
     """)
     input("  Press ENTER, then occlude your ear ...")
     t_form_start = time.time()
-    input("  Press ENTER the moment you notice "
-          "ANY change in the tinnitus ...")
+    input("  Press ENTER at first detectable change ...")
     formation_lag_s = time.time() - t_form_start
 
     if formation_lag_s > 28:
-        print(f"  Formation lag: >28s (no clear change)")
-        print("  This may indicate:")
-        print("    — Noise-like tinnitus without a")
-        print("      single dominant frequency")
-        print("    — Very shallow attractor well")
-        print("    — Occlusion insufficient")
+        print("  Formation lag: >28s (no clear change)")
         print("  Using default tone duration.")
         formation_lag_s = DEFAULT_TONE_DURATION / 2.5
     else:
@@ -585,14 +690,12 @@ def beanie_calibration(session, side):
     # ── DISSOLUTION LAG ────────────────────────────
     print("\n  ── DISSOLUTION LAG ────────────────────────")
     print("""
-  Keep your palm over the ear for 15 more
-  seconds to allow the false attractor to
-  fully establish.
+  Keep occlusion for 15 more seconds to fully
+  establish the false attractor.
 
   Then remove your hand when prompted.
-  Press ENTER the moment the tinnitus returns
-  to what it was BEFORE you covered the ear
-  — your normal baseline.
+  Press ENTER the moment tinnitus is back to
+  exactly what it was before you covered the ear.
     """)
     print("  Holding occlusion for 15 seconds ...")
     time.sleep(15)
@@ -610,34 +713,33 @@ def beanie_calibration(session, side):
         formation_lag_s * 2.5,
         DEFAULT_TONE_DURATION
     )
-    # Cap at 45s — practical limit for session length
     tone_duration_s = min(tone_duration_s, 45.0)
-    # Round to nearest second
     tone_duration_s = round(tone_duration_s)
+
+    depth_label = (
+        "DEEP (severe — fills fast, drains slow)"
+        if dissolution_lag_s > formation_lag_s * 1.5
+        else "MODERATE"
+        if dissolution_lag_s > 5
+        else "SHALLOW (mild — fills slow, drains fast)"
+    )
 
     print(f"""
   ── BEANIE CALIBRATION RESULT ───────────────────
   Formation lag      : {formation_lag_s:.1f}s
   Dissolution lag    : {dissolution_lag_s:.1f}s
   Tone duration set  : {tone_duration_s}s
-  Inter-trial timing : person-confirmed
-                       (press ENTER when baseline
-                        restored between every tone)
-
-  ATTRACTOR DEPTH ESTIMATE:
-    {"DEEP (severe — fills fast, drains slow)" 
-      if dissolution_lag_s > formation_lag_s * 1.5 
-      else "MODERATE" 
-      if dissolution_lag_s > 5 
-      else "SHALLOW (mild — fills slow, drains fast)"}
-  ───────────────────────────��─────────────────────
+  Attractor depth    : {depth_label}
+  ─────────────────────────────────────────────────
     """)
 
-    ear["formation_lag_s"]   = formation_lag_s
+    ear["formation_lag_s"]  = formation_lag_s
     ear["dissolution_lag_s"] = dissolution_lag_s
-    ear["tone_duration_s"]   = tone_duration_s
-    ear["amplitude"]         = AMPLITUDE
-    session.save()
+    ear["tone_duration_s"]  = tone_duration_s
+    ear["amplitude"]        = AMPLITUDE
+
+    # Mark complete — must be last write before return.
+    session.mark_phase_complete(side, PHASE_0B)
 
     return formation_lag_s, dissolution_lag_s, \
            tone_duration_s
@@ -649,39 +751,27 @@ def beanie_calibration(session, side):
 def rainbow_sweep(session, side):
     """
     Play each eigenfunction position tone.
-    Tone duration from beanie calibration.
-    Post-tone settling window before feedback.
-    Inter-trial: person-confirmed return to baseline.
-    Dissolution time logged per tone as second channel.
-
-    Returns dict: freq_hz → response
+    Marks PHASE_1 complete as its final act.
+    Returns: (responses dict, dissolution_map dict)
     """
-    ear            = session.ear(side)
-    play           = play_left if side == "L" else play_right
-    tone_duration  = ear["tone_duration_s"]
+    ear           = session.ear(side)
+    play          = play_left if side == "L" else play_right
+    tone_duration = ear["tone_duration_s"]
     dissolution_map = {}
 
     print(f"""
   ┌─────────────────────────────────────────────┐
   │  PHASE 1: RAINBOW SWEEP — {side} EAR               │
   │                                             │
-  │  {len(RAINBOW)} tones at cochlear eigenfunction       │
-  │  positions. Equally spaced on basilar       │
-  │  membrane geometry (Greenwood function).    │
+  │  {len(RAINBOW)} tones at Greenwood-spaced positions. │
+  │  Each tone: {tone_duration}s + {POST_TONE_SETTLE_S}s settling.          │
   │                                             │
-  │  Each tone: {tone_duration}s                          │
-  │  After each tone: {POST_TONE_SETTLE_S}s settling window.    │
-  │  Then: B / W / N feedback.                 │
-  │  Then: confirm baseline before next tone.  │
-  │                                             │
-  │  B — tinnitus BETTER (any reduction,        │
-  │      even subtle — trust it)               │
-  │  W — tinnitus WORSE (louder, stronger)      │
+  │  B — tinnitus BETTER (any reduction)        │
+  │  W — tinnitus WORSE                         │
   │  N — NO DIFFERENCE                          │
   │                                             │
-  │  The dissolution time between tones is      │
-  │  also logged — it maps attractor depth      │
-  │  across the eigenfunction space.            │
+  │  Confirm baseline before each next tone.    │
+  │  Dissolution time is also logged.           │
   └─────────────────────────────────────────────┘
     """)
     input("  Press ENTER when ready ...")
@@ -691,54 +781,45 @@ def rainbow_sweep(session, side):
         hz_label = f"{freq:.0f} Hz"
         mm_label = f"{pos * 35:.1f} mm"
         print(f"\n  [{i+1:2d}/{len(RAINBOW)}]  "
-              f"{hz_label:>9}  "
-              f"cochlear {mm_label}")
+              f"{hz_label:>9}  cochlear {mm_label}")
         input("  Press ENTER to play ...")
 
         response, dissolution_s = run_trial(
-            freq_hz        = freq,
-            tone_duration_s= tone_duration,
-            play_fn        = play,
-            label          = f"[{i+1}/{len(RAINBOW)}]"
+            freq_hz         = freq,
+            tone_duration_s = tone_duration,
+            play_fn         = play,
+            label           = f"[{i+1}/{len(RAINBOW)}]"
         )
+        responses[freq]       = response
+        dissolution_map[freq] = dissolution_s
 
-        responses[freq]           = response
-        dissolution_map[freq]     = dissolution_s
-
-        # Wait for confirmed baseline before next tone.
-        # Do not proceed until person confirms.
-        # This is enforced — not optional.
         if i < len(RAINBOW) - 1:
-            print("  Waiting for baseline to restore ...")
-            input("  Press ENTER when your tinnitus "
+            print("  Waiting for baseline ...")
+            input("  Press ENTER when tinnitus "
                   "is back to normal baseline ...")
 
-    ear["rainbow"]          = {str(k): v
-                                for k, v in
-                                responses.items()}
-    ear["dissolution_map"]  = {str(k): v
-                                for k, v in
-                                dissolution_map.items()}
-    session.save()
+    ear["rainbow"]         = {str(k): v
+                               for k, v in
+                               responses.items()}
+    ear["dissolution_map"] = {str(k): v
+                               for k, v in
+                               dissolution_map.items()}
+
+    # Mark complete — must be last write before return.
+    session.mark_phase_complete(side, PHASE_1)
+
     return responses, dissolution_map
 
 
 def interpret_rainbow(responses, dissolution_map):
     """
     Analyse rainbow sweep results.
-    Uses both subjective B/W/N and dissolution times
-    as convergent evidence for eigenfunction position.
-
-    Returns: best_freq, landscape dict
+    Returns: (best_freq, landscape dict)
     """
     better = [f for f, r in responses.items() if r == "B"]
     worse  = [f for f, r in responses.items() if r == "W"]
     same   = [f for f, r in responses.items() if r == "N"]
 
-    # Find frequency with longest dissolution time —
-    # structural evidence independent of B/W/N.
-    # Longest dissolution = deepest interaction =
-    # closest to FA eigenfunction position.
     best_dissolution_freq = None
     if dissolution_map:
         best_dissolution_freq = max(
@@ -751,7 +832,6 @@ def interpret_rainbow(responses, dissolution_map):
   Worse responses    : {len(worse)} tones
     {[f"{f:.0f}" for f in sorted(worse)]}
   No difference      : {len(same)} tones
-
   Longest dissolution: {
     f"{best_dissolution_freq:.0f} Hz"
     f" ({dissolution_map[best_dissolution_freq]:.1f}s)"
@@ -760,80 +840,56 @@ def interpret_rainbow(responses, dissolution_map):
   ─────────────────────────────────────────────────
     """)
 
-    # Report dissolution map as depth profile
     print("  Attractor depth by eigenfunction position:")
     for freq in sorted(dissolution_map.keys()):
-        d = dissolution_map[freq]
-        r = responses.get(freq, "?")
+        d   = dissolution_map[freq]
+        r   = responses.get(freq, "?")
         bar = "█" * min(int(d * 2), 30)
-        print(f"  {freq:7.0f} Hz  {r}  "
-              f"{d:5.1f}s  {bar}")
+        print(f"  {freq:7.0f} Hz  {r}  {d:5.1f}s  {bar}")
     print()
 
     if not better and best_dissolution_freq is None:
-        print("  No Better responses and no dissolution "
-              "signal detected.")
-        print("  Possible causes:")
-        print("    1. Volume too low — increase AMPLITUDE.")
-        print("    2. Noise-like / broadband tinnitus.")
-        print("    3. No tinnitus in this ear.")
+        print("  No gradient detected.")
+        print("  1. Volume too low — increase AMPLITUDE.")
+        print("  2. Noise-like tinnitus.")
+        print("  3. No tinnitus in this ear.")
         return None, {}
 
-    # Determine best starting frequency.
-    # Primary: B responses.
-    # Secondary (if no B): longest dissolution time.
     if better:
-        if len(better) == 1:
-            best = better[0]
-        else:
-            best = sorted(better)[-1]
-            if worse:
-                worst_min = min(worse)
-                candidates = [f for f in better
-                               if f < worst_min]
-                if candidates:
-                    best = max(candidates)
-
-        # Cross-check with dissolution signal.
-        # If dissolution peak is far from B cluster,
-        # note the discrepancy — may indicate
-        # B response was subjective noise.
+        best = sorted(better)[-1] if len(better) > 1 \
+               else better[0]
+        if worse:
+            worst_min  = min(worse)
+            candidates = [f for f in better
+                          if f < worst_min]
+            if candidates:
+                best = max(candidates)
         if (best_dissolution_freq and
                 abs(best_dissolution_freq - best) > 2000):
-            print(f"  NOTE: B cluster at {best:.0f} Hz")
-            print(f"  Dissolution peak at "
-                  f"{best_dissolution_freq:.0f} Hz")
-            print("  These diverge. Gradient descent will")
-            print("  clarify. Trust the dissolution signal")
-            print("  if B/W feedback is ambiguous.")
-
+            print(f"  NOTE: B cluster at {best:.0f} Hz, "
+                  f"dissolution peak at "
+                  f"{best_dissolution_freq:.0f} Hz.")
+            print("  These diverge. Trust dissolution "
+                  "if B/W is ambiguous.")
     else:
-        # No B responses — use dissolution peak
         best = best_dissolution_freq
-        print(f"  No B responses. Using dissolution peak "
-              f"as start: {best:.0f} Hz")
+        print(f"  No B responses. Using dissolution "
+              f"peak: {best:.0f} Hz")
 
     print(f"\n  Starting gradient descent at: {best:.0f} Hz")
-    return best, {"better":   better,
-                  "worse":    worse,
-                  "same":     same,
+    return best, {"better":           better,
+                  "worse":            worse,
+                  "same":             same,
                   "best_dissolution": best_dissolution_freq}
 
 # ═══════════════════════════════════════════════════════════
 # PHASE 2 — GRADIENT DESCENT
-# ════════════════════════════════════════��══════════════════
+# ═══════════════════════════════════════════════════════════
 
 def gradient_descent(session, side, start_freq):
     """
     Patient-guided gradient descent toward FA.
-
-    Uses corrected timing from beanie calibration:
-    personalised tone duration, post-tone settling
-    window, person-confirmed inter-trial interval.
-
-    Dissolution time logged per step — cross-validates
-    subjective B/W/N with objective attractor depth.
-
+    Marks PHASE_2 complete as its final act.
     Returns: fa_hz
     """
     ear           = session.ear(side)
@@ -843,19 +899,13 @@ def gradient_descent(session, side, start_freq):
     print(f"""
   ┌─────────────────────────────────────────────┐
   │  PHASE 2: GRADIENT DESCENT — {side} EAR            │
-  │                                             │
   │  Starting at {start_freq:.0f} Hz                     │
   │  Tone duration: {tone_duration}s                        │
   │                                             │
-  │  After each tone + {POST_TONE_SETTLE_S}s settling:         │
-  │    B — better    W — worse    N — same      │
-  │    L — LOCK (this is the optimum)           │
+  │  B — better   W — worse   N — same          │
+  │  L — LOCK (this is the optimum)             │
   │                                             │
-  │  After feedback: confirm baseline before    │
-  │  each next step.                            │
-  │                                             │
-  │  Watch for convergence: dissolving longer   │
-  │  after B responses means you are near FA.   │
+  │  Confirm baseline before each step.         │
   └─────────────────────────────────────────────┘
     """)
     input("  Press ENTER to begin ...")
@@ -863,7 +913,7 @@ def gradient_descent(session, side, start_freq):
     freq      = float(start_freq)
     step      = 300.0
     direction = 0
-    history   = []   # (freq_hz, response, dissolution_s)
+    history   = []
     fa        = freq
 
     for iteration in range(80):
@@ -872,68 +922,62 @@ def gradient_descent(session, side, start_freq):
         mm    = pos * 35
 
         print(f"\n  Step {iteration+1:2d}: "
-              f"{f_int} Hz  "
-              f"cochlear {mm:.1f} mm  "
+              f"{f_int} Hz  cochlear {mm:.1f} mm  "
               f"step={step:.0f} Hz")
         input("  ENTER to play ...")
 
         response, dissolution_s = run_trial(
-            freq_hz        = f_int,
-            tone_duration_s= tone_duration,
-            play_fn        = play,
-            label          = f"step {iteration+1}"
+            freq_hz         = f_int,
+            tone_duration_s = tone_duration,
+            play_fn         = play,
+            label           = f"step {iteration+1}"
         )
         history.append((f_int, response, dissolution_s))
 
-        # After feedback, confirm baseline before next
         if response != "L":
             print("  Confirm baseline before next step.")
             input("  Press ENTER when tinnitus "
                   "is back to normal baseline ...")
 
-        # Navigation logic
         if response == "L":
             fa = f_int
             print(f"\n  Locked at {fa} Hz")
-            print(f"  Final dissolution: {dissolution_s:.1f}s")
             break
-
         elif response == "B":
             fa = f_int
             if direction == 0:
                 direction = 1
-            step = max(step * 0.65, 5.0)
+            step  = max(step * 0.65, 5.0)
             freq += direction * step
-
         elif response == "W":
             if direction == 0:
                 direction = -1
             else:
                 direction *= -1
-            step = max(step * 0.65, 5.0)
+            step  = max(step * 0.65, 5.0)
             freq += direction * step
-
         elif response == "N":
-            step = min(step * 1.4, 500.0)
+            step      = min(step * 1.4, 500.0)
             direction = 1 if direction <= 0 else -1
-            freq += direction * step
+            freq     += direction * step
 
-        # Convergence: 3 consecutive B, step < 8 Hz
         if (len(history) >= 3 and
                 all(h[1] == "B" for h in history[-3:])
                 and step <= 8.0):
             fa = f_int
-            print(f"\n  Converged at {fa} Hz")
-            # Report dissolution trend at convergence
             recent_d = [h[2] for h in history[-3:]]
-            print(f"  Dissolution at convergence: "
+            print(f"\n  Converged at {fa} Hz")
+            print(f"  Dissolution: "
                   f"{recent_d[0]:.1f}s → "
                   f"{recent_d[1]:.1f}s → "
                   f"{recent_d[2]:.1f}s")
             break
 
     ear["fa_hz"] = fa
-    session.save()
+
+    # Mark complete — must be last write before return.
+    session.mark_phase_complete(side, PHASE_2)
+
     return fa
 
 # ═══════════════════════════════════════════════════════════
@@ -942,12 +986,8 @@ def gradient_descent(session, side, start_freq):
 
 def phase_calibration(session, side, fa):
     """
-    Sweep phase 0–360° at locked FA frequency.
-    Find individual cancellation phase.
-
-    Uses corrected timing from beanie calibration.
-    Dissolution time used as cross-check on B/W/N.
-
+    Sweep phase 0–360° at locked FA.
+    Marks PHASE_3 complete as its final act.
     Returns: best_phase_deg
     """
     ear           = session.ear(side)
@@ -957,28 +997,20 @@ def phase_calibration(session, side, fa):
     print(f"""
   ┌─────────────────────────────────────────────┐
   │  PHASE 3: PHASE CALIBRATION — {side} EAR           │
-  │  FA locked at: {fa} Hz                    │
-  │  Tone duration: {tone_duration}s                        │
+  │  FA: {fa} Hz   Tone duration: {tone_duration}s          │
   │                                             │
   │  Finding your cochlea's cancellation phase. │
-  │  180° is the standard assumption.           │
-  │  Your cochlear geometry may differ.         │
-  │                                             │
-  │  Watch for the phase that produces the      │
-  │  longest dissolution — this is the          │
-  │  structural cross-check on your B/W/N.      │
+  │  Longest dissolution = structural           │
+  │  cross-check on B/W/N.                      │
   └─────────────────────────────────────────────┘
     """)
     input("  Press ENTER to begin ...")
 
-    # Score map: B=2, N=1, W=0
-    # Dissolution time used as tiebreaker
     score_map     = {"B": 2, "N": 1, "W": 0}
     coarse_phases = [0, 45, 90, 135, 180, 225, 270, 315]
     best_phase    = 180
     best_score    = -1
     best_diss     = 0.0
-    phase_results = {}
 
     print("\n  ── Coarse phase sweep (8 angles) ──")
     for ph in coarse_phases:
@@ -986,18 +1018,15 @@ def phase_calibration(session, side, fa):
         input("  ENTER to play ...")
 
         response, dissolution_s = run_trial(
-            freq_hz        = fa,
-            tone_duration_s= tone_duration,
-            play_fn        = play,
-            phase_deg      = ph,
-            label          = f"phase {ph}°"
+            freq_hz         = fa,
+            tone_duration_s = tone_duration,
+            play_fn         = play,
+            phase_deg       = ph,
+            label           = f"phase {ph}°"
         )
         score = score_map.get(response, 0)
-        phase_results[ph] = (response, score,
-                             dissolution_s)
         print(f"  → {response}  dissolution {dissolution_s:.1f}s")
 
-        # Better score, or same score with longer dissolution
         if (score > best_score or
                 (score == best_score and
                  dissolution_s > best_diss)):
@@ -1008,33 +1037,28 @@ def phase_calibration(session, side, fa):
         input("  Press ENTER when back to baseline ...")
 
     print(f"\n  Best coarse phase: {best_phase}°  "
-          f"(score={best_score}, "
-          f"dissolution={best_diss:.1f}s)")
+          f"dissolution={best_diss:.1f}s")
     print("  Fine-tuning ±40° in 10° steps ...")
 
-    fine_phases = range(best_phase - 40,
-                        best_phase + 41, 10)
-    for ph in fine_phases:
+    for ph in range(best_phase - 40, best_phase + 41, 10):
         ph_n = ph % 360
         print(f"\n  Phase {ph_n}°")
         input("  ENTER to play ...")
 
         response, dissolution_s = run_trial(
-            freq_hz        = fa,
-            tone_duration_s= tone_duration,
-            play_fn        = play,
-            phase_deg      = ph_n,
-            label          = f"phase {ph_n}°"
+            freq_hz         = fa,
+            tone_duration_s = tone_duration,
+            play_fn         = play,
+            phase_deg       = ph_n,
+            label           = f"phase {ph_n}°"
         )
         score = score_map.get(response, 0)
-        phase_results[ph_n] = (response, score,
-                               dissolution_s)
         print(f"  → {response}  dissolution {dissolution_s:.1f}s")
 
         if (score > best_score or
                 (score == best_score and
                  dissolution_s > best_diss)):
-            best_score = best_score
+            best_score = score
             best_phase = ph_n
             best_diss  = dissolution_s
 
@@ -1042,23 +1066,20 @@ def phase_calibration(session, side, fa):
 
     print(f"\n  Phase locked at: {best_phase}°")
     ear["phase_deg"] = best_phase
-    session.save()
+
+    # Mark complete — must be last write before return.
+    session.mark_phase_complete(side, PHASE_3)
+
     return best_phase
 
 # ═══════════════════════════════════════════════════════════
-# PHASE 4 — FR SWEEP (RESIDUAL RESONANT FREQUENCY)
+# PHASE 4 — FR SWEEP
 # ═══════════════════════════════════════════════════════════
 
 def fr_sweep(session, side, fa, phase):
     """
-    Find residual resonant frequency (FR):
-    the frequency where the damaged zone retains
-    mechanical response capacity.
-
-    Each trial: anti-signal at FA + probe at test freq.
-    Dissolution time cross-validates B/W/N.
-    Longest dissolution at a B response = FR.
-
+    Find residual resonant frequency (FR).
+    Marks PHASE_4 complete as its final act.
     Returns: fr_hz
     """
     ear           = session.ear(side)
@@ -1069,33 +1090,25 @@ def fr_sweep(session, side, fa, phase):
     print(f"""
   ┌─────────────────────────────────────────────┐
   │  PHASE 4: FR SWEEP — {side} EAR                    │
-  │  FA locked at: {fa} Hz                    │
-  │  Tone duration: {tone_duration}s                        │
+  │  FA: {fa} Hz   Tone duration: {tone_duration}s          │
   │                                             │
-  │  Each tone = anti-signal at FA              │
-  │            + probe at test frequency.       │
-  │                                             │
-  │  You are finding the note the cracked       │
-  │  instrument can still play.                 │
-  │                                             │
-  │  B/W/N + dissolution time both logged.      │
-  │  Longest dissolution at B = FR.             │
+  │  Anti-signal at FA active throughout.       │
+  │  Finding the note the cracked instrument    │
+  │  can still play.                            │
   └─────────────────────────────────────────────┘
     """)
     input("  Press ENTER to begin ...")
 
-    offsets    = [-400, -300, -200, -150,
-                  -100, -50, 0,
-                  50, 100, 150, 200, 300, 400]
-    score_map  = {"B": 2, "N": 1, "W": 0}
-    best_fr    = fa
+    offsets   = [-400, -300, -200, -150,
+                 -100, -50, 0,
+                 50, 100, 150, 200, 300, 400]
+    score_map = {"B": 2, "N": 1, "W": 0}
+    best_fr   = fa
     best_score = 0
     best_diss  = 0.0
 
-    # Pre-build anti-signal long enough for any trial
     max_dur   = tone_duration + POST_TONE_SETTLE_S + 5
-    anti_long = make_tone(fa,
-                          max_dur,
+    anti_long = make_tone(fa, max_dur,
                           amplitude=amp,
                           phase_deg=phase)
 
@@ -1107,20 +1120,14 @@ def fr_sweep(session, side, fa, phase):
         print(f"\n  {label} = {f_test} Hz")
         input("  ENTER to play ...")
 
-        # Probe tone at test frequency
-        probe = make_tone(f_test, tone_duration,
-                          amplitude=amp * 0.45,
-                          phase_deg=0)
-
         response, dissolution_s = run_trial(
-            freq_hz        = f_test,
-            tone_duration_s= tone_duration,
-            play_fn        = play,
-            amplitude      = amp * 0.45,
-            extra_signal   = anti_long,
-            label          = label
+            freq_hz         = f_test,
+            tone_duration_s = tone_duration,
+            play_fn         = play,
+            amplitude       = amp * 0.45,
+            extra_signal    = anti_long,
+            label           = label
         )
-
         score = score_map.get(response, 0)
         print(f"  dissolution {dissolution_s:.1f}s")
 
@@ -1135,19 +1142,21 @@ def fr_sweep(session, side, fa, phase):
         input("  Press ENTER when back to baseline ...")
 
     print(f"\n  FR identified: {best_fr} Hz")
-    print(f"  FA→FR gap: {best_fr - fa:+d} Hz")
-    print(f"  FR dissolution: {best_diss:.1f}s")
+    print(f"  FA→FR gap: {best_fr - fa:+d} Hz  "
+          f"dissolution: {best_diss:.1f}s")
 
     if best_fr < fa:
-        print("  → CRACKED VIOLIN CASE:")
-        print("    Damaged zone capacity below FA.")
+        print("  → CRACKED VIOLIN CASE")
     elif best_fr == fa:
-        print("  → CANCELLATION-ONLY CASE.")
+        print("  → CANCELLATION-ONLY CASE")
     else:
-        print("  → FR ABOVE FA (less common).")
+        print("  → FR ABOVE FA (less common)")
 
     ear["fr_hz"] = best_fr
-    session.save()
+
+    # Mark complete — must be last write before return.
+    session.mark_phase_complete(side, PHASE_4)
+
     return best_fr
 
 # ═══════════════════════════════════════════════════════════
@@ -1156,13 +1165,9 @@ def fr_sweep(session, side, fa, phase):
 
 def orthogonal_resweep(session, side, fa):
     """
-    Rainbow sweep with FA anti-signal active throughout.
-    Tests whether the calibration has converged or
-    whether residual gradient exists in other
-    eigenfunction dimensions (complex tinnitus).
-
-    Uses corrected timing. Dissolution time logged.
-
+    Rainbow sweep with FA anti-signal active.
+    Checks for residual gradient (complex tinnitus).
+    Marks PHASE_5 complete as its final act.
     Returns: converged (bool)
     """
     ear           = session.ear(side)
@@ -1176,9 +1181,6 @@ def orthogonal_resweep(session, side, fa):
   │  PHASE 5: ORTHOGONAL RE-SWEEP — {side} EAR         │
   │                                             │
   │  FA anti-signal active throughout.          │
-  │  Probing for residual gradient in other     │
-  │  eigenfunction dimensions.                  │
-  │                                             │
   │  B anywhere = more structure to find.       │
   │  No B anywhere = converged.                 │
   └─────────────────────────────────────────────┘
@@ -1187,27 +1189,24 @@ def orthogonal_resweep(session, side, fa):
 
     responses       = {}
     dissolution_map = {}
-
-    max_dur   = tone_duration + POST_TONE_SETTLE_S + 5
-    anti_long = make_tone(fa,
-                          max_dur,
-                          amplitude=amp,
-                          phase_deg=phase)
+    max_dur         = tone_duration + POST_TONE_SETTLE_S + 5
+    anti_long       = make_tone(fa, max_dur,
+                                amplitude=amp,
+                                phase_deg=phase)
 
     for i, (pos, freq) in enumerate(RAINBOW):
         if abs(freq - fa) < 50:
             continue
-        hz_label = f"{freq:.0f} Hz"
-        print(f"\n  [{i+1:2d}/{len(RAINBOW)}]  {hz_label}")
+        print(f"\n  [{i+1:2d}/{len(RAINBOW)}]  {freq:.0f} Hz")
         input("  ENTER to play ...")
 
         response, dissolution_s = run_trial(
-            freq_hz        = freq,
-            tone_duration_s= tone_duration,
-            play_fn        = play,
-            amplitude      = amp * 0.5,
-            extra_signal   = anti_long,
-            label          = f"[ortho {i+1}]"
+            freq_hz         = freq,
+            tone_duration_s = tone_duration,
+            play_fn         = play,
+            amplitude       = amp * 0.5,
+            extra_signal    = anti_long,
+            label           = f"[ortho {i+1}]"
         )
         responses[freq]       = response
         dissolution_map[freq] = dissolution_s
@@ -1222,31 +1221,26 @@ def orthogonal_resweep(session, side, fa):
   ── ORTHOGONAL SWEEP RESULT ─────────────────────
   New Better responses at:
     {[f"{f:.0f} Hz" for f in sorted(better)]}
-
-  Dissolution at Better frequencies:
+  Dissolution:
     {[f"{f:.0f} Hz: {dissolution_map[f]:.1f}s"
       for f in sorted(better)]}
-
-  INTERPRETATION: Residual gradient exists.
-  Complex tinnitus — components at multiple
-  eigenfunction positions.
-  Consider gradient descent from new B cluster.
+  INTERPRETATION: Complex tinnitus.
+  Residual gradient — more structure to find.
   ─────────────────────────────────────────────────
         """)
         ear["orthogonal_clear"] = False
     else:
-        print(f"""
+        print("""
   ── ORTHOGONAL SWEEP RESULT ─────────────────────
   No new Better responses.
-
   INTERPRETATION: CONVERGED.
-  Calibration is at the optimum for this
-  individual's cochlear eigenfunction map.
   ─────────────────────────────────────────────────
         """)
         ear["orthogonal_clear"] = True
 
-    session.save()
+    # Mark complete — must be last write before return.
+    session.mark_phase_complete(side, PHASE_5)
+
     return ear["orthogonal_clear"]
 
 # ═══════════════════════════════════════════════════════════
@@ -1256,11 +1250,8 @@ def orthogonal_resweep(session, side, fa):
 def generate_remedy(session, side, duration_minutes=60):
     """
     Generate personalised sleep remedy WAV file.
-
-    Three layers:
-      1. Pink noise floor (FA notched)
-      2. Anti-signal at FA, calibrated phase
-      3. FR boost (cracked violin layer)
+    Marks PHASE_6 complete as its final act.
+    Returns: output filename or None.
     """
     ear   = session.ear(side)
     fa    = ear["fa_hz"]
@@ -1275,10 +1266,8 @@ def generate_remedy(session, side, duration_minutes=60):
 
     print(f"""
   Generating {side} ear remedy:
-    FA       = {fa} Hz
-    FR       = {fr} Hz
-    Phase    = {phase}°
-    Duration = {duration_minutes} min
+    FA = {fa} Hz   FR = {fr} Hz
+    Phase = {phase}°   Duration = {duration_minutes} min
     """)
 
     duration_s = duration_minutes * 60
@@ -1286,22 +1275,17 @@ def generate_remedy(session, side, duration_minutes=60):
     t          = np.linspace(0, duration_s,
                               n_samples, endpoint=False)
 
-    # Layer 1: Pink noise with FA notched
-    pink          = make_pink_noise(duration_s,
-                                    amplitude=0.03)
-    fa_notch_depth = 0.015
-    pink -= (fa_notch_depth *
+    pink = make_pink_noise(duration_s, amplitude=0.03)
+    pink -= (0.015 *
              np.sin(2 * np.pi * fa * t +
                     np.random.uniform(0, 2*np.pi))
              ).astype(np.float32)
 
-    # Layer 2: Anti-signal at FA, calibrated phase
     ph_rad = np.deg2rad(phase)
     anti   = (amp * 0.85 *
                np.sin(2 * np.pi * fa * t + ph_rad)
                ).astype(np.float32)
 
-    # Layer 3: FR boost (cracked violin)
     boost = np.zeros(n_samples, dtype=np.float32)
     if fr is not None and fr != fa:
         boost = (amp * 0.38 *
@@ -1309,9 +1293,7 @@ def generate_remedy(session, side, duration_minutes=60):
                  ).astype(np.float32)
 
     combined = np.clip(pink + anti + boost, -1.0, 1.0)
-
-    # Fade in/out 3 seconds
-    fade_s = int(3 * SAMPLE_RATE)
+    fade_s   = int(3 * SAMPLE_RATE)
     combined[:fade_s]  *= np.linspace(
         0, 1, fade_s).astype(np.float32)
     combined[-fade_s:] *= np.linspace(
@@ -1322,6 +1304,10 @@ def generate_remedy(session, side, duration_minutes=60):
                  else OUTPUT_WAV_R)
     wavfile.write(fname, SAMPLE_RATE, out_int16)
     print(f"  Saved: {fname}")
+
+    # Mark complete — must be last write before return.
+    session.mark_phase_complete(side, PHASE_6)
+
     return fname
 
 
@@ -1353,12 +1339,11 @@ def generate_binaural(session, duration_minutes=60):
         fa_notch = (0.015 *
                     np.sin(2 * np.pi * fa * t)
                     ).astype(np.float32)
-        return np.clip(pink - fa_notch + anti + boost,
-                       -1.0, 1.0)
+        return np.clip(
+            pink - fa_notch + anti + boost, -1.0, 1.0)
 
     l_chan = ear_channel(session.left)
     r_chan = ear_channel(session.right)
-
     fade_s = int(3 * SAMPLE_RATE)
     for ch in [l_chan, r_chan]:
         ch[:fade_s]  *= np.linspace(0, 1, fade_s)
@@ -1371,80 +1356,163 @@ def generate_binaural(session, duration_minutes=60):
     return OUTPUT_WAV_B
 
 # ═══════════════════════════════════════════════════════════
-# FULL PROTOCOL — ONE EAR
+# CALIBRATE EAR — SEGMENTED SESSION AWARE
 # ═══════════════════════════════════════════════════════════
 
 def calibrate_ear(session, side):
     """
-    Run the full calibration protocol for one ear.
+    Run (or resume) the full calibration for one ear.
 
-    Phase 0B — Beanie pre-calibration
-    Phase 1   — Rainbow sweep
-    Phase 2   — Gradient descent
-    Phase 3   — Phase calibration
-    Phase 4   — FR sweep
-    Phase 5   — Orthogonal re-sweep
-    Phase 6   — WAV generation
+    Checks phase completion flags before each phase.
+    Skips completed phases entirely.
+    Resumes from the first incomplete phase.
+    Offers a break after each completed phase.
+
+    Phase data needed by later phases is read from
+    the session object, so resumed phases have access
+    to all values set by earlier phases regardless of
+    whether those phases ran in this session or a
+    previous one.
     """
     side = side.upper()
-    print(f"""
-  ╔═════════════════════════════════════════════╗
-  ║  CALIBRATING: {side} EAR                           ║
-  ╚═════════════════════════════════════════════╝
-    """)
+    ear  = session.ear(side)
 
-    # Phase 0B — Beanie pre-calibration
-    print("\n  PHASE 0B — BEANIE PRE-CALIBRATION")
-    formation_lag, dissolution_lag, tone_duration = \
-        beanie_calibration(session, side)
-    print(f"\n  Tone duration set: {tone_duration}s")
-    print(f"  Formation lag:     {formation_lag:.1f}s")
-    print(f"  Dissolution lag:   {dissolution_lag:.1f}s")
-
-    # Phase 1 — Rainbow sweep
-    print("\n  PHASE 1 — RAINBOW SWEEP")
-    responses, dissolution_map = rainbow_sweep(
-        session, side)
-    start_freq, landscape = interpret_rainbow(
-        responses, dissolution_map)
-
-    if start_freq is None:
-        print(f"  Cannot calibrate {side} ear — "
-              "no gradient detected.")
-        print("  Check volume. Confirm tinnitus present.")
+    # ── Show current status on entry ──────────────────
+    next_phase = session.next_incomplete_phase(side)
+    if next_phase is None:
+        print(f"\n  {side} ear: all phases already complete.")
+        print(f"  Skipping to WAV regeneration if needed.")
+        if not os.path.exists(
+                OUTPUT_WAV_L if side == "L"
+                else OUTPUT_WAV_R):
+            generate_remedy(session, side)
         return
 
-    # Phase 2 — Gradient descent
-    print("\n  PHASE 2 — GRADIENT DESCENT")
-    fa = gradient_descent(session, side, start_freq)
-    print(f"\n  FA locked: {fa} Hz")
+    # Show what is done and what remains
+    print(f"\n{session.status_summary(side)}")
+    if next_phase != PHASE_0B:
+        print(f"\n  Resuming at: "
+              f"{PHASE_LABELS[next_phase]}")
+    input("\n  Press ENTER to continue ...")
 
-    # Phase 3 — Phase calibration
-    print("\n  PHASE 3 — PHASE CALIBRATION")
-    phase = phase_calibration(session, side, fa)
-    print(f"\n  Phase locked: {phase}°")
+    # ── PHASE 0B ──────────────────────────────────────
+    if not session.phase_complete(side, PHASE_0B):
+        print(f"\n  ── {PHASE_LABELS[PHASE_0B]} ──")
+        formation_lag, dissolution_lag, tone_duration = \
+            beanie_calibration(session, side)
+        print(f"\n  Tone duration: {tone_duration}s  "
+              f"Formation: {formation_lag:.1f}s  "
+              f"Dissolution: {dissolution_lag:.1f}s")
+        offer_break(session, side, PHASE_0B)
+    else:
+        print(f"\n  ✓ {PHASE_LABELS[PHASE_0B]} "
+              f"(tone duration: "
+              f"{ear['tone_duration_s']}s)")
 
-    # Phase 4 — FR sweep
-    print("\n  PHASE 4 — FR SWEEP")
-    fr = fr_sweep(session, side, fa, phase)
-    print(f"\n  FR locked: {fr} Hz")
+    # ── PHASE 1 ───────────────��───────────────────────
+    if not session.phase_complete(side, PHASE_1):
+        print(f"\n  ── {PHASE_LABELS[PHASE_1]} ──")
+        responses, dissolution_map = rainbow_sweep(
+            session, side)
+        start_freq, landscape = interpret_rainbow(
+            responses, dissolution_map)
+        if start_freq is None:
+            print(f"  Cannot calibrate {side} ear — "
+                  "no gradient detected.")
+            print("  Check volume. "
+                  "Confirm tinnitus present.")
+            return
+        # Store start_freq for Phase 2 handoff
+        ear["_start_freq"] = start_freq
+        session.save()
+        offer_break(session, side, PHASE_1)
+    else:
+        print(f"\n  ✓ {PHASE_LABELS[PHASE_1]}")
+        # Reconstruct start_freq from saved rainbow data
+        # for use by Phase 2 if it hasn't run yet.
+        if not session.phase_complete(side, PHASE_2):
+            responses_raw    = ear.get("rainbow", {})
+            dissolution_raw  = ear.get("dissolution_map",
+                                       {})
+            responses       = {float(k): v
+                               for k, v in
+                               responses_raw.items()}
+            dissolution_map = {float(k): v
+                               for k, v in
+                               dissolution_raw.items()}
+            start_freq, _   = interpret_rainbow(
+                responses, dissolution_map)
+            ear["_start_freq"] = start_freq
+            session.save()
 
-    # Phase 5 — Orthogonal re-sweep
-    print("\n  PHASE 5 — ORTHOGONAL RE-SWEEP")
-    converged = orthogonal_resweep(session, side, fa)
+    # ── PHASE 2 ───────────────────────────────────────
+    if not session.phase_complete(side, PHASE_2):
+        print(f"\n  ── {PHASE_LABELS[PHASE_2]} ──")
+        start_freq = ear.get("_start_freq")
+        if start_freq is None:
+            print("  ERROR: No start frequency available.")
+            print("  Re-run Phase 1 (delete log file).")
+            return
+        fa = gradient_descent(session, side, start_freq)
+        print(f"\n  FA locked: {fa} Hz")
+        offer_break(session, side, PHASE_2)
+    else:
+        fa = ear["fa_hz"]
+        print(f"\n  ✓ {PHASE_LABELS[PHASE_2]}  "
+              f"FA = {fa} Hz")
 
-    # Phase 6 — WAV generation
-    print("\n  PHASE 6 — WAV GENERATION")
-    generate_remedy(session, side)
+    # ── PHASE 3 ───────────────────────────────────────
+    if not session.phase_complete(side, PHASE_3):
+        print(f"\n  ── {PHASE_LABELS[PHASE_3]} ──")
+        phase = phase_calibration(session, side, fa)
+        print(f"\n  Phase locked: {phase}°")
+        offer_break(session, side, PHASE_3)
+    else:
+        phase = ear["phase_deg"]
+        print(f"\n  ✓ {PHASE_LABELS[PHASE_3]}  "
+              f"Phase = {phase}°")
 
-    ear = session.ear(side)
+    # ── PHASE 4 ────────────��──────────────────────────
+    if not session.phase_complete(side, PHASE_4):
+        print(f"\n  ── {PHASE_LABELS[PHASE_4]} ──")
+        fr = fr_sweep(session, side, fa, phase)
+        print(f"\n  FR locked: {fr} Hz")
+        offer_break(session, side, PHASE_4)
+    else:
+        fr = ear["fr_hz"]
+        print(f"\n  ✓ {PHASE_LABELS[PHASE_4]}  "
+              f"FR = {fr} Hz")
+
+    # ── PHASE 5 ───────────────────────────────────────
+    if not session.phase_complete(side, PHASE_5):
+        print(f"\n  ── {PHASE_LABELS[PHASE_5]} ──")
+        converged = orthogonal_resweep(
+            session, side, fa)
+        offer_break(session, side, PHASE_5)
+    else:
+        converged = ear["orthogonal_clear"]
+        print(f"\n  ✓ {PHASE_LABELS[PHASE_5]}  "
+              f"Converged = {converged}")
+
+    # ── PHASE 6 ───────────────────────────────────────
+    if not session.phase_complete(side, PHASE_6):
+        print(f"\n  ── {PHASE_LABELS[PHASE_6]} ──")
+        generate_remedy(session, side)
+    else:
+        print(f"\n  ✓ {PHASE_LABELS[PHASE_6]}")
+
+    # ── SUMMARY ───────────────────────────────────────
+    formation_lag  = ear.get("formation_lag_s",  "?")
+    dissolution_lag = ear.get("dissolution_lag_s", "?")
+    tone_dur       = ear.get("tone_duration_s",  "?")
+
     print(f"""
   ╔═════════════════════════════════════════════╗
   ║  {side} EAR CALIBRATION COMPLETE                   ║
   ╠═════════════════════════════════════════════╣
-  ║  Formation lag:   {str(round(formation_lag, 1)) + 's':>10}       ║
-  ║  Dissolution lag: {str(round(dissolution_lag, 1)) + 's':>10}       ║
-  ║  Tone duration:   {str(tone_duration) + 's':>10}       ║
+  ║  Formation lag:          {str(round(formation_lag, 1)) + 's' if isinstance(formation_lag, float) else str(formation_lag):>10}    ║
+  ║  Dissolution lag:        {str(round(dissolution_lag, 1)) + 's' if isinstance(dissolution_lag, float) else str(dissolution_lag):>10}    ║
+  ║  Tone duration:          {str(tone_dur) + 's':>10}    ║
   ║  FA (false attractor):   {str(fa) + ' Hz':>10}    ║
   ║  FR (residual resonant): {str(fr) + ' Hz':>10}    ║
   ║  Phase (cancellation):   {str(phase) + '°':>10}    ║
@@ -1462,17 +1530,14 @@ def main():
   ║   TINNITUS EIGENFUNCTION CALIBRATION SYSTEM         ║
   ║   OC-TINNITUS-001 — OrganismCore                    ║
   ║   Eric Robert Lawson — 2026-03-23                   ║
-  ║   Beanie timing correction applied                  ║
   ╠═════════════════════════════════════════════════════╣
   ║                                                     ║
-  ║   Finds your tinnitus eigenfunction position        ║
-  ║   and generates a personalised cancellation         ║
-  ║   remedy. Glasses for a broken ear.                 ║
+  ║   Segmented session support — resume at any         ║
+  ║   phase boundary. No completed work repeated.       ║
   ║                                                     ║
-  ║   Self-administrable. No specialist required.       ║
-  ║   You are the measurement instrument.               ║
+  ║   Duration: ~2–2.5 hours bilateral (severe case)   ║
+  ║             ~45–60 minutes unilateral (mild case)  ║
   ║                                                     ║
-  ║   Duration: ~45–60 minutes (full bilateral)         ║
   ║   Output:   remedy_left.wav                         ║
   ║             remedy_right.wav                        ║
   ║             remedy_binaural.wav                     ║
@@ -1481,63 +1546,139 @@ def main():
   ╚═════════════════════════════════════════════════════╝
     """)
 
-    # Resume previous session?
+    # ── Session load / create ──────────────────────────
     session = None
     prev    = Session.load()
-    if prev:
-        r = ask("Previous session found. Resume? (Y/N):",
-                valid={"Y", "N"})
-        if r == "Y":
-            session = prev
-            print("  Session resumed.")
 
-    if session is None:
+    if prev:
+        # Show what is already done before asking
+        any_done = False
+        for s in ["L", "R"]:
+            completed = prev.ear(s)["phases_complete"]
+            if completed:
+                any_done = True
+                print(prev.status_summary(s))
+
+        if any_done:
+            r = ask(
+                "Previous session found with completed "
+                "phases. Resume? (Y/N):",
+                valid={"Y", "N"}
+            )
+            if r == "Y":
+                session = prev
+                print("  Session resumed.")
+            else:
+                confirm = ask(
+                    "Start fresh? All saved data will "
+                    "be lost. (Y/N):",
+                    valid={"Y", "N"}
+                )
+                if confirm == "Y":
+                    session = Session()
+                    print("  New session started.")
+                else:
+                    session = prev
+                    print("  Keeping existing session.")
+        else:
+            session = Session()
+    else:
         session = Session()
 
-    # Phase 0A — Volume calibration
-    calibrate_volume()
+    # Register for Ctrl+C save
+    _save_on_interrupt(session)
 
-    # Which ears?
-    print("""
+    # ── Phase 0A — Volume calibration ─────────────────
+    # Always run at session start — not phase-flagged.
+    # Takes 2 minutes. Confirms hardware is working.
+    # If resuming, volume must be re-confirmed because
+    # headphones may have been reconnected.
+    calibrate_volume()
+    # Sync AMPLITUDE into any ear that hasn't run 0B yet
+    for s in ["L", "R"]:
+        if not session.phase_complete(s, PHASE_0B):
+            session.ear(s)["amplitude"] = AMPLITUDE
+
+    # ── Which ears? ────────────────────────────────────
+    # On resume, pre-select ears that have incomplete
+    # phases. On fresh start, ask.
+    incomplete_ears = [
+        s for s in ["L", "R"]
+        if session.next_incomplete_phase(s) is not None
+    ]
+
+    if session.timestamp != Session().timestamp or \
+            not incomplete_ears:
+        # Fresh session or all ears complete — ask
+        print("""
   Which ears have tinnitus?
     L — left only
     R — right only
     B — both ears
-    """)
-    ears = ask("L / R / B:", valid={"L", "R", "B"})
+        """)
+        ears = ask("L / R / B:", valid={"L", "R", "B"})
+        sides = []
+        if ears in {"L", "B"}:
+            sides.append("L")
+        if ears in {"R", "B"}:
+            sides.append("R")
+    else:
+        sides = incomplete_ears
+        if len(sides) == 1:
+            print(f"\n  Resuming {sides[0]} ear "
+                  f"(other ear already complete or "
+                  f"not selected).")
+        else:
+            print(f"\n  Resuming both ears.")
 
-    sides = []
-    if ears in {"L", "B"}:
-        sides.append("L")
-    if ears in {"R", "B"}:
-        sides.append("R")
-
-    # Calibrate each ear independently
-    for side in sides:
+    # ── Calibrate each ear ────────────────────────────
+    for i, side in enumerate(sides):
         calibrate_ear(session, side)
 
-        if len(sides) > 1 and side == sides[0]:
-            print(f"""
-  ── Break before {sides[1]} ear ───────────────────────
-  Take a 5-minute break.
-  Auditory system needs to rest between ears.
-  Tinnitus perception can shift after sustained
-  acoustic engagement.
-  ──────────────────────────────────────────────
-            """)
-            input("  Press ENTER when ready for "
-                  f"{sides[1]} ear ...")
+        # Inter-ear break for bilateral sessions
+        if len(sides) > 1 and i == 0:
+            remaining = sides[1]
+            if session.next_incomplete_phase(
+                    remaining) is not None:
+                print(f"""
+  ── Break before {remaining} ear ──────────────────────
+  Take at least 10 minutes.
+  Auditory attention degrades with sustained
+  perceptual engagement. The second ear
+  calibration requires the same quality of
+  attention as the first.
 
-    # Generate binaural remedy if both ears calibrated
-    if len(sides) == 2:
+  For severe bilateral cases: consider
+  scheduling the second ear as a separate
+  session (run script again, answer Y to
+  resume — it will go directly to {remaining} ear).
+  ──────────────────────────────────────────────
+                """)
+                input(f"  Press ENTER when ready "
+                      f"for {remaining} ear ...")
+
+    # ── Generate binaural if both ears complete ────────
+    both_done = all(
+        session.phase_complete(s, PHASE_6)
+        for s in ["L", "R"]
+    )
+    if both_done and not os.path.exists(OUTPUT_WAV_B):
         print("\n  Generating binaural remedy ...")
         generate_binaural(session)
+    elif both_done:
+        r = ask(
+            f"Binaural file exists ({OUTPUT_WAV_B}). "
+            f"Regenerate? (Y/N):",
+            valid={"Y", "N"}
+        )
+        if r == "Y":
+            generate_binaural(session)
 
-    # Final prescription summary
+    # ── Final prescription summary ─────────────────────
     print("""
   ╔═════════════════════════════════════════════════════╗
   ║   CALIBRATION COMPLETE — PRESCRIPTION SUMMARY       ║
-  ╚═════════════════════════════════════════════════════╝
+  ╚══════════════════════════════════════════���══════════╝
     """)
     for side in ["L", "R"]:
         ear = session.ear(side)
@@ -1559,31 +1700,26 @@ def main():
                   f"{ear['orthogonal_clear']}")
             print()
 
-    print("  SLEEP REMEDY FILES:")
-    for side in sides:
-        fname = (OUTPUT_WAV_L if side == "L"
-                 else OUTPUT_WAV_R)
+    print("  REMEDY FILES:")
+    for fname in [OUTPUT_WAV_L, OUTPUT_WAV_R,
+                  OUTPUT_WAV_B]:
         if os.path.exists(fname):
-            print(f"    {side} ear : {fname}")
-    if len(sides) == 2 and os.path.exists(OUTPUT_WAV_B):
-        print(f"    Binaural  : {OUTPUT_WAV_B}")
+            print(f"    {fname}")
 
     print("""
   TO USE:
-    Play remedy_binaural.wav on loop through
-    headphones while sleeping.
+    Play remedy_binaural.wav on loop
+    through headphones while sleeping.
     Volume: barely audible.
 
   RE-CALIBRATE:
     Run again when efficacy changes.
-    The false attractor drifts over time.
-    Re-calibration takes 20-25 minutes.
-    Start fresh (N) when prompted.
+    Answer Y to resume → N to start fresh.
+    Re-calibration: 25–35 minutes.
 
   SESSION LOG:
     """)
-    print(f"    {LOG_FILE}")
-    print()
+    print(f"    {LOG_FILE}\n")
     session.save()
 
 
