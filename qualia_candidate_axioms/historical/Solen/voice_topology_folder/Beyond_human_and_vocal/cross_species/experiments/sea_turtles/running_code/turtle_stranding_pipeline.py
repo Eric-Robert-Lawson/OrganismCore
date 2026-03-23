@@ -197,15 +197,16 @@ def rayleigh_test(angles_deg):
     R_bar = float(np.sqrt(np.mean(np.cos(rad)) ** 2
                           + np.mean(np.sin(rad)) ** 2))
 
-    # chi-squared statistic
     stat = 2.0 * n * R_bar ** 2
     p    = float(chi2.sf(stat, df=2))
 
     if p == 0.0:
-        # Report as underflow with log-space value
         log_p = float(chi2.logsf(stat, df=2))
-        p_str = f"< 1e{int(log_p / math.log(10)):d}"
-        return R_bar, p_str
+        if not math.isfinite(log_p) or log_p == 0.0:
+            return R_bar, "< 1e-300"
+        exponent = int(log_p / math.log(10))
+        return R_bar, f"< 1e{exponent:d}"
+
     return R_bar, p
 
 
@@ -229,19 +230,17 @@ def v_test(angles_deg, expected_mean_deg=0.0):
     R_bar    = math.sqrt(mean_cos ** 2 + mean_sin ** 2)
     theta    = math.atan2(mean_sin, mean_cos)
 
-    V = n * R_bar * math.cos(theta - mu_rad)
-    u = V * math.sqrt(2.0 / n)
-
-    # log_ndtr(x) = log(Phi(x)) — use upper tail: log(1 - Phi(u))
-    # log_ndtr(-u) = log(P(Z > u)) for the upper tail
+    V     = n * R_bar * math.cos(theta - mu_rad)
+    u     = V * math.sqrt(2.0 / n)
     log_p = float(log_ndtr(-u))
 
-    if log_p < math.log(1e-300):
-        p_str = f"< 1e{int(log_p / math.log(10)):d}"
-        return V, p_str
+    if not math.isfinite(log_p) or log_p < math.log(1e-300):
+        if not math.isfinite(log_p) or log_p == float("-inf"):
+            return V, "< 1e-300"
+        exponent = int(log_p / math.log(10))
+        return V, f"< 1e{exponent:d}"
 
-    p = math.exp(log_p)
-    return V, p
+    return V, math.exp(log_p)
 
 
 # ── P-VALUE HELPERS ───────────────────────────────────────────
