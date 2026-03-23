@@ -667,7 +667,7 @@ def step6_colony_dialect(df, X_pca, n_primary=4):
         mask = colonies == col
         groups_per_colony.append(X[mask])
 
-    eta_sq_values = []
+        eta_sq_values = []
     for dim in range(n_primary):
         groups = [g[:, dim] for g in groups_per_colony
                   if len(g) > 1]
@@ -676,9 +676,10 @@ def step6_colony_dialect(df, X_pca, n_primary=4):
         f_stat, p_val = f_oneway(*groups)
 
         # Eta squared (effect size)
+        # groups is now a list of 1D arrays — index with [g] not [g[:, dim]]
         grand_mean = np.mean(X[:, dim])
         ss_between = sum(
-            len(g[:, dim]) * (np.mean(g[:, dim]) - grand_mean) ** 2
+            len(g) * (np.mean(g) - grand_mean) ** 2
             for g in groups
         )
         ss_total = np.sum((X[:, dim] - grand_mean) ** 2)
