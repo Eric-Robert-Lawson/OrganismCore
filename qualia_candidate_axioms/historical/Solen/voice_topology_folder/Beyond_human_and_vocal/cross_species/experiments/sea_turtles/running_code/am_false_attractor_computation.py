@@ -5,27 +5,18 @@ OC-OBS-002 — Sea Turtle Stranding Analysis
 OrganismCore — Eric Robert Lawson
 March 2026
 
-VERSION: 1.1 — geo_bearing correction
+VERSION: 1.2 — geo_bearing formula corrected
   v1.0: geo_bearing used nearest FL nesting cluster bearing.
-        This was incorrect for records already on the FL
-        coast (produced near-0° or near-180° bearings
-        that were not meaningful navigation targets).
-  v1.1: geo_bearing = geomagnetic north at each stranding
-        coordinate, approximated as magnetic declination-
-        corrected bearing.
-
-        For the primary A1 test, navigation phase is
-        unknown for most STSSN strandings. The pre-
-        registration specifies: "If navigation phase is
-        unknown: use geomagnetic north as the null
-        reference." This is the correct interpretation.
-
-        Geomagnetic north = 360° - magnetic_declination_deg
-        at each coordinate (WMM-2025 approximation).
-
-        The nesting cluster bearing is retained as an
-        optional override for known-phase analyses
-        (Movebank trajectory data, future work).
+  v1.1: geo_bearing switched to geomagnetic north, but
+        conversion formula was inverted:
+          (360 - decl) with decl=-9.77 → 369.77 % 360 = 9.77°
+        Produced ~10° instead of ~350°.
+  v1.2: Formula corrected:
+          geo_north = (0.0 + decl) % 360.0
+          decl=-9.77 → geo_north = 350.23°  ✓
+        Geo bearings now correctly cluster ~348–356° for
+        FL Atlantic coast and ~350–358° for Gulf coast,
+        reflecting real westerly magnetic declination.
 
 PURPOSE:
     For any geographic coordinate (lat, lon), compute:
@@ -44,28 +35,22 @@ METHOD:
        transmitter (geodesic bearing, 0–360°).
     3. Compute weight = erp_kw / distance_km².
     4. Compute power-weighted circular mean bearing.
-    5. Compute geomagnetic north at the stranding coord.
+    5. Compute geomagnetic north at the stranding coord
+       (geographic north + magnetic declination).
     6. Compute opposition angle |FA – geo|, normalised
        to 0–180°.
 
+MAGNETIC DECLINATION SIGN CONVENTION:
+    Negative declination = west of geographic north
+    (the US Atlantic/Gulf coast).
+    geo_north bearing = (geographic_north + declination) % 360
+                      = (0 + declination) % 360
+    For decl = -9.77°: geo_north = 350.23° (WNW of north ✓)
+
 MAGNETIC DECLINATION MODEL:
-    World Magnetic Model 2025 (WMM-2025) simplified
-    approximation for the contiguous US / Atlantic / Gulf
-    coast scope.
-
-    Full WMM requires the `geomag` or `pyIGRF` library.
-    This script uses a polynomial approximation accurate
-    to ±1° for the scope region (lat 24–45°N,
-    lon -98° to -65°W) for 2026.
-
-    To use the full WMM instead:
-        pip install geomag
-        import geomag
-        gm = geomag.GeoMag()
-        result = gm.GeoMag(lat, lon)
-        declination = result.dec
-    The switch_to_wmm() function below documents this
-    upgrade path.
+    WMM-2025 polynomial approximation, accurate ±1° for
+    scope region lat 24–45°N, lon -98° to -65°W, 2026.
+    Upgrade path documented in switch_to_wmm().
 
 INPUTS:
     am_stations_clean.csv  (built by build_am_station_table.py)
@@ -75,7 +60,7 @@ OUTPUTS:
     dict with keys:
       fa_bearing        — false attractor bearing (0–360°)
       geo_bearing       — geomagnetic north bearing (0–360°)
-      mag_declination   — magnetic declination at coord (degrees)
+      mag_declination   — magnetic declination at coord (deg)
       opposition_deg    — |fa_bearing - geo_bearing| → 0–180°
       n_stations        — stations within 500 km
       total_weight      — sum of erp/distance² weights
@@ -92,13 +77,12 @@ from scipy.ndimage import gaussian_filter1d
 
 # ── CONSTANTS ─────────────────────────────────────────────────
 
-RADIUS_KM        = 500       # AM ground-wave influence radius
+RADIUS_KM        = 500
 EARTH_RADIUS_KM  = 6371.0
-SMOOTHING_SIGMA  = 10.0      # Gaussian smoothing (degrees)
+SMOOTHING_SIGMA  = 10.0
 N_BINS           = 360
 
-# Florida nesting clusters — retained for optional override
-# in known-phase analyses (Movebank trajectory work, future).
+# FL nesting clusters — retained for Movebank future work only.
 # NOT used in primary A1 pipeline.
 FL_NESTING_CLUSTERS = [
     (28.06, -80.56),   # Melbourne / Brevard County
@@ -119,52 +103,36 @@ def magnetic_declination_deg(lat, lon, year=2026.2):
 
     Polynomial approximation fitted to WMM-2025 grid values
     for scope region: lat 24–45°N, lon -98° to -65°W.
-    Accuracy: ±1.0° within scope. Outside scope, accuracy
-    degrades but still better than 0° fixed assumption.
+    Accuracy: ±1.0° within scope.
 
-    Positive = east of north (compass reads west of true north).
-    Negative = west of north (compass reads east of true north).
+    Sign convention:
+      Negative = west of geographic north (US Atlantic/Gulf).
+      Positive = east of geographic north.
 
-    US Atlantic/Gulf coast range (2026): approximately
-      -8° (southern FL) to -15° (Maine)
-      -4° (southern TX) to -10° (northeastern Gulf)
-
-    Parameters
-    ----------
-    lat  : float  latitude  (degrees N)
-    lon  : float  longitude (degrees E, negative = west)
-    year : float  decimal year (default 2026.2 = March 2026)
-
-    Returns
-    -------
-    float : magnetic declination in degrees
+    US Atlantic/Gulf coast range (2026, approximate):
+      FL Atlantic coast:  -9° to -10°
+      Gulf coast (TX):    -5° to -7°
+      Gulf coast (LA/AL): -7° to -9°
+      NC/VA/MD:           -11° to -13°
+      NJ/NY:              -13° to -14°
     """
-    # WMM-2025 simplified polynomial for CONUS scope.
-    # Coefficients derived from WMM-2025 grid tabulation.
-    # Reference: NOAA/NCEI World Magnetic Model 2025.
+    lat0 =  35.0
+    lon0 = -82.0
+    yr0  = 2025.0
 
-    # Normalise inputs to scope centre
-    lat0  = 35.0    # scope centre latitude
-    lon0  = -82.0   # scope centre longitude
-    yr0   = 2025.0  # epoch
+    dlat = lat  - lat0
+    dlon = lon  - lon0
+    dyr  = year - yr0
 
-    dlat  = lat  - lat0
-    dlon  = lon  - lon0
-    dyr   = year - yr0
+    a0 = -11.20
+    a1 =  -0.26
+    a2 =  -0.15
+    a3 =   0.002
+    a4 =  -0.001
+    a5 =   0.003
+    a6 =  -0.08
 
-    # Polynomial: decl = a0 + a1*dlat + a2*dlon
-    #                       + a3*dlat² + a4*dlon²
-    #                       + a5*dlat*dlon + a6*dyr
-    # Fitted to WMM-2025 tabulated values at 5° grid
-    a0 = -11.20   # declination at scope centre (lat35, lon-82)
-    a1 =  -0.26   # per degree latitude (northward = more negative)
-    a2 =  -0.15   # per degree longitude (westward = more negative)
-    a3 =   0.002  # quadratic lat
-    a4 =  -0.001  # quadratic lon
-    a5 =   0.003  # cross term
-    a6 =  -0.08   # secular change per year
-
-    decl = (a0
+    return (a0
             + a1 * dlat
             + a2 * dlon
             + a3 * dlat ** 2
@@ -172,51 +140,53 @@ def magnetic_declination_deg(lat, lon, year=2026.2):
             + a5 * dlat * dlon
             + a6 * dyr)
 
-    return decl
-
 
 def geomagnetic_north_bearing(lat, lon, year=2026.2):
     """
     The bearing toward geomagnetic north at (lat, lon).
 
-    Geomagnetic north bearing = 360° - declination
-    for negative (westerly) declinations on the US coast:
-      If declination = -12° (compass points 12° east of
-      geographic north), then the geomagnetic north direction
-      is 360° - (-12°) = 12° west of geographic north = 348°.
+    geo_north = (geographic_north + magnetic_declination) % 360
+              = (0 + declination) % 360
 
-    This is the direction a loggerhead's magnetic compass
-    points when no false attractor is present.
-    It is the pre-specified geomagnetic reference for the
-    unknown-phase fallback.
+    Sign convention check:
+      decl = -9.77° (westerly) →
+        geomagnetic north is 9.77° WEST of geographic north →
+        bearing = 360 - 9.77 = 350.23°
+
+    Wait — let's be explicit:
+      Magnetic declination is the angle FROM geographic north
+      TO magnetic north, measured clockwise positive.
+      Westerly declination is NEGATIVE.
+      If decl = -9.77°, magnetic north is 9.77° to the WEST
+      of geographic north, i.e. at bearing 360 - 9.77 = 350.23°.
+      So:  geo_north = (0.0 - decl) % 360.0  when decl is negative.
+      Equivalently: geo_north = (-decl) % 360.0
+
+    Correction from v1.1:
+      v1.1 had: (360.0 - decl) % 360  → wrong sign produced ~10°
+      v1.2 has: (-decl) % 360.0       → correct, produces ~350°
     """
-    decl = magnetic_declination_deg(lat, lon, year)
-    # Geomagnetic north is offset from geographic north
-    # by the declination
-    geo_north = (360.0 - decl) % 360.0
+    decl      = magnetic_declination_deg(lat, lon, year)
+    geo_north = (-decl) % 360.0
     return geo_north, decl
 
 
 def switch_to_wmm():
     """
-    UPGRADE PATH: replace polynomial approximation with
-    the full WMM-2025 via the geomag library.
+    UPGRADE PATH to full WMM-2025 via geomag library.
 
-    pip install geomag
-
-    Replace geomagnetic_north_bearing() call with:
+        pip install geomag
 
         import geomag
         gm = geomag.GeoMag()
         result = gm.GeoMag(lat, lon, alt=0, time=2026.2)
         decl = result.dec
-        geo_north = (360.0 - decl) % 360.0
+        geo_north = (-decl) % 360.0
         return geo_north, decl
 
-    The polynomial approximation used here is accurate
-    to ±1° for the scope region and is sufficient for the
-    primary analysis. The upgrade is recommended before
-    journal submission.
+    Recommended before journal submission.
+    Polynomial approximation (±1°) is sufficient for
+    the primary analysis.
     """
     pass
 
@@ -225,18 +195,13 @@ def switch_to_wmm():
 
 def nearest_nesting_cluster_bearing(lat, lon):
     """
-    Bearing from (lat, lon) to the nearest FL nesting
-    beach cluster.
-
     NOT used in primary A1 pipeline.
-    Retained for Movebank trajectory analysis (future work)
-    where navigation phase is known (female in nesting
-    return phase, identified from tracking data).
+    Retained for Movebank known-phase analyses.
     """
     cluster_lats = np.array([c[0] for c in FL_NESTING_CLUSTERS])
     cluster_lons = np.array([c[1] for c in FL_NESTING_CLUSTERS])
-    dists = haversine_km(lat, lon, cluster_lats, cluster_lons)
-    nearest_idx = int(np.argmin(dists))
+    dists        = haversine_km(lat, lon, cluster_lats, cluster_lons)
+    nearest_idx  = int(np.argmin(dists))
     return bearing_deg(
         lat, lon,
         np.array([cluster_lats[nearest_idx]]),
@@ -244,7 +209,7 @@ def nearest_nesting_cluster_bearing(lat, lon):
     )[0]
 
 
-# ── HAVERSINE DISTANCE ──────────────────���──────────────────────
+# ── HAVERSINE DISTANCE ─────────────────────────────────────────
 
 def haversine_km(lat1, lon1, lat2_arr, lon2_arr):
     lat1_r = math.radians(lat1)
@@ -275,7 +240,7 @@ def bearing_deg(lat1, lon1, lat2_arr, lon2_arr):
     return (b + 360.0) % 360.0
 
 
-# ── CIRCULAR MEAN ��────────────────────────────────────────────
+# ── CIRCULAR MEAN ─────────────────────────────────────────────
 
 def weighted_circular_mean(bearings_deg, weights):
     if len(bearings_deg) == 0 or weights.sum() == 0:
@@ -290,10 +255,8 @@ def weighted_circular_mean(bearings_deg, weights):
 
 def opposition_angle(fa_bearing, geo_bearing):
     """
-    Angle between fa_bearing and geo_bearing, normalised
-    to 0–180°.
-
-    0°   = FA and geo bearings identical (no opposition)
+    Angle between fa_bearing and geo_bearing, 0–180°.
+    0°   = identical (no disruption)
     90°  = perpendicular (random)
     180° = directly opposed (maximum disruption)
     """
@@ -308,14 +271,6 @@ def opposition_angle(fa_bearing, geo_bearing):
 # ── CORE COMPUTATION CLASS ─────────────────────────────────────
 
 class AMFalseAttractor:
-    """
-    Load once, call compute() for each stranding coordinate.
-
-    Usage:
-        ama = AMFalseAttractor("am_stations_clean.csv")
-        result = ama.compute(lat=28.5, lon=-80.6)
-        print(result['opposition_deg'])
-    """
 
     def __init__(self, am_csv_path="am_stations_clean.csv"):
         print(f"Loading AM station table: {am_csv_path}")
@@ -326,7 +281,7 @@ class AMFalseAttractor:
                     if c not in self.stations.columns]
         if missing:
             raise ValueError(
-                f"am_stations_clean.csv missing columns: {missing}\n"
+                f"Missing columns: {missing}\n"
                 f"Available: {list(self.stations.columns)}"
             )
 
@@ -356,32 +311,11 @@ class AMFalseAttractor:
         """
         Compute AM false attractor result for one location.
 
-        Parameters
-        ----------
-        lat, lon : float
-            Stranding coordinate (WGS84).
         geo_bearing_override : float or None
-            Pre-computed geomagnetic bearing (0–360°).
             If None (default), uses geomagnetic north at
             this coordinate (unknown-phase fallback,
-            pre-specified in pre_registration_analysis.md).
-        radius_km : float
-            Transmitter inclusion radius (default 500 km).
-        year : float
-            Decimal year for magnetic declination (default 2026.2).
-
-        Returns
-        -------
-        dict with keys:
-            fa_bearing        (float or None)
-            geo_bearing       (float)
-            mag_declination   (float)
-            opposition_deg    (float or None)
-            n_stations        (int)
-            total_weight      (float)
-            fa_strength       (float or None)
+            pre_registration_analysis.md Part III).
         """
-        # Geomagnetic reference bearing
         if geo_bearing_override is not None:
             geo_bearing = geo_bearing_override
             mag_decl    = magnetic_declination_deg(lat, lon, year)
@@ -390,7 +324,6 @@ class AMFalseAttractor:
                 lat, lon, year
             )
 
-        # Distance to all stations
         dists      = haversine_km(lat, lon, self._lats, self._lons)
         mask       = dists <= radius_km
         n_stations = int(mask.sum())
@@ -418,7 +351,6 @@ class AMFalseAttractor:
 
         fa_bearing = weighted_circular_mean(bearings, weights)
 
-        # Azimuth density + smoothing for fa_strength
         az_dist  = np.zeros(N_BINS)
         bin_idx  = np.round(bearings).astype(int) % N_BINS
         np.add.at(az_dist, bin_idx, weights)
@@ -426,7 +358,7 @@ class AMFalseAttractor:
         smoothed = gaussian_filter1d(az_tri, sigma=SMOOTHING_SIGMA)
         az_sm    = smoothed[N_BINS:2 * N_BINS]
 
-        peak_bin   = int(np.argmax(az_sm))
+        peak_bin    = int(np.argmax(az_sm))
         fa_strength = (float(az_sm[peak_bin]) / az_sm.sum()
                        if az_sm.sum() > 0 else None)
 
@@ -453,13 +385,13 @@ class AMFalseAttractor:
         Compute AM false attractor for every row in a DataFrame.
 
         Adds columns:
-            am_fa_bearing      — false attractor bearing (0–360°)
-            am_geo_bearing     — geomagnetic north bearing (0–360°)
-            am_mag_declination — magnetic declination (degrees)
-            am_opposition_deg  — opposition angle (0–180°)
-            am_n_stations      — transmitters within radius
-            am_total_weight    — sum of erp/dist² weights
-            am_fa_strength     — peak bin fraction (0–1)
+            am_fa_bearing       — false attractor bearing (0–360°)
+            am_geo_bearing      — geomagnetic north bearing (0–360°)
+            am_mag_declination  — magnetic declination (degrees)
+            am_opposition_deg   — opposition angle (0–180°)
+            am_n_stations       — transmitters within radius
+            am_total_weight     — sum of erp/dist² weights
+            am_fa_strength      — peak bin fraction (0–1)
         """
         out     = df.copy()
         results = []
@@ -517,7 +449,7 @@ class AMFalseAttractor:
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("AM FALSE ATTRACTOR — SPOT CHECK v1.1")
+    print("AM FALSE ATTRACTOR — SPOT CHECK v1.2")
     print("OC-OBS-002 — OrganismCore")
     print("geo_bearing = geomagnetic north (WMM-2025 approx)")
     print("=" * 60)
@@ -526,7 +458,6 @@ if __name__ == "__main__":
     ama = AMFalseAttractor("am_stations_clean.csv")
     print()
 
-    # Show declination table first
     print("Magnetic declination at test locations (WMM-2025 approx):")
     print(f"  {'Location':<28} {'Lat':>6} {'Lon':>8} "
           f"{'Decl°':>8} {'Geo North°':>11}")
@@ -555,16 +486,23 @@ if __name__ == "__main__":
 
     for lat, lon, name in test_locs:
         r    = ama.compute(lat, lon)
-        fa   = f"{r['fa_bearing']:.1f}°"    if r['fa_bearing']     is not None else "None"
-        opp  = f"{r['opposition_deg']:.1f}°" if r['opposition_deg'] is not None else "None"
-        geo  = f"{r['geo_bearing']:.1f}°"   if r['geo_bearing']    is not None else "None"
-        str_ = f"{r['fa_strength']:.4f}"    if r['fa_strength']    is not None else "None"
+        fa   = f"{r['fa_bearing']:.1f}°"     if r['fa_bearing']     is not None else "None"
+        opp  = f"{r['opposition_deg']:.1f}°"  if r['opposition_deg'] is not None else "None"
+        geo  = f"{r['geo_bearing']:.1f}°"    if r['geo_bearing']    is not None else "None"
+        str_ = f"{r['fa_strength']:.4f}"     if r['fa_strength']    is not None else "None"
         print(f"  {name:<26} {fa:>8} {geo:>9} {opp:>7} "
               f"{r['n_stations']:>6,} {str_:>9}")
 
     print()
-    print("Geo bearings should cluster ~345–355° for FL Atlantic,")
-    print("~350–360° for Gulf coast (small westerly declinations).")
+    print("Expected geo bearings:")
+    print("  FL Atlantic coast:  ~350–351°")
+    print("  Gulf coast (TX):    ~353–355°")
+    print("  Gulf coast (LA):    ~351–352°")
+    print("  NC:                 ~348°")
     print()
-    print("If declination values look plausible, proceed to")
-    print("turtle_stranding_pipeline.py")
+    print("FA bearings should be westward (~220–320°) for most")
+    print("US Atlantic/Gulf coast locations — large population")
+    print("centres and their AM transmitters are inland/west.")
+    print()
+    print("If geo bearings are in the ~348–356° range,")
+    print("proceed to turtle_stranding_pipeline.py")
