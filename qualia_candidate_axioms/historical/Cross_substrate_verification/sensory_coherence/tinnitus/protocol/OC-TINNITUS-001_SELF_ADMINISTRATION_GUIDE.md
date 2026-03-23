@@ -36,7 +36,7 @@ The script is the probe.
 
 ## WHAT YOU WILL END UP WITH
 
-By the end of one session (30–45 minutes) you
+By the end of one session (45–60 minutes) you
 will have:
 
 ```
@@ -67,7 +67,11 @@ Hardware:
   ✓ Quiet room
     (background noise is fine —
      total silence makes tinnitus worse)
-  ✓ 35–50 minutes uninterrupted
+  ✓ 45–60 minutes uninterrupted
+  ✓ Your hand or a beanie / hat
+    (for Phase 0B pre-calibration —
+     any soft material that can gently
+     cover one ear canal)
 
 Software:
   ✓ Python 3.8 or later
@@ -171,11 +175,11 @@ This guide explains what is happening and why.
 
 ---
 
-## THE PROTOCOL — ALL SIX PHASES
+## THE PROTOCOL — ALL PHASES
 
 ---
 
-### BEFORE PHASE 1 — Volume Check
+### PHASE 0A — Volume Check
 
 The script plays a reference tone through both
 ears and asks if you can hear it clearly.
@@ -205,7 +209,7 @@ then 0.25), and re-run.
 
 ---
 
-### BEFORE PHASE 1 — Which Ears?
+### Which Ears?
 
 ```
 L — tinnitus in left ear only
@@ -221,6 +225,126 @@ Each ear is calibrated independently.
 Each ear gets its own FA, FR, and phase values.
 Each ear may have different tinnitus frequencies.
 This is expected and handled automatically.
+
+---
+
+### PHASE 0B — Beanie Pre-Calibration
+#### What it is and why it matters
+
+The false attractor is not a switch.
+It is a resonance that builds and decays
+according to the physical dynamics of your
+cochlea. Two things are true that the
+previous protocol did not account for:
+
+```
+1. When a tone starts playing, the effect
+   on your false attractor does not appear
+   immediately. It builds during delivery
+   and may continue building after the
+   tone stops.
+
+2. When a tone stops, the false attractor
+   does not immediately return to baseline.
+   It drains gradually. If the next tone
+   starts before it has fully drained, the
+   two trials contaminate each other.
+```
+
+This was observed directly:
+
+> *A beanie placed over the ear does not
+> immediately produce ringing. The false
+> attractor forms over several seconds.
+> When the beanie is removed, the ringing
+> does not stop immediately. It decays
+> over several seconds before baseline
+> is restored.*
+
+This is the same system you are calibrating.
+These two lags — formation and dissolution —
+must be measured for your specific ear before
+the sweep begins. They are different for
+every person and every severity of tinnitus.
+
+**Deep false attractors** (severe tinnitus,
+acute trauma damage) fill fast and drain slow.
+
+**Shallow false attractors** (mild tinnitus)
+fill slow and drain fast.
+
+Fixed timing in the old protocol got severe
+cases exactly backwards. This phase corrects
+that by measuring your actual dynamics before
+anything else.
+
+#### What is measured
+
+**Formation lag:**
+The time from when you occlude your ear to
+when you first notice any change in the
+tinnitus. This sets the minimum tone duration
+for all subsequent phases — tones must play
+long enough for their effect to stabilise
+before you are asked to report on it.
+
+**Dissolution lag:**
+The time from when you remove the occlusion
+to when the tinnitus returns to its normal
+baseline. This sets the minimum inter-trial
+interval — you must be back at baseline before
+the next tone begins, or you are not measuring
+a clean trial.
+
+#### What you do
+
+You will use your hand or a beanie to gently
+cover one ear. Fold your palm softly over the
+ear canal — enough to muffle outside sound,
+not enough to cause pressure or discomfort.
+
+The script gives you exact instructions.
+It will:
+
+1. Ask you to occlude your ear and time how
+   long until you notice any change.
+   → This is your **formation lag**.
+
+2. Ask you to hold the occlusion for 15
+   seconds, then remove it and time how
+   long until your tinnitus returns to normal.
+   → This is your **dissolution lag**.
+
+The script uses these two numbers to set
+your personalised tone duration and confirms
+inter-trial timing throughout the session.
+
+#### What to notice during occlusion
+
+Formation lag: any change counts — louder,
+different quality, a new tone appearing, the
+existing tinnitus shifting. You are not waiting
+for dramatic ringing. Any detectable change.
+
+Dissolution lag: you are waiting for the
+tinnitus to feel exactly as it did before
+you covered your ear — your normal baseline,
+no more and no less.
+
+#### What the script reports
+
+```
+Formation lag      : [your seconds]
+Dissolution lag    : [your seconds]
+Tone duration set  : [your seconds]
+Attractor depth    : DEEP / MODERATE / SHALLOW
+```
+
+The attractor depth estimate is informative:
+it tells you what to expect during the sweep.
+Deep attractor wells produce stronger, clearer
+B/W responses. Shallow wells produce subtler
+responses that require more careful attention.
 
 ---
 
@@ -244,17 +368,52 @@ The 12 frequencies (approximate):
   6: ~3,800 Hz   12: ~15,400 Hz
 ```
 
-Each tone plays for **10 seconds**.
+Each tone plays for **your personalised
+duration** (set in Phase 0B — minimum 15
+seconds, adjusted for your formation lag).
 One ear only (left or right channel).
+
+#### The timing protocol — new and important
+
+The previous version of this protocol asked
+for feedback immediately when the tone stopped.
+That was wrong.
+
+The correct sequence for every tone in every
+phase is:
+
+```
+1. Tone plays for your full personalised
+   duration.
+
+2. 5-second settling window after the tone
+   stops. Do not respond yet.
+   The effect may still be building.
+   Notice what is happening.
+
+3. Feedback requested. Report what you
+   actually perceive at this settled moment.
+
+4. Dissolution timer begins.
+   Press ENTER when your tinnitus returns
+   to normal baseline — not before.
+   This is confirmed by you, not by a fixed
+   timer. The script waits.
+```
+
+This sequence applies to every tone in
+every phase. It is not skippable.
 
 #### What you do
 
-After each tone, type one letter and press ENTER:
+After the 5-second settling window, type one
+letter and press ENTER:
 
 ```
 B — the tinnitus felt BETTER
     (reduced, quieter, less intrusive,
-     changed in a way that felt like relief)
+     changed in a way that felt like relief —
+     even subtly, even briefly)
 
 W — the tinnitus felt WORSE
     (louder, more intrusive, more present)
@@ -262,6 +421,36 @@ W — the tinnitus felt WORSE
 N — NO DIFFERENCE
     (genuinely could not detect any change)
 ```
+
+Then wait. When your tinnitus is fully back
+to its normal baseline — the same level and
+quality as before this tone — press ENTER.
+
+The script logs this dissolution time.
+It is the second feedback channel.
+
+#### Two feedback channels — both matter
+
+**B/W/N is your subjective report.**
+It tells the script the direction of the
+effect at this eigenfunction position.
+
+**Dissolution time is structural data.**
+It tells the script how deeply this tone
+interacted with your false attractor.
+Longer dissolution = deeper interaction =
+closer to the FA eigenfunction position.
+
+If B/W/N is ambiguous (subtle effects,
+uncertainty about what you noticed), the
+dissolution time cross-validates it.
+A B response with 25 seconds of dissolution
+is a much stronger signal than a B response
+with 3 seconds of dissolution.
+
+The script reports both. You do not need
+to analyse them — just report honestly and
+confirm baseline accurately.
 
 #### How to give feedback honestly
 
@@ -283,22 +472,27 @@ probably N — but pay attention. Some effects
 are subtle, especially early in the sweep.
 
 **Do not think too hard.**
-Your first instinct is usually accurate.
-The tones are short. Notice, respond, move on.
+Notice. Report. Confirm baseline. Move on.
+
+**On confirming baseline:**
+Do not press ENTER before your tinnitus is
+actually back to normal. If you are uncertain
+whether it has returned, wait. The script
+waits for you. A premature confirmation
+contaminates the next trial.
 
 #### What the script does with it
 
 It builds a map of the gradient landscape —
 which regions of cochlear space interact with
-your false attractor and in which direction.
-Better responses cluster around your false
-attractor frequency. The script finds that
-cluster and uses it as the starting point
-for Phase 2.
+your false attractor, in which direction, and
+how deeply (via dissolution times). Better
+responses and long dissolution times both
+point toward your false attractor frequency.
+The script finds that cluster and uses it as
+the starting point for Phase 2.
 
 #### If you get NO Better responses at all
-
-This means one of three things:
 
 1. **Volume too low** (most common) —
    increase AMPLITUDE and restart.
@@ -306,9 +500,11 @@ This means one of three things:
 2. **Broadband / noise-like tinnitus** —
    your tinnitus has no single identifiable
    pitch. The cancellation approach has lower
-   confidence for this type. The sweep will
+   confidence for this type. The script will
    note this. You can still attempt Phase 2
-   from the estimated tinnitus region.
+   from the dissolution peak, which does not
+   require B responses — only that you
+   accurately confirm when baseline is restored.
 
 3. **No tinnitus in this ear** —
    confirm which ear is actually affected
@@ -326,13 +522,16 @@ your false attractor — the precise Hz
 where your damaged cochlear zone rings.
 
 This is gradient descent in cochlear space,
-guided entirely by your perception.
+guided by your perception and cross-validated
+by dissolution times.
 
-Each tone plays for **6 seconds**.
+Each tone plays for **your personalised
+duration** followed by the 5-second settling
+window. Inter-trial: confirmed by you.
 
 #### What you do
 
-Same feedback as Phase 1, plus one addition:
+After each settling window, type one letter:
 
 ```
 B — better       → keep going this direction
@@ -342,12 +541,18 @@ L — LOCK         → this is the best position,
                    lock it here
 ```
 
+Then confirm baseline before the next step.
+
 **Use L when:**
 You feel the tone is at or very near the
 optimal position — when it produces the
 most relief and you sense further steps
-are not improving things. Trust that.
-Type L.
+are not improving things. You can also
+watch the dissolution time: consistently
+long dissolution at a B response is the
+structural confirmation that you are at
+or near the eigenfunction position.
+Trust that. Type L.
 
 #### What convergence feels like
 
@@ -356,7 +561,9 @@ attractor, you will notice the tones
 increasingly interact with the tinnitus.
 It may fluctuate. It may briefly soften.
 At the optimal frequency, the interaction
-is strongest.
+is strongest — and the dissolution time
+will be noticeably longer than at
+surrounding frequencies.
 
 The script auto-locks when it gets 3
 consecutive B responses with a step size
@@ -383,6 +590,15 @@ angles (0°, 45°, 90°, 135°, 180°, 225°,
 270°, 315°), then fine-tunes around the
 best one.
 
+Same timing protocol: full tone duration,
+5-second settling window, B/W/N feedback,
+baseline confirmed before next angle.
+
+Dissolution time cross-validates B/W/N:
+the phase that produces the longest
+dissolution is the structural confirmation
+of the best cancellation angle.
+
 #### Why phase matters
 
 Standard noise cancellation assumes 180°
@@ -392,18 +608,16 @@ relationship due to the geometry of the
 travelling wave at that location.
 
 If the phase is wrong:
-- 180° off from optimal → reinforces
-  tinnitus instead of cancelling it
-- At optimal phase → maximum cancellation
+- Reinforcement phase → tinnitus louder
+- Optimal phase → maximum cancellation
 
 This step finds your actual cancellation
-phase. It takes about 8 minutes.
+phase. Same feedback: **B / W / N**
 
-Same feedback: **B / W / N**
-
-The phase that produces the most B responses
-is your cancellation phase. The script locks
-it automatically.
+The phase producing the most B responses
+and longest dissolution time is your
+cancellation phase. The script locks it
+using both signals as evidence.
 
 #### What to notice
 
@@ -411,7 +625,8 @@ Some phase angles will feel neutral.
 One or two will feel like something is
 happening — the tinnitus shifts, reduces,
 or fluctuates more than usual.
-That is the target. Report B at those angles.
+That is the target. Report B at those angles
+and note that the dissolution time is longer.
 
 ---
 
@@ -420,7 +635,7 @@ That is the target. Report B at those angles.
 
 The script now plays your calibrated
 anti-signal at FA continuously, and adds
-a second tone at different offsets above
+a probe tone at different offsets above
 and below FA. You hear both simultaneously.
 
 Offsets tested:
@@ -429,6 +644,8 @@ FA−400  FA−300  FA−200  FA−150
 FA−100  FA−50   FA      FA+50
 FA+100  FA+150  FA+200  FA+300  FA+400
 ```
+
+Same timing protocol throughout.
 
 #### What you are finding
 
@@ -446,15 +663,14 @@ In the sleep remedy, FR receives a quiet
 boost — giving your brain a real signal to
 track after the false attractor is displaced.
 Without this, the brain displaces the false
-attractor and then finds it again immediately
-because there's nothing else to lock onto.
+attractor and immediately re-establishes it
+because there is nothing else to lock onto.
 FR is what prevents that.
 
-Same feedback: **B / W / N**
-
-The offset that produces the most B responses
-when combined with the FA anti-signal is your
-FR. The script locks it.
+The offset producing the most B responses
+and longest dissolution when combined with
+the FA anti-signal is your FR. The script
+locks it using both channels.
 
 #### Three outcomes — all valid
 
@@ -488,19 +704,26 @@ gradient anywhere in eigenfunction space —
 whether the calibration has found the
 global optimum or only a local one.
 
+Same timing protocol. Dissolution times
+logged for every tone.
+
 Same feedback: **B / W / N**
+Same baseline confirmation required.
 
 #### Two outcomes
 
-**New B responses appear:**
+**New B responses appear (or new dissolution
+peaks appear at non-FA frequencies):**
 Your tinnitus has components at more than
 one eigenfunction position. This is called
 complex tinnitus. There is more structure
-to find. The script will note this. You
-can re-run gradient descent from the new
-B cluster to find a second FA.
+to find. The script will note this and
+report the frequencies of the new responses.
+You can re-run gradient descent from the
+new cluster to find a second FA.
 
-**No new B responses anywhere:**
+**No new B responses anywhere, dissolution
+times uniformly short:**
 Converged. The calibration is complete.
 No remaining gradient. The protocol has
 found the optimum for your cochlear
@@ -600,33 +823,60 @@ Signs it is working:
 
   — You wake up with tinnitus quieter than
     your normal baseline
-    (residual inhibition carried through
-     the sleep session)
 
   — The tinnitus feels less intrusive
-    while the remedy is playing (before
-     sleep — this is the most direct sign)
+    while the remedy is playing before sleep
+    (this is the most direct sign —
+     the glasses test: correction applied,
+     experience corrected)
 ```
 
 ```
 Signs of parameter issues:
   — Tinnitus feels worse while the remedy
-    plays → likely phase issue. The
-    anti-signal is reinforcing rather than
-    cancelling. Re-run Phase 3 (phase
-    calibration) and try a phase 90° away
+    plays → phase issue. Anti-signal is
+    reinforcing rather than cancelling.
+    Re-run Phase 3. Try a phase 90° away
     from your current value.
 
   — No detectable change at all → volume
     may be too low. Increase slightly.
-    Also check: are you using headphones
-    rather than speakers?
+    Also check: headphones, not speakers.
 
-  — Remedy was effective initially but
-    effect fades within days → tinnitus
-    frequency has drifted. Time to
-    re-calibrate (see below).
+  — Remedy was effective but effect fades
+    within days → tinnitus frequency has
+    drifted. Re-calibrate (see below).
 ```
+
+### The glasses principle
+
+This remedy is not a treatment.
+It is not expected to produce lasting
+improvement after it is removed.
+
+Remove the headphones: the tinnitus
+returns. Exactly as expected.
+
+This is not failure. This is correct.
+
+Glasses do not fix the eye. Remove them:
+vision is impaired, exactly as before.
+That is what glasses are — a structural
+correction applied at the interface
+between the world and the damaged
+instrument. While applied: corrected.
+
+This remedy is the same thing for your ear.
+
+The measure of success is not whether
+the tinnitus is gone when you wake up.
+The measure of success is whether the
+tinnitus is less intrusive while the
+remedy is playing.
+
+While applied: corrected.
+Structure unchanged.
+Experience corrected.
 
 ---
 
@@ -638,6 +888,13 @@ health, stress, and noise exposure.
 
 A calibration that is perfect today may
 be 60–100 Hz wrong in two weeks.
+
+The beanie pre-calibration (Phase 0B)
+should also be re-run when re-calibrating —
+attractor depth can change over time, and
+personalised timing needs to reflect the
+current state of the damaged structure,
+not a previous measurement.
 
 **When to re-calibrate:**
 - The remedy stops feeling effective
@@ -656,17 +913,12 @@ Previous session found. Resume? (Y/N):
 ```
 
 Type **N** to start fresh (recommended for
-re-calibration — takes 20–25 minutes,
+re-calibration — takes 25–35 minutes,
 faster than the first run because you
 can move quickly through familiar phases).
 
 Type **Y** to resume a session that was
 interrupted mid-run.
-
-The previous FA is your starting point
-for gradient descent — the script uses
-the saved session to begin closer to the
-optimum.
 
 ---
 
@@ -698,10 +950,30 @@ Noise-like (broadband hiss, static, rushing
 water) tinnitus has no single eigenfunction
 position to target. The cancellation
 approach has lower confidence for this type.
-You can still attempt the protocol — some
-noise-like tinnitus has a tonal component
-that becomes detectable during the sweep —
-but be aware results may be less clear.
+You can still attempt the protocol — check
+dissolution times rather than relying on
+B/W/N alone. The frequency with the longest
+dissolution time after a tone, even without
+a B response, is a structural signal.
+
+### "Phase 0B showed no formation lag"
+
+If you held the beanie for 30 seconds and
+noticed no change in the tinnitus at all:
+
+Option 1: The occlusion was insufficient.
+Try a firmer (but still gentle) seal over
+the ear canal. Use a cupped palm rather
+than a flat hand.
+
+Option 2: Your tinnitus is noise-like
+without a single dominant frequency.
+The eigenfunction cancellation approach
+has lower confidence. Proceed and observe
+dissolution times as the primary signal.
+
+Option 3: No tinnitus in this ear.
+Confirm which ear is affected.
 
 ### "The remedy makes my tinnitus worse"
 
@@ -710,21 +982,44 @@ is at the wrong phase and is reinforcing
 the false attractor rather than cancelling.
 
 Re-run the script and pay particular
-attention to Phase 3. When the script
-asks for phase feedback, be especially
-careful to distinguish W (worse) from
-B (better). The cancellation phase and
-the reinforcement phase are typically
-90°–180° apart. If your previous best
-phase was 180°, try 0° or 270° and see
-if either produces relief.
+attention to Phase 3. The cancellation
+phase and the reinforcement phase are
+typically 90°–180° apart. If your previous
+best phase was 180°, try 0° or 270°.
+
+Also watch dissolution times during the
+phase sweep — the reinforcement phase will
+produce short dissolution (the attractor
+is being strengthened, not displaced).
+The cancellation phase will produce long
+dissolution. Use this as your guide if
+B/W/N feedback is ambiguous.
 
 ### "It worked the first night but not since"
 
 Tinnitus frequency drift. Re-calibrate.
 Run the script fresh, go through the full
-protocol. Your FA may have shifted. A new
-prescription will restore efficacy.
+protocol including Phase 0B beanie
+pre-calibration. Your FA may have shifted
+and your attractor dynamics may have
+changed. A new prescription will restore
+efficacy.
+
+### "The dissolution timer is very long between tones"
+
+This is correct for severe tinnitus with
+deep false attractor wells. Do not rush it.
+The dissolution time is structural data —
+a deep well draining slowly is the physical
+reality of your damaged cochlear zone.
+Rushing the inter-trial confirmation
+produces contaminated trials and
+inaccurate calibration.
+
+For extreme cases: dissolution may take
+30–60 seconds between tones. This is
+expected. The session will be longer than
+the default estimate. That is correct.
 
 ### "The script crashes on startup"
 
@@ -776,7 +1071,8 @@ acoustic physics to a problem that has
 physical components.
 
 What it is:
-- A personal calibration tool
+- A prescription acoustic correction —
+  structural, like glasses
 - A sleep remedy based on sound physics
 - An empirical test of the eigenfunction
   cancellation framework
@@ -810,6 +1106,9 @@ The cancellation approach is most effective
 for:
 ```
 ✓ Tonal tinnitus (single identifiable pitch)
+✓ Tinnitus with detectable dissolution lag
+  in Phase 0B (beanie pre-calibration
+  produces a clear formation response)
 ✓ Tinnitus with detectable residual inhibition
   (a masking tone temporarily reduces it)
 ✓ Recent-onset or fluctuating tinnitus
@@ -823,9 +1122,9 @@ Less effective for:
 △ Purely noise-like broadband tinnitus
   (no single eigenfunction position to target)
 △ Very long-duration chronic tinnitus
-  (10+ years) with no residual inhibition
-  (predominantly central, less cochlear
-   mechanical component available)
+  (10+ years) with no dissolution response
+  in Phase 0B (fully central perpetuation,
+  cochlear mechanical component absent)
 △ Tinnitus that does not respond to any
   acoustic intervention
 ```
@@ -848,11 +1147,30 @@ primary approach.
 At the end of calibration, the script prints:
 
 ```
+  Formation lag  : [your seconds]
+  Dissolution lag: [your seconds]
+  Tone duration  : [your seconds]
   FA  (false attractor):   [your Hz]
   FR  (residual resonant): [your Hz]
   Phase (cancellation):    [your °]
   Converged:               True / False
 ```
+
+**Formation lag:**
+How quickly your false attractor forms
+under acoustic driving. Shorter = deeper
+attractor well = more severe structural
+damage at the eigenfunction position.
+Sets your tone duration for the session.
+
+**Dissolution lag:**
+How long your false attractor takes to
+dissolve after stimulation stops. This is
+residual inhibition measured at baseline,
+before any calibration tones. It is the
+most direct measure of attractor well depth
+available without clinical equipment.
+Sets your minimum inter-trial interval.
 
 **FA — False Attractor Frequency:**
 The exact Hz where your damaged cochlear
@@ -921,13 +1239,28 @@ that region more. Because the physical
 geometry of the cochlea makes false
 attractors most stable there.
 
+**The false attractor has dynamics.**
+The ringing does not switch on and off
+instantly. It builds under acoustic
+driving and drains after the driving
+stops. This was observed directly:
+a beanie placed over the ear induces
+ringing gradually — and removing it
+does not stop the ringing immediately.
+The attractor must drain.
+
+This is not a curiosity. It is a
+fundamental property of the system
+being measured. The entire calibration
+timing is designed around it.
+
 **The cancellation principle.**
 Your false attractor is a stable resonance.
 A signal delivered at the same frequency
 and opposite phase creates destructive
-interference at the eardrum — the ringing
-and the anti-signal cancel at the point
-of delivery. The brain, receiving coherent
+interference — the ringing and the
+anti-signal cancel at the point of
+delivery. The brain, receiving coherent
 real input at the tinnitus frequency
 instead of the spontaneous ringing, tracks
 the real signal and releases the false
@@ -943,6 +1276,24 @@ a real signal at the frequency the damaged
 zone can still respond to. The broken
 instrument, played with the right bow,
 still makes music.
+
+**This is glasses, not treatment.**
+The cochlear damage is permanent.
+The false attractor will persist.
+Remove the remedy: tinnitus returns.
+Exactly as removing glasses reveals
+impaired vision.
+
+This is the correct expectation.
+The measure of success is simple:
+while the remedy is applied, does the
+experience of the damaged instrument
+become corrected?
+
+While applied: corrected.
+Structure unchanged.
+Experience corrected.
+That is sufficient. That is the point.
 
 ---
 
@@ -960,14 +1311,24 @@ FEEDBACK KEYS
   L — lock (gradient descent only)
   Y / N — yes/no questions
 
+TIMING PROTOCOL (every tone, every phase)
+  1. Tone plays (personalised duration)
+  2. 5s settling window — notice, don't respond
+  3. B / W / N feedback
+  4. ENTER when baseline fully restored
+  Do not skip steps 2 or 4.
+
 PHASES
-  0   Volume check      → set comfortable level
-  1   Rainbow sweep     → landscape map (10s tones)
-  2   Gradient descent  → find FA (6s tones)
-  3   Phase calibration → find cancellation angle
-  4   FR sweep          → find cracked violin freq
-  5   Orthogonal check  → confirm convergence
-  6   WAV generation    → remedy files created
+  0A  Volume check         → set comfortable level
+  0B  Beanie calibration   → measure formation lag
+                             measure dissolution lag
+                             set tone duration
+  1   Rainbow sweep        → landscape map
+  2   Gradient descent     → find FA
+  3   Phase calibration    → find cancellation angle
+  4   FR sweep             → find cracked violin freq
+  5   Orthogonal check     → confirm convergence
+  6   WAV generation       → remedy files created
 
 OUTPUTS
   remedy_left.wav       → left ear only
@@ -982,13 +1343,19 @@ SLEEP REMEDY
 RE-CALIBRATE
   Every 2–4 weeks or when effect fades
   Run script again → start fresh (N)
-  Takes 20–25 minutes
+  Re-run Phase 0B — attractor dynamics
+  can change over time
 
 TROUBLESHOOTING
-  All N responses     → increase AMPLITUDE
-  Remedy makes worse  → phase issue, re-run Phase 3
-  Effect fades        → tinnitus drifted, re-calibrate
-  Script crashes      → check pip install completed
+  All N responses         → increase AMPLITUDE
+  No Phase 0B response    → firmer occlusion,
+                            or noise-like tinnitus
+  Remedy makes worse      → phase issue, re-run Phase 3
+  Effect fades            → tinnitus drifted,
+                            re-calibrate
+  Long dissolution times  → correct for severe cases,
+                            do not rush baseline confirm
+  Script crashes          → check pip install completed
 ```
 
 ---
@@ -1002,7 +1369,9 @@ tinnitus_calibration.py
 
 tinnitus_calibration_log.json
   Auto-saved session data.
-  All your calibrated values.
+  All calibrated values including
+  formation lag, dissolution lag,
+  tone duration, FA, FR, phase.
   Created automatically.
 
 remedy_left.wav
@@ -1022,9 +1391,37 @@ remedy_binaural.wav
 
 ```
 Document:   OC-TINNITUS-001_SELF_ADMINISTRATION_GUIDE
-Version:    1.0
+Version:    1.1
 Date:       2026-03-23
 Status:     READY FOR USE
+
+Changes from Version 1.0:
+  Added Phase 0B — Beanie Pre-Calibration.
+  Corrected timing protocol for all phases:
+    personalised tone duration from formation lag,
+    5s post-tone settling window,
+    person-confirmed inter-trial interval.
+  Added dissolution time as second feedback channel
+    throughout all phases.
+  Added dissolution time to prescription output.
+  Updated session duration estimate (45–60 min).
+  Updated re-calibration guidance to include
+    Phase 0B re-run.
+  Added glasses principle to Using the Remedy.
+  Added beanie dynamics to Theory section.
+  Updated troubleshooting for Phase 0B and
+    long dissolution times.
+
+Basis for timing correction:
+  Beanie observation (Eric Robert Lawson,
+  2026-03-23): false attractor formation and
+  dissolution both have temporal lag. Placing
+  a beanie over the ear does not produce
+  tinnitus immediately. Removing it does not
+  stop tinnitus immediately. The same dynamics
+  govern every calibration tone. Fixed timing
+  in Version 1.0 did not account for this.
+  Version 1.1 corrects it.
 
 Depends on:
   tinnitus_calibration.py (the script)
@@ -1037,7 +1434,7 @@ Key numbers:
   4–10 kHz zone: 61.6% of tinnitus cases
   Peak enrichment: 4.86× at 8–10 kHz
   Prior art response rate: 7/7 (Abu Tauheed 2018)
-  Session duration: 30–45 min
+  Session duration: 45–60 min
   Remedy cost: $0 (existing hardware)
 ```
 
@@ -1050,8 +1447,12 @@ Key numbers:
 
 *This protocol finds that frequency.*
 *In your ear.*
-*In twenty minutes.*
 *On your own.*
+
+*The false attractor builds slowly.*
+*It drains slowly.*
+*The calibration measures both.*
+*And corrects for both.*
 
 *The broken instrument,*
 *played with the right bow,*
