@@ -6,6 +6,10 @@
 
 ---
 
+Mention of previous built upon reasoning artifact is not found in repo because the chat only went into photosensitive and music related reflex, this is full derivation, not the shallow one. Refused the shallow one.
+
+---
+
 ## STATUS
 
 Reasoning artifact — principles first derivation
