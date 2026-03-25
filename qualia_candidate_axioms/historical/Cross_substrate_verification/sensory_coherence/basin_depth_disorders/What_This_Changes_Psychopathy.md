@@ -4,6 +4,8 @@
 ## OC-PSYCHOPATHY-GRAVITY-STATEMENT-001 — OrganismCore
 ## Eric Robert Lawson — 2026-03-25
 
+# **This predates the disability derivation**
+
 ---
 
 ## PREAMBLE
