@@ -1359,12 +1359,12 @@ def main():
         log("OUTPUTS", fh)
         log("═"*70, fh)
         log(f"""
-  {OUT_CSMD1_FM:<35s} CSMD1 approximate fine-mapping
-  {OUT_EQTL:<35s} Brain eQTL lookup (SEMA3A, CSMD1, SLIT2)
-  {OUT_MR:<35s} MR results (IVW, WM, Egger, Mode)
-  {OUT_MR_LOO:<35s} Leave-one-out MR
-  {OUT_MR_STEIGER:<35s} Steiger direction test
-  {OUT_COLOC:<35s} Colocalisation posteriors (ABF)
+  {str(OUT_CSMD1_FM):<35s} CSMD1 approximate fine-mapping
+  {str(OUT_EQTL):<35s} Brain eQTL lookup (SEMA3A, CSMD1, SLIT2)
+  {str(OUT_MR):<35s} MR results (IVW, WM, Egger, Mode)
+  {str(OUT_MR_LOO):<35s} Leave-one-out MR
+  {str(OUT_MR_STEIGER):<35s} Steiger direction test
+  {str(OUT_COLOC):<35s} Colocalisation posteriors (ABF)
 
 INTERPRETATION GUIDE:
 
