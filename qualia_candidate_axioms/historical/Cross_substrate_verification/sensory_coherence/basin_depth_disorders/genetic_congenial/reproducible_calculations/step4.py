@@ -522,16 +522,16 @@ def csmd1_finemap(df_r, fh):
 
 def eqtl_lookup(fh):
     """
-    Query EBI eQTL Catalogue API v2 for brain eQTLs at:
-      rs78404854  — top SEMA3A hit (chr7:83,662,138)
-      rs4383974   — top CSMD1 hit  (chr8:9,619,348)
-      rs144081524 — top SLIT2 hit  (chr4:20,870,358)
+    Query EBI eQTL Catalogue API v2 by genomic position.
+    The /associations endpoint returns 404 for rsIDs not in
+    its internal variant registry. Use /associations with
+    molecular_trait_id or query by chromosome + position range
+    via the /regions endpoint instead.
     """
     log("\n── ANALYSIS 2: EBI eQTL CATALOGUE LOOKUP ────────────────", fh)
 
     if not HAS_REQUESTS:
-        log("  requests library not available.", fh)
-        log("  Install: pip install requests", fh)
+        log("  requests library not available (pip install requests).", fh)
         _eqtl_offline_guide(fh)
         return pd.DataFrame()
 
@@ -539,128 +539,205 @@ def eqtl_lookup(fh):
         "rs78404854": {
             "gene": "SEMA3A", "chr": "7", "pos": 83_662_138,
             "note": "Top SEMA3A Layer A hit — beta=+0.071 right UF FA",
-            "risk_allele": "C",
-            "protective_allele": "T",
+            "risk_allele": "C", "protective_allele": "T",
+            "window": 50_000,
         },
         "rs4383974": {
             "gene": "CSMD1", "chr": "8", "pos": 9_619_348,
             "note": "Top CSMD1 Layer E hit — beta=+0.059 right UF FA",
-            "risk_allele": "G",
-            "protective_allele": "C",
+            "risk_allele": "G", "protective_allele": "C",
+            "window": 50_000,
         },
         "rs144081524": {
             "gene": "SLIT2", "chr": "4", "pos": 20_870_358,
             "note": "Top SLIT2 suggestive hit — beta=+0.435 right UF FA",
-            "risk_allele": "A",
-            "protective_allele": "G",
+            "risk_allele": "A", "protective_allele": "G",
+            "window": 50_000,
         },
     }
 
-    results = []
-    log(f"\n  Querying EBI eQTL Catalogue API: {EBI_EQTL_BASE}", fh)
-    log(f"  Brain tissue keywords: brain, cortex, temporal, frontal,", fh)
-    log(f"    hippocampus, cerebellum, caudate, putamen, nucleus,", fh)
-    log(f"    psyche, neuro, fetal, foetal", fh)
+    brain_keywords = [
+        "brain", "cortex", "temporal", "frontal", "hippocampus",
+        "cerebellum", "caudate", "putamen", "nucleus", "psyche",
+        "neuro", "fetal", "foetal", "substantia", "amygdala",
+    ]
 
-    brain_keywords = ["brain", "cortex", "temporal", "frontal",
-                      "hippocampus", "cerebellum", "caudate",
-                      "putamen", "nucleus", "psyche", "neuro",
-                      "fetal", "foetal"]
+    results = []
+
+    # Strategy 1: rsID via /associations (may 404 — known issue)
+    # Strategy 2: position range via /regions endpoint
+    # Strategy 3: gene name via /genes/{gene_id}/associations
+    # We try all three and take the union
+
+    log(f"\n  Three-strategy eQTL lookup per SNP:", fh)
+    log(f"  Strategy 1 — rsID direct (/associations?variant_id=)", fh)
+    log(f"  Strategy 2 — position range (/regions endpoint)", fh)
+    log(f"  Strategy 3 — gene-level lookup (/genes endpoint)", fh)
 
     for rsid, info in query_snps.items():
-        log(f"\n  ── {rsid} ({info['gene']}) ──", fh)
+        log(f"\n  ── {rsid} ({info['gene']}) ──────────────────────────", fh)
         log(f"     {info['note']}", fh)
-        log(f"     Risk allele (lower UF FA): {info['risk_allele']}", fh)
 
-        url    = f"{EBI_EQTL_BASE}/associations"
-        params = {"variant_id": rsid, "size": 1000}
+        snp_hits = []
 
+        # ── Strategy 1: rsID direct ──────────────────────────────
         try:
-            resp = requests.get(url, params=params, timeout=30)
-
+            url    = f"{EBI_EQTL_BASE}/associations"
+            params = {"variant_id": rsid, "size": 1000}
+            resp   = requests.get(url, params=params, timeout=20)
             if resp.status_code == 200:
                 data = resp.json()
                 hits = data.get("_embedded", {}).get("associations", [])
-
-                if not hits:
-                    log(f"     No associations found in eQTL Catalogue.", fh)
-                    log(f"     Possible reasons:", fh)
-                    log(f"       (a) Variant not genotyped in catalogued studies", fh)
-                    log(f"       (b) Not a significant eQTL in any catalogued tissue", fh)
-                    log(f"       (c) eQTL effect is fetal-specific (absent from adult GTEx)", fh)
+                if hits:
+                    log(f"     Strategy 1 (rsID): {len(hits)} hits", fh)
+                    snp_hits.extend(hits)
                 else:
-                    log(f"     Total associations found: {len(hits)}", fh)
-
-                    brain_hits = [
-                        h for h in hits
-                        if any(kw in str(h.get("tissue_label", "")).lower()
-                               for kw in brain_keywords)
-                    ]
-                    log(f"     Brain-tissue hits: {len(brain_hits)}", fh)
-
-                    display = brain_hits if brain_hits else hits
-                    log(f"\n     {'Gene':15s} {'Tissue':35s} {'Beta':>8s} "
-                        f"{'p':>12s} {'Study':20s}", fh)
-                    log(f"     {'─'*95}", fh)
-
-                    for h in display[:15]:
-                        gene_id   = str(h.get("gene_id", "?"))
-                        tissue    = str(h.get("tissue_label", "?"))
-                        beta_eqtl = h.get("beta", "?")
-                        pval      = h.get("pvalue", "?")
-                        study     = str(h.get("study_id", "?"))
-                        log(f"     {gene_id:15s} {tissue:35s} {str(beta_eqtl):>8s} "
-                            f"{str(pval):>12s} {study:20s}", fh)
-
-                        results.append({
-                            "query_rsid":       rsid,
-                            "query_gene":       info["gene"],
-                            "eqtl_gene":        gene_id,
-                            "tissue":           tissue,
-                            "beta_eqtl":        beta_eqtl,
-                            "pvalue":           pval,
-                            "study":            study,
-                            "is_brain":         h in brain_hits,
-                        })
-
-                    # Direction check for SEMA3A
-                    if info["gene"] == "SEMA3A":
-                        target_hits = [
-                            h for h in brain_hits
-                            if "SEMA3A" in str(h.get("gene_id", "")).upper()
-                        ]
-                        if target_hits:
-                            log(f"\n     P4-7 DIRECTION CHECK (SEMA3A eQTL):", fh)
-                            log(f"     Risk allele {info['risk_allele']} reduces right UF FA (beta<0 in GWAS)", fh)
-                            log(f"     Prediction: same allele reduces SEMA3A expression", fh)
-                            for h in target_hits[:3]:
-                                b = h.get("beta", None)
-                                if b is not None:
-                                    try:
-                                        b_float = float(b)
-                                        direction = "LOWER expression" if b_float < 0 else "HIGHER expression"
-                                        concordant = b_float < 0
-                                        log(f"     eQTL beta={b_float:.4f} -> {direction}", fh)
-                                        log(f"     P4-7: {'CONCORDANT (CONFIRMED)' if concordant else 'DISCORDANT (DENIED)'}", fh)
-                                    except (ValueError, TypeError):
-                                        log(f"     eQTL beta={b} (cannot parse)", fh)
-                        else:
-                            log(f"\n     No SEMA3A brain eQTLs found — P4-7 untestable from API.", fh)
-                            log(f"     Manual check required: https://gtexportal.org/home/snp/rs78404854", fh)
-
-            elif resp.status_code == 404:
-                log(f"     rsID not found in eQTL Catalogue (404).", fh)
+                    log(f"     Strategy 1 (rsID): 0 hits", fh)
             else:
-                log(f"     API returned status {resp.status_code}.", fh)
-
-        except requests.exceptions.Timeout:
-            log(f"     API timeout (>30s). EBI server may be slow.", fh)
-            log(f"     Manual: https://www.ebi.ac.uk/eqtl/", fh)
+                log(f"     Strategy 1 (rsID): HTTP {resp.status_code}", fh)
         except Exception as e:
-            log(f"     API error: {e}", fh)
+            log(f"     Strategy 1 error: {e}", fh)
+
+        # ── Strategy 2: position range ───────────────────────────
+        try:
+            chrom    = info["chr"]
+            pos      = info["pos"]
+            win      = info["window"]
+            url2     = f"{EBI_EQTL_BASE}/associations"
+            params2  = {
+                "chromosome":   chrom,
+                "position_lower": pos - win,
+                "position_upper": pos + win,
+                "size": 1000,
+            }
+            resp2 = requests.get(url2, params=params2, timeout=30)
+            if resp2.status_code == 200:
+                data2 = resp2.json()
+                hits2 = data2.get("_embedded", {}).get("associations", [])
+                # Filter to SNPs near our position
+                hits2_near = [
+                    h for h in hits2
+                    if abs(int(h.get("position", 0)) - pos) <= win
+                ]
+                if hits2_near:
+                    log(f"     Strategy 2 (position ±{win//1000}kb): "
+                        f"{len(hits2_near)} hits near target", fh)
+                    snp_hits.extend(hits2_near)
+                else:
+                    log(f"     Strategy 2 (position): 0 hits near target "
+                        f"({len(hits2)} in window)", fh)
+            else:
+                log(f"     Strategy 2 (position): HTTP {resp2.status_code}", fh)
+        except Exception as e:
+            log(f"     Strategy 2 error: {e}", fh)
+
+        # ── Strategy 3: gene-level ───────────────────────────────
+        try:
+            gene_name = info["gene"]
+            # Search by gene name in molecular_trait_id
+            url3    = f"{EBI_EQTL_BASE}/associations"
+            params3 = {
+                "molecular_trait_id": gene_name,
+                "size": 1000,
+            }
+            resp3 = requests.get(url3, params=params3, timeout=30)
+            if resp3.status_code == 200:
+                data3 = resp3.json()
+                hits3 = data3.get("_embedded", {}).get("associations", [])
+                # Filter to SNPs near our position
+                hits3_near = [
+                    h for h in hits3
+                    if abs(int(h.get("position", 0)) - info["pos"]) <= 500_000
+                ]
+                if hits3_near:
+                    log(f"     Strategy 3 (gene={gene_name}): "
+                        f"{len(hits3_near)} hits within 500kb of target", fh)
+                    snp_hits.extend(hits3_near)
+                else:
+                    log(f"     Strategy 3 (gene): 0 hits near position "
+                        f"({len(hits3)} total for gene)", fh)
+            else:
+                log(f"     Strategy 3 (gene): HTTP {resp3.status_code}", fh)
+        except Exception as e:
+            log(f"     Strategy 3 error: {e}", fh)
+
+        # ── Deduplicate and display ──────────────────────────────
+        if not snp_hits:
+            log(f"\n     No eQTL hits from any strategy.", fh)
+            log(f"     This variant/gene is not in the EBI Catalogue.", fh)
+            log(f"     Manual GTEx lookup required:", fh)
+            log(f"     https://gtexportal.org/home/snp/{rsid}", fh)
+            continue
+
+        # Deduplicate on (gene_id, tissue_label, variant_id)
+        seen   = set()
+        unique = []
+        for h in snp_hits:
+            key = (h.get("gene_id",""), h.get("tissue_label",""),
+                   h.get("variant_id", h.get("rsid","")))
+            if key not in seen:
+                seen.add(key)
+                unique.append(h)
+
+        # Filter to brain tissues
+        brain_hits = [
+            h for h in unique
+            if any(kw in str(h.get("tissue_label","")).lower()
+                   for kw in brain_keywords)
+        ]
+
+        log(f"\n     Total unique hits: {len(unique)} "
+            f"| Brain-tissue hits: {len(brain_hits)}", fh)
+
+        display = brain_hits if brain_hits else unique[:10]
+        if display:
+            log(f"\n     {'Gene':18s} {'Tissue':35s} {'Beta':>8s} "
+                f"{'p':>12s} {'Study':15s}", fh)
+            log(f"     {'─'*95}", fh)
+            for h in display[:15]:
+                gene_id   = str(h.get("gene_id","?"))
+                tissue    = str(h.get("tissue_label","?"))
+                beta_eqtl = h.get("beta","?")
+                pval      = h.get("pvalue","?")
+                study     = str(h.get("study_id","?"))
+                log(f"     {gene_id:18s} {tissue:35s} {str(beta_eqtl):>8s} "
+                    f"{str(pval):>12s} {study:15s}", fh)
+                results.append({
+                    "query_rsid":  rsid,
+                    "query_gene":  info["gene"],
+                    "eqtl_gene":   gene_id,
+                    "tissue":      tissue,
+                    "beta_eqtl":   beta_eqtl,
+                    "pvalue":      pval,
+                    "study":       study,
+                    "is_brain":    h in brain_hits,
+                })
+
+        # Direction check for SEMA3A
+        if info["gene"] == "SEMA3A" and brain_hits:
+            sema3a_hits = [
+                h for h in brain_hits
+                if "SEMA3A" in str(h.get("gene_id","")).upper()
+                or "SEMA3A" in str(h.get("molecular_trait_id","")).upper()
+            ]
+            if sema3a_hits:
+                log(f"\n     P4-7 DIRECTION CHECK:", fh)
+                log(f"     Risk allele C -> lower right UF FA (beta_GWAS < 0)", fh)
+                log(f"     Prediction: C allele -> lower SEMA3A expression", fh)
+                for h in sema3a_hits[:3]:
+                    try:
+                        b = float(h.get("beta", "nan"))
+                        direction  = "LOWER" if b < 0 else "HIGHER"
+                        concordant = b < 0
+                        log(f"     beta_eQTL = {b:+.4f} -> {direction} SEMA3A expression", fh)
+                        log(f"     P4-7: {'CONFIRMED (concordant)' if concordant else 'DENIED (discordant)'}", fh)
+                    except (ValueError, TypeError):
+                        log(f"     beta_eQTL = {h.get('beta','?')} (unparseable)", fh)
 
     if not results:
-        log(f"\n  No eQTL results retrieved via API.", fh)
+        log(f"\n  No eQTL results from any strategy for any SNP.", fh)
+        log(f"  These variants are not in the EBI eQTL Catalogue.", fh)
+        log(f"  P4-7 requires manual GTEx lookup.", fh)
         _eqtl_offline_guide(fh)
 
     df_eqtl = pd.DataFrame(results) if results else pd.DataFrame()
