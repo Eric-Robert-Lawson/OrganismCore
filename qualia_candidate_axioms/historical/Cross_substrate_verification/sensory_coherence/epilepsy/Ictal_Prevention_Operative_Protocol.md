@@ -31,7 +31,7 @@ G — the attractor landscape
     seizure discharge [Basin B],
     separated by a saddle point)
 
-R �� the resolution
+R — the resolution
     (stable neural activity OR seizure)
 ```
 
