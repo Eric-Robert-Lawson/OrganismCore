@@ -1,0 +1,472 @@
+══════════════════════════════════════════════════════════════════════
+STEP 3 DEEPER ANALYSIS
+OC-PSYCHOPATHY-GENETIC-MARKER-DERIVATION-001
+Run: 2026-03-26 16:37:38
+══════════════════════════════════════════════════════════════════════
+
+Seven analyses:
+  1. Genomic inflation decomposition (confounding vs polygenicity)
+  2. Chr8 cluster identification (5 GWS loci in 4Mb)
+  3. SEMA3A locus fine-mapping
+  4. Right vs left beta comparison at shared significant SNPs
+  5. Candidate layer enrichment test (1000 permutations)
+  6. Cross-layer signal profile (mean chi-squared per window)
+  7. SLIT2 locus extraction and directional check
+
+── LOADING ───────────────────────────────────────────────
+  Loading 1496.txt  (936 MB)...
+  17,103,079 variants  [14.6s]
+  Loading 1497.txt  (936 MB)...
+  17,103,079 variants  [15.9s]
+
+── ANALYSIS 1: GENOMIC INFLATION DECOMPOSITION ──────────
+  Testing whether inflation is confounding vs polygenicity.
+  Confounding: lambda uniform across p-value quantiles.
+  Polygenicity: lambda larger at top quantiles.
+
+  Right UF FA:
+  Quantile range                N SNPs    Lambda GC
+  ──────────────────────────────────────────────────
+  Bottom 50% (p>0.5)         8,287,669       0.2249
+  25-50% (0.1<p<0.5)         6,853,892       2.3930
+  10-25% (0.01<p<0.1)        1,701,998       8.1989
+  Top 10% (p<0.01)             259,470      17.9925
+  Top 1% (p<0.001)              45,968      28.4617
+  Top 0.1% (p<1e-4)             13,197      45.1259
+  Top 0.01% (p<1e-5)             7,272      51.1562
+  GWS (p<5e-8)                     898      79.9310
+
+  Left UF FA:
+  Quantile range                N SNPs    Lambda GC
+  ──────────────────────────────────────────────────
+  Bottom 50% (p>0.5)         8,259,543       0.2255
+  25-50% (0.1<p<0.5)         6,848,078       2.3898
+  10-25% (0.01<p<0.1)        1,725,661       8.2276
+  Top 10% (p<0.01)             269,743      18.0522
+  Top 1% (p<0.001)              48,200      28.0838
+  Top 0.1% (p<1e-4)             11,564      39.9028
+  Top 0.01% (p<1e-5)             4,580      53.5626
+  GWS (p<5e-8)                     855      81.6741
+
+  Interpretation:
+  If lambda at bottom 50% ~ 1.0 but rises at top 1%:
+    -> POLYGENICITY. The trait is genuinely influenced by
+       many variants, each with small effect.
+    -> The GWS hits are real signals.
+  If lambda is uniformly elevated across all quantiles:
+    -> CONFOUNDING. Population stratification is inflating
+       all test statistics equally.
+    -> Results need genomic correction before interpretation.
+
+── ANALYSIS 2: CHR8 CLUSTER ──────────────────────────────
+  5 of 16 GWS loci on chr8:8.5M-13.0M
+  Extracting full cluster for gene annotation...
+
+  Total SNPs in cluster region: 35,928
+  GWS hits in cluster: 259
+  Suggestive hits: 749
+
+  Top 20 SNPs in chr8 cluster:
+          rsid chr      pos a1 a2      beta       se            p
+     rs4383974   8  9619348  C  G  0.059401 0.008688 8.241388e-12
+     rs7827369   8  9614486  T  G  0.059267 0.008700 9.772367e-12
+     rs3088186   8 10226355  C  T  0.057589 0.008581 1.967885e-11
+    rs10087073   8  9616251  A  G  0.057921 0.008653 2.213096e-11
+    rs10101132   8  9616553  C  A  0.057909 0.008657 2.285600e-11
+8:9571840_CT_C   8  9571840 CT  C -0.060345 0.009035 2.443428e-11
+     rs7014007   8  9611001  A  G  0.058065 0.008698 2.506110e-11
+     rs6989782   8  9610538  C  T  0.057979 0.008695 2.636329e-11
+    rs10095004   8  9621746  G  C  0.057666 0.008663 2.844464e-11
+     rs7009721   8  9610671  A  G  0.057733 0.008689 3.097421e-11
+     rs7842564   8  9617966  T  G  0.057234 0.008638 3.507519e-11
+     rs7842207   8  9617684  T  C  0.057233 0.008640 3.548135e-11
+     rs7845986   8  9618020  T  C  0.057191 0.008639 3.655946e-11
+     rs4841201   8  9571019  G  A -0.057034 0.008648 4.325135e-11
+     rs7459728   8  9571445  T  C -0.057001 0.008646 4.385309e-11
+     rs4841207   8  9591398  C  T -0.056733 0.008618 4.666590e-11
+     rs7004915   8  9613554  G  A  0.057313 0.008707 4.698940e-11
+     rs6601349   8  9572260  G  A -0.056737 0.008647 5.420011e-11
+     rs7006003   8  9613512  C  G  0.056771 0.008705 7.063175e-11
+    rs28693548   8  9612882  T  C  0.056271 0.008704 1.025888e-10
+
+  Position landscape (binned by 500kb windows):
+  Window                             SNPs    GWS       Best_p
+  chr8:8.5M-9.0M                    4,619     21     2.70e-09
+  chr8:9.0M-9.5M                    4,466     27     2.80e-10
+  chr8:9.5M-10.0M                   3,964    106     8.24e-12
+  chr8:10.0M-10.5M                  4,332     54     1.97e-11
+  chr8:10.5M-11.0M                  3,689     39     1.18e-10
+  chr8:11.0M-11.5M                  4,177     12     1.34e-08
+  chr8:11.5M-12.0M                  4,297      0     1.54e-07
+  chr8:12.0M-12.5M                  1,589      0     8.67e-05
+  chr8:12.5M-13.0M                  4,795      0     2.78e-04
+
+  Known genes in chr8:8M-13M region:
+
+  CSMD1:
+    Position : chr8:2,970,000-10,118,393
+    Note     : CUB and Sushi multiple domains 1 — brain-expressed, synapse development, implicated in schizophrenia and cognitive traits
+    SNPs     : 14,092  Best p: 8.24e-12
+
+  NKX6-3:
+    Position : chr8:10,539,000-10,544,000
+    Note     : NK6 homeobox 3 — transcription factor
+    SNPs     : 29  Best p: 4.70e-04
+
+  PINX1:
+    Position : chr8:10,600,000-10,720,000
+    Note     : PIN2/TERF1 interacting telomerase inhibitor
+    SNPs     : 1,038  Best p: 1.82e-06
+
+  KEY QUESTION for chr8 cluster:
+  ARHGEF10 (chr8:~8M) is directly implicated in axon
+  myelination — Charcot-Marie-Tooth disease gene.
+  If the chr8 cluster signal overlaps ARHGEF10:
+    -> This is a Layer B (myelination) signal that
+       was not in the original candidate gene windows.
+    -> Would suggest the myelination layer is actually
+       stronger than Layer B ranking indicated.
+  CSMD1 (chr8:2.9M-10.1M) overlaps the cluster window.
+  CSMD1 is brain-expressed and synapse-relevant.
+  Its role in white matter tract development is not
+  well characterised — this may be a novel signal.
+
+  Chr8 cluster saved -> chr8_cluster_genes.tsv (35,928 rows)
+
+── ANALYSIS 3: SEMA3A LOCUS DEEP EXTRACTION ─────────────
+  GWS hit: rs78404854  chr7:83,662,138  p=4.07e-09  beta=+0.071
+  Extracting ±1Mb window for fine-mapping context...
+
+  SNPs in locus window: 9,040
+  GWS hits: 17
+  p < 1e-5: 103
+  p < 1e-4: 119
+
+  Top 30 SNPs in SEMA3A locus:
+            rsid chr      pos  a1    a2     beta       se            p
+      rs78404854   7 83662138   T     C 0.071074 0.012081 4.066301e-09
+      rs76125976   7 83651318   G     A 0.071020 0.012077 4.133326e-09
+     rs766415339   7 83666469 TTC     T 0.071041 0.012115 4.571934e-09
+      rs79643070   7 83670131   T     G 0.071193 0.012162 4.848421e-09
+      rs76881522   7 83670129   T     A 0.071170 0.012159 4.865197e-09
+      rs17158507   7 83642711   C     A 0.070427 0.012111 6.122088e-09
+      rs76633062   7 83672716   A     G 0.068613 0.012047 1.242510e-08
+       rs2372024   7 83673021   T     C 0.068502 0.012051 1.324342e-08
+      rs80263827   7 83660738   T     C 0.061325 0.010998 2.483133e-08
+       rs6960796   7 83684076   T     C 0.066675 0.012131 3.911109e-08
+      rs59594890   7 83650595   T TAGAA 0.060010 0.010921 3.937314e-08
+     rs201077280   7 83683782   G     A 0.066526 0.012131 4.187938e-08
+      rs59636011   7 83674590   C     G 0.066086 0.012053 4.217937e-08
+     rs116568134   7 83653709   A     C 0.059981 0.010941 4.235456e-08
+       rs2372025   7 83674323   T     C 0.065832 0.012022 4.381271e-08
+      rs78702998   7 83677032   G     A 0.065938 0.012050 4.482293e-08
+       rs7788378   7 83647970   T     G 0.059709 0.010942 4.878655e-08
+     rs756178645   7 83648513  CT     C 0.059560 0.010934 5.155845e-08
+       rs7800922   7 83648043   G     A 0.059543 0.010933 5.182030e-08
+      rs58241289   7 83648411   C     T 0.059536 0.010932 5.188002e-08
+      rs73376838   7 83649524   C     A 0.059490 0.010929 5.271085e-08
+      rs59002690   7 83650249   T     C 0.059468 0.010928 5.308843e-08
+      rs57531433   7 83650505   C     T 0.059460 0.010927 5.322308e-08
+      rs57283860   7 83650623   A     C 0.059455 0.010927 5.328441e-08
+      rs61691495   7 83650759   A     G 0.059453 0.010926 5.333352e-08
+      rs17158533   7 83661339   T     C 0.059472 0.010936 5.427503e-08
+7:83645527_ATG_A   7 83645527 ATG     A 0.059481 0.010938 5.431253e-08
+      rs12674315   7 83646167   G     C 0.059357 0.010932 5.689836e-08
+      rs55721141   7 83647566   T     A 0.059341 0.010932 5.726645e-08
+      rs17158540   7 83666860   G     A 0.059469 0.010961 5.817012e-08
+
+  Effect direction analysis:
+  Top 20 SNPs: 20 with positive beta (increase right UF FA), 0 with negative beta
+
+  SEMA3A gene body (83.29M-83.70M):
+    SNPs: 2,446  GWS: 17  Best p: 4.07e-09
+    Top SNP: rs78404854  pos=83,662,138  beta=0.0711  p=4.07e-09
+
+  Upstream of SEMA3A (<83.29M):
+    SNPs: 1,915  GWS: 0  Best p: 1.10e-04
+
+  Downstream/SEMA3D (>83.70M):
+    SNPs: 4,679  GWS: 0  Best p: 1.61e-07
+
+  Localisation interpretation:
+  If top SNPs cluster in gene body -> coding/splicing variant
+  If top SNPs cluster upstream -> regulatory/promoter variant
+  If top SNPs span SEMA3A+SEMA3D -> may tag both genes
+
+  SEMA3A locus saved -> sema3a_locus_snps.tsv (9,040 rows)
+
+── ANALYSIS 4: RIGHT vs LEFT EFFECT SIZE COMPARISON ─────
+  At all GWS/suggestive SNPs: how does beta_R compare to beta_L?
+  Identifies lateralised SNPs — Layer D candidates.
+
+  SNPs significant (p<1e-6) in right UF FA:  2,366
+  SNPs significant (p<1e-6) in left UF FA:   2,449
+  Shared significant SNPs (merged on rsID):  980
+
+  Effect direction at shared significant SNPs:
+    Right stronger (beta_R > beta_L + 0.01) : 190
+    Left  stronger (beta_L > beta_R + 0.01) : 82
+    Symmetric      (|diff| <= 0.01)          : 708
+
+  Pearson correlation beta_R vs beta_L: 0.9918
+  Interpretation:
+    Very high correlation (r>0.95) — right and left UF FA
+    are driven by largely the same genetic variants.
+    This explains asymmetry index lambda GC deflation.
+    The traits are genetically near-identical.
+
+  Top 20 most lateralised SNPs (|beta_R - beta_L|):
+      rsid chr      pos    beta_R    beta_L  beta_diff          p_R          p_L
+rs17247838   4 97950728 -0.118890 -0.150120   0.031230 1.624426e-09 2.600159e-14
+ rs7659577   4 97922646 -0.061467 -0.090756   0.029289 2.778433e-10 1.150803e-20
+rs17247004   4 97934806 -0.061247 -0.090180   0.028933 2.291923e-10 9.727492e-21
+rs17246599   4 97921253 -0.062545 -0.091350   0.028805 1.126418e-10 4.405540e-21
+rs28880998   4 98050511 -0.068336 -0.090150   0.021814 1.633428e-07 4.852884e-12
+rs13118118   4 98034219 -0.069361 -0.090408   0.021047 6.907170e-08 2.046444e-12
+rs10028618   4 98042024 -0.069336 -0.090222   0.020886 7.257713e-08 2.421028e-12
+rs71606964   4 98043226 -0.069564 -0.090448   0.020884 6.585673e-08 2.137962e-12
+rs10015005   4 98044364 -0.069382 -0.090265   0.020883 7.125246e-08 2.365917e-12
+ rs6823166   4 98041490 -0.069345 -0.090227   0.020882 7.206093e-08 2.398834e-12
+ rs6848535   4 98041436 -0.069357 -0.090232   0.020875 7.171333e-08 2.393314e-12
+ rs6822998   4 98041538 -0.069359 -0.090233   0.020874 7.163086e-08 2.393314e-12
+rs28827318   4 98039984 -0.069346 -0.090215   0.020869 7.191179e-08 2.409905e-12
+rs34900649   4 98046868 -0.067021 -0.087747   0.020726 1.577611e-07 6.606930e-12
+rs34986320   4 98049410 -0.069548 -0.090144   0.020596 8.999115e-08 4.207262e-12
+rs34938666   4 98048456 -0.069395 -0.089947   0.020552 7.636603e-08 3.198896e-12
+rs34415867   4 98023804 -0.070338 -0.090852   0.020514 4.894408e-08 1.823894e-12
+rs13121156   4 97918159 -0.063690 -0.083880   0.020190 1.640590e-13 2.564486e-22
+ rs5024083   4 97921559 -0.067515 -0.087662   0.020147 7.161427e-15 5.140442e-24
+  rs981544   4 97931374 -0.067679 -0.087740   0.020061 4.977366e-15 3.280959e-24
+
+  SNPs where beta_R > beta_L by > 0.02 (strong lateralisation):
+      rsid chr      pos    beta_R    beta_L  beta_diff          p_R          p_L
+rs17247838   4 97950728 -0.118890 -0.150120   0.031230 1.624426e-09 2.600159e-14
+ rs7659577   4 97922646 -0.061467 -0.090756   0.029289 2.778433e-10 1.150803e-20
+rs17247004   4 97934806 -0.061247 -0.090180   0.028933 2.291923e-10 9.727492e-21
+rs17246599   4 97921253 -0.062545 -0.091350   0.028805 1.126418e-10 4.405540e-21
+rs28880998   4 98050511 -0.068336 -0.090150   0.021814 1.633428e-07 4.852884e-12
+rs13118118   4 98034219 -0.069361 -0.090408   0.021047 6.907170e-08 2.046444e-12
+rs10028618   4 98042024 -0.069336 -0.090222   0.020886 7.257713e-08 2.421028e-12
+rs71606964   4 98043226 -0.069564 -0.090448   0.020884 6.585673e-08 2.137962e-12
+rs10015005   4 98044364 -0.069382 -0.090265   0.020883 7.125246e-08 2.365917e-12
+ rs6823166   4 98041490 -0.069345 -0.090227   0.020882 7.206093e-08 2.398834e-12
+ rs6848535   4 98041436 -0.069357 -0.090232   0.020875 7.171333e-08 2.393314e-12
+ rs6822998   4 98041538 -0.069359 -0.090233   0.020874 7.163086e-08 2.393314e-12
+rs28827318   4 98039984 -0.069346 -0.090215   0.020869 7.191179e-08 2.409905e-12
+rs34900649   4 98046868 -0.067021 -0.087747   0.020726 1.577611e-07 6.606930e-12
+rs34986320   4 98049410 -0.069548 -0.090144   0.020596 8.999115e-08 4.207262e-12
+
+  Beta comparison saved -> right_left_beta_comparison.tsv (980 rows)
+
+── ANALYSIS 5: CANDIDATE LAYER ENRICHMENT TEST ──────────
+  1000 permutations per gene.
+  Matched on: chromosome size, window size.
+  Enrichment p < 0.05 = this gene window has more signal
+  than expected by chance.
+
+  Gene       L      Win_size   Obs_p<1e-4   Exp_mean   Enrich   Perm_p
+  ──────────────────────────────────────────────────────────────────────
+  SEMA3A     A       658,922          119        2.5    48.22    0.010
+  SEMA3D     A       726,656            0        2.6     0.00    1.000
+  ROBO1      A       982,327            0        0.9     0.00    1.000
+  SLIT2      A       834,349            3        2.0     1.51    0.054
+  MBP        B       628,615            0        0.6     0.00    1.000
+  MAG        B       519,697            1        2.9     0.35    0.305
+  PLP1       B       528,927            0        0.2     0.00    1.000
+  OXTR       C       516,476            0        0.4     0.00    1.000
+  LRRTM1     D       518,389            0        1.3     0.00    1.000
+  PCDH11X    D       911,710            1        0.3     2.88    0.170
+  CNTNAP2    D     2,304,637            0        8.3     0.00    1.000
+
+  Significant enrichments (perm_p < 0.05):
+  gene layer  enrichment  perm_p
+SEMA3A     A    48.21718    0.01
+
+  Layer-level enrichment summary:
+    Layer A: best perm_p = 0.010  mean enrichment = 12.43x
+    Layer B: best perm_p = 0.305  mean enrichment = 0.12x
+    Layer C: best perm_p = 1.000  mean enrichment = 0.00x
+    Layer D: best perm_p = 0.170  mean enrichment = 0.96x
+
+  Enrichment results saved -> layer_enrichment.tsv
+
+── ANALYSIS 6: CROSS-LAYER SIGNAL PROFILE ───────────────
+  Genome-wide mean chi-squared: 1.1022
+  (Expected under null: 1.0)
+
+  Gene       Layer         N    Mean_X2    Ratio   p<0.05%   p<1e-4%   Top_SNP_lp
+  ────────────────────────────────────────────────────────────────────────────────
+  SEMA3A     A         4,026     2.5568    2.320    19.97    2.956        8.391
+  SEMA3D     A         3,862     1.8783    1.704    13.72    0.000        3.653
+  ROBO1      A         5,075     1.3105    1.189     9.52    0.000        3.433
+  SLIT2      A         5,315     1.2545    1.138     8.03    0.056        5.765
+  MBP        B         4,981     1.2787    1.160     8.47    0.000        3.215
+  MAG        B         3,319     1.0563    0.958     7.56    0.030        4.162
+  PLP1       B         1,752     1.2934    1.173     9.59    0.000        2.874
+  OXTR       C         3,925     1.1559    1.049     7.18    0.000        2.969
+  LRRTM1     D         2,478     0.9818    0.891     4.12    0.000        3.073
+  PCDH11X    D         4,739     1.0981    0.996     7.01    0.021        4.356
+  CNTNAP2    D        16,387     1.2371    1.122     8.48    0.000        3.866
+
+  Ratio interpretation:
+  ratio > 1.0 = more signal than genome average
+  ratio > 1.5 = clearly enriched
+  ratio > 2.0 = strongly enriched (likely real signal)
+
+  Genes with ratio > 1.5 (enriched windows):
+  gene layer  ratio_to_genome  top_snp_lp
+SEMA3A     A         2.319630      8.3908
+SEMA3D     A         1.704079      3.6526
+
+  Profile saved -> cross_layer_profile.tsv
+
+── ANALYSIS 7: SLIT2 LOCUS (LAYER A PARTNER) ────────────
+  SLIT2 p=1.72e-06 — suggestive. ROBO1/SLIT2 are the
+  guidance couplet at hemispheric axon decision points.
+  Checking directional concordance with SEMA3A hit.
+
+  SNPs in SLIT2 region: 12,224
+  Best p: 1.72e-06
+  Suggestive (p<1e-5): 3
+
+  Top 15 SLIT2 region SNPs:
+              rsid chr      pos    a1 a2      beta       se        p
+       rs144081524   4 20870358     G  A  0.434600 0.090822 0.000002
+       rs548583448   4 20803409     A  C  0.466980 0.104990 0.000009
+       rs527896161   4 20723663     C  T  0.458890 0.103540 0.000009
+       rs565728658   4 20844150     C  G -0.481260 0.125770 0.000130
+       rs545213985   4 20912588     A  G -0.448030 0.122510 0.000256
+       rs150273559   4 20804473     G  A -0.073496 0.020314 0.000297
+         rs1863633   4 20809664     T  C -0.073208 0.020258 0.000302
+       rs777998266   4 20345766     C  T  0.431780 0.121730 0.000390
+4:20366006_AAAAG_A   4 20366006 AAAAG  A  0.418050 0.121320 0.000570
+       rs193108313   4 19833183     T  C  0.243370 0.070925 0.000601
+       rs543591527   4 20085140     A  G  0.419940 0.122820 0.000629
+       rs771281782   4 19803750     C  T -0.415620 0.121780 0.000644
+ 4:20717964_TTTG_T   4 20717964  TTTG  T -0.062192 0.018573 0.000813
+       rs191652773   4 19917064     C  T  0.262380 0.079031 0.000902
+       rs777185050   4 19934608     A  T -0.421330 0.127660 0.000967
+
+  SEMA3A top hit beta direction: positive
+  SLIT2  top hit beta direction: positive
+  CONCORDANT: Both Layer A genes push in same direction.
+  Supports shared axon guidance pathway interpretation.
+
+  SLIT2 locus saved -> slit2_locus_snps.tsv (12,224 rows)
+
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+OUTPUTS PRODUCED
+══════════════════════════════════════════════════════════════════════
+
+  step3_results.txt       — this report
+  chr8_cluster_genes.tsv      — chr8 cluster full SNP table
+  sema3a_locus_snps.tsv       — SEMA3A locus fine-mapping SNPs
+  slit2_locus_snps.tsv        — SLIT2 locus SNPs
+  right_left_beta_comparison.tsv  — right vs left beta at shared SNPs
+  layer_enrichment.tsv      — layer enrichment permutation results
+  cross_layer_profile.tsv   — per-gene signal profile
+
+WHAT THESE RESULTS DETERMINE:
+
+  After Step 3:
+
+  1. If inflation is concentrated at top hits (not uniform):
+     -> GWS hits are real. Proceed with confidence.
+
+  2. If chr8 cluster overlaps ARHGEF10 (myelination gene):
+     -> Layer B signal is stronger than candidate window showed.
+     -> ARHGEF10 should be added to the Layer B candidate set.
+
+  3. If SEMA3A signal localises to gene body:
+     -> Candidate causal variant is a coding/splicing change.
+     -> Functional follow-up is sequencing the SEMA3A coding region.
+
+  4. If beta_R correlation with beta_L is very high (r>0.95):
+     -> Asymmetry index requires individual-level data (confirmed).
+     -> Most genetic variance is shared between right and left UF.
+     -> The lateralisation signal is real but small.
+
+  5. If Layer A enrichment is significant in permutation test:
+     -> Axon guidance is confirmed as the primary failure mode.
+
+  6. If SLIT2 is directionally concordant with SEMA3A:
+     -> Two-gene convergent confirmation of Layer A pathway.
+     -> The axon guidance conclusion is robust.
+
+STEP 4 (after obtaining antisocial GWAS):
+  Two-sample Mendelian Randomisation using gwas_ready_instruments.tsv
+  Exposure: right UF FA (16 instrument SNPs)
+  Outcome:  antisocial behaviour
+  Test: does genetic predisposition to lower right UF FA
+        causally predict antisocial phenotype?
+
+Done: 2026-03-26 17:44:20
