@@ -1,0 +1,402 @@
+══════════════════════════════════════════════════════════════════════
+STEP 4 — MENDELIAN RANDOMISATION AND COLOCALISATION
+OC-PSYCHOPATHY-GENETIC-MARKER-DERIVATION-001
+Run: 2026-03-26 18:24:56
+══════════════════════════════════════════════════════════════════════
+
+──────────────────────────────────────────────────────────────────────
+PRE-REGISTERED PREDICTIONS (locked 2026-03-26)
+──────────────────────────────────────────────────────────────────────
+
+PRE-REGISTERED PREDICTIONS — STEP 4
+Locked: 2026-03-26
+OC-PSYCHOPATHY-GENETIC-MARKER-DERIVATION-001
+
+P4-1  MR PRIMARY (IVW):
+  Genetic predisposition to lower right UF FA is associated
+  with higher broad antisocial behaviour score.
+  Predicted direction: NEGATIVE beta in MR
+  (lower right UF FA -> higher antisocial behaviour)
+  Predicted significance: p < 0.05 in IVW
+  Predicted effect size: beta in range -0.05 to -0.30
+  (small-to-moderate causal effect on standardised scale)
+  NOTE: BroadABC beta scale is large (units ~4.0 per common variant).
+  The MR beta will be on this scale. Direction is the primary test.
+
+P4-2  MR ROBUSTNESS:
+  Weighted Median MR will be directionally concordant with IVW.
+  If IVW is negative, Weighted Median will also be negative.
+
+P4-3  MR-EGGER INTERCEPT:
+  MR-Egger intercept will not significantly differ from zero
+  (p > 0.05 for intercept), indicating no directional pleiotropy.
+  The effect is via right UF FA biology, not via pleiotropic
+  confounding through unrelated pathways.
+
+P4-4  SEMA3A COLOCALISATION:
+  The SEMA3A locus will show colocalisation between right UF FA
+  GWAS and BroadABC antisocial GWAS.
+  Predicted PP4 (shared causal variant) > 0.5.
+  Predicted: the same variants that reduce SEMA3A function
+  (reduce right UF FA) also increase antisocial behaviour.
+
+P4-5  CSMD1 COLOCALISATION:
+  The CSMD1 chr8 locus will show colocalisation between right
+  UF FA GWAS and BroadABC antisocial GWAS.
+  Predicted PP4 > 0.3 (weaker prior — CSMD1 is novel,
+  its pathway to antisocial behaviour is less direct).
+
+P4-6  CSMD1 FINE-MAPPING:
+  The chr8 cluster will resolve to 2-4 independent signals,
+  not one extended haplotype.
+  Predicted: multiple sub-peaks at distinct positions within
+  the CSMD1 gene body.
+
+P4-7  SEMA3A eQTL:
+  rs78404854 or a nearby SNP in LD will be a significant
+  eQTL for SEMA3A expression in at least one brain tissue
+  in the EBI eQTL Catalogue.
+  Predicted: the effect allele that reduces right UF FA
+  (C allele of rs78404854) will also reduce SEMA3A expression.
+  Same direction: lower SEMA3A expression -> lower right UF FA.
+
+P4-8  STEIGER FILTERING:
+  The 16 instruments pass Steiger direction test:
+  The variants explain more variance in right UF FA (exposure)
+  than in antisocial behaviour (outcome).
+  This confirms the causal direction is right UF FA -> behaviour,
+  not reverse causation.
+  NOTE: Steiger r2 for outcome uses per-SNP N from BroadABC 'n'
+  column where available (mean ~56,000-85,000 across SNPs).
+
+──────────────────────────────────────────────────────────────────────
+
+── LOADING ───────────────────────────────────────────────
+  Loading Right UF FA (exposure)  (936 MB)...
+  17,103,079 variants  [26.8s]
+  Columns present: ['chr', 'rsid', 'pos', 'a1', 'a2', 'beta', 'se', 'pval(-log10)']
+  Loading BroadABC antisocial behaviour (outcome)  (455 MB)...
+  6,733,554 variants  [10.9s]
+  Columns present: ['chr', 'pos', 'a1', 'a2', 'beta', 'se', 'eaf', 'p', 'rsid', 'n']
+
+── ANALYSIS 1: CSMD1 FINE-MAPPING ───────────────────────
+  Loaded chr8 cluster from chr8_cluster_genes.tsv: 35,928 SNPs
+  GWS SNPs in CSMD1 region: 259
+
+  Approximate independent signals (500kb window): 5
+
+  Independent signals:
+     rsid chr      pos a1 a2      beta       se            p
+rs4383974   8  9619348  C  G  0.059401 0.008688 8.241388e-12
+rs3088186   8 10226355  C  T  0.057589 0.008581 1.967885e-11
+ rs755856   8 10736552  C  G -0.053535 0.008308 1.184950e-10
+rs2979255   8  8919309  C  T  0.048746 0.008192 2.702713e-09
+rs2409797   8 11433780  T  C -0.045647 0.008033 1.341220e-08
+
+  CSMD1 gene body landmark annotations:
+    #  rsid                             pos  Region                                          p
+  ──────────────────────────────────────────────────────────────────────────────────────────
+    1  rs4383974                  9,619,348  CSMD1 3' region (late / exon cluster)      8.24e-12
+    2  rs3088186                 10,226,355  3' of CSMD1 / PINX1 region               1.97e-11
+    3  rs755856                  10,736,552  Distal / NKX6-3 region                   1.18e-10
+    4  rs2979255                  8,919,309  CSMD1 3' region (early)                  2.70e-09
+    5  rs2409797                 11,433,780  Distal / NKX6-3 region                   1.34e-08
+
+  Effect directions: 3 positive beta, 2 negative beta
+  Mixed directions — suggests multiple independent signals
+  with different LD patterns tagging different causal variants.
+
+  Architecture interpretation (P4-6 prediction: 2-4 signals):
+  5 signals — high allelic heterogeneity or LD complexity.
+  Individual-level conditional analysis required.
+  P4-6: PARTIAL (5 signals, outside predicted 2-4 range).
+
+  CSMD1 fine-mapping saved -> csmd1_finemap.tsv
+
+── ANALYSIS 2: EBI eQTL CATALOGUE LOOKUP ────────────────
+
+  Three-strategy eQTL lookup per SNP:
+  Strategy 1 — rsID direct (/associations?variant_id=)
+  Strategy 2 — position range (/regions endpoint)
+  Strategy 3 — gene-level lookup (/genes endpoint)
+
+  ── rs78404854 (SEMA3A) ──────────────────────────
+     Top SEMA3A Layer A hit — beta=+0.071 right UF FA
+     Strategy 1 (rsID): HTTP 404
+     Strategy 2 (position): HTTP 404
+     Strategy 3 (gene): HTTP 404
+
+     No eQTL hits from any strategy.
+     This variant/gene is not in the EBI Catalogue.
+     Manual GTEx lookup required:
+     https://gtexportal.org/home/snp/rs78404854
+
+  ── rs4383974 (CSMD1) ──────────────────────────
+     Top CSMD1 Layer E hit — beta=+0.059 right UF FA
+     Strategy 1 (rsID): HTTP 404
+     Strategy 2 (position): HTTP 404
+     Strategy 3 (gene): HTTP 404
+
+     No eQTL hits from any strategy.
+     This variant/gene is not in the EBI Catalogue.
+     Manual GTEx lookup required:
+     https://gtexportal.org/home/snp/rs4383974
+
+  ── rs144081524 (SLIT2) ──────────────────────────
+     Top SLIT2 suggestive hit — beta=+0.435 right UF FA
+     Strategy 1 (rsID): HTTP 404
+     Strategy 2 (position): HTTP 404
+     Strategy 3 (gene): HTTP 404
+
+     No eQTL hits from any strategy.
+     This variant/gene is not in the EBI Catalogue.
+     Manual GTEx lookup required:
+     https://gtexportal.org/home/snp/rs144081524
+
+  No eQTL results from any strategy for any SNP.
+  These variants are not in the EBI eQTL Catalogue.
+  P4-7 requires manual GTEx lookup.
+
+  MANUAL eQTL LOOKUP GUIDE
+  ─────────────────────────
+  GTEx Portal (adult brain):
+    https://gtexportal.org/home/snp/rs78404854
+    Tissues: Brain - Temporal Cortex, Frontal Cortex BA9,
+             Caudate Basal Ganglia
+    Expected: SEMA3A expression association
+
+  PsychENCODE (fetal + adult brain):
+    https://psychencode.synapse.org/
+    Most relevant dataset: fetal prefrontal cortex eQTLs
+    Search gene: SEMA3A
+
+  EBI eQTL Catalogue (browser):
+    https://www.ebi.ac.uk/eqtl/
+    Enter rs78404854 -> filter to brain tissues
+
+  BrainSeq Phase 2 (DLPFC and hippocampus):
+    http://eqtl.brainseq.org/phase2/
+
+  P4-7 PREDICTION TO VERIFY:
+    rs78404854 C allele (risk allele for lower right UF FA)
+    should show LOWER SEMA3A expression in temporal cortex.
+    Confirmed: mechanism = rs78404854 -> SEMA3A expression
+    reduction -> impaired axon guidance -> lower right UF FA.
+
+
+  eQTL results saved -> eqtl_lookup_results.tsv (0 rows)
+
+── ANALYSIS 3: MENDELIAN RANDOMISATION ──────────────────
+  Exposure : right UF FA (fractional anisotropy, N~31,341)
+  Outcome  : broad antisocial behaviour (BroadABC 2022, N~85,359)
+  Reference: Tielbeek et al., Mol Psychiatry 2022
+  File     : broadABC2022_Final_CombinedSex.TBL
+
+  Instruments loaded: 16 SNPs
+             rsid  chr       pos  a1  a2      beta       se            p
+        rs2189574    4  97943856   G   A -0.069574 0.008590 5.701637e-16
+        rs2713546    2 227177546   C   A  0.062265 0.007991 6.823381e-15
+         rs263071    4  96906564   A   T -0.071546 0.009890 4.775292e-13
+        rs4383974    8   9619348   C   G  0.059401 0.008688 8.241388e-12
+        rs3088186    8  10226355   C   T  0.057589 0.008581 1.967885e-11
+        rs3076538    7 101762573   C CCT  0.052776 0.008088 6.886528e-11
+         rs755856    8  10736552   C   G -0.053535 0.008309 1.184950e-10
+        rs7733216    5  82857870   T   C -0.064106 0.009979 1.344622e-10
+12:69676379_TTA_T   12  69676379 TTA   T  0.051349 0.008595 2.335606e-09
+        rs2979255    8   8919309   C   T  0.048746 0.008192 2.702713e-09
+       rs12911569   15  43597297   T   A -0.060252 0.010139 2.836611e-09
+       rs78404854    7  83662138   T   C  0.071074 0.012081 4.066301e-09
+       rs12550039    8 123850020   A   T  0.048528 0.008365 6.643548e-09
+        rs2409797    8  11433780   T   C -0.045647 0.008033 1.341220e-08
+       rs17719345   16  89911681   G   C  0.056295 0.009994 1.788133e-08
+  17:44297459_G_A   17  44297459   G   A  0.062400 0.011329 3.659315e-08
+
+  Harmonising instruments with BroadABC outcome...
+  Instruments found in BroadABC: 12 / 16
+  Allele-flipped 5 instruments to align A1 allele.
+  6 palindromic (A/T or G/C) SNPs — kept but flagged (EAF used for orientation if available).
+  Valid instruments after allele alignment and QC: 12
+
+  Harmonised instruments:
+      rsid a1      beta       se  beta_out   se_out  p_out
+ rs2189574  G -0.069574 0.008590  0.488132 0.651712 0.4537
+ rs2713546  C  0.062265 0.007991 -0.347587 0.706477 0.6230
+  rs263071  A -0.071546 0.009890  0.022444 0.590644 0.9701
+ rs4383974  C  0.059401 0.008688 -0.075402 0.661425 0.9089
+ rs3088186  C  0.057589 0.008581  0.561526 0.656756 0.3927
+  rs755856  C -0.053535 0.008309  0.266957 0.706236 0.7056
+ rs7733216  T -0.064106 0.009979  0.944308 0.613187 0.1236
+rs12911569  T -0.060252 0.010139  0.090647 0.559549 0.8717
+rs78404854  T  0.071074 0.012081 -0.096922 0.523905 0.8532
+rs12550039  A  0.048528 0.008365 -0.068566 0.692588 0.9214
+ rs2409797  T -0.045647 0.008033 -1.054940 0.707062 0.1357
+rs17719345  G  0.056295 0.009994 -0.777751 0.568947 0.1718
+
+  IVW (primary):
+    beta = -2.96401  SE = 2.94712  Z = -1.006  p = 3.1454e-01
+    Cochran Q = 7.22  df = 11  Q_p = 0.7813
+    Heterogeneity phi = 1.000
+
+  Weighted Median:
+    beta = -1.41292  SE = 2.05852  Z = -0.686  p = 4.9248e-01
+
+  MR-Egger:
+    beta      = -2.96404  SE = 2.50358  p = 2.3644e-01
+    intercept = -0.00108  SE = 0.15381  p = 9.9437e-01
+    Intercept p=0.994 > 0.05 -> NO directional pleiotropy.
+
+  Weighted Mode:
+    beta = -1.29446  SE = 3.51772  Z = -0.368  p = 7.1289e-01
+
+  Leave-one-out (IVW):
+  Excluded SNP                  Beta_LOO       SE            p
+  ────────────────────────────────────────────────────────────
+  rs2189574                     -2.51886  3.10479   4.1720e-01
+  rs2713546                     -2.77458  3.05186   3.6327e-01
+  rs263071                      -3.35111  3.15501   2.8816e-01
+  rs4383974                     -3.09167  3.05610   3.1171e-01
+  rs3088186                     -3.87390  3.05075   2.0415e-01
+  rs755856                      -2.85777  3.02353   3.4457e-01
+  rs7733216                     -1.72987  3.09782   5.7656e-01
+  rs12911569                    -3.12746  3.10775   3.1425e-01
+  rs78404854                    -3.26850  3.21528   3.0937e-01
+  rs12550039                    -3.03310  3.01203   3.1394e-01
+  rs2409797                     -3.94337  3.00195   1.8898e-01
+  rs17719345                    -1.95551  3.08102   5.2563e-01
+
+  Steiger direction test:
+  Exposure N = 31,341  |  Outcome N = per-SNP from BroadABC 'n' column
+  SNP                           r2_exp     r2_out    N_out   Dir
+  ─────────────────────────────────────────────────────────────────
+  rs2189574                   0.002089   0.000010    55858     ✓
+  rs2713546                   0.001933   0.000005    48279     ✓
+  rs263071                    0.001667   0.000000    48279     ✓
+  rs4383974                   0.001489   0.000000    55858     ✓
+  rs3088186                   0.001435   0.000013    56633     ✓
+  rs755856                    0.001323   0.000003    40919     ✓
+  rs7733216                   0.001315   0.000042    56399     ✓
+  rs12911569                  0.001126   0.000000    56399     ✓
+  rs78404854                  0.001103   0.000001    55273     ✓
+  rs12550039                  0.001073   0.000000    49011     ✓
+  rs2409797                   0.001029   0.000044    50759     ✓
+  rs17719345                  0.001011   0.000039    48045     ✓
+
+  Steiger direction correct: 12/12
+  ALL instruments consistent with right UF FA -> antisocial
+  (not reverse causation).
+
+  ── MR RESULTS SUMMARY ──────────────────────────────────
+  Method                       Beta         SE            p  Note
+  ────────────────────────────────────────────────────────────────────────────────
+  IVW                      -2.96401    2.94712   3.1454e-01    Q=7.22 df=11 Q_p=0.781 phi=1.00
+  Weighted_Median          -1.41292    2.05852   4.9248e-01    Bootstrap SE 1000 iterations
+  MR_Egger                 -2.96404    2.50358   2.3644e-01    intercept=-0.0011 SE=0.1538 p=0.994
+  Weighted_Mode            -1.29446    3.51772   7.1289e-01    Bootstrap SE 500 iterations
+
+  BroadABC beta scale note:
+  MR beta is in BroadABC composite score units.
+  A negative MR beta = lower right UF FA -> higher antisocial score.
+  Effect size interpretation requires SD of BroadABC phenotype.
+
+  MR results saved -> mr_results.tsv
+  LOO results saved -> mr_loo.tsv
+  Steiger results   -> mr_steiger.tsv
+
+  ── PREDICTION SCORING ──────────────────────────────────
+  P4-1 (IVW: negative beta, p<0.05):
+    DENIED — not significant: p=3.1454e-01
+  P4-2 (WM directionally concordant with IVW):
+    CONFIRMED — IVW=-2.96401  WM=-1.41292
+  P4-3 (Egger intercept not significant, p>0.05):
+    CONFIRMED — intercept p=0.994
+  P4-8 (Steiger: all instruments direction correct):
+    CONFIRMED — 12/12 correct
+
+── ANALYSIS 4: COLOCALISATION ────────────────────────────
+  Method: Approximate Bayes Factor (Giambartolomei 2014)
+  Priors: p1=0.0001  p2=0.0001  p12=1e-05
+  W1 (prior SD on FA effect)         = 0.15
+  W2 (prior SD on antisocial effect) = 0.20
+
+  ── Locus: SEMA3A (chr7:83,000,000-84,500,000) ──
+  SNPs in exposure window : 9,040
+  SNPs in outcome window  : 3,616
+  Matched SNPs : 3,614
+  Valid SNPs for ABF: 3,614
+
+  Posterior probabilities:
+    PP0 (no signal in region)     : 0.0005
+    PP1 (right UF FA signal only) : 0.9136
+    PP2 (antisocial signal only)  : 0.0002
+    PP3 (distinct causal SNPs)    : 0.0001
+    PP4 (SHARED causal SNP)       : 0.0856  ← key
+
+  P4-4: PP4 > 0.5: DENIED    (PP4=0.086 <  0.5)
+
+  Best colocalising SNP:
+    rsid          = rs78404854
+    pos           = 83662138
+    beta_exposure = +0.07107  (right UF FA)
+    beta_outcome  = -0.09692  (antisocial behaviour)
+    lBF_combined  = 14.606
+
+  ── Locus: CSMD1 (chr8:8,500,000-11,500,000) ──
+  SNPs in exposure window : 25,247
+  SNPs in outcome window  : 10,965
+  Matched SNPs : 10,943
+  Valid SNPs for ABF: 10,943
+
+  Posterior probabilities:
+    PP0 (no signal in region)     : 0.0000
+    PP1 (right UF FA signal only) : 0.9119
+    PP2 (antisocial signal only)  : 0.0000
+    PP3 (distinct causal SNPs)    : 0.0001
+    PP4 (SHARED causal SNP)       : 0.0880  ← key
+
+  P4-5: PP4 > 0.3: DENIED    (PP4=0.088 <  0.3)
+
+  Best colocalising SNP:
+    rsid          = rs4383974
+    pos           = 9619348
+    beta_exposure = +0.05940  (right UF FA)
+    beta_outcome  = -0.07540  (antisocial behaviour)
+    lBF_combined  = 20.401
+
+  Colocalisation results saved -> coloc_results.tsv
+
+══════════════════════════════════════════════════════════════════════
+OUTPUTS
+══════════════════════════════════════════════════════════════════════
+
+  csmd1_finemap.tsv                   CSMD1 approximate fine-mapping
+  eqtl_lookup_results.tsv             Brain eQTL lookup (SEMA3A, CSMD1, SLIT2)
+  mr_results.tsv                      MR results (IVW, WM, Egger, Mode)
+  mr_loo.tsv                          Leave-one-out MR
+  mr_steiger.tsv                      Steiger direction test
+  coloc_results.tsv                   Colocalisation posteriors (ABF)
+
+INTERPRETATION GUIDE:
+
+  MR significant + Steiger correct + Egger intercept null:
+    -> Genetic reduction in right UF FA CAUSALLY predicts
+       antisocial behaviour. Causal chain confirmed.
+
+  Colocalisation PP4 > 0.5 at SEMA3A:
+    -> Same variant drives both right UF FA and antisocial
+       behaviour. Molecular mechanism confirmed at SEMA3A.
+
+  eQTL rs78404854 negative in temporal cortex:
+    -> Causal variant reduces SEMA3A expression.
+    -> Full chain: rs78404854 -> SEMA3A down -> UF FA down
+       -> affective coupling deficit -> antisocial behaviour.
+
+STEP 5 (after Step 4 results):
+  If MR confirmed and PP4 > 0.5:
+    -> Full derivation document: all steps integrated.
+    -> Population-level causal chain complete.
+  Regardless:
+    -> Rare variant analysis: Layers B, C, D
+    -> CSMD1 individual-level fine-mapping
+    -> rs78404854 iPSC functional validation
+
+Done: 2026-03-26 18:25:50
