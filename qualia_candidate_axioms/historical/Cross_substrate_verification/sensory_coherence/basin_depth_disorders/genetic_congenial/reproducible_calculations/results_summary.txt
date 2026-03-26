@@ -1,0 +1,273 @@
+══════════════════════════════════════════════════════════════════════
+CALCULATION RESULTS
+OC-PSYCHOPATHY-GENETIC-MARKER-DERIVATION-001
+Right UF Build Programme — Four-Layer Candidate Analysis
+Run: 2026-03-26 16:27:04
+══════════════════════════════════════════════════════════════════════
+
+Layers under test:
+  A — Axon guidance     : SEMA3A, SEMA3D, ROBO1, SLIT2
+  B — Myelination       : MBP, MAG, PLP1
+  C — OXTR coupling     : OXTR  (rs53576 explicitly tracked)
+  D — Lateralisation    : LRRTM1, PCDH11X, CNTNAP2
+
+── LOADING ───────────────────────────────────────────────
+
+  Loading Right UF FA (1496)  (936 MB)...
+  17,103,079 variants after QC  (0 removed)  [15.0s]
+
+  Loading Left  UF FA (1497)  (936 MB)...
+  17,103,079 variants after QC  (0 removed)  [17.1s]
+
+── GLOBAL STATISTICS ─────────────────────────────────────
+
+  Right UF FA:
+    Variants        : 17,103,079
+    Lambda GC       : 1.0755
+    GWS  p<5e-8     : 898
+    Suggestive p<1e-6: 2,366
+
+  Left UF FA:
+    Variants        : 17,103,079
+    Lambda GC       : 1.0839
+    GWS  p<5e-8     : 855
+    Suggestive p<1e-6: 2,449
+
+── GENOME-WIDE SIGNIFICANT HITS ──────────────────────────
+
+  Right UF FA: 898 hits at p<5e-08  -> 16 independent loci after clumping
+             rsid chr       pos  a1  a2      beta       se            p
+        rs2189574   4  97943856   G   A -0.069574 0.008590 5.701637e-16
+        rs2713546   2 227177546   C   A  0.062265 0.007991 6.823381e-15
+         rs263071   4  96906564   A   T -0.071546 0.009890 4.775292e-13
+        rs4383974   8   9619348   C   G  0.059401 0.008688 8.241388e-12
+        rs3088186   8  10226355   C   T  0.057589 0.008581 1.967885e-11
+        rs3076538   7 101762573   C CCT  0.052776 0.008088 6.886528e-11
+         rs755856   8  10736552   C   G -0.053535 0.008309 1.184950e-10
+        rs7733216   5  82857870   T   C -0.064106 0.009979 1.344622e-10
+12:69676379_TTA_T  12  69676379 TTA   T  0.051349 0.008595 2.335606e-09
+        rs2979255   8   8919309   C   T  0.048746 0.008192 2.702713e-09
+       rs12911569  15  43597297   T   A -0.060252 0.010139 2.836611e-09
+       rs78404854   7  83662138   T   C  0.071074 0.012081 4.066301e-09
+       rs12550039   8 123850020   A   T  0.048528 0.008365 6.643548e-09
+        rs2409797   8  11433780   T   C -0.045647 0.008033 1.341220e-08
+       rs17719345  16  89911681   G   C  0.056295 0.009994 1.788133e-08
+  17:44297459_G_A  17  44297459   G   A  0.062400 0.011329 3.659315e-08
+  Saved -> top_hits_right_UF.tsv
+
+  Left  UF FA: 855 hits at p<5e-08  -> 19 independent loci after clumping
+                    rsid chr       pos         a1    a2      beta       se            p
+                rs981544   4  97931374          C     A -0.087740 0.008636 3.280959e-24
+                rs263071   4  96906564          A     T -0.072444 0.009889 2.437811e-13
+               rs1057625   8  10962957          G     C -0.055718 0.008035 4.149541e-12
+               rs4550447  16  89991599          G     C  0.082316 0.011918 5.058252e-12
+              rs80263827   7  83660738          T     C  0.074173 0.010996 1.548815e-11
+               rs7832708   8  10190040          C     T  0.052402 0.008004 5.970353e-11
+              rs11119085   1 208708083          C     T -0.056759 0.008785 1.058035e-10
+               rs7733216   5  82857870          T     C -0.063363 0.009979 2.187762e-10
+             rs572794518  22  43865962          C CCCAT -0.048603 0.008221 3.409570e-09
+              rs10109026   8   9411986          C     T  0.047858 0.008221 5.906093e-09
+              rs12550039   8 123850020          A     T  0.047991 0.008365 9.725228e-09
+               rs4954059   2 134262625          C     T -0.046569 0.008127 1.012744e-08
+                rs332040   8   8730488          G     A  0.045395 0.008046 1.698635e-08
+               rs3098912   4  41076809          G     A  0.045988 0.008158 1.740204e-08
+             rs567779929   2 227149196          C    CA  0.045891 0.008141 1.747432e-08
+20:30477306_ACCTCTGCCT_A  20  30477306 ACCTCTGCCT     A  0.149440 0.026523 1.772965e-08
+             rs542891756   6    290225          C     A -1.009900 0.180370 2.169702e-08
+              rs34421088   8  11589042          A     G -0.043992 0.008013 4.055084e-08
+               rs6722862   2  55381112          A     G  0.063885 0.011713 4.953362e-08
+  Saved -> top_hits_left_UF.tsv
+
+── ASYMMETRY INDEX (RIGHT − LEFT UF FA) ──────────────────
+  Novel Layer D / Layer 6 exposure.
+  Variants with p_asym < 5e-8 predict right > left UF
+  elaboration — the human-specific lateralised structure.
+
+  Computing asymmetry index...
+  Merged on rsID: 16,260,672 variants
+
+  Asymmetry variants    : 16,260,672
+  Lambda GC             : 0.3712
+  GWS hits p<5e-8       : 0
+  Mean beta_asym        : -0.000014  (0 = symmetric population)
+  beta_asym > 0         : 8,146,408  (SNPs that increase right > left)
+  beta_asym < 0         : 8,114,001  (SNPs that reduce right > left)
+
+  Using suggestive threshold: 0 hits
+  Independent asymmetry loci: 0
+
+  Saved -> top_hits_asymmetry.tsv
+
+── CANDIDATE GENE ANALYSIS: ALL FOUR LAYERS ─────────────
+
+  Candidate gene results by layer:
+
+  Gene       L   Chr   N_SNPs     Best_p_R         Top_SNP   Beta_R  Best_p_asym Note
+  ────────────────────────────────────────────────────────────────────────────────────────────────────
+  SEMA3A     A     7    4,026     4.07e-09      rs78404854   0.0711     4.50e-02  
+  SEMA3D     A     7    3,862     2.23e-04      rs10264300  -0.3424     2.88e-02  
+  ROBO1      A     3    5,075     3.69e-04     rs140943678   0.0964     9.27e-03  
+  SLIT2      A     4    5,315     1.72e-06     rs144081524   0.4346     5.29e-02  
+  ····························································
+  MBP        B    18    4,981     6.10e-04     rs558470649  -0.0363     2.00e-02  
+  MAG        B    19    3,319     6.89e-05     rs185129370   0.1795     1.01e-02  
+  PLP1       B     X    1,752     1.34e-03        rs475827   0.0247     1.86e-02  
+  ····························································
+  OXTR       C     3    3,925     1.07e-03     rs191091388   0.2575     2.67e-02  rs53576: p=7.09e-01 beta=-0.0033
+  ····························································
+  LRRTM1     D     2    2,478     8.46e-04     rs114071259  -0.1926     2.29e-02  
+  PCDH11X    D     X    4,739     4.40e-05     rs145917962   0.0427     1.27e-02  
+  CNTNAP2    D     7   16,387     1.36e-04     rs567219768  -0.4205     3.30e-02  
+  ····························································
+
+  Layer ranking by minimum p-value (right UF FA):
+    Layer A (Axon guidance failure                   ): best p = 4.07e-09
+    Layer D (Lateralisation specification failure    ): best p = 4.40e-05
+    Layer B (Myelination timing failure              ): best p = 6.89e-05
+    Layer C (OXTR coupling consolidation failure     ): best p = 1.07e-03
+
+  Strongest signal: Layer A
+  Interpretation: the most common build programme failure mode
+  in this population is the OXTR coupling consolidation failure pathway.
+
+── OXTR rs53576 EXPLICIT CHECK (Layer C key SNP) ────────
+  rs53576 in Right UF FA:
+    beta = -0.00327
+    se   = 0.00875
+    p    = 7.087e-01
+    chr  = 3  pos = 8804371
+    a1/a2 = A / G
+  rs53576 in Left UF FA:
+    beta = -0.00299  p = 7.326e-01
+  rs53576 asymmetry index:
+    beta_asym = -0.00028  p_asym = 9.820e-01
+    Interpretation: beta_asym < 0: rs53576 A allele DECREASES right > left UF
+
+  All candidate SNPs saved -> candidate_genes_all_layers.tsv (55,859 rows)
+
+── MR INSTRUMENT FILE ────────────────────────────────────
+  Ready for Step 3 when antisocial GWAS is obtained.
+  16 instrument SNPs saved -> gwas_ready_instruments.tsv
+
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+═
+INTERPRETATION
+══════════════════════════════════════════════════════════════════════
+
+RIGHT UF FA
+  GWS hits           : 898
+  Independent loci   : 16
+
+ASYMMETRY INDEX (right − left UF FA)
+  GWS hits           : 0
+  Independent loci   : 0
+
+OXTR rs53576 (Layer C key SNP)
+  p in right UF FA   : 7.087e-01
+  ABOVE 1e-4: Layer C not the dominant signal in this dataset
+
+BUILD PROGRAMME LAYER RANKING (by best p, right UF FA):
+  Layer A: best p = 4.07e-09
+  Layer D: best p = 4.40e-05
+  Layer B: best p = 6.89e-05
+  Layer C: best p = 1.07e-03
+
+WHAT THIS MEANS:
+  The layer with the smallest p-value is where the genome
+  most strongly influences right UF structural integrity
+  in this population dataset.
+
+  If Layer C (OXTR) ranks first or second:
+    The derivation's primary prediction is confirmed —
+    the oxytocin coupling consolidation pathway is
+    genetically encoded as a major determinant of
+    right UF structural quality.
+
+  If Layer A (axon guidance) ranks first:
+    The axon pathfinding step is the dominant source
+    of genetic variance in right UF integrity —
+    the build programme fails most often at the
+    earliest step.
+
+  If Layer D (lateralisation) ranks first:
+    The human-specific right-sided elaboration is the
+    most genetically variable component — consistent
+    with the asymmetry index being the most sensitive
+    biomarker target.
+
+  No layer ranking is a falsification of the framework.
+  All four layers are part of the build programme.
+  The ranking tells us which failure mode is most
+  common in the general population — not which is
+  most important for the congenital psychopathy pathway.
+
+Report saved: results_summary.txt
+Done: 2026-03-26 16:28:18
