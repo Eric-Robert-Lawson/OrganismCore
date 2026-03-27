@@ -1,0 +1,275 @@
+══════════════════════════════════════════════════════════════════════
+STEP 7B — GENE ANNOTATION FIX
+OC-PSYCHOPATHY-GENETIC-MARKER-DERIVATION-001
+Run: 2026-03-26 19:11:19
+══════════════════════════════════════════════════════════════════════
+
+── LOADING REFGENE ───────────────────────────────────────
+  Loading refGene.txt...
+  Loaded 81,407 transcript records [0.1s]
+
+  Chromosome strings in refGene (sample):
+    'chr1': 7738 transcripts
+    'chr10': 3666 transcripts
+    'chr11': 4717 transcripts
+    'chr12': 3890 transcripts
+    'chr13': 1497 transcripts
+    'chr14': 2434 transcripts
+    'chr15': 2629 transcripts
+    'chr16': 3117 transcripts
+    'chr17': 3949 transcripts
+    'chr17_ctg5_hap1': 98 transcripts
+    'chr17_gl000205_random': 1 transcripts
+    'chr18': 1268 transcripts
+    'chr19': 4647 transcripts
+    'chr19_gl000209_random': 21 transcripts
+    'chr1_gl000191_random': 9 transcripts
+    'chr1_gl000192_random': 1 transcripts
+    'chr2': 5517 transcripts
+    'chr20': 1949 transcripts
+    'chr21': 945 transcripts
+    'chr22': 1669 transcripts
+    'chr3': 4817 transcripts
+    'chr4': 2985 transcripts
+    'chr4_ctg9_hap1': 13 transcripts
+    'chr4_gl000193_random': 1 transcripts
+    'chr4_gl000194_random': 4 transcripts
+    'chr5': 3432 transcripts
+    'chr6': 3903 transcripts
+    'chr6_apd_hap1': 255 transcripts
+    'chr6_cox_hap2': 518 transcripts
+    'chr6_dbb_hap3': 474 transcripts
+
+  Building chromosome lookup...
+  Standard chromosomes mapped: 25
+       1 -> 'chr1'
+       2 -> 'chr2'
+       3 -> 'chr3'
+       4 -> 'chr4'
+       5 -> 'chr5'
+       6 -> 'chr6'
+       7 -> 'chr7'
+       8 -> 'chr8'
+       9 -> 'chr9'
+      10 -> 'chr10'
+      11 -> 'chr11'
+      12 -> 'chr12'
+      13 -> 'chr13'
+      14 -> 'chr14'
+      15 -> 'chr15'
+      16 -> 'chr16'
+      17 -> 'chr17'
+      18 -> 'chr18'
+      19 -> 'chr19'
+      20 -> 'chr20'
+      21 -> 'chr21'
+      22 -> 'chr22'
+       x -> 'chrX'
+       y -> 'chrY'
+       m -> 'chrM'
+
+── LOCUS ANNOTATION ──────────────────────────────────────
+
+  ── rs78404854 ──
+  chr7:83,662,138  beta=+0.07107  p=4.07e-09  Layer=A  Step6=SEMA3A
+  CONFIRMED (SNP in gene body): SEMA3A
+  Function: Semaphorin-3A — extracellular axon guidance ligand. Directs UF projection axons to prefrontal target via growth cone repulsion.
+
+  ── rs4383974 ──
+  chr8:9,619,348  beta=+0.05940  p=8.24e-12  Layer=E  Step6=CSMD1
+  CONFIRMED (SNP in gene body): CSMD1
+  Function: CUB and Sushi multiple domains 1 — complement-mediated synaptic pruning precision during UF consolidation.
+
+  ── 17:44297459_G_A ──
+  chr17:44,297,459  beta=+0.06240  p=3.66e-08  Layer=B  Step6=MAPT
+  CONFIRMED (SNP in gene body): MAPT
+  Function: Microtubule-associated protein tau — organises axonal microtubules, determines axon diameter and myelination efficiency.
+
+  ── rs2713546 ──
+  chr2:227,177,546  beta=+0.06227  p=6.82e-15  Layer=B  Step6=COL4A3BP
+  SNP is intergenic.
+
+  Nearest genes (within 500kb):
+  Gene                        Distance         Start           End  Strand
+  ───────────────────────────────────────────────────────────────────────────
+  LOC646736                    132,768   227,007,509   227,044,778       +   ◄
+  MIR5702                      345,879   227,523,425   227,523,509       -  
+  IRS1                         418,481   227,596,027   227,664,536       -  
+  RHBDD1                       487,328   227,664,874   227,863,923       +  
+
+  NEAREST GENE: LOC646736 (132,768 bp)
+  Step 6 gene COL4A3BP NOT found in 500kb window
+  Using nearest gene: LOC646736
+
+  ── rs7733216 ──
+  chr5:82,857,870  beta=+0.06411  p=1.34e-10  Layer=A  Step6=DPYSL3
+  SNP is INSIDE gene body: ['VCAN', 'VCAN-AS1']
+  Best gene: VCAN
+  Function: Function requires literature review
+  Step 6 validation: ✗ CONFLICT — Step6=DPYSL3, refGene=VCAN
+
+  ── rs12911569 ──
+  chr15:43,597,297  beta=+0.06025  p=2.84e-09  Layer=B  Step6=SLC12A6
+  SNP is intergenic.
+
+  Nearest genes (within 500kb):
+  Gene                        Distance         Start           End  Strand
+  ───────────────────────────────────────────────────────────────────────────
+  TGM7                           2,844    43,568,468    43,594,453       -   ◄
+  LCMT2                         18,549    43,615,846    43,622,771       -  
+  ADAL                          25,572    43,622,869    43,646,767       +  
+  TGM5                          38,171    43,524,787    43,559,126       -  
+  ZSCAN29                       53,076    43,650,373    43,663,241       -  
+  TUBGCP4                       66,001    43,663,298    43,701,969       +  
+  EPB42                         84,081    43,489,425    43,513,216       -  
+  TP53BP1                       97,961    43,695,258    43,802,838       -  
+  CCNDBP1                      107,922    43,477,600    43,489,375       +  
+  TMEM62                       119,956    43,425,312    43,477,341       +  
+  UBR1                         199,061    43,235,097    43,398,236       -  
+  MAP1A                        212,508    43,809,805    43,823,809       +  
+  PPIP5K1                      228,362    43,825,659    43,882,451       -  
+  CKMT1B                       287,757    43,885,054    43,891,604       +  
+  STRC                         294,463    43,891,760    43,910,998       -  
+
+  NEAREST GENE: TGM7 (2,844 bp)
+  Step 6 gene SLC12A6 NOT found in 500kb window
+  Using nearest gene: TGM7
+
+  ── rs17719345 ──
+  chr16:89,911,681  beta=+0.05630  p=1.79e-08  Layer=B  Step6=CBFA2T3
+  SNP is INSIDE gene body: ['SPIRE2']
+  Best gene: SPIRE2
+  Function: Function requires literature review
+  Step 6 validation: ✗ CONFLICT — Step6=CBFA2T3, refGene=SPIRE2
+
+  ── 12:69676379_TTA_T ──
+  chr12:69,676,379  beta=+0.05135  p=2.34e-09  Layer=B?  Step6=UNKNOWN
+  SNP is intergenic.
+
+  Nearest genes (within 500kb):
+  Gene                        Distance         Start           End  Strand
+  ───────────────────────────────────────────────────────────────────────────
+  CPSF6                          8,241    69,633,348    69,668,138       +   ◄
+  MIR1279                        9,381    69,666,936    69,666,998       -  
+  LYZ                           65,781    69,742,160    69,748,014       +  
+  YEATS4                        77,110    69,753,489    69,784,650       +  
+  FRS2                         187,788    69,864,167    69,973,571       +  
+  SNORA113                     232,840    69,909,219    69,909,373       +  
+  MIR3913-1                    302,122    69,978,501    69,978,603       -  
+  MIR3913-2                    302,123    69,978,502    69,978,602       +  
+  CCT2                         302,859    69,979,238    69,995,350       +  
+  CPM                          319,359    69,244,954    69,357,020       -  
+  LRRC10                       325,965    70,002,344    70,004,687       -  
+  BEST3                        360,908    70,037,287    70,093,196       -  
+  LOC101928002                 431,035    70,107,414    70,132,330       -  
+  MDM2                         431,915    69,202,803    69,244,464       +  
+  RAB3IP                       456,260    70,132,639    70,216,979       +  
+
+  NEAREST GENE: CPSF6 (8,241 bp)
+
+  ── rs2189574 ──
+  chr4:97,943,856  beta=+0.06957  p=5.70e-16  Layer=D  Step6=UNKNOWN
+  SNP is intergenic.
+
+  Nearest genes (within 500kb):
+  Gene                        Distance         Start           End  Strand
+  ───────────────────────────────────────────────────────────────────────────
+  LINC02267                    204,290    97,231,853    97,739,566       +   ◄
+  STPG2-AS1                    344,220    98,288,076    98,411,315       +  
+
+  NEAREST GENE: LINC02267 (204,290 bp)
+
+  ── rs263071 ──
+  chr4:96,906,564  beta=+0.07155  p=4.78e-13  Layer=D  Step6=UNKNOWN
+  SNP is intergenic.
+
+  Nearest genes (within 500kb):
+  Gene                        Distance         Start           End  Strand
+  ───────────────────────────────────────────────────────────────────────────
+  PDHA2                        143,949    96,761,243    96,762,615       +   ◄
+  LINC02267                    325,289    97,231,853    97,739,566       +  
+  UNC5C                        436,440    96,083,655    96,470,124       -  
+
+  NEAREST GENE: PDHA2 (143,949 bp)
+
+  ── rs12550039 ──
+  chr8:123,850,020  beta=+0.04853  p=6.64e-09  Layer=?  Step6=UNKNOWN
+  SNP is INSIDE gene body: ['ZHX2']
+  Best gene: ZHX2
+  Function: Function requires literature review
+
+  ── rs3076538 ──
+  chr7:101,762,573  beta=+0.05278  p=6.89e-11  Layer=A  Step6=UNKNOWN
+  SNP is INSIDE gene body: ['CUX1']
+  Best gene: CUX1
+  Function: Function requires literature review
+
+  ── rs3088186 ──
+  chr8:10,226,355  beta=+0.05759  p=1.97e-11  Layer=E  Step6=CSMD1
+  SNP is INSIDE gene body: ['MSRA']
+  Best gene: MSRA
+  Function: Function requires literature review
+  Step 6 validation: ✗ CONFLICT — Step6=CSMD1, refGene=MSRA
+
+  ── rs2979255 ──
+  chr8:8,919,309  beta=+0.04875  p=2.70e-09  Layer=E  Step6=CSMD1
+  SNP is INSIDE gene body: ['ERI1']
+  Best gene: ERI1
+  Function: Function requires literature review
+  Step 6 validation: ✗ CONFLICT — Step6=CSMD1, refGene=ERI1
+
+── FINAL MARKER TABLE ────────────────────────────────────
+
+  PSYCHOPATHY GENETIC MARKER SET — FINAL ANNOTATED
+  Right UF FA Build Programme Failure Markers
+  OC-PSYCHOPATHY-GENETIC-MARKER-DERIVATION-001
+  ══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+    #  rsid                        chr           pos  Gene                  Layer    beta_FA    SDs             p  BroadABC
+  ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    1  rs3076538                     7   101,762,573  CUX1                      A   +0.05278  1.319      6.89e-11  not_in_broadabc
+    2  rs7733216                     5    82,857,870  VCAN                      A   +0.06411  1.603      1.34e-10  concordant
+    3  rs78404854                    7    83,662,138  SEMA3A                    A   +0.07107  1.777      4.07e-09  concordant
+    4  rs2713546                     2   227,177,546  LOC646736                 B   +0.06227  1.557      6.82e-15  concordant
+    5  rs12911569                   15    43,597,297  TGM7                      B   +0.06025  1.506      2.84e-09  concordant
+    6  rs17719345                   16    89,911,681  SPIRE2                    B   +0.05630  1.407      1.79e-08  concordant
+    7  17:44297459_G_A              17    44,297,459  MAPT                      B   +0.06240  1.560      3.66e-08  not_in_broadabc
+    8  12:69676379_TTA_T            12    69,676,379  CPSF6                    B?   +0.05135  1.284      2.34e-09  not_in_broadabc
+    9  rs2189574                     4    97,943,856  LINC02267                 D   +0.06957  1.739      5.70e-16  concordant
+   10  rs263071                      4    96,906,564  PDHA2                     D   +0.07155  1.789      4.78e-13  concordant
+   11  rs4383974                     8     9,619,348  CSMD1                     E   +0.05940  1.485      8.24e-12  concordant
+   12  rs3088186                     8    10,226,355  MSRA                      E   +0.05759  1.440      1.97e-11  noise_p=0.39
+   13  rs2979255                     8     8,919,309  ERI1                      E   +0.04875  1.219      2.70e-09  not_in_broadabc
+   14  rs12550039                    8   123,850,020  ZHX2                      ?   +0.04853  1.213      6.64e-09  concordant
+
+  Total: 14 active markers
+
+  Layer summary:
+  Layer A  :   3 markers  CUX1, VCAN, SEMA3A
+  Layer B  :   4 markers  LOC646736, TGM7, SPIRE2, MAPT
+  Layer B? :   1 markers  CPSF6
+  Layer D  :   2 markers  LINC02267, PDHA2
+  Layer E  :   3 markers  CSMD1, MSRA, ERI1
+  Layer ?  :   1 markers  ZHX2
+
+  Gene annotations:
+  Gene                  Layer  Function
+  ──────────────────────────────────────────────────────────────────────────────────────────
+  CUX1                      A  Function requires literature review
+  VCAN                      A  Function requires literature review
+  SEMA3A                    A  Semaphorin-3A — extracellular axon guidance ligand. Directs UF project
+  LOC646736                 B  Function requires literature review
+  TGM7                      B  Function requires literature review
+  SPIRE2                    B  Function requires literature review
+  MAPT                      B  Microtubule-associated protein tau — organises axonal microtubules, de
+  CPSF6                    B?  Function requires literature review
+  LINC02267                 D  Function requires literature review
+  PDHA2                     D  Function requires literature review
+  CSMD1                     E  CUB and Sushi multiple domains 1 — complement-mediated synaptic prunin
+  MSRA                      E  Function requires literature review
+  ERI1                      E  Function requires literature review
+  ZHX2                      ?  Function requires literature review
+
+  Saved -> psychopathy_markers_annotated_v2.tsv
+
+Done: 2026-03-26 19:11:19

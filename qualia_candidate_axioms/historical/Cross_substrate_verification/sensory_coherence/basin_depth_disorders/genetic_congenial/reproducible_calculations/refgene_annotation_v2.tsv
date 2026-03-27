@@ -1,0 +1,15 @@
+rsid	chr	pos	beta_FA	gwas_p	layer	gene	distance_bp	overlapping	gene_function	confidence	validation
+rs78404854	7	83662138	0.07107	4.07e-09	A	SEMA3A	0	True	Semaphorin-3A — extracellular axon guidance ligand. Directs UF projection axons to prefrontal target via growth cone repulsion.	CONFIRMED	SNP_IN_GENE_BODY
+rs4383974	8	9619348	0.0594	8.24e-12	E	CSMD1	0	True	CUB and Sushi multiple domains 1 — complement-mediated synaptic pruning precision during UF consolidation.	CONFIRMED	SNP_IN_GENE_BODY
+17:44297459_G_A	17	44297459	0.0624	3.66e-08	B	MAPT	0	True	Microtubule-associated protein tau — organises axonal microtubules, determines axon diameter and myelination efficiency.	CONFIRMED	SNP_IN_GENE_BODY
+rs2713546	2	227177546	0.06227	6.82e-15	B	LOC646736	132768	False	Function requires literature review	NEAREST_GENE	REFGENE_NEAREST
+rs7733216	5	82857870	0.06411	1.34e-10	A	VCAN	0	True	Function requires literature review	CONFIRMED	REFGENE_OVERLAP
+rs12911569	15	43597297	0.06025	2.84e-09	B	TGM7	2844	False	Function requires literature review	NEAREST_GENE	REFGENE_NEAREST
+rs17719345	16	89911681	0.0563	1.79e-08	B	SPIRE2	0	True	Function requires literature review	CONFIRMED	REFGENE_OVERLAP
+12:69676379_TTA_T	12	69676379	0.05135	2.34e-09	B?	CPSF6	8241	False	Function requires literature review	NEAREST_GENE	REFGENE_NEAREST
+rs2189574	4	97943856	0.06957	5.7e-16	D	LINC02267	204290	False	Function requires literature review	NEAREST_GENE	REFGENE_NEAREST
+rs263071	4	96906564	0.07155	4.78e-13	D	PDHA2	143949	False	Function requires literature review	NEAREST_GENE	REFGENE_NEAREST
+rs12550039	8	123850020	0.04853	6.64e-09	?	ZHX2	0	True	Function requires literature review	CONFIRMED	REFGENE_OVERLAP
+rs3076538	7	101762573	0.05278	6.89e-11	A	CUX1	0	True	Function requires literature review	CONFIRMED	REFGENE_OVERLAP
+rs3088186	8	10226355	0.05759	1.97e-11	E	MSRA	0	True	Function requires literature review	CONFIRMED	REFGENE_OVERLAP
+rs2979255	8	8919309	0.04875	2.7e-09	E	ERI1	0	True	Function requires literature review	CONFIRMED	REFGENE_OVERLAP
