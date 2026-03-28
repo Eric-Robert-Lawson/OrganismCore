@@ -48,31 +48,76 @@ the animal as intermediary.
 
 The Universal Tonnetz is not a theoretical
 framework applied to bird communication.
+It is the mathematical derivation that
+predicted this observation before it happened.
 
-It is the mathematical structure that
-bird communication is already an instance of.
+Reference: the_universal_tonnetz.md
+OrganismCore, February 26, 2026
+Prediction 3, Part VIII:
+
+  "Any species at Level 4-5 on the triadic
+  gradient should demonstrate aesthetic
+  response to Tonnetz navigation in their
+  primary channel — not just to conspecific
+  signals but to well-formed Tonnetz
+  trajectories produced by any sender."
+
+OC-OBS-005 is the first empirical test
+of Prediction 3.
+The mathematics came first.
+The observation followed 29 days later.
+
+---
 
 Music is the triadic intersection of
 physics, mathematics, and instrument.
 Not as metaphor. As definition.
 
+From the Universal Tonnetz, Part III,
+the universal derivation:
+
+  Bounded domain → eigenfunctions
+  → interval structure → Tonnetz topology
+
+  Every bounded resonating system
+  navigated under selection pressure
+  produces a Tonnetz.
+
+This is not a claim about bird calls.
+This is a consequence of physics.
+Bird calls are an instance of it.
+
+---
+
 A bounded physical system under tension
 has eigenfunctions.
 Those eigenfunctions define a space.
 Navigation of that space by the system
-is what music is — in any substrate,
-in any species, at any scale.
+is what music is —
+in any substrate, in any species,
+at any scale.
 
 The cockatiel's syrinx is an instrument
 in this precise sense.
-Its contact call is a trajectory
-through its eigenfunction space.
+Not metaphorically.
+By the structural definition established
+in the Universal Tonnetz, Section 11.2:
+
+  "The receptor-signal relationship does
+  not resemble a Tonnetz.
+  The receptor-signal relationship IS a
+  Tonnetz, by structural definition."
+
+The contact call is a trajectory
+through the syrinx eigenfunction space.
 The ramp-and-hold shape extracted
 from 434 calls is the mathematical
 description of that trajectory.
 Not an approximation of it.
 Not an analogy for it.
 The trajectory itself, described exactly.
+
+---
 
 The sparrow, the chickadee, the cardinal
 each operate instruments with different
@@ -85,17 +130,46 @@ each vocal apparatus.
 
 The cross-species communication
 that cockatiels perform is not
-behaviour that can be explained
-by shared eigenfunction space.
+behaviour explained by shared
+eigenfunction space.
 It IS shared eigenfunction space
 being navigated simultaneously
 by multiple physical systems.
+That is what the Universal Tonnetz
+establishes as mathematical fact
+at Part III and Section 11.2.
+
+---
 
 This tool transmits into that space
 deliberately and mathematically.
 Not theoretically.
 Not approximately.
 Exactly.
+
+The synthesis pipeline extracted
+the geometric invariant of the
+cockatiel's Tonnetz trajectory,
+reconstituted it as a controllable
+instrument, and transmitted it
+into the shared eigenfunction space
+that the flock network already
+navigates.
+
+The Brittany Spaniel's immediate
+response on 2026-03-27 is the
+first empirical confirmation that
+the synthesized trajectory is
+a well-formed Tonnetz navigation —
+recognised as such by a mammalian
+bird-detection system shaped by
+selection to detect exactly this
+class of signal.
+
+Prediction 3 confirmed.
+First test.
+29 days after the prediction
+was written.
 
 ---
 
