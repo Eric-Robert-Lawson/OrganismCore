@@ -31,7 +31,7 @@ The geometric invariant provided
 the grammar.
 The synthesis provided the transmitter.
 The Universal Tonnetz provided
-the theoretical framework that
+the mathematical framework that
 explains why the coordinate system
 generalises beyond the cockatiel
 to the entire flock network.
@@ -41,6 +41,61 @@ built from first principles
 to transmit deliberately into
 that network without requiring
 the animal as intermediary.
+
+---
+
+## THE MATHEMATICAL BASIS
+
+The Universal Tonnetz is not a theoretical
+framework applied to bird communication.
+
+It is the mathematical structure that
+bird communication is already an instance of.
+
+Music is the triadic intersection of
+physics, mathematics, and instrument.
+Not as metaphor. As definition.
+
+A bounded physical system under tension
+has eigenfunctions.
+Those eigenfunctions define a space.
+Navigation of that space by the system
+is what music is — in any substrate,
+in any species, at any scale.
+
+The cockatiel's syrinx is an instrument
+in this precise sense.
+Its contact call is a trajectory
+through its eigenfunction space.
+The ramp-and-hold shape extracted
+from 434 calls is the mathematical
+description of that trajectory.
+Not an approximation of it.
+Not an analogy for it.
+The trajectory itself, described exactly.
+
+The sparrow, the chickadee, the cardinal
+each operate instruments with different
+physical constraints but overlapping
+eigenfunction spaces.
+The overlap is not approximate.
+It is mathematically computable
+from the physical parameters of
+each vocal apparatus.
+
+The cross-species communication
+that cockatiels perform is not
+behaviour that can be explained
+by shared eigenfunction space.
+It IS shared eigenfunction space
+being navigated simultaneously
+by multiple physical systems.
+
+This tool transmits into that space
+deliberately and mathematically.
+Not theoretically.
+Not approximately.
+Exactly.
 
 ---
 
