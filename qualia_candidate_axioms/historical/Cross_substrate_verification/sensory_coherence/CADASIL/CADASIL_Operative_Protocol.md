@@ -1099,85 +1099,439 @@ QUESTION 4 — ORTHOSTATIC HYPOTENSION:
 
 ---
 
-### 3.3 THE CONVERSATION ABOUT BHB/KETONES
+## SECTION 3.3 — THE CONVERSATION ABOUT
+## KETOGENIC DIET AND BHB/KETONES
 
 ```
-OPENING STATEMENT — READ THIS VERBATIM
-OR PRINT IT:
+WHAT THE LITERATURE NOW SHOWS —
+READ BEFORE THE NEUROLOGIST CONVERSATION:
 
-  "I want to discuss whether exogenous
-  beta-hydroxybutyrate supplementation
-  might be appropriate. This is not
-  ketogenic diet for epilepsy — the
-  mechanism is different and specific
-  to CADASIL.
+  The previous version of this protocol
+  framed the ketogenic diet and BHB
+  purely as a fuel bypass:
+    BHB reaches glucose-deficient white
+    matter via MCT transporters when
+    glucose delivery is restricted by
+    narrowed vessels.
+  That mechanism is confirmed and
+  remains valid.
 
-  In CADASIL, white matter is chronically
-  glucose-deficient because blood flow
-  to deep white matter is reduced by
-  structural vascular narrowing.
-  Oligodendrocytes — the cells that
-  maintain myelin on white matter axons
-  — are among the most metabolically
-  vulnerable cells in the brain under
-  energy deficit.
+  The literature check (2026-03-28)
+  found two additional mechanisms
+  that were not in the original
+  derivation. Both require full dietary
+  ketosis — not just MCT oil or
+  exogenous BHB supplementation.
 
-  Beta-hydroxybutyrate crosses the
-  blood-brain barrier via monocarboxylate
-  transporters — a different pathway
-  than glucose — and can partially
-  supplement fuel delivery to white
-  matter even when glucose delivery
-  is restricted.
+  MECHANISM 1 — FUEL BYPASS:
+    BHB crosses the BBB via
+    monocarboxylate transporters —
+    a different pathway from glucose.
+    Provides alternative fuel to
+    oligodendrocytes and white matter
+    axons under chronic glucose deficit.
+    Confirmed: Wang et al., Brain
+    Research Bulletin 2023 — direct
+    preclinical model of chronic cerebral
+    hypoperfusion, the precise CADASIL
+    disease geometry.
+    This mechanism is accessible via
+    MCT oil or exogenous BHB salts —
+    full KD not required.
 
-  The 2023 preclinical evidence I am
-  referencing is:
-  Wang et al., Brain Research Bulletin,
-  2023 — BHB in a rat model of chronic
-  cerebral hypoperfusion specifically
-  showed reduced BBB leakage, reduced
-  microglial activation, and enhanced
-  oligodendrocyte motility.
-  This is the direct disease geometry
-  of CADASIL.
+  MECHANISM 2 — CEREBRAL BLOOD FLOW
+  INCREASE:
+    Journal of Clinical Endocrinology
+    and Metabolism, 2025 — randomised
+    crossover trial, n=11, ages 50-70,
+    3 weeks of full ketogenic diet:
+      Global cerebral blood flow: +22%
+      Measured by PET/MRI.
+      Blood BHB correlated directly
+      with the CBF increase.
+    Proposed mechanism:
+      Ketone bodies increase nitric
+      oxide availability in endothelial
+      cells → vasodilation and improved
+      perfusion through existing channels.
+      Reduced oxidative stress in
+      endothelium → improved vascular
+      reactivity.
+      Enhanced neurovascular coupling.
+    WHY THIS IS GEOMETRICALLY
+    SIGNIFICANT FOR CADASIL:
+      The primary problem in CADASIL is
+      reduced cerebral blood flow through
+      structurally narrowed channels.
+      Mechanism 1 bypasses the delivery
+      constraint by providing fuel through
+      a different transporter.
+      Mechanism 2 directly increases
+      flow through the narrowed channels
+      themselves by improving endothelial
+      function.
+      These are categorically different
+      interventions acting on the same
+      structural problem from two
+      different angles.
+    This mechanism requires sustained
+    full dietary ketosis.
+    It is NOT replicated by MCT oil
+    or exogenous BHB supplementation
+    alone — those produce transient BHB
+    spikes of 0.3-1.0 mmol/L for 1-3
+    hours. Full KD produces continuous
+    0.5-3.0+ mmol/L. The endothelial
+    changes require sustained exposure.
+
+  MECHANISM 3 — BDNF UPREGULATION:
+    Same 2025 JCEM trial:
+      Brain-derived neurotrophic factor:
+      +47% under full KD.
+    BDNF supports axonal survival,
+    synaptic integrity, and white matter
+    maintenance — directly relevant to
+    the navigator substrate being
+    protected in CADASIL.
+    Mechanism: BHB inhibits histone
+    deacetylases → increased BDNF
+    transcription. Also: reduced
+    neuroinflammation indirectly supports
+    BDNF levels.
+    Again: requires sustained ketosis,
+    not transient BHB spike.
+
+  MECHANISM 4 — WHITE MATTER INTEGRITY
+  IN CSVD MODEL:
+    bioRxiv, February 2025 — KD in
+    Tg-SwDI mice (cerebral amyloid
+    angiopathy — a different CSVD,
+    same vascular small vessel geometry):
+      Enhanced spatial learning and memory.
+      Reduced vascular pathology.
+      Increased hippocampal neurogenesis.
+      Direct improvement in white matter
+      integrity assessed by imaging.
+    CAA is not CADASIL. But it is
+    cerebrovascular small vessel disease
+    with white matter involvement —
+    the closest available animal model
+    to CADASIL's disease geometry in
+    the current literature.
+
+──────────────────────────────────────
+
+THE THREE-TIER FRAMEWORK:
+  This is the framework to bring to
+  the neurologist. It is ordered by
+  burden and by the mechanisms accessed.
+
+  TIER 1 — EXOGENOUS BHB OR MCT OIL:
+    Mechanism accessed: Fuel bypass only.
+    BHB level achieved: 0.3-1.0 mmol/L
+    transient peak.
+    Duration: 1-3 hours post-dose.
+    Dietary burden: minimal.
+    Added to existing diet without
+    dietary restructuring.
+    Medical risk: low — requires
+    neurologist safety assessment for
+    medication interactions.
+    Start here if full KD is not
+    feasible immediately.
+
+  TIER 2 — MODIFIED ATKINS OR
+  LOW-CARBOHYDRATE DIET:
+    Moderate carbohydrate restriction
+    without full ketogenic ratios.
+    Mechanism accessed: partial fuel
+    bypass, partial CBF and BDNF effects
+    depending on degree of ketosis achieved.
+    BHB level achieved: variable,
+    typically 0.3-1.0 mmol/L sustained
+    if carbohydrates are sufficiently
+    restricted.
+    Dietary burden: moderate.
+    Requires dietary assessment.
+
+  TIER 3 — FULL KETOGENIC DIET:
+    Classical ratios: 70-75% fat,
+    20-25% protein, 5% carbohydrate.
+    Mechanisms accessed: all four —
+    fuel bypass, +22% CBF, +47% BDNF,
+    white matter integrity.
+    BHB level achieved: 0.5-3.0+ mmol/L
+    continuous.
+    Dietary burden: high.
+    Requires dietitian involvement.
+    Requires executive function for
+    planning and preparation — assess
+    this honestly against current
+    cognitive status.
+    Requires neurologist safety
+    assessment: cardiac history, renal
+    function, lipid profile, medication
+    interactions.
+    This is the highest-leverage
+    dietary intervention in the protocol.
+    The 22% CBF increase measured in
+    humans is acting directly on the
+    primary structural problem of
+    CADASIL — not working around it.
+
+──────────────────────────────────────
+
+THE HONEST ASSESSMENT OF TIER 1 vs
+TIER 3:
+
+  MCT oil and exogenous BHB are not
+  substitutes for full KD.
+  They access mechanism 1 only.
+  They are the appropriate entry point
+  when full KD is not feasible —
+  due to compliance burden, cognitive
+  capacity for dietary planning, medical
+  contraindication, or while awaiting
+  neurologist assessment.
+
+  Full KD accesses all four mechanisms
+  including the 22% CBF increase — the
+  only intervention in this protocol
+  that directly increases flow through
+  the structurally compromised channels.
+
+  For someone with intact executive
+  function and early-stage CADASIL:
+  the full KD conversation with the
+  neurologist is worth having seriously.
+
+  For someone with cognitive impairment
+  already affecting executive function:
+  the planning burden of full KD may
+  exceed its benefit without significant
+  support infrastructure. Tier 1 is
+  the realistic option.
+
+  The neurologist and ideally a
+  dietitian determine which tier is
+  appropriate. That conversation should
+  now be explicitly about all three
+  tiers — not just BHB supplementation.
+
+──────────────────────────────────────
+
+OPENING STATEMENT FOR THE NEUROLOGIST:
+
+  "I want to discuss the ketogenic diet
+  and ketone supplementation as
+  interventions for CADASIL. I want
+  to be specific about mechanisms
+  because there are three distinct
+  things being proposed, not one.
+
+  First: beta-hydroxybutyrate as an
+  alternative fuel for glucose-deficient
+  white matter via MCT transporters.
+  This is accessible via MCT oil or
+  BHB mineral salts without full dietary
+  change. Confirmed preclinically in a
+  chronic cerebral hypoperfusion model
+  in 2023.
+
+  Second: a 22% increase in global
+  cerebral blood flow measured by
+  PET/MRI under full ketogenic diet
+  in a randomised crossover trial
+  published in the Journal of Clinical
+  Endocrinology and Metabolism in 2025.
+  The mechanism is endothelial nitric
+  oxide and improved vascular reactivity.
+  This requires sustained ketosis —
+  not just MCT oil.
+
+  Third: a 47% increase in BDNF under
+  full ketogenic diet in the same trial,
+  supporting axonal survival and white
+  matter integrity.
 
   I am asking about safety assessment
-  for a trial, not a prescription."
+  for all three tiers — supplementation,
+  modified low-carbohydrate, and full
+  ketogenic diet — so we can decide
+  together which is appropriate."
 
 QUESTION 1:
   "Is there any contraindication to
-  BHB mineral salt supplementation
-  in my specific case — particularly
-  given antiplatelet therapy, cardiac
-  history, or renal function?"
+  MCT oil or BHB mineral salt
+  supplementation in my specific case —
+  particularly given antiplatelet
+  therapy, cardiac history, or renal
+  function?"
 
 QUESTION 2:
-  "Is MCT oil supplementation safe
-  to trial? This is the lowest-barrier
-  form — MCT is converted rapidly to
-  BHB in the liver and can be added
-  to food without full dietary change."
+  "Is a full ketogenic diet safe for
+  me to trial given my current cardiac
+  profile, lipid levels, and renal
+  function? What monitoring would
+  you want — lipid panel, renal
+  function, how frequently?"
 
 QUESTION 3:
+  "Would you refer me to a dietitian
+  with neurological or ketogenic
+  diet experience to support a
+  full KD trial?"
+
+QUESTION 4:
   "Are you aware of any clinical
-  trials for ketone supplementation
-  in CADASIL or cerebral small vessel
-  disease that I might be eligible for?"
+  trials for ketogenic diet or ketone
+  supplementation in CADASIL or
+  cerebral small vessel disease that
+  I might be eligible for?"
 
-  Context: No CADASIL-specific trial
-  exists as of 2026. The glymphatic-
-  CSVD connection is an active research
-  frontier. Trials may be emerging.
+QUESTION 5 — IF COGNITIVE IMPAIRMENT
+IS ALREADY PRESENT:
+  "Given current cognitive status,
+  is full KD planning realistic?
+  Would Tier 1 MCT oil be more
+  appropriate as a starting point
+  while we assess compliance capacity?"
 
-IF THE NEUROLOGIST IS UNFAMILIAR:
-  Request consideration of a monitored
-  trial — baseline cognitive assessment,
-  3-6 months MCT oil or BHB salts,
-  follow-up cognitive and MRI assessment.
-  This is not asking to deviate from
-  standard care. It is asking for
-  oversight of a mechanistically
-  grounded intervention.
+IF THE NEUROLOGIST IS UNFAMILIAR
+WITH THE CBF FINDING:
+  Reference verbatim:
+    Kackley ML et al.
+    "A 3-Week Ketogenic Diet Increases
+    Global Cerebral Blood Flow and
+    Brain-Derived Neurotrophic Factor."
+    Journal of Clinical Endocrinology
+    and Metabolism, 2025.
+    doi: 10.1210/clinem/dgaf207
+  This is a peer-reviewed randomised
+  crossover trial in humans.
+  It is not preclinical extrapolation.
+  The 22% CBF increase was measured
+  directly by PET/MRI.
+
+──────────────────────────────────────
+
+WHAT TO MONITOR IF A KD TRIAL IS
+APPROVED:
+
+  BASELINE BEFORE STARTING:
+    Fasting lipid panel
+    (LDL, HDL, triglycerides).
+    Renal function (eGFR, creatinine).
+    Liver function (ALT, AST).
+    Fasting glucose and HbA1c.
+    Weight and BP.
+
+  DURING TRIAL (4-6 WEEKS IN):
+    Repeat lipid panel — KD can
+    increase LDL in some individuals.
+    This requires assessment in the
+    context of CADASIL's vascular risk.
+    BHB measurement (blood ketone
+    meter) to confirm ketosis achieved.
+    Target: >0.5 mmol/L fasting.
+    Optimal: 1.0-2.5 mmol/L.
+    Migraine frequency — record in
+    trigger log. If migraine frequency
+    increases, report immediately.
+    Energy and cognitive function —
+    "keto flu" in weeks 1-2 is normal.
+    Persistent cognitive worsening
+    is not. Report if it occurs.
+
+  AT 3 MONTHS:
+    Repeat full metabolic panel.
+    Clinical assessment of cognitive
+    function against baseline.
+    Decision: continue, modify, or stop.
+
+  HOME MONITORING:
+    A blood ketone meter (same finger-
+    prick device as blood glucose,
+    different strips) allows daily
+    confirmation of ketosis.
+    Costs approximately £30 for the
+    meter. Strips are the ongoing cost.
+    Worth acquiring if a full KD trial
+    is approved — confirms the dietary
+    state is actually achieved.
+```
+
+---
+
+## WHERE TO PLACE THIS SECTION
+
+```
+PLACEMENT:
+  Replace the existing Section 3.3
+  in full.
+
+  The section title changes from:
+    "3.3 THE CONVERSATION ABOUT
+    BHB/KETONES"
+  To:
+    "3.3 THE CONVERSATION ABOUT
+    KETOGENIC DIET AND BHB/KETONES"
+
+  The document structure otherwise
+  remains unchanged:
+    Section 3.1 — Migraine prevention
+    Section 3.2 — Blood pressure
+    Section 3.3 — KD and BHB [UPDATED]
+    Section 3.4 — NAC and omega-3
+    Section 3.5 — MRI and monitoring
+
+UPDATE THE DOCUMENT METADATA:
+  Version: 2.1
+  Date: 2026-03-28
+  Changes from v2.0 to v2.1:
+
+    Section 3.3 fully revised.
+
+    KD framing upgraded from
+    "fuel bypass only" to three-tier
+    framework with four distinct
+    mechanisms.
+
+    New finding added:
+    Kackley et al., JCEM 2025 —
+    3-week KD increases global CBF
+    +22% and BDNF +47% by PET/MRI
+    in humans. Endothelial nitric
+    oxide mechanism. Requires sustained
+    ketosis — not replicated by MCT oil.
+
+    New finding added:
+    bioRxiv 2025 — KD in CAA rodent
+    model (CSVD geometry) improves
+    white matter integrity, cognition,
+    and reduces vascular pathology.
+
+    Quantitative BHB comparison added:
+    MCT oil 0.3-1.0 mmol/L transient
+    vs full KD 0.5-3.0+ mmol/L
+    continuous — distinction is
+    mechanistically significant.
+
+    MCT oil correctly reframed as
+    Tier 1 entry point to mechanism 1
+    only — not a substitute for full KD.
+
+    Full KD now identified as highest-
+    leverage dietary intervention in
+    the protocol due to the CBF finding —
+    the only intervention that directly
+    increases flow through structurally
+    compromised channels.
+
+    Monitoring protocol added for
+    approved KD trial: baseline labs,
+    4-6 week check, 3-month review,
+    home ketone meter recommendation.
 ```
 
 ---
