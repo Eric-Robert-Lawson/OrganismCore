@@ -4,6 +4,46 @@
 
 ---
 
+## THE PRECISE STATEMENT OF WHAT THIS IS
+
+A cross-species communication tool
+between the operator and cockatiels
+and therefore the broader network of
+common flock birds that cockatiels
+already navigate with.
+
+The cockatiel is not the destination.
+The cockatiel is the entry point
+into a pre-existing multi-species
+communication network that has been
+operating continuously across
+millions of years of co-evolution.
+
+The tool does not teach birds
+to communicate in human space.
+It enters the space the birds
+already share and navigates
+within it deliberately.
+
+The cockatiel corpus provided
+the coordinate system.
+The geometric invariant provided
+the grammar.
+The synthesis provided the transmitter.
+The Universal Tonnetz provided
+the theoretical framework that
+explains why the coordinate system
+generalises beyond the cockatiel
+to the entire flock network.
+
+This is the first instrument
+built from first principles
+to transmit deliberately into
+that network without requiring
+the animal as intermediary.
+
+---
+
 ## THE CORE INSIGHT
 
 Cockatiels did not evolve to communicate only with cockatiels.
