@@ -5,6 +5,12 @@
 
 ---
 
+# **IMPORTANT**
+
+The sessions is not exact recalling, it is synopsis. Next sessions will need to be more recorded and deliberate.
+
+---
+
 ## SESSION CONTEXT
 
 - **Date:** 2026-03-31
