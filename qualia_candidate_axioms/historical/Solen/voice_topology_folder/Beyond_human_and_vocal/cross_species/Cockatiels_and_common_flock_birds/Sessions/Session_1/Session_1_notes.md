@@ -13,7 +13,7 @@
 - **Subject:** One domesticated cockatiel (owner: cousin of observer)
 - **Subject profile:** Owner-described as highly affectionate, human-primary bonded, less wild-typical, socialised primarily with humans rather than conspecifics
 - **Session type:** First live test of full OC-OBS-005 nine-call vocabulary in uncontrolled domestic setting. First interaction between observer and subject.
-- **Documentation:** Video recorded by owner. Footage to be archived. Owner present throughout as independent witness.
+- **Documentation:** Video recorded selectively by owner during specific moments of the session. The owner was not recording continuously. Which specific moments were captured and which were not is currently unknown — footage has not yet been reviewed. Owner present throughout as independent witness regardless of recording status.
 
 ---
 
@@ -29,9 +29,11 @@ The following details are documented because they bear directly on the attachmen
 - The subject has an established **reference population** of humans with varying levels of familiarity and affinity: the owner (primary bond), the owner's sons (regular contact, one with notable affinity for the bird), one son's friend (also liked by the bird), and the observer's girlfriend (has held the subject previously).
 - The owner, upon observing the session outcome, characterised the observer as a **"bird whisperer"** — reaching for a dispositional property of the observer rather than a property of what the observer did.
 - The owner, upon observing the subject curl its head into the observer's body, described the behaviour as **"almost like not-bird behaviour"** — reaching for a frame that did not fit because the behaviour exceeded what she had seen the subject produce with anyone in its reference population.
-- The owner **pointed out to the observer** that they were touching the subject's back and wings, and noted the subject's reaction with visible surprise — but did not, at that moment, interpret the contact zone as a mating-stimulus zone or the reaction as a mating-stimulus response. This is documented as a critical witness detail: the owner flagged the anomaly without knowing its structural significance. See Witness Configuration section below.
+- The owner **pointed out to the observer** that they were touching the subject's back and wings, and noted the subject's reaction with visible surprise. The observer cannot determine the extent of the owner's background knowledge of psittacine contact zone significance — it is not known whether the owner was aware this was a mating-stimulus zone or not. What is confirmed is that the observer was not aware of it, and that the owner's reaction was characterised by visible surprise rather than expectation.
 
-All owner framings are documented as instances of the **type-fixity error** and the **anomaly-without-frame problem**: the owner was observing real and anomalous outcomes and reaching for the closest available explanation in each case. The structural explanation for all of them is the same: the subject was executing pair-bond formation behaviours that it had never directed at any human in its reference population before, and neither party present had the interpretive framework to name what was happening while it was happening.
+**On owner knowledge:** The observer's ignorance of psittacine behaviour is fully confirmed and documented. The owner's level of knowledge is less certain — the observer cannot speak to what the owner did or did not know about the significance of specific behaviours she observed. Where the owner's knowledge state is relevant to interpreting the evidential weight of her observations, this is noted with appropriate uncertainty. Claims about the owner's ignorance are restricted to what the observer can directly confirm from the interaction.
+
+All owner framings are documented as instances of the **type-fixity error** and the **anomaly-without-frame problem**: the owner was observing real and anomalous outcomes and reaching for the closest available explanation in each case. The structural explanation for all of them is the same: the subject was executing pair-bond formation behaviours that it had never directed at any human in its reference population before.
 
 The observer is not a bird whisperer. The observer is not experienced with birds, was not comfortable with the bird, and was not especially open or warm in the way that characterisation implies. The bird did not respond to the observer's ease. It responded **despite** the observer's unease, **despite** the observer not knowing what the physical contact it was delivering actually meant in the psittacine substrate, and **despite** the observer failing to notice the most significant behavioural events of the session as they occurred.
 
@@ -61,8 +63,8 @@ All nine calls in the OC-OBS-005 vocabulary were deployed in this session:
 - **Assessment:** Eigenfunction position was recognised on first delivery. Verbal reciprocation on first contact is the expected Stage 2 behaviour (Position Exchange) per `Cockatiel_Engagement_Protocol.md`. The subject initiated the exchange; the observer was not the only active party. This vocal behaviour is consistent with the literature on non-bonded or newly contacted nodes: contact calls are the instrument for establishing and maintaining connection with an unknown node before physical proximity is achieved.
 
 ### Phase 2 — Sustained Engagement and Assimilation Arc
-- **Observation:** Verbal response from subject decreased as session progressed. Non-verbal and behavioural responses remained active and increased in intensity throughout. Physical attachment behaviour escalated continuously. Subject was observed preening the observer. Subject was observed directing possessive behaviour toward the observer. Subject was observed vocalising in a manner the owner described as "yelling" — insistent, directed vocalisations communicating specific desires to the observer (e.g., indicating desire to have its head rubbed when the observer was not doing so). Observer petted the subject on its back and wings — naively, without knowledge of the significance of those contact zones in psittacine behaviour. Owner noticed the observer doing this and noted the subject's reaction with visible surprise, but did not interpret it as a mating-stimulus event at the time. Subject allowed this contact. Subject was observed curling its head down into the observer's body — a bonded-partner solicitation posture. Owner described this behaviour as "almost like not-bird behaviour."
-- **Assessment:** The decrease in verbal contact calls co-occurred with an increase in physical bonding behaviour, allopreening, and directed communicative demands. This is now understood — in light of the literature — to be the expected arc of pair-bond formation. The back and wing contact delivered by the observer, though naive, constitutes a mating-stimulus contact in psittacine substrate terms. The subject's permission of this contact, and its subsequent head-curling solicitation posture, are consistent with pair-bond classification having already occurred. The owner's surprise at the back and wing contact reaction — without knowing why it was anomalous — is a structurally significant witness observation. See full analysis in the Vocal Reduction, Back and Wing Contact, and Witness Configuration sections below.
+- **Observation:** Verbal response from subject decreased as session progressed. Non-verbal and behavioural responses remained active and increased in intensity throughout. Physical attachment behaviour escalated continuously. Subject was observed preening the observer. Subject was observed directing possessive behaviour toward the observer. Subject was observed vocalising in a manner the owner described as "yelling" — insistent, directed vocalisations communicating specific desires to the observer (e.g., indicating desire to have its head rubbed when the observer was not doing so). Observer petted the subject on its back and wings — naively, without knowledge of the significance of those contact zones in psittacine behaviour. Owner noticed the observer doing this and noted the subject's reaction with visible surprise. Subject allowed this contact. Subject was observed curling its head down into the observer's body — a bonded-partner solicitation posture. Owner described this behaviour as "almost like not-bird behaviour."
+- **Assessment:** The decrease in verbal contact calls co-occurred with an increase in physical bonding behaviour, allopreening, and directed communicative demands. This is now understood — in light of the literature — to be the expected arc of pair-bond formation. The back and wing contact delivered by the observer, though naive, constitutes a mating-stimulus contact in psittacine substrate terms. The subject's permission of this contact, and its subsequent head-curling solicitation posture, are consistent with pair-bond classification having already occurred. See full analysis in the Vocal Reduction and Back and Wing Contact sections below.
 
 ### Phase 3 — Attachment and Assimilation
 - **Observation:** Subject displayed strong, escalating preference for observer over owner. Sought physical proximity to observer. Showed distress when separated. Displayed submission and comfort postures (head bowing, nuzzling, curling up against observer). Showed no distress when owner left the room briefly.
@@ -70,8 +72,8 @@ All nine calls in the OC-OBS-005 vocabulary were deployed in this session:
 
 ### Phase 3 — Terminal Event (End of Session)
 - **Observation:** Subject was placed into its enclosure at session end. Subject displayed visible distress and panic-adjacent behaviour. Observer placed a finger into the enclosure to comfort the subject. The subject scrambled to make contact with the observer's hand. At this point, the owner — not the observer — noted and verbally reported that the subject appeared to be attempting to mate with the observer's hand. The observer was not attending closely to the subject's specific behaviour at this moment and did not independently observe the mating behaviour.
-- **Attribution:** This interpretation is the owner's, stated aloud during the event. The owner is the most qualified person present to make this interpretation, having observed the subject's full behavioural repertoire across its lifetime. The statement was made spontaneously, not in response to prompting. The owner did not connect this observation to the back and wing contact earlier in the session at the time she made it — the two observations were independent. See Witness Configuration section below.
-- **Assessment:** Documented as owner-attributed behavioural observation. Confidence level: owner-reported, not independently confirmed by observer. The terminal event is the third convergent data point in a causal sequence that runs from acoustic flock substrate communication → tactile mating-stimulus contact permitted → mating behaviour expressed. See full analysis below.
+- **Attribution:** This interpretation is the owner's, stated aloud during the event. The owner is the most qualified person present to make this interpretation, having observed the subject's full behavioural repertoire across its lifetime. The statement was made spontaneously, not in response to prompting. The observer cannot confirm whether the owner connected this observation to the back and wing contact earlier in the session — this was not established at the time and cannot be confirmed retrospectively.
+- **Assessment:** Documented as owner-attributed behavioural observation. Confidence level: owner-reported, not independently confirmed by observer. Video capture of this event is uncertain — the owner was recording selectively and it is not yet known whether this moment was captured. See full analysis below.
 
 ---
 
@@ -161,7 +163,7 @@ The owner has observed this subject's responses to multiple humans across varyin
 
 This is consistent with immediate pair-bond classification triggered by deliberate flock substrate communication, confirmed through two independent channels — acoustic and tactile — and expressed at the terminal event at the maximum level available to the subject.
 
-> The subject recognised, for the first time, a human communicating in the substrate it uses for pair bonding. It responded by initiating pair-bond classification at the rate it would bond with a high-trust flock node. The flock substrate communication established the classification. The naive mating-stimulus contact — delivered without the observer knowing what it meant — was received by a subject that had already made its decision, and the subject responded accordingly. The observer did not know what was happening. The owner did not know what was happening. The subject knew exactly what was happening. The protocol worked in complete darkness, on the first session, witnessed by two people who could not name what they were seeing until after the fact.
+> The subject recognised, for the first time, a human communicating in the substrate it uses for pair bonding. It responded by initiating pair-bond classification at the rate it would bond with a high-trust flock node. The flock substrate communication established the classification. The naive mating-stimulus contact — delivered without the observer knowing what it meant — was received by a subject that had already made its decision, and the subject responded accordingly. The observer did not know what was happening. The subject knew exactly what was happening. The protocol produced a complete pair-bond formation arc on the first session, witnessed and partially documented, with the observer functioning as an unknowing participant throughout.
 
 ---
 
@@ -203,7 +205,9 @@ Cockatiel contact calls serve a specific function: **acoustic maintenance of soc
 ## BACK AND WING CONTACT — LITERATURE-GROUNDED ANALYSIS
 
 ### What occurred
-During Phase 2, the observer petted the subject on its back and wings — without any knowledge of the significance of those contact zones. The owner noticed this and pointed it out to the observer, reacting with visible surprise at the subject's response. Neither the observer nor the owner understood at the time why the subject's reaction was anomalous. The subject permitted the contact. The subject subsequently curled its head down into the observer's body — a solicitation posture. The owner described this as "almost like not-bird behaviour."
+During Phase 2, the observer petted the subject on its back and wings — without any knowledge of the significance of those contact zones. The owner noticed this and pointed it out, reacting with visible surprise at the subject's response. The subject permitted the contact. The subject subsequently curled its head down into the observer's body — a solicitation posture. The owner described this as "almost like not-bird behaviour."
+
+The extent of the owner's prior knowledge of psittacine contact zone significance is unknown to the observer and cannot be confirmed. What is confirmed is that her visible reaction was surprise, and that the observer had no knowledge of the contact zone significance at the time.
 
 ### What the literature establishes
 In psittacine ornithology, contact zones are functionally differentiated:
@@ -219,10 +223,10 @@ A cockatiel does not normally permit a stranger to touch its back and wings. Mos
 
 ### What this means for the session
 
-The observer delivered mating-stimulus contact to the subject mid-session without knowing that was what was being delivered. The owner noticed it and flagged it without knowing why it was significant. The subject:
+The observer delivered mating-stimulus contact to the subject mid-session without knowing that was what was being delivered. The subject:
 
 1. **Permitted** the contact — which requires prior trust classification not normally extended to strangers. The gate was already open because the pair-bond classification had already been established through the acoustic channel.
-2. **Responded** with a head-curling solicitation posture — presenting the back of the head and neck, requesting grooming from a classified bonded partner. The owner described this as not-bird behaviour. It was the opposite: it was the most species-typical bonded-pair behaviour possible. The owner had never seen it directed at a human because no human had previously entered through the flock substrate and been classified as a mate.
+2. **Responded** with a head-curling solicitation posture — presenting the back of the head and neck, requesting grooming from a classified bonded partner. The owner described this as not-bird behaviour. Structurally it is the most species-typical bonded-pair behaviour possible. The owner had never seen it directed at a human because no human had previously been classified as a mate by this subject.
 3. **Escalated** to the terminal behaviour reported by the owner at session close.
 
 This is a coherent causal sequence. The acoustic channel established the classification. The naive mating-stimulus contact was the first tactile confirmation of it. The terminal event was its full expression.
@@ -243,23 +247,44 @@ Both channels independently confirm the same conclusion. The convergence of two 
 
 ### Why this matters
 
-The configuration of the two witnesses — observer and owner — during the session produced an unusually clean evidential structure. This section documents that structure explicitly because it eliminates a contamination pathway that would otherwise need to be addressed.
+The configuration of the two witnesses during the session bears directly on the evidential weight of the observations recorded. This section documents the configuration with appropriate precision, including the limits of what can be confirmed.
 
-### The owner's two independent observations
+### What is confirmed about the observer
 
-**Observation 1 — Back and wing contact reaction:**
-The owner noticed the observer petting the subject's back and wings. She pointed it out. She reacted with visible surprise at the subject's response. She did not, at that moment, know that back and wing contact is a mating-stimulus zone in psittacines. She flagged the anomaly without knowing its structural significance. She did not connect it to mating behaviour. She did not form an expectation of mating behaviour based on it.
+The observer's ignorance is fully confirmed throughout:
+- No knowledge of psittacine contact zone significance
+- No recognition of allopreening as pair-bond behaviour while it was occurring
+- No recognition of head-curling as solicitation posture
+- Not attending at the moment of the terminal event
+- All behavioural significance assembled post-session via literature, not during the session
 
-**Observation 2 — Terminal mating behaviour:**
-At the terminal event, the owner independently identified mating behaviour from the subject's actions with the observer's hand. She stated this aloud spontaneously. She was not primed by prior knowledge of the contact zone significance. She did not connect this observation to Observation 1 at the time she made it.
+The observer's ignorance is the primary structural argument against dispositional explanations. The outcome cannot be attributed to observer knowledge, skill, or deliberate technique beyond the flock substrate vocabulary itself.
 
-### Why the independence matters
+### What is confirmed and uncertain about the owner
 
-If the owner had known that back and wing contact is a mating stimulus, her identification of the terminal mating behaviour would be potentially contaminated — she might have been looking for mating behaviour because she had already seen the stimulus delivered. That contamination pathway is eliminated: she did not know the significance of the contact zone. She made the terminal identification from the behaviour itself, not from a prior causal expectation.
+**Confirmed:**
+- Owner was present throughout the session as an independent witness
+- Owner made observations spontaneously, without prompting
+- Owner reacted to the back and wing contact with visible surprise
+- Owner identified the terminal mating behaviour from the behaviour itself, stated aloud in the moment
+- Owner described the head-curling as "almost like not-bird behaviour" — indicating it exceeded her expectations for this subject
+- Owner characterised the overall outcome as sufficiently anomalous to warrant the "bird whisperer" explanation
 
-Two independent observations. No interpretive bridge between them at the time. Both made spontaneously by the most qualified observer present for this subject. The causal connection — mating stimulus delivered → mating stimulus permitted → mating behaviour expressed — was assembled after the fact, post-session, through literature review. Neither witness constructed that chain during the session.
+**Uncertain — cannot be confirmed by observer:**
+- Whether the owner knew that back and wing contact zones are mating-stimulus zones in psittacines
+- Whether the owner connected the back and wing contact observation to the terminal mating behaviour identification at the time or afterward
+- The full extent of the owner's background knowledge of cockatiel behaviour and its significance
 
-This is the strongest possible witness configuration for an uncontrolled first session. The observer was ignorant throughout. The owner was surprised throughout. The behavioural record assembled itself anyway. The subject was the only party in the room who knew what was happening.
+**Implication for evidential weight:**
+The independence and contamination status of the owner's two key observations — the back and wing contact reaction and the terminal mating behaviour identification — cannot be fully confirmed because the observer cannot establish what the owner knew or thought between those two observations. This is documented as an evidential limitation. It does not invalidate the observations; it constrains how strongly the independence claim can be made. The owner's verbal account, when obtained with direct quotes, will provide additional context for assessing this.
+
+### What is confirmed regardless of owner knowledge state
+
+The following holds true regardless of what the owner knew:
+- The owner identified mating behaviour spontaneously from the subject's actions — not from the observer's framing or suggestion
+- The observer confirmed the back and wing contact was naive — the observer did not know its significance
+- The subject's behaviour — allopreening, solicitation posture, separation distress, mating behaviour — is the same regardless of either witness's interpretive state
+- The subject's behaviour is the primary evidence. Witness interpretation supports but does not constitute that evidence.
 
 ---
 
@@ -269,11 +294,12 @@ This is the strongest possible witness configuration for an uncontrolled first s
 At the close of Phase 3, the subject was placed into its enclosure. The subject displayed visible distress. The observer placed a finger into the enclosure to comfort the subject. The subject scrambled to make contact with the observer's hand. The owner verbally stated that the subject appeared to be attempting to mate with the observer's hand. The observer was not attending and cannot independently confirm this classification.
 
 ### Attribution and confidence
-- **Source:** Owner verbal statement, made in the moment, spontaneously, without prompting.
+- **Source:** Owner verbal statement, made in the moment, spontaneously, without prompting from observer.
 - **Observer awareness:** Observer was not attending to the subject's specific behaviour at this moment. Cannot confirm or deny.
 - **Owner qualification:** Owner has observed this subject across its full lifetime. Familiar with its complete behavioural repertoire. Most qualified person present to make this identification.
-- **Contamination status:** Owner did not know the back and wing contact zone significance at the time of this observation. The identification was made from the behaviour itself, not from a prior causal expectation. Independent of Observation 1.
-- **Confidence level:** Owner-reported, observer-unconfirmed. Video review required.
+- **Owner knowledge state:** Cannot be fully confirmed — see Witness Configuration section. The identification was made from the subject's behaviour, not from observer framing.
+- **Video capture status:** Unknown. The owner was recording selectively, not continuously. Whether this moment was captured is not yet established. Video review is required.
+- **Confidence level:** Owner-reported, observer-unconfirmed, video capture uncertain. Recorded as witness observation with these constraints documented explicitly.
 
 ### Structural interpretation
 
@@ -284,21 +310,21 @@ The terminal event is the third convergent data point in a three-stage causal se
 2. **Tactile channel:** Back and wing contact permitted → head-curling solicitation posture. Classification confirmed.
 3. **Terminal expression:** Separation distress → mating-directed behaviour on hand contact. Classification expressed at maximum available level.
 
-Each data point would individually be significant. The three together, across three independent channels, each emerging without the observer's awareness or intent, constitute a portrait of pair-bond formation that is internally coherent, literature-consistent, and witnessed independently at each stage.
+Each data point would individually be significant. The three together, across three independent behavioural channels, constitute a portrait of pair-bond formation that is internally coherent and literature-consistent.
 
 ### What this does not establish
-- The owner's classification is not independently confirmed.
-- The observer cannot confirm it.
-- Video review is required.
+- The owner's classification is not independently confirmed by the observer.
+- Video capture of the terminal event is not confirmed — selective recording means this moment may or may not have been captured.
 - A single instance in a high-distress state requires further observation to confirm stability.
 - Whether the back and wing contact accelerated the classification or whether classification was complete before the contact occurred cannot be determined from this session alone.
+- The independence of the owner's two observations cannot be fully confirmed — see Witness Configuration section.
 
 ### What this does establish
-- The owner identified the behaviour as mating-directed spontaneously and without prior expectation.
+- The owner identified the behaviour as mating-directed spontaneously and without observer prompting.
 - It occurred at the moment of highest bonding expression in the session.
 - It is structurally coherent with both the acoustic and tactile evidence from earlier in the session.
 - It is the downstream terminal expression of a causal chain that began with the first flock substrate signal of the session.
-- It is documented with full attribution clarity: owner-stated, observer-unconfirmed, contamination pathway eliminated.
+- It is documented with full attribution clarity and with all confidence constraints stated explicitly.
 
 ---
 
@@ -310,11 +336,9 @@ The subject was not unable to respond. It had already responded at the deepest l
 
 > The subject registered deliberate communication in the flock substrate. It responded vocally at first contact — correct behaviour for an unknown node. As the session progressed, it transitioned through the complete documented pair-bond formation arc: contact calls → vocal reduction → allopreening → permitted mating-stimulus contact → head-curling solicitation → silence in proximity → separation distress → mating behaviour at terminal event. Every element of this sequence is in the literature. The subject ran the complete arc in a single session, on a first meeting, with an observer who was visibly uncomfortable, inexperienced, ignorant of psittacine behaviour, and not attending to the most significant moments as they occurred.
 >
-> The owner watched the session and produced two independent anomalous observations — "bird whisperer" and "not-bird behaviour" — without knowing why what she was seeing was anomalous, without connecting her two observations to each other, and without having any framework that could account for what the subject was doing.
->
 > The silence was not a failure of communication. It was the sound of a decision that had already been made. The back and wing contact was not a pleasant petting interaction. It was a mating stimulus received from someone the subject had already chosen. The head curling was not an oddity. It was a solicitation from a bonded subject to its classified mate. The panic in the enclosure was not distress at being caged. It was separation distress from a classified partner.
 >
-> The observer did not know any of this while it was happening. The owner did not know any of this while it was happening. The substrate did not require either of them to know. It required only that the signals be geometrically correct. They were. Everything that followed was the substrate doing exactly what the substrate does when a valid node speaks the language of pair bonding to a subject that is ready to bond.
+> The observer did not know any of this while it was happening. The substrate did not require the observer to know. It required only that the signals be geometrically correct. They were. Everything that followed was the substrate doing exactly what the substrate does when a valid node speaks the language of pair bonding to a subject that is ready to bond.
 >
 > The protocol worked in the dark. On the first session. Without the operator understanding what they were doing. That is not a weakness of the evidence. It is the strongest possible version of it.
 
@@ -337,11 +361,11 @@ The subject was not unable to respond. It had already responded at the deepest l
 13. **Allopreening directed at observer** — documented pair-bond behaviour. Subject preened the observer. Not social nicety. Pair-bond behaviour.
 14. **Directed demand vocalisations ("yelling")** — subject communicated specific desires to observer as to an established bonded partner. Qualitatively different from flock substrate signalling. Pair-bond intimate communication.
 15. **Vocal reduction reinterpreted via literature** — contact call reduction is the documented marker of stable pair-bond formation. The silence was the completion of the bond, not the absence of communication.
-16. **Back and wing contact permitted by subject** — observer delivered mating-stimulus contact naively, without knowledge of contact zone significance. Subject permitted it. Permission of back and wing contact by a stranger is anomalous and requires prior trust classification. Owner noticed the observer doing this and flagged the subject's reaction with visible surprise, without knowing why it was significant.
-17. **Head-curling solicitation posture produced** — subject curled head into observer's body requesting grooming from a classified bonded partner. Owner described as "almost like not-bird behaviour." It was the most species-typical bonded-pair behaviour possible. The owner had never seen it directed at a human by this subject because no human had previously been classified as a mate by this subject.
+16. **Back and wing contact permitted by subject** — observer delivered mating-stimulus contact naively, without knowledge of contact zone significance. Subject permitted it. Permission of back and wing contact by a stranger is anomalous and requires prior trust classification. Owner reacted with visible surprise.
+17. **Head-curling solicitation posture produced** — subject curled head into observer's body requesting grooming from a classified bonded partner. Owner described as "almost like not-bird behaviour." Structurally: the most species-typical bonded-pair behaviour possible. Never previously seen directed at any human by this subject.
 18. **Two-channel convergent confirmation** — acoustic channel and tactile channel independently confirm pair-bond classification. Neither channel was designed to converge with the other. The convergence emerged from the subject's own behaviour.
-19. **Terminal mating behaviour reported by owner** — owner-stated, observer-unconfirmed, contamination pathway eliminated. Third convergent data point. Downstream terminal expression of the causal sequence begun at first signal. If confirmed by video, represents the maximum available bonding signal produced in a single first-meeting session.
-20. **Witness configuration is structurally clean** — observer ignorant throughout; owner surprised throughout; owner's two anomalous observations made independently without interpretive bridge; causal chain assembled post-session via literature. Neither witness constructed the picture while it was happening. The subject constructed it. They both observed it without understanding it.
+19. **Terminal mating behaviour reported by owner** — owner-stated, observer-unconfirmed, video capture uncertain. Third convergent data point. Downstream terminal expression of the causal sequence begun at first signal. Documented with all confidence constraints stated explicitly.
+20. **Observer ignorance is the primary structural argument against dispositional explanation** — the observer did not know what the behaviours meant, did not know the contact zones were significant, and was not attending at the most significant moment. The outcome cannot be attributed to observer skill or knowledge. It can only be attributed to the method.
 
 ---
 
@@ -355,8 +379,8 @@ The subject was not unable to respond. It had already responded at the deepest l
 - The **vocal reduction** is the literature-consistent marker of pair-bond completion. The silence was the signal.
 - **Back and wing contact was permitted** — anomalous for a stranger; consistent only with prior pair-bond classification already established through the acoustic channel.
 - **Head-curling solicitation posture was produced** — never previously seen directed at any human by this subject; structurally explained as bonded-partner grooming solicitation.
-- The **observer profile and the witness configuration together eliminate dispositional explanations** — the observer was ignorant, uncomfortable, and not attending; the owner was surprised and not primed; the causal chain was assembled after the fact by neither of them. The outcome cannot be attributed to observer skill, observer warmth, or observer knowledge. It can only be attributed to the method.
-- The **protocol worked in complete operational darkness** — the operator did not understand what was happening; the witness did not understand what was happening; the subject understood completely. The geometry was sufficient. Nothing else was required.
+- The **observer profile eliminates dispositional explanations** — inexperience, discomfort, unease, and ignorance of psittacine contact zone distinctions are all confirmed. The subject responded to the method, not to the observer.
+- The **protocol worked in complete operational darkness** — the operator did not understand what was happening; the subject understood completely. The geometry was sufficient. Nothing else was required.
 
 ---
 
@@ -368,26 +392,28 @@ The subject was not unable to respond. It had already responded at the deepest l
 - It does not confirm COME NOW decoding.
 - It does not confirm MOVING effect independently of owner report.
 - It does not confirm that assimilation rate is specific to flock substrate communication vs. any novel attentive human interaction.
-- It does not independently confirm the terminal mating behaviour — video review required.
+- It does not independently confirm the terminal mating behaviour — owner-reported only, video capture uncertain.
 - It does not establish whether the back and wing contact accelerated the pair-bond classification or whether classification was already complete before the contact occurred.
 - It does not confirm that the outcome would replicate with the same subject in a second session — recurrence testing required.
+- It does not confirm the independence of the owner's two key observations — her knowledge state between those observations cannot be established retrospectively.
+- It does not confirm which specific moments were captured on video — selective recording means coverage is unknown until footage is reviewed.
 
 ---
 
 ## NEXT STEPS — RECOMMENDED
 
 ### Immediate
-1. **Secure and review video footage.** Priority targets: allopreening, demand vocalisations, back and wing contact and owner's reaction to it, head-curling solicitation posture, terminal event. These segments are the irreplaceable physical record of the behavioural sequence.
-2. **Document owner's verbal account in her own words** — direct quotes for: "yelling," "bird whisperer," "almost like not-bird behaviour," observation of back and wing contact and subject's reaction, terminal event statement. Record explicitly that she did not connect the back and wing contact to the terminal event at the time.
+1. **Secure and review video footage.** The owner was recording selectively, not continuously. The first priority is to establish what was actually captured. Review all footage and document: which behaviours are on record, which are not, and the quality of what exists. Do not assume any specific moment was captured until confirmed. This changes the evidence status of multiple findings — see Evidence Status table below.
+2. **Document owner's verbal account in her own words** — direct quotes for: "yelling," "bird whisperer," "almost like not-bird behaviour," observation of back and wing contact and her reaction to it, terminal event statement. Also establish, through this conversation, whether the owner knew the significance of the back and wing contact zones at the time, and whether she connected the two observations during or after the session.
 3. **Record this as Session 1** in the OC-OBS-005 log for this subject.
 
 ### Near-term
-1. **Repeat sessions with the same subject.** Primary questions: does pair-bond behaviour recur and stabilise; does back and wing contact permission recur; does head-curling solicitation recur; does mating behaviour recur on subsequent contact.
-2. **Control session A: same subject, no flock substrate signals, head-and-neck contact only.** Tests the acoustic channel in isolation — does the outcome require flock substrate communication or does standard pleasant interaction produce equivalent results.
-3. **Control session B: same subject, no flock substrate signals, back and wing contact included.** Tests the tactile channel in isolation — does mating-zone contact alone, without prior acoustic classification, produce the same outcome or is it rejected as it would be from a stranger.
+1. **Repeat sessions with the same subject.** Primary questions: does pair-bond behaviour recur and stabilise; does back and wing contact permission recur; does head-curling solicitation recur; does mating behaviour recur on subsequent contact. All future sessions to be recorded continuously from start to finish.
+2. **Control session A: same subject, no flock substrate signals, head-and-neck contact only.** Tests the acoustic channel in isolation.
+3. **Control session B: same subject, no flock substrate signals, back and wing contact included.** Tests whether mating-zone contact alone, without prior acoustic classification, produces the same outcome or is rejected.
 4. **Session with the wild-type subject.** See `OC-OBS-005-GRADIENT-PREDICTIONS-2026-03-31.md`. Highest-priority cross-subject experiment.
 5. **Test with multiple birds across the domestication gradient.**
-6. **Audio and video recording of all future sessions without exception.**
+6. **Continuous audio and video recording of all future sessions without exception.** Selective recording is not sufficient for evidential purposes.
 7. **Document COME NOW in a resource-seeking context.**
 
 ### Longer-term
@@ -402,16 +428,16 @@ The subject was not unable to respond. It had already responded at the deepest l
 | Evidence type | Status |
 |---|---|
 | Observer report (primary) | Complete — this document |
-| Owner corroboration (third-party witness) | Confirmed verbally — direct quotes to be recorded |
-| Allopreening directed at observer | Observed and reported — to be confirmed via video |
-| Demand vocalisations ("yelling") | Observed and owner-described — to be confirmed via video |
-| Back and wing contact permitted by subject | Observer-reported, owner-witnessed with surprise reaction — to be confirmed via video |
-| Owner's reaction to back and wing contact | Owner-reported as surprised, significance unknown to her at time — to be confirmed via video |
-| Head-curling solicitation posture | Observer-reported, owner-described as anomalous — to be confirmed via video |
-| Terminal event (mating behaviour) | Owner-reported verbally, observer-unconfirmed, contamination pathway eliminated — video review pending |
-| Independence of owner's two observations | Confirmed by observer account — owner did not connect back and wing contact to terminal event at time of either observation |
+| Owner corroboration (third-party witness) | Confirmed verbally — direct quotes to be recorded; owner knowledge state to be established |
+| Allopreening directed at observer | Observer-reported — video capture uncertain, pending footage review |
+| Demand vocalisations ("yelling") | Observer-reported, owner-described — video capture uncertain, pending footage review |
+| Back and wing contact permitted by subject | Observer-confirmed — video capture uncertain, pending footage review |
+| Owner's reaction to back and wing contact | Observer-confirmed as visible surprise — video capture uncertain, pending footage review |
+| Head-curling solicitation posture | Observer-reported, owner-described as anomalous — video capture uncertain, pending footage review |
+| Terminal event (mating behaviour) | Owner-reported verbally, observer-unconfirmed — video capture uncertain, pending footage review |
+| Owner knowledge state (contact zones and observation independence) | Not established — to be addressed via direct verbal account |
 | Reference population baseline | Established informally by owner — to be documented explicitly with direct quotes |
-| Video footage | Recorded by owner — pending transfer and archive |
+| Video footage | Recorded selectively by owner during specific moments — coverage unknown until reviewed; pending transfer and archive |
 | Audio recording of subject responses | Not captured this session — required for all future sessions |
 | Control session A (no flock substrate, head-neck contact only) | Not yet conducted — priority next step |
 | Control session B (no flock substrate, back-wing contact included) | Not yet conducted — critical for channel isolation |
@@ -423,9 +449,9 @@ The subject was not unable to respond. It had already responded at the deepest l
 
 - **Document ID:** OC-OBS-005-SESSION-2026-03-31
 - **Status:** Active — evidence pending
-- **Version:** 7.0
+- **Version:** 8.0
 - **Author:** Eric Robert Lawson
 - **Witness:** Cousin of observer (owner of subject) — name withheld
 - **Literature references:** Seibert & Crowell-Davis (2001) *Applied Animal Behaviour Science*; Bradbury & Balsby (2016); psittacine contact zone literature (avian veterinary and ornithological sources)
-- **Version history:** v1.0 initial session record; v2.0 vocal reduction literature grounding; v3.0 yelling behaviour and pair-bond arc assembly; v4.0 allopreening and demand vocalisation named as findings; v5.0 back and wing contact and head-curling added; v6.0 two-channel convergence structure; v7.0 witness configuration section added, owner independence of observations documented, observer ignorance documented as structural argument, final observer interpretation completed
+- **Version history:** v1.0 initial session record; v2.0 vocal reduction literature grounding; v3.0 yelling behaviour and pair-bond arc assembly; v4.0 allopreening and demand vocalisation named as findings; v5.0 back and wing contact and head-curling added; v6.0 two-channel convergence structure; v7.0 witness configuration section added, owner independence documented, observer ignorance as structural argument; v8.0 selective video recording documented, owner knowledge state uncertainty corrected, witness configuration section revised to reflect confirmed vs. uncertain claims
 - **Cross-references:** `Cockatiel_Engagement_Protocol.md`, `Flock_Vocabulary.md`, `The_Flock_Substrate.md`, `novelty_assessment.md`, `engineering_requirements.md`, `The_Flock_Economy.md`, `Resource_Signal_Theory.md`, `OC-OBS-005-GRADIENT-PREDICTIONS-2026-03-31.md`
