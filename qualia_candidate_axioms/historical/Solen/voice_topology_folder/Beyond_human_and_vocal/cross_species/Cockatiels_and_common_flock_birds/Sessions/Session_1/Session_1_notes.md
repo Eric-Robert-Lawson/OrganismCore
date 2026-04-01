@@ -17,6 +17,22 @@
 
 ---
 
+## OBSERVER PROFILE — RELEVANT TO INTERPRETATION
+
+The following details are documented because they bear directly on the attachment outcome and its interpretation.
+
+- Observer is **not a bird person**. No prior experience handling or bonding with birds. No practiced ease with avian subjects.
+- Observer displayed **visible discomfort** during the session: startled when subject flew onto them; uncomfortable when defecated upon. No hostile behaviour at any point, but the observer was not relaxed or open in the way conventionally associated with fast animal bonding.
+- Observer had **seen the subject before in passing** but had never interacted with it directly. This was the first substantive contact.
+- The subject has an established **reference population** of humans with varying levels of familiarity and affinity: the owner (primary bond), the owner's sons (regular contact, one with notable affinity for the bird), one son's friend (also liked by the bird), and the observer's girlfriend (has held the subject previously).
+- The owner, upon observing the session outcome, characterised the observer as a **"bird whisperer"** — reaching for a dispositional property of the observer rather than a property of what the observer did.
+
+This framing is documented as an instance of the **type-fixity error**: attributing the result to a fixed personal attribute of the observer rather than to the method deployed. The observer is not a bird whisperer. The observer is not experienced with birds, was not comfortable with the bird, and was not especially open or warm in the way that characterisation implies. The bird did not respond to the observer's ease. It responded **despite** the observer's unease.
+
+The reference population detail sharpens the result: the owner has observed the subject's responses to multiple humans across varying levels of familiarity and affinity. The outcome of this single session was distinguishable from that entire reference population — clearly enough that the owner named it. This is not anecdote. It is a comparison with an existing baseline.
+
+---
+
 ## CALLS DEPLOYED
 
 All nine calls in the OC-OBS-005 vocabulary were deployed in this session:
@@ -112,17 +128,24 @@ All nine calls in the OC-OBS-005 vocabulary were deployed in this session:
 The most significant finding of this session is not the individual call responses. It is the overall attachment outcome.
 
 ### What was observed
-- Subject was meeting observer for the first time.
+- Subject was meeting observer for the first time in a substantive interaction.
 - Observer is not a bird person; had no prior experience handling or bonding with birds.
-- Observer displayed mild discomfort during the session (startled when subject flew onto them; uncomfortable with being pooped on) — no hostile behaviour, but no practiced ease either.
-- Despite observer inexperience and mild discomfort, the subject:
+- Observer displayed mild discomfort during the session (startled when subject flew onto them; uncomfortable with being defecated upon) — no hostile behaviour, but no practiced ease either. The observer was visibly not a natural fit for fast animal bonding by conventional measures.
+- The subject has an established reference population of humans: the owner (primary bond), the owner's sons (regular contact, one with notable affinity), one son's friend (also liked by the subject), and the observer's girlfriend (has held the subject previously).
+- Despite observer inexperience, mild discomfort, and the existence of this reference population, the subject:
   - Chose the observer over the owner (the bird's primary human bond) for proximity throughout the session
   - Showed no distress when owner briefly left the room
   - Actively avoided returning to the owner and sought to remain on or near the observer
   - Displayed full submission and comfort postures: head bowing, nuzzling, curling up
   - When placed into a container to be taken home, showed visible distress and panic-adjacent behaviour
   - When observer placed a finger into the container, immediately scrambled to climb onto it
-  - Owner described the bird as loving the observer — characterised the attachment as unusual and beyond normal
+  - Owner described the bird as loving the observer — characterised the attachment as unusual and beyond normal, reaching for the explanation of "bird whisperer"
+
+### The reference population context
+
+The owner has observed this subject's responses to multiple humans across varying degrees of familiarity, affinity, and frequency of contact. That population constitutes an informal baseline for what strong attachment to a human looks like for this subject. The outcome of this single session — a first substantive meeting, with an observer who was visibly uncomfortable — was distinguishable from that entire baseline population clearly enough that the owner named it and reached for a special explanation.
+
+This is the most important contextual detail for evaluating the attachment outcome. It is not just that the bird liked the observer. It is that the bird's response to the observer in one session exceeded its established pattern of response to people it already knew and liked, as judged by the person best positioned to make that comparison.
 
 ### What this is
 
@@ -134,18 +157,21 @@ The hypothesis that best fits the observed outcome is:
 
 > The subject recognised, for the first time, a human communicating in the substrate it uses for flock bonding. It responded by initiating flock-level bonding with that human at the rate it would bond with a high-trust flock node — not at the rate it bonds with a novel human social contact.
 
-The observer did not do anything conventionally associated with fast bird bonding: no prior relationship, no special treats, no extended handling experience, unfamiliar person, mild discomfort visible to the subject. The only variable that distinguishes this interaction from a standard first meeting with a stranger is the deliberate use of the flock substrate vocabulary throughout the session.
+The observer did not do anything conventionally associated with fast bird bonding: no prior relationship, no special treats, no extended handling experience, unfamiliar person, mild discomfort visible to the subject. The only variable that distinguishes this interaction from a standard first meeting with a stranger — or from the established relationships in the reference population — is the deliberate use of the flock substrate vocabulary throughout the session.
+
+The "bird whisperer" framing is documented here as an alternative explanation and assessed as insufficient. It attributes the result to a dispositional property of the observer that is contradicted by the observer's actual behaviour: discomfort, inexperience, visible unease. A bird whisperer is someone with practiced ease. The observer had the opposite. The subject responded despite that, not because of it.
 
 ### What this does not establish
-- It does not rule out that the subject's response was driven by the observer's novelty alone.
-- It does not rule out that the subject's human-primary bonding made it more, not less, likely to bond rapidly with any new human contact.
+- It does not rule out that some component of the subject's response was driven by observer novelty.
+- It does not rule out that this subject has an unusually fast bonding rate with any sufficiently attentive new human contact.
 - Single subject, single session. The geometric invariant across subjects is not confirmed.
 - The specific causal contribution of each signal to the attachment outcome cannot be isolated from this session alone.
 
 ### What this does establish
-- The attachment outcome was unexpected by the owner — a person who knows this subject well.
-- The attachment outcome was anomalous relative to what the owner predicted for a first meeting.
+- The attachment outcome was unexpected by the owner — a person who knows this subject and its reference population well.
+- The attachment outcome was anomalous relative to the subject's established response pattern across a known reference population.
 - The attachment outcome is coherent with the flock assimilation hypothesis.
+- The "bird whisperer" explanation offered by the owner is inconsistent with the observer's actual profile and behaviour during the session.
 - The attachment outcome is the most striking result of the session and must be the primary focus of follow-up investigation.
 
 ---
@@ -158,7 +184,7 @@ A more precise interpretation:
 
 > The subject registered deliberate communication in the flock substrate. It responded vocally at first contact (Stage 2 — Position Exchange). As the session progressed, it shifted from vocal reciprocation to physical/behavioural assimilation — which is Stage 3 in the assimilation arc. The decrease in verbal response was not a failure of communication; it was a deepening of it. The subject stopped talking and started bonding.
 
-The attachment outcome at session end — the distress on separation, the scramble to return, the preference over owner — is the subject's most unambiguous communication of the session. It is behavioural, not vocal, and it is unambiguous.
+The attachment outcome at session end — the distress on separation, the scramble to return, the preference over the entire reference population including the primary bond owner — is the subject's most unambiguous communication of the session. It is behavioural, not vocal, and it is unambiguous.
 
 ---
 
@@ -174,7 +200,8 @@ The attachment outcome at session end — the distress on separation, the scramb
 8. **RESOURCE decoded, not acted upon** — social engagement dominated resource-seeking; signal registered, superseded by attachment state.
 9. **WHERE ARE YOU decoded** — initial verbal response confirms position exchange recognition; cessation consistent with Stage 2 → Stage 3 transition.
 10. **ACKNOWLEDGE functioned as deliberate agency signal** — primary instrument for establishing observer as a communicating node rather than environmental stimulus.
-11. **Rapid flock assimilation occurred** — single session, first meeting, no prior relationship. Attachment outcome anomalous relative to owner's expectations and the observer's inexperience. This is the primary result.
+11. **Rapid flock assimilation occurred** — single session, first substantive meeting, observer visibly inexperienced and uncomfortable. Attachment outcome anomalous relative to owner's expectations, the observer's profile, and the subject's established reference population. This is the primary result.
+12. **Type-fixity explanation offered and documented** — owner's "bird whisperer" framing is recorded and assessed as inconsistent with observer behaviour profile. The result is more parsimoniously explained by the method than by a dispositional property of the observer.
 
 ---
 
@@ -185,7 +212,8 @@ The attachment outcome at session end — the distress on separation, the scramb
 - **Alarm and all-clear are the most structurally robust confirmations** — their responses are survival-obligate and were confirmed on every trial.
 - The **integrated comfort protocol** (I AM HERE + SAFE + ALL CLEAR + ACKNOWLEDGE) produced measurable de-stressing and affiliative response.
 - The **assimilation arc progressed within a single session** from Stage 2 (vocal position exchange) to Stage 3 (behavioural integration) to an attachment outcome consistent with Stage 4 (network integration) initiation.
-- The **rate of attachment** was anomalous relative to baseline expectations for a first encounter — consistent with the hypothesis that flock substrate communication accelerates the assimilation timeline.
+- The **rate of attachment** was anomalous relative to the subject's established reference population baseline — as judged by the owner, who has the most prior knowledge of that baseline.
+- The **observer profile actively argues against dispositional explanations** — inexperience, visible discomfort, and lack of practiced ease with birds are documented. The result cannot be straightforwardly attributed to the observer being a natural fit for bird bonding.
 
 ---
 
@@ -196,7 +224,7 @@ The attachment outcome at session end — the distress on separation, the scramb
 - It does not confirm the geometric invariant across subjects — single subject, single session.
 - It does not confirm COME NOW decoding (context inapplicability vs. signal failure unresolved).
 - It does not confirm MOVING effect independently of owner report.
-- It does not confirm that the assimilation rate is specific to flock substrate communication vs. any novel and attentive human interaction.
+- It does not confirm that the assimilation rate is specific to flock substrate communication vs. any novel and sufficiently attentive human interaction.
 
 ---
 
@@ -204,20 +232,21 @@ The attachment outcome at session end — the distress on separation, the scramb
 
 ### Immediate
 1. **Secure video footage from owner.** Archive with session date, metadata, and owner verbal account. This is the primary physical evidence.
-2. **Document owner's verbal account** with direct quotes, timestamp, and specific observations (preference over owner, distress on separation, cage panic, nuzzling postures).
+2. **Document owner's verbal account** with direct quotes, timestamp, and specific observations (preference over owner, distress on separation, cage panic, nuzzling postures, "bird whisperer" characterisation).
 3. **Record this as Session 1** in the OC-OBS-005 log for this subject.
 
 ### Near-term
 1. **Repeat sessions with the same subject.** Primary question: does the assimilation deepen across sessions, and does vocal reciprocation resume once the node is more fully integrated?
-2. **Control session: same subject, no flock substrate signals.** Have observer interact with the subject using normal human social behaviour only, no calls. Compare attachment outcome. This is the most direct test of whether flock substrate communication is the causal variable.
-3. **Test with multiple birds.** The geometric invariant hypothesis requires cross-subject confirmation. The alarm/all-clear sequence is the highest-priority replication target.
-4. **Audio and video recording of all future sessions.** Subject response geometry must be captured for analysis.
-5. **Document COME NOW in a resource-seeking context.** Test the signal when the subject is actively foraging or calling for a flock location — the predicted conditions under which COME NOW should produce directed movement.
+2. **Control session: same subject, no flock substrate signals.** Have observer interact with the subject using normal human social behaviour only, no calls. Compare attachment outcome against Session 1. This is the most direct test of whether flock substrate communication is the causal variable — and whether the reference population baseline is replicated or exceeded without the method.
+3. **Session with the wild-type subject housed in the same environment.** See `OC-OBS-005-GRADIENT-PREDICTIONS-2026-03-31.md` for pre-registered predictions. This is the highest-priority next experiment.
+4. **Test with multiple birds across the domestication gradient.** The geometric invariant hypothesis requires cross-subject confirmation. The alarm/all-clear sequence is the highest-priority replication target.
+5. **Audio and video recording of all future sessions.** Subject response geometry must be captured for analysis.
+6. **Document COME NOW in a resource-seeking context.** Test the signal when the subject is actively foraging or calling for a flock location — the predicted conditions under which COME NOW should produce directed movement.
 
 ### Longer-term
 1. **Multi-species testing** — extend to other flock species to test substrate-independence.
 2. **Receiver and classifier development** — build the missing components from `engineering_requirements.md` to enable fully bidirectional instrumented sessions.
-3. **Assimilation rate study** — systematic comparison of attachment outcomes with and without flock substrate communication, across multiple subjects, to test whether the accelerated assimilation observed here is reproducible and attributable to the substrate.
+3. **Assimilation rate study** — systematic comparison of attachment outcomes with and without flock substrate communication, across multiple subjects and across the domestication gradient, to test whether the accelerated assimilation observed here is reproducible and attributable to the substrate.
 
 ---
 
@@ -227,9 +256,11 @@ The attachment outcome at session end — the distress on separation, the scramb
 |---|---|
 | Observer report (primary) | Complete — this document |
 | Owner corroboration (third-party witness) | Confirmed verbally — direct quotes to be recorded |
+| Reference population baseline | Established informally by owner — to be documented explicitly |
 | Video footage | Recorded by owner — pending transfer and archive |
 | Audio recording of subject responses | Not captured this session — required for all future sessions |
 | Control session (no flock substrate) | Not yet conducted — priority next step |
+| Wild-type subject session | Not yet conducted — pre-registered predictions documented separately |
 
 ---
 
@@ -237,7 +268,7 @@ The attachment outcome at session end — the distress on separation, the scramb
 
 - **Document ID:** OC-OBS-005-SESSION-2026-03-31
 - **Status:** Active — evidence pending
-- **Version:** 2.0
+- **Version:** 3.0
 - **Author:** Eric Robert Lawson
 - **Witness:** Cousin of observer (owner of subject) — name withheld
-- **Cross-references:** `Cockatiel_Engagement_Protocol.md`, `Flock_Vocabulary.md`, `The_Flock_Substrate.md`, `novelty_assessment.md`, `engineering_requirements.md`, `The_Flock_Economy.md`, `Resource_Signal_Theory.md`
+- **Cross-references:** `Cockatiel_Engagement_Protocol.md`, `Flock_Vocabulary.md`, `The_Flock_Substrate.md`, `novelty_assessment.md`, `engineering_requirements.md`, `The_Flock_Economy.md`, `Resource_Signal_Theory.md`, `OC-OBS-005-GRADIENT-PREDICTIONS-2026-03-31.md`
