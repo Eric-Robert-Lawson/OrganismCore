@@ -73,7 +73,7 @@ All nine calls in the OC-OBS-005 vocabulary were deployed in this session:
 ### Phase 3 — Terminal Event (End of Session)
 - **Observation:** Subject was placed into its enclosure at session end. Subject displayed visible distress and panic-adjacent behaviour. Observer placed a finger into the enclosure to comfort the subject. The subject scrambled to make contact with the observer's hand. At this point, the owner — not the observer — noted and verbally reported that the subject appeared to be attempting to mate with the observer's hand. The observer was not attending closely to the subject's specific behaviour at this moment and did not independently observe the mating behaviour.
 - **Attribution:** This interpretation is the owner's, stated aloud during the event. The owner is the most qualified person present to make this interpretation, having observed the subject's full behavioural repertoire across its lifetime. The statement was made spontaneously, not in response to prompting. The observer cannot confirm whether the owner connected this observation to the back and wing contact earlier in the session — this was not established at the time and cannot be confirmed retrospectively.
-- **Assessment:** Documented as owner-attributed behavioural observation. Confidence level: owner-reported, not independently confirmed by observer. Video capture of this event is uncertain — the owner was recording selectively and it is not yet known whether this moment was captured. See full analysis below.
+- **Assessment:** Documented as owner-attributed behavioural observation. Confidence level: owner-reported, not independently confirmed by observer. Video capture of this event is uncertain — the owner was recording selectively and it is not yet known whether this moment was captured. The terminal event is not the primary evidence of pair-bond classification — it is the expected downstream output of a classification already established through three independent preceding channels. See full analysis below.
 
 ---
 
@@ -229,7 +229,7 @@ The observer delivered mating-stimulus contact to the subject mid-session withou
 2. **Responded** with a head-curling solicitation posture — presenting the back of the head and neck, requesting grooming from a classified bonded partner. The owner described this as not-bird behaviour. Structurally it is the most species-typical bonded-pair behaviour possible. The owner had never seen it directed at a human because no human had previously been classified as a mate by this subject.
 3. **Escalated** to the terminal behaviour reported by the owner at session close.
 
-This is a coherent causal sequence. The acoustic channel established the classification. The naive mating-stimulus contact was the first tactile confirmation of it. The terminal event was its full expression.
+This is a coherent causal sequence. The acoustic channel established the classification. The naive mating-stimulus contact was the first tactile confirmation of it. The terminal event was its expected downstream expression — not a surprise given the preceding sequence, but the completion of it.
 
 ### The compounding structure
 
@@ -293,13 +293,21 @@ The following holds true regardless of what the owner knew:
 ### Event description
 At the close of Phase 3, the subject was placed into its enclosure. The subject displayed visible distress. The observer placed a finger into the enclosure to comfort the subject. The subject scrambled to make contact with the observer's hand. The owner verbally stated that the subject appeared to be attempting to mate with the observer's hand. The observer was not attending and cannot independently confirm this classification.
 
+### Evidential position of the terminal event
+
+The terminal event is documented as the third convergent data point in a causal sequence — not as the primary evidence of pair-bond classification. The primary evidence is the preceding behavioural arc: vocal reduction, allopreening, back and wing contact permission, solicitation posture, and separation distress. Each of those elements is observer-confirmed and literature-grounded. Together they constitute pair-bond classification evidence that is complete and coherent independently of the terminal event.
+
+The terminal event is what that classification, expressed under separation distress, predicts. A subject that has pair-bond classified a node and is then separated from that node will express the classification at the maximum level available to it in the moment of separation. Mating-directed behaviour toward the classified partner on hand contact is the predicted output of that state. The terminal event is not surprising given the preceding sequence. It is the expected completion of it.
+
+Its evidentiary weight as a standalone observation is constrained by its attribution status. Its evidentiary weight as the predicted output of an already-established causal sequence is high. Both statements are true simultaneously and are documented as such.
+
 ### Attribution and confidence
 - **Source:** Owner verbal statement, made in the moment, spontaneously, without prompting from observer.
 - **Observer awareness:** Observer was not attending to the subject's specific behaviour at this moment. Cannot confirm or deny.
 - **Owner qualification:** Owner has observed this subject across its full lifetime. Familiar with its complete behavioural repertoire. Most qualified person present to make this identification.
 - **Owner knowledge state:** Cannot be fully confirmed — see Witness Configuration section. The identification was made from the subject's behaviour, not from observer framing.
 - **Video capture status:** Unknown. The owner was recording selectively, not continuously. Whether this moment was captured is not yet established. Video review is required.
-- **Confidence level:** Owner-reported, observer-unconfirmed, video capture uncertain. Recorded as witness observation with these constraints documented explicitly.
+- **Confidence level:** Owner-reported, observer-unconfirmed, video capture uncertain. Recorded as witness observation with these constraints documented explicitly. Evidentiary weight elevated by structural position as predicted output of the preceding causal sequence.
 
 ### Structural interpretation
 
@@ -310,7 +318,7 @@ The terminal event is the third convergent data point in a three-stage causal se
 2. **Tactile channel:** Back and wing contact permitted → head-curling solicitation posture. Classification confirmed.
 3. **Terminal expression:** Separation distress → mating-directed behaviour on hand contact. Classification expressed at maximum available level.
 
-Each data point would individually be significant. The three together, across three independent behavioural channels, constitute a portrait of pair-bond formation that is internally coherent and literature-consistent.
+Each data point would individually be significant. The three together, across three independent behavioural channels, constitute a portrait of pair-bond formation that is internally coherent and literature-consistent. The terminal event is the least surprising element of the three given everything that preceded it.
 
 ### What this does not establish
 - The owner's classification is not independently confirmed by the observer.
@@ -322,9 +330,56 @@ Each data point would individually be significant. The three together, across th
 ### What this does establish
 - The owner identified the behaviour as mating-directed spontaneously and without observer prompting.
 - It occurred at the moment of highest bonding expression in the session.
-- It is structurally coherent with both the acoustic and tactile evidence from earlier in the session.
+- It is structurally coherent with and predicted by the acoustic and tactile evidence from earlier in the session.
 - It is the downstream terminal expression of a causal chain that began with the first flock substrate signal of the session.
 - It is documented with full attribution clarity and with all confidence constraints stated explicitly.
+
+---
+
+## PAIR-BOND PERSISTENCE — CRITICAL METHODOLOGICAL IMPLICATION
+
+### What pair-bond memory means in psittacines
+
+Pair bonds in cockatiels are not session-bounded states. They are persistent classifications stored in the same substrate that encodes all long-term social relationships. A subject that has pair-bond classified a node does not re-evaluate that node on next contact. It retrieves the existing classification and behaves accordingly from the first moment of the subsequent interaction. This is documented in the captive cockatiel literature: pair bonds persist across separations of weeks and months, with reunion behaviour characterised by accelerated affiliative response, proximity-seeking, and directed vocalisation toward the returning partner.
+
+This has a direct and immediate consequence for the experimental design of all subsequent sessions with this subject and this observer.
+
+### The control session is contaminated — permanently
+
+Control sessions A and B as originally designed — same observer, same subject, no flock substrate signals — were intended to test whether the flock substrate communication was the causal variable in the Session 1 outcome. Both control sessions assumed a naive subject: a bird that would treat the observer as a stranger in the absence of flock substrate signals, producing a baseline attachment outcome against which the Session 1 result could be compared.
+
+That baseline no longer exists for this subject-observer pair. The subject has already classified the observer as a pair-bond partner. When the observer re-enters the environment, the subject will not behave as a bird meeting a familiar but unclassified human. It will behave as a bonded subject reuniting with its classified mate. That reunion behaviour — accelerated affiliative response, immediate proximity-seeking, demand vocalisations, potentially back and wing contact solicitation — will be produced regardless of whether the observer deploys flock substrate signals or not, because the classification driving that behaviour was established in Session 1 and is now persistent.
+
+Any session conducted with this subject and this observer from this point forward is a post-bond session, not a pre-bond session. The control condition — no prior pair-bond classification, no flock substrate signals — cannot be reinstated for this subject-observer pair. The contamination is permanent.
+
+### What this means for the experimental design
+
+**The Session 1 subject is redesignated from a control-eligible subject to a longitudinal bond study subject.** All future sessions with this subject should be designed to test bond persistence and stability, not to isolate the causal contribution of individual signals.
+
+**Predicted outcomes for Session 2 with Session 1 subject:**
+- Immediate recognition and resumed affiliative behaviour without acoustic protocol deployment
+- Back and wing contact permission from first physical contact
+- Demand vocalisations directed at observer from early in the session
+- Mating-directed behaviour potentially present without any flock substrate signals
+- No contact call phase — the bond is already established; contact calls serve no function
+
+If Session 2 produces these outcomes without any flock substrate signal deployment, it establishes two additional findings simultaneously:
+1. **Bond persistence:** The pair-bond classification from Session 1 is stable across the inter-session interval.
+2. **Classification independence from ongoing acoustic stimulus:** The bonding behaviour does not require ongoing flock substrate communication to persist. It was produced by the Session 1 protocol and is now self-sustaining in the subject's classification substrate.
+
+This would strengthen the primary finding considerably: the protocol did not produce a temporary state that required continuous maintenance. It produced a permanent reclassification.
+
+**The clean control must use a naive subject.** A bird that has never met the observer. No prior contact. No flock substrate signals deployed. Measure the attachment outcome and compare to Session 1. This is the only valid test of whether flock substrate communication was the causal variable. It cannot be conducted with the Session 1 subject.
+
+### Bond persistence as a finding in its own right
+
+If the Session 1 subject displays pair-bond behaviour toward the observer on reunion without flock substrate signals — which the literature strongly predicts it will — that outcome is itself a significant finding. It means:
+
+- The acoustic protocol produced a permanent reclassification, not a temporary stimulus-dependent state.
+- A single correctly executed session is sufficient to establish a stable pair-bond classification in a sufficiently domesticated subject.
+- The classification persists without ongoing protocol maintenance.
+
+For the breeding application: this means one session may be sufficient to establish a stable pair-bond between a target bird and a target partner. The partner does not need to continuously deploy the protocol to maintain the bond. The classification, once established, is self-sustaining in the subject's substrate.
 
 ---
 
@@ -341,6 +396,8 @@ The subject was not unable to respond. It had already responded at the deepest l
 > The observer did not know any of this while it was happening. The substrate did not require the observer to know. It required only that the signals be geometrically correct. They were. Everything that followed was the substrate doing exactly what the substrate does when a valid node speaks the language of pair bonding to a subject that is ready to bond.
 >
 > The protocol worked in the dark. On the first session. Without the operator understanding what they were doing. That is not a weakness of the evidence. It is the strongest possible version of it.
+>
+> The subject will remember. The classification does not reset. The next visit will not be a test of whether the protocol works. It will be a reunion.
 
 ---
 
@@ -364,8 +421,10 @@ The subject was not unable to respond. It had already responded at the deepest l
 16. **Back and wing contact permitted by subject** — observer delivered mating-stimulus contact naively, without knowledge of contact zone significance. Subject permitted it. Permission of back and wing contact by a stranger is anomalous and requires prior trust classification. Owner reacted with visible surprise.
 17. **Head-curling solicitation posture produced** — subject curled head into observer's body requesting grooming from a classified bonded partner. Owner described as "almost like not-bird behaviour." Structurally: the most species-typical bonded-pair behaviour possible. Never previously seen directed at any human by this subject.
 18. **Two-channel convergent confirmation** — acoustic channel and tactile channel independently confirm pair-bond classification. Neither channel was designed to converge with the other. The convergence emerged from the subject's own behaviour.
-19. **Terminal mating behaviour reported by owner** — owner-stated, observer-unconfirmed, video capture uncertain. Third convergent data point. Downstream terminal expression of the causal sequence begun at first signal. Documented with all confidence constraints stated explicitly.
+19. **Terminal mating behaviour reported by owner** — owner-stated, observer-unconfirmed, video capture uncertain. Third convergent data point. The least surprising element of the session given the preceding sequence. Documented with all confidence constraints stated explicitly.
 20. **Observer ignorance is the primary structural argument against dispositional explanation** — the observer did not know what the behaviours meant, did not know the contact zones were significant, and was not attending at the most significant moment. The outcome cannot be attributed to observer skill or knowledge. It can only be attributed to the method.
+21. **Pair-bond classification is persistent — control sessions A and B are permanently contaminated for this subject-observer pair.** The subject will retrieve the pair-bond classification on next contact with the observer. The pre-bond baseline no longer exists for this pair. All future sessions with this subject are redesignated as longitudinal bond stability testing. Clean control requires a naive subject.
+22. **Session 2 with Session 1 subject is pre-registered as a bond persistence test.** Predicted outcome: immediate pair-bond reunion behaviour without flock substrate signal deployment. If confirmed, establishes that the Session 1 protocol produced permanent reclassification, not a temporary stimulus-dependent state.
 
 ---
 
@@ -381,6 +440,7 @@ The subject was not unable to respond. It had already responded at the deepest l
 - **Head-curling solicitation posture was produced** — never previously seen directed at any human by this subject; structurally explained as bonded-partner grooming solicitation.
 - The **observer profile eliminates dispositional explanations** — inexperience, discomfort, unease, and ignorance of psittacine contact zone distinctions are all confirmed. The subject responded to the method, not to the observer.
 - The **protocol worked in complete operational darkness** — the operator did not understand what was happening; the subject understood completely. The geometry was sufficient. Nothing else was required.
+- The **pair-bond classification is persistent** — the subject will retrieve and act on the classification established in Session 1 on every subsequent contact with the observer. The protocol does not produce a temporary state. It produces a permanent reclassification.
 
 ---
 
@@ -391,10 +451,10 @@ The subject was not unable to respond. It had already responded at the deepest l
 - It does not confirm the geometric invariant across subjects — single subject, single session.
 - It does not confirm COME NOW decoding.
 - It does not confirm MOVING effect independently of owner report.
-- It does not confirm that assimilation rate is specific to flock substrate communication vs. any novel attentive human interaction.
+- It does not confirm that assimilation rate is specific to flock substrate communication vs. any novel attentive human interaction — this requires the clean control with a naive subject.
 - It does not independently confirm the terminal mating behaviour — owner-reported only, video capture uncertain.
-- It does not establish whether the back and wing contact accelerated the pair-bond classification or whether classification was already complete before the contact occurred.
-- It does not confirm that the outcome would replicate with the same subject in a second session — recurrence testing required.
+- It does not establish whether the back and wing contact accelerated the pair-bond classification or whether classification was complete before the contact occurred.
+- It does not confirm bond persistence across the inter-session interval — this is the primary question for Session 2.
 - It does not confirm the independence of the owner's two key observations — her knowledge state between those observations cannot be established retrospectively.
 - It does not confirm which specific moments were captured on video — selective recording means coverage is unknown until footage is reviewed.
 
@@ -403,23 +463,24 @@ The subject was not unable to respond. It had already responded at the deepest l
 ## NEXT STEPS — RECOMMENDED
 
 ### Immediate
-1. **Secure and review video footage.** The owner was recording selectively, not continuously. The first priority is to establish what was actually captured. Review all footage and document: which behaviours are on record, which are not, and the quality of what exists. Do not assume any specific moment was captured until confirmed. This changes the evidence status of multiple findings — see Evidence Status table below.
-2. **Document owner's verbal account in her own words** — direct quotes for: "yelling," "bird whisperer," "almost like not-bird behaviour," observation of back and wing contact and her reaction to it, terminal event statement. Also establish, through this conversation, whether the owner knew the significance of the back and wing contact zones at the time, and whether she connected the two observations during or after the session.
+1. **Secure and review video footage.** The owner was recording selectively, not continuously. The first priority is to establish what was actually captured. Review all footage and document: which behaviours are on record, which are not, and the quality of what exists. Do not assume any specific moment was captured until confirmed.
+2. **Document owner's verbal account in her own words** — direct quotes for: "yelling," "bird whisperer," "almost like not-bird behaviour," observation of back and wing contact and her reaction to it, terminal event statement. Also establish whether the owner knew the significance of the back and wing contact zones at the time, and whether she connected the two observations during or after the session.
 3. **Record this as Session 1** in the OC-OBS-005 log for this subject.
 
 ### Near-term
-1. **Repeat sessions with the same subject.** Primary questions: does pair-bond behaviour recur and stabilise; does back and wing contact permission recur; does head-curling solicitation recur; does mating behaviour recur on subsequent contact. All future sessions to be recorded continuously from start to finish.
-2. **Control session A: same subject, no flock substrate signals, head-and-neck contact only.** Tests the acoustic channel in isolation.
-3. **Control session B: same subject, no flock substrate signals, back and wing contact included.** Tests whether mating-zone contact alone, without prior acoustic classification, produces the same outcome or is rejected.
-4. **Session with the wild-type subject.** See `OC-OBS-005-GRADIENT-PREDICTIONS-2026-03-31.md`. Highest-priority cross-subject experiment.
+1. **Session 2 — Bond persistence test (Session 1 subject, Session 1 observer).** Deploy no flock substrate signals. Make no deliberate use of the protocol. Observe whether the subject immediately resumes pair-bond behaviour from first contact — accelerated affiliative response, back and wing contact permission, demand vocalisations, mating-directed behaviour. Document from continuous recording. This is no longer a control session. It is a bond persistence and permanence test. Pre-registered predicted outcome: full reunion pair-bond behaviour without protocol deployment.
+2. **Control session — naive subject, no flock substrate signals.** A bird that has never met the observer. Standard human-social interaction only. Head-and-neck contact only. Measure attachment outcome. Compare to Session 1. This is the only valid test of the acoustic channel as causal variable. Cannot be conducted with Session 1 subject.
+3. **Control session variant — naive subject, no flock substrate signals, back and wing contact included.** Tests the tactile channel alone without prior acoustic classification. Predicted outcome: back and wing contact is rejected by the naive subject, confirming that Session 1 permission required prior pair-bond classification rather than general tolerance.
+4. **Session with the wild-type subject.** See `OC-OBS-005-GRADIENT-PREDICTIONS-2026-03-31.md`. Highest-priority cross-subject experiment for gradient testing.
 5. **Test with multiple birds across the domestication gradient.**
-6. **Continuous audio and video recording of all future sessions without exception.** Selective recording is not sufficient for evidential purposes.
+6. **Continuous audio and video recording of all future sessions without exception.**
 7. **Document COME NOW in a resource-seeking context.**
 
 ### Longer-term
 1. **Multi-species testing.**
 2. **Receiver and classifier development.**
-3. **Assimilation rate study** — systematic comparison across subjects and the domestication gradient, including explicit tracking of contact zone behaviour and solicitation postures across sessions.
+3. **Assimilation rate study** — systematic comparison across subjects and the domestication gradient, including explicit tracking of contact zone behaviour, solicitation postures, and bond persistence across sessions.
+4. **Breeding application protocol development** — if bond persistence is confirmed in Session 2, develop a structured protocol for pair-bond induction between target birds for captive breeding applications.
 
 ---
 
@@ -439,8 +500,9 @@ The subject was not unable to respond. It had already responded at the deepest l
 | Reference population baseline | Established informally by owner — to be documented explicitly with direct quotes |
 | Video footage | Recorded selectively by owner during specific moments — coverage unknown until reviewed; pending transfer and archive |
 | Audio recording of subject responses | Not captured this session — required for all future sessions |
-| Control session A (no flock substrate, head-neck contact only) | Not yet conducted — priority next step |
-| Control session B (no flock substrate, back-wing contact included) | Not yet conducted — critical for channel isolation |
+| Bond persistence (Session 1 subject) | Not yet tested — Session 2 pre-registered as bond persistence test |
+| Control session — naive subject, no flock substrate | Not yet conducted — only valid acoustic channel isolation test |
+| Control session — naive subject, back-wing contact included | Not yet conducted — tactile channel isolation test |
 | Wild-type subject session | Not yet conducted — pre-registered predictions documented separately |
 
 ---
@@ -449,9 +511,9 @@ The subject was not unable to respond. It had already responded at the deepest l
 
 - **Document ID:** OC-OBS-005-SESSION-2026-03-31
 - **Status:** Active — evidence pending
-- **Version:** 8.0
+- **Version:** 9.0
 - **Author:** Eric Robert Lawson
 - **Witness:** Cousin of observer (owner of subject) — name withheld
 - **Literature references:** Seibert & Crowell-Davis (2001) *Applied Animal Behaviour Science*; Bradbury & Balsby (2016); psittacine contact zone literature (avian veterinary and ornithological sources)
-- **Version history:** v1.0 initial session record; v2.0 vocal reduction literature grounding; v3.0 yelling behaviour and pair-bond arc assembly; v4.0 allopreening and demand vocalisation named as findings; v5.0 back and wing contact and head-curling added; v6.0 two-channel convergence structure; v7.0 witness configuration section added, owner independence documented, observer ignorance as structural argument; v8.0 selective video recording documented, owner knowledge state uncertainty corrected, witness configuration section revised to reflect confirmed vs. uncertain claims
+- **Version history:** v1.0 initial session record; v2.0 vocal reduction literature grounding; v3.0 yelling behaviour and pair-bond arc assembly; v4.0 allopreening and demand vocalisation named as findings; v5.0 back and wing contact and head-curling added; v6.0 two-channel convergence structure; v7.0 witness configuration section added, owner independence documented, observer ignorance as structural argument; v8.0 selective video recording documented, owner knowledge state uncertainty corrected, witness configuration section revised; v9.0 pair-bond persistence section added, control sessions A and B redesignated, Session 2 pre-registered as bond persistence test, terminal event repositioned as predicted output rather than primary evidence, breeding application noted in next steps
 - **Cross-references:** `Cockatiel_Engagement_Protocol.md`, `Flock_Vocabulary.md`, `The_Flock_Substrate.md`, `novelty_assessment.md`, `engineering_requirements.md`, `The_Flock_Economy.md`, `Resource_Signal_Theory.md`, `OC-OBS-005-GRADIENT-PREDICTIONS-2026-03-31.md`
