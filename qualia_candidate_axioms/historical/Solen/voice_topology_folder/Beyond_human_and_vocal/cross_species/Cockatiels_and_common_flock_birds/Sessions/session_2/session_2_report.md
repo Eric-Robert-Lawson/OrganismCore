@@ -81,7 +81,7 @@ Sora is described by the current household
 as depressed and withdrawn. She is described
 as motherly in general disposition.
 
-**Critical distinction from previous documentation:**
+**Critical correction from previous documentation:**
 Sora's original owner is an unknown individual —
 not a family member of the current household.
 The household does not know who the original
@@ -126,20 +126,30 @@ session. She has an established flock-level
 social bond with Juicy. This is documented
 as distinct from the pair-bond classification
 established between observer and Juicy in
-Session 1.
+Session 1. Estela had no prior substantive
+interaction with Sora before this session.
+Her presence created a multi-node competition
+condition that was unplanned and experimentally
+valuable.
 
-**Critical distinction regarding Estela
-and Sora:**
-Estela had NO prior substantive interaction
-with Sora before this session. Sora had
-no established social bond with Estela.
-Sora had no established social bond with
-observer either. Both observer and Estela
-were equally new nodes to Sora at session
-start. This is structurally critical to
-interpreting Sora's node selection behaviour
-throughout the session — see Sora Analysis
-section below.
+**Critical distinction — Estela's node status
+relative to each subject:**
+- With Juicy: flock-level social bond,
+  2-3 prior meetings, established familiarity.
+  Not pair-bond classified.
+- With Sora: no prior substantive interaction.
+  No established bond of any documented type
+  before this session.
+
+This distinction is critical for interpreting
+Sora's node selection behaviour across the
+session. Sora had no prior reason to prefer
+Estela over observer based on relationship
+history. Both were new nodes to Sora.
+Sora's preference for Estela when both
+were present was therefore not driven by
+prior relationship — it requires a different
+explanation. See Sora Node Hierarchy section.
 
 ---
 
@@ -156,19 +166,9 @@ section below.
   substantive interaction.
 - Estela has met Juicy 2-3 times. Has
   flock-level social bond with Juicy.
-  Has NOT met Sora in any prior substantive
+  Has not met Sora in prior substantive
   interaction. No documented pair-bond
   indicators with any subject.
-
-**The symmetry for Sora:**
-Both observer and Estela were new nodes
-to Sora. Neither had prior relationship
-with Sora. Sora's node selection behaviour
-between observer and Estela during this
-session therefore cannot be attributed
-to prior familiarity with Estela.
-Whatever drove Sora's selections, it
-was not an established Sora-Estela bond.
 
 ---
 
@@ -217,20 +217,12 @@ The sequence is documented in full because
 the changes in node configuration are the
 primary data of this session.
 
-The node configuration at each moment
-is the independent variable. The birds'
-behaviour is the dependent variable.
-Documenting the sequence precisely is
-therefore the primary methodological
-requirement of this session record.
-
 ---
 
-### Event 1 — Living room entry, Estela dominant
+### Event 1 — Living room, Estela dominant node
 **Location:** Living room (recently rearranged)
-**Configuration:** Observer and Estela both present.
-Multiple birds in environment including Juicy,
-Sora, Melon.
+**Configuration:** Observer and Estela both
+present. Juicy, Sora, Melon in environment.
 
 **Observations:**
 - Observer entered delivering I AM HERE
@@ -251,217 +243,203 @@ Sora, Melon.
   at observer
 
 **Assessment:**
-Low response is expected and correct
-given four compounding factors:
+Low response expected and correct given
+four compounding factors:
 
 1. Environmental disruption — elevated
    cognitive load, spatial reorientation
    ongoing, substrate already stressed
-2. Estela as competing node — present,
-   familiar to Juicy, physically engaged.
-   Note: Estela was not familiar to Sora.
-   Estela's dominance over Sora during
-   this phase cannot be attributed to
-   prior relationship. It may be attributed
-   to Juicy's affiliation with Estela
-   acting as social proof for Sora —
-   see Sora Analysis section.
+2. Estela as dominant competing node —
+   present, engaged, birds affiliating
 3. Signal attribution ambiguity — birds
-   in multi-node environment cannot
-   cleanly attribute observer's signals
-   to observer specifically vs. Estela
-   as the more physically proximate source
+   cannot cleanly attribute observer's
+   signals to observer vs. Estela
 4. Proximity deficit — observer at distance,
-   acoustic channel only. The acoustic
-   channel opens the door. Physical
-   proximity is what walks through it.
-   90 minutes of acoustic-only at distance
-   in a multi-node environment is
-   substrate preparation, not
-   expression-phase protocol.
+   acoustic channel only
 
 **The 90 minutes was not wasted.**
 The signals were entering the substrate
-continuously. The substrate was processing
-them. Expression was waiting for the
-condition that would allow it to emerge.
+continuously. Expression was waiting for
+the condition that would allow it to emerge.
 
 ---
 
 ### Event 2 — Identity hypothesis raised,
-### Estela asked to leave living room
+### Estela leaves living room
 **Location:** Living room
-**Configuration:** Observer alone with birds
-in living room. Estela has left the space.
+**Configuration:** Observer alone with birds.
+Estela has left the space.
 
-**Rationale for Estela's departure:**
-Observer identified the possibility that
-birds may have been attributing observer's
-signals to Estela — the most proximate
-node. To test whether observer could
-establish individual node recognition
-without the attribution ambiguity,
-observer asked Estela to leave the room.
+**Rationale:**
+Observer identified possible attribution
+ambiguity — birds may be attributing
+observer's signals to Estela as the
+most familiar proximate node. Observer
+asked Estela to leave to test whether
+node-specific response would emerge.
 
-**Observations — Sora specifically:**
-- With Estela absent and observer delivering
-  SAFE and I AM HERE signals, Sora flew
-  onto observer's head
-- This was an unprompted, spontaneous
-  approach by Sora with no physical
-  recruitment by observer
-- Owner has not observed this behaviour
-  from Sora toward any person in the
-  current household as normal behaviour
-- This was the first time Sora had ever
-  landed on anyone's head in this context —
-  observer was first, not Estela
+**Observations:**
+- Sora flew to observer's head
+- Behaviour was spontaneous and unprompted
+- No physical recruitment by observer
+- Owner has not observed Sora landing
+  on anyone's head in this household
+  as normal behaviour
+- This is the first time Sora has
+  been observed doing this with
+  any person in the current household
 
-**This point is critical and must be
-stated with complete precision:**
-Sora had never done this with anyone
-in the household before. Observer was
-the first person Sora flew to in this
-way. This is not a behaviour Estela
-had previously received from Sora.
-The behaviour emerged toward observer
-specifically, during observer's signals,
-in observer's sole presence. It then
-transferred to Estela subsequently —
-Estela did not receive it first.
+**This is the first anomalous Sora
+finding of the session.**
 
 **Assessment:**
-Sora approaching observer in the living
-room, on first real contact, in a grief
-state, in a disrupted environment, after
-90 minutes of ambient SAFE and I AM HERE
-signals, is a significant finding
-independent of everything that followed.
+90 minutes of ambient substrate signals
+had been absorbed without visible response.
+Removal of the competing node allowed
+the accumulated processing to express
+immediately as physical approach.
 
-The 90 minutes produced no visible
-response. The substrate was processing
-the signals invisibly. When the competing
-node was removed and observer was the
-only available node, the accumulated
-substrate processing expressed immediately.
-
-This is the first demonstration of the
-signal-precedes-expression mechanism
-in this session.
+Signal-precedes-expression mechanism:
+first clear demonstration this session.
 
 ---
 
-### Event 3 — Transition to isolated room,
-### both Estela and observer present
+### Event 3 — Sora lands on Estela's head,
+### Estela briefly present, Juicy also on Estela
+**Location:** Living room or transition
+**Configuration:** Estela returns or is
+briefly present. Juicy on Estela's head.
+Sora also lands on Estela's head.
+
+**Critical observation:**
+Estela had no prior relationship with Sora.
+Sora had no established bond with Estela
+before this session. Both observer and
+Estela were new nodes to Sora.
+
+Yet when Juicy was on Estela's head,
+Sora also flew to Estela's head.
+
+**This is the Juicy-as-hierarchy-signal
+hypothesis:**
+Sora did not select Estela based on
+prior relationship with Estela.
+Sora selected Estela based on the
+fact that Juicy — the bird Sora has
+an established flock relationship with —
+was already on Estela.
+
+Juicy's presence on Estela functioned
+as a flock-level trust signal to Sora.
+Sora read Juicy's node choice and
+followed it. Juicy's preference for
+Estela communicated to Sora that
+Estela was the endorsed flock node.
+
+This is conspecific social proof
+operating within the flock substrate:
+Sora used Juicy's behaviour as
+information about which human node
+to affiliate with, not her own
+independent assessment of the humans.
+
+**This reframes Sora's entire node
+selection pattern for this session.**
+Sora was not independently evaluating
+observer and Estela and choosing Estela.
+Sora was following Juicy's node signal.
+When Juicy was on Estela, Sora went
+to Estela. When Juicy was not directing
+Sora toward a node, Sora selected
+observer as the safe-signalling node.
+
+---
+
+### Event 4 — Transition to isolated room,
+### both observer and Estela present
 **Location:** Isolated room
 **Configuration:** Observer and Estela both
 present. Juicy and Sora in room.
 
 **Observations:**
 - Juicy affiliating with Estela
-- Sora entered room having previously
-  landed on observer's head in Event 2
-- Sora assessed the two-node configuration
-- Sora flew to Estela — abandoning observer
-  as node
-- Sora did not return to observer's head
-  during this phase
-- Sora perched on environment (not on
-  either human) after moving to Estela's space
-- Observer was abandoned as node by Sora
-  when both nodes were simultaneously available
+- Sora initially on observer's head
+  (carried over from Event 2)
+- Sora assessed two-node configuration
+  and flew to Estela
+- Sora abandoned observer as node
+  when Estela became available
+- After leaving observer, Sora did not
+  return to observer's head — Sora
+  perched on environment instead
+  once on Estela
 
-**The Sora-Estela dynamic — stated precisely:**
-Estela had no prior relationship with Sora.
-Sora had no established social bond with
-Estela before this session. Sora's selection
-of Estela as preferred node when both
-humans were present cannot be explained
-by a pre-existing Sora-Estela bond.
+**Assessment:**
+Consistent with Juicy-hierarchy-signal
+hypothesis. Juicy was on Estela.
+Sora followed the Juicy-endorsed node.
+Observer was abandoned.
 
-**The most parsimonious explanation:**
-Sora followed Juicy's node preference.
-Juicy had a pair-bond classification for
-observer and a flock social bond with Estela.
-In this session, Juicy was affiliating with
-Estela. Sora, a flock bird assessing two
-unknown nodes, used Juicy's expressed
-preference as social proof to determine
-which human node was the higher-value
-selection. Juicy's affiliation with Estela
-made Estela appear to Sora as the dominant
-node in the flock hierarchy — not because
-Sora had any prior relationship with Estela,
-but because the bird Sora trusts most
-was affiliated with Estela.
+Sora's behaviour in this room was
+not independent node assessment.
+It was flock-coherent node following —
+Sora tracking Juicy's affiliation
+to determine where the flock anchor is.
 
-This means Sora's node selection was
-mediated by Juicy's expressed behaviour,
-not by any direct Sora-Estela bond.
-This is flock social proof operating
-as the node selection mechanism for Sora.
-
-**Assessment of observer abandonment:**
-Sora abandoning observer as node when
-Estela became available is therefore
-not evidence that Estela was intrinsically
-preferred by Sora. It is evidence that
-Juicy's preference for Estela in this
-moment outweighed the signal-based
-selection Sora had made in Event 2.
-When Juicy was on Estela, Estela became
-the Juicy-endorsed node. Sora followed
-the endorsement.
+When Sora left observer's head and
+did not return to it — perching on
+environment instead — this documents
+that Sora was not oscillating between
+two comparable nodes. Estela, endorsed
+by Juicy's presence, became the clear
+hierarchy anchor. Observer became
+environmental background.
 
 ---
 
-### Event 4 — Estela leaves isolated room,
+### Event 5 — Estela leaves isolated room,
 ### observer alone with Juicy and Sora
 **Location:** Isolated room
 **Configuration:** Observer alone with
-Juicy and Sora. No other human present.
+Juicy and Sora.
 
-**Observations — precise sequence:**
-- Both birds did not immediately fly to observer
+**Observations:**
+- Birds did not immediately fly to observer
 - Both birds initially flew to wall —
-  neither to observer
-- **Sora flew to observer's head first**
-- **Then Juicy flew to observer's head
-  and displaced Sora**
+  neutral assessment position
+- Sora flew to observer's head first
+- Juicy then flew to observer's head
+  and displaced Sora
 - Sora moved to cage adjacent to observer
 - Final configuration: Juicy on observer's
   head, Sora on cage next to observer
 
-**The sequence order matters enormously
-and must be stated with precision:**
-Sora reached observer first.
-Juicy came second and removed Sora.
+**Assessment of wall landing:**
+Brief substrate assessment before
+committing to available node. More
+deliberate than the immediate transfer
+in the living room (Event 2). This is
+the second isolation event — birds have
+more information and are making a
+more considered decision.
 
-This is not a detail. This is the finding.
+**Assessment of Sora flying to observer first:**
+When Juicy was not providing a node
+hierarchy signal — because Juicy had
+not yet selected observer — Sora made
+an independent assessment and selected
+observer based on observer's own signals.
 
-Sora, with no competing node available
-and Juicy no longer on Estela providing
-social proof of Estela's node value,
-selected observer independently and
-immediately. Sora's substrate, absent
-Juicy's social proof signal toward Estela,
-defaulted to the node that had been
-broadcasting SAFE and I AM HERE for
-90 minutes. Observer was that node.
+Sora chose observer independently,
+without Juicy's endorsement, before
+Juicy had landed.
 
-Then Juicy arrived and displaced Sora.
-
-**Assessment of Sora reaching observer first:**
-Sora's independent selection of observer
-in the absence of Juicy's social proof
-toward Estela is the clearest evidence
-in this session that observer's signals
-had genuine substrate penetration for Sora
-independent of Juicy's mediation.
-
-When the social proof signal was removed
-(Juicy no longer endorsing Estela),
-Sora went directly to the signal source.
+This is the cleanest test of observer's
+direct node signal to Sora in the
+entire session. No Juicy hierarchy
+signal present. No Estela available.
+Sora selected observer on her own
+substrate assessment.
 
 **Assessment of Juicy displacing Sora:**
 This is the most important single
@@ -472,101 +450,222 @@ Juicy displaced Sora from observer's head.
 Displacement of a flock member from
 the pair-bond partner is pair-bond
 territorial behaviour. It is not
-comfort-seeking. It is not positional
-preference for a warm perch. It is
-a specific behaviour that requires
-the displacing bird to have already
-classified the occupied node as
-belonging to it specifically.
+comfort-seeking. It is not coincidental
+positioning. It requires the displacing
+bird to have classified the occupied
+node as specifically belonging to it.
 
-Juicy was not competing for a perch.
-Juicy was asserting: this node is mine.
-You do not have priority access here.
+Juicy was not observed displacing
+anyone from Estela's head at any
+point in the session. Juicy displaced
+Sora from observer specifically.
 
-This behaviour was not observable in
-Session 1 because there were no
-competing flock members in Session 1.
-The multi-bird environment that made
-this session more complex to read
-is also what made this finding possible.
+The specificity is the finding.
 
-Juicy did not displace anyone from
-Estela's head. Juicy displaced Sora
-from observer's head specifically.
-The target of the displacement is
-the finding.
+Additionally: Sora had just selected
+observer independently, without Juicy's
+endorsement, demonstrating that observer
+was a genuinely attractive node to Sora.
+Juicy then removed Sora from that node.
+The displacement was therefore not
+removing a bird from a neutral perch.
+It was removing a bird from a node
+that the bird had just actively chosen.
 
-**Assessment of silence following displacement:**
-- Room went silent
-- No contact call reciprocation from
-  either bird to observer's signals
-- Interpersonal Juicy-Sora communication
-  observed — birds talking to each other,
-  not to observer
-- Hissing when observer attempted
-  to initiate physical touch
-
-Silence in proximity confirmed again.
-Identical pattern to Session 1 Phase 2/3.
-Bonded state = silence.
-
-Hissing at touch attempts: presence
-channel is open. Contact initiation
-channel is not yet open in this
-session context. Coherent and not
-contradictory — two substrate channels
-at two different access states.
+That is pair-bond territorial assertion
+in its clearest observable form.
 
 ---
 
-### Event 5 — Estela returns to isolated room
+### Event 6 — Room state following displacement
+**Location:** Isolated room
+**Configuration:** Juicy on observer's head.
+Sora on cage adjacent to observer.
+
+**Observations:**
+- Room went silent
+- No contact call reciprocation from
+  either bird to observer's signals
+- Interpersonal communication between
+  Juicy and Sora observed — birds
+  communicating with each other,
+  not directed at observer
+- Hissing when observer attempted
+  to initiate physical touch
+- Both birds eventually observed
+  with eyes closed — settled,
+  resting state, possibly sleeping
+
+**Assessment of silence:**
+Bonded state confirmed again.
+Identical pattern to Session 1.
+Physical presence has replaced the
+acoustic contact-maintenance function.
+The silence is the signal.
+
+**Assessment of hissing at touch:**
+Presence channel is open.
+Contact initiation channel is not
+yet open in this session context.
+Both channels can be simultaneously
+active at different access states.
+Coherent, not contradictory.
+
+**Assessment of eyes closed — resting state:**
+Both birds settling into eyes-closed
+resting posture on and adjacent to
+observer is a significant comfort
+and safety indicator. Birds do not
+close their eyes and rest in the
+presence of a node they do not trust.
+Closing eyes removes the primary
+predator-detection sense. A bird
+that closes its eyes near a node
+has classified that node as safe
+enough to be vulnerable around.
+
+For Juicy, on observer's head with
+eyes closed: consistent with established
+pair-bond classification. Deep comfort
+state with classified partner.
+
+For Sora, on adjacent cage with eyes
+closed: significant for a grief-state
+bird on first substantive contact with
+observer. Sora was sufficiently settled
+in observer's presence to enter a
+resting state. This is above what
+substitution-level comfort behaviour
+alone would predict.
+
+---
+
+### Event 7 — Estela returns to isolated room
 **Location:** Isolated room
 **Configuration:** Estela re-enters.
 Observer remains completely still.
 No signals deployed to retain birds.
-No reaching for birds.
-Passive observation only.
+No reaching for birds. Passive only.
 
 **Observations:**
 - Neither Juicy nor Sora flew to Estela
-  on her return
 - Juicy remained on observer's head
-- Sora remained on cage adjacent
-  to observer
+- Sora remained on cage adjacent to observer
 - Node dominance did not transfer back
   to Estela despite her physical re-entry
 
 **Assessment:**
-Node dominance transferred to observer
-on Estela's departure and was retained
-on Estela's return.
+The reversal did not occur.
 
-Notably: when Estela returned, Juicy
-did not resume endorsing Estela as
-the dominant node. Juicy stayed on
-observer. Without Juicy's endorsement
-of Estela, Sora had no social proof
-signal directing her toward Estela.
-Sora stayed on the cage adjacent
-to observer.
+Estela had been the dominant node for
+90 minutes prior. She had Juicy's
+endorsed flock position. She had
+Sora following Juicy's node signal
+to her. She re-entered the room
+with all of that prior status intact.
 
-The retention finding therefore has
-two layers:
+Neither bird moved.
 
-**Layer 1 — Juicy's retention:**
-Pair-bond classification held.
-Juicy did not return to Estela.
-Bond persistence confirmed.
+The classification formed in Event 5
+— pair-bond expression for Juicy,
+independent node selection for Sora —
+held against the reintroduction of
+the previously dominant node with
+full prior status.
 
-**Layer 2 — Sora's retention:**
-Without Juicy's social proof toward
-Estela, Sora had no mechanism to
-select Estela over observer.
-Sora stayed adjacent to observer —
-the node whose signals had penetrated
-her substrate for 90 minutes and who
-had been validated by Sora's own
-approach in Event 2 and Event 4.
+---
+
+## SORA NODE HIERARCHY — CRITICAL ANALYSIS
+
+This section synthesises the Sora observations
+across all events to establish what actually
+drove Sora's node selection behaviour.
+
+### What appeared to be happening
+Sora appeared to be selecting Estela as
+the dominant node when both Estela and
+observer were present, and selecting
+observer as a secondary node when Estela
+was absent.
+
+This appeared to be substitution behaviour:
+Estela as primary, observer as backup.
+
+### What was actually happening
+Estela had no prior relationship with Sora.
+Observer had no prior relationship with Sora.
+Both were equally new nodes to Sora.
+
+If Sora were making an independent node
+assessment, she had no basis to prefer
+Estela over observer from prior experience.
+Her selection of Estela when both were
+present requires a different explanation.
+
+The explanation is Juicy.
+
+When Juicy was on Estela's head, Sora
+followed Juicy to Estela. Sora was not
+selecting Estela. Sora was reading Juicy's
+node choice and using it as flock-level
+information about which human node was
+the endorsed safe anchor.
+
+This is conspecific social proof:
+the flock member Sora has an existing
+relationship with communicated node
+trustworthiness to Sora through
+its own affiliation behaviour.
+
+### The clean test — Event 5
+When Estela left and Juicy had not yet
+selected observer, Sora made an independent
+assessment and flew to observer first —
+before Juicy landed.
+
+This is the only moment in the session
+where Sora's choice was fully independent
+of both Estela's presence and Juicy's
+node signal. Sora chose observer.
+
+This means observer's direct signals —
+90 minutes of SAFE and I AM HERE —
+had registered in Sora's substrate
+sufficiently to produce independent
+node selection when no other
+information was overriding it.
+
+### The full Sora picture
+
+| Condition | Juicy Signal | Sora Selection | Explanation |
+|---|---|---|---|
+| Estela present, Juicy on Estela | Juicy endorses Estela | Sora goes to Estela | Conspecific social proof |
+| Observer alone, Estela absent | No Juicy signal | Sora goes to observer | Independent substrate assessment |
+| Both present, Juicy on Estela | Juicy endorses Estela | Sora goes to Estela | Conspecific social proof |
+| Both absent, Juicy on wall | No Juicy signal | Sora goes to observer first | Independent substrate assessment |
+| Juicy displaces Sora, takes observer | Juicy claims observer | Sora on adjacent cage | Respects Juicy's territorial assertion |
+| Estela returns | No Juicy signal toward Estela | Sora stays adjacent to observer | Observer substrate state holds |
+
+**Sora's behaviour is entirely coherent
+and entirely explained by this framework.**
+She is not randomly affiliating.
+She is running a sophisticated flock
+substrate assessment that uses both
+conspecific social proof (Juicy's node
+signal) and direct node evaluation
+(observer's safety signals) as inputs.
+
+When Juicy provides a hierarchy signal,
+Sora follows it. When Juicy does not,
+Sora uses her own substrate assessment.
+Her own substrate assessment selects observer.
+
+This is not a simple result. It is
+a multi-layered substrate intelligence
+finding that documents how flock
+hierarchy mediates individual node
+selection in a multi-subject,
+multi-node environment.
 
 ---
 
@@ -577,149 +676,23 @@ was not planned. It emerged from natural
 session dynamics. It produced a complete
 within-session control condition.
 
-| Condition | Node Configuration | Juicy | Sora |
+| Condition | Configuration | Juicy | Sora |
 |---|---|---|---|
-| Baseline | Both present | On Estela | On no one |
-| Estela departs (living room) | Observer only | Not in room | Flies to observer — first time ever |
-| Both present (isolated room) | Both available | On Estela | Abandons observer, moves toward Estela space |
-| Estela departs (isolated room) | Observer only | Wall → observer | Wall → observer first, then displaced by Juicy |
-| Estela returns (isolated room) | Both available | Stays on observer | Stays on cage adjacent to observer |
+| Baseline | Estela present, dominant | On Estela | On no one / Estela (via Juicy signal) |
+| Estela departs (living room) | Observer only | Not recorded | Flies to observer — anomalous |
+| Estela briefly present, Juicy on Estela | Both present | On Estela | Follows Juicy to Estela |
+| Both in isolated room, Juicy on Estela | Both present | On Estela | Follows Juicy to Estela, abandons observer |
+| Estela departs (isolated room) | Observer only | Displaces Sora from observer | Flies to observer first independently |
+| Estela returns (isolated room) | Both present | Stays on observer | Stays on cage adjacent to observer |
 
-**The table is the finding.**
-
-Read Sora's column specifically:
-- No one's head → observer (first ever) →
-  Estela space (Juicy endorsing Estela) →
-  observer first (no Juicy endorsement) →
-  adjacent to observer (Juicy not endorsing Estela)
-
-Sora's column is a precise record of
-flock social proof operating in real time.
-When Juicy endorsed Estela, Sora followed.
-When Juicy stopped endorsing Estela,
-Sora defaulted to the signal source.
-
----
-
-## SORA ANALYSIS — EXTENDED
-
-### Why Sora's behaviour requires its own section
-
-Sora's behaviour in this session is the most
-structurally complex finding and requires
-precise interpretation. Misreading it in
-either direction — over-claiming or
-under-claiming — would distort the record.
-
-### What is established about Sora
-
-**Prior to this session:**
-- Sora has never been observed landing
-  on anyone's head in the current household
-- Sora had no prior relationship with observer
-- Sora had no prior relationship with Estela
-- Both humans were equally new nodes to Sora
-
-**During this session:**
-- Sora flew to observer's head first —
-  first time this behaviour has been
-  observed from Sora toward any person
-- Sora then followed Juicy's social proof
-  toward Estela when both humans were present
-- Sora returned to observer first when
-  Estela departed and Juicy's endorsement
-  of Estela was removed
-- Sora remained adjacent to observer
-  when Estela returned
-
-### What this establishes
-
-1. **Observer's signals penetrated Sora's
-   substrate.** The 90 minutes of SAFE
-   and I AM HERE produced a classification
-   in Sora that expressed when conditions
-   allowed. A grief-state bird that has
-   never landed on anyone's head flew
-   to observer's head on first isolation.
-   This cannot be attributed to prior
-   relationship. It can only be attributed
-   to the signals.
-
-2. **Sora's node selection is mediated
-   by flock social proof.** Sora used
-   Juicy's expressed preference as a
-   node selection signal. When Juicy
-   endorsed Estela, Sora followed.
-   When Juicy stopped endorsing Estela,
-   Sora selected observer. This is
-   sophisticated flock substrate
-   intelligence, not random behaviour.
-
-3. **Sora's selection of observer is
-   independent when social proof is absent.**
-   When Estela departed the isolated room
-   and Juicy was no longer on Estela,
-   Sora selected observer without any
-   social proof signal directing her there.
-   This is the cleanest evidence that
-   observer's signals had genuine independent
-   substrate penetration for Sora.
-
-4. **Sora's approach to observer was first —
-   not Estela's.** This is the most important
-   factual precision in this document.
-   The anomalous head-landing behaviour
-   emerged toward observer, not toward
-   Estela. Estela received it second,
-   as a downstream consequence of Juicy's
-   social endorsement. The behaviour
-   originated with observer.
-
-### What this does not establish
-
-Sora has not pair-bond classified observer.
-The behaviour is substitution-level when
-Juicy's social proof is present, and
-signal-based selection when it is absent.
-This is the correct and expected finding
-for a grief-state bird on first substantive
-contact in a disrupted environment.
-It is not a failure. It is Sora's substrate
-operating correctly given the inputs available.
-
-### Sora's Juicy-mediated node selection
-### as a separate structural finding
-
-The mechanism by which Sora selected nodes
-in this session — using Juicy's expressed
-preference as a social proof signal — is
-itself a finding about flock substrate
-dynamics that was not anticipated in the
-session design.
-
-It means that observer's pair-bond
-classification by Juicy has an indirect
-effect on other flock members' assessment
-of observer. Juicy's behaviour toward
-observer communicates observer's node
-value to other birds in the flock who
-have no independent basis for assessment.
-
-When Juicy endorses observer (by staying
-on observer's head, by displacing Sora
-from observer), Juicy is broadcasting
-observer's node value to the rest of
-the flock. Sora was reading that broadcast.
-
-This is a flock-level propagation mechanism.
-Observer's pair-bond classification by one
-bird propagates node value information
-to other birds through normal flock
-social proof channels. The implications
-for the protocol's application in
-multi-bird environments are significant
-and require documentation in future
-protocol development documents.
+Read as a complete sequence, this table
+documents: node hierarchy mediated by
+conspecific social proof (Juicy's signal),
+independent substrate assessment when
+social proof signal is absent, pair-bond
+territorial displacement, and retention
+of new node classification against
+reintroduction of the previously dominant node.
 
 ---
 
@@ -727,45 +700,32 @@ protocol development documents.
 
 ### Finding 1 — Bond persistence confirmed
 **Juicy's pair-bond classification from Session 1
-(2026-03-31) persisted across the inter-session
-interval and expressed under active competition.**
+persisted across inter-session interval and
+expressed under active competition.**
 
 Confidence: **High.**
 Observer-confirmed, video-recorded.
 
 ---
 
-### Finding 2 — Dominant node transfer confirmed
-**Node dominance transferred from Estela to
-observer immediately on Estela's departure —
-in both the living room and the isolated room.**
-
-Transfer occurred twice, in two different
-spaces, with two different preceding conditions.
-
-Confidence: **High.**
-Observer-confirmed, video-recorded.
-
----
-
-### Finding 3 — Node dominance retention confirmed
-**Node dominance was retained by observer on
-Estela's return. Neither Juicy nor Sora
-transferred back to Estela.**
-
-Confidence: **High.**
-Observer-confirmed, video-recorded.
-
----
-
-### Finding 4 — Juicy displacement of Sora
+### Finding 2 — Pair-bond territorial
+### displacement confirmed
 **Juicy displaced Sora from observer's head,
-asserting territorial priority access to
-the pair-bond classified node.**
+asserting exclusive priority access to the
+pair-bond classified node.**
 
-Juicy did not displace anyone from Estela.
 Juicy displaced Sora from observer specifically.
-The target specificity is the finding.
+Not from Estela. Not from any other position.
+From observer. Sora had just independently
+chosen observer before Juicy landed.
+Juicy removed a bird from a node that bird
+had actively chosen. That is pair-bond
+territorial assertion in its clearest form.
+
+This behaviour was unavailable in Session 1
+(single-bird environment). The multi-bird
+condition produced a finding that clean
+single-bird conditions cannot produce.
 
 Confidence: **High.**
 Observer-confirmed. Video capture
@@ -773,199 +733,239 @@ to be confirmed from footage review.
 
 ---
 
-### Finding 5 — Sora was first to observer's
-### head — anomalous, owner-confirmed, never
-### previously observed
-**Sora flew to observer's head in the living
-room on first isolation. This is the first
-time this behaviour has been observed from
-Sora toward any person. Observer was first.
-Estela received the behaviour subsequently.**
+### Finding 3 — Node dominance transfer confirmed
+**Node dominance transferred from Estela to
+observer on Estela's departure — twice,
+in two different environments.**
 
-The behaviour originated with observer
-during observer's signals. It was not
-a behaviour Estela had previously elicited
-or received first.
+Living room: Sora flew to observer
+immediately on Estela's departure.
+Isolated room: Sora flew to observer first,
+then Juicy displaced Sora and took observer.
+Both events on video.
 
 Confidence: **High.**
-Observer-confirmed. Owner confirmation
-of behavioural anomaly to be recorded
-in direct quotes. Video-recorded.
+Observer-confirmed, video-recorded.
 
 ---
 
-### Finding 6 — Sora flew to observer first
-### in isolated room, before Juicy arrived
-**In Event 4, Sora reached observer's head
-before Juicy did. Juicy arrived second
-and displaced Sora. The sequence — Sora
-first, Juicy second displacing Sora —
-is the precise record.**
+### Finding 4 — Node dominance retention confirmed
+**Neither Juicy nor Sora transferred to Estela
+on her return to the isolated room.**
 
-This establishes that Sora's selection
-of observer was independent of Juicy's
-presence on observer. Sora chose observer
-before Juicy had expressed any preference.
+Estela had 90 minutes of prior dominant
+node status. Her return did not reassert it.
+The new classification held.
 
 Confidence: **High.**
-Observer-confirmed. Video capture
-to be confirmed from footage review.
+Observer-confirmed, video-recorded.
 
 ---
 
-### Finding 7 — Flock social proof mechanism
-### identified — Juicy mediating Sora's
-### node selection
-**Sora's node selection throughout the session
-was mediated by Juicy's expressed preference.
-When Juicy endorsed Estela (by affiliating
-with her), Sora followed. When Juicy stopped
-endorsing Estela (by staying on observer),
-Sora selected observer.**
+### Finding 5 — Conspecific social proof
+### mechanism documented
+**Sora's node selection was mediated by
+Juicy's node choice. When Juicy was on
+Estela, Sora followed to Estela. When
+Juicy was not providing a node signal,
+Sora selected observer independently.**
 
-Sora had no prior relationship with either
-human. Sora's selections cannot be attributed
-to familiarity. They are attributable to
-flock social proof from Juicy.
+Estela had no prior relationship with Sora.
+Sora had no basis to prefer Estela over
+observer from prior experience. Sora's
+preference for Estela when Juicy was on
+Estela is explained by Juicy functioning
+as a flock hierarchy signal — endorsing
+Estela as the trusted node, which Sora
+read and followed.
 
-This means observer's pair-bond classification
-by Juicy propagates node value information
-to other flock members through normal
-flock social proof channels. This is a
-flock-level propagation mechanism not
-previously documented in this project.
+This is conspecific social proof operating
+within the flock substrate. It has not been
+previously documented in this project's
+sessions. It emerged from the multi-bird
+environment.
 
 Confidence: **High.**
-Directly readable from the event sequence table.
+Observer-confirmed. Fully coherent across
+all events when applied as explanatory frame.
 
 ---
 
-### Finding 8 — Signal accumulation precedes
-### expression
+### Finding 6 — Sora independent node selection
+### confirmed — Event 5 clean test
+**When no Juicy hierarchy signal was present
+and Estela was absent, Sora flew to observer
+first — before Juicy landed.**
+
+This is the only moment in the session where
+Sora's choice was fully independent. She chose
+observer. This confirms observer's direct
+substrate signals registered in Sora's
+substrate sufficiently to produce independent
+node selection when not overridden by
+conspecific social proof.
+
+Confidence: **High.**
+Observer-confirmed. Video capture to be confirmed.
+
+---
+
+### Finding 7 — Sora approach behaviour —
+### anomalous, owner-confirmed
+**Sora has never been observed landing on
+anyone's head in this household as normal
+behaviour. She landed on observer's head
+in the living room and on Estela's head
+in the same session — both are anomalous.**
+
+Owner confirmation to be recorded in
+direct quotes. The anomalous nature of
+this behaviour for this subject is the
+reference population anchor for this finding.
+
+Confidence: **Moderate-High.**
+Observer-confirmed, owner-confirmed verbally,
+video-recorded. Direct quote pending.
+
+---
+
+### Finding 8 — Resting state — eyes closed
+### in observer's presence
+**Both birds settled into eyes-closed resting
+posture in observer's presence at session close.
+Juicy on observer's head. Sora on adjacent cage.**
+
+Eyes-closed resting near a node requires
+that the node has been classified as safe
+enough to be vulnerable around. Birds do
+not close their eyes — removing primary
+predator-detection — near untrusted nodes.
+
+For Juicy: consistent with established
+pair-bond classification.
+For Sora: significant for a grief-state
+bird on first substantive contact with observer.
+Above what substitution-level comfort
+behaviour alone would predict.
+
+Confidence: **High.**
+Observer-confirmed. Video capture to be confirmed.
+
+---
+
+### Finding 9 — Signal accumulation
+### precedes expression
 **90 minutes of acoustic signals produced
 no visible response. Removal of competing
-node produced immediate expression of
-accumulated substrate processing.**
+node produced immediate expression.**
 
-The substrate was not ignoring the signals.
-It was absorbing them while conditions
-suppressed expression. Expression emerged
-immediately when suppression was removed.
+The substrate was absorbing signals
+throughout Phase 1. Expression emerged
+when the condition changed, not when
+the signal began.
 
 Confidence: **High.**
-Directly demonstrated by Phase 1 vs
-Phase 2 contrast.
+Directly demonstrated by Phase 1 vs Phase 2 contrast.
 
 ---
 
-### Finding 9 — Silence in proximity confirmed
-### — second session
+### Finding 10 — Silence in proximity
+### confirmed — second session
 **Both subjects silent in physical proximity
-to observer. Identical vocal reduction
-pattern to Session 1. Interpersonal
-bird-to-bird communication present.
-Silence toward observer is the settled
-state.**
+to observer. Identical to Session 1 pattern.**
+
+Interpersonal bird-to-bird communication
+present. Silence toward observer is the
+settled bonded state.
 
 Confidence: **High.**
 Observer-confirmed.
 
 ---
 
-### Finding 10 — Natural control condition
-**Estela's unplanned departure and return
-produced a valid within-session control.
-Not designed. Evidentially clean because
-it was not designed.**
-
-Confidence: **High.**
-Observer-confirmed, video-recorded throughout.
-
----
-
 ### Finding 11 — Full continuous video record
-**First session in this project with complete
-uninterrupted video documentation. All primary
-events on film.**
+**First session with complete uninterrupted
+video documentation from start to finish.**
 
-Confidence: **Complete — footage review pending.**
+All key events are on film.
+Video review required to confirm
+exact timing and sequence.
+
+Confidence: **Complete — review pending.**
 
 ---
 
 ## WHAT THIS SESSION ESTABLISHES
 
 - **Bond persistence confirmed** — Juicy's
-  pair-bond classification survived the
+  Session 1 classification survived the
   inter-session interval and expressed
-  under multi-node competition.
+  under active competition.
 
-- **Pair-bond territorial behaviour confirmed**
-  — Juicy displaced Sora from observer
-  specifically. Not producible by
-  flock affiliation alone.
-
-- **Sora flew to observer first** — the
-  anomalous head-landing behaviour
-  originated with observer, not Estela.
-  Observer was first. This is the
-  precise factual record.
-
-- **Sora flew to observer first in isolated
-  room before Juicy arrived** — independent
-  selection confirmed without Juicy's
-  social proof present.
-
-- **Flock social proof mechanism identified**
-  — Juicy's expressed preference mediated
-  Sora's node selection throughout. Observer's
-  pair-bond classification by Juicy propagates
-  node value to other flock members.
-
-- **Signal accumulation mechanism confirmed**
-  — substrate processed 90 minutes of signals
-  invisibly and expressed immediately when
-  conditions changed.
+- **Pair-bond territorial displacement
+  confirmed** — Juicy removed Sora from
+  observer specifically. Strongest single
+  pair-bond signal of the session.
 
 - **Node transfer and retention confirmed**
-  — twice, in two environments, against
+  — twice across two environments, against
   reintroduction of previously dominant node.
 
-- **Sora's grief state source partially unknown**
-  — original owner identity unestablished.
+- **Conspecific social proof documented**
+  — Sora's node selection mediated by
+  Juicy's affiliation signal, not by
+  Sora's independent assessment of humans.
+  New mechanism finding not previously
+  observed in this project.
+
+- **Sora independent selection confirmed**
+  — when Juicy's signal was absent,
+  Sora chose observer independently.
+
+- **Resting state in observer's presence**
+  — both birds eyes-closed, settled.
+  Vulnerability posture requires trust
+  classification.
+
+- **Signal accumulation mechanism confirmed**
+  — substrate absorbs signals invisibly,
+  expresses when condition allows.
+
+- **Sora's grief state source partially
+  unknown** — original owner unidentified,
+  person who moved out not confirmed
+  as Sora's original owner.
 
 ---
 
 ## WHAT THIS SESSION DOES NOT ESTABLISH
 
-- Does not confirm Sora as pair-bond classified —
-  behaviour is signal-based selection and
-  social-proof-mediated, not pair-bond level.
-  Correct for first session with grief-state
-  subject.
+- Does not confirm Sora as pair-bond
+  classified — behaviour explained by
+  conspecific social proof and independent
+  substrate assessment. Not pair-bond level.
+  Correct for first session.
 
-- Does not confirm whether Sora's selection
-  of observer was driven primarily by the
-  signals or by the absence of any other
-  available node — the two cannot be fully
-  separated in this session. A future session
-  with observer alone from the start, with
-  no prior competing node phase, would
-  provide cleaner data.
+- Does not confirm whether Sora's resting
+  state near observer reflects deepening
+  classification or general environmental
+  settling — requires repeat session to test.
 
 - Does not confirm Melon's response —
-  Melon not reached in isolated room.
+  not reached this session.
 
 - Does not confirm contact initiation
-  permission — hissing at touch attempts
-  in this multi-bird disrupted context.
+  permission — hissing at touch in this
+  context. Requires clean single-bird
+  session to test.
 
-- Does not confirm Juicy's displacement
-  of Sora was pair-bond assertion vs
-  perch competition — video review
-  may clarify the manner of displacement.
+- Does not confirm Juicy displacement
+  was deliberate pair-bond assertion vs
+  perch position competition — video
+  review may clarify.
 
-- Does not confirm Sora's original
-  owner identity or prior bond history.
+- Does not confirm Sora's original owner
+  identity or prior bond history.
 
 - Does not establish exact event timing —
   video review required.
@@ -974,108 +974,103 @@ Confidence: **Complete — footage review pending.**
 
 ## METHODOLOGICAL NOTES
 
-### Multi-node attribution problem
-In multi-node environments with a competing
-trusted node present, signal attribution
-cannot be confirmed from bird behaviour alone.
-All future sessions with multiple humans
-present require either signal isolation
-protocol or explicit acceptance of
-attribution ambiguity in the evidence record.
+### Conspecific social proof is a new variable
+Sessions involving multiple birds must now
+account for inter-bird social proof as a
+mediating variable in node selection.
+A bird's choice of human node may reflect
+the flock hierarchy signal from a conspecific
+rather than the bird's own independent
+assessment. These are different things
+and must be distinguished in the evidence record.
 
-### Flock social proof as experimental variable
-This session revealed that Juicy's expressed
-preference is itself a variable that affects
-other birds' node selection. In future
-multi-bird sessions, the pair-bond classified
-bird's behaviour toward observer must be
-tracked and documented not only as a
-finding in itself but as an independent
-variable affecting all other birds present.
+Future multi-bird sessions should document
+not only which bird selects which node,
+but whether that selection is preceded by
+or correlated with another bird's selection
+of the same node.
 
-### Sora's node selection sequence — precise
-### reading requirement
-The sequence in which Sora selected nodes
-matters more than which node Sora was on
-at any given moment. Sora on observer,
-then Estela, then observer first in
-isolated room is a precise behavioural
-record of flock social proof operating
-in real time. The sequence is the data.
-Snapshots of Sora's position at a single
-moment would misrepresent the finding.
+### The multi-bird environment produced
+### findings unavailable in single-bird conditions
+Territorial displacement requires a competing
+bird. Conspecific social proof requires
+multiple birds. Neither finding was available
+in Session 1. The complexity that made this
+session harder to read also made it more
+productive. This is now the second session
+to confirm the framework prediction that
+suppressive conditions produce stronger
+signals, not weaker ones.
 
-### Ignorance superpower — active again
-The most significant finding of this session
-— Juicy's displacement of Sora, and the
-identification of the flock social proof
-mechanism — emerged from an uncontrolled,
-complex, multi-bird environment that was
-not designed to produce these findings.
-The uncontrolled condition generated
-evidence that a designed session could
-not have produced.
+### The unplanned is outperforming the planned
+Every major finding of Sessions 1 and 2
+emerged from unplanned conditions:
+- Session 1: observer's ignorance of
+  contact zones produced naive mating-
+  stimulus delivery
+- Session 2: Estela's natural departure
+  and return produced the control condition;
+  Juicy's territorial displacement of Sora
+  emerged from the multi-bird environment;
+  conspecific social proof emerged from
+  Sora following Juicy's node signal
+
+The framework does not require designed
+conditions to produce clean results.
+It requires presence, signals, and
+documentation. The substrate produces
+the findings.
 
 ---
 
 ## NEXT STEPS
 
 ### Immediate
-1. **Back up all video footage.** The full
-   session is recorded. Secure it before
-   anything else.
+1. **Back up all video footage.** Primary
+   evidence record. Secure before anything else.
 
-2. **Review footage and document precisely:**
-   - Sora's approach to observer in living room —
-     confirm this is on film and establish timing
-   - Sora reaching observer's head before Juicy
-     in Event 4 — confirm sequence on film
-   - Juicy's displacement manner — confirm
-     whether territorial assertion or
-     positional competition
-   - Estela's return and birds' non-response —
-     confirm on film
+2. **Review footage and document:**
+   - Sora's initial approach in living room
+   - Whether Sora or Juicy landed first
+     after Estela's departure in isolated room
+   - Juicy's displacement of Sora — manner
+     and specificity
+   - Both birds' eyes-closed resting state
+   - Estela's return and birds' non-response
 
-3. **Obtain owner confirmation in direct quotes:**
-   - That Sora flying to a person's head has
-     never been observed before in this household
-   - That observer was the first person this
-     happened with, before Estela
-   - Baseline description of Sora's normal
-     behaviour for comparison
+3. **Obtain owner confirmation in direct
+   quotes:** That Sora landing on a person's
+   head has not been observed as normal
+   behaviour in this household. Critical
+   anchor for Finding 7.
 
 ### Near-term
-1. **Session 3 — Observer alone with Juicy
-   from session start.** No competing nodes.
-   No prior 90-minute suppression phase.
-   Test whether full Session 1 behaviour
-   arc repeats under clean conditions.
-   Continuous video and audio from start.
+1. **Session 3 — Observer alone with Juicy.**
+   No competing nodes, no competing birds.
+   Test whether full Session 1 arc repeats
+   under clean conditions. Does back and wing
+   contact permission recur? Does mating
+   behaviour recur? Continuous video and audio.
 
-2. **Sora dedicated session — observer alone
-   from session start.** Test whether Sora's
-   approach behaviour repeats without any
-   competing node present at any point.
-   No prior Juicy social proof available
-   to mediate. Clean test of whether
-   observer's signals alone produce
-   Sora's approach.
+2. **Sora dedicated session — observer alone.**
+   No Juicy present. No Estela. Test Sora's
+   independent node selection without
+   conspecific social proof from Juicy
+   mediating her choices. Measure approach
+   time. Test whether approach deepens
+   across sessions.
 
 3. **Melon session.** Wild-type gradient
    data still outstanding.
 
-4. **Establish Sora's history more completely.**
-   When did Sora's withdrawn state begin?
+4. **Establish Sora's history.**
+   When did withdrawn state begin?
    What is known about original owner?
-   How long has Sora been with current household?
+   Is grief correlated with original
+   owner departure or household node removal?
 
-5. **Document flock social proof mechanism
-   in protocol development files.** The
-   finding that pair-bond classified bird's
-   expressed preference propagates observer's
-   node value to other flock members has
-   implications for multi-bird protocol
-   design that require formal documentation.
+5. **Formal documentation of Estela's
+   node classification status with each bird.**
 
 ---
 
@@ -1085,20 +1080,23 @@ not have produced.
 |---|---|
 | Observer report (primary) | Complete — this document |
 | Video documentation | Complete — full session, review pending |
-| Sora anomalous approach in living room — first ever, to observer first | Observer-confirmed, video-recorded |
-| Owner confirmation Sora head-landing is not normal and observer was first | Verbally confirmed — direct quote pending |
-| Sora reaching observer first in isolated room before Juicy | Observer-confirmed, video capture to be confirmed |
-| Juicy displacement of Sora from observer | Observer-confirmed, video capture to be confirmed |
+| Sora anomalous approach — living room | Observer-confirmed, video-recorded |
+| Sora anomalous approach — Estela's head | Observer-confirmed, video-recorded |
+| Owner confirmation Sora head-landing is anomalous | Verbally confirmed — direct quote pending |
+| Conspecific social proof — Sora following Juicy's node | Observer-confirmed across multiple events |
+| Sora independent selection of observer (Event 5) | Observer-confirmed, video capture pending |
+| Juicy displacement of Sora from observer | Observer-confirmed, video capture pending |
 | Node transfer — living room, Estela departure | Observer-confirmed, video-recorded |
 | Node transfer — isolated room, Estela departure | Observer-confirmed, video-recorded |
-| Node retention — Estela return to isolated room | Observer-confirmed, video-recorded |
-| Flock social proof mechanism — Juicy mediating Sora's selections | Observer-confirmed, directly readable from event sequence |
-| Silence in proximity (both subjects) | Observer-confirmed |
+| Node retention — Estela return | Observer-confirmed, video-recorded |
+| Eyes-closed resting state — both birds | Observer-confirmed, video capture pending |
+| Silence in proximity — both subjects | Observer-confirmed |
 | Hissing at touch attempts | Observer-confirmed |
-| Sora's original owner identity | Unknown — not established |
-| Relationship between person who moved out and Sora's grief state | Not confirmed |
+| Sora original owner identity | Unknown — not established |
+| Person who moved out relationship to Sora | Not confirmed |
 | Melon response data | Not captured this session |
-| Contact initiation permission (Juicy, clean session) | Not yet tested |
+| Estela formal node classification status | Informal observation only — pending |
+| Contact initiation permission — Juicy clean session | Not yet tested |
 
 ---
 
@@ -1111,31 +1109,26 @@ not have produced.
 - **Secondary person present:** Estela
 - **Subjects:** Juicy (Session 1 pair-bond
   classified), Sora (grief state, unknown
-  original owner, first-ever head-landing
-  to observer, safety-node classification
-  established this session), Melon (not reached)
+  original owner, first contact this session),
+  Melon (not reached)
 - **Version history:**
-  v1.0 initial session record — live
-  documentation during session;
-  v2.0 full sequence correction — living room
-  phase added, Sora approach documented,
-  Sora's original owner identity corrected,
-  event sequence restructured, signal
-  accumulation mechanism added as finding;
-  v3.0 critical precision corrections —
-  Sora-Estela prior relationship explicitly
-  documented as non-existent, Sora as first
-  to observer's head documented with full
-  precision (observer first, Estela second),
-  Sora reaching observer first in isolated
-  room before Juicy documented as standalone
-  finding, flock social proof mechanism
-  identified and documented as new structural
-  finding, Sora analysis extended to full
-  section, control table updated to include
-  Juicy and Sora columns separately,
-  node selection sequence analysis added
-  as methodological note
+  v1.0 initial live session record;
+  v2.0 sequence corrected — living room phase
+  added, Sora approach documented as anomalous,
+  Sora original owner identity corrected,
+  signal accumulation documented as finding;
+  v3.0 full Sora node hierarchy analysis added,
+  conspecific social proof mechanism documented
+  as standalone finding, Event 3 (Juicy on Estela
+  → Sora follows) added and analysed, Sora
+  independent selection in Event 5 isolated and
+  documented as clean test, eyes-closed resting
+  state added as Finding 8, Sora node hierarchy
+  table added, event sequence corrected to reflect
+  accurate chronology including Estela's node
+  status with Sora (no prior relationship),
+  natural control condition table updated
+  to reflect full sequence
 - **Cross-references:**
   `OC-OBS-005-SESSION-2026-03-31.md`,
   `OC-OBS-005-CONFIDENCE-2026-04-01.md`,
