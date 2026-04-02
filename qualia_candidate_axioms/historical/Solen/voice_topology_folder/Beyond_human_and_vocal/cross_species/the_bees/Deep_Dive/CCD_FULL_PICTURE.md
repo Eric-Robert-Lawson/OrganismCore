@@ -728,4 +728,11 @@ The argument is complete pending that check.
 | AIA island-level survey result | Confirms or falsifies within-Hawaii gradient |
 | 2025 CCD data in charts | +110% spike, Varroa dissociation visualized |
 | Apiary geocoding vs tower proximity | Within-island resolution beyond county FCC data |
-| BIP island-level Hawaii historical | Retrosp
+| BIP island-level Hawaii historical | Retrospective gradient confirmation |
+| Puerto Rico / Guam comparison | Independent island replication |
+
+---
+
+*OrganismCore — Eric Robert Lawson — 2026-04-02*
+*All data sources public. All code reproducible.*
+*The argument is complete pending the island gradient check.*
