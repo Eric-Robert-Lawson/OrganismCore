@@ -1,0 +1,1151 @@
+
+Honey Bee Colonies 
+
+ISSN: 2470-993X
+
+Released August 3, 2020, by the National Agricultural Statistics Service 
+(NASS), Agricultural Statistics Board, United States Department of 
+Agriculture (USDA).
+
+January 1 Honey Bee Colonies Up 8 Percent for Operations with Five or More 
+Colonies
+
+Honey bee colonies for operations with five or more colonies in the United 
+States on January 1, 2020 totaled 2.88 million colonies, up 8 percent from 
+January 1, 2019. The number of colonies in the United States on April 1, 2020 
+was 2.98 million colonies. During 2019, honey bee colonies on January 1, July 
+1, and October 1 were 2.67 million, 3.18 million, and 3.02 million colonies, 
+respectively.
+
+Honey bee colonies lost for operations with five or more colonies from 
+January through March 2020, was 399,570 colonies, or 14 percent. The number 
+of colonies lost during the quarter of April through June 2020 was 252,630 
+colonies, or 8 percent. During the quarter of July through September 2019, 
+colonies lost totaled 434,700 colonies, or 14 percent, the highest number 
+lost of any quarter surveyed in 2019. The quarter surveyed in 2019 with the 
+lowest number of colonies lost was October through December, with 399,510 
+colonies lost, or 13 percent.
+
+Honey bee colonies added for operations with five or more colonies from 
+January through March 2020 was 477,200 colonies. The number of colonies added 
+during the quarter of April through June 2020 was 596,860. During the quarter 
+of July through September 2019, 252,550 colonies were added, the highest 
+number of honey bee colonies added for any quarter surveyed in 2019. The 
+quarter of October through December 2019 added 233,260 colonies, the least 
+number of honey bee colonies added for any quarter surveyed in 2019.
+
+Honey bee colonies renovated for operations with five or more colonies from 
+January through March 2020 was 153,390 colonies, or 5 percent. During the 
+quarter of April through June 2020, 632,680 colonies, or 21 percent, were 
+renovated. The quarter surveyed in 2019 with the highest number of colonies 
+renovated was July through September with 355,330 colonies renovated, or 11 
+percent. The quarter surveyed in 2019 with the lowest number of colonies 
+renovated was October through December 2019, with 91,000, or 3 percent. 
+Renovated colonies are those that were requeened or received new honey bees 
+through a nuc or package.
+
+Varroa Mites Top Colony Stressor for Operations with Five or More Colonies
+
+Varroa mites were the number one stressor for operations with five or more 
+colonies during all quarters surveyed in 2019. The quarter of October through 
+December 2019 had the highest percentage of colonies reported to be affected 
+by varroa mites at 45.7 percent. The percent of colonies reported to be 
+affected by varroa mites during January through March 2020 and April through 
+June 2020 are 25.5 percent and 42.3 percent respectively.
+
+Colonies Lost with Colony Collapse Disorder Symptoms Up 76 Percent for 
+Operations with Five or More Colonies 
+
+Honey bee colonies lost with Colony Collapse Disorder symptoms on operations 
+with five or more colonies was 105,240 colonies from January through March 
+2020. This is a 76 percent increase from the same quarter of 2019.
+
+Contents
+
+Colonies, Maximum, Lost, Percent Lost, Added, Renovated, and Percent Renovated with Five or More Colonies 
+- States and United States: January 1, 2019 and January-March 2019...........................................  3
+
+Colonies, Maximum, Lost, Percent Lost, Added, Renovated, and Percent Renovated with Five or More Colonies 
+- States and United States: April 1, 2019 and April-June 2019 ...............................................  4
+
+Colonies, Maximum, Lost, Percent Lost, Added, Renovated, and Percent Renovated with Five or More Colonies 
+- States and United States: July 1, 2019 and July-September 2019.............................................  5
+
+Colonies, Maximum, Lost, Percent Lost, Added, Renovated, and Percent Renovated with Five or More Colonies 
+- States and United States: October 1, 2019 and October-December 2019........................................  6
+
+Colonies, Maximum, Lost, Percent Lost, Added, Renovated, and Percent Renovated with Five or More Colonies 
+- States and United States: January 1, 2020 and January-March 2020...........................................  7
+
+Colonies, Maximum, Lost, Percent Lost, Added, Renovated, and Percent Renovated with Five or More Colonies 
+- States and United States: April 1, 2020 and April-June 2020................................................  8
+
+Colony Health Stressors with Five or More Colonies - States and United States: January-March 2019............  9
+
+Colony Health Stressors with Five or More Colonies - States and United States: April-June 2019 .............. 10
+
+Colony Health Stressors with Five or More Colonies - States and United States: July-September 2019........... 11
+
+Colony Health Stressors with Five or More Colonies - States and United States: October-December 2019......... 12
+
+Colony Health Stressors with Five or More Colonies - States and United States: January-March 2020............ 13
+
+Colony Health Stressors with Five or More Colonies - States and United States: April-June 2020............... 14
+
+Colonies Lost with Colony Collapse Disorder Symptoms with Five or More Colonies - United States: 
+2019 and 2020................................................................................................ 15
+
+Terms and Definitions of Honey Bee Colony Estimates.......................................................... 16
+
+Statistical Methodology...................................................................................... 17
+
+Information Contacts......................................................................................... 18
+ 
+Colonies, Maximum, Lost, Percent Lost, Added, Renovated, and Percent Renovated with Five or More Colonies -
+States and United States: January 1, 2019 and January-March 2019
+-----------------------------------------------------------------------------------------------------------------
+                 :             :                                  January-March                                  
+      State      :  January 1  :---------------------------------------------------------------------------------
+                 :  colonies   :   Maximum   :    Lost     :  Percent  :    Added    :  Renovated  :   Percent   
+                 :             : colonies 1/ :  colonies   :  lost 2/  :  colonies   : colonies 3/ :renovated 4/ 
+-----------------------------------------------------------------------------------------------------------------
+                 :   number        number        number       percent      number        number        percent   
+                 :                                                                                               
+Alabama .........:      5,500         5,500          650         12            800           200           4     
+Arizona .........:     22,000        22,000        2,500         11            430            90         (Z)     
+Arkansas ........:     28,000        28,000        6,500         23             20            20         (Z)     
+California ......:  1,140,000     1,580,000      235,000         15         83,000        86,000           5     
+Colorado ........:      5,000         7,500          320          4              -             -           -     
+Connecticut .....:      3,100         3,100          270          9            170            10         (Z)     
+Florida .........:    300,000       315,000       46,000         15         41,000        16,500           5     
+Georgia .........:    120,000       129,000       14,500         11         19,500         8,000           6     
+Hawaii ..........:     16,500        16,500          390          2            660         3,700          22     
+Idaho ...........:    132,000       145,000       12,500          9          4,600         1,100           1     
+                 :                                                                                               
+Illinois ........:      9,000         9,000        2,300         26            210            80           1     
+Indiana .........:      6,000         6,000          710         12            440           280           5     
+Iowa ............:      7,500        11,500        1,600         14            170           140           1     
+Kansas ..........:      4,500         4,500        1,500         33            370           110           2     
+Kentucky ........:      3,700         4,400          890         20             60            30           1     
+Louisiana .......:     49,000        51,000        3,500          7          9,000        16,000          31     
+Maine ...........:      7,000         7,000          470          7             10            30         (Z)     
+Maryland ........:      8,000         8,000        2,300         29             30            10         (Z)     
+Massachusetts ...:      3,800         3,800          680         18             60            20           1     
+Michigan ........:     24,000        33,000        6,500         20              -             -           -     
+                 :                                                                                               
+Minnesota .......:     17,000        43,000        2,200          5             80           470           1     
+Mississippi .....:     26,000        29,000        2,400          8          3,800         1,700           6     
+Missouri ........:      8,500         8,500        1,100         13             80            60           1     
+Montana .........:     37,000        68,000        3,500          5          1,700         1,900           3     
+Nebraska ........:     13,500        16,500        2,500         15              -             -           -     
+New Jersey ......:      6,000         6,000          310          5            130            60           1     
+New Mexico ......:      4,800         4,800          170          4              -             -           -     
+New York ........:     24,000        24,000        3,400         14            110            80         (Z)     
+North Carolina ..:     10,500        14,500        1,700         12            750           890           6     
+North Dakota ....:     92,000       102,000        1,100          1              -         1,300           1     
+                 :                                                                                               
+Ohio ............:     10,500        12,500        3,500         28          1,700           440           4     
+Oklahoma ........:     21,000        55,000           50        (Z)             20             -           -     
+Oregon ..........:     89,000        95,000        7,500          8          8,000         1,800           2     
+Pennsylvania ....:     15,000        15,000        2,900         19            370           320           2     
+South Carolina ..:     12,000        13,000          690          5          2,000           340           3     
+South Dakota ....:     18,500        18,500        1,100          6              -             -           -     
+Tennessee .......:      6,000         7,000        1,500         21            240           320           5     
+Texas ...........:    260,000       330,000       17,000          5         61,000        35,000          11     
+Utah ............:      8,500        11,000        1,800         16            900             -           -     
+Vermont .........:      6,500         6,500          260          4             50           (Z)         (Z)     
+                 :                                                                                               
+Virginia ........:      5,500         5,500        1,100         20             80           110           2     
+Washington ......:     51,000        75,000        7,000          9          5,500         2,200           3     
+West Virginia ...:      5,000         7,000        1,300         19             20            60           1     
+Wisconsin .......:     16,500        17,000        3,700         22            580           100           1     
+Wyoming .........:      6,500         9,500          250          3              -             -           -     
+                 :                                                                                               
+Other States 5/ .:      6,070         6,070          590         10             70            30         (Z)     
+                 :                                                                                               
+United States ...:  2,671,470           (X)      407,700         15        247,710       179,500           7     
+-----------------------------------------------------------------------------------------------------------------
+-   Represents zero.                                                                                             
+(X) Not applicable.                                                                                              
+(Z) Less than half of the unit shown.                                                                            
+1/  January 1 colonies plus all colonies moved into that state during the quarter.                               
+2/  Percent lost is the number of lost colonies divided by maximum colonies except for the United States, where  
+    percent lost is the number of lost colonies divided by the January 1 colonies.                               
+3/  Defined as any surviving colony that was requeened or received new honey bees through nuc or package.        
+4/  Percent renovated is the number of renovated colonies divided by maximum colonies except for the United      
+    States, where percent renovated is the number of renovated colonies divided by the January 1 colonies.       
+5/  Includes data for States not published in this table.                                                        
+
+Colonies, Maximum, Lost, Percent Lost, Added, Renovated, and Percent Renovated with Five or More Colonies -
+States and United States: April 1, 2019 and April-June 2019 6/
+-----------------------------------------------------------------------------------------------------------------
+                 :             :                                   April-June                                    
+      State      :   April 1   :---------------------------------------------------------------------------------
+                 :  colonies   :   Maximum   :    Lost     :  Percent  :    Added    :  Renovated  :   Percent   
+                 :             : colonies 1/ :  colonies   :  lost 2/  :  colonies   : colonies 3/ :renovated 4/ 
+-----------------------------------------------------------------------------------------------------------------
+                 :   number        number        number       percent      number        number        percent   
+                 :                                                                                               
+Alabama .........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Arizona .........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Arkansas ........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+California ......:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Colorado ........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Connecticut .....:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Florida .........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Georgia .........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Hawaii ..........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Idaho ...........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+                 :                                                                                               
+Illinois ........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Indiana .........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Iowa ............:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Kansas ..........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Kentucky ........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Louisiana .......:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Maine ...........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Maryland ........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Massachusetts ...:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Michigan ........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+                 :                                                                                               
+Minnesota .......:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Mississippi .....:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Missouri ........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Montana .........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Nebraska ........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+New Jersey ......:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+New Mexico ......:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+New York ........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+North Carolina ..:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+North Dakota ....:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+                 :                                                                                               
+Ohio ............:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Oklahoma ........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Oregon ..........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Pennsylvania ....:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+South Carolina ..:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+South Dakota ....:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Tennessee .......:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Texas ...........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Utah ............:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Vermont .........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+                 :                                                                                               
+Virginia ........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Washington ......:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+West Virginia ...:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Wisconsin .......:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+Wyoming .........:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+                 :                                                                                               
+Other States 5/ .:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+                 :                                                                                               
+United States ...:    (NA)          (NA)          (NA)         (NA)         (NA)          (NA)          (NA)     
+-----------------------------------------------------------------------------------------------------------------
+(NA) Not available.                                                                                              
+1/   April 1 colonies plus all colonies moved into that state during the quarter.                                
+2/   Percent lost is the number of lost colonies divided by maximum colonies except for the United States, where 
+     percent lost is the number of lost colonies divided by the April 1 colonies.                                
+3/   Defined as any surviving colony that was requeened or received new honey bees through nuc or package.       
+4/   Percent renovated is the number of renovated colonies divided by maximum colonies except for the United     
+     States, where percent renovated is the number of renovated colonies divided by the April 1 colonies.        
+5/   Includes data for States not published in this table.                                                       
+6/   Data collection for July 2019 quarterly honey bee colonies was suspended.                                   
+
+Colonies, Maximum, Lost, Percent Lost, Added, Renovated, and Percent Renovated with Five or More Colonies -
+States and United States: July 1, 2019 and July-September 2019
+-----------------------------------------------------------------------------------------------------------------
+                 :             :                                 July-September                                  
+      State      :   July 1    :---------------------------------------------------------------------------------
+                 :  colonies   :   Maximum   :    Lost     :  Percent  :    Added    :  Renovated  :   Percent   
+                 :             : colonies 1/ :  colonies   :  lost 2/  :  colonies   : colonies 3/ :Renovated 4/ 
+-----------------------------------------------------------------------------------------------------------------
+                 :   number        number        number       percent      number        number        percent   
+                 :                                                                                               
+Alabama .........:      7,000        7,000           990        14             160           330          5      
+Arizona .........:     26,000       30,000         2,000         7           5,500         3,800         13      
+Arkansas ........:     20,000       21,000         2,100        10             170           680          3      
+California ......:    650,000      700,000        93,000        13          87,000       108,000         15      
+Colorado ........:     33,000       36,000         9,500        26           2,200         3,400          9      
+Connecticut .....:      4,400        4,400           200         5              70           470         11      
+Florida .........:    210,000      240,000        20,000         8          46,000        33,000         14      
+Georgia .........:    116,000      118,000        13,000        11          12,000        36,000         31      
+Hawaii ..........:     17,000       17,000           200         1             200         6,000         35      
+Idaho ...........:     95,000      111,000        10,500         9           8,500        12,500         11      
+                 :                                                                                               
+Illinois ........:     13,500       13,500           940         7             460         1,300         10      
+Indiana .........:     14,000       16,000         1,000         6           2,200         1,500          9      
+Iowa ............:     30,000       33,000         3,400        10           2,000         4,800         15      
+Kansas ..........:      7,500        7,500         1,900        25             190           400          5      
+Kentucky ........:      8,000        8,500           850        10             700           430          5      
+Louisiana .......:     42,000       44,000         4,100         9           4,400        13,000         30      
+Maine ...........:     11,500       12,000         1,100         9             460         3,500         29      
+Maryland ........:      7,500        7,500           790        11             720         1,200         16      
+Massachusetts ...:     13,500       13,500         1,100         8             800           560          4      
+Michigan ........:     94,000       99,000        11,000        11           3,000         3,300          3      
+                 :                                                                                               
+Minnesota .......:    126,000      129,000        21,000        16           5,000         2,100          2      
+Mississippi .....:     23,000       23,000         2,900        13             550           850          4      
+Missouri ........:     10,500       10,500           500         5             260           350          3      
+Montana .........:    147,000      154,000        18,500        12           3,600        12,500          8      
+Nebraska ........:     40,000       41,000         3,700         9             680         1,400          3      
+New Jersey ......:     16,000       16,000           680         4             650         3,100         19      
+New Mexico ......:      2,400        5,500           170         3           1,000           550         10      
+New York ........:     65,000       69,000         8,500        12           3,200         3,700          5      
+North Carolina ..:     22,000       22,000         2,700        12           1,800         5,000         23      
+North Dakota ....:    530,000      530,000        81,000        15          15,000        17,500          3      
+                 :                                                                                               
+Ohio ............:     19,500       19,500         1,600         8           2,800         3,000         15      
+Oklahoma ........:      7,500        7,500           930        12             130         1,100         15      
+Oregon ..........:     83,000      118,000         8,000         7           6,000        21,000         18      
+Pennsylvania ....:     19,000       20,000           980         5           1,800         1,900         10      
+South Carolina ..:     14,500       14,500         2,200        15           2,000         1,400         10      
+South Dakota ....:    255,000      255,000        51,000        20           1,300         8,000          3      
+Tennessee .......:     14,000       14,000         4,500        32           2,200         2,200         16      
+Texas ...........:    126,000      133,000        11,000         8           6,500         7,000          5      
+Utah ............:     24,000       29,000         2,800        10           3,500         1,700          6      
+Vermont .........:      7,000        7,000           120         2              80           490          7      
+                 :                                                                                               
+Virginia ........:      9,000        9,000           570         6             350           820          9      
+Washington ......:     85,000       97,000        21,000        22          12,000        10,000         10      
+West Virginia ...:     10,000       10,000         1,100        11             200         1,100         11      
+Wisconsin .......:     63,000       63,000         6,500        10           2,400        10,000         16      
+Wyoming .........:     24,000       27,000         3,000        11           2,500         3,500         13      
+                 :                                                                                               
+Other States 5/ .:     13,660       13,900         2,080        15             320           900          6      
+                 :                                                                                               
+United States ...:  3,175,960          (X)       434,700        14         252,550       355,330         11      
+-----------------------------------------------------------------------------------------------------------------
+(X) Not applicable.                                                                                              
+1/  July 1 colonies plus all colonies moved into that state during the quarter.                                  
+2/  Percent lost is the number of lost colonies divided by maximum colonies except for the United States, where  
+    percent lost is the number of lost colonies divided by the July 1 colonies.                                  
+3/  Defined as any surviving colony that was requeened or received new honey bees through nuc or package.        
+4/  Percent renovated is the number of renovated colonies divided by maximum colonies except for the United      
+    States, where percent renovated is the number of renovated colonies divided by the July 1 colonies.          
+5/  Includes data for States not published in this table.                                                        
+
+Colonies, Maximum, Lost, Percent Lost, Added, Renovated, and Percent Renovated with Five or More Colonies -
+States and United States: October 1, 2019 and October-December 2019
+-----------------------------------------------------------------------------------------------------------------
+                 :             :                                October-December                                 
+      State      :  October 1  :---------------------------------------------------------------------------------
+                 :  colonies   :   Maximum   :    Lost     :  Percent  :    Added    :  Renovated  :   Percent   
+                 :             : colonies 1/ :  colonies   :  lost 2/  :  colonies   : colonies 3/ :renovated 4/ 
+-----------------------------------------------------------------------------------------------------------------
+                 :   number        number        number       percent      number        number        percent   
+                 :                                                                                               
+Alabama .........:      6,000         6,000          660        11             240           70            1     
+Arizona .........:     34,000        36,000        7,000        19             300          300            1     
+Arkansas ........:     19,000        19,500        1,600         8             430          310            2     
+California ......:    700,000     1,300,000      136,000        10         160,000       37,000            3     
+Colorado ........:     27,000        27,000        8,000        30           1,100          440            2     
+Connecticut .....:      3,800         4,000          300         8              10           50            1     
+Florida .........:    270,000       300,000       30,000        10          28,000       15,000            5     
+Georgia .........:    119,000       131,000       20,000        15          10,500       10,500            8     
+Hawaii ..........:     17,000        17,000        1,300         8             300           50          (Z)     
+Idaho ...........:    111,000       196,000       15,500         8           1,800        1,000            1     
+                 :                                                                                               
+Illinois ........:     13,000        13,000        1,700        13           1,000        1,500           12     
+Indiana .........:     17,500        17,500        1,300         7             160          180            1     
+Iowa ............:     32,000        32,000        7,500        23           1,500          530            2     
+Kansas ..........:      4,800         4,900          650        13             190          460            9     
+Kentucky ........:      8,500         8,500          410         5             190          170            2     
+Louisiana .......:     41,000        46,000        2,300         5              70           80          (Z)     
+Maine ...........:     11,500        11,500          770         7             110           40          (Z)     
+Maryland ........:      6,500         8,000        1,100        14             390          420            5     
+Massachusetts ...:      5,000         5,000        1,200        24              60          130            3     
+Michigan ........:     84,000        84,000        6,500         8             820        1,500            2     
+                 :                                                                                               
+Minnesota .......:     97,000        97,000       15,500        16           3,400           60          (Z)     
+Mississippi .....:     21,000        29,000        3,400        12             350           50          (Z)     
+Missouri ........:      9,000        10,000        1,500        15             260           10          (Z)     
+Montana .........:     71,000        79,000        7,000         9             770        4,000            5     
+Nebraska ........:     37,000        38,000        2,700         7             320           10          (Z)     
+New Jersey ......:     15,500        15,500          220         1              60           80            1     
+New Mexico ......:      6,000         6,000           70         1              30           10          (Z)     
+New York ........:     65,000        65,000       10,000        15             630          510            1     
+North Carolina ..:     17,500        18,000        3,200        18             240          770            4     
+North Dakota ....:    420,000       420,000       27,000         6           3,000        4,300            1     
+                 :                                                                                               
+Ohio ............:     19,000        19,000        2,700        14             800          390            2     
+Oklahoma ........:      6,500        37,000        2,500         7             460            -            -     
+Oregon ..........:    115,000       130,000       15,000        12             650        2,000            2     
+Pennsylvania ....:     21,000        21,000        3,800        18           1,600        1,100            5     
+South Carolina ..:     12,500        13,500        1,900        14           1,400          430            3     
+South Dakota ....:    189,000       189,000        7,500         4               -           40          (Z)     
+Tennessee .......:     11,000        11,000        1,300        12              20           70            1     
+Texas ...........:    129,000       240,000       17,500         7           8,000        1,700            1     
+Utah ............:     30,000        32,000        4,400        14             970           90          (Z)     
+Vermont .........:      7,000         7,000          190         3             100          270            4     
+                 :                                                                                               
+Virginia ........:      8,000         8,000        1,200        15              10          190            2     
+Washington ......:     89,000        93,000       12,500        13             810          100          (Z)     
+West Virginia ...:      7,500         8,000        1,500        19              30        1,600           20     
+Wisconsin .......:     46,000        46,000        8,500        18           1,800        3,000            7     
+Wyoming .........:     27,000        28,000        3,300        12             100          490            2     
+                 :                                                                                               
+Other States 5/ .:     11,010        11,510        1,340        12             280            -            -     
+                 :                                                                                               
+United States ...:  3,018,110           (X)      399,510        13         233,260       91,000            3     
+-----------------------------------------------------------------------------------------------------------------
+-   Represents zero.                                                                                             
+(X) Not applicable.                                                                                              
+(Z) Less than half of the unit shown.                                                                            
+1/  October 1 colonies plus all colonies moved into that state during the quarter.                               
+2/  Percent lost is the number of lost colonies divided by maximum colonies except for the United States, where  
+    percent lost is the number of lost colonies divided by the October 1 colonies.                               
+3/  Defined as any surviving colony that was requeened or received new honey bees through nuc or package.        
+4/  Percent renovated is the number of renovated colonies divided by maximum colonies except for the United      
+    States, where percent renovated is the number of renovated colonies divided by the October 1 colonies.       
+5/  Includes data for States not published in this table.                                                        
+
+Colonies, Maximum, Lost, Percent Lost, Added, Renovated, and Percent Renovated with Five or More Colonies -
+States and United States: January 1, 2020 and January-March 2020
+-----------------------------------------------------------------------------------------------------------------
+                 :             :                                  January-March                                  
+      State      :  January 1  :---------------------------------------------------------------------------------
+                 :  colonies   :   Maximum   :    Lost     :  Percent  :    Added    :  Renovated  :   Percent   
+                 :             : colonies 1/ :  colonies   :  lost 2/  :  colonies   : colonies 3/ :renovated 4/ 
+-----------------------------------------------------------------------------------------------------------------
+                 :   number        number        number       percent      number        number        percent   
+                 :                                                                                               
+Alabama .........:      5,500         8,000          410          5          1,000           780          10     
+Arizona .........:     29,000        32,000        6,500         20            150           120         (Z)     
+Arkansas ........:     16,500        17,500        1,200          7            700            30         (Z)     
+California ......:  1,350,000     1,710,000      230,000         13        240,000        66,000           4     
+Colorado ........:      4,500        16,000          650          4            850           500           3     
+Connecticut .....:      3,700         4,100          330          8             60             -           -     
+Florida .........:    295,000       310,000       30,000         10         41,000         8,000           3     
+Georgia .........:    115,000       121,000       14,500         12         32,000        22,000          18     
+Hawaii ..........:     16,000        16,000        1,500          9          1,000         2,200          14     
+Idaho ...........:    156,000       168,000       18,500         11          4,400           920           1     
+                 :                                                                                               
+Illinois ........:     11,500        13,000        2,100         16            900           160           1     
+Indiana .........:     11,000        11,500        1,600         14            880           420           4     
+Iowa ............:      9,000        21,000        1,600          8          1,200           420           2     
+Kansas ..........:      4,500         7,000          750         11          1,200           130           2     
+Kentucky ........:      7,000        10,500        1,200         11          1,500           120           1     
+Louisiana .......:     44,000        48,000        4,800         10          9,000        20,000          42     
+Maine ...........:      1,300         1,700          130          8              -             -           -     
+Maryland ........:      7,000         7,500          640          9              -            30         (Z)     
+Massachusetts ...:      3,800         4,000          350          9            600           100           3     
+Michigan ........:     60,000        65,000        6,000          9          3,800           100         (Z)     
+                 :                                                                                               
+Minnesota .......:     21,000        57,000        1,000          2          2,000            40         (Z)     
+Mississippi .....:     26,000        28,000        5,000         18         16,000           660           2     
+Missouri ........:      8,500         8,500        2,100         25             30           (Z)         (Z)     
+Montana .........:     18,000        48,000          150        (Z)              -             -           -     
+Nebraska ........:      9,000        17,000          670          4             70             -           -     
+New Jersey ......:      6,500         7,000          250          4            110            40           1     
+New Mexico ......:      6,000         6,000           40          1            120           (Z)         (Z)     
+New York ........:     29,000        36,000        3,700         10            230           370           1     
+North Carolina ..:     15,000        23,000        2,200         10          3,000           490           2     
+North Dakota ....:     53,000        82,000        4,500          5          2,500             -           -     
+                 :                                                                                               
+Ohio ............:     15,500        20,000        5,500         28            840         1,100           6     
+Oklahoma ........:     19,500        19,500          700          4          5,000             -           -     
+Oregon ..........:     97,000       108,000        4,800          4          9,000         1,700           2     
+Pennsylvania ....:     18,500        24,000        1,000          4          1,100           320           1     
+South Carolina ..:     13,000        16,500          800          5          3,500         1,100           7     
+South Dakota ....:     20,000        20,000        1,200          6             20             -           -     
+Tennessee .......:      8,000        14,000        1,500         11          1,000           130           1     
+Texas ...........:    235,000       340,000       35,000         10         83,000        24,000           7     
+Utah ............:     12,000        17,000          400          2          4,200             -           -     
+Vermont .........:      6,500         7,500          520          7              -            70           1     
+                 :                                                                                               
+Virginia ........:      6,000         7,000        1,100         16          1,600            60           1     
+Washington ......:     49,000        74,000        1,500          2            580           150         (Z)     
+West Virginia ...:      6,000         8,000        1,100         14            450           680           9     
+Wisconsin .......:     16,000        26,000        1,500          6          2,000           370           1     
+Wyoming .........:      4,000        17,000          140          1            450            60         (Z)     
+                 :                                                                                               
+Other States 5/ .:      7,800         8,200          440          5            160            20         (Z)     
+                 :                                                                                               
+United States ...:  2,876,100           (X)      399,570         14        477,200       153,390           5     
+-----------------------------------------------------------------------------------------------------------------
+-   Represents zero.                                                                                             
+(X) Not applicable.                                                                                              
+(Z) Less than half of the unit shown.                                                                            
+1/  January 1 colonies plus all colonies moved into that state during the quarter.                               
+2/  Percent lost is the number of lost colonies divided by maximum colonies except for the United States, where  
+    percent lost is the number of lost colonies divided by the January 1 colonies.                               
+3/  Defined as any surviving colony that was requeened or received new honey bees through nuc or package.        
+4/  Percent renovated is the number of renovated colonies divided by maximum colonies except for the United      
+    States, where percent renovated is the number of renovated colonies divided by the January 1 colonies.       
+5/  Includes data for States not published in this table.                                                        
+
+Colonies, Maximum, Lost, Percent Lost, Added, Renovated, and Percent Renovated with Five or More Colonies -
+States and United States: April 1, 2020 and April-June 2020
+-----------------------------------------------------------------------------------------------------------------
+                 :             :                                   April-June                                    
+      State      :   April 1   :---------------------------------------------------------------------------------
+                 :  colonies   :   Maximum   :    Lost     :  Percent  :    Added    :  Renovated  :   Percent   
+                 :             : colonies 1/ :  colonies   :  lost 2/  :  colonies   : colonies 3/ :renovated 4/ 
+-----------------------------------------------------------------------------------------------------------------
+                 :   number        number        number       percent      number        number        percent   
+                 :                                                                                               
+Alabama .........:      8,500         8,500        4,100         48          4,700         2,620         31      
+Arizona .........:     26,000        26,000        1,300          5         14,000         4,700         18      
+Arkansas ........:     17,000        17,000        1,900         11          5,000           800          5      
+California ......:  1,200,000     1,200,000       74,000          6        184,000       240,000         20      
+Colorado ........:     16,500        27,000        2,100          8          6,000         2,800         10      
+Connecticut .....:      3,900         4,300           30          1          1,200           480         11      
+Florida .........:    325,000       325,000       39,000         12         36,000        23,000          7      
+Georgia .........:    141,000       143,000       10,000          7         19,500        19,000         13      
+Hawaii ..........:     15,500        15,500           40        (Z)            240         2,300         15      
+Idaho ...........:     48,000        81,000       14,500         18         32,000        29,000         36      
+                 :                                                                                               
+Illinois ........:     12,000        12,000        1,500         13          4,200         1,700         14      
+Indiana .........:     11,000        12,000          920          8          4,300         3,200         27      
+Iowa ............:     21,000        29,000        3,600         12         14,500         4,700         16      
+Kansas ..........:      7,500         8,000          440          6          1,800         1,800         23      
+Kentucky ........:     11,000        11,000        1,200         11          4,200         3,500         32      
+Louisiana .......:     53,000        53,000        1,800          3          2,200         4,700          9      
+Maine ...........:      1,600        22,000        1,300          6            520           110          1      
+Maryland ........:      7,000         8,000          680          9          4,500         1,700         21      
+Massachusetts ...:      4,300        13,500          740          5            980           590          4      
+Michigan ........:     64,000        79,000        2,600          3          9,500        10,000         13      
+                 :                                                                                               
+Minnesota .......:     59,000       126,000        6,500          5         20,000         2,600          2      
+Mississippi .....:     34,000        37,000        3,000          8          3,700           570          2      
+Missouri ........:      6,500         6,500          390          6          2,900         1,200         18      
+Montana .........:     48,000       120,000        3,800          3         14,000        16,500         14      
+Nebraska ........:     16,500        39,000        1,800          5          7,000         1,100          3      
+New Jersey ......:      7,000        20,000          760          4          1,600           720          4      
+New Mexico ......:      3,100         6,000           50          1            250            60          1      
+New York ........:     33,000        56,000        4,900          9          6,500         3,300          6      
+North Carolina ..:     24,000        25,000        1,600          6          6,000         1,300          5      
+North Dakota ....:     67,000       395,000       17,500          4         29,000        37,000          9      
+                 :                                                                                               
+Ohio ............:     15,500        16,500        1,700         10          9,500         3,700         22      
+Oklahoma ........:     16,000        16,000        1,500          9          6,000         3,100         19      
+Oregon ..........:     89,000        95,000        2,500          3         10,500        19,000         20      
+Pennsylvania ....:     24,000        27,000        1,000          4          6,000         1,700          6      
+South Carolina ..:     19,500        20,000        1,700          9          2,700         2,500         13      
+South Dakota ....:      9,500       205,000        4,600          2          8,500        14,500          7      
+Tennessee .......:     13,500        13,500        1,200          9          4,200         3,200         24      
+Texas ...........:    360,000       385,000       25,000          6         75,000       136,000         35      
+Utah ............:     21,000        31,000        2,700          9          7,000        13,500         44      
+Vermont .........:      7,000         7,000          260          4            700           130          2      
+                 :                                                                                               
+Virginia ........:      7,500         8,000        1,200         15          4,800         1,300         16      
+Washington ......:     50,000       114,000        3,100          3          5,000         3,300          3      
+West Virginia ...:      7,500         7,500          570          8          1,600         1,500         20      
+Wisconsin .......:     27,000        53,000        1,700          3         11,500         4,600          9      
+Wyoming .........:     17,500        24,000        1,600          7          2,300         2,100          9      
+                 :                                                                                               
+Other States 5/ .:      6,500         7,440          250          3          1,270         1,500         20      
+                 :                                                                                               
+United States ...:  2,982,900           (X)      252,630          8        596,860       632,680         21      
+-----------------------------------------------------------------------------------------------------------------
+(X) Not applicable.                                                                                              
+(Z) Less than half of the unit shown.                                                                            
+1/  April 1 number of colonies plus all colonies moved into that state during the quarter.                       
+2/  Percent lost is the number of lost colonies divided by maximum colonies except for the United States, where  
+    percent lost is the number of lost colonies divided by the April 1 number of colonies.                       
+3/  Defined as any surviving colony that was requeened or received new honey bees through nuc or package.        
+4/  Percent renovated is the number of renovated colonies divided by maximum colonies except for the United      
+    States, where percent renovated is the number of renovated colonies divided by the April 1 number of         
+    colonies.                                                                                                    
+5/  Includes data for States not published in this table.                                                        
+
+Colony Health Stressors with Five or More Colonies - States and United States: January-March 2019
+[Percent of colonies affected by stressors anytime during the quarter. A colony may be affected by multiple
+stressors during the quarter]
+----------------------------------------------------------------------------------------------------------------
+                    :    Varroa    :  Other pests   :              :              :              :              
+        State       :    mites     :and parasites 1/: Diseases 2/  :  Pesticides  :   Other 3/   :   Unknown    
+----------------------------------------------------------------------------------------------------------------
+                    :                                          percent                                          
+                    :                                                                                           
+Alabama ............:     27.2            22.7             1.8            0.3            3.1            9.0     
+Arizona ............:     25.8             7.9             6.5           16.2            8.4            0.2     
+Arkansas ...........:     19.5             1.5             3.3           55.3            0.7            2.9     
+California .........:     43.5            13.4             6.4           12.3            8.7            5.6     
+Colorado ...........:     11.2             0.3               -              -            2.5            0.6     
+Connecticut ........:     10.1             1.3               -              -            3.6            1.7     
+Florida ............:     46.9            24.8             5.5           22.9            7.4            5.5     
+Georgia ............:     69.6            17.8             7.4            9.6           10.6            4.9     
+Hawaii .............:     72.1            64.9             0.1            0.7            2.9              -     
+Idaho ..............:     24.5             8.0             8.0            9.2            8.6            (Z)     
+                    :                                                                                           
+Illinois ...........:     33.3            14.7             3.1            0.7           15.5           10.1     
+Indiana ............:     15.6             8.8             2.6            5.5            7.1            1.7     
+Iowa ...............:     34.8             1.7             0.6            0.3            7.7            3.5     
+Kansas .............:     86.9             7.8             2.5           12.2           21.6            4.0     
+Kentucky ...........:     21.6            12.9             0.1            5.3           10.7            4.6     
+Louisiana ..........:     57.8             1.3             0.1            0.3            1.0            0.7     
+Maine ..............:      2.3             0.1               -              -            1.4            0.8     
+Maryland ...........:     12.6             5.1             0.2            (Z)           10.1            2.4     
+Massachusetts ......:     10.3               -               -            4.3            6.3            0.9     
+Michigan ...........:     18.2             5.8             1.5            0.2           12.2            0.7     
+                    :                                                                                           
+Minnesota ..........:      1.3             0.2             1.9              -            2.0            0.8     
+Mississippi ........:     14.6            71.0            64.8           48.4            1.9            5.5     
+Missouri ...........:      5.4             2.3             1.9            0.5            5.4            3.2     
+Montana ............:     15.1             (Z)               -            0.8            0.8            1.1     
+Nebraska ...........:     32.3             1.3            32.0            0.8            2.2            0.1     
+New Jersey .........:     15.3             4.4               -              -            3.5            0.6     
+New Mexico .........:      3.5             1.1             0.6              -            1.4            0.3     
+New York ...........:     10.6             2.5             1.7            1.7            7.7            9.0     
+North Carolina .....:     16.4             2.0             0.2            0.7            2.2            3.4     
+North Dakota .......:      6.9               -               -            6.5            0.4            1.3     
+                    :                                                                                           
+Ohio ...............:     49.3             9.9            11.1            1.1            6.7            3.1     
+Oklahoma ...........:      7.7             0.3               -              -            (Z)            (Z)     
+Oregon .............:     18.0             0.1             0.2            0.2            2.7            0.5     
+Pennsylvania .......:     15.3             4.6             3.7            4.0            7.5            9.5     
+South Carolina .....:     18.5            14.5             (Z)            1.7           12.4            1.0     
+South Dakota .......:      0.8             (Z)               -            2.5            0.8            2.2     
+Tennessee ..........:     62.8            23.6             5.1            0.9            7.7            7.1     
+Texas ..............:     26.1             6.5             5.3            8.3            6.9            3.0     
+Utah ...............:     22.9               -             0.1              -            0.3            8.8     
+Vermont ............:      6.2             0.1             2.4              -            0.2            1.2     
+                    :                                                                                           
+Virginia ...........:     16.6            12.8             0.8            0.3            3.9            9.3     
+Washington .........:     22.3             0.8             0.6            0.3            0.8            0.2     
+West Virginia ......:     10.3             3.2             1.1            0.2            5.0            1.3     
+Wisconsin ..........:     15.9             3.2             0.7            1.1           13.8            5.0     
+Wyoming ............:      0.7               -             0.1              -            0.5            2.3     
+                    :                                                                                           
+Other States 4/ ....:      6.9             1.8             0.3              -            2.1            1.6     
+                    :                                                                                           
+United States ......:     45.6            14.8             7.1           13.6            9.0            5.2     
+----------------------------------------------------------------------------------------------------------------
+-   Represents zero.                                                                                            
+(Z) Less than half of the unit shown.                                                                           
+1/  Tracheal mites, nosema, hive beetle, wax moths, etc.                                                        
+2/  Includes American and European foulbrood, chalkbrood, stonebrood, paralysis (acute and chronic), kashmir,   
+    deformed wing, sacbrood, IAPV, Lake Sinai II, etc.                                                          
+3/  Includes weather, starvation, insufficient forage, queen failure, hive damage/destroyed, etc.               
+4/  Includes data for States not published in this table.                                                       
+
+Colony Health Stressors with Five or More Colonies - States and United States: April-June 2019 5/
+[Percent of colonies affected by stressors anytime during the quarter. A colony may be affected by multiple
+stressors during the quarter]
+----------------------------------------------------------------------------------------------------------------
+                    :    Varroa    :  Other pests   :              :              :              :              
+        State       :    mites     :and parasites 1/: Diseases 2/  :  Pesticides  :   Other 3/   :   Unknown    
+----------------------------------------------------------------------------------------------------------------
+                    :                                          percent                                          
+                    :                                                                                           
+Alabama ............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Arizona ............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Arkansas ...........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+California .........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Colorado ...........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Connecticut ........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Florida ............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Georgia ............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Hawaii .............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Idaho ..............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+                    :                                                                                           
+Illinois ...........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Indiana ............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Iowa ...............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Kansas .............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Kentucky ...........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Louisiana ..........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Maine ..............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Maryland ...........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Massachusetts ......:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Michigan ...........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+                    :                                                                                           
+Minnesota ..........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Mississippi ........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Missouri ...........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Montana ............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Nebraska ...........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+New Jersey .........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+New Mexico .........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+New York ...........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+North Carolina .....:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+North Dakota .......:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+                    :                                                                                           
+Ohio ...............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Oklahoma ...........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Oregon .............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Pennsylvania .......:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+South Carolina .....:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+South Dakota .......:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Tennessee ..........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Texas ..............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Utah ...............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Vermont ............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+                    :                                                                                           
+Virginia ...........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Washington .........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+West Virginia ......:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Wisconsin ..........:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+Wyoming ............:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+                    :                                                                                           
+Other States 4/ ....:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+                    :                                                                                           
+United States ......:     (NA)            (NA)            (NA)           (NA)           (NA)           (NA)     
+----------------------------------------------------------------------------------------------------------------
+(NA) Not available.                                                                                             
+1/   Tracheal mites, nosema, hive beetle, wax moths, etc.                                                       
+2/   Includes American and European foulbrood, chalkbrood, stonebrood, paralysis (acute and chronic), kashmir,  
+     deformed wing, sacbrood, IAPV, Lake Sinai II, etc.                                                         
+3/   Includes weather, starvation, insufficient forage, queen failure, hive damage/destroyed, etc.              
+4/   Includes data for States not published in this table.                                                      
+5/   Data collection for July 2019 quarterly honey bee colonies was suspended.                                  
+
+Colony Health Stressors with Five or More Colonies - States and United States: July-September 2019
+[Percent of colonies affected by stressors anytime during the quarter. A colony may be affected by multiple
+stressors during the quarter]
+----------------------------------------------------------------------------------------------------------------
+                    :    Varroa    :  Other pests   :              :              :              :              
+        State       :    mites     :and parasites 1/: Diseases 2/  :  Pesticides  :   Other 3/   :   Unknown    
+----------------------------------------------------------------------------------------------------------------
+                    :                                          percent                                          
+                    :                                                                                           
+Alabama ............:     30.6            24.6             2.9            0.2            9.7            6.4     
+Arizona ............:     29.0             9.9             2.7           11.4           13.2            0.6     
+Arkansas ...........:     53.2            19.7             6.8           50.5            6.9           39.3     
+California .........:     49.0            11.5             8.7           16.0           11.1            3.2     
+Colorado ...........:     79.8            12.5             4.8           10.2            9.4            1.0     
+Connecticut ........:     24.3             6.9             2.4              -            3.9            0.5     
+Florida ............:     44.9            20.7             6.3           18.2           11.7           10.8     
+Georgia ............:     52.5            18.6             1.6           25.8           17.1            4.6     
+Hawaii .............:     37.2            39.0             0.3              -            1.3            0.2     
+Idaho ..............:     59.9            15.4            21.7            9.9           18.5            0.8     
+                    :                                                                                           
+Illinois ...........:     35.9             8.3             0.7            2.5            5.5           11.5     
+Indiana ............:     55.7            15.2             3.0           23.1           19.2            1.4     
+Iowa ...............:     39.4             7.1             5.8           26.3           27.8            3.6     
+Kansas .............:     67.5            33.8            21.8           23.9            1.2            0.5     
+Kentucky ...........:     29.2            17.6             0.4            5.2            7.9            8.6     
+Louisiana ..........:     67.1            66.8             0.4           57.0            2.5            2.7     
+Maine ..............:     10.1             0.7             0.1              -            0.2            0.1     
+Maryland ...........:     26.7             2.7               -            0.3            5.1            1.4     
+Massachusetts ......:     13.0             2.9             0.2            (Z)            0.7            7.3     
+Michigan ...........:     42.7            16.4             8.7            7.3            2.1            1.5     
+                    :                                                                                           
+Minnesota ..........:     54.9             8.2             4.0           13.4            6.6            2.1     
+Mississippi ........:     59.1            45.6             2.4           25.4            4.0            5.1     
+Missouri ...........:     18.4             7.1             0.4            0.8            2.1            0.6     
+Montana ............:     28.0            10.0            10.6            6.1            4.1            1.0     
+Nebraska ...........:     29.2             2.7             1.8            2.8            7.2            1.9     
+New Jersey .........:     26.1             2.3             0.3            0.2            0.5            0.1     
+New Mexico .........:     39.5            29.1             0.9              -            0.8              -     
+New York ...........:     30.7            11.5             1.2            8.2            2.5            3.8     
+North Carolina .....:     26.9            11.3            19.7            4.0            9.7            5.7     
+North Dakota .......:     48.4            10.2            14.7            9.0           23.7            9.3     
+                    :                                                                                           
+Ohio ...............:     40.6            23.0             4.2            1.8            5.9            3.9     
+Oklahoma ...........:     29.0             1.4             0.1            0.1            4.1            4.4     
+Oregon .............:     35.4            12.8            19.8           15.1           16.6            0.4     
+Pennsylvania .......:     23.4             8.8             1.8            5.0            1.5            5.6     
+South Carolina .....:     44.9            11.6             0.6           16.2           19.6            3.7     
+South Dakota .......:     10.4             3.5             0.3           14.0            4.0            1.5     
+Tennessee ..........:     51.4            23.3             0.2            9.1           11.5            1.5     
+Texas ..............:     21.9            18.3             4.4           11.5            7.2            2.1     
+Utah ...............:     29.4             4.9             5.5            0.2            0.6            4.6     
+Vermont ............:     22.2             4.3             0.7              -            0.5            0.1     
+                    :                                                                                           
+Virginia ...........:     37.9            18.3             0.9            1.3            2.7            3.1     
+Washington .........:     47.3             0.9             2.5            4.6            9.4            0.3     
+West Virginia ......:     33.7            10.7             0.7            2.7            6.9            0.3     
+Wisconsin ..........:     46.4            20.5            13.9           18.1            6.5            3.9     
+Wyoming ............:     45.7             0.4             3.3            2.2            6.3            2.5     
+                    :                                                                                           
+Other States 4/ ....:     11.3             4.5             4.2            7.7            1.4            0.1     
+                    :                                                                                           
+United States ......:     44.1            13.4             8.5           13.6           11.9            4.5     
+----------------------------------------------------------------------------------------------------------------
+-   Represents zero.                                                                                            
+(Z) Less than half of the unit shown.                                                                           
+1/  Tracheal mites, nosema, hive beetle, wax moths, etc.                                                        
+2/  Includes American and European foulbrood, chalkbrood, stonebrood, paralysis (acute and chronic), kashmir,   
+    deformed wing, sacbrood, IAPV, Lake Sinai II, etc.                                                          
+3/  Includes weather, starvation, insufficient forage, queen failure, hive damage/destroyed, etc.               
+4/  Includes data for States not published in this table.                                                       
+
+Colony Health Stressors with Five or More Colonies - States and United States: October-December 2019
+[Percent of colonies affected by stressors anytime during the quarter. A colony may be affected by multiple
+stressors during the quarter]
+----------------------------------------------------------------------------------------------------------------
+                    :    Varroa    :  Other pests   :              :              :              :              
+        State       :    mites     :and parasites 1/: Diseases 2/  :  Pesticides  :   Other 3/   :   Unknown    
+----------------------------------------------------------------------------------------------------------------
+                    :                                          percent                                          
+                    :                                                                                           
+Alabama ............:     46.7            26.7             0.6            4.9            9.0           11.3     
+Arizona ............:     53.9             1.5             0.4           23.3            4.0            2.9     
+Arkansas ...........:     47.7            39.7             1.4            7.8           12.5           32.8     
+California .........:     40.5            10.9             5.2           11.3            8.0            5.0     
+Colorado ...........:     67.7             1.5               -           15.3            2.6            0.8     
+Connecticut ........:     22.2            11.1             2.4              -            1.7            1.6     
+Florida ............:     43.5            25.6             7.8           11.7            7.8            4.8     
+Georgia ............:     34.3            18.2             5.6            9.1            2.6            4.4     
+Hawaii .............:     44.0            61.8             0.2            1.0            0.1              -     
+Idaho ..............:     20.3             4.3             5.4           10.5            9.9            1.1     
+                    :                                                                                           
+Illinois ...........:     28.9            27.3             1.1            3.4            8.9            8.9     
+Indiana ............:     20.7            15.0             2.6            6.7            1.6            0.6     
+Iowa ...............:     61.0            17.8             5.6           25.2           19.7            4.2     
+Kansas .............:     65.8            15.0            11.9           43.4            0.4           14.4     
+Kentucky ...........:     33.0            20.1             0.2            5.3           12.0            9.9     
+Louisiana ..........:     33.0            18.5             3.5            0.7            6.1            0.9     
+Maine ..............:     20.5               -             0.1            2.5            0.3            0.2     
+Maryland ...........:     12.6             4.5             1.8              -            0.3            5.0     
+Massachusetts ......:      7.6             0.2             0.8              -            1.1           10.7     
+Michigan ...........:     37.0             9.7             9.2            8.3            1.1            3.8     
+                    :                                                                                           
+Minnesota ..........:     37.3             7.8             1.2            6.1            1.8            4.0     
+Mississippi ........:     41.0            38.0             4.1           13.9           10.5            5.2     
+Missouri ...........:     19.2             5.9             0.2            0.1            1.5            0.4     
+Montana ............:     15.7             1.8             (Z)            0.8            2.8            0.3     
+Nebraska ...........:      5.8             1.0               -            3.5            2.8            6.4     
+New Jersey .........:      2.5             0.9               -              -            1.3            0.5     
+New Mexico .........:      5.2             0.3             0.4              -            2.6              -     
+New York ...........:     33.3            24.8             3.0            8.7            3.2            4.0     
+North Carolina .....:     44.5            21.0             4.5            2.4           15.7           11.7     
+North Dakota .......:     43.0             7.1             1.8            3.7            2.0            1.7     
+                    :                                                                                           
+Ohio ...............:     33.2             5.6             0.4            0.6            3.3            7.6     
+Oklahoma ...........:      1.0             0.4               -            0.4            0.4            0.1     
+Oregon .............:     35.8             2.1             4.7            1.8           16.6           16.0     
+Pennsylvania .......:     33.2             4.6             1.0            3.2            2.3            2.9     
+South Carolina .....:     56.7            18.4             1.7            3.5           13.1            6.3     
+South Dakota .......:     12.2             6.1             3.2            5.6           11.2            1.5     
+Tennessee ..........:     66.6            53.5               -           33.6            7.6            9.1     
+Texas ..............:     23.1            14.0             4.6            4.9            5.8            1.4     
+Utah ...............:     22.1             2.0             2.0           10.3            0.2            0.3     
+Vermont ............:     21.0             1.3             0.6            0.8            0.6            0.9     
+                    :                                                                                           
+Virginia ...........:     37.7            18.6             0.4              -            5.3            6.0     
+Washington .........:     40.3             2.3             0.6           19.6            2.9            3.2     
+West Virginia ......:     65.8            10.7             1.1            0.4            6.1            2.2     
+Wisconsin ..........:     40.0            22.1            14.8           14.1           22.0            7.3     
+Wyoming ............:     27.6            12.3             3.2              -            4.3           13.2     
+                    :                                                                                           
+Other States 4/ ....:     13.6             2.3             0.3            0.3           32.4            0.9     
+                    :                                                                                           
+United States ......:     45.7            15.0             5.4           10.9            8.6            5.3     
+----------------------------------------------------------------------------------------------------------------
+-   Represents zero.                                                                                            
+(Z) Less than half of the unit shown.                                                                           
+1/  Tracheal mites, nosema, hive beetle, wax moths, etc.                                                        
+2/  Includes American and European foulbrood, chalkbrood, stonebrood, paralysis (acute and chronic), kashmir,   
+    deformed wing, sacbrood, IAPV, Lake Sinai II, etc.                                                          
+3/  Includes weather, starvation, insufficient forage, queen failure, hive damage/destroyed, etc.               
+4/  Includes data for States not published in this table.                                                       
+
+Colony Health Stressors with Five or More Colonies - States and United States: January-March 2020
+[Percent of colonies affected by stressors anytime during the quarter. A colony may be affected by multiple
+stressors during the quarter]
+----------------------------------------------------------------------------------------------------------------
+                    :    Varroa    :  Other pests   :              :              :              :              
+        State       :    mites     :and parasites 1/: Diseases 2/  :  Pesticides  :   Other 3/   :   Unknown    
+----------------------------------------------------------------------------------------------------------------
+                    :                                          percent                                          
+                    :                                                                                           
+Alabama ............:     12.4             3.4             (Z)            0.1            1.7            4.3     
+Arizona ............:     31.7             0.1             0.1              -           10.1            9.0     
+Arkansas ...........:     31.7            22.7             0.2            2.6            0.4           11.2     
+California .........:     22.4             6.0             5.0            5.3            5.3            4.2     
+Colorado ...........:     20.8             (Z)             0.1            0.4           10.8            2.4     
+Connecticut ........:     11.2             2.9             0.4              -            2.8            3.0     
+Florida ............:     28.0            14.2             5.5            5.3            8.7           10.9     
+Georgia ............:     50.9             3.4             0.2            0.3            0.4            7.5     
+Hawaii .............:     75.3            60.8             0.1              -            0.2            0.2     
+Idaho ..............:     10.4             0.8             0.1            2.8            2.1            1.9     
+                    :                                                                                           
+Illinois ...........:     17.2             8.9             0.2            (Z)            7.3           10.0     
+Indiana ............:      8.2             0.5             0.1            2.9            1.9            6.2     
+Iowa ...............:     22.3             1.9               -            0.2            5.7            5.5     
+Kansas .............:     13.3             8.1             7.8            7.8            3.1           11.3     
+Kentucky ...........:     17.4             2.6             2.0            0.3            7.6            6.5     
+Louisiana ..........:     26.5             7.0             0.7            1.2            1.4            0.6     
+Maine ..............:     19.6             1.2             0.7              -            2.2            3.0     
+Maryland ...........:     19.9             1.5             0.1              -            8.5            2.4     
+Massachusetts ......:     13.9             0.5             1.8            0.3            4.5            2.2     
+Michigan ...........:      8.1             0.5             0.2            0.2            0.4            0.7     
+                    :                                                                                           
+Minnesota ..........:      3.5               -             (Z)            0.2            4.3            0.3     
+Mississippi ........:     58.6            50.9             0.3            1.8           14.5            3.6     
+Missouri ...........:      8.4             3.4             0.9            1.6            2.1            3.4     
+Montana ............:      4.0               -               -              -            0.5            (Z)     
+Nebraska ...........:      2.2             0.1             0.1              -            0.3            0.8     
+New Jersey .........:      9.4             2.9             0.5            0.1            3.2            2.3     
+New Mexico .........:      2.1               -               -              -            0.7            0.2     
+New York ...........:      6.6             2.9             (Z)              -            1.7            7.7     
+North Carolina .....:     35.7             7.1             4.8            0.6            1.4            5.1     
+North Dakota .......:      0.6               -               -              -            3.1              -     
+                    :                                                                                           
+Ohio ...............:     17.6             3.6             1.1            0.1            3.0           13.4     
+Oklahoma ...........:     11.4             0.6             0.4            0.5            0.4            0.3     
+Oregon .............:     24.4            10.4            10.8           14.5            1.3            0.3     
+Pennsylvania .......:     15.5             3.9             2.8            1.8            2.7            3.2     
+South Carolina .....:     15.5            11.5             9.6            0.3            6.4            5.4     
+South Dakota .......:     14.7             0.1               -            2.1            0.3            0.3     
+Tennessee ..........:     18.9            17.3             1.0              -            4.1            7.8     
+Texas ..............:     12.2             6.8             1.3            3.4            5.2            4.6     
+Utah ...............:     38.9            17.2            17.1            2.3           15.7           22.4     
+Vermont ............:      9.1             0.8             0.6            0.9            2.0            3.1     
+                    :                                                                                           
+Virginia ...........:     17.5            10.6             0.3            0.3            3.8            3.5     
+Washington .........:      1.7             0.1             0.1            0.5            0.2            0.3     
+West Virginia ......:     17.3             7.0             1.3            0.6            2.6            0.3     
+Wisconsin ..........:      9.0             1.9             0.4            (Z)            2.7            3.1     
+Wyoming ............:      0.2             0.1             0.1              -            0.8            1.7     
+                    :                                                                                           
+Other States 4/ ....:      5.5               -             (Z)            (Z)            0.7            0.4     
+                    :                                                                                           
+United States ......:     25.5             8.0             4.4            5.0            5.6            5.4     
+----------------------------------------------------------------------------------------------------------------
+-   Represents zero.                                                                                            
+(Z) Less than half of the unit shown.                                                                           
+1/  Tracheal mites, nosema, hive beetle, wax moths, etc.                                                        
+2/  Includes American and European foulbrood, chalkbrood, stonebrood, paralysis (acute and chronic), kashmir,   
+    deformed wing, sacbrood, IAPV, Lake Sinai II, etc.                                                          
+3/  Includes weather, starvation, insufficient forage, queen failure, hive damage/destroyed, etc.               
+4/  Includes data for States not published in this table.                                                       
+
+Colony Health Stressors with Five or More Colonies - States and United States: April-June 2020
+[Percent of colonies affected by stressors anytime during the quarter. A colony may be affected by multiple
+stressors during the quarter]
+----------------------------------------------------------------------------------------------------------------
+                    :    Varroa    :  Other pests   :              :              :              :              
+        State       :    mites     :and parasites 1/: Diseases 2/  :  Pesticides  :   Other 3/   :   Unknown    
+----------------------------------------------------------------------------------------------------------------
+                    :                                          percent                                          
+                    :                                                                                           
+Alabama ............:     28.5            18.0             1.6            7.7            7.9            9.5     
+Arizona ............:     22.1             (Z)             (Z)            4.2            5.5            0.6     
+Arkansas ...........:     40.5            15.3             5.1           24.6            2.1           12.4     
+California .........:     33.4             4.7             3.9            5.4            7.5            3.0     
+Colorado ...........:     35.4             0.1             0.1              -            0.5            2.5     
+Connecticut ........:     14.8             2.1             (Z)              -            0.1            0.6     
+Florida ............:     31.4            15.2             3.2            5.5            5.5            7.5     
+Georgia ............:     49.2            20.2             7.1            3.0            8.1           13.8     
+Hawaii .............:     43.1            41.1             1.0              -            1.1              -     
+Idaho ..............:     44.2            10.9            11.1            8.6            6.9            5.8     
+                    :                                                                                           
+Illinois ...........:     23.5             8.2             1.0            8.3           11.9            4.0     
+Indiana ............:     26.8            12.5             1.8           20.2            5.4            1.5     
+Iowa ...............:     30.4            24.6            16.5            0.8            3.5            0.5     
+Kansas .............:     68.4            34.1            24.0           32.8           28.9           14.3     
+Kentucky ...........:     18.3            10.9             0.2            1.2            2.9            3.2     
+Louisiana ..........:     23.7             4.7             0.5            0.1            3.5            1.3     
+Maine ..............:     12.1             0.2             6.9              -            0.5              -     
+Maryland ...........:     12.0             1.1             0.1            1.1            3.2            0.5     
+Massachusetts ......:     14.7             2.1             0.3            0.4            1.1            0.4     
+Michigan ...........:     38.0            11.5             2.2            6.0            3.2            1.1     
+                    :                                                                                           
+Minnesota ..........:     20.6             2.9             0.7            8.8            4.4            0.4     
+Mississippi ........:     51.2            36.8               -            0.9            8.4            0.2     
+Missouri ...........:     17.4             1.5             5.7            3.1           11.2            1.9     
+Montana ............:     12.1             5.6             5.9              -            4.6            0.3     
+Nebraska ...........:     15.8             1.0             4.4           10.9            0.1            2.6     
+New Jersey .........:      7.2             0.8            22.1            0.1           22.3            0.1     
+New Mexico .........:      3.0             0.4             0.3            0.4            0.4            0.1     
+New York ...........:     21.2             2.6             0.6            0.2            3.6            0.6     
+North Carolina .....:     23.0             5.5             1.9              -            1.8            1.4     
+North Dakota .......:     25.7             1.7             2.6            3.0            2.9            1.5     
+                    :                                                                                           
+Ohio ...............:     23.8            12.0             6.2            5.8            7.3           13.3     
+Oklahoma ...........:     14.8             3.9             0.4            0.9           18.1            5.1     
+Oregon .............:     28.0             1.7             7.5            2.2            5.9            0.7     
+Pennsylvania .......:     27.3             2.7             1.4            0.3            3.4            1.3     
+South Carolina .....:     27.4             5.8             0.5            (Z)            5.3            0.4     
+South Dakota .......:     53.4            31.4             4.8            0.4           37.5            5.3     
+Tennessee ..........:     31.2             7.8             0.2            6.8            3.3            3.0     
+Texas ..............:     30.2             7.7             3.3            4.6            5.7            5.8     
+Utah ...............:     38.4               -             0.3           13.1            0.1            7.7     
+Vermont ............:     10.7             0.5             0.1              -            1.1              -     
+                    :                                                                                           
+Virginia ...........:     33.7             7.9             0.3            0.4            7.9            1.1     
+Washington .........:     10.6             (Z)             0.7            1.0            1.3            0.4     
+West Virginia ......:     46.2             1.8             0.7            0.5            2.8            1.9     
+Wisconsin ..........:     46.1            27.3            25.0           25.1           25.8           26.1     
+Wyoming ............:     28.8             (Z)             0.1            1.1            3.5            1.2     
+                    :                                                                                           
+Other States 4/ ....:     16.8             1.1             0.7              -            0.3            0.3     
+                    :                                                                                           
+United States ......:     42.3            12.2             5.5            6.1           10.8            5.2     
+----------------------------------------------------------------------------------------------------------------
+-   Represents zero.                                                                                            
+(Z) Less than half of the unit shown.                                                                           
+1/  Tracheal mites, nosema, hive beetle, wax moths, etc.                                                        
+2/  Includes American and European foulbrood, chalkbrood, stonebrood, paralysis (acute and chronic), kashmir,   
+    deformed wing, sacbrood, IAPV, Lake Sinai II, etc.                                                          
+3/  Includes weather, starvation, insufficient forage, queen failure, hive damage/destroyed, etc.               
+4/  Includes data for States not published in this table.                                                       
+
+Colonies Lost with Colony Collapse Disorder Symptoms with Five or More Colonies -
+United States: 2019 and 2020
+[Loss reported that met all of the following criteria: 1) Little to no build-up of dead
+bees in the hive or at the hive entrance 2) Rapid loss of adult honey bee population
+despite the presence of queen, capped brood, and food reserves 3) Absence or delayed
+robbing of the food reserves 4) Loss not attributable to varroa or nosema loads. Blank
+cells indicate estimation period has not yet begun]
+------------------------------------------------------------------------------------------
+       Year       :  January-March  :   April-June    : July-September  :October-December 
+------------------------------------------------------------------------------------------
+                  :     number            number            number            number      
+                  :                                                                       
+2019 .............:      59,940             (NA)            67,240            83,710      
+2020 .............:     105,240           55,830                                          
+------------------------------------------------------------------------------------------
+(NA) Not available.                                                                       
+
+Terms and Definitions of Honey Bee Colony Estimates
+
+Added colonies: A new or replacement, surviving colony that was either 
+created or purchased whole by an operation. 
+
+Colony: A hive containing a queen honey bee and attendant worker bees and/or 
+drone bees.
+
+Colony Collapse Disorder (CCD) criteria: Colonies reported as being lost due 
+to CCD must have fully met four criteria: 1) Little to no build-up of dead 
+bees in the hive or at the hive entrance 2) Rapid loss of adult honey bee 
+population despite the presence of queen, capped brood, and food reserves 3) 
+Absence or delayed robbing of the food reserves 4) Loss not attributable to 
+varroa or nosema loads. Colonies lost due to CCD were collected on a 
+quarterly basis for operations with five or more colonies. Colonies lost due 
+to CCD on operations with less than five colonies were collected annually and 
+for the year as a whole.
+
+Lost colony: A completely failed colony, loss of most workers, and possibly 
+the queen. Colony is no longer viable. Sometimes referred to as a dead out. 
+
+Maximum colonies: Refers to the sum of colonies in a state on the first of 
+the quarter plus all those moved into the state during that period. Maximum 
+colonies is considered the base number from which a data user can do further 
+analysis. It does not include the colonies that were added, lost, or 
+renovated in the state. Colonies are counted in every state they were in 
+during the quarter; therefore, a national level maximum number of colonies 
+cannot be calculated due to duplication.
+
+Nuc: A smaller sized hive box with reduced numbers of bees and brood, usually 
+containing a queen; used for expansion of the apiary operation or renovating 
+an existing colony.
+
+Package: A shipping container with several pounds of honey bees that may or 
+may not include a queen; used for expansion of the apiary operation or 
+renovating an existing colony. 
+
+Percent lost: The state-level percentage of colonies lost is the number of 
+colonies lost in that state divided by the maximum colonies for that state. 
+The national level percentage of colonies lost is the total number of all 
+colonies lost in the United States divided by the number of colonies on the 
+first of the quarter.
+
+Percent renovated: The state-level percentage of colonies renovated is the 
+number of colonies renovated in that state divided by the maximum colonies 
+for that state. The national level percentage of colonies renovated is the 
+total number of all colonies renovated in the United States divided by the 
+number of colonies on the first of the quarter.
+
+Renovated colony: An existing colony that was requeened or received a nuc or 
+package. 
+
+Stressors: State level colony health stressors for operations with five or 
+more colonies are the percent of the maximum colonies reported to be 
+affected, by quarter. The national level colony stressors is the summed 
+number for the United States divided by the number of colonies on the first 
+of the quarter.
+
+Statistical Methodology
+
+Survey Procedures: Data for operations with honey bee colonies are collected 
+quarterly from a stratified sample of operations that responded as having 
+five or more honey bee colonies on the Bee and Honey Inquiry and from the 
+NASS list frame. NASS Regional Field Offices maintain a list of all known 
+operations with honey bees and use known sources of producers to update their 
+lists. All operations are mailed a questionnaire and given adequate time to 
+respond by mail or electronic data reporting (EDR). Those that do not respond 
+by mail or EDR are telephoned or possibly enumerated in person. 
+
+Estimation Procedures: Estimates were prepared by the Agricultural Statistics 
+Board after reviewing recommendations and analysis submitted by each Regional 
+Field Office. All data were analyzed for unusual values. Data from each 
+operation were compared to their own past operating profile and to trends 
+from similar operations. Data for missing operations were estimated based on 
+similar operations or historical data. National and State survey data were 
+reviewed for reasonableness with each other and estimates from the previous 
+quarters using a balance sheet.  
+
+Revision Policy: The previous year's estimates are subject to revision when 
+current year's estimates are made. Revisions are the result of late reports 
+or corrected data.
+
+Reliability: Since all operations with honey bees are not included in the 
+sample, survey estimates are subject to sampling variability. Survey results 
+are also subject to non-sampling errors such as omissions, duplication, and 
+mistakes in reporting, recording, and processing the data. While these errors 
+cannot be measured directly, they are minimized through strict quality 
+controls in the data collection process and a careful review of all reported 
+data for consistency and reasonableness.
+
+Special Note: Data collection for July 2019 quarterly honey bee colonies was 
+suspended.
+
+Information Contacts
+
+Listed below are the commodity specialists in the Livestock Branch of the National 
+Agricultural Statistics Service to contact for additional information. E-mail inquiries may 
+be sent to nass@usda.gov
+
+Travis Averill, Chief, Livestock Branch ..................................... (202) 692-0069
+
+Tony Dorn, Head, Poultry and Specialty Commodities Section .................. (202) 690-3223
+   Holly Brenize - Poultry Slaughter......................................... (202) 720-0585
+   Alissa Cowell-Mytar - Cold Storage, Capacity of Refrigerated Warehouses .. (202) 720-4751
+   Liana Cuffman - Catfish and Trout, Mink, Census of Aquaculture ........... (202) 720-8784
+   Fatema Haque - Turkey Hatchery, Turkeys Raised ........................... (202) 690-3244 
+   Adam Peters - Honey, Honey Bee Colonies .................................. (202) 690-4870
+   Autumn Stone - Layers, Eggs, Egg Products ................................ (202) 690-3676
+   Takiyah Walker - Broiler Hatchery, Chicken Hatchery ...................... (202) 720-6147
+
+Access to NASS Reports
+
+For your convenience, you may access NASS reports and products the following 
+ways:
+
+ 	All reports are available electronically, at no cost, on the NASS web 
+site: www.nass.usda.gov
+
+ 	Both national and state specific reports are available via a free e-
+mail subscription. To set-up this free subscription, visit 
+www.nass.usda.gov and click on "National" or "State" in upper right 
+corner above "search" box to create an account and select the reports 
+you would like to receive.
+
+ 	Cornell's Mann Library has launched a new website housing NASS's and 
+other agency's archived reports. The new website, 
+https://usda.library.cornell.edu. All email subscriptions containing 
+reports will be sent from the new website, 
+https://usda.library.cornell.edu. To continue receiving the reports via 
+e-mail, you will have to go to the new website, create a new account 
+and re-subscribe to the reports. If you need instructions to set up an 
+account or subscribe, they are located at: 
+https://usda.library.cornell.edu/help. You should whitelist 
+notifications@usda-esmis.library.cornell.edu in your email client to 
+avoid the emails going into spam/junk folders. 
+
+For more information on NASS surveys and reports, call the NASS Agricultural 
+Statistics Hotline at (800) 727-9540, 7:30 a.m. to 4:00 p.m. ET, or e-mail: 
+nass@usda.gov. 
+The U.S. Department of Agriculture (USDA) prohibits discrimination against 
+its customers, employees, and applicants for employment on the basis of race, 
+color, national origin, age, disability, sex, gender identity, religion, 
+reprisal, and where applicable, political beliefs, marital status, familial 
+or parental status, sexual orientation, or all or part of an individual's 
+income is derived from any public assistance program, or protected genetic 
+information in employment or in any program or activity conducted or funded 
+by the Department. (Not all prohibited bases will apply to all programs 
+and/or employment activities.) 
+If you wish to file a Civil Rights program complaint of discrimination, 
+complete the USDA Program Discrimination Complaint Form (PDF), found online 
+at www.ascr.usda.gov/filing-program-discrimination-complaint-usda-customer, 
+or at any USDA office, or call (866) 632-9992 to request the form. You may 
+also write a letter containing all of the information requested in the form. 
+Send your completed complaint form or letter to us by mail at U.S. Department 
+of Agriculture, Director, Office of Adjudication, 1400 Independence Avenue, 
+S.W., Washington, D.C. 20250-9410, by fax (202) 690-7442 or email at 
+program.intake@usda.gov. 
+
