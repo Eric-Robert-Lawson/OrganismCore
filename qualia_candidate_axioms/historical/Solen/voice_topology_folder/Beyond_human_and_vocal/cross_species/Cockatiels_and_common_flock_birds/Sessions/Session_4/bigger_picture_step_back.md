@@ -6,22 +6,6 @@
 
 ---
 
-## VERSION HISTORY
-
-```
-v1.0 — 2026-04-17
-  Initial synthesis document.
-  Combines and supersedes:
-    OC-OBS-005-WHAT-YOU-HAVE-DONE-2026-04-17.md v1.0
-    OC-OBS-005-THE-KEY-STATED-PRECISELY-2026-04-17.md
-  This is the single definitive big-picture
-  record of what has been accomplished,
-  why it works, and what it means.
-  All prior versions retired into this one.
-```
-
----
-
 ## THE QUESTION
 
 ```
