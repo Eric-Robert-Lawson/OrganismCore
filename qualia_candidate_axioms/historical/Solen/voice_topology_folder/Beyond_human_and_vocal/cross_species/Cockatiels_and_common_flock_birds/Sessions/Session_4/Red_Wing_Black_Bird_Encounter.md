@@ -1453,6 +1453,6 @@ reveal their meaning.
 
 ---
 
-# **DDITIONAL INFORMATION**
+# **ADDITIONAL INFORMATION**
 
 The red wing black bird returned, I heard its call, it appears to be a returning character. I am not too certain of how often in these next few days I can contribute to this node, but upon returning to this I hope to see the bird returning. May only be able to put food out for a bit, but I think that will be sufficient. I will continue marking observations, however it seems sufficient that I am a participant in the flock as a node. I have nurtured an environment to participate with a red wing black bird, deliberately, for perhaps the first time in history.
